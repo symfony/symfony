@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class LazyClosureTest extends TestCase
 {
-    public function testMagicGetThrows()
+    public function testMagicGetThrows(): void
     {
         $closure = new LazyClosure(static fn () => null);
 
@@ -28,7 +28,7 @@ class LazyClosureTest extends TestCase
         $closure->foo;
     }
 
-    public function testThrowsWhenNotUsingInterface()
+    public function testThrowsWhenNotUsingInterface(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot create adapter for service "foo" because "Symfony\Component\DependencyInjection\Tests\Argument\LazyClosureTest" is not an interface.');
@@ -36,7 +36,7 @@ class LazyClosureTest extends TestCase
         LazyClosure::getCode('foo', [new \stdClass(), 'bar'], self::class, new ContainerBuilder(), 'foo');
     }
 
-    public function testThrowsOnNonFunctionalInterface()
+    public function testThrowsOnNonFunctionalInterface(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot create adapter for service "foo" because interface "Symfony\Component\DependencyInjection\Tests\Argument\NonFunctionalInterface" doesn\'t have exactly one method.');
@@ -44,7 +44,7 @@ class LazyClosureTest extends TestCase
         LazyClosure::getCode('foo', [new \stdClass(), 'bar'], NonFunctionalInterface::class, new ContainerBuilder(), 'foo');
     }
 
-    public function testThrowsOnUnknownMethodInInterface()
+    public function testThrowsOnUnknownMethodInInterface(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot create lazy closure for service "bar" because its corresponding callable is invalid.');

@@ -40,7 +40,7 @@ class SerializerCacheWarmerTest extends TestCase
     }
 
     #[DataProvider('loaderProvider')]
-    public function testWarmUp(array $loaders)
+    public function testWarmUp(array $loaders): void
     {
         $file = sys_get_temp_dir().'/cache-serializer.php';
         @unlink($file);
@@ -57,7 +57,7 @@ class SerializerCacheWarmerTest extends TestCase
     }
 
     #[DataProvider('loaderProvider')]
-    public function testWarmUpAbsoluteFilePath(array $loaders)
+    public function testWarmUpAbsoluteFilePath(array $loaders): void
     {
         $file = sys_get_temp_dir().'/0/cache-serializer.php';
         @unlink($file);
@@ -77,7 +77,7 @@ class SerializerCacheWarmerTest extends TestCase
     }
 
     #[DataProvider('loaderProvider')]
-    public function testWarmUpWithoutBuildDir(array $loaders)
+    public function testWarmUpWithoutBuildDir(array $loaders): void
     {
         $file = sys_get_temp_dir().'/cache-serializer.php';
         @unlink($file);
@@ -113,7 +113,7 @@ class SerializerCacheWarmerTest extends TestCase
         ];
     }
 
-    public function testWarmUpWithoutLoader()
+    public function testWarmUpWithoutLoader(): void
     {
         $file = sys_get_temp_dir().'/cache-serializer-without-loader.php';
         @unlink($file);
@@ -128,7 +128,7 @@ class SerializerCacheWarmerTest extends TestCase
      * Test that the cache warming process is not broken if a class loader
      * throws an exception (on class / file not found for example).
      */
-    public function testClassAutoloadException()
+    public function testClassAutoloadException(): void
     {
         $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_SerializerCacheWarmerTest', false));
 
@@ -137,7 +137,7 @@ class SerializerCacheWarmerTest extends TestCase
 
         $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], $file);
 
-        spl_autoload_register($classLoader = static function ($class) use ($mappedClass) {
+        spl_autoload_register($classLoader = static function ($class) use ($mappedClass): void {
             if ($class === $mappedClass) {
                 throw new \DomainException('This exception should be caught by the warmer.');
             }
@@ -153,7 +153,7 @@ class SerializerCacheWarmerTest extends TestCase
      * Test that the cache warming process is broken if a class loader throws an
      * exception but that is unrelated to the class load.
      */
-    public function testClassAutoloadExceptionWithUnrelatedException()
+    public function testClassAutoloadExceptionWithUnrelatedException(): void
     {
         $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_SerializerCacheWarmerTest', false));
 
@@ -162,7 +162,7 @@ class SerializerCacheWarmerTest extends TestCase
 
         $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], basename($file));
 
-        spl_autoload_register($classLoader = function ($class) use ($mappedClass) {
+        spl_autoload_register($classLoader = function ($class) use ($mappedClass): void {
             if ($class === $mappedClass) {
                 eval('class '.$mappedClass.'{}');
                 throw new \DomainException('This exception should not be caught by the warmer.');

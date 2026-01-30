@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Matrix\MatrixOptions;
 
 class MatrixOptionsTest extends TestCase
 {
-    public function testToArray()
+    public function testToArray(): void
     {
         $options = new MatrixOptions([
             'recipient_id' => '@testuser:matrix.io',
@@ -26,7 +26,7 @@ class MatrixOptionsTest extends TestCase
         $this->assertSame(['recipient_id' => '@testuser:matrix.io', 'msgtype' => 'm.text', 'format' => 'org.matrix.custom.html'], $options->toArray());
     }
 
-    public function testGetRecipientId()
+    public function testGetRecipientId(): void
     {
         $options = new MatrixOptions([
             'recipient_id' => '@testuser:matrix.io',

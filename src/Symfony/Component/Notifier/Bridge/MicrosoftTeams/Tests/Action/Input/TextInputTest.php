@@ -21,7 +21,7 @@ final class TextInputTest extends AbstractInputTestCase
         return new TextInput();
     }
 
-    public function testIsMultilineWithTrue()
+    public function testIsMultilineWithTrue(): void
     {
         $input = $this->createInput()
             ->isMultiline(true);
@@ -29,7 +29,7 @@ final class TextInputTest extends AbstractInputTestCase
         $this->assertTrue($input->toArray()['isMultiline']);
     }
 
-    public function testIsMultilineWithFalse()
+    public function testIsMultilineWithFalse(): void
     {
         $input = $this->createInput()
             ->isMultiline(false);
@@ -37,7 +37,7 @@ final class TextInputTest extends AbstractInputTestCase
         $this->assertFalse($input->toArray()['isMultiline']);
     }
 
-    public function testMaxLength()
+    public function testMaxLength(): void
     {
         $input = $this->createInput()
             ->maxLength($value = 10);
@@ -45,7 +45,7 @@ final class TextInputTest extends AbstractInputTestCase
         $this->assertSame($value, $input->toArray()['maxLength']);
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $this->assertSame(
             [

@@ -41,21 +41,21 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getInvalidLocalesTests')]
-    public function testConstructorInvalidLocale($locale)
+    public function testConstructorInvalidLocale($locale): void
     {
         $this->expectException(InvalidArgumentException::class);
         new Translator($locale);
     }
 
     #[DataProvider('getValidLocalesTests')]
-    public function testConstructorValidLocale($locale)
+    public function testConstructorValidLocale($locale): void
     {
         $translator = new Translator($locale);
 
         $this->assertSame($locale ?: (class_exists(\Locale::class) ? \Locale::getDefault() : 'en'), $translator->getLocale());
     }
 
-    public function testSetGetLocale()
+    public function testSetGetLocale(): void
     {
         $translator = new Translator('en');
 
@@ -66,7 +66,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getInvalidLocalesTests')]
-    public function testSetInvalidLocale(string $locale)
+    public function testSetInvalidLocale(string $locale): void
     {
         $translator = new Translator('fr');
 
@@ -76,7 +76,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getValidLocalesTests')]
-    public function testSetValidLocale(string $locale)
+    public function testSetValidLocale(string $locale): void
     {
         $translator = new Translator($locale);
         $translator->setLocale($locale);
@@ -84,7 +84,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals($locale ?: (class_exists(\Locale::class) ? \Locale::getDefault() : 'en'), $translator->getLocale());
     }
 
-    public function testGetCatalogue()
+    public function testGetCatalogue(): void
     {
         $translator = new Translator('en');
 
@@ -94,7 +94,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals(new MessageCatalogue('fr'), $translator->getCatalogue('fr'));
     }
 
-    public function testGetCatalogueReturnsConsolidatedCatalogue()
+    public function testGetCatalogueReturnsConsolidatedCatalogue(): void
     {
         /*
          * This will be useful once we refactor so that different domains will be loaded lazily (on-demand).
@@ -118,7 +118,7 @@ class TranslatorTest extends TestCase
         $this->assertTrue($catalogue->defines('bar', 'domain-b'));
     }
 
-    public function testSetFallbackLocales()
+    public function testSetFallbackLocales(): void
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
@@ -132,7 +132,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobar', $translator->trans('bar'));
     }
 
-    public function testSetFallbackLocalesMultiple()
+    public function testSetFallbackLocalesMultiple(): void
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
@@ -147,7 +147,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getInvalidLocalesTests')]
-    public function testSetFallbackInvalidLocales($locale)
+    public function testSetFallbackInvalidLocales($locale): void
     {
         $this->expectException(InvalidArgumentException::class);
         $translator = new Translator('fr');
@@ -155,7 +155,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getValidLocalesTests')]
-    public function testSetFallbackValidLocales($locale)
+    public function testSetFallbackValidLocales($locale): void
     {
         $translator = new Translator($locale);
         $translator->setFallbackLocales(['fr', $locale]);
@@ -163,7 +163,7 @@ class TranslatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testTransWithFallbackLocale()
+    public function testTransWithFallbackLocale(): void
     {
         $translator = new Translator('fr_FR');
         $translator->setFallbackLocales(['en']);
@@ -175,7 +175,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getInvalidLocalesTests')]
-    public function testAddResourceInvalidLocales($locale)
+    public function testAddResourceInvalidLocales($locale): void
     {
         $translator = new Translator('fr');
 
@@ -185,7 +185,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getValidLocalesTests')]
-    public function testAddResourceValidLocales(string $locale)
+    public function testAddResourceValidLocales(string $locale): void
     {
         $translator = new Translator('fr');
         $translator->addResource('array', ['foo' => 'foofoo'], $locale);
@@ -193,7 +193,7 @@ class TranslatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testAddResourceAfterTrans()
+    public function testAddResourceAfterTrans(): void
     {
         $translator = new Translator('fr');
         $translator->addLoader('array', new ArrayLoader());
@@ -208,7 +208,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getTransFileTests')]
-    public function testTransWithoutFallbackLocaleFile(string $format, string $loader)
+    public function testTransWithoutFallbackLocaleFile(string $format, string $loader): void
     {
         $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
         $translator = new Translator('en');
@@ -223,7 +223,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getTransFileTests')]
-    public function testTransWithFallbackLocaleFile(string $format, string $loader)
+    public function testTransWithFallbackLocaleFile(string $format, string $loader): void
     {
         $loaderClass = 'Symfony\\Component\\Translation\\Loader\\'.$loader;
         $translator = new Translator('en_GB');
@@ -234,7 +234,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('bar', $translator->trans('foo', [], 'resources'));
     }
 
-    public function testTransWithIcuFallbackLocale()
+    public function testTransWithIcuFallbackLocale(): void
     {
         $translator = new Translator('en_GB');
         $translator->addLoader('array', new ArrayLoader());
@@ -246,7 +246,7 @@ class TranslatorTest extends TestCase
         $this->assertSame('foobaz', $translator->trans('baz'));
     }
 
-    public function testTransWithIcuVariantFallbackLocale()
+    public function testTransWithIcuVariantFallbackLocale(): void
     {
         $translator = new Translator('en_GB_scouse');
         $translator->addLoader('array', new ArrayLoader());
@@ -266,7 +266,7 @@ class TranslatorTest extends TestCase
         $this->assertSame('nl_NL', $translator->trans('fallback'));
     }
 
-    public function testTransWithIcuRootFallbackLocale()
+    public function testTransWithIcuRootFallbackLocale(): void
     {
         $translator = new Translator('az_Cyrl');
         $translator->addLoader('array', new ArrayLoader());
@@ -277,7 +277,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getFallbackLocales')]
-    public function testTransWithFallbackLocaleBis($expectedLocale, $locale)
+    public function testTransWithFallbackLocaleBis($expectedLocale, $locale): void
     {
         $translator = new Translator($locale);
         $translator->addLoader('array', new ArrayLoader());
@@ -306,7 +306,7 @@ class TranslatorTest extends TestCase
         return $locales;
     }
 
-    public function testTransWithFallbackLocaleTer()
+    public function testTransWithFallbackLocaleTer(): void
     {
         $translator = new Translator('fr_FR');
         $translator->addLoader('array', new ArrayLoader());
@@ -319,7 +319,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('bar (en)', $translator->trans('bar'));
     }
 
-    public function testTransNonExistentWithFallback()
+    public function testTransNonExistentWithFallback(): void
     {
         $translator = new Translator('fr');
         $translator->setFallbackLocales(['en']);
@@ -327,7 +327,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('non-existent', $translator->trans('non-existent'));
     }
 
-    public function testWhenAResourceHasNoRegisteredLoader()
+    public function testWhenAResourceHasNoRegisteredLoader(): void
     {
         $translator = new Translator('en');
         $translator->addResource('array', ['foo' => 'foofoo'], 'en');
@@ -337,7 +337,7 @@ class TranslatorTest extends TestCase
         $translator->trans('foo');
     }
 
-    public function testNestedFallbackCatalogueWhenUsingMultipleLocales()
+    public function testNestedFallbackCatalogueWhenUsingMultipleLocales(): void
     {
         $translator = new Translator('fr');
         $translator->setFallbackLocales(['ru', 'en']);
@@ -347,7 +347,7 @@ class TranslatorTest extends TestCase
         $this->assertNotNull($translator->getCatalogue('ru')->getFallbackCatalogue());
     }
 
-    public function testFallbackCatalogueResources()
+    public function testFallbackCatalogueResources(): void
     {
         $translator = new Translator('en_GB');
         $translator->addLoader('yml', new YamlFileLoader());
@@ -368,7 +368,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getTransTests')]
-    public function testTrans($expected, $id, $translation, $parameters, $locale, $domain)
+    public function testTrans($expected, $id, $translation, $parameters, $locale, $domain): void
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
@@ -378,7 +378,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getTransICUTests')]
-    public function testTransICU(...$args)
+    public function testTransICU(...$args): void
     {
         if (!class_exists(\MessageFormatter::class)) {
             $this->markTestSkipped(\sprintf('Skipping test as the required "%s" class does not exist. Consider installing the "intl" PHP extension or the "symfony/polyfill-intl-messageformatter" package.', \MessageFormatter::class));
@@ -388,7 +388,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getInvalidLocalesTests')]
-    public function testTransInvalidLocale($locale)
+    public function testTransInvalidLocale($locale): void
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
@@ -400,7 +400,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getValidLocalesTests')]
-    public function testTransValidLocale(string $locale)
+    public function testTransValidLocale(string $locale): void
     {
         $translator = new Translator($locale);
         $translator->addLoader('array', new ArrayLoader());
@@ -411,7 +411,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getFlattenedTransTests')]
-    public function testFlattenedTrans(string $expected, $messages, $id)
+    public function testFlattenedTrans(string $expected, $messages, $id): void
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
@@ -420,7 +420,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals($expected, $translator->trans($id, [], '', 'fr'));
     }
 
-    public function testTransNullId()
+    public function testTransNullId(): void
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
@@ -428,7 +428,7 @@ class TranslatorTest extends TestCase
 
         $this->assertSame('', $translator->trans(null));
 
-        (\Closure::bind(function () use ($translator) {
+        (\Closure::bind(function () use ($translator): void {
             $this->assertSame([], $translator->catalogues);
         }, $this, Translator::class))();
     }
@@ -529,7 +529,7 @@ class TranslatorTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testIntlFormattedDomain()
+    public function testIntlFormattedDomain(): void
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
@@ -541,7 +541,7 @@ class TranslatorTest extends TestCase
         $this->assertSame('Hi Bob', $translator->trans('some_message', ['%name%' => 'Bob']));
     }
 
-    public function testIntlDomainOverlapseWithIntlResourceBefore()
+    public function testIntlDomainOverlapseWithIntlResourceBefore(): void
     {
         $intlFormatterMock = $this->createMock(IntlFormatterInterface::class);
         $intlFormatterMock->expects($this->once())->method('formatIntl')->with('hello intl', 'en', [])->willReturn('hello intl');
@@ -561,7 +561,7 @@ class TranslatorTest extends TestCase
         $this->assertSame('hello intl', $translator->trans('some_message', [], 'messages'));
     }
 
-    public function testMissingLoaderForResourceError()
+    public function testMissingLoaderForResourceError(): void
     {
         $translator = new Translator('en');
         $translator->addResource('twig', 'messages.en.twig', 'en');
@@ -572,7 +572,7 @@ class TranslatorTest extends TestCase
         $translator->getCatalogue('en');
     }
 
-    public function testTransWithGlobalParameters()
+    public function testTransWithGlobalParameters(): void
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
@@ -586,7 +586,7 @@ class TranslatorTest extends TestCase
         $this->assertSame('Bienvenue Jean!', $translator->trans('welcome', ['{name}' => 'Jean'], null, 'fr'));
     }
 
-    public function testTransWithGlobalTranslatableParameters()
+    public function testTransWithGlobalTranslatableParameters(): void
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
@@ -605,7 +605,7 @@ class TranslatorTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testTransICUWithGlobalParameters()
+    public function testTransICUWithGlobalParameters(): void
     {
         $domain = 'test.'.MessageCatalogue::INTL_DOMAIN_SUFFIX;
 

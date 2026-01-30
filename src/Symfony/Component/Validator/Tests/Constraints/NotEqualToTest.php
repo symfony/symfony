@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class NotEqualToTest extends TestCase
 {
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(NotEqualToDummy::class);
         $loader = new AttributeLoader();

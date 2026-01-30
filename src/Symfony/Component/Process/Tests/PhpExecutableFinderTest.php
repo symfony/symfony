@@ -22,7 +22,7 @@ class PhpExecutableFinderTest extends TestCase
     /**
      * tests find() with the constant PHP_BINARY.
      */
-    public function testFind()
+    public function testFind(): void
     {
         $f = new PhpExecutableFinder();
 
@@ -36,7 +36,7 @@ class PhpExecutableFinderTest extends TestCase
     /**
      * tests find() with the env var PHP_PATH.
      */
-    public function testFindArguments()
+    public function testFindArguments(): void
     {
         $f = new PhpExecutableFinder();
 
@@ -47,7 +47,7 @@ class PhpExecutableFinderTest extends TestCase
         }
     }
 
-    public function testNotExitsBinaryFile()
+    public function testNotExitsBinaryFile(): void
     {
         $f = new PhpExecutableFinder();
 
@@ -63,7 +63,7 @@ class PhpExecutableFinderTest extends TestCase
         }
     }
 
-    public function testFindWithExecutableDirectory()
+    public function testFindWithExecutableDirectory(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Directories are not executable on Windows');

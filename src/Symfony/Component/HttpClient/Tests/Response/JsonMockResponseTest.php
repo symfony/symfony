@@ -19,7 +19,7 @@ use Symfony\Component\HttpClient\Response\JsonMockResponse;
 
 final class JsonMockResponseTest extends TestCase
 {
-    public function testDefaults()
+    public function testDefaults(): void
     {
         $client = new MockHttpClient(new JsonMockResponse());
         $response = $client->request('GET', 'https://symfony.com');
@@ -28,7 +28,7 @@ final class JsonMockResponseTest extends TestCase
         $this->assertSame('application/json', $response->getHeaders()['content-type'][0]);
     }
 
-    public function testInvalidBody()
+    public function testInvalidBody(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('JSON encoding failed: Malformed UTF-8 characters, possibly incorrectly encoded');
@@ -36,7 +36,7 @@ final class JsonMockResponseTest extends TestCase
         new JsonMockResponse("\xB1\x31");
     }
 
-    public function testJsonEncodeArray()
+    public function testJsonEncodeArray(): void
     {
         $client = new MockHttpClient(new JsonMockResponse([
             'foo' => 'bar',
@@ -51,7 +51,7 @@ final class JsonMockResponseTest extends TestCase
         $this->assertSame('application/json', $response->getHeaders()['content-type'][0]);
     }
 
-    public function testJsonEncodeString()
+    public function testJsonEncodeString(): void
     {
         $client = new MockHttpClient(new JsonMockResponse('foobarccc'));
         $response = $client->request('GET', 'https://symfony.com');
@@ -60,7 +60,7 @@ final class JsonMockResponseTest extends TestCase
         $this->assertSame('application/json', $response->getHeaders()['content-type'][0]);
     }
 
-    public function testJsonEncodeFloat()
+    public function testJsonEncodeFloat(): void
     {
         $client = new MockHttpClient(new JsonMockResponse([
             'foo' => 1.23,
@@ -77,7 +77,7 @@ final class JsonMockResponseTest extends TestCase
     }
 
     #[DataProvider('responseHeadersProvider')]
-    public function testResponseHeaders(string $expectedContentType, array $responseHeaders)
+    public function testResponseHeaders(string $expectedContentType, array $responseHeaders): void
     {
         $client = new MockHttpClient(new JsonMockResponse([
             'foo' => 'bar',
@@ -101,7 +101,7 @@ final class JsonMockResponseTest extends TestCase
         ];
     }
 
-    public function testFromFile()
+    public function testFromFile(): void
     {
         $client = new MockHttpClient(JsonMockResponse::fromFile(__DIR__.'/Fixtures/response.json'));
         $response = $client->request('GET', 'https://symfony.com');
@@ -112,7 +112,7 @@ final class JsonMockResponseTest extends TestCase
         $this->assertSame('application/json', $response->getHeaders()['content-type'][0]);
     }
 
-    public function testFromFileWithInvalidJson()
+    public function testFromFileWithInvalidJson(): void
     {
         $path = __DIR__.'/Fixtures/invalid_json.json';
 

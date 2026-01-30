@@ -20,7 +20,7 @@ use Symfony\Component\Mime\RawMessage;
 
 class SentMessageTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $m = new SentMessage($r = new RawMessage('Email'), $e = new Envelope(new Address('fabien@example.com'), [new Address('helene@example.com')]));
         $this->assertSame($r, $m->getOriginalMessage());

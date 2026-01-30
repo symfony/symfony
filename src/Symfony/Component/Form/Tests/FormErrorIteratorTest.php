@@ -25,7 +25,7 @@ use Symfony\Component\Validator\ConstraintViolation;
 class FormErrorIteratorTest extends TestCase
 {
     #[DataProvider('findByCodesProvider')]
-    public function testFindByCodes($code, $violationsCount)
+    public function testFindByCodes($code, $violationsCount): void
     {
         $formBuilder = new FormBuilder(
             'form',

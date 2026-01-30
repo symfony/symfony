@@ -20,7 +20,7 @@ use Symfony\Component\Translation\Loader\IcuResFileLoader;
 #[RequiresPhpExtension('intl')]
 class IcuResFileLoaderTest extends LocalizedTestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         // resource is build using genrb command
         $loader = new IcuResFileLoader();
@@ -32,14 +32,14 @@ class IcuResFileLoaderTest extends LocalizedTestCase
         $this->assertEquals([new DirectoryResource($resource)], $catalogue->getResources());
     }
 
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $this->expectException(NotFoundResourceException::class);
 
         (new IcuResFileLoader())->load(__DIR__.'/../Fixtures/non-existing.txt', 'en', 'domain1');
     }
 
-    public function testLoadInvalidResource()
+    public function testLoadInvalidResource(): void
     {
         $this->expectException(InvalidResourceException::class);
 

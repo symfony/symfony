@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeExceptio
 final class InvalidParameterTypeExceptionTest extends TestCase
 {
     #[DataProvider('provideReflectionParameters')]
-    public function testExceptionMessage(\ReflectionParameter $parameter, string $expectedMessage)
+    public function testExceptionMessage(\ReflectionParameter $parameter, string $expectedMessage): void
     {
         $exception = new InvalidParameterTypeException('my_service', 'int', $parameter);
 

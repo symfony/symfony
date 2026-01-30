@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class TraceableNormalizerTest extends TestCase
 {
-    public function testForwardsToNormalizer()
+    public function testForwardsToNormalizer(): void
     {
         $normalizer = $this->createMock(NormalizerInterface::class);
         $normalizer->method('getSupportedTypes')->willReturn(['*' => false]);
@@ -42,7 +42,7 @@ class TraceableNormalizerTest extends TestCase
         $this->assertSame('denormalized', (new TraceableNormalizer($denormalizer, new SerializerDataCollector(), 'default'))->denormalize('data', 'type', 'format'));
     }
 
-    public function testCollectNormalizationData()
+    public function testCollectNormalizationData(): void
     {
         $serializerName = uniqid('name', true);
 
@@ -65,7 +65,7 @@ class TraceableNormalizerTest extends TestCase
         (new TraceableNormalizer($denormalizer, $dataCollector, $serializerName))->denormalize('data', 'type', 'format', [TraceableSerializer::DEBUG_TRACE_ID => 'debug']);
     }
 
-    public function testNotCollectNormalizationDataIfNoDebugTraceId()
+    public function testNotCollectNormalizationDataIfNoDebugTraceId(): void
     {
         $normalizer = $this->createStub(NormalizerInterface::class);
         $normalizer->method('getSupportedTypes')->willReturn(['*' => false]);
@@ -80,21 +80,21 @@ class TraceableNormalizerTest extends TestCase
         (new TraceableNormalizer($denormalizer, $dataCollector, 'default'))->denormalize('data', 'type', 'format');
     }
 
-    public function testCannotNormalizeIfNotNormalizer()
+    public function testCannotNormalizeIfNotNormalizer(): void
     {
         $this->expectException(\BadMethodCallException::class);
 
         (new TraceableNormalizer($this->createStub(DenormalizerInterface::class), new SerializerDataCollector(), 'default'))->normalize('data');
     }
 
-    public function testCannotDenormalizeIfNotDenormalizer()
+    public function testCannotDenormalizeIfNotDenormalizer(): void
     {
         $this->expectException(\BadMethodCallException::class);
 
         (new TraceableNormalizer($this->createStub(NormalizerInterface::class), new SerializerDataCollector(), 'default'))->denormalize('data', 'type');
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $normalizer = $this->createStub(NormalizerInterface::class);
         $normalizer->method('getSupportedTypes')->willReturn(['*' => false]);

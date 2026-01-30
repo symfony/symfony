@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 class IconTest extends TestCase
 {
     #[DataProvider('provideIconFilePaths')]
-    public function testIconFileContents($iconFilePath)
+    public function testIconFileContents($iconFilePath): void
     {
         $iconFilePath = realpath($iconFilePath);
         $svgFileContents = file_get_contents($iconFilePath);

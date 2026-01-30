@@ -20,7 +20,7 @@ use Symfony\Component\TypeInfo\Type\ArrayShapeType;
 class ArrayShapeTypeTest extends TestCase
 {
     #[DataProvider('cannotConstructWithInvalidExtraDataProvider')]
-    public function testCannotConstructWithInvalidExtra(string $expectedMessage, ?Type $extraKeyType, ?Type $extraValueType)
+    public function testCannotConstructWithInvalidExtra(string $expectedMessage, ?Type $extraKeyType, ?Type $extraValueType): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedMessage);
@@ -42,7 +42,7 @@ class ArrayShapeTypeTest extends TestCase
         yield ['"float" is not a valid array key type.', Type::float(), Type::string()];
     }
 
-    public function testGetCollectionKeyType()
+    public function testGetCollectionKeyType(): void
     {
         $type = new ArrayShapeType([
             1 => ['type' => Type::bool(), 'optional' => false],
@@ -61,7 +61,7 @@ class ArrayShapeTypeTest extends TestCase
         $this->assertEquals(Type::arrayKey(), $type->getCollectionKeyType());
     }
 
-    public function testGetCollectionValueType()
+    public function testGetCollectionValueType(): void
     {
         $type = new ArrayShapeType([
             1 => ['type' => Type::bool(), 'optional' => false],
@@ -87,7 +87,7 @@ class ArrayShapeTypeTest extends TestCase
         $this->assertEquals(Type::bool(), $type->getCollectionValueType());
     }
 
-    public function testAccepts()
+    public function testAccepts(): void
     {
         $type = new ArrayShapeType([
             'foo' => ['type' => Type::bool(), 'optional' => false],
@@ -114,7 +114,7 @@ class ArrayShapeTypeTest extends TestCase
         $this->assertFalse($type->accepts(['other' => 'string', 'foo' => 'foo']));
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $type = new ArrayShapeType([1 => ['type' => Type::bool(), 'optional' => false]]);
         $this->assertSame('array{1: bool}', (string) $type);

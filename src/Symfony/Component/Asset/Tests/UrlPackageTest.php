@@ -24,7 +24,7 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 class UrlPackageTest extends TestCase
 {
     #[DataProvider('getConfigs')]
-    public function testGetUrl($baseUrls, string $format, string $path, string $expected)
+    public function testGetUrl($baseUrls, string $format, string $path, string $expected): void
     {
         $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format));
         $this->assertSame($expected, $package->getUrl($path));
@@ -62,7 +62,7 @@ class UrlPackageTest extends TestCase
     }
 
     #[DataProvider('getContextConfigs')]
-    public function testGetUrlWithContext(bool $secure, $baseUrls, string $format, string $path, string $expected)
+    public function testGetUrlWithContext(bool $secure, $baseUrls, string $format, string $path, string $expected): void
     {
         $package = new UrlPackage($baseUrls, new StaticVersionStrategy('v1', $format), $this->getContext($secure));
 
@@ -87,7 +87,7 @@ class UrlPackageTest extends TestCase
         ];
     }
 
-    public function testVersionStrategyGivesAbsoluteURL()
+    public function testVersionStrategyGivesAbsoluteURL(): void
     {
         $versionStrategy = $this->createStub(VersionStrategyInterface::class);
         $versionStrategy
@@ -98,14 +98,14 @@ class UrlPackageTest extends TestCase
         $this->assertSame('https://cdn.com/bar/main.css', $package->getUrl('main.css'));
     }
 
-    public function testNoBaseUrls()
+    public function testNoBaseUrls(): void
     {
         $this->expectException(LogicException::class);
         new UrlPackage([], new EmptyVersionStrategy());
     }
 
     #[DataProvider('getWrongBaseUrlConfig')]
-    public function testWrongBaseUrl(string $baseUrls)
+    public function testWrongBaseUrl(string $baseUrls): void
     {
         $this->expectException(InvalidArgumentException::class);
         new UrlPackage($baseUrls, new EmptyVersionStrategy());

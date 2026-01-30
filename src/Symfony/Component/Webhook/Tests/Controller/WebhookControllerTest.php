@@ -25,7 +25,7 @@ use Symfony\Component\Webhook\Controller\WebhookController;
 
 class WebhookControllerTest extends TestCase
 {
-    public function testNoParserAvailable()
+    public function testNoParserAvailable(): void
     {
         $controller = new WebhookController([], new MessageBus());
 
@@ -35,7 +35,7 @@ class WebhookControllerTest extends TestCase
     }
 
     #[DataProvider('rejectedParseProvider')]
-    public function testParserRejectsPayload($return)
+    public function testParserRejectsPayload($return): void
     {
         $secret = '1234';
         $request = new Request();
@@ -68,7 +68,7 @@ class WebhookControllerTest extends TestCase
         yield 'empty array' => [[]];
     }
 
-    public function testParserAcceptsPayloadAndReturnsSingleEvent()
+    public function testParserAcceptsPayloadAndReturnsSingleEvent(): void
     {
         $secret = '1234';
         $request = new Request();
@@ -107,7 +107,7 @@ class WebhookControllerTest extends TestCase
         $this->assertEquals($event, $bus->message->getEvent());
     }
 
-    public function testParserAcceptsPayloadAndReturnsMultipleEvents()
+    public function testParserAcceptsPayloadAndReturnsMultipleEvents(): void
     {
         $secret = '1234';
         $request = new Request();

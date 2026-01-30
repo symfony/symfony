@@ -34,7 +34,7 @@ class HttplugClientTest extends TestCase
     }
 
     #[RequiresFunction('ob_gzhandler')]
-    public function testSendRequest()
+    public function testSendRequest(): void
     {
         $client = new HttplugClient(new NativeHttpClient());
 
@@ -49,7 +49,7 @@ class HttplugClientTest extends TestCase
     }
 
     #[RequiresFunction('ob_gzhandler')]
-    public function testSendAsyncRequest()
+    public function testSendAsyncRequest(): void
     {
         $client = new HttplugClient(new NativeHttpClient());
 
@@ -60,7 +60,7 @@ class HttplugClientTest extends TestCase
             $successCallableCalled = true;
 
             return $response;
-        }, static function (\Exception $exception) use (&$failureCallableCalled) {
+        }, static function (\Exception $exception) use (&$failureCallableCalled): void {
             $failureCallableCalled = true;
 
             throw $exception;
@@ -81,7 +81,7 @@ class HttplugClientTest extends TestCase
         $this->assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
     }
 
-    public function testWait()
+    public function testWait(): void
     {
         $client = new HttplugClient(new NativeHttpClient());
 
@@ -92,7 +92,7 @@ class HttplugClientTest extends TestCase
                 $successCallableCalled = true;
 
                 return $response;
-            }, static function (\Exception $exception) use (&$failureCallableCalled) {
+            }, static function (\Exception $exception) use (&$failureCallableCalled): void {
                 $failureCallableCalled = true;
 
                 throw $exception;
@@ -106,7 +106,7 @@ class HttplugClientTest extends TestCase
         $this->assertFalse($failureCallableCalled, 'Failure callable should not be called when request is successful.');
     }
 
-    public function testPostRequest()
+    public function testPostRequest(): void
     {
         $client = new HttplugClient(new NativeHttpClient());
 
@@ -119,7 +119,7 @@ class HttplugClientTest extends TestCase
         $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $body);
     }
 
-    public function testNetworkException()
+    public function testNetworkException(): void
     {
         $client = new HttplugClient(new NativeHttpClient());
 
@@ -127,7 +127,7 @@ class HttplugClientTest extends TestCase
         $client->sendRequest($client->createRequest('GET', 'http://localhost:8058'));
     }
 
-    public function testAsyncNetworkException()
+    public function testAsyncNetworkException(): void
     {
         $client = new HttplugClient(new NativeHttpClient());
 
@@ -138,7 +138,7 @@ class HttplugClientTest extends TestCase
             $successCallableCalled = true;
 
             return $response;
-        }, static function (\Exception $exception) use (&$failureCallableCalled) {
+        }, static function (\Exception $exception) use (&$failureCallableCalled): void {
             $failureCallableCalled = true;
 
             throw $exception;
@@ -153,7 +153,7 @@ class HttplugClientTest extends TestCase
         $promise->wait(true);
     }
 
-    public function testRequestException()
+    public function testRequestException(): void
     {
         $client = new HttplugClient(new NativeHttpClient());
 
@@ -161,7 +161,7 @@ class HttplugClientTest extends TestCase
         $client->sendRequest($client->createRequest('BAD.METHOD', 'http://localhost:8057'));
     }
 
-    public function testRetry404()
+    public function testRetry404(): void
     {
         $client = new HttplugClient(new NativeHttpClient());
 
@@ -177,7 +177,7 @@ class HttplugClientTest extends TestCase
 
                     return $client->sendAsyncRequest($client->createRequest('GET', 'http://localhost:8057'));
                 },
-                static function (\Exception $exception) use (&$failureCallableCalled) {
+                static function (\Exception $exception) use (&$failureCallableCalled): void {
                     $failureCallableCalled = true;
 
                     throw $exception;
@@ -192,7 +192,7 @@ class HttplugClientTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
     }
 
-    public function testRetryNetworkError()
+    public function testRetryNetworkError(): void
     {
         $client = new HttplugClient(new NativeHttpClient());
 
@@ -221,7 +221,7 @@ class HttplugClientTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
     }
 
-    public function testRetryEarlierError()
+    public function testRetryEarlierError(): void
     {
         $isFirstRequest = true;
         $errorMessage = 'Error occurred before making the actual request.';
@@ -267,7 +267,7 @@ class HttplugClientTest extends TestCase
         $this->assertSame('OK', (string) $response->getBody());
     }
 
-    public function testInvalidHeaderResponse()
+    public function testInvalidHeaderResponse(): void
     {
         $responseHeaders = [
             // space in header name not allowed in RFC 7230
@@ -285,7 +285,7 @@ class HttplugClientTest extends TestCase
         $this->assertCount(1, $resultResponse->getHeaders());
     }
 
-    public function testResponseReasonPhrase()
+    public function testResponseReasonPhrase(): void
     {
         $responseHeaders = [
             'HTTP/1.1 103 Very Early Hints',
@@ -300,7 +300,7 @@ class HttplugClientTest extends TestCase
         $this->assertSame('Very Early Hints', $resultResponse->getReasonPhrase());
     }
 
-    public function testAutoUpgradeHttpVersion()
+    public function testAutoUpgradeHttpVersion(): void
     {
         $clientWithoutOption = new HttplugClient(new MockHttpClient(static fn (string $method, string $url, array $options) => new MockResponse(json_encode([
             'SERVER_PROTOCOL' => 'HTTP/'.$options['http_version'] ?? '',

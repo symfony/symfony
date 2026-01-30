@@ -37,7 +37,7 @@ class SecretsGenerateKeysCommandTest extends TestCase
         (new Filesystem())->remove($this->secretsDir);
     }
 
-    public function testItGeneratesSodiumKeys()
+    public function testItGeneratesSodiumKeys(): void
     {
         $vault = new SodiumVault($this->secretsDir);
         $tester = new CommandTester(new SecretsGenerateKeysCommand($vault));
@@ -46,7 +46,7 @@ class SecretsGenerateKeysCommandTest extends TestCase
         $this->assertKeysExistAndReadable();
     }
 
-    public function testItRotatesSodiumKeysWhenRequested()
+    public function testItRotatesSodiumKeysWhenRequested(): void
     {
         $vault = new SodiumVault($this->secretsDir);
         $tester = new CommandTester(new SecretsGenerateKeysCommand($vault));
@@ -55,7 +55,7 @@ class SecretsGenerateKeysCommandTest extends TestCase
         $this->assertKeysExistAndReadable();
     }
 
-    public function testItFailsGracefullyWhenLocalVaultIsDisabled()
+    public function testItFailsGracefullyWhenLocalVaultIsDisabled(): void
     {
         $vault = $this->createStub(AbstractVault::class);
         $tester = new CommandTester(new SecretsGenerateKeysCommand($vault));
@@ -64,7 +64,7 @@ class SecretsGenerateKeysCommandTest extends TestCase
         $this->assertStringContainsString('The local vault is disabled.', $tester->getDisplay());
     }
 
-    public function testFailsWhenKeysAlreadyExistAndRotateNotPassed()
+    public function testFailsWhenKeysAlreadyExistAndRotateNotPassed(): void
     {
         $vault = new SodiumVault($this->secretsDir);
         $vault->generateKeys();

@@ -27,70 +27,70 @@ class PropertyAccessorBuilderTest extends TestCase
         $this->builder = new PropertyAccessorBuilder();
     }
 
-    public function testEnableMagicGet()
+    public function testEnableMagicGet(): void
     {
         $this->assertSame($this->builder, $this->builder->enableMagicGet());
         $this->assertTrue($this->builder->isMagicGetEnabled());
     }
 
-    public function testDisableMagicGet()
+    public function testDisableMagicGet(): void
     {
         $this->assertSame($this->builder, $this->builder->disableMagicGet());
         $this->assertFalse($this->builder->disableMagicGet()->isMagicGetEnabled());
     }
 
-    public function testEnableMagicSet()
+    public function testEnableMagicSet(): void
     {
         $this->assertSame($this->builder, $this->builder->enableMagicSet());
         $this->assertTrue($this->builder->isMagicSetEnabled());
     }
 
-    public function testDisableMagicSet()
+    public function testDisableMagicSet(): void
     {
         $this->assertSame($this->builder, $this->builder->disableMagicSet());
         $this->assertFalse($this->builder->disableMagicSet()->isMagicSetEnabled());
     }
 
-    public function testEnableMagicCall()
+    public function testEnableMagicCall(): void
     {
         $this->assertSame($this->builder, $this->builder->enableMagicCall());
         $this->assertTrue($this->builder->isMagicCallEnabled());
     }
 
-    public function testDisableMagicCall()
+    public function testDisableMagicCall(): void
     {
         $this->assertSame($this->builder, $this->builder->disableMagicCall());
         $this->assertFalse($this->builder->isMagicCallEnabled());
     }
 
-    public function testTogglingMagicGet()
+    public function testTogglingMagicGet(): void
     {
         $this->assertTrue($this->builder->isMagicGetEnabled());
         $this->assertFalse($this->builder->disableMagicGet()->isMagicGetEnabled());
         $this->assertTrue($this->builder->enableMagicGet()->isMagicGetEnabled());
     }
 
-    public function testTogglingMagicSet()
+    public function testTogglingMagicSet(): void
     {
         $this->assertTrue($this->builder->isMagicSetEnabled());
         $this->assertFalse($this->builder->disableMagicSet()->isMagicSetEnabled());
         $this->assertTrue($this->builder->enableMagicSet()->isMagicSetEnabled());
     }
 
-    public function testTogglingMagicCall()
+    public function testTogglingMagicCall(): void
     {
         $this->assertFalse($this->builder->isMagicCallEnabled());
         $this->assertTrue($this->builder->enableMagicCall()->isMagicCallEnabled());
         $this->assertFalse($this->builder->disableMagicCall()->isMagicCallEnabled());
     }
 
-    public function testGetPropertyAccessor()
+    public function testGetPropertyAccessor(): void
     {
         $this->assertInstanceOf(PropertyAccessor::class, $this->builder->getPropertyAccessor());
         $this->assertInstanceOf(PropertyAccessor::class, $this->builder->enableMagicCall()->getPropertyAccessor());
     }
 
-    public function testUseCache()
+    public function testUseCache(): void
     {
         $cacheItemPool = new ArrayAdapter();
         $this->builder->setCacheItemPool($cacheItemPool);
@@ -98,7 +98,7 @@ class PropertyAccessorBuilderTest extends TestCase
         $this->assertInstanceOf(PropertyAccessor::class, $this->builder->getPropertyAccessor());
     }
 
-    public function testUseReadInfoExtractor()
+    public function testUseReadInfoExtractor(): void
     {
         $readInfoExtractor = $this->createStub(PropertyReadInfoExtractorInterface::class);
 
@@ -108,7 +108,7 @@ class PropertyAccessorBuilderTest extends TestCase
         $this->assertInstanceOf(PropertyAccessor::class, $this->builder->getPropertyAccessor());
     }
 
-    public function testUseWriteInfoExtractor()
+    public function testUseWriteInfoExtractor(): void
     {
         $writeInfoExtractor = $this->createStub(PropertyWriteInfoExtractorInterface::class);
 

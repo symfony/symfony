@@ -22,7 +22,7 @@ use Symfony\Component\Process\Process;
 class ProcessHelperTest extends TestCase
 {
     #[DataProvider('provideCommandsAndOutput')]
-    public function testVariousProcessRuns(array $expectedOutputLines, bool $successful, Process|string|array $cmd, int $verbosity, ?string $error)
+    public function testVariousProcessRuns(array $expectedOutputLines, bool $successful, Process|string|array $cmd, int $verbosity, ?string $error): void
     {
         if (\is_string($cmd)) {
             $cmd = Process::fromShellCommandline($cmd);
@@ -83,14 +83,14 @@ class ProcessHelperTest extends TestCase
         }
     }
 
-    public function testPassedCallbackIsExecuted()
+    public function testPassedCallbackIsExecuted(): void
     {
         $helper = new ProcessHelper();
         $helper->setHelperSet(new HelperSet([new DebugFormatterHelper()]));
         $output = $this->getOutputStream(StreamOutput::VERBOSITY_NORMAL);
 
         $executed = false;
-        $callback = static function () use (&$executed) { $executed = true; };
+        $callback = static function () use (&$executed): void { $executed = true; };
 
         $helper->run($output, ['php', '-r', 'echo 42;'], null, $callback);
         $this->assertTrue($executed);

@@ -21,7 +21,7 @@ use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 
 class AddConstraintValidatorsPassTest extends TestCase
 {
-    public function testThatConstraintValidatorServicesAreProcessed()
+    public function testThatConstraintValidatorServicesAreProcessed(): void
     {
         $container = new ContainerBuilder();
         $validatorFactory = $container->register('validator.validator_factory')
@@ -45,7 +45,7 @@ class AddConstraintValidatorsPassTest extends TestCase
         $this->assertEquals($expected, $locator);
     }
 
-    public function testAbstractConstraintValidator()
+    public function testAbstractConstraintValidator(): void
     {
         $container = new ContainerBuilder();
         $container->register('validator.validator_factory')
@@ -63,7 +63,7 @@ class AddConstraintValidatorsPassTest extends TestCase
         $addConstraintValidatorsPass->process($container);
     }
 
-    public function testThatCompilerPassIsIgnoredIfThereIsNoConstraintValidatorFactoryDefinition()
+    public function testThatCompilerPassIsIgnoredIfThereIsNoConstraintValidatorFactoryDefinition(): void
     {
         $container = new ContainerBuilder();
 

@@ -20,7 +20,7 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
 
 class TraceableArgumentResolverTest extends TestCase
 {
-    public function testStopwatchEventIsStoppedWhenResolverThrows()
+    public function testStopwatchEventIsStoppedWhenResolverThrows(): void
     {
         $stopwatchEvent = $this->createMock(StopwatchEvent::class);
         $stopwatchEvent->expects(self::once())->method('stop');
@@ -38,7 +38,7 @@ class TraceableArgumentResolverTest extends TestCase
         $traceableResolver = new TraceableArgumentResolver($resolver, $stopwatch);
 
         try {
-            $traceableResolver->getArguments(new Request(), static function () {});
+            $traceableResolver->getArguments(new Request(), static function (): void {});
         } catch (\Exception $ex) {
         }
     }

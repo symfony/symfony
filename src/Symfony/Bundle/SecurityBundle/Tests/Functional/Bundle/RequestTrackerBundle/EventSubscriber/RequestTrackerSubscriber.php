@@ -26,7 +26,7 @@ final class RequestTrackerSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function onRequest(RequestEvent $event)
+    public function onRequest(RequestEvent $event): void
     {
         $this->lastRequest = $event->getRequest();
     }

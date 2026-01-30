@@ -21,7 +21,7 @@ use Symfony\Component\VarDumper\Dumper\ContextProvider\RequestContextProvider;
 #[RequiresMethod(RequestStack::class, '__construct')]
 class RequestContextProviderTest extends TestCase
 {
-    public function testGetContextOnNullRequest()
+    public function testGetContextOnNullRequest(): void
     {
         $requestStack = new RequestStack();
         $provider = new RequestContextProvider($requestStack);
@@ -29,7 +29,7 @@ class RequestContextProviderTest extends TestCase
         $this->assertNull($provider->getContext());
     }
 
-    public function testGetContextOnRequest()
+    public function testGetContextOnRequest(): void
     {
         $request = Request::create('https://example.org/', 'POST');
         $request->attributes->set('_controller', 'MyControllerClass');

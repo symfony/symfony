@@ -33,12 +33,12 @@ class InMemoryTransportFactoryTest extends TestCase
     }
 
     #[DataProvider('provideDSN')]
-    public function testSupports(string $dsn, bool $expected = true)
+    public function testSupports(string $dsn, bool $expected = true): void
     {
         $this->assertSame($expected, $this->factory->supports($dsn, []), 'InMemoryTransportFactory::supports returned unexpected result.');
     }
 
-    public function testCreateTransport()
+    public function testCreateTransport(): void
     {
         /** @var SerializerInterface $serializer */
         $serializer = $this->createStub(SerializerInterface::class);
@@ -46,7 +46,7 @@ class InMemoryTransportFactoryTest extends TestCase
         $this->assertInstanceOf(InMemoryTransport::class, $this->factory->createTransport('in-memory://', [], $serializer));
     }
 
-    public function testCreateTransportWithoutSerializer()
+    public function testCreateTransportWithoutSerializer(): void
     {
         /** @var SerializerInterface $serializer */
         $serializer = $this->createMock(SerializerInterface::class);
@@ -61,7 +61,7 @@ class InMemoryTransportFactoryTest extends TestCase
         $this->assertEquals([$message->with(new TransportMessageIdStamp(1))], $transport->get());
     }
 
-    public function testCreateTransportWithSerializer()
+    public function testCreateTransportWithSerializer(): void
     {
         /** @var SerializerInterface $serializer */
         $serializer = $this->createMock(SerializerInterface::class);
@@ -75,7 +75,7 @@ class InMemoryTransportFactoryTest extends TestCase
         $transport->send($message);
     }
 
-    public function testResetCreatedTransports()
+    public function testResetCreatedTransports(): void
     {
         $transport = $this->factory->createTransport('in-memory://', [], $this->createStub(SerializerInterface::class));
         $transport->send(Envelope::wrap(new DummyMessage('Hello.')));

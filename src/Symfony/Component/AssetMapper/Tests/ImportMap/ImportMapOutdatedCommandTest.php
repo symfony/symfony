@@ -20,7 +20,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 class ImportMapOutdatedCommandTest extends TestCase
 {
     #[DataProvider('provideNoOutdatedPackageCases')]
-    public function testCommandWhenNoOutdatedPackages(string $display, ?string $format = null)
+    public function testCommandWhenNoOutdatedPackages(string $display, ?string $format = null): void
     {
         $updateChecker = $this->createStub(ImportMapUpdateChecker::class);
         $command = new ImportMapOutdatedCommand($updateChecker);

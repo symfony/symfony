@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceivedStamp;
 #[RequiresPhpExtension('amqp')]
 class AmqpReceivedStampTest extends TestCase
 {
-    public function testStamp()
+    public function testStamp(): void
     {
         $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
 

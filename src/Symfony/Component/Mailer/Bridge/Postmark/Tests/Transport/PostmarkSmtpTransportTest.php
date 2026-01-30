@@ -21,7 +21,7 @@ use Symfony\Component\Mime\Email;
 
 class PostmarkSmtpTransportTest extends TestCase
 {
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
@@ -35,7 +35,7 @@ class PostmarkSmtpTransportTest extends TestCase
         $this->assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
     }
 
-    public function testTagAndMetadataAndMessageStreamHeaders()
+    public function testTagAndMetadataAndMessageStreamHeaders(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
@@ -57,7 +57,7 @@ class PostmarkSmtpTransportTest extends TestCase
         $this->assertSame('X-PM-Message-Stream: broadcasts', $email->getHeaders()->get('X-PM-Message-Stream')->toString());
     }
 
-    public function testMultipleTagsAreNotAllowed()
+    public function testMultipleTagsAreNotAllowed(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('tag1'));

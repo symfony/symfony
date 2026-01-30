@@ -47,7 +47,7 @@ final class ClickatellTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testExceptionIsThrownWhenNonMessageIsSend()
+    public function testExceptionIsThrownWhenNonMessageIsSend(): void
     {
         $transport = self::createTransport();
 
@@ -56,7 +56,7 @@ final class ClickatellTransportTest extends TransportTestCase
         $transport->send($this->createStub(MessageInterface::class));
     }
 
-    public function testExceptionIsThrownWhenHttpSendFailed()
+    public function testExceptionIsThrownWhenHttpSendFailed(): void
     {
         $client = new MockHttpClient(new MockResponse(json_encode([
             'error' => [

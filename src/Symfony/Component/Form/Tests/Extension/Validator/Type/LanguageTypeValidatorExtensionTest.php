@@ -20,7 +20,7 @@ class LanguageTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         return $this->factory->create(LanguageType::class, null, $options);
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 

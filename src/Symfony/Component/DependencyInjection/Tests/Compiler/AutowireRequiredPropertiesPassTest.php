@@ -21,7 +21,7 @@ require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
 class AutowireRequiredPropertiesPassTest extends TestCase
 {
-    public function testAttribute()
+    public function testAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class);
@@ -38,7 +38,7 @@ class AutowireRequiredPropertiesPassTest extends TestCase
         $this->assertEquals(Foo::class, (string) $properties['foo']);
     }
 
-    public function testAttributeWithReadonlyProperty()
+    public function testAttributeWithReadonlyProperty(): void
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class);
@@ -51,7 +51,7 @@ class AutowireRequiredPropertiesPassTest extends TestCase
         (new AutowireRequiredPropertiesPass())->process($container);
     }
 
-    public function testAttributeWithPrivateProperty()
+    public function testAttributeWithPrivateProperty(): void
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class);

@@ -30,7 +30,7 @@ use Twig\Environment;
 class WebDebugToolbarListenerTest extends TestCase
 {
     #[DataProvider('getInjectToolbarTests')]
-    public function testInjectToolbar($content, $expected)
+    public function testInjectToolbar($content, $expected): void
     {
         $listener = new WebDebugToolbarListener($this->getTwigMock());
         $m = new \ReflectionMethod($listener, 'injectToolbar');
@@ -60,7 +60,7 @@ class WebDebugToolbarListenerTest extends TestCase
     }
 
     #[DataProvider('provideRedirects')]
-    public function testHtmlRedirectionIsIntercepted($statusCode)
+    public function testHtmlRedirectionIsIntercepted($statusCode): void
     {
         $response = new Response('Some content', $statusCode);
         $response->headers->set('Location', 'https://example.com/');
@@ -74,7 +74,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals('Redirection', $response->getContent());
     }
 
-    public function testNonHtmlRedirectionIsNotIntercepted()
+    public function testNonHtmlRedirectionIsNotIntercepted(): void
     {
         $response = new Response('Some content', '301');
         $response->headers->set('Location', 'https://example.com/');
@@ -88,7 +88,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals('Some content', $response->getContent());
     }
 
-    public function testToolbarIsInjected()
+    public function testToolbarIsInjected(): void
     {
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -102,7 +102,7 @@ class WebDebugToolbarListenerTest extends TestCase
     }
 
     #[Depends('testToolbarIsInjected')]
-    public function testToolbarIsNotInjectedOnNonHtmlContentType()
+    public function testToolbarIsNotInjectedOnNonHtmlContentType(): void
     {
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -116,7 +116,7 @@ class WebDebugToolbarListenerTest extends TestCase
     }
 
     #[Depends('testToolbarIsInjected')]
-    public function testToolbarIsNotInjectedOnContentDispositionAttachment()
+    public function testToolbarIsNotInjectedOnContentDispositionAttachment(): void
     {
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -131,7 +131,7 @@ class WebDebugToolbarListenerTest extends TestCase
 
     #[DataProvider('provideRedirects')]
     #[Depends('testToolbarIsInjected')]
-    public function testToolbarIsNotInjectedOnRedirection($statusCode)
+    public function testToolbarIsNotInjectedOnRedirection($statusCode): void
     {
         $response = new Response('<html><head></head><body></body></html>', $statusCode);
         $response->headers->set('Location', 'https://example.com/');
@@ -153,7 +153,7 @@ class WebDebugToolbarListenerTest extends TestCase
     }
 
     #[Depends('testToolbarIsInjected')]
-    public function testToolbarIsNotInjectedWhenThereIsNoNoXDebugTokenResponseHeader()
+    public function testToolbarIsNotInjectedWhenThereIsNoNoXDebugTokenResponseHeader(): void
     {
         $response = new Response('<html><head></head><body></body></html>');
 
@@ -166,7 +166,7 @@ class WebDebugToolbarListenerTest extends TestCase
     }
 
     #[Depends('testToolbarIsInjected')]
-    public function testToolbarIsNotInjectedWhenOnSubRequest()
+    public function testToolbarIsNotInjectedWhenOnSubRequest(): void
     {
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -180,7 +180,7 @@ class WebDebugToolbarListenerTest extends TestCase
     }
 
     #[Depends('testToolbarIsInjected')]
-    public function testToolbarIsNotInjectedOnIncompleteHtmlResponses()
+    public function testToolbarIsNotInjectedOnIncompleteHtmlResponses(): void
     {
         $response = new Response('<div>Some content</div>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -194,7 +194,7 @@ class WebDebugToolbarListenerTest extends TestCase
     }
 
     #[Depends('testToolbarIsInjected')]
-    public function testToolbarIsNotInjectedOnXmlHttpRequests()
+    public function testToolbarIsNotInjectedOnXmlHttpRequests(): void
     {
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -211,7 +211,7 @@ class WebDebugToolbarListenerTest extends TestCase
     }
 
     #[Depends('testToolbarIsInjected')]
-    public function testToolbarIsNotInjectedOnNonHtmlRequests()
+    public function testToolbarIsNotInjectedOnNonHtmlRequests(): void
     {
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -224,7 +224,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals('<html><head></head><body></body></html>', $response->getContent());
     }
 
-    public function testXDebugUrlHeader()
+    public function testXDebugUrlHeader(): void
     {
         $response = new Response();
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -245,7 +245,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals('http://mydomain.com/_profiler/xxxxxxxx', $response->headers->get('X-Debug-Token-Link'));
     }
 
-    public function testThrowingUrlGenerator()
+    public function testThrowingUrlGenerator(): void
     {
         $response = new Response();
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -266,7 +266,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals('Exception: foo', $response->headers->get('X-Debug-Error'));
     }
 
-    public function testThrowingErrorCleanup()
+    public function testThrowingErrorCleanup(): void
     {
         $response = new Response();
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -287,7 +287,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals('Exception: This multiline tabbed text should come out on a single plain line', $response->headers->get('X-Debug-Error'));
     }
 
-    public function testCspIsDisabledIfDumperWasUsed()
+    public function testCspIsDisabledIfDumperWasUsed(): void
     {
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -308,7 +308,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals("<html><head></head><body>\nWDT\n</body></html>", $response->getContent());
     }
 
-    public function testCspIsKeptEnabledIfDumperWasNotUsed()
+    public function testCspIsKeptEnabledIfDumperWasNotUsed(): void
     {
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('X-Debug-Token', 'xxxxxxxx');
@@ -329,7 +329,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertEquals("<html><head></head><body>\nWDT\n</body></html>", $response->getContent());
     }
 
-    public function testNullContentTypeWithNoDebugEnv()
+    public function testNullContentTypeWithNoDebugEnv(): void
     {
         $response = new Response('<html><head></head><body></body></html>');
         $response->headers->set('Content-Type', null);
@@ -343,7 +343,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testAjaxReplaceHeaderOnDisabledToolbar()
+    public function testAjaxReplaceHeaderOnDisabledToolbar(): void
     {
         $response = new Response();
         $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
@@ -354,7 +354,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertFalse($response->headers->has('Symfony-Debug-Toolbar-Replace'));
     }
 
-    public function testAjaxReplaceHeaderOnDisabledReplace()
+    public function testAjaxReplaceHeaderOnDisabledReplace(): void
     {
         $response = new Response();
         $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
@@ -365,7 +365,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertFalse($response->headers->has('Symfony-Debug-Toolbar-Replace'));
     }
 
-    public function testAjaxReplaceHeaderOnEnabledAndNonXHR()
+    public function testAjaxReplaceHeaderOnEnabledAndNonXHR(): void
     {
         $response = new Response();
         $event = new ResponseEvent($this->createStub(KernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $response);
@@ -376,7 +376,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertFalse($response->headers->has('Symfony-Debug-Toolbar-Replace'));
     }
 
-    public function testAjaxReplaceHeaderOnEnabledAndXHR()
+    public function testAjaxReplaceHeaderOnEnabledAndXHR(): void
     {
         $request = new Request();
         $request->headers->set('X-Requested-With', 'XMLHttpRequest');
@@ -389,7 +389,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $this->assertSame('1', $response->headers->get('Symfony-Debug-Toolbar-Replace'));
     }
 
-    public function testAjaxReplaceHeaderOnEnabledAndXHRButPreviouslySet()
+    public function testAjaxReplaceHeaderOnEnabledAndXHRButPreviouslySet(): void
     {
         $request = new Request();
         $request->headers->set('X-Requested-With', 'XMLHttpRequest');
@@ -440,7 +440,7 @@ class WebDebugToolbarListenerTest extends TestCase
         $response->send(false);
     }
 
-    public function testEventStreamResponseHasDebugEventForException()
+    public function testEventStreamResponseHasDebugEventForException(): void
     {
         if (!class_exists(EventStreamResponse::class)) {
             self::markTestSkipped('This test requires symfony/http-foundation >= 7.3');

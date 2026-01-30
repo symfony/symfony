@@ -16,7 +16,7 @@ use Symfony\Component\Mime\Encoder\IdnAddressEncoder;
 
 class IdnAddressEncoderTest extends TestCase
 {
-    public function testEncodeString()
+    public function testEncodeString(): void
     {
         $this->assertSame('test@xn--fuball-cta.test', (new IdnAddressEncoder())->encodeString('test@fußball.test'));
     }

@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
  */
 class CheckArgumentsValidityPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $definition = $container->register('foo');
@@ -43,7 +43,7 @@ class CheckArgumentsValidityPassTest extends TestCase
     }
 
     #[DataProvider('definitionProvider')]
-    public function testException(array $arguments, array $methodCalls)
+    public function testException(array $arguments, array $methodCalls): void
     {
         $container = new ContainerBuilder();
         $definition = $container->register('foo');
@@ -65,7 +65,7 @@ class CheckArgumentsValidityPassTest extends TestCase
         ];
     }
 
-    public function testNoException()
+    public function testNoException(): void
     {
         $container = new ContainerBuilder();
         $definition = $container->register('foo');

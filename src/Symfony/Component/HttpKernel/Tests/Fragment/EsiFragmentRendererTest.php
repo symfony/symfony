@@ -21,13 +21,13 @@ use Symfony\Component\HttpKernel\HttpCache\Esi;
 
 class EsiFragmentRendererTest extends TestCase
 {
-    public function testRenderFallbackToInlineStrategyIfEsiNotSupported()
+    public function testRenderFallbackToInlineStrategyIfEsiNotSupported(): void
     {
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true));
         $strategy->render('/', Request::create('/'));
     }
 
-    public function testRenderFallbackWithScalar()
+    public function testRenderFallbackWithScalar(): void
     {
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(true), new UriSigner('foo'));
         $request = Request::create('/');
@@ -35,7 +35,7 @@ class EsiFragmentRendererTest extends TestCase
         $strategy->render($reference, $request);
     }
 
-    public function testRender()
+    public function testRender(): void
     {
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
 
@@ -48,7 +48,7 @@ class EsiFragmentRendererTest extends TestCase
         $this->assertEquals('<esi:include src="/" alt="foo" />', $strategy->render('/', $request, ['alt' => 'foo'])->getContent());
     }
 
-    public function testRenderControllerReference()
+    public function testRenderControllerReference(): void
     {
         $signer = new UriSigner('foo');
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(), $signer);
@@ -66,7 +66,7 @@ class EsiFragmentRendererTest extends TestCase
         );
     }
 
-    public function testRenderControllerReferenceWithAbsoluteUri()
+    public function testRenderControllerReferenceWithAbsoluteUri(): void
     {
         $signer = new UriSigner('foo');
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy(), $signer);
@@ -84,7 +84,7 @@ class EsiFragmentRendererTest extends TestCase
         );
     }
 
-    public function testRenderControllerReferenceWithoutSignerThrowsException()
+    public function testRenderControllerReferenceWithoutSignerThrowsException(): void
     {
         $this->expectException(\LogicException::class);
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());
@@ -96,7 +96,7 @@ class EsiFragmentRendererTest extends TestCase
         $strategy->render(new ControllerReference('main_controller'), $request);
     }
 
-    public function testRenderAltControllerReferenceWithoutSignerThrowsException()
+    public function testRenderAltControllerReferenceWithoutSignerThrowsException(): void
     {
         $this->expectException(\LogicException::class);
         $strategy = new EsiFragmentRenderer(new Esi(), $this->getInlineStrategy());

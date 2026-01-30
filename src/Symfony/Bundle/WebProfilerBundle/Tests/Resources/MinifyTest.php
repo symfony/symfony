@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
  */
 class MinifyTest extends TestCase
 {
-    public function testNoSingleLineComments()
+    public function testNoSingleLineComments(): void
     {
         $dir = \dirname(__DIR__, 2).'/Resources/views/Profiler';
 

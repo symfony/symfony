@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\EventListener\ClearSiteDataLogoutListener;
 class ClearSiteDataLogoutListenerTest extends TestCase
 {
     #[DataProvider('provideClearSiteDataConfig')]
-    public function testLogout(array $clearSiteDataConfig, string $expectedHeader)
+    public function testLogout(array $clearSiteDataConfig, string $expectedHeader): void
     {
         $response = new Response();
         $event = new LogoutEvent(new Request(), null);

@@ -43,7 +43,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeDefaultsTestData')]
-    public function testDescribeDefaults($object, array $options, $fixtureName)
+    public function testDescribeDefaults($object, array $options, $fixtureName): void
     {
         $describedObject = $this->getObjectDescription($object, $options);
         $expectedDescription = $this->getExpectedDescription($fixtureName);
@@ -56,7 +56,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeResolvedFormTypeTestData')]
-    public function testDescribeResolvedFormType(ResolvedFormTypeInterface $type, array $options, $fixtureName)
+    public function testDescribeResolvedFormType(ResolvedFormTypeInterface $type, array $options, $fixtureName): void
     {
         $describedObject = $this->getObjectDescription($type, $options);
         $expectedDescription = $this->getExpectedDescription($fixtureName);
@@ -69,7 +69,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeOptionTestData')]
-    public function testDescribeOption(OptionsResolver $optionsResolver, array $options, $fixtureName)
+    public function testDescribeOption(OptionsResolver $optionsResolver, array $options, $fixtureName): void
     {
         $describedObject = $this->getObjectDescription($optionsResolver, $options);
         $expectedDescription = $this->getExpectedDescription($fixtureName);
@@ -182,7 +182,7 @@ class FooType extends AbstractType
 
             return (string) $value;
         });
-        $resolver->setOptions('baz', static function (OptionsResolver $baz) {
+        $resolver->setOptions('baz', static function (OptionsResolver $baz): void {
             $baz->setRequired('foo');
             $baz->setDefaults(['foo' => true, 'bar' => true]);
         });

@@ -23,12 +23,12 @@ class PropertyAccessorCollectionTestCase_Car
     }
 
     // In the test, use a name that StringUtil can't uniquely singularify
-    public function addAxis($axis)
+    public function addAxis($axis): void
     {
         $this->axes[] = $axis;
     }
 
-    public function removeAxis($axis)
+    public function removeAxis($axis): void
     {
         foreach ($this->axes as $key => $value) {
             if ($value === $axis) {
@@ -47,62 +47,62 @@ class PropertyAccessorCollectionTestCase_Car
 
 class PropertyAccessorCollectionTestCase_CarOnlyAdder
 {
-    public function addAxis($axis)
+    public function addAxis($axis): void
     {
     }
 
-    public function getAxes()
+    public function getAxes(): void
     {
     }
 }
 
 class PropertyAccessorCollectionTestCase_CarOnlyRemover
 {
-    public function removeAxis($axis)
+    public function removeAxis($axis): void
     {
     }
 
-    public function getAxes()
+    public function getAxes(): void
     {
     }
 }
 
 class PropertyAccessorCollectionTestCase_CarNoAdderAndRemover
 {
-    public function getAxes()
+    public function getAxes(): void
     {
     }
 }
 
 class PropertyAccessorCollectionTestCase_CompositeCar
 {
-    public function getStructure()
+    public function getStructure(): void
     {
     }
 
-    public function setStructure($structure)
+    public function setStructure($structure): void
     {
     }
 }
 
 class PropertyAccessorCollectionTestCase_CarStructure
 {
-    public function addAxis($axis)
+    public function addAxis($axis): void
     {
     }
 
-    public function removeAxis($axis)
+    public function removeAxis($axis): void
     {
     }
 
-    public function getAxes()
+    public function getAxes(): void
     {
     }
 }
 
 abstract class PropertyAccessorCollectionTestCase extends PropertyAccessorArrayAccessTestCase
 {
-    public function testSetValueCallsAdderAndRemoverForCollections()
+    public function testSetValueCallsAdderAndRemoverForCollections(): void
     {
         $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth', 4 => 'fifth']);
         $axesMerged = $this->getContainer([1 => 'first', 2 => 'second', 3 => 'third']);
@@ -121,7 +121,7 @@ abstract class PropertyAccessorCollectionTestCase extends PropertyAccessorArrayA
         $this->assertEquals($axesMergedCopy, $axesMerged);
     }
 
-    public function testSetValueCallsAdderAndRemoverForNestedCollections()
+    public function testSetValueCallsAdderAndRemoverForNestedCollections(): void
     {
         $car = $this->createStub(__CLASS__.'_CompositeCar');
         $structure = $this->createMock(__CLASS__.'_CarStructure');
@@ -141,7 +141,7 @@ abstract class PropertyAccessorCollectionTestCase extends PropertyAccessorArrayA
 
         $structure->expects($this->exactly(2))
             ->method('addAxis')
-            ->willReturnCallback(function (string $axis) {
+            ->willReturnCallback(function (string $axis): void {
                 static $series = [
                     'first',
                     'third',
@@ -154,7 +154,7 @@ abstract class PropertyAccessorCollectionTestCase extends PropertyAccessorArrayA
         $this->propertyAccessor->setValue($car, 'structure.axes', $axesAfter);
     }
 
-    public function testSetValueFailsIfNoAdderNorRemoverFound()
+    public function testSetValueFailsIfNoAdderNorRemoverFound(): void
     {
         $car = $this->createStub(__CLASS__.'_CarNoAdderAndRemover');
         $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth']);
@@ -170,31 +170,31 @@ abstract class PropertyAccessorCollectionTestCase extends PropertyAccessorArrayA
         $this->propertyAccessor->setValue($car, 'axes', $axesAfter);
     }
 
-    public function testIsWritableReturnsTrueIfAdderAndRemoverExists()
+    public function testIsWritableReturnsTrueIfAdderAndRemoverExists(): void
     {
         $car = new PropertyAccessorCollectionTestCase_Car();
         $this->assertTrue($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
-    public function testIsWritableReturnsFalseIfOnlyAdderExists()
+    public function testIsWritableReturnsFalseIfOnlyAdderExists(): void
     {
         $car = new PropertyAccessorCollectionTestCase_CarOnlyAdder();
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
-    public function testIsWritableReturnsFalseIfOnlyRemoverExists()
+    public function testIsWritableReturnsFalseIfOnlyRemoverExists(): void
     {
         $car = new PropertyAccessorCollectionTestCase_CarOnlyRemover();
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
-    public function testIsWritableReturnsFalseIfNoAdderNorRemoverExists()
+    public function testIsWritableReturnsFalseIfNoAdderNorRemoverExists(): void
     {
         $car = new PropertyAccessorCollectionTestCase_CarNoAdderAndRemover();
         $this->assertFalse($this->propertyAccessor->isWritable($car, 'axes'));
     }
 
-    public function testSetValueFailsIfAdderAndRemoverExistButValueIsNotTraversable()
+    public function testSetValueFailsIfAdderAndRemoverExistButValueIsNotTraversable(): void
     {
         $car = new PropertyAccessorCollectionTestCase_Car();
 

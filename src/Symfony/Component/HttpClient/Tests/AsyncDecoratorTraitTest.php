@@ -55,7 +55,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         };
     }
 
-    public function testTimeoutOnDestruct()
+    public function testTimeoutOnDestruct(): void
     {
         if (HttpClient::create() instanceof NativeHttpClient) {
             $this->markTestSkipped('NativeHttpClient doesn\'t support opening concurrent requests.');
@@ -64,9 +64,9 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         HttpClientTestCase::testTimeoutOnDestruct();
     }
 
-    public function testRetry404()
+    public function testRetry404(): void
     {
-        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context): void {
             $this->assertTrue($chunk->isFirst());
             $this->assertSame(404, $context->getStatusCode());
             $context->getResponse()->cancel();
@@ -82,9 +82,9 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertSame(200, $response->getStatusCode());
     }
 
-    public function testRetry404WithThrow()
+    public function testRetry404WithThrow(): void
     {
-        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context): void {
             $this->assertTrue($chunk->isFirst());
             $this->assertSame(404, $context->getStatusCode());
             $context->getResponse()->cancel();
@@ -98,9 +98,9 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $response->getContent(true);
     }
 
-    public function testRetryTransportError()
+    public function testRetryTransportError(): void
     {
-        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
+        $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context): void {
             try {
                 if ($chunk->isFirst()) {
                     $this->assertSame(200, $context->getStatusCode());
@@ -117,7 +117,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertSame(200, $response->getStatusCode());
     }
 
-    public function testJsonTransclusion()
+    public function testJsonTransclusion(): void
     {
         $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
             if ('' === $content = $chunk->getContent()) {
@@ -156,14 +156,14 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertSame('{"documents":[{"title":"\/json\/1"},{"title":"\/json\/2"},{"title":"\/json\/3"}]}', $response->getContent());
     }
 
-    public function testPreflightRequest()
+    public function testPreflightRequest(): void
     {
         $client = new class(parent::getHttpClient(__FUNCTION__)) implements HttpClientInterface {
             use AsyncDecoratorTrait;
 
             public function request(string $method, string $url, array $options = []): ResponseInterface
             {
-                $chunkFilter = static function (ChunkInterface $chunk, AsyncContext $context) use ($method, $url, $options) {
+                $chunkFilter = static function (ChunkInterface $chunk, AsyncContext $context) use ($method, $url, $options): void {
                     $context->replaceRequest($method, $url, $options);
                     $context->passthru();
                 };
@@ -178,7 +178,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertSame('http://localhost:8057/', $response->getInfo('previous_info')[0]['url']);
     }
 
-    public function testProcessingHappensOnce()
+    public function testProcessingHappensOnce(): void
     {
         $lastChunks = 0;
         $client = $this->getHttpClient(__FUNCTION__, static function (ChunkInterface $chunk, AsyncContext $context) use (&$lastChunks) {
@@ -201,7 +201,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertSame(1, $lastChunks);
     }
 
-    public function testLastChunkIsYieldOnHttpExceptionAtDestructTime()
+    public function testLastChunkIsYieldOnHttpExceptionAtDestructTime(): void
     {
         $lastChunk = null;
         $client = $this->getHttpClient(__FUNCTION__, static function (ChunkInterface $chunk, AsyncContext $context) use (&$lastChunk) {
@@ -219,7 +219,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertTrue($lastChunk->isLast());
     }
 
-    public function testBufferPurePassthru()
+    public function testBufferPurePassthru(): void
     {
         $client = $this->getHttpClient(__FUNCTION__, static function (ChunkInterface $chunk, AsyncContext $context) {
             $context->passthru();
@@ -247,7 +247,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertStringContainsString('HTTP_HOST', $response->getContent());
     }
 
-    public function testRetryTimeout()
+    public function testRetryTimeout(): void
     {
         $client = $this->getHttpClient(__FUNCTION__, function (ChunkInterface $chunk, AsyncContext $context) {
             static $cpt = 0;
@@ -271,7 +271,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertSame(200, $response->getStatusCode());
     }
 
-    public function testRecurciveStream()
+    public function testRecurciveStream(): void
     {
         $client = new class(parent::getHttpClient(__FUNCTION__)) implements HttpClientInterface {
             use AsyncDecoratorTrait;
@@ -294,13 +294,13 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertSame('{"documents":[{"id":"\/json\/1"},{"id":"\/json\/2"},{"id":"\/json\/3"}]}', $content);
     }
 
-    public function testInfoPassToDecorator()
+    public function testInfoPassToDecorator(): void
     {
         $lastInfo = null;
-        $options = ['on_progress' => static function (int $dlNow, int $dlSize, array $info) use (&$lastInfo) {
+        $options = ['on_progress' => static function (int $dlNow, int $dlSize, array $info) use (&$lastInfo): void {
             $lastInfo = $info;
         }];
-        $client = $this->getHttpClient(__FUNCTION__, static function (ChunkInterface $chunk, AsyncContext $context) use ($options) {
+        $client = $this->getHttpClient(__FUNCTION__, static function (ChunkInterface $chunk, AsyncContext $context) use ($options): void {
             $context->setInfo('foo', 'test');
             $context->getResponse()->cancel();
             $context->replaceRequest('GET', 'http://localhost:8057/', $options);
@@ -313,7 +313,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertArrayHasKey('previous_info', $lastInfo);
     }
 
-    public function testMultipleYieldInInitializer()
+    public function testMultipleYieldInInitializer(): void
     {
         $client = $this->getHttpClient(__FUNCTION__, static function (ChunkInterface $chunk, AsyncContext $context) {
             static $first;
@@ -334,7 +334,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $this->assertStringContainsString('injectedFoo', $response->getContent(false));
     }
 
-    public function testConsumingDecoratedClient()
+    public function testConsumingDecoratedClient(): void
     {
         $client = $this->getHttpClient(__FUNCTION__, null, new class(parent::getHttpClient(__FUNCTION__)) implements HttpClientInterface {
             use DecoratorTrait;
@@ -355,7 +355,7 @@ class AsyncDecoratorTraitTest extends NativeHttpClientTest
         $response->getStatusCode();
     }
 
-    public function testMaxDuration()
+    public function testMaxDuration(): void
     {
         $client = $this->getHttpClient(__FUNCTION__, static function (ChunkInterface $chunk, AsyncContext $context) {
             static $sawFirst = false;

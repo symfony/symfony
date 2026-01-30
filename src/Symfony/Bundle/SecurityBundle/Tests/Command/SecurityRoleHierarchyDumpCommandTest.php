@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
 
 class SecurityRoleHierarchyDumpCommandTest extends TestCase
 {
-    public function testExecuteWithRoleHierarchy()
+    public function testExecuteWithRoleHierarchy(): void
     {
         $hierarchy = [
             'ROLE_ADMIN' => ['ROLE_USER'],
@@ -48,7 +48,7 @@ class SecurityRoleHierarchyDumpCommandTest extends TestCase
         $this->assertSame($expectedOutput, $output);
     }
 
-    public function testExecuteWithCustomDirection()
+    public function testExecuteWithCustomDirection(): void
     {
         $hierarchy = [
             'ROLE_ADMIN' => ['ROLE_USER'],
@@ -65,7 +65,7 @@ class SecurityRoleHierarchyDumpCommandTest extends TestCase
         $this->assertStringContainsString('graph BT', $output);
     }
 
-    public function testExecuteWithInvalidDirection()
+    public function testExecuteWithInvalidDirection(): void
     {
         $hierarchy = [
             'ROLE_ADMIN' => ['ROLE_USER'],

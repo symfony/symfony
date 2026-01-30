@@ -38,7 +38,7 @@ class CachedMappedAssetFactoryTest extends TestCase
         $this->filesystem->remove($this->cacheDir);
     }
 
-    public function testCreateMappedAssetCallsInsideWhenNoCache()
+    public function testCreateMappedAssetCallsInsideWhenNoCache(): void
     {
         $factory = $this->createMock(MappedAssetFactoryInterface::class);
         $cachedFactory = new CachedMappedAssetFactory(
@@ -64,7 +64,7 @@ class CachedMappedAssetFactoryTest extends TestCase
         $this->assertSame(__DIR__.'/../Fixtures/dir1/file1.css', $secondActualAsset->sourcePath);
     }
 
-    public function testAssetIsNotBuiltWhenCached()
+    public function testAssetIsNotBuiltWhenCached(): void
     {
         $sourcePath = __DIR__.'/../Fixtures/dir1/file1.css';
         $mappedAsset = new MappedAsset('file1.css', $sourcePath, content: 'cached content');
@@ -85,7 +85,7 @@ class CachedMappedAssetFactoryTest extends TestCase
         $this->assertSame($mappedAsset->content, $actualAsset->content);
     }
 
-    public function testAssetConfigCacheResourceContainsDependencies()
+    public function testAssetConfigCacheResourceContainsDependencies(): void
     {
         $sourcePath = realpath(__DIR__.'/../Fixtures/dir1/file1.css');
         $mappedAsset = new MappedAsset('file1.css', $sourcePath, content: 'cached content');

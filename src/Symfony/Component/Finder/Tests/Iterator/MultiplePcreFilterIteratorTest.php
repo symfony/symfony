@@ -18,7 +18,7 @@ use Symfony\Component\Finder\Iterator\MultiplePcreFilterIterator;
 class MultiplePcreFilterIteratorTest extends TestCase
 {
     #[DataProvider('getIsRegexFixtures')]
-    public function testIsRegex($string, $isRegex, $message)
+    public function testIsRegex($string, $isRegex, $message): void
     {
         $testIterator = new TestMultiplePcreFilterIterator();
         $this->assertEquals($isRegex, $testIterator->isRegex($string), $message);

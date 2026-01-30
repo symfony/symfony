@@ -28,21 +28,21 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidValues')]
-    public function testYamlIsValid($value)
+    public function testYamlIsValid($value): void
     {
         $this->validator->validate($value, new Yaml());
 
         $this->assertNoViolation();
     }
 
-    public function testYamlWithFlags()
+    public function testYamlWithFlags(): void
     {
         $this->validator->validate('date: 2023-01-01', new Yaml(flags: YamlParser::PARSE_DATETIME));
         $this->assertNoViolation();
     }
 
     #[DataProvider('getInvalidValues')]
-    public function testInvalidValues($value, $message, $line)
+    public function testInvalidValues($value, $message, $line): void
     {
         $constraint = new Yaml(
             message: 'myMessageTest',
@@ -57,7 +57,7 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidFlags()
+    public function testInvalidFlags(): void
     {
         $value = 'tags: [!tagged app.myclass]';
         $this->validator->validate($value, new Yaml());
@@ -69,7 +69,7 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getDeprecationOnLinesData')]
-    public function testDeprecationTriggersParseException(int $yamlLine, string $yamlValue)
+    public function testDeprecationTriggersParseException(int $yamlLine, string $yamlValue): void
     {
         $lines = explode("\n", $yamlValue);
         $errorLine = end($lines);

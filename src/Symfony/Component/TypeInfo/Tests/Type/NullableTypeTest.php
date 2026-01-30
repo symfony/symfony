@@ -18,13 +18,13 @@ use Symfony\Component\TypeInfo\Type\NullableType;
 
 class NullableTypeTest extends TestCase
 {
-    public function testCannotCreateWithNullableType()
+    public function testCannotCreateWithNullableType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new NullableType(Type::null());
     }
 
-    public function testNullPartIsAdded()
+    public function testNullPartIsAdded(): void
     {
         $type = new NullableType(Type::int());
         $this->assertEquals([Type::int(), Type::null()], $type->getTypes());
@@ -33,7 +33,7 @@ class NullableTypeTest extends TestCase
         $this->assertEquals([Type::int(), Type::null(), Type::string()], $type->getTypes());
     }
 
-    public function testWrappedTypeIsSatisfiedBy()
+    public function testWrappedTypeIsSatisfiedBy(): void
     {
         $type = new NullableType(Type::int());
         $this->assertTrue($type->wrappedTypeIsSatisfiedBy(static fn (Type $t): bool => 'int' === (string) $t));
@@ -42,7 +42,7 @@ class NullableTypeTest extends TestCase
         $this->assertFalse($type->wrappedTypeIsSatisfiedBy(static fn (Type $t): bool => 'int' === (string) $t));
     }
 
-    public function testAccepts()
+    public function testAccepts(): void
     {
         $type = new NullableType(Type::int());
 

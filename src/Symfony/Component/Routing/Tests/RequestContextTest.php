@@ -18,7 +18,7 @@ use Symfony\Component\Routing\RequestContext;
 
 class RequestContextTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $requestContext = new RequestContext(
             'foo',
@@ -45,7 +45,7 @@ class RequestContextTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $requestContext->getParameters());
     }
 
-    public function testConstructParametersBcLayer()
+    public function testConstructParametersBcLayer(): void
     {
         $requestContext = new class extends RequestContext {
             public function __construct()
@@ -58,7 +58,7 @@ class RequestContextTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $requestContext->getParameters());
     }
 
-    public function testFromUriWithBaseUrl()
+    public function testFromUriWithBaseUrl(): void
     {
         $requestContext = RequestContext::fromUri('https://test.com:444/index.php');
 
@@ -71,7 +71,7 @@ class RequestContextTest extends TestCase
         $this->assertSame(444, $requestContext->getHttpsPort());
     }
 
-    public function testFromUriWithTrailingSlash()
+    public function testFromUriWithTrailingSlash(): void
     {
         $requestContext = RequestContext::fromUri('http://test.com:8080/');
 
@@ -83,7 +83,7 @@ class RequestContextTest extends TestCase
         $this->assertSame('/', $requestContext->getPathInfo());
     }
 
-    public function testFromUriWithoutTrailingSlash()
+    public function testFromUriWithoutTrailingSlash(): void
     {
         $requestContext = RequestContext::fromUri('https://test.com');
 
@@ -93,7 +93,7 @@ class RequestContextTest extends TestCase
         $this->assertSame('/', $requestContext->getPathInfo());
     }
 
-    public function testFromUriBeingEmpty()
+    public function testFromUriBeingEmpty(): void
     {
         $requestContext = RequestContext::fromUri('');
 
@@ -113,7 +113,7 @@ class RequestContextTest extends TestCase
     #[TestWith([' foo'])]
     #[TestWith(['foo '])]
     #[TestWith([':'])]
-    public function testFromBadUri(string $uri)
+    public function testFromBadUri(string $uri): void
     {
         $context = RequestContext::fromUri($uri);
 
@@ -123,7 +123,7 @@ class RequestContextTest extends TestCase
         $this->assertSame('/', $context->getPathInfo());
     }
 
-    public function testFromRequest()
+    public function testFromRequest(): void
     {
         $request = Request::create('https://test.com:444/foo?bar=baz');
         $requestContext = new RequestContext();
@@ -148,7 +148,7 @@ class RequestContextTest extends TestCase
         $this->assertSame(567, $requestContext->getHttpsPort());
     }
 
-    public function testGetParameters()
+    public function testGetParameters(): void
     {
         $requestContext = new RequestContext();
         $this->assertEquals([], $requestContext->getParameters());
@@ -157,7 +157,7 @@ class RequestContextTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $requestContext->getParameters());
     }
 
-    public function testHasParameter()
+    public function testHasParameter(): void
     {
         $requestContext = new RequestContext();
         $requestContext->setParameters(['foo' => 'bar']);
@@ -166,7 +166,7 @@ class RequestContextTest extends TestCase
         $this->assertFalse($requestContext->hasParameter('baz'));
     }
 
-    public function testGetParameter()
+    public function testGetParameter(): void
     {
         $requestContext = new RequestContext();
         $requestContext->setParameters(['foo' => 'bar']);
@@ -175,7 +175,7 @@ class RequestContextTest extends TestCase
         $this->assertNull($requestContext->getParameter('baz'));
     }
 
-    public function testSetParameter()
+    public function testSetParameter(): void
     {
         $requestContext = new RequestContext();
         $requestContext->setParameter('foo', 'bar');
@@ -183,7 +183,7 @@ class RequestContextTest extends TestCase
         $this->assertEquals('bar', $requestContext->getParameter('foo'));
     }
 
-    public function testMethod()
+    public function testMethod(): void
     {
         $requestContext = new RequestContext();
         $requestContext->setMethod('post');
@@ -191,7 +191,7 @@ class RequestContextTest extends TestCase
         $this->assertSame('POST', $requestContext->getMethod());
     }
 
-    public function testScheme()
+    public function testScheme(): void
     {
         $requestContext = new RequestContext();
         $requestContext->setScheme('HTTPS');
@@ -199,7 +199,7 @@ class RequestContextTest extends TestCase
         $this->assertSame('https', $requestContext->getScheme());
     }
 
-    public function testHost()
+    public function testHost(): void
     {
         $requestContext = new RequestContext();
         $requestContext->setHost('eXampLe.com');
@@ -207,7 +207,7 @@ class RequestContextTest extends TestCase
         $this->assertSame('example.com', $requestContext->getHost());
     }
 
-    public function testQueryString()
+    public function testQueryString(): void
     {
         $requestContext = new RequestContext();
         $requestContext->setQueryString(null);
@@ -215,7 +215,7 @@ class RequestContextTest extends TestCase
         $this->assertSame('', $requestContext->getQueryString());
     }
 
-    public function testPort()
+    public function testPort(): void
     {
         $requestContext = new RequestContext();
         $requestContext->setHttpPort('123');
@@ -225,7 +225,7 @@ class RequestContextTest extends TestCase
         $this->assertSame(456, $requestContext->getHttpsPort());
     }
 
-    public function testFluentInterface()
+    public function testFluentInterface(): void
     {
         $requestContext = new RequestContext();
 

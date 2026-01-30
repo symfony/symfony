@@ -28,7 +28,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 #[RunTestsInSeparateProcesses]
 class SessionHandlerProxyTest extends TestCase
 {
-    public function testOpenTrue()
+    public function testOpenTrue(): void
     {
         $handler = $this->createMock(\SessionHandlerInterface::class);
         $proxy = new SessionHandlerProxy($handler);
@@ -41,7 +41,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->assertFalse($proxy->isActive());
     }
 
-    public function testOpenFalse()
+    public function testOpenFalse(): void
     {
         $handler = $this->createMock(\SessionHandlerInterface::class);
         $proxy = new SessionHandlerProxy($handler);
@@ -54,7 +54,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->assertFalse($proxy->isActive());
     }
 
-    public function testClose()
+    public function testClose(): void
     {
         $handler = $this->createMock(\SessionHandlerInterface::class);
         $proxy = new SessionHandlerProxy($handler);
@@ -67,7 +67,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->assertFalse($proxy->isActive());
     }
 
-    public function testCloseFalse()
+    public function testCloseFalse(): void
     {
         $handler = $this->createMock(\SessionHandlerInterface::class);
         $proxy = new SessionHandlerProxy($handler);
@@ -80,7 +80,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->assertFalse($proxy->isActive());
     }
 
-    public function testRead()
+    public function testRead(): void
     {
         $handler = $this->createMock(\SessionHandlerInterface::class);
         $proxy = new SessionHandlerProxy($handler);
@@ -92,7 +92,7 @@ class SessionHandlerProxyTest extends TestCase
         $proxy->read('id');
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $handler = $this->createMock(\SessionHandlerInterface::class);
         $proxy = new SessionHandlerProxy($handler);
@@ -104,7 +104,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->assertTrue($proxy->write('id', 'data'));
     }
 
-    public function testDestroy()
+    public function testDestroy(): void
     {
         $handler = $this->createMock(\SessionHandlerInterface::class);
         $proxy = new SessionHandlerProxy($handler);
@@ -116,7 +116,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->assertTrue($proxy->destroy('id'));
     }
 
-    public function testGc()
+    public function testGc(): void
     {
         $handler = $this->createMock(\SessionHandlerInterface::class);
         $proxy = new SessionHandlerProxy($handler);
@@ -128,14 +128,14 @@ class SessionHandlerProxyTest extends TestCase
         $proxy->gc(86400);
     }
 
-    public function testValidateIdWithoutUpdateTimestampHandler()
+    public function testValidateIdWithoutUpdateTimestampHandler(): void
     {
         $proxy = new SessionHandlerProxy($this->createStub(\SessionHandlerInterface::class));
 
         $this->assertTrue($proxy->validateId('id'));
     }
 
-    public function testValidateIdWithUpdateTimestampHandlerAndValidId()
+    public function testValidateIdWithUpdateTimestampHandlerAndValidId(): void
     {
         $handler = $this->createMock(TestSessionHandler::class);
         $handler->expects($this->once())
@@ -147,7 +147,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->assertTrue($proxy->validateId('id'));
     }
 
-    public function testValidateIdWithUpdateTimestampHandlerAndInvalidId()
+    public function testValidateIdWithUpdateTimestampHandlerAndInvalidId(): void
     {
         $handler = $this->createMock(TestSessionHandler::class);
         $handler->expects($this->once())
@@ -159,7 +159,7 @@ class SessionHandlerProxyTest extends TestCase
         $this->assertFalse($proxy->validateId('id'));
     }
 
-    public function testUpdateTimestampWithUpdateTimestampHandler()
+    public function testUpdateTimestampWithUpdateTimestampHandler(): void
     {
         $handler = $this->createMock(TestSessionHandler::class);
         $handler->expects($this->once())
@@ -171,7 +171,7 @@ class SessionHandlerProxyTest extends TestCase
         $proxy->updateTimestamp('id', 'data');
     }
 
-    public function testUpdateTimestampWithoutUpdateTimestampHandler()
+    public function testUpdateTimestampWithoutUpdateTimestampHandler(): void
     {
         $handler = $this->createMock(\SessionHandlerInterface::class);
         $handler->expects($this->once())
@@ -184,7 +184,7 @@ class SessionHandlerProxyTest extends TestCase
     }
 
     #[DataProvider('provideNativeSessionStorageHandler')]
-    public function testNativeSessionStorageSaveHandlerName($handler)
+    public function testNativeSessionStorageSaveHandlerName($handler): void
     {
         $this->assertSame('files', (new NativeSessionStorage([], $handler))->getSaveHandler()->getSaveHandlerName());
     }

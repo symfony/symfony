@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class DivisibleByTest extends TestCase
 {
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(DivisibleByDummy::class);
         $loader = new AttributeLoader();

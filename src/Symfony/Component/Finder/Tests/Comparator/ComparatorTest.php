@@ -17,7 +17,7 @@ use Symfony\Component\Finder\Comparator\Comparator;
 
 class ComparatorTest extends TestCase
 {
-    public function testInvalidOperator()
+    public function testInvalidOperator(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid operator "foo".');
@@ -26,7 +26,7 @@ class ComparatorTest extends TestCase
     }
 
     #[DataProvider('provideMatches')]
-    public function testTestSucceeds(string $operator, string $target, string $testedValue)
+    public function testTestSucceeds(string $operator, string $target, string $testedValue): void
     {
         $c = new Comparator($target, $operator);
 
@@ -53,7 +53,7 @@ class ComparatorTest extends TestCase
     }
 
     #[DataProvider('provideNonMatches')]
-    public function testTestFails(string $operator, string $target, string $testedValue)
+    public function testTestFails(string $operator, string $target, string $testedValue): void
     {
         $c = new Comparator($target, $operator);
 

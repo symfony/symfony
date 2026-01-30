@@ -24,28 +24,28 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         return new LocaleValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Locale());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Locale());
 
         $this->assertNoViolation();
     }
 
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Locale());
     }
 
     #[DataProvider('getValidLocales')]
-    public function testValidLocales($locale)
+    public function testValidLocales($locale): void
     {
         $this->validator->validate($locale, new Locale());
 
@@ -66,7 +66,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidLocales')]
-    public function testInvalidLocales($locale)
+    public function testInvalidLocales($locale): void
     {
         $constraint = new Locale(message: 'myMessage');
 
@@ -86,7 +86,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testTooLongLocale()
+    public function testTooLongLocale(): void
     {
         $constraint = new Locale(message: 'myMessage');
 
@@ -100,7 +100,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getUncanonicalizedLocales')]
-    public function testValidLocalesWithCanonicalization(string $locale)
+    public function testValidLocalesWithCanonicalization(string $locale): void
     {
         $constraint = new Locale(message: 'myMessage');
 
@@ -110,7 +110,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidLocales')]
-    public function testValidLocalesWithoutCanonicalization(string $locale)
+    public function testValidLocalesWithoutCanonicalization(string $locale): void
     {
         $constraint = new Locale(
             message: 'myMessage',
@@ -123,7 +123,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getUncanonicalizedLocales')]
-    public function testInvalidLocalesWithoutCanonicalization(string $locale)
+    public function testInvalidLocalesWithoutCanonicalization(string $locale): void
     {
         $constraint = new Locale(
             message: 'myMessage',
@@ -138,7 +138,7 @@ class LocaleValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidLocaleWithoutCanonicalizationNamed()
+    public function testInvalidLocaleWithoutCanonicalizationNamed(): void
     {
         $this->validator->validate(
             'en-US',

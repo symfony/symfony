@@ -22,7 +22,7 @@ use Symfony\Component\Mailer\Event\MessageEvent;
 class EventDispatcherDebugCommandTest extends TestCase
 {
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $tester = $this->createCommandCompletionTester();
 

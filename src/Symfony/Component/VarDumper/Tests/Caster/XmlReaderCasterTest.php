@@ -34,7 +34,7 @@ class XmlReaderCasterTest extends TestCase
         $this->reader->close();
     }
 
-    public function testParserProperty()
+    public function testParserProperty(): void
     {
         $this->reader->setParserProperty(\XMLReader::SUBST_ENTITIES, true);
 
@@ -235,7 +235,7 @@ class XmlReaderCasterTest extends TestCase
         ];
     }
 
-    public function testWithUninitializedXMLReader()
+    public function testWithUninitializedXMLReader(): void
     {
         $this->reader = new \XMLReader();
 

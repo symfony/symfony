@@ -29,7 +29,7 @@ require_once __DIR__.'/../Fixtures/includes/classes.php';
 
 class ServiceLocatorTagPassTest extends TestCase
 {
-    public function testNoServices()
+    public function testNoServices(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid definition for service "foo": an array of references is expected as first argument when the "container.service_locator" tag is set.');
@@ -42,7 +42,7 @@ class ServiceLocatorTagPassTest extends TestCase
         (new ServiceLocatorTagPass())->process($container);
     }
 
-    public function testScalarServices()
+    public function testScalarServices(): void
     {
         $container = new ContainerBuilder();
 
@@ -58,7 +58,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertSame('dummy', $container->get('foo')->get(0));
     }
 
-    public function testProcessValue()
+    public function testProcessValue(): void
     {
         $container = new ContainerBuilder();
 
@@ -86,7 +86,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertSame(CustomDefinition::class, $locator('inlines.service')::class);
     }
 
-    public function testServiceListIsOrdered()
+    public function testServiceListIsOrdered(): void
     {
         $container = new ContainerBuilder();
 
@@ -106,7 +106,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertSame(['bar', 'baz'], array_keys($container->getDefinition('foo')->getArgument(0)));
     }
 
-    public function testServiceWithKeyOverwritesPreviousInheritedKey()
+    public function testServiceWithKeyOverwritesPreviousInheritedKey(): void
     {
         $container = new ContainerBuilder();
 
@@ -129,7 +129,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertSame(TestDefinition2::class, $locator('bar')::class);
     }
 
-    public function testInheritedKeyOverwritesPreviousServiceWithKey()
+    public function testInheritedKeyOverwritesPreviousServiceWithKey(): void
     {
         $container = new ContainerBuilder();
 
@@ -154,7 +154,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertSame(TestDefinition2::class, $locator(16)::class);
     }
 
-    public function testBindingsAreCopied()
+    public function testBindingsAreCopied(): void
     {
         $container = new ContainerBuilder();
 
@@ -169,7 +169,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertInstanceOf(BoundArgument::class, $locator->getBindings()['foo']);
     }
 
-    public function testTaggedServices()
+    public function testTaggedServices(): void
     {
         $container = new ContainerBuilder();
 
@@ -190,7 +190,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertSame(TestDefinition2::class, $locator('baz')::class);
     }
 
-    public function testTaggedServicesKeysAreKept()
+    public function testTaggedServicesKeysAreKept(): void
     {
         $container = new ContainerBuilder();
 
@@ -211,7 +211,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertSame(TestDefinition2::class, $locator(1)::class);
     }
 
-    public function testIndexedByServiceIdWithDecoration()
+    public function testIndexedByServiceIdWithDecoration(): void
     {
         $container = new ContainerBuilder();
 
@@ -242,7 +242,7 @@ class ServiceLocatorTagPassTest extends TestCase
         static::assertInstanceOf(DecoratedService::class, $locator->get(Service::class));
     }
 
-    public function testServicesKeysAreKept()
+    public function testServicesKeysAreKept(): void
     {
         $container = new ContainerBuilder();
         $container->register('service-1');
@@ -260,7 +260,7 @@ class ServiceLocatorTagPassTest extends TestCase
         static::assertSame([0, 'service-2', 'foo'], array_keys($factories));
     }
 
-    public function testDefinitionOrderIsTheSame()
+    public function testDefinitionOrderIsTheSame(): void
     {
         $container = new ContainerBuilder();
         $container->register('service-1');
@@ -276,7 +276,7 @@ class ServiceLocatorTagPassTest extends TestCase
         static::assertSame(['service-2', 'service-1'], array_keys($factories));
     }
 
-    public function testBindingsAreProcessed()
+    public function testBindingsAreProcessed(): void
     {
         $container = new ContainerBuilder();
 

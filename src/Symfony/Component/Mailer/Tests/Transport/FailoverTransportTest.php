@@ -22,13 +22,13 @@ use Symfony\Component\Mime\RawMessage;
 #[Group('time-sensitive')]
 class FailoverTransportTest extends TestCase
 {
-    public function testSendNoTransports()
+    public function testSendNoTransports(): void
     {
         $this->expectException(TransportException::class);
         new FailoverTransport([]);
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->once())->method('__toString')->willReturn('t1://local');
@@ -38,7 +38,7 @@ class FailoverTransportTest extends TestCase
         $this->assertEquals('failover(t1://local t2://local)', (string) $t);
     }
 
-    public function testSendFirstWork()
+    public function testSendFirstWork(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->exactly(3))->method('send');
@@ -53,7 +53,7 @@ class FailoverTransportTest extends TestCase
         $this->assertTransports($t, 1, []);
     }
 
-    public function testSendAllDead()
+    public function testSendAllDead(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->once())->method('send')->willThrowException(new TransportException());
@@ -66,7 +66,7 @@ class FailoverTransportTest extends TestCase
         $this->assertTransports($t, 0, [$t1, $t2]);
     }
 
-    public function testSendOneDead()
+    public function testSendOneDead(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->once())->method('send')->willThrowException(new TransportException());
@@ -81,7 +81,7 @@ class FailoverTransportTest extends TestCase
         $this->assertTransports($t, 0, [$t1]);
     }
 
-    public function testSendOneDeadAndRecoveryWithinRetryPeriod()
+    public function testSendOneDeadAndRecoveryWithinRetryPeriod(): void
     {
         $t1 = $this->createStub(TransportInterface::class);
 
@@ -127,7 +127,7 @@ class FailoverTransportTest extends TestCase
         $this->assertTransports($t, 1, [$t2]);
     }
 
-    public function testSendAllDeadWithinRetryPeriod()
+    public function testSendAllDeadWithinRetryPeriod(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $t1->method('send')->willThrowException(new TransportException());
@@ -154,7 +154,7 @@ class FailoverTransportTest extends TestCase
         $t->send(new RawMessage(''));
     }
 
-    public function testSendOneDeadButRecover()
+    public function testSendOneDeadButRecover(): void
     {
         $t1 = $this->createStub(TransportInterface::class);
         $t1->method('send')->willReturnCallback(static function () {
@@ -187,7 +187,7 @@ class FailoverTransportTest extends TestCase
         $t->send(new RawMessage(''));
     }
 
-    private function assertTransports(RoundRobinTransport $transport, int $cursor, array $deadTransports)
+    private function assertTransports(RoundRobinTransport $transport, int $cursor, array $deadTransports): void
     {
         $p = new \ReflectionProperty(RoundRobinTransport::class, 'cursor');
         $this->assertSame($cursor, $p->getValue($transport));

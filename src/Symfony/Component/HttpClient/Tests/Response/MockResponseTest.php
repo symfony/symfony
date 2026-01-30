@@ -21,7 +21,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 class MockResponseTest extends TestCase
 {
-    public function testTotalTimeShouldBeSimulatedWhenNotProvided()
+    public function testTotalTimeShouldBeSimulatedWhenNotProvided(): void
     {
         $response = new MockResponse('body');
         $response = MockResponse::fromRequest('GET', 'https://example.com/file.txt', [], $response);
@@ -30,7 +30,7 @@ class MockResponseTest extends TestCase
         $this->assertGreaterThan(0.0, $response->getInfo('total_time'));
     }
 
-    public function testTotalTimeShouldNotBeSimulatedWhenProvided()
+    public function testTotalTimeShouldNotBeSimulatedWhenProvided(): void
     {
         $totalTime = 4.2;
         $response = new MockResponse('body', ['total_time' => $totalTime]);
@@ -39,7 +39,7 @@ class MockResponseTest extends TestCase
         $this->assertEquals($totalTime, $response->getInfo('total_time'));
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $data = ['color' => 'orange', 'size' => 42];
         $response = new MockResponse(json_encode($data));
@@ -49,7 +49,7 @@ class MockResponseTest extends TestCase
     }
 
     #[DataProvider('toArrayErrors')]
-    public function testToArrayError($content, $responseHeaders, $message)
+    public function testToArrayError($content, $responseHeaders, $message): void
     {
         $this->expectException(JsonException::class);
         $this->expectExceptionMessage($message);
@@ -59,7 +59,7 @@ class MockResponseTest extends TestCase
         $response->toArray();
     }
 
-    public function testUrlHttpMethodMockResponse()
+    public function testUrlHttpMethodMockResponse(): void
     {
         $responseMock = new MockResponse(json_encode(['foo' => 'bar']));
         $url = 'https://example.com/some-endpoint';
@@ -105,7 +105,7 @@ class MockResponseTest extends TestCase
         ];
     }
 
-    public function testErrorIsTakenIntoAccountInInitialization()
+    public function testErrorIsTakenIntoAccountInInitialization(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('ccc error');
@@ -115,7 +115,7 @@ class MockResponseTest extends TestCase
         ]))->getStatusCode();
     }
 
-    public function testCancelingAMockResponseNotIssuedByMockHttpClient()
+    public function testCancelingAMockResponseNotIssuedByMockHttpClient(): void
     {
         $mockResponse = new MockResponse();
         $mockResponse->cancel();
@@ -123,7 +123,7 @@ class MockResponseTest extends TestCase
         $this->assertTrue($mockResponse->getInfo('canceled'));
     }
 
-    public function testMustBeIssuedByMockHttpClient()
+    public function testMustBeIssuedByMockHttpClient(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('MockResponse instances must be issued by MockHttpClient before processing.');
@@ -131,7 +131,7 @@ class MockResponseTest extends TestCase
         (new MockResponse())->getContent();
     }
 
-    public function testFromFile()
+    public function testFromFile(): void
     {
         $client = new MockHttpClient(MockResponse::fromFile(__DIR__.'/Fixtures/response.txt'));
         $response = $client->request('GET', 'https://symfony.com');

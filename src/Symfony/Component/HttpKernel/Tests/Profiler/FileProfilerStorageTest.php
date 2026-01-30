@@ -36,7 +36,7 @@ class FileProfilerStorageTest extends TestCase
         self::cleanDir();
     }
 
-    public function testStore()
+    public function testStore(): void
     {
         for ($i = 0; $i < 10; ++$i) {
             $profile = new Profile('token_'.$i);
@@ -48,7 +48,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertCount(10, $this->storage->find('127.0.0.1', 'http://foo.bar', 20, 'GET'), '->write() stores data in the storage');
     }
 
-    public function testChildren()
+    public function testChildren(): void
     {
         $parentProfile = new Profile('token_parent');
         $parentProfile->setIp('127.0.0.1');
@@ -81,7 +81,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertEquals($childProfile->getToken(), $children[0]->getToken());
     }
 
-    public function testStoreSpecialCharsInUrl()
+    public function testStoreSpecialCharsInUrl(): void
     {
         // The storage accepts special characters in URLs (Even though URLs are not
         // supposed to contain them)
@@ -122,7 +122,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertNotFalse($this->storage->read('comma'), '->write() accepts comma in URL');
     }
 
-    public function testStoreDuplicateToken()
+    public function testStoreDuplicateToken(): void
     {
         $profile = new Profile('token');
         $profile->setUrl('http://example.com/');
@@ -140,7 +140,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertCount(1, $this->storage->find('', '', 1000, ''), '->find() does not return the same profile twice');
     }
 
-    public function testRetrieveByIp()
+    public function testRetrieveByIp(): void
     {
         $profile = new Profile('token');
         $profile->setIp('127.0.0.1');
@@ -152,7 +152,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertCount(0, $this->storage->find('127.0._.1', '', 10, 'GET'), '->find() does not interpret a "_" as a wildcard in the IP');
     }
 
-    public function testRetrieveByStatusCode()
+    public function testRetrieveByStatusCode(): void
     {
         $profile200 = new Profile('statuscode200');
         $profile200->setStatusCode(200);
@@ -166,7 +166,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertCount(1, $this->storage->find(null, null, 10, null, null, null, '404'), '->find() retrieve a record by Status code 404');
     }
 
-    public function testRetrieveByUrl()
+    public function testRetrieveByUrl(): void
     {
         $profile = new Profile('simple_quote');
         $profile->setIp('127.0.0.1');
@@ -219,7 +219,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertCount(6, $this->storage->find('127.0.0.1', '!.webp', 10, 'GET'), '->find() does not interpret a "!" at the beginning as a negation operator in the URL');
     }
 
-    public function testStoreTime()
+    public function testStoreTime(): void
     {
         $start = $now = time();
 
@@ -243,7 +243,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertCount(2, $records, '->find() should return only first two of the previously added records');
     }
 
-    public function testRetrieveByEmptyUrlAndIp()
+    public function testRetrieveByEmptyUrlAndIp(): void
     {
         for ($i = 0; $i < 5; ++$i) {
             $profile = new Profile('token_'.$i);
@@ -254,7 +254,7 @@ class FileProfilerStorageTest extends TestCase
         $this->storage->purge();
     }
 
-    public function testRetrieveByMethodAndLimit()
+    public function testRetrieveByMethodAndLimit(): void
     {
         foreach (['POST', 'GET'] as $method) {
             for ($i = 0; $i < 5; ++$i) {
@@ -269,7 +269,7 @@ class FileProfilerStorageTest extends TestCase
         $this->storage->purge();
     }
 
-    public function testPurge()
+    public function testPurge(): void
     {
         $profile = new Profile('token1');
         $profile->setIp('127.0.0.1');
@@ -297,7 +297,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertCount(0, $this->storage->find('127.0.0.1', '', 10, 'GET'), '->purge() removes all items from index');
     }
 
-    public function testDuplicates()
+    public function testDuplicates(): void
     {
         for ($i = 1; $i <= 5; ++$i) {
             $profile = new Profile('foo'.$i);
@@ -313,7 +313,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertCount(3, $this->storage->find('127.0.0.1', 'http://example.net/', 3, 'GET'), '->find() method returns incorrect number of entries');
     }
 
-    public function testStatusCode()
+    public function testStatusCode(): void
     {
         $profile = new Profile('token1');
         $profile->setStatusCode(200);
@@ -329,7 +329,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertContains((int) $tokens[1]['status_code'], [200, 404]);
     }
 
-    public function testMultiRowIndexFile()
+    public function testMultiRowIndexFile(): void
     {
         $iteration = 3;
         for ($i = 0; $i < $iteration; ++$i) {
@@ -353,7 +353,7 @@ class FileProfilerStorageTest extends TestCase
     }
 
     #[DataProvider('provideExpiredProfiles')]
-    public function testRemoveExpiredProfiles(string $index, string $expectedOffset)
+    public function testRemoveExpiredProfiles(string $index, string $expectedOffset): void
     {
         $file = $this->tmpDir.'/index.csv';
         file_put_contents($file, $index);
@@ -427,7 +427,7 @@ class FileProfilerStorageTest extends TestCase
         ];
     }
 
-    public function testReadLineFromFile()
+    public function testReadLineFromFile(): void
     {
         $r = new \ReflectionMethod($this->storage, 'readLineFromFile');
 
@@ -440,7 +440,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertEquals('line1', $r->invoke($this->storage, $h));
     }
 
-    protected function cleanDir()
+    protected function cleanDir(): void
     {
         $flags = \FilesystemIterator::SKIP_DOTS;
         $iterator = new \RecursiveDirectoryIterator($this->tmpDir, $flags);

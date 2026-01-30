@@ -22,7 +22,7 @@ use Symfony\Component\Mime\Message;
 
 class MessengerTransportListenerTest extends TestCase
 {
-    public function testNoMessengerTransportStampsByDefault()
+    public function testNoMessengerTransportStampsByDefault(): void
     {
         $l = new MessengerTransportListener();
         $envelope = new Envelope(new Address('sender@example.com'), [new Address('recipient@example.com')]);
@@ -32,7 +32,7 @@ class MessengerTransportListenerTest extends TestCase
         $this->assertSame([], $event->getStamps());
     }
 
-    public function testMessengerTransportStampViaHeader()
+    public function testMessengerTransportStampViaHeader(): void
     {
         $l = new MessengerTransportListener();
         $envelope = new Envelope(new Address('sender@example.com'), [new Address('recipient@example.com')]);
@@ -46,7 +46,7 @@ class MessengerTransportListenerTest extends TestCase
         $this->assertFalse($message->getHeaders()->has('X-Bus-Transport'));
     }
 
-    public function testMessengerTransportStampsViaHeader()
+    public function testMessengerTransportStampsViaHeader(): void
     {
         $l = new MessengerTransportListener();
         $envelope = new Envelope(new Address('sender@example.com'), [new Address('recipient@example.com')]);

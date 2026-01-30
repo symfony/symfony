@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Serializer;
 
 class TemplatedEmailTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $email = new TemplatedEmail();
         $email->context($context = ['product' => 'Symfony']);
@@ -37,7 +37,7 @@ class TemplatedEmailTest extends TestCase
         $this->assertEquals($template, $email->getHtmlTemplate());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $email = (new TemplatedEmail())
             ->textTemplate('text.txt.twig')
@@ -53,7 +53,7 @@ class TemplatedEmailTest extends TestCase
         $this->assertEquals($locale, $email->getLocale());
     }
 
-    public function testSymfonySerialize()
+    public function testSymfonySerialize(): void
     {
         // we don't add from/sender to check that validation is not triggered to serialize an email
         $e = new TemplatedEmail();

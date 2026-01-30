@@ -21,7 +21,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 class ControllerArgumentValueResolverPassTest extends TestCase
 {
-    public function testServicesAreOrderedAccordingToPriority()
+    public function testServicesAreOrderedAccordingToPriority(): void
     {
         $services = [
             'n3' => [[]],
@@ -53,7 +53,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('n3.traceable'));
     }
 
-    public function testInDebugWithStopWatchDefinition()
+    public function testInDebugWithStopWatchDefinition(): void
     {
         $services = [
             'n3' => [[]],
@@ -90,7 +90,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $this->assertTrue($container->hasDefinition('n3'));
     }
 
-    public function testInDebugWithouStopWatchDefinition()
+    public function testInDebugWithouStopWatchDefinition(): void
     {
         $expected = [new Reference('n1')];
 
@@ -108,7 +108,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $this->assertTrue($container->hasDefinition('n1'));
     }
 
-    public function testReturningEmptyArrayWhenNoService()
+    public function testReturningEmptyArrayWhenNoService(): void
     {
         $definition = new Definition(ArgumentResolver::class, [null, []]);
         $container = new ContainerBuilder();
@@ -120,7 +120,7 @@ class ControllerArgumentValueResolverPassTest extends TestCase
         $this->assertEquals([], $definition->getArgument(1)->getValues());
     }
 
-    public function testNoArgumentResolver()
+    public function testNoArgumentResolver(): void
     {
         $container = new ContainerBuilder();
 

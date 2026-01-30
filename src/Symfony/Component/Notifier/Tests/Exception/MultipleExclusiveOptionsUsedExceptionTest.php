@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Exception\MultipleExclusiveOptionsUsedException;
 
 class MultipleExclusiveOptionsUsedExceptionTest extends TestCase
 {
-    public function testMessage()
+    public function testMessage(): void
     {
         $exception = new MultipleExclusiveOptionsUsedException(['foo', 'bar'], ['foo', 'bar', 'baz']);
 

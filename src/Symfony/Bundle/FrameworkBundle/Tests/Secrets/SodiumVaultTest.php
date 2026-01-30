@@ -35,7 +35,7 @@ class SodiumVaultTest extends TestCase
         $this->filesystem->remove($this->secretsDir);
     }
 
-    public function testGenerateKeys()
+    public function testGenerateKeys(): void
     {
         $vault = new SodiumVault($this->secretsDir);
 
@@ -55,7 +55,7 @@ class SodiumVaultTest extends TestCase
         $this->assertStringNotEqualsFile($this->secretsDir.'/test.decrypt.private.php', $decKey);
     }
 
-    public function testEncryptAndDecrypt()
+    public function testEncryptAndDecrypt(): void
     {
         $vault = new SodiumVault($this->secretsDir);
         $vault->generateKeys();
@@ -76,7 +76,7 @@ class SodiumVaultTest extends TestCase
         $this->assertSame([], $vault->list());
     }
 
-    public function testDerivedSecretEnvVar()
+    public function testDerivedSecretEnvVar(): void
     {
         $vault = new SodiumVault($this->secretsDir, null, 'MY_SECRET');
         $vault->generateKeys();
@@ -85,7 +85,7 @@ class SodiumVaultTest extends TestCase
         $this->assertSame(['FOO', 'MY_SECRET'], array_keys($vault->loadEnvVars()));
     }
 
-    public function testEmptySecretEnvVar()
+    public function testEmptySecretEnvVar(): void
     {
         $vault = new SodiumVault($this->secretsDir, '', 'MY_SECRET');
         $envVars = $vault->loadEnvVars();

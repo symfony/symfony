@@ -16,7 +16,7 @@ use Symfony\Component\Ldap\Entry;
 
 class EntryTest extends TestCase
 {
-    public function testCaseSensitiveAttributeAccessors()
+    public function testCaseSensitiveAttributeAccessors(): void
     {
         $mail = 'fabpot@symfony.com';
         $givenName = 'Fabien Potencier';

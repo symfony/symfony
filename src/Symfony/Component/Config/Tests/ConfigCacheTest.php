@@ -41,7 +41,7 @@ class ConfigCacheTest extends TestCase
     }
 
     #[DataProvider('debugModes')]
-    public function testCacheIsNotValidIfNothingHasBeenCached(bool $debug)
+    public function testCacheIsNotValidIfNothingHasBeenCached(bool $debug): void
     {
         unlink($this->cacheFile); // remove tempnam() side effect
         $cache = new ConfigCache($this->cacheFile, $debug);
@@ -49,7 +49,7 @@ class ConfigCacheTest extends TestCase
         $this->assertFalse($cache->isFresh());
     }
 
-    public function testIsAlwaysFreshInProduction()
+    public function testIsAlwaysFreshInProduction(): void
     {
         $staleResource = new ResourceStub();
         $staleResource->setFresh(false);
@@ -61,14 +61,14 @@ class ConfigCacheTest extends TestCase
     }
 
     #[DataProvider('debugModes')]
-    public function testIsFreshWhenNoResourceProvided(bool $debug)
+    public function testIsFreshWhenNoResourceProvided(bool $debug): void
     {
         $cache = new ConfigCache($this->cacheFile, $debug);
         $cache->write('', []);
         $this->assertTrue($cache->isFresh());
     }
 
-    public function testFreshResourceInDebug()
+    public function testFreshResourceInDebug(): void
     {
         $p = (new \ReflectionClass(SelfCheckingResourceChecker::class))->getProperty('cache');
         $p->setValue(null, []);
@@ -82,7 +82,7 @@ class ConfigCacheTest extends TestCase
         $this->assertTrue($cache->isFresh());
     }
 
-    public function testStaleResourceInDebug()
+    public function testStaleResourceInDebug(): void
     {
         $p = (new \ReflectionClass(SelfCheckingResourceChecker::class))->getProperty('cache');
         $p->setValue(null, []);
@@ -104,7 +104,7 @@ class ConfigCacheTest extends TestCase
         ];
     }
 
-    public function testCacheWithCustomMetaFile()
+    public function testCacheWithCustomMetaFile(): void
     {
         $this->assertStringEqualsFile($this->metaFile, '');
 

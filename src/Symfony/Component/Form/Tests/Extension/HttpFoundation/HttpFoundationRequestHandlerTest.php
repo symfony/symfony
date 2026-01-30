@@ -22,19 +22,19 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTestCase
 {
-    public function testRequestShouldNotBeNull()
+    public function testRequestShouldNotBeNull(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->requestHandler->handleRequest($this->createForm('name', 'GET'));
     }
 
-    public function testRequestShouldBeInstanceOfRequest()
+    public function testRequestShouldBeInstanceOfRequest(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->requestHandler->handleRequest($this->createForm('name', 'GET'), new \stdClass());
     }
 
-    protected function setRequestData($method, $data, $files = [])
+    protected function setRequestData($method, $data, $files = []): void
     {
         $this->request = Request::create('http://localhost', $method, $data, [], $files);
     }

@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\Extension
 
 class BundleTest extends TestCase
 {
-    public function testGetContainerExtension()
+    public function testGetContainerExtension(): void
     {
         $bundle = new ExtensionPresentBundle();
 
@@ -30,7 +30,7 @@ class BundleTest extends TestCase
         );
     }
 
-    public function testBundleNameIsGuessedFromClass()
+    public function testBundleNameIsGuessedFromClass(): void
     {
         $bundle = new GuessedNameBundle();
 
@@ -38,7 +38,7 @@ class BundleTest extends TestCase
         $this->assertSame('GuessedNameBundle', $bundle->getName());
     }
 
-    public function testBundleNameCanBeExplicitlyProvided()
+    public function testBundleNameCanBeExplicitlyProvided(): void
     {
         $bundle = new NamedBundle();
 
@@ -47,7 +47,7 @@ class BundleTest extends TestCase
         $this->assertSame('ExplicitlyNamedBundle', $bundle->getName());
     }
 
-    public function testBundleAsCompilerPass()
+    public function testBundleAsCompilerPass(): void
     {
         $kernel = new class('test', true) extends Kernel {
             public function registerBundles(): iterable

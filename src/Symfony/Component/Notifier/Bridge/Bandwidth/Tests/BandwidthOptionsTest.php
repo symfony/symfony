@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthOptions;
 
 class BandwidthOptionsTest extends TestCase
 {
-    public function testBandwidthOptions()
+    public function testBandwidthOptions(): void
     {
         $bandwidthOptions = (new BandwidthOptions())
             ->media(['foo'])

@@ -45,12 +45,12 @@ abstract class PropertyAccessorArrayAccessTestCase extends TestCase
     }
 
     #[DataProvider('getValidPropertyPaths')]
-    public function testGetValue($collection, $path, $value)
+    public function testGetValue($collection, $path, $value): void
     {
         $this->assertSame($value, $this->propertyAccessor->getValue($collection, $path));
     }
 
-    public function testGetValueFailsIfNoSuchIndex()
+    public function testGetValueFailsIfNoSuchIndex(): void
     {
         $this->propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
@@ -64,7 +64,7 @@ abstract class PropertyAccessorArrayAccessTestCase extends TestCase
     }
 
     #[DataProvider('getValidPropertyPaths')]
-    public function testSetValue($collection, $path, $value)
+    public function testSetValue($collection, $path, $value): void
     {
         $this->propertyAccessor->setValue($collection, $path, 'Updated');
 
@@ -72,19 +72,19 @@ abstract class PropertyAccessorArrayAccessTestCase extends TestCase
     }
 
     #[DataProvider('getValidPropertyPaths')]
-    public function testIsReadable($collection, $path, $value)
+    public function testIsReadable($collection, $path, $value): void
     {
         $this->assertTrue($this->propertyAccessor->isReadable($collection, $path));
     }
 
     #[DataProvider('getValidPropertyPaths')]
-    public function testIsWritable($collection, $path, $value)
+    public function testIsWritable($collection, $path, $value): void
     {
         $this->assertTrue($this->propertyAccessor->isWritable($collection, $path));
     }
 
     #[DataProvider('getInvalidPropertyPaths')]
-    public function testIsNotWritable($collection, $path, $value)
+    public function testIsNotWritable($collection, $path, $value): void
     {
         $this->assertFalse($this->propertyAccessor->isWritable($collection, $path));
     }

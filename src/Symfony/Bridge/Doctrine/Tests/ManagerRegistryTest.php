@@ -23,7 +23,7 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
 
 class ManagerRegistryTest extends TestCase
 {
-    public function testResetService()
+    public function testResetService(): void
     {
         $container = new ContainerBuilder();
 
@@ -51,7 +51,7 @@ class ManagerRegistryTest extends TestCase
     }
 
     #[DataProvider('provideResetServiceWithNativeLazyObjectsCases')]
-    public function testResetServiceWithNativeLazyObjects(string $class)
+    public function testResetServiceWithNativeLazyObjects(string $class): void
     {
         $container = new $class();
 
@@ -112,7 +112,7 @@ class ManagerRegistryTest extends TestCase
      * overflow or memory overflow operations, which can happen for long-running processes that rely on
      * services that are reset very often.
      */
-    public function testResetServiceWillNotNestFurtherLazyServicesWithinEachOther()
+    public function testResetServiceWillNotNestFurtherLazyServicesWithinEachOther(): void
     {
         // This test scenario only applies to containers composed as a set of generated sources
         $this->dumpLazyServiceDoctrineBridgeContainerAsFiles();
@@ -149,7 +149,7 @@ class ManagerRegistryTest extends TestCase
         self::assertNotInstanceOf(LazyObjectInterface::class, $wrappedValue);
     }
 
-    private function dumpLazyServiceDoctrineBridgeContainerAsFiles()
+    private function dumpLazyServiceDoctrineBridgeContainerAsFiles(): void
     {
         if (class_exists(\LazyServiceDoctrineBridgeContainerAsFiles::class, false)) {
             return;

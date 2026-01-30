@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class AutowireInlineTest extends TestCase
 {
-    public function testInvalidFactoryArray()
+    public function testInvalidFactoryArray(): void
     {
         $autowireInline = new AutowireInline([123, 456]);
 
@@ -26,7 +26,7 @@ class AutowireInlineTest extends TestCase
     }
 
     #[DataProvider('provideInvalidCalls')]
-    public function testInvalidCallsArray(array $calls)
+    public function testInvalidCallsArray(array $calls): void
     {
         $autowireInline = new AutowireInline('someClass', calls: $calls);
 
@@ -52,7 +52,7 @@ class AutowireInlineTest extends TestCase
         yield 'invalid arguments value type6' => [[['someMethod', '']]];
     }
 
-    public function testClass()
+    public function testClass(): void
     {
         $attribute = new AutowireInline('someClass');
 
@@ -63,7 +63,7 @@ class AutowireInlineTest extends TestCase
         self::assertFalse($attribute->lazy);
     }
 
-    public function testClassAndParams()
+    public function testClassAndParams(): void
     {
         $attribute = new AutowireInline('someClass', ['someParam']);
 
@@ -74,7 +74,7 @@ class AutowireInlineTest extends TestCase
         self::assertFalse($attribute->lazy);
     }
 
-    public function testClassAndParamsLazy()
+    public function testClassAndParamsLazy(): void
     {
         $attribute = new AutowireInline('someClass', ['someParam'], lazy: true);
 
@@ -86,7 +86,7 @@ class AutowireInlineTest extends TestCase
     }
 
     #[DataProvider('provideFactories')]
-    public function testFactory(string|array $factory, string|array $expectedResult)
+    public function testFactory(string|array $factory, string|array $expectedResult): void
     {
         $attribute = new AutowireInline($factory);
 
@@ -99,7 +99,7 @@ class AutowireInlineTest extends TestCase
     }
 
     #[DataProvider('provideFactories')]
-    public function testFactoryAndParams(string|array $factory, string|array $expectedResult)
+    public function testFactoryAndParams(string|array $factory, string|array $expectedResult): void
     {
         $attribute = new AutowireInline($factory, ['someParam']);
 
@@ -112,7 +112,7 @@ class AutowireInlineTest extends TestCase
     }
 
     #[DataProvider('provideFactories')]
-    public function testFactoryAndParamsLazy(string|array $factory, string|array $expectedResult)
+    public function testFactoryAndParamsLazy(string|array $factory, string|array $expectedResult): void
     {
         $attribute = new AutowireInline($factory, ['someParam'], lazy: true);
 
@@ -137,7 +137,7 @@ class AutowireInlineTest extends TestCase
     }
 
     #[DataProvider('provideCalls')]
-    public function testCalls(string|array $calls, array $expectedResult)
+    public function testCalls(string|array $calls, array $expectedResult): void
     {
         $attribute = new AutowireInline('someClass', calls: $calls);
 

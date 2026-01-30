@@ -44,7 +44,7 @@ final class UlidTypeTest extends TestCase
         $this->type = Type::getType('ulid');
     }
 
-    public function testUlidConvertsToDatabaseValue()
+    public function testUlidConvertsToDatabaseValue(): void
     {
         $ulid = Ulid::fromString(self::DUMMY_ULID);
 
@@ -54,7 +54,7 @@ final class UlidTypeTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testUlidInterfaceConvertsToDatabaseValue()
+    public function testUlidInterfaceConvertsToDatabaseValue(): void
     {
         $ulid = $this->createMock(AbstractUid::class);
 
@@ -68,7 +68,7 @@ final class UlidTypeTest extends TestCase
         $this->assertEquals('foo', $actual);
     }
 
-    public function testUlidStringConvertsToDatabaseValue()
+    public function testUlidStringConvertsToDatabaseValue(): void
     {
         $actual = $this->type->convertToDatabaseValue(self::DUMMY_ULID, new PostgreSQLPlatform());
         $ulid = Ulid::fromString(self::DUMMY_ULID);
@@ -78,19 +78,19 @@ final class UlidTypeTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testNotSupportedTypeConversionForDatabaseValue()
+    public function testNotSupportedTypeConversionForDatabaseValue(): void
     {
         $this->expectException(ConversionException::class);
 
         $this->type->convertToDatabaseValue(new \stdClass(), new SQLitePlatform());
     }
 
-    public function testNullConversionForDatabaseValue()
+    public function testNullConversionForDatabaseValue(): void
     {
         $this->assertNull($this->type->convertToDatabaseValue(null, new SQLitePlatform()));
     }
 
-    public function testUlidInterfaceConvertsToPHPValue()
+    public function testUlidInterfaceConvertsToPHPValue(): void
     {
         $ulid = $this->createStub(AbstractUid::class);
         $actual = $this->type->convertToPHPValue($ulid, new SQLitePlatform());
@@ -98,7 +98,7 @@ final class UlidTypeTest extends TestCase
         $this->assertSame($ulid, $actual);
     }
 
-    public function testUlidConvertsToPHPValue()
+    public function testUlidConvertsToPHPValue(): void
     {
         $ulid = $this->type->convertToPHPValue(self::DUMMY_ULID, new SQLitePlatform());
 
@@ -106,32 +106,32 @@ final class UlidTypeTest extends TestCase
         $this->assertEquals(self::DUMMY_ULID, $ulid->__toString());
     }
 
-    public function testInvalidUlidConversionForPHPValue()
+    public function testInvalidUlidConversionForPHPValue(): void
     {
         $this->expectException(ConversionException::class);
 
         $this->type->convertToPHPValue('abcdefg', new SQLitePlatform());
     }
 
-    public function testNullConversionForPHPValue()
+    public function testNullConversionForPHPValue(): void
     {
         $this->assertNull($this->type->convertToPHPValue(null, new SQLitePlatform()));
     }
 
-    public function testReturnValueIfUlidForPHPValue()
+    public function testReturnValueIfUlidForPHPValue(): void
     {
         $ulid = new Ulid();
 
         $this->assertSame($ulid, $this->type->convertToPHPValue($ulid, new SQLitePlatform()));
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('ulid', $this->type->getName());
     }
 
     #[DataProvider('provideSqlDeclarations')]
-    public function testGetGuidTypeDeclarationSQL(AbstractPlatform $platform, string $expectedDeclaration)
+    public function testGetGuidTypeDeclarationSQL(AbstractPlatform $platform, string $expectedDeclaration): void
     {
         $this->assertEquals($expectedDeclaration, $this->type->getSqlDeclaration(['length' => 36], $platform));
     }
@@ -144,7 +144,7 @@ final class UlidTypeTest extends TestCase
         yield [new MariaDBPlatform(), 'BINARY(16)'];
     }
 
-    public function testRequiresSQLCommentHint()
+    public function testRequiresSQLCommentHint(): void
     {
         $this->assertTrue($this->type->requiresSQLCommentHint(new SQLitePlatform()));
     }

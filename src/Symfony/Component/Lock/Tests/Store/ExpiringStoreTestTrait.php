@@ -38,7 +38,7 @@ trait ExpiringStoreTestTrait
      *
      * This test is time-sensitive: the $clockDelay could be adjusted.
      */
-    public function testExpiration()
+    public function testExpiration(): void
     {
         $key = new Key(__METHOD__);
         $clockDelay = $this->getClockDelay();
@@ -57,7 +57,7 @@ trait ExpiringStoreTestTrait
     /**
      * Tests the store thrown exception when TTL expires.
      */
-    public function testAbortAfterExpiration()
+    public function testAbortAfterExpiration(): void
     {
         $this->expectException(LockExpiredException::class);
         $key = new Key(__METHOD__);
@@ -74,7 +74,7 @@ trait ExpiringStoreTestTrait
      *
      * This test is time-sensitive: the $clockDelay could be adjusted.
      */
-    public function testRefreshLock()
+    public function testRefreshLock(): void
     {
         // Amount of microseconds we should wait without slowing things down too much
         $clockDelay = $this->getClockDelay();
@@ -92,7 +92,7 @@ trait ExpiringStoreTestTrait
         $this->assertFalse($store->exists($key));
     }
 
-    public function testSetExpiration()
+    public function testSetExpiration(): void
     {
         $key = new Key(__METHOD__);
 
@@ -105,7 +105,7 @@ trait ExpiringStoreTestTrait
         $this->assertLessThanOrEqual(1, $key->getRemainingLifetime());
     }
 
-    public function testExpiredLockCleaned()
+    public function testExpiredLockCleaned(): void
     {
         $key1 = new Key(static::class.__METHOD__);
         $key2 = new Key(static::class.__METHOD__);

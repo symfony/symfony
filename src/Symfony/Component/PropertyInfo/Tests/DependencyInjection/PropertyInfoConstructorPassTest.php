@@ -19,7 +19,7 @@ use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoConstructorPa
 
 class PropertyInfoConstructorPassTest extends TestCase
 {
-    public function testServicesAreOrderedAccordingToPriority()
+    public function testServicesAreOrderedAccordingToPriority(): void
     {
         $container = new ContainerBuilder();
 
@@ -40,7 +40,7 @@ class PropertyInfoConstructorPassTest extends TestCase
         $this->assertEquals($expected, $definition->getArgument(0));
     }
 
-    public function testReturningEmptyArrayWhenNoService()
+    public function testReturningEmptyArrayWhenNoService(): void
     {
         $container = new ContainerBuilder();
         $propertyInfoExtractorDefinition = $container->register('property_info.constructor_extractor')

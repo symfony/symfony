@@ -13,7 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 class ErrorHandlerWebTestCase extends AbstractWebTestCase
 {
-    public function testHtmlErrorResponseOnCliContext()
+    public function testHtmlErrorResponseOnCliContext(): void
     {
         $client = self::createClient(['test_case' => 'ErrorHandler', 'root_config' => 'config.yml', 'debug' => false]);
         $client->request('GET', '/_error/500.html');

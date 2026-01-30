@@ -56,7 +56,7 @@ class ConsoleLoggerTest extends TestCase
     }
 
     #[DataProvider('provideOutputMappingParams')]
-    public function testOutputMapping($logLevel, $outputVerbosity, $isOutput, $addVerbosityLevelMap = [])
+    public function testOutputMapping($logLevel, $outputVerbosity, $isOutput, $addVerbosityLevelMap = []): void
     {
         $out = new BufferedOutput($outputVerbosity);
         $logger = new ConsoleLogger($out, $addVerbosityLevelMap);
@@ -85,7 +85,7 @@ class ConsoleLoggerTest extends TestCase
         ];
     }
 
-    public function testHasErrored()
+    public function testHasErrored(): void
     {
         $logger = new ConsoleLogger(new BufferedOutput());
 
@@ -98,13 +98,13 @@ class ConsoleLoggerTest extends TestCase
         $this->assertTrue($logger->hasErrored());
     }
 
-    public function testImplements()
+    public function testImplements(): void
     {
         $this->assertInstanceOf(LoggerInterface::class, $this->getLogger());
     }
 
     #[DataProvider('provideLevelsAndMessages')]
-    public function testLogsAtAllLevels($level, $message)
+    public function testLogsAtAllLevels($level, $message): void
     {
         $logger = $this->getLogger();
         $logger->{$level}($message, ['user' => 'Bob']);
@@ -131,13 +131,13 @@ class ConsoleLoggerTest extends TestCase
         ];
     }
 
-    public function testThrowsOnInvalidLevel()
+    public function testThrowsOnInvalidLevel(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->getLogger()->log('invalid level', 'Foo');
     }
 
-    public function testContextReplacement()
+    public function testContextReplacement(): void
     {
         $logger = $this->getLogger();
         $logger->info('{Message {nothing} {user} {foo.bar} a}', ['user' => 'Bob', 'foo.bar' => 'Bar']);
@@ -146,7 +146,7 @@ class ConsoleLoggerTest extends TestCase
         $this->assertEquals($expected, $this->getLogs());
     }
 
-    public function testObjectCastToString()
+    public function testObjectCastToString(): void
     {
         $this->getLogger()->warning(new DummyTest());
 
@@ -154,7 +154,7 @@ class ConsoleLoggerTest extends TestCase
         $this->assertEquals($expected, $this->getLogs());
     }
 
-    public function testContextCanContainAnything()
+    public function testContextCanContainAnything(): void
     {
         $context = [
             'bool' => true,
@@ -173,7 +173,7 @@ class ConsoleLoggerTest extends TestCase
         $this->assertEquals($expected, $this->getLogs());
     }
 
-    public function testContextExceptionKeyCanBeExceptionOrOtherValues()
+    public function testContextExceptionKeyCanBeExceptionOrOtherValues(): void
     {
         $logger = $this->getLogger();
         $logger->warning('Random message', ['exception' => 'oops']);

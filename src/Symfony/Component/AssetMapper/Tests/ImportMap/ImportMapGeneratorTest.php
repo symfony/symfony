@@ -47,7 +47,7 @@ class ImportMapGeneratorTest extends TestCase
         $this->filesystem->remove(self::$writableRoot);
     }
 
-    public function testGetEntrypointNames()
+    public function testGetEntrypointNames(): void
     {
         $manager = $this->createImportMapGenerator();
         $this->mockImportMap([
@@ -59,7 +59,7 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertEquals(['entry1', 'entry2'], $manager->getEntrypointNames());
     }
 
-    public function testGetImportMapData()
+    public function testGetImportMapData(): void
     {
         $manager = $this->createImportMapGenerator();
         $this->mockImportMap([
@@ -255,7 +255,7 @@ class ImportMapGeneratorTest extends TestCase
     }
 
     #[DataProvider('getRawImportMapDataTests')]
-    public function testGetRawImportMapData(array $importMapEntries, array $mappedAssets, array $expectedData)
+    public function testGetRawImportMapData(array $importMapEntries, array $mappedAssets, array $expectedData): void
     {
         $manager = $this->createImportMapGenerator();
         $this->mockImportMap($importMapEntries);
@@ -570,7 +570,7 @@ class ImportMapGeneratorTest extends TestCase
         ];
     }
 
-    public function testGetRawImportDataUsesCacheFile()
+    public function testGetRawImportDataUsesCacheFile(): void
     {
         $this->compiledConfigReader = $this->createMock(CompiledAssetMapperConfigReader::class);
         $manager = $this->createImportMapGenerator();
@@ -595,7 +595,7 @@ class ImportMapGeneratorTest extends TestCase
     }
 
     #[DataProvider('getEagerEntrypointImportsTests')]
-    public function testFindEagerEntrypointImports(MappedAsset $entryAsset, array $expected, array $mappedAssets = [])
+    public function testFindEagerEntrypointImports(MappedAsset $entryAsset, array $expected, array $mappedAssets = []): void
     {
         $manager = $this->createImportMapGenerator();
         $this->mockAssetMapper([$entryAsset, ...$mappedAssets]);
@@ -688,7 +688,7 @@ class ImportMapGeneratorTest extends TestCase
         ];
     }
 
-    public function testFindEagerEntrypointImportsUsesCacheFile()
+    public function testFindEagerEntrypointImportsUsesCacheFile(): void
     {
         $this->compiledConfigReader = $this->createMock(CompiledAssetMapperConfigReader::class);
         $manager = $this->createImportMapGenerator();

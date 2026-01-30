@@ -17,7 +17,7 @@ use Symfony\Component\HtmlSanitizer\Visitor\AttributeSanitizer\AttributeSanitize
 
 class HtmlSanitizerConfigTest extends TestCase
 {
-    public function testCreateEmpty()
+    public function testCreateEmpty(): void
     {
         $config = new HtmlSanitizerConfig();
         $this->assertSame([], $config->getAllowedElements());
@@ -29,7 +29,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertFalse($config->getForceHttpsUrls());
     }
 
-    public function testSimpleOptions()
+    public function testSimpleOptions(): void
     {
         $config = new HtmlSanitizerConfig();
         $this->assertSame(['http', 'https', 'mailto', 'tel'], $config->getAllowedLinkSchemes());
@@ -60,7 +60,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertTrue($config->getForceHttpsUrls());
     }
 
-    public function testAllowElement()
+    public function testAllowElement(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div', ['style']);
@@ -68,7 +68,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testAllowElementTwiceOverridesIt()
+    public function testAllowElementTwiceOverridesIt(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div', ['style']);
@@ -85,7 +85,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testAllowBlockedElementUnblocksIt()
+    public function testAllowBlockedElementUnblocksIt(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->blockElement('div');
@@ -96,7 +96,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testAllowElementNoAttributes()
+    public function testAllowElementNoAttributes(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div', []);
@@ -104,7 +104,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testAllowElementStandardAttributes()
+    public function testAllowElementStandardAttributes(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div', '*');
@@ -113,7 +113,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testAllowElementStringAttribute()
+    public function testAllowElementStringAttribute(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div', 'width');
@@ -121,14 +121,14 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testBlockElement()
+    public function testBlockElement(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->blockElement('div');
         $this->assertSame(['div' => true], $config->getBlockedElements());
     }
 
-    public function testBlockElementDisallowsIt()
+    public function testBlockElementDisallowsIt(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div', 'width');
@@ -140,7 +140,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame(['div' => true], $config->getBlockedElements());
     }
 
-    public function testDropAllowedElement()
+    public function testDropAllowedElement(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div', 'width');
@@ -152,7 +152,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testDropBlockedElement()
+    public function testDropBlockedElement(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->blockElement('div');
@@ -164,7 +164,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testAllowAttributeNoElement()
+    public function testAllowAttributeNoElement(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowAttribute('width', 'div');
@@ -172,7 +172,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testAllowAttributeAllowedElement()
+    public function testAllowAttributeAllowedElement(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div');
@@ -181,7 +181,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testAllowAttributeAllElements()
+    public function testAllowAttributeAllElements(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div');
@@ -191,7 +191,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testAllowAttributeElementsArray()
+    public function testAllowAttributeElementsArray(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div');
@@ -201,7 +201,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testAllowAttributeElementsString()
+    public function testAllowAttributeElementsString(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div');
@@ -211,7 +211,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testAllowAttributeOverridesIt()
+    public function testAllowAttributeOverridesIt(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div');
@@ -226,7 +226,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testDropAllowedAttributeAllowedElementsArray()
+    public function testDropAllowedAttributeAllowedElementsArray(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div', 'width');
@@ -239,7 +239,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testDropAllowedAttributeAllowedElementString()
+    public function testDropAllowedAttributeAllowedElementString(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div', 'width');
@@ -252,7 +252,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testDropAllowedAttributeAllElements()
+    public function testDropAllowedAttributeAllElements(): void
     {
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div', 'width');
@@ -265,7 +265,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $this->assertSame([], $config->getBlockedElements());
     }
 
-    public function testWithWithoutAttributeSanitizer()
+    public function testWithWithoutAttributeSanitizer(): void
     {
         $config = new HtmlSanitizerConfig();
 

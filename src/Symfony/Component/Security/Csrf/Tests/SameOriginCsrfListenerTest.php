@@ -28,7 +28,7 @@ class SameOriginCsrfListenerTest extends TestCase
         $this->sameOriginCsrfListener = new SameOriginCsrfListener('csrf-token');
     }
 
-    public function testOnKernelResponseClearsCookies()
+    public function testOnKernelResponseClearsCookies(): void
     {
         $request = new Request([], [], ['csrf-token' => 2], ['csrf-token_test' => 'csrf-token']);
         $response = new Response();
@@ -39,7 +39,7 @@ class SameOriginCsrfListenerTest extends TestCase
         $this->assertTrue($response->headers->has('Set-Cookie'));
     }
 
-    public function testOnKernelResponsePersistsStrategy()
+    public function testOnKernelResponsePersistsStrategy(): void
     {
         $session = $this->createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
@@ -56,7 +56,7 @@ class SameOriginCsrfListenerTest extends TestCase
         $this->sameOriginCsrfListener->onKernelResponse($eventMainRequest);
     }
 
-    public function testOnKernelResponseDoesNothingIfSessionNotStarted()
+    public function testOnKernelResponseDoesNothingIfSessionNotStarted(): void
     {
         $session = $this->createMock(Session::class);
         $session->method('isStarted')->willReturn(false);
@@ -73,7 +73,7 @@ class SameOriginCsrfListenerTest extends TestCase
         $this->sameOriginCsrfListener->onKernelResponse($eventMainRequest);
     }
 
-    public function testOnKernelResponseIgnoresSubRequests()
+    public function testOnKernelResponseIgnoresSubRequests(): void
     {
         $request = new Request([], [], ['csrf-token' => 2]);
         $response = new Response();

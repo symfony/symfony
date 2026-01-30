@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Tests\Dummy\DummyGroupProvider;
 
 class GroupSequenceProviderTest extends TestCase
 {
-    public function testCreateAttributeStyle()
+    public function testCreateAttributeStyle(): void
     {
         $sequence = new GroupSequenceProvider(provider: DummyGroupProvider::class);
 

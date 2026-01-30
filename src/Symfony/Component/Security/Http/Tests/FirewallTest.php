@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\FirewallMapInterface;
 
 class FirewallTest extends TestCase
 {
-    public function testOnKernelRequestRegistersExceptionListener()
+    public function testOnKernelRequestRegistersExceptionListener(): void
     {
         $dispatcher = new EventDispatcher();
 
@@ -52,7 +52,7 @@ class FirewallTest extends TestCase
         $firewall->onKernelRequest($event);
     }
 
-    public function testOnKernelRequestStopsWhenThereIsAResponse()
+    public function testOnKernelRequestStopsWhenThereIsAResponse(): void
     {
         $listener = new class extends AbstractListener {
             public int $callCount = 0;
@@ -84,7 +84,7 @@ class FirewallTest extends TestCase
         $this->assertSame(1, $listener->callCount);
     }
 
-    public function testOnKernelRequestWithSubRequest()
+    public function testOnKernelRequestWithSubRequest(): void
     {
         $map = $this->createMock(FirewallMapInterface::class);
         $map
@@ -104,7 +104,7 @@ class FirewallTest extends TestCase
         $this->assertFalse($event->hasResponse());
     }
 
-    public function testFirewallListenersAreCalled()
+    public function testFirewallListenersAreCalled(): void
     {
         $calledListeners = [];
 

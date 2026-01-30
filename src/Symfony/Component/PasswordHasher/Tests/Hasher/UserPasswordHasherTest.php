@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class UserPasswordHasherTest extends TestCase
 {
-    public function testHashWithLegacyUser()
+    public function testHashWithLegacyUser(): void
     {
         $user = new TestLegacyPasswordAuthenticatedUser('name', null, 'userSalt');
 
@@ -43,7 +43,7 @@ class UserPasswordHasherTest extends TestCase
         $this->assertEquals('hash', $encoded);
     }
 
-    public function testHashWithPasswordAuthenticatedUser()
+    public function testHashWithPasswordAuthenticatedUser(): void
     {
         $user = new TestPasswordAuthenticatedUser();
 
@@ -64,7 +64,7 @@ class UserPasswordHasherTest extends TestCase
         $this->assertSame('hash', $hashedPassword);
     }
 
-    public function testVerifyWithLegacyUser()
+    public function testVerifyWithLegacyUser(): void
     {
         $user = new TestLegacyPasswordAuthenticatedUser('user', 'hash', 'userSalt');
 
@@ -84,7 +84,7 @@ class UserPasswordHasherTest extends TestCase
         $this->assertTrue($isValid);
     }
 
-    public function testVerify()
+    public function testVerify(): void
     {
         $user = new TestPasswordAuthenticatedUser('hash');
 
@@ -104,7 +104,7 @@ class UserPasswordHasherTest extends TestCase
         $this->assertTrue($isValid);
     }
 
-    public function testNeedsRehash()
+    public function testNeedsRehash(): void
     {
         $user = new InMemoryUser('username', null);
         $hasher = new NativePasswordHasher(4, 20000, 4);
@@ -117,7 +117,7 @@ class UserPasswordHasherTest extends TestCase
 
         $passwordHasher = new UserPasswordHasher($passwordHasherFactory);
 
-        \Closure::bind(function () use ($passwordHasher) { $this->password = $passwordHasher->hashPassword($this, 'foo', 'salt'); }, $user, InMemoryUser::class)();
+        \Closure::bind(function () use ($passwordHasher): void { $this->password = $passwordHasher->hashPassword($this, 'foo', 'salt'); }, $user, InMemoryUser::class)();
         $this->assertFalse($passwordHasher->needsRehash($user));
         $this->assertTrue($passwordHasher->needsRehash($user));
         $this->assertFalse($passwordHasher->needsRehash($user));

@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class IdenticalToTest extends TestCase
 {
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(IdenticalToDummy::class);
         $loader = new AttributeLoader();

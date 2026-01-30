@@ -24,7 +24,7 @@ use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
 
 class TypeContextTest extends TestCase
 {
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $typeContext = (new TypeContextFactory())->createFromClassName(DummyWithUses::class);
 
@@ -38,19 +38,19 @@ class TypeContextTest extends TestCase
         $this->assertSame('unknown', $typeContextWithoutNamespace->normalize('unknown'));
     }
 
-    public function testGetDeclaringClass()
+    public function testGetDeclaringClass(): void
     {
         $this->assertSame(Dummy::class, (new TypeContextFactory())->createFromClassName(Dummy::class)->getDeclaringClass());
         $this->assertSame(AbstractDummy::class, (new TypeContextFactory())->createFromClassName(Dummy::class, AbstractDummy::class)->getDeclaringClass());
     }
 
-    public function testGetCalledClass()
+    public function testGetCalledClass(): void
     {
         $this->assertSame(Dummy::class, (new TypeContextFactory())->createFromClassName(Dummy::class)->getCalledClass());
         $this->assertSame(Dummy::class, (new TypeContextFactory())->createFromClassName(Dummy::class, AbstractDummy::class)->getCalledClass());
     }
 
-    public function testGetCalledClassInDifferentNamespace()
+    public function testGetCalledClassInDifferentNamespace(): void
     {
         $this->assertSame(
             DummyInDifferentNs::class,
@@ -58,13 +58,13 @@ class TypeContextTest extends TestCase
         );
     }
 
-    public function testGetParentClass()
+    public function testGetParentClass(): void
     {
         $this->assertSame(AbstractDummy::class, (new TypeContextFactory())->createFromClassName(Dummy::class)->getParentClass());
         $this->assertSame(\stdClass::class, (new TypeContextFactory())->createFromClassName(DummyExtendingStdClass::class)->getParentClass());
     }
 
-    public function testCannotGetParentClassWhenDoNotInherit()
+    public function testCannotGetParentClassWhenDoNotInherit(): void
     {
         $this->expectException(LogicException::class);
         (new TypeContextFactory())->createFromClassName(AbstractDummy::class)->getParentClass();

@@ -20,7 +20,7 @@ use Symfony\Component\Uid\Ulid;
 
 class UlidGeneratorTest extends TestCase
 {
-    public function testUlidCanBeGenerated()
+    public function testUlidCanBeGenerated(): void
     {
         $em = (new \ReflectionClass(EntityManager::class))->newInstanceWithoutConstructor();
         $generator = new UlidGenerator();
@@ -30,7 +30,7 @@ class UlidGeneratorTest extends TestCase
         $this->assertTrue(Ulid::isValid($ulid));
     }
 
-    public function testUlidFactory()
+    public function testUlidFactory(): void
     {
         $ulid = new Ulid('00000000000000000000000000');
         $em = (new \ReflectionClass(EntityManager::class))->newInstanceWithoutConstructor();

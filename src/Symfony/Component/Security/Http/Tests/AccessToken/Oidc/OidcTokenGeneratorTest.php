@@ -26,7 +26,7 @@ use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
 #[RequiresPhpExtension('openssl')]
 class OidcTokenGeneratorTest extends TestCase
 {
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $algorithmManager = new AlgorithmManager([new ES256()]);
         $audience = 'Symfony OIDC';
@@ -49,7 +49,7 @@ class OidcTokenGeneratorTest extends TestCase
     }
 
     #[DataProvider('provideGenerateWithInvalid')]
-    public function testGenerateWithInvalid(?string $algorithm, ?string $issuer, ?int $ttl, ?int $notBefore, string $expectedMessage)
+    public function testGenerateWithInvalid(?string $algorithm, ?string $issuer, ?int $ttl, ?int $notBefore, string $expectedMessage): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedMessage);

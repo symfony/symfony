@@ -21,7 +21,7 @@ trait ObjectToPopulateTestTrait
 {
     abstract protected function getDenormalizerForObjectToPopulate(): DenormalizerInterface;
 
-    public function testObjectToPopulate()
+    public function testObjectToPopulate(): void
     {
         $dummy = new ObjectDummy();
         $dummy->bar = 'bar';
@@ -40,7 +40,7 @@ trait ObjectToPopulateTestTrait
         $this->assertEquals('bar', $obj->bar);
     }
 
-    public function testObjectToPopulateWithProxy()
+    public function testObjectToPopulateWithProxy(): void
     {
         $proxyDummy = new ProxyDummy();
 
@@ -52,7 +52,7 @@ trait ObjectToPopulateTestTrait
         $this->assertSame('bar', $proxyDummy->getFoo());
     }
 
-    public function testObjectToPopulateNoMatch()
+    public function testObjectToPopulateNoMatch(): void
     {
         $this->markTestSkipped('something broken here!');
         $denormalizer = $this->getDenormalizerForObjectToPopulate();
@@ -75,7 +75,7 @@ trait ObjectToPopulateTestTrait
         $this->assertNull($inner->foo);
     }
 
-    public function testDeepObjectToPopulate()
+    public function testDeepObjectToPopulate(): void
     {
         $child = new DeepObjectPopulateChildDummy();
         $child->bar = 'bar-old';

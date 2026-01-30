@@ -20,7 +20,7 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
 class CommentHandlerTest extends AbstractHandlerTestCase
 {
     #[DataProvider('getHandleValueTestData')]
-    public function testHandleValue($value, Token $unusedArgument, $remainingContent)
+    public function testHandleValue($value, Token $unusedArgument, $remainingContent): void
     {
         $reader = new Reader($value);
         $stream = new TokenStream();

@@ -20,7 +20,7 @@ use Symfony\Component\Form\FormTypeGuesserChain;
 
 class DependencyInjectionExtensionTest extends TestCase
 {
-    public function testGetTypeExtensions()
+    public function testGetTypeExtensions(): void
     {
         $typeExtension1 = new TestTypeExtension();
         $typeExtension2 = new TestTypeExtension();
@@ -41,7 +41,7 @@ class DependencyInjectionExtensionTest extends TestCase
         $this->assertSame([$typeExtension3, $typeExtension4], $extension->getTypeExtensions('other'));
     }
 
-    public function testThrowExceptionForInvalidExtendedType()
+    public function testThrowExceptionForInvalidExtendedType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('The extended type "unmatched" specified for the type extension class "%s" does not match any of the actual extended types (["test"]).', TestTypeExtension::class));
@@ -55,14 +55,14 @@ class DependencyInjectionExtensionTest extends TestCase
         $extension->getTypeExtensions('unmatched');
     }
 
-    public function testGetTypeGuesser()
+    public function testGetTypeGuesser(): void
     {
         $extension = new DependencyInjectionExtension(new ContainerBuilder(), [], [new FormTypeGuesserChain([])]);
 
         $this->assertInstanceOf(FormTypeGuesserChain::class, $extension->getTypeGuesser());
     }
 
-    public function testGetTypeGuesserReturnsNullWhenNoTypeGuessersHaveBeenConfigured()
+    public function testGetTypeGuesserReturnsNullWhenNoTypeGuessersHaveBeenConfigured(): void
     {
         $extension = new DependencyInjectionExtension(new ContainerBuilder(), [], []);
 

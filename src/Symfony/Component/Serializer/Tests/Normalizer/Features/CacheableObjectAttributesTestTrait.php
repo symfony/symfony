@@ -35,7 +35,7 @@ trait CacheableObjectAttributesTestTrait
      *  1. an object having some uninitialized properties
      *  2. an object with all properties being initialized.
      */
-    public function testObjectCollectionNormalization()
+    public function testObjectCollectionNormalization(): void
     {
         [$collection, $expectedArray] = $this->getObjectCollectionWithExpectedArray();
         $this->assertCollectionNormalizedProperly($collection, $expectedArray);
@@ -46,7 +46,7 @@ trait CacheableObjectAttributesTestTrait
      *  1. an object with all properties being initialized
      *  2. an object having some uninitialized properties.
      */
-    public function testReversedObjectCollectionNormalization()
+    public function testReversedObjectCollectionNormalization(): void
     {
         [$collection, $expectedArray] = array_map('array_reverse', $this->getObjectCollectionWithExpectedArray());
         $this->assertCollectionNormalizedProperly($collection, $expectedArray);

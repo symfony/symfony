@@ -24,7 +24,7 @@ class PredisSessionHandlerTest extends AbstractRedisSessionHandlerTestCase
         return new Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => 6379]));
     }
 
-    public function testNoDuplicatePrefixWhenUsingDsn()
+    public function testNoDuplicatePrefixWhenUsingDsn(): void
     {
         $host = getenv('REDIS_HOST') ?: 'localhost';
         $dsn = 'redis://'.$host.'?prefix=my_session_prefix_&class='.urlencode(Client::class);

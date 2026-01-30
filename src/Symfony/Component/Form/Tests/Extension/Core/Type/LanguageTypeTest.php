@@ -28,7 +28,7 @@ class LanguageTypeTest extends BaseTypeTestCase
         parent::setUp();
     }
 
-    public function testCountriesAreSelectable()
+    public function testCountriesAreSelectable(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE)
             ->createView()->vars['choices'];
@@ -39,7 +39,7 @@ class LanguageTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testChoiceTranslationLocaleOption()
+    public function testChoiceTranslationLocaleOption(): void
     {
         $choices = $this->factory
             ->create(static::TESTED_TYPE, null, [
@@ -53,7 +53,7 @@ class LanguageTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('my', 'my', 'бірманська'), $choices);
     }
 
-    public function testAlpha3Option()
+    public function testAlpha3Option(): void
     {
         $choices = $this->factory
             ->create(static::TESTED_TYPE, null, [
@@ -69,7 +69,7 @@ class LanguageTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testChoiceTranslationLocaleAndAlpha3Option()
+    public function testChoiceTranslationLocaleAndAlpha3Option(): void
     {
         $choices = $this->factory
             ->create(static::TESTED_TYPE, null, [
@@ -86,7 +86,7 @@ class LanguageTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testChoiceSelfTranslationOption()
+    public function testChoiceSelfTranslationOption(): void
     {
         $choices = $this->factory
             ->create(static::TESTED_TYPE, null, [
@@ -104,7 +104,7 @@ class LanguageTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testChoiceSelfTranslationAndAlpha3Options()
+    public function testChoiceSelfTranslationAndAlpha3Options(): void
     {
         $choices = $this->factory
             ->create(static::TESTED_TYPE, null, [
@@ -117,7 +117,7 @@ class LanguageTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('yid', 'yid', 'ייִדיש'), $choices, '', false, false);
     }
 
-    public function testSelfTranslationNotAllowedWithChoiceTranslation()
+    public function testSelfTranslationNotAllowedWithChoiceTranslation(): void
     {
         $this->expectException(LogicException::class);
 
@@ -127,7 +127,7 @@ class LanguageTypeTest extends BaseTypeTestCase
         ]);
     }
 
-    public function testMultipleLanguagesIsNotIncluded()
+    public function testMultipleLanguagesIsNotIncluded(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE, 'language')
             ->createView()->vars['choices'];
@@ -135,12 +135,12 @@ class LanguageTypeTest extends BaseTypeTestCase
         $this->assertNotContainsEquals(new ChoiceView('mul', 'mul', 'Mehrsprachig'), $choices);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'en', $expectedData = 'en')
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'en', $expectedData = 'en'): void
     {
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
     }

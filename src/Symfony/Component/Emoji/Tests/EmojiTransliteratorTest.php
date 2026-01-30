@@ -21,7 +21,7 @@ use Symfony\Component\Finder\Finder;
 class EmojiTransliteratorTest extends TestCase
 {
     #[DataProvider('provideTransliterateTests')]
-    public function testTransliterate(string $locale, string $input, string $expected)
+    public function testTransliterate(string $locale, string $input, string $expected): void
     {
         $tr = EmojiTransliterator::create('emoji-'.$locale);
 
@@ -86,7 +86,7 @@ class EmojiTransliteratorTest extends TestCase
     }
 
     #[DataProvider('provideLocaleTest')]
-    public function testAllTransliterator(string $locale)
+    public function testAllTransliterator(string $locale): void
     {
         $tr = EmojiTransliterator::create($locale);
 
@@ -107,7 +107,7 @@ class EmojiTransliteratorTest extends TestCase
         }
     }
 
-    public function testTransliterateWithInvalidLocale()
+    public function testTransliterateWithInvalidLocale(): void
     {
         $this->expectException(\IntlException::class);
 
@@ -116,19 +116,19 @@ class EmojiTransliteratorTest extends TestCase
         EmojiTransliterator::create('invalid');
     }
 
-    public function testListIds()
+    public function testListIds(): void
     {
         $this->assertContains('emoji-en_ca', EmojiTransliterator::listIDs());
         $this->assertNotContains('..', EmojiTransliterator::listIDs());
     }
 
-    public function testSlice()
+    public function testSlice(): void
     {
         $tr = EmojiTransliterator::create('emoji-en');
         $this->assertSame('😀grinning face', $tr->transliterate('😀😀', 2));
     }
 
-    public function testNotUtf8()
+    public function testNotUtf8(): void
     {
         $tr = EmojiTransliterator::create('emoji-en');
 
@@ -149,7 +149,7 @@ class EmojiTransliteratorTest extends TestCase
         }
     }
 
-    public function testBadOffsets()
+    public function testBadOffsets(): void
     {
         $tr = EmojiTransliterator::create('emoji-en');
 
@@ -170,7 +170,7 @@ class EmojiTransliteratorTest extends TestCase
         }
     }
 
-    public function testReverse()
+    public function testReverse(): void
     {
         $tr = EmojiTransliterator::create('emoji-github', EmojiTransliterator::REVERSE);
         $this->assertSame('github-emoji', $tr->id);
@@ -192,14 +192,14 @@ class EmojiTransliteratorTest extends TestCase
         EmojiTransliterator::create('emoji-en', EmojiTransliterator::REVERSE);
     }
 
-    public function testGetErrorCodeWithUninitializedTransliterator()
+    public function testGetErrorCodeWithUninitializedTransliterator(): void
     {
         $transliterator = EmojiTransliterator::create('emoji-en');
 
         $this->assertSame(0, $transliterator->getErrorCode());
     }
 
-    public function testGetErrorMessageWithUninitializedTransliterator()
+    public function testGetErrorMessageWithUninitializedTransliterator(): void
     {
         $transliterator = EmojiTransliterator::create('emoji-en');
 

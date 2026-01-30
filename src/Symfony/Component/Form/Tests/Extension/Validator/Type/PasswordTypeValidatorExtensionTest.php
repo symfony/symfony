@@ -20,7 +20,7 @@ class PasswordTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         return $this->factory->create(PasswordType::class, null, $options);
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 

@@ -21,7 +21,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class SecretsRevealCommandTest extends TestCase
 {
-    public function testExecute()
+    public function testExecute(): void
     {
         $vault = $this->createStub(AbstractVault::class);
         $vault->method('list')->willReturn(['secretKey' => 'secretValue']);
@@ -34,7 +34,7 @@ class SecretsRevealCommandTest extends TestCase
         $this->assertEquals('secretValue', trim($tester->getDisplay(true)));
     }
 
-    public function testInvalidName()
+    public function testInvalidName(): void
     {
         $vault = $this->createStub(AbstractVault::class);
         $vault->method('list')->willReturn(['secretKey' => 'secretValue']);
@@ -47,7 +47,7 @@ class SecretsRevealCommandTest extends TestCase
         $this->assertStringContainsString('The secret "undefinedKey" does not exist.', trim($tester->getDisplay(true)));
     }
 
-    public function testFailedDecrypt()
+    public function testFailedDecrypt(): void
     {
         $vault = $this->createStub(AbstractVault::class);
         $vault->method('list')->willReturn(['secretKey' => null]);
@@ -61,7 +61,7 @@ class SecretsRevealCommandTest extends TestCase
     }
 
     #[BackupGlobals(true)]
-    public function testLocalVaultOverride()
+    public function testLocalVaultOverride(): void
     {
         $vault = $this->createStub(AbstractVault::class);
         $vault->method('list')->willReturn(['secretKey' => 'secretValue']);
@@ -78,7 +78,7 @@ class SecretsRevealCommandTest extends TestCase
     }
 
     #[BackupGlobals(true)]
-    public function testOnlyLocalVaultContainsName()
+    public function testOnlyLocalVaultContainsName(): void
     {
         $vault = $this->createStub(AbstractVault::class);
         $vault->method('list')->willReturn(['otherKey' => 'secretValue']);

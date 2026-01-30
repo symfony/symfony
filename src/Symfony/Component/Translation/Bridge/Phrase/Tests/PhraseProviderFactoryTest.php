@@ -40,7 +40,7 @@ class PhraseProviderFactoryTest extends AbstractProviderFactoryTestCase
     private CacheItemPoolInterface $cache;
     private string $defaultLocale;
 
-    public function testRequiredUserAgentOption()
+    public function testRequiredUserAgentOption(): void
     {
         $factory = $this->createFactory();
         $dsn = new Dsn('phrase://PROJECT_ID:API_TOKEN@default');
@@ -51,7 +51,7 @@ class PhraseProviderFactoryTest extends AbstractProviderFactoryTestCase
         $factory->create($dsn);
     }
 
-    public function testHttpClientConfig()
+    public function testHttpClientConfig(): void
     {
         $httpClient = $this->createMock(HttpClientInterface::class);
         $httpClient

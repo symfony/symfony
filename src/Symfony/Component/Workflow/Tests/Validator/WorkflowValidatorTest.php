@@ -23,7 +23,7 @@ class WorkflowValidatorTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
-    public function testWorkflowWithInvalidNames()
+    public function testWorkflowWithInvalidNames(): void
     {
         $places = range('a', 'c');
 
@@ -40,7 +40,7 @@ class WorkflowValidatorTest extends TestCase
         (new WorkflowValidator())->validate($definition, 'foo');
     }
 
-    public function testSameTransitionNameButNotSamePlace()
+    public function testSameTransitionNameButNotSamePlace(): void
     {
         $places = range('a', 'd');
 
@@ -57,7 +57,7 @@ class WorkflowValidatorTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testWithTooManyOutput()
+    public function testWithTooManyOutput(): void
     {
         $places = ['a', 'b', 'c'];
         $transitions = [
@@ -71,7 +71,7 @@ class WorkflowValidatorTest extends TestCase
         (new WorkflowValidator(true))->validate($definition, 'foo');
     }
 
-    public function testWithTooManyInitialPlaces()
+    public function testWithTooManyInitialPlaces(): void
     {
         $places = ['a', 'b', 'c'];
         $transitions = [
@@ -85,7 +85,7 @@ class WorkflowValidatorTest extends TestCase
         (new WorkflowValidator(true))->validate($definition, 'foo');
     }
 
-    public function testWithArcInFromTooHeavy()
+    public function testWithArcInFromTooHeavy(): void
     {
         $places = ['a', 'b'];
         $transitions = [
@@ -99,7 +99,7 @@ class WorkflowValidatorTest extends TestCase
         (new WorkflowValidator(true))->validate($definition, 'foo');
     }
 
-    public function testWithArcInToTooHeavy()
+    public function testWithArcInToTooHeavy(): void
     {
         $places = ['a', 'b'];
         $transitions = [

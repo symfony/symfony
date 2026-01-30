@@ -78,7 +78,7 @@ class IntegrationTest extends TestCase
      *   * A -> C
      *   * B -> C
      */
-    public function testProcessRemovesAndInlinesRecursively()
+    public function testProcessRemovesAndInlinesRecursively(): void
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -107,7 +107,7 @@ class IntegrationTest extends TestCase
         $this->assertFalse($container->hasDefinition('c'));
     }
 
-    public function testProcessInlinesReferencesToAliases()
+    public function testProcessInlinesReferencesToAliases(): void
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -133,7 +133,7 @@ class IntegrationTest extends TestCase
         $this->assertFalse($container->hasDefinition('c'));
     }
 
-    public function testProcessInlinesWhenThereAreMultipleReferencesButFromTheSameDefinition()
+    public function testProcessInlinesWhenThereAreMultipleReferencesButFromTheSameDefinition(): void
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -161,7 +161,7 @@ class IntegrationTest extends TestCase
         $this->assertFalse($container->hasDefinition('c'), 'Service C was not inlined.');
     }
 
-    public function testCanDecorateServiceSubscriberUsingBinding()
+    public function testCanDecorateServiceSubscriberUsingBinding(): void
     {
         $container = new ContainerBuilder();
         $container->register(ServiceSubscriberStub::class)
@@ -179,7 +179,7 @@ class IntegrationTest extends TestCase
         $this->assertInstanceOf(ServiceLocator::class, $container->get(ServiceSubscriberStub::class)->inner->container);
     }
 
-    public function testCanDecorateServiceSubscriberReplacingArgument()
+    public function testCanDecorateServiceSubscriberReplacingArgument(): void
     {
         $container = new ContainerBuilder();
         $container->register(ServiceSubscriberStub::class)
@@ -198,7 +198,7 @@ class IntegrationTest extends TestCase
         $this->assertInstanceOf(ServiceLocator::class, $container->get(ServiceSubscriberStub::class)->inner->container);
     }
 
-    public function testCanDecorateServiceLocator()
+    public function testCanDecorateServiceLocator(): void
     {
         $container = new ContainerBuilder();
 
@@ -221,7 +221,7 @@ class IntegrationTest extends TestCase
         $this->assertSame($container->get('foo'), $container->get(DecoratedServiceLocator::class)->get('foo'));
     }
 
-    public function testAliasDecoratedService()
+    public function testAliasDecoratedService(): void
     {
         $container = new ContainerBuilder();
 
@@ -249,7 +249,7 @@ class IntegrationTest extends TestCase
     }
 
     #[DataProvider('getYamlCompileTests')]
-    public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ?ContainerBuilder $mainContainer = null)
+    public function testYamlContainerCompiles($directory, $actualServiceId, $expectedServiceId, ?ContainerBuilder $mainContainer = null): void
     {
         // allow a container to be passed in, which might have autoconfigure settings
         $container = $mainContainer ?? new ContainerBuilder();
@@ -347,7 +347,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedServiceWithIndexAttribute()
+    public function testTaggedServiceWithIndexAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(BarTagClass::class)
@@ -373,7 +373,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedServiceWithIndexAttributeAndDefaultMethod()
+    public function testTaggedServiceWithIndexAttributeAndDefaultMethod(): void
     {
         $container = new ContainerBuilder();
         $container->register(BarTagClass::class)
@@ -397,7 +397,7 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get(BarTagClass::class), 'foo' => $container->get(FooTagClass::class)], $param);
     }
 
-    public function testLocatorConfiguredViaAttribute()
+    public function testLocatorConfiguredViaAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('some.parameter', 'foo');
@@ -426,7 +426,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedServiceWithIndexAttributeAndDefaultMethodConfiguredViaAttribute()
+    public function testTaggedServiceWithIndexAttributeAndDefaultMethodConfiguredViaAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(BarTagClass::class)
@@ -452,7 +452,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedIteratorWithDefaultIndexMethodConfiguredViaAttribute()
+    public function testTaggedIteratorWithDefaultIndexMethodConfiguredViaAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(BarTagClass::class)
@@ -478,7 +478,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedIteratorWithDefaultPriorityMethodConfiguredViaAttribute()
+    public function testTaggedIteratorWithDefaultPriorityMethodConfiguredViaAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(BarTagClass::class)
@@ -504,7 +504,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedIteratorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute()
+    public function testTaggedIteratorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(BarTagClass::class)
@@ -530,7 +530,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedLocatorConfiguredViaAttribute()
+    public function testTaggedLocatorConfiguredViaAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(BarTagClass::class)
@@ -558,7 +558,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedLocatorConfiguredViaAttributeWithoutIndex()
+    public function testTaggedLocatorConfiguredViaAttributeWithoutIndex(): void
     {
         $container = new ContainerBuilder();
         $container->register(BarTagClass::class)
@@ -586,7 +586,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedLocatorWithDefaultIndexMethodConfiguredViaAttribute()
+    public function testTaggedLocatorWithDefaultIndexMethodConfiguredViaAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(BarTagClass::class)
@@ -614,7 +614,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedLocatorWithDefaultPriorityMethodConfiguredViaAttribute()
+    public function testTaggedLocatorWithDefaultPriorityMethodConfiguredViaAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(BarTagClass::class)
@@ -645,7 +645,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedLocatorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute()
+    public function testTaggedLocatorWithDefaultIndexMethodAndWithDefaultPriorityMethodConfiguredViaAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(BarTagClass::class)
@@ -678,7 +678,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testNestedDefinitionWithAutoconfiguredConstructorArgument()
+    public function testNestedDefinitionWithAutoconfiguredConstructorArgument(): void
     {
         $container = new ContainerBuilder();
         $container->register(FooTagClass::class)
@@ -702,7 +702,7 @@ class IntegrationTest extends TestCase
         self::assertSame($container->get(FooTagClass::class), $locator->get('foo'));
     }
 
-    public function testFactoryWithAutoconfiguredArgument()
+    public function testFactoryWithAutoconfiguredArgument(): void
     {
         $container = new ContainerBuilder();
         $container->register(FooTagClass::class)
@@ -727,7 +727,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedServiceWithDefaultPriorityMethod()
+    public function testTaggedServiceWithDefaultPriorityMethod(): void
     {
         $container = new ContainerBuilder();
         $container->register(BarTagClass::class)
@@ -753,7 +753,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedServiceLocatorWithIndexAttribute()
+    public function testTaggedServiceLocatorWithIndexAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register('bar_tag', BarTagClass::class)
@@ -786,7 +786,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedServiceLocatorWithMultipleIndexAttribute()
+    public function testTaggedServiceLocatorWithMultipleIndexAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register('bar_tag', BarTagClass::class)
@@ -822,7 +822,7 @@ class IntegrationTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedServiceLocatorWithIndexAttributeAndDefaultMethod()
+    public function testTaggedServiceLocatorWithIndexAttributeAndDefaultMethod(): void
     {
         $container = new ContainerBuilder();
         $container->register('bar_tag', BarTagClass::class)
@@ -853,7 +853,7 @@ class IntegrationTest extends TestCase
         $this->assertSame(['bar_tab_class_with_defaultmethod' => $container->get('bar_tag'), 'foo' => $container->get('foo_tag')], $same);
     }
 
-    public function testTaggedServiceLocatorWithFallback()
+    public function testTaggedServiceLocatorWithFallback(): void
     {
         $container = new ContainerBuilder();
         $container->register('bar_tag', BarTagClass::class)
@@ -879,7 +879,7 @@ class IntegrationTest extends TestCase
         $this->assertSame($expected, ['bar_tag' => $serviceLocator->get('bar_tag')]);
     }
 
-    public function testTaggedServiceLocatorWithDefaultIndex()
+    public function testTaggedServiceLocatorWithDefaultIndex(): void
     {
         $container = new ContainerBuilder();
         $container->register('bar_tag', BarTagClass::class)
@@ -905,12 +905,12 @@ class IntegrationTest extends TestCase
         $this->assertSame($expected, ['baz' => $serviceLocator->get('baz')]);
     }
 
-    public function testTagsViaAttribute()
+    public function testTagsViaAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->registerAttributeForAutoconfiguration(
             CustomAutoconfiguration::class,
-            static function (ChildDefinition $definition, CustomAutoconfiguration $attribute, \ReflectionClass $reflector) {
+            static function (ChildDefinition $definition, CustomAutoconfiguration $attribute, \ReflectionClass $reflector): void {
                 $definition->addTag('app.custom_tag', get_object_vars($attribute) + ['class' => $reflector->getName()]);
             }
         );
@@ -940,12 +940,12 @@ class IntegrationTest extends TestCase
         ], $collector->collectedTags);
     }
 
-    public function testAttributesAreIgnored()
+    public function testAttributesAreIgnored(): void
     {
         $container = new ContainerBuilder();
         $container->registerAttributeForAutoconfiguration(
             CustomAutoconfiguration::class,
-            static function (Definition $definition, CustomAutoconfiguration $attribute) {
+            static function (Definition $definition, CustomAutoconfiguration $attribute): void {
                 $definition->addTag('app.custom_tag', get_object_vars($attribute));
             }
         );
@@ -970,12 +970,12 @@ class IntegrationTest extends TestCase
         ], $collector->collectedTags);
     }
 
-    public function testTagsViaAttributeOnPropertyMethodAndParameter()
+    public function testTagsViaAttributeOnPropertyMethodAndParameter(): void
     {
         $container = new ContainerBuilder();
         $container->registerAttributeForAutoconfiguration(
             CustomMethodAttribute::class,
-            static function (ChildDefinition $definition, CustomMethodAttribute $attribute, \ReflectionMethod $reflector) {
+            static function (ChildDefinition $definition, CustomMethodAttribute $attribute, \ReflectionMethod $reflector): void {
                 $tagAttributes = get_object_vars($attribute);
                 $tagAttributes['method'] = $reflector->getName();
 
@@ -984,7 +984,7 @@ class IntegrationTest extends TestCase
         );
         $container->registerAttributeForAutoconfiguration(
             CustomPropertyAttribute::class,
-            static function (ChildDefinition $definition, CustomPropertyAttribute $attribute, \ReflectionProperty $reflector) {
+            static function (ChildDefinition $definition, CustomPropertyAttribute $attribute, \ReflectionProperty $reflector): void {
                 $tagAttributes = get_object_vars($attribute);
                 $tagAttributes['property'] = $reflector->getName();
 
@@ -993,7 +993,7 @@ class IntegrationTest extends TestCase
         );
         $container->registerAttributeForAutoconfiguration(
             CustomParameterAttribute::class,
-            static function (ChildDefinition $definition, CustomParameterAttribute $attribute, \ReflectionParameter $reflector) {
+            static function (ChildDefinition $definition, CustomParameterAttribute $attribute, \ReflectionParameter $reflector): void {
                 $tagAttributes = get_object_vars($attribute);
                 $tagAttributes['parameter'] = $reflector->getName();
 
@@ -1002,7 +1002,7 @@ class IntegrationTest extends TestCase
         );
         $container->registerAttributeForAutoconfiguration(
             CustomAnyAttribute::class,
-            static function (ChildDefinition $definition, CustomAnyAttribute $attribute, \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter $reflector) {
+            static function (ChildDefinition $definition, CustomAnyAttribute $attribute, \ReflectionClass|\ReflectionMethod|\ReflectionProperty|\ReflectionParameter $reflector): void {
                 $tagAttributes = get_object_vars($attribute);
                 if ($reflector instanceof \ReflectionClass) {
                     $tagAttributes['class'] = $reflector->getName();
@@ -1071,12 +1071,12 @@ class IntegrationTest extends TestCase
         ], $collector->collectedTags);
     }
 
-    public function testAutoconfigureViaAttribute()
+    public function testAutoconfigureViaAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->registerAttributeForAutoconfiguration(
             CustomAutoconfiguration::class,
-            static function (ChildDefinition $definition) {
+            static function (ChildDefinition $definition): void {
                 $definition
                     ->addMethodCall('doSomething', [1, 2, 3])
                     ->setBindings(['string $foo' => 'bar'])
@@ -1100,12 +1100,12 @@ class IntegrationTest extends TestCase
         self::assertTrue($service->hasBeenConfigured);
     }
 
-    public function testAttributeAutoconfigurationOnStaticMethod()
+    public function testAttributeAutoconfigurationOnStaticMethod(): void
     {
         $container = new ContainerBuilder();
         $container->registerAttributeForAutoconfiguration(
             CustomMethodAttribute::class,
-            static function (ChildDefinition $d, CustomMethodAttribute $a, \ReflectionMethod $_r) {
+            static function (ChildDefinition $d, CustomMethodAttribute $a, \ReflectionMethod $_r): void {
                 $d->addTag('custom_tag', ['attribute' => $a->someAttribute]);
             }
         );
@@ -1122,7 +1122,7 @@ class IntegrationTest extends TestCase
         $container->get('service');
     }
 
-    public function testTaggedIteratorAndLocatorWithExclude()
+    public function testTaggedIteratorAndLocatorWithExclude(): void
     {
         $container = new ContainerBuilder();
 
@@ -1160,7 +1160,7 @@ class IntegrationTest extends TestCase
         $this->assertFalse($locator->has(TaggedConsumerWithExclude::class));
     }
 
-    public function testAutowireAttributeHasPriorityOverBindings()
+    public function testAutowireAttributeHasPriorityOverBindings(): void
     {
         $container = new ContainerBuilder();
         $container->register(FooTagClass::class)
@@ -1191,7 +1191,7 @@ class IntegrationTest extends TestCase
         self::assertTrue($taggedLocator->has('tagged_service'));
     }
 
-    public function testBindingsWithAutowireAttributeAndAutowireFalse()
+    public function testBindingsWithAutowireAttributeAndAutowireFalse(): void
     {
         $container = new ContainerBuilder();
         $container->register(FooTagClass::class)
@@ -1272,12 +1272,12 @@ class IntegrationTestStub extends IntegrationTestStubParent
 
 class IntegrationTestStubParent
 {
-    public function enableSummer($enable)
+    public function enableSummer($enable): void
     {
         // methods used in calls - added here to prevent errors for not existing
     }
 
-    public function setSunshine($type)
+    public function setSunshine($type): void
     {
     }
 }

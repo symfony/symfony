@@ -17,7 +17,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 
 class BooleanNodeDefinitionTest extends TestCase
 {
-    public function testCannotBeEmptyThrowsAnException()
+    public function testCannotBeEmptyThrowsAnException(): void
     {
         $this->expectException(InvalidDefinitionException::class);
         $this->expectExceptionMessage('->cannotBeEmpty() is not applicable to BooleanNodeDefinition.');
@@ -25,7 +25,7 @@ class BooleanNodeDefinitionTest extends TestCase
         $def->cannotBeEmpty();
     }
 
-    public function testBooleanNodeWithDefaultNull()
+    public function testBooleanNodeWithDefaultNull(): void
     {
         $def = new BooleanNodeDefinition('foo');
         $def->defaultNull();
@@ -37,7 +37,7 @@ class BooleanNodeDefinitionTest extends TestCase
         $this->assertNull($node->normalize(null));
     }
 
-    public function testBooleanNodeWithDefaultValueAtNull()
+    public function testBooleanNodeWithDefaultValueAtNull(): void
     {
         $def = new BooleanNodeDefinition('foo');
         $def->defaultValue(null);
@@ -49,7 +49,7 @@ class BooleanNodeDefinitionTest extends TestCase
         $this->assertNull($node->normalize(null));
     }
 
-    public function testSetDeprecated()
+    public function testSetDeprecated(): void
     {
         $def = new BooleanNodeDefinition('foo');
         $def->setDeprecated('vendor/package', '1.1', 'The "%path%" node is deprecated.');

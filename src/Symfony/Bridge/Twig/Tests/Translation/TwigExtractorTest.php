@@ -25,7 +25,7 @@ class TwigExtractorTest extends TestCase
     public const CUSTOM_DOMAIN = 'domain';
 
     #[DataProvider('getExtractData')]
-    public function testExtract($template, $messages)
+    public function testExtract($template, $messages): void
     {
         $twig = new Environment(new ArrayLoader(), [
             'strict_variables' => true,
@@ -92,7 +92,7 @@ class TwigExtractorTest extends TestCase
     }
 
     #[DataProvider('resourcesWithSyntaxErrorsProvider')]
-    public function testExtractSyntaxError($resources, array $messages)
+    public function testExtractSyntaxError($resources, array $messages): void
     {
         $twig = new Environment(new ArrayLoader());
         $twig->addExtension(new TranslationExtension(new IdentityTranslator()));
@@ -113,7 +113,7 @@ class TwigExtractorTest extends TestCase
     }
 
     #[DataProvider('resourceProvider')]
-    public function testExtractWithFiles($resource)
+    public function testExtractWithFiles($resource): void
     {
         $loader = new ArrayLoader([]);
         $twig = new Environment($loader, [

@@ -27,7 +27,7 @@ class PropertyNormalizerContextBuilderTest extends TestCase
         $this->contextBuilder = new PropertyNormalizerContextBuilder();
     }
 
-    public function testWithNormalizeVisibility()
+    public function testWithNormalizeVisibility(): void
     {
         $context = $this->contextBuilder
             ->withNormalizeVisibility(PropertyNormalizer::NORMALIZE_PUBLIC | PropertyNormalizer::NORMALIZE_PROTECTED)

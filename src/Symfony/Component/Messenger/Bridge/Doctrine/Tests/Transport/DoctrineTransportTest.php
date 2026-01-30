@@ -24,14 +24,14 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 class DoctrineTransportTest extends TestCase
 {
-    public function testItIsATransport()
+    public function testItIsATransport(): void
     {
         $transport = $this->getTransport();
 
         $this->assertInstanceOf(TransportInterface::class, $transport);
     }
 
-    public function testReceivesMessages()
+    public function testReceivesMessages(): void
     {
         $transport = $this->getTransport(
             $serializer = $this->createStub(SerializerInterface::class),
@@ -53,7 +53,7 @@ class DoctrineTransportTest extends TestCase
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
     }
 
-    public function testConfigureSchema()
+    public function testConfigureSchema(): void
     {
         $transport = $this->getTransport(
             null,
@@ -71,7 +71,7 @@ class DoctrineTransportTest extends TestCase
         $transport->configureSchema($schema, $dbalConnection, $isSameDatabaseChecker);
     }
 
-    public function testKeepalive()
+    public function testKeepalive(): void
     {
         $transport = $this->getTransport(
             null,

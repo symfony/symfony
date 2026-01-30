@@ -18,7 +18,7 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 
 class ImportMapEntryTest extends TestCase
 {
-    public function testCreateLocal()
+    public function testCreateLocal(): void
     {
         $entry = ImportMapEntry::createLocal('foo', ImportMapType::JS, 'foo.js', true);
         $this->assertSame('foo', $entry->importName);
@@ -28,7 +28,7 @@ class ImportMapEntryTest extends TestCase
         $this->assertFalse($entry->isRemotePackage());
     }
 
-    public function testCreateRemote()
+    public function testCreateRemote(): void
     {
         $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, 'foo.js', '1.0.0', 'foo/bar', true);
         $this->assertSame('foo', $entry->importName);
@@ -41,7 +41,7 @@ class ImportMapEntryTest extends TestCase
     }
 
     #[DataProvider('getSplitPackageNameTests')]
-    public function testSplitPackageNameAndFilePath(string $packageModuleSpecifier, string $expectedPackage, string $expectedPath)
+    public function testSplitPackageNameAndFilePath(string $packageModuleSpecifier, string $expectedPackage, string $expectedPath): void
     {
         [$actualPackage, $actualPath] = ImportMapEntry::splitPackageNameAndFilePath($packageModuleSpecifier);
         $this->assertSame($expectedPackage, $actualPackage);
@@ -75,7 +75,7 @@ class ImportMapEntryTest extends TestCase
         ];
     }
 
-    public function testGetPackageNameAndPackagePath()
+    public function testGetPackageNameAndPackagePath(): void
     {
         $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, 'foo.js', '1.0.0', 'foo/bar', true);
         $this->assertSame('foo', $entry->getPackageName());

@@ -20,18 +20,18 @@ use Twig\Loader\ArrayLoader;
 
 class CodeExtensionTest extends TestCase
 {
-    public function testFormatFile()
+    public function testFormatFile(): void
     {
         $expected = \sprintf('<a href="proto://foobar%s#&amp;line=25" title="Click to open this file" class="file_link">%s at line 25</a>', substr(__FILE__, 5), __FILE__);
         $this->assertEquals($expected, $this->getExtension()->formatFile(__FILE__, 25));
     }
 
-    public function testFileRelative()
+    public function testFileRelative(): void
     {
         $this->assertEquals('file.txt', $this->getExtension()->getFileRelative(\DIRECTORY_SEPARATOR.'project'.\DIRECTORY_SEPARATOR.'file.txt'));
     }
 
-    public function testClassAbbreviationIntegration()
+    public function testClassAbbreviationIntegration(): void
     {
         $data = [
             'fqcn' => 'F\Q\N\Foo',
@@ -53,7 +53,7 @@ class CodeExtensionTest extends TestCase
         $this->assertEquals($expected, $this->render($template, $data));
     }
 
-    public function testMethodAbbreviationIntegration()
+    public function testMethodAbbreviationIntegration(): void
     {
         $data = [
             'fqcn' => 'F\Q\N\Foo::Method',
@@ -79,7 +79,7 @@ class CodeExtensionTest extends TestCase
         $this->assertEquals($expected, $this->render($template, $data));
     }
 
-    public function testFormatArgsIntegration()
+    public function testFormatArgsIntegration(): void
     {
         $data = [
             'args' => [
@@ -117,7 +117,7 @@ class CodeExtensionTest extends TestCase
         $this->assertEquals($expected, $this->render($template, $data));
     }
 
-    public function testFormatFileIntegration()
+    public function testFormatFileIntegration(): void
     {
         $template = <<<'TWIG'
             {{ 'foo/bar/baz.php'|format_file(21) }}
@@ -131,7 +131,7 @@ class CodeExtensionTest extends TestCase
     }
 
     #[DataProvider('fileExcerptIntegrationProvider')]
-    public function testFileExcerptIntegration(string $expected, array $data)
+    public function testFileExcerptIntegration(string $expected, array $data): void
     {
         $template = <<<'TWIG'
             {{ file_path|file_excerpt(line, src_context) }}
@@ -217,7 +217,7 @@ class CodeExtensionTest extends TestCase
         ];
     }
 
-    public function testFormatFileFromTextIntegration()
+    public function testFormatFileFromTextIntegration(): void
     {
         $template = <<<'TWIG'
             {{ 'in "foo/bar/baz.php" at line 21'|format_file_from_text }}

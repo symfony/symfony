@@ -21,7 +21,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class CachePoolInvalidateTagsCommandTest extends TestCase
 {
-    public function testComplete()
+    public function testComplete(): void
     {
         $tester = new CommandCompletionTester($this->createCommand(['foo' => null, 'bar' => null]));
 
@@ -30,7 +30,7 @@ class CachePoolInvalidateTagsCommandTest extends TestCase
         $this->assertSame(['foo', 'bar'], $suggestions);
     }
 
-    public function testInvalidatesTagsForAllPoolsByDefault()
+    public function testInvalidatesTagsForAllPoolsByDefault(): void
     {
         $tagsToInvalidate = ['tag1', 'tag2'];
 
@@ -50,7 +50,7 @@ class CachePoolInvalidateTagsCommandTest extends TestCase
         $this->assertSame(Command::SUCCESS, $ret);
     }
 
-    public function testCanInvalidateSpecificPools()
+    public function testCanInvalidateSpecificPools(): void
     {
         $tagsToInvalidate = ['tag1', 'tag2'];
 
@@ -70,7 +70,7 @@ class CachePoolInvalidateTagsCommandTest extends TestCase
         $this->assertSame(Command::SUCCESS, $ret);
     }
 
-    public function testCommandFailsIfPoolNotFound()
+    public function testCommandFailsIfPoolNotFound(): void
     {
         $tagsToInvalidate = ['tag1', 'tag2'];
 
@@ -90,7 +90,7 @@ class CachePoolInvalidateTagsCommandTest extends TestCase
         $this->assertSame(Command::FAILURE, $ret);
     }
 
-    public function testCommandFailsIfPoolNotTaggable()
+    public function testCommandFailsIfPoolNotTaggable(): void
     {
         $tagsToInvalidate = ['tag1', 'tag2'];
 
@@ -109,7 +109,7 @@ class CachePoolInvalidateTagsCommandTest extends TestCase
         $this->assertSame(Command::FAILURE, $ret);
     }
 
-    public function testCommandFailsIfInvalidatingTagsFails()
+    public function testCommandFailsIfInvalidatingTagsFails(): void
     {
         $tagsToInvalidate = ['tag1', 'tag2'];
 

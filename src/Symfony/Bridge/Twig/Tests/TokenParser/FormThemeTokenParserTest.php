@@ -26,7 +26,7 @@ use Twig\Source;
 class FormThemeTokenParserTest extends TestCase
 {
     #[DataProvider('getTestsForFormTheme')]
-    public function testCompile($source, $expected)
+    public function testCompile($source, $expected): void
     {
         $env = new Environment(new ArrayLoader(), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
         $env->addTokenParser(new FormThemeTokenParser());

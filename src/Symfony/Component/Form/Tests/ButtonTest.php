@@ -26,7 +26,7 @@ use Symfony\Component\Form\ResolvedFormTypeFactory;
  */
 class ButtonTest extends TestCase
 {
-    public function testSetParentOnSubmittedButton()
+    public function testSetParentOnSubmittedButton(): void
     {
         $this->expectException(AlreadySubmittedException::class);
         $button = $this->getButtonBuilder('button')
@@ -39,7 +39,7 @@ class ButtonTest extends TestCase
     }
 
     #[DataProvider('getDisabledStates')]
-    public function testDisabledIfParentIsDisabled($parentDisabled, $buttonDisabled, $result)
+    public function testDisabledIfParentIsDisabled($parentDisabled, $buttonDisabled, $result): void
     {
         $form = $this->getFormBuilder()
             ->setDisabled($parentDisabled)

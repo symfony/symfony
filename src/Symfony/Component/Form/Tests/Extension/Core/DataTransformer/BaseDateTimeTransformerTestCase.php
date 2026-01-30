@@ -17,14 +17,14 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransforme
 
 abstract class BaseDateTimeTransformerTestCase extends TestCase
 {
-    public function testConstructFailsIfInputTimezoneIsInvalid()
+    public function testConstructFailsIfInputTimezoneIsInvalid(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('this_timezone_does_not_exist');
         $this->createDateTimeTransformer('this_timezone_does_not_exist');
     }
 
-    public function testConstructFailsIfOutputTimezoneIsInvalid()
+    public function testConstructFailsIfOutputTimezoneIsInvalid(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('that_timezone_does_not_exist');

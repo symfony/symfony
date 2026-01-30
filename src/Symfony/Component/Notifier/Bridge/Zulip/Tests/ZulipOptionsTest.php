@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Zulip\ZulipOptions;
 
 final class ZulipOptionsTest extends TestCase
 {
-    public function testZulipOptions()
+    public function testZulipOptions(): void
     {
         $options = new ZulipOptions('Test Topic', 'user@example.com');
 
@@ -28,7 +28,7 @@ final class ZulipOptionsTest extends TestCase
         $this->assertSame('user@example.com', $options->getRecipientId());
     }
 
-    public function testZulipOptionsWithNullValues()
+    public function testZulipOptionsWithNullValues(): void
     {
         $options = new ZulipOptions();
 
@@ -40,7 +40,7 @@ final class ZulipOptionsTest extends TestCase
         $this->assertNull($options->getRecipientId());
     }
 
-    public function testZulipOptionsWithTopicMethod()
+    public function testZulipOptionsWithTopicMethod(): void
     {
         $options = (new ZulipOptions())
             ->topic('New Topic');
@@ -53,7 +53,7 @@ final class ZulipOptionsTest extends TestCase
         $this->assertNull($options->getRecipientId());
     }
 
-    public function testZulipOptionsChaining()
+    public function testZulipOptionsChaining(): void
     {
         $options = new ZulipOptions();
 
@@ -66,7 +66,7 @@ final class ZulipOptionsTest extends TestCase
         ], $options->toArray());
     }
 
-    public function testZulipOptionsWithStream()
+    public function testZulipOptionsWithStream(): void
     {
         $options = new ZulipOptions('Deploy Notifications', 'engineering');
 
@@ -78,7 +78,7 @@ final class ZulipOptionsTest extends TestCase
         $this->assertSame('engineering', $options->getRecipientId());
     }
 
-    public function testZulipOptionsModification()
+    public function testZulipOptionsModification(): void
     {
         $options = new ZulipOptions('Initial Topic', 'initial@example.com');
 

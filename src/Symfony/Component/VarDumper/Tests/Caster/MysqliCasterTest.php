@@ -22,7 +22,7 @@ class MysqliCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testNotConnected()
+    public function testNotConnected(): void
     {
         $driver = new \mysqli_driver();
         $driver->report_mode = 3;

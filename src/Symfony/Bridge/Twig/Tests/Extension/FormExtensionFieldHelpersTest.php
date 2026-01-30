@@ -110,73 +110,73 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
         $this->view = $form->createView();
     }
 
-    public function testFieldName()
+    public function testFieldName(): void
     {
         $this->assertFalse($this->view->children['username']->isRendered());
         $this->assertSame('register[username]', $this->rawExtension->getFieldName($this->view->children['username']));
         $this->assertTrue($this->view->children['username']->isRendered());
     }
 
-    public function testFieldId()
+    public function testFieldId(): void
     {
         $this->assertSame('register_username', $this->rawExtension->getFieldId($this->view->children['username']));
         $this->assertSame('register_choice_multiple', $this->rawExtension->getFieldId($this->view->children['choice_multiple']));
     }
 
-    public function testFieldValue()
+    public function testFieldValue(): void
     {
         $this->assertSame('tgalopin', $this->rawExtension->getFieldValue($this->view->children['username']));
         $this->assertSame(['sugar', 'salt'], $this->rawExtension->getFieldValue($this->view->children['choice_multiple']));
     }
 
-    public function testFieldLabel()
+    public function testFieldLabel(): void
     {
         $this->assertSame('base.username', $this->rawExtension->getFieldLabel($this->view->children['username']));
     }
 
-    public function testFieldTranslatedLabel()
+    public function testFieldTranslatedLabel(): void
     {
         $this->assertSame('[trans]base.username[/trans]', $this->translatorExtension->getFieldLabel($this->view->children['username']));
     }
 
-    public function testFieldLabelFromFormat()
+    public function testFieldLabelFromFormat(): void
     {
         $this->assertSame('label format for field "choice_grouped" with id "register_choice_grouped"', $this->rawExtension->getFieldLabel($this->view->children['choice_grouped']));
     }
 
-    public function testFieldLabelFallsBackToName()
+    public function testFieldLabelFallsBackToName(): void
     {
         $this->assertSame('Choice flat', $this->rawExtension->getFieldLabel($this->view->children['choice_flat']));
     }
 
-    public function testFieldLabelReturnsNullWhenLabelIsDisabled()
+    public function testFieldLabelReturnsNullWhenLabelIsDisabled(): void
     {
         $this->assertNull($this->rawExtension->getFieldLabel($this->view->children['choice_multiple']));
     }
 
-    public function testFieldHelp()
+    public function testFieldHelp(): void
     {
         $this->assertSame('base.username_help', $this->rawExtension->getFieldHelp($this->view->children['username']));
     }
 
-    public function testFieldTranslatedHelp()
+    public function testFieldTranslatedHelp(): void
     {
         $this->assertSame('[trans]base.username_help[/trans]', $this->translatorExtension->getFieldHelp($this->view->children['username']));
     }
 
-    public function testFieldErrors()
+    public function testFieldErrors(): void
     {
         $errors = $this->rawExtension->getFieldErrors($this->view->children['username']);
         $this->assertSame(['username.max_length'], iterator_to_array($errors));
     }
 
-    public function testFieldTranslatedErrors()
+    public function testFieldTranslatedErrors(): void
     {
         $errors = $this->translatorExtension->getFieldErrors($this->view->children['username']);
         $this->assertSame(['username.max_length'], iterator_to_array($errors));
     }
 
-    public function testFieldChoicesFlat()
+    public function testFieldChoicesFlat(): void
     {
         $choices = $this->rawExtension->getFieldChoices($this->view->children['choice_flat']);
 
@@ -194,7 +194,7 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
         $this->assertSame('base.no', $choicesArray[1]['label']);
     }
 
-    public function testFieldTranslatedChoicesFlat()
+    public function testFieldTranslatedChoicesFlat(): void
     {
         $choices = $this->translatorExtension->getFieldChoices($this->view->children['choice_flat']);
 
@@ -212,7 +212,7 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
         $this->assertSame('[trans]base.no[/trans]', $choicesArray[1]['label']);
     }
 
-    public function testFieldChoicesGrouped()
+    public function testFieldChoicesGrouped(): void
     {
         $choices = $this->rawExtension->getFieldChoices($this->view->children['choice_grouped']);
 
@@ -247,7 +247,7 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
         $this->assertSame('base.jp', $choicesArray[1]['choices'][1]['label']);
     }
 
-    public function testFieldTranslatedChoicesGrouped()
+    public function testFieldTranslatedChoicesGrouped(): void
     {
         $choices = $this->translatorExtension->getFieldChoices($this->view->children['choice_grouped']);
 
@@ -282,7 +282,7 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
         $this->assertSame('[trans]base.jp[/trans]', $choicesArray[1]['choices'][1]['label']);
     }
 
-    public function testFieldChoicesMultiple()
+    public function testFieldChoicesMultiple(): void
     {
         $choices = $this->rawExtension->getFieldChoices($this->view->children['choice_multiple']);
 
@@ -300,7 +300,7 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
         $this->assertSame('base.salt', $choicesArray[1]['label']);
     }
 
-    public function testFieldTranslatedChoicesMultiple()
+    public function testFieldTranslatedChoicesMultiple(): void
     {
         $choices = $this->translatorExtension->getFieldChoices($this->view->children['choice_multiple']);
 
@@ -318,7 +318,7 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
         $this->assertSame('[trans]base.salt[/trans]', $choicesArray[1]['label']);
     }
 
-    public function testChoiceParametrizedLabel()
+    public function testChoiceParametrizedLabel(): void
     {
         $choices = $this->translatorExtension->getFieldChoices($this->view->children['parametrized_choice_label']);
 
@@ -336,7 +336,7 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
         $this->assertSame('[trans]parametrized.NO[/trans]', $choicesArray[1]['label']);
     }
 
-    public function testChoiceTranslatableLabel()
+    public function testChoiceTranslatableLabel(): void
     {
         $choices = $this->translatorExtension->getFieldChoices($this->view->children['translatable_choice_label']);
 

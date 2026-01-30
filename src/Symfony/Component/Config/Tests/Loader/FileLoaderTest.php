@@ -21,7 +21,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 
 class FileLoaderTest extends TestCase
 {
-    public function testImportWithFileLocatorDelegation()
+    public function testImportWithFileLocatorDelegation(): void
     {
         $locatorMockForAdditionalLoader = $this->createStub(FileLocatorInterface::class);
         $locatorMockForAdditionalLoader
@@ -71,7 +71,7 @@ class FileLoaderTest extends TestCase
         }
     }
 
-    public function testImportWithGlobLikeResource()
+    public function testImportWithGlobLikeResource(): void
     {
         $locatorMock = $this->createMock(FileLocatorInterface::class);
         $locatorMock->expects($this->once())->method('locate')->willReturn('');
@@ -80,7 +80,7 @@ class FileLoaderTest extends TestCase
         $this->assertSame('[foo]', $loader->import('[foo]'));
     }
 
-    public function testImportWithGlobLikeResourceWhichContainsSlashes()
+    public function testImportWithGlobLikeResourceWhichContainsSlashes(): void
     {
         $locatorMock = $this->createMock(FileLocatorInterface::class);
         $locatorMock->expects($this->once())->method('locate')->willReturn('');
@@ -89,21 +89,21 @@ class FileLoaderTest extends TestCase
         $this->assertNull($loader->import('foo/bar[foo]'));
     }
 
-    public function testImportWithGlobLikeResourceWhichContainsMultipleLines()
+    public function testImportWithGlobLikeResourceWhichContainsMultipleLines(): void
     {
         $loader = new TestFileLoader(new FileLocator());
 
         $this->assertSame("foo\nfoobar[foo]", $loader->import("foo\nfoobar[foo]"));
     }
 
-    public function testImportWithGlobLikeResourceWhichContainsSlashesAndMultipleLines()
+    public function testImportWithGlobLikeResourceWhichContainsSlashesAndMultipleLines(): void
     {
         $loader = new TestFileLoader(new FileLocator());
 
         $this->assertSame("foo\nfoo/bar[foo]", $loader->import("foo\nfoo/bar[foo]"));
     }
 
-    public function testImportWithNoGlobMatch()
+    public function testImportWithNoGlobMatch(): void
     {
         $locatorMock = $this->createMock(FileLocatorInterface::class);
         $locatorMock->expects($this->once())->method('locate')->willReturn('');
@@ -112,14 +112,14 @@ class FileLoaderTest extends TestCase
         $this->assertNull($loader->import('./*.abc'));
     }
 
-    public function testImportWithSimpleGlob()
+    public function testImportWithSimpleGlob(): void
     {
         $loader = new TestFileLoader(new FileLocator(__DIR__));
 
         $this->assertSame(__FILE__, strtr($loader->import('FileLoaderTest.*'), '/', \DIRECTORY_SEPARATOR));
     }
 
-    public function testImportWithExclude()
+    public function testImportWithExclude(): void
     {
         $loader = new TestFileLoader(new FileLocator(__DIR__.'/../Fixtures'));
         $loadedFiles = $loader->import('Include/*', null, false, null, __DIR__.'/../Fixtures/Include/{ExcludeFile.txt}');
@@ -128,7 +128,7 @@ class FileLoaderTest extends TestCase
     }
 
     #[DataProvider('excludeTrailingSlashConsistencyProvider')]
-    public function testExcludeTrailingSlashConsistency(string $exclude)
+    public function testExcludeTrailingSlashConsistency(string $exclude): void
     {
         $loader = new TestFileLoader(new FileLocator(__DIR__.'/../Fixtures'));
         $loadedFiles = $loader->import('ExcludeTrailingSlash/*', null, false, null, $exclude);

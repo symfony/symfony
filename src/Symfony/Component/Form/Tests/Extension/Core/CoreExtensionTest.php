@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormFactoryBuilder;
 
 class CoreExtensionTest extends TestCase
 {
-    public function testTransformationFailuresAreConvertedIntoFormErrors()
+    public function testTransformationFailuresAreConvertedIntoFormErrors(): void
     {
         $formFactoryBuilder = new FormFactoryBuilder();
         $formFactory = $formFactoryBuilder->addExtension(new CoreExtension())

@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\Serializer;
 
 class MessageTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $m = new Message();
         $this->assertNull($m->getBody());
@@ -50,20 +50,20 @@ class MessageTest extends TestCase
         $this->assertSame($h, $m->getHeaders());
     }
 
-    public function testGetPreparedHeadersThrowsWhenNoFrom()
+    public function testGetPreparedHeadersThrowsWhenNoFrom(): void
     {
         $this->expectException(\LogicException::class);
         (new Message())->getPreparedHeaders();
     }
 
-    public function testGetPreparedHeadersCloneHeaders()
+    public function testGetPreparedHeadersCloneHeaders(): void
     {
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
         $this->assertNotSame($message->getPreparedHeaders(), $message->getHeaders());
     }
 
-    public function testGetPreparedHeadersSetRequiredHeaders()
+    public function testGetPreparedHeadersSetRequiredHeaders(): void
     {
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
@@ -74,7 +74,7 @@ class MessageTest extends TestCase
         $this->assertFalse($headers->has('Bcc'));
     }
 
-    public function testGetPreparedHeaders()
+    public function testGetPreparedHeaders(): void
     {
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
@@ -96,13 +96,13 @@ class MessageTest extends TestCase
         $this->assertNull($message->getPreparedHeaders()->get('Bcc'));
     }
 
-    public function testGetPreparedHeadersWithNoFrom()
+    public function testGetPreparedHeadersWithNoFrom(): void
     {
         $this->expectException(\LogicException::class);
         (new Message())->getPreparedHeaders();
     }
 
-    public function testGetPreparedHeadersWithNamedFrom()
+    public function testGetPreparedHeadersWithNamedFrom(): void
     {
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', [new Address('fabien@symfony.com', 'Fabien')]);
@@ -111,7 +111,7 @@ class MessageTest extends TestCase
         $this->assertTrue($h->has('Message-Id'));
     }
 
-    public function testGetPreparedHeadersHasSenderWhenNeeded()
+    public function testGetPreparedHeadersHasSenderWhenNeeded(): void
     {
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
@@ -127,7 +127,7 @@ class MessageTest extends TestCase
         $this->assertEquals('thomas@symfony.com', $message->getPreparedHeaders()->get('Sender')->getAddress()->getAddress());
     }
 
-    public function testGenerateMessageIdThrowsWhenHasFromButNoAddresses()
+    public function testGenerateMessageIdThrowsWhenHasFromButNoAddresses(): void
     {
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', []);
@@ -135,7 +135,7 @@ class MessageTest extends TestCase
         $message->generateMessageId();
     }
 
-    public function testGenerateMessageIdThrowsWhenNeitherFromNorSenderIsPresent()
+    public function testGenerateMessageIdThrowsWhenNeitherFromNorSenderIsPresent(): void
     {
         $message = new Message();
 
@@ -145,7 +145,7 @@ class MessageTest extends TestCase
         $message->generateMessageId();
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $message = new Message();
         $message->getHeaders()->addMailboxListHeader('From', ['fabien@symfony.com']);
@@ -178,7 +178,7 @@ class MessageTest extends TestCase
         $this->assertStringMatchesFormat($expected, str_replace("\r\n", "\n", implode('', iterator_to_array($message->toIterable(), false))));
     }
 
-    public function testSymfonySerialize()
+    public function testSymfonySerialize(): void
     {
         // we don't add from/sender to check that it's not needed to serialize an email
         $body = new MixedPart(
@@ -289,7 +289,7 @@ class MessageTest extends TestCase
     }
 
     #[DataProvider('ensureValidityProvider')]
-    public function testEnsureValidity(array $headers, ?string $exceptionClass, ?string $exceptionMessage)
+    public function testEnsureValidity(array $headers, ?string $exceptionClass, ?string $exceptionMessage): void
     {
         if ($exceptionClass) {
             $this->expectException($exceptionClass);

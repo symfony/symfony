@@ -38,7 +38,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
-    public function testPrune()
+    public function testPrune(): void
     {
         $cache = new TagAwareAdapter($this->getPruneableMock());
         $this->assertTrue($cache->prune());
@@ -50,7 +50,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertFalse($cache->prune());
     }
 
-    public function testKnownTagVersionsTtl()
+    public function testKnownTagVersionsTtl(): void
     {
         $itemsPool = new FilesystemAdapter('', 10);
         $tagsPool = new ArrayAdapter();
@@ -80,7 +80,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $this->assertFalse($pool->getItem('foo')->isHit()); // known tag version has expired
     }
 
-    public function testInvalidateTagsWithArrayAdapter()
+    public function testInvalidateTagsWithArrayAdapter(): void
     {
         $adapter = new TagAwareAdapter(new ArrayAdapter());
 
@@ -124,7 +124,7 @@ class TagAwareAdapterTest extends AdapterTestCase
     }
 
     #[DoesNotPerformAssertions]
-    public function testToleranceForStringsAsTagVersionsCase1()
+    public function testToleranceForStringsAsTagVersionsCase1(): void
     {
         $pool = $this->createCachePool();
         $adapter = new FilesystemAdapter();
@@ -139,7 +139,7 @@ class TagAwareAdapterTest extends AdapterTestCase
     }
 
     #[DoesNotPerformAssertions]
-    public function testToleranceForStringsAsTagVersionsCase2()
+    public function testToleranceForStringsAsTagVersionsCase2(): void
     {
         $pool = $this->createCachePool();
         $adapter = new FilesystemAdapter();
@@ -155,7 +155,7 @@ class TagAwareAdapterTest extends AdapterTestCase
     }
 
     #[DoesNotPerformAssertions]
-    public function testToleranceForStringsAsTagVersionsCase3()
+    public function testToleranceForStringsAsTagVersionsCase3(): void
     {
         $pool = $this->createCachePool();
         $adapter = new FilesystemAdapter();
@@ -177,7 +177,7 @@ class TagAwareAdapterTest extends AdapterTestCase
     }
 
     #[DoesNotPerformAssertions]
-    public function testToleranceForStringsAsTagVersionsCase4()
+    public function testToleranceForStringsAsTagVersionsCase4(): void
     {
         $pool = $this->createCachePool();
         $adapter = new FilesystemAdapter();
@@ -197,7 +197,7 @@ class TagAwareAdapterTest extends AdapterTestCase
     }
 
     #[DoesNotPerformAssertions]
-    public function testToleranceForStringsAsTagVersionsCase5()
+    public function testToleranceForStringsAsTagVersionsCase5(): void
     {
         $pool = $this->createCachePool();
         $pool2 = $this->createCachePool();

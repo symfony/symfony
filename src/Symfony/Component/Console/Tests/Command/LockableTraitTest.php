@@ -32,7 +32,7 @@ class LockableTraitTest extends TestCase
         require_once self::$fixturesPath.'/FooLock4InvokableCommand.php';
     }
 
-    public function testLockIsReleased()
+    public function testLockIsReleased(): void
     {
         $command = new \FooLockCommand();
 
@@ -41,7 +41,7 @@ class LockableTraitTest extends TestCase
         $this->assertSame(2, $tester->execute([]));
     }
 
-    public function testLockReturnsFalseIfAlreadyLockedByAnotherCommand()
+    public function testLockReturnsFalseIfAlreadyLockedByAnotherCommand(): void
     {
         $command = new \FooLockCommand();
 
@@ -61,7 +61,7 @@ class LockableTraitTest extends TestCase
         $this->assertSame(2, $tester->execute([]));
     }
 
-    public function testMultipleLockCallsThrowLogicException()
+    public function testMultipleLockCallsThrowLogicException(): void
     {
         $command = new \FooLock2Command();
 
@@ -69,7 +69,7 @@ class LockableTraitTest extends TestCase
         $this->assertSame(1, $tester->execute([]));
     }
 
-    public function testCustomLockFactoryIsUsed()
+    public function testCustomLockFactoryIsUsed(): void
     {
         $lockFactory = $this->createMock(LockFactory::class);
         $command = new \FooLock3Command($lockFactory);
@@ -83,7 +83,7 @@ class LockableTraitTest extends TestCase
         $this->assertSame(1, $tester->execute([]));
     }
 
-    public function testLockInvokableCommandReturnsFalseIfAlreadyLockedByAnotherCommand()
+    public function testLockInvokableCommandReturnsFalseIfAlreadyLockedByAnotherCommand(): void
     {
         $command = new Command('foo:lock4');
         $command->setCode(new \FooLock4InvokableCommand());

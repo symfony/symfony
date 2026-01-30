@@ -25,7 +25,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         return new TypeValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $constraint = new Type(type: 'integer');
 
@@ -34,7 +34,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testEmptyIsValidIfString()
+    public function testEmptyIsValidIfString(): void
     {
         $constraint = new Type(type: 'string');
 
@@ -43,7 +43,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testEmptyIsInvalidIfNoString()
+    public function testEmptyIsInvalidIfNoString(): void
     {
         $constraint = new Type(
             type: 'integer',
@@ -60,7 +60,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidValues')]
-    public function testValidValues($value, $type)
+    public function testValidValues($value, $type): void
     {
         $constraint = new Type(type: $type);
 
@@ -118,7 +118,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidValues')]
-    public function testInvalidValues($value, $type, $valueAsString)
+    public function testInvalidValues($value, $type, $valueAsString): void
     {
         $constraint = new Type(
             type: $type,
@@ -188,7 +188,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidValuesMultipleTypes')]
-    public function testValidValuesMultipleTypes($value, array $types)
+    public function testValidValuesMultipleTypes($value, array $types): void
     {
         $constraint = new Type(type: $types);
 
@@ -205,7 +205,7 @@ class TypeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testInvalidValuesMultipleTypes()
+    public function testInvalidValuesMultipleTypes(): void
     {
         $this->validator->validate('12345', new Type(type: ['boolean', 'array'], message: 'myMessage'));
 

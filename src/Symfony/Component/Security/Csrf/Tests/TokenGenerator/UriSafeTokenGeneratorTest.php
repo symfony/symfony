@@ -39,7 +39,7 @@ class UriSafeTokenGeneratorTest extends TestCase
         $this->generator = new UriSafeTokenGenerator(self::ENTROPY);
     }
 
-    public function testGenerateToken()
+    public function testGenerateToken(): void
     {
         $token = $this->generator->generateToken();
 
@@ -48,7 +48,7 @@ class UriSafeTokenGeneratorTest extends TestCase
     }
 
     #[DataProvider('validDataProvider')]
-    public function testValidLength(int $entropy, int $length)
+    public function testValidLength(int $entropy, int $length): void
     {
         $generator = new UriSafeTokenGenerator($entropy);
         $token = $generator->generateToken();
@@ -61,7 +61,7 @@ class UriSafeTokenGeneratorTest extends TestCase
         yield 'Float length' => [20, 3];
     }
 
-    public function testInvalidLength()
+    public function testInvalidLength(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Entropy should be greater than 7.');

@@ -25,7 +25,7 @@ class ChainEncoderTest extends TestCase
     private const FORMAT_2 = 'format2';
     private const FORMAT_3 = 'format3';
 
-    public function testSupportsEncoding()
+    public function testSupportsEncoding(): void
     {
         $encoder1 = $this->createEncoder1();
         $encoder1
@@ -53,7 +53,7 @@ class ChainEncoderTest extends TestCase
         $this->assertEquals('result2', $chainEncoder->encode('', self::FORMAT_3, ['foo' => 'bar2']));
     }
 
-    public function testEncode()
+    public function testEncode(): void
     {
         $encoder1 = $this->createEncoder1(true);
         $encoder1->expects($this->never())->method('encode');
@@ -65,14 +65,14 @@ class ChainEncoderTest extends TestCase
         $this->assertSame('foo:123', $chainEncoder->encode(['foo' => 123], self::FORMAT_2));
     }
 
-    public function testEncodeUnsupportedFormat()
+    public function testEncodeUnsupportedFormat(): void
     {
         $chainEncoder = new ChainEncoder([$this->createEncoder1(), $this->createEncoder2()]);
         $this->expectException(RuntimeException::class);
         $chainEncoder->encode(['foo' => 123], self::FORMAT_3);
     }
 
-    public function testNeedsNormalizationBasic()
+    public function testNeedsNormalizationBasic(): void
     {
         $chainEncoder = new ChainEncoder([$this->createEncoder1(), $this->createEncoder2()]);
 
@@ -80,7 +80,7 @@ class ChainEncoderTest extends TestCase
         $this->assertTrue($chainEncoder->needsNormalization(self::FORMAT_2));
     }
 
-    public function testNeedsNormalizationNormalizationAware()
+    public function testNeedsNormalizationNormalizationAware(): void
     {
         $encoder = new NormalizationAwareEncoder();
         $sut = new ChainEncoder([$encoder]);
@@ -88,7 +88,7 @@ class ChainEncoderTest extends TestCase
         $this->assertFalse($sut->needsNormalization(self::FORMAT_1));
     }
 
-    public function testNeedsNormalizationTraceableEncoder()
+    public function testNeedsNormalizationTraceableEncoder(): void
     {
         $traceableEncoder = $this->createStub(TraceableEncoder::class);
         $traceableEncoder->method('needsNormalization')->willReturn(true);

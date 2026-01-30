@@ -16,7 +16,7 @@ use Symfony\Component\Mime\Header\IdentificationHeader;
 
 class IdentificationHeaderTest extends TestCase
 {
-    public function testValueMatchesMsgIdSpec()
+    public function testValueMatchesMsgIdSpec(): void
     {
         /* -- RFC 2822, 3.6.4.
          message-id      =       "Message-ID:" msg-id CRLF
@@ -40,20 +40,20 @@ class IdentificationHeaderTest extends TestCase
         $this->assertEquals('<id-left@id-right>', $header->getBodyAsString());
     }
 
-    public function testIdCanBeRetrievedVerbatim()
+    public function testIdCanBeRetrievedVerbatim(): void
     {
         $header = new IdentificationHeader('Message-ID', 'id-left@id-right');
         $this->assertEquals('id-left@id-right', $header->getId());
     }
 
-    public function testMultipleIdsCanBeSet()
+    public function testMultipleIdsCanBeSet(): void
     {
         $header = new IdentificationHeader('References', 'c@d');
         $header->setIds(['a@b', 'x@y']);
         $this->assertEquals(['a@b', 'x@y'], $header->getIds());
     }
 
-    public function testSettingMultipleIdsProducesAListValue()
+    public function testSettingMultipleIdsProducesAListValue(): void
     {
         /* -- RFC 2822, 3.6.4.
         The "References:" and "In-Reply-To:" field each contain one or more
@@ -70,7 +70,7 @@ class IdentificationHeaderTest extends TestCase
         $this->assertEquals('<a@b> <x@y>', $header->getBodyAsString());
     }
 
-    public function testIdLeftCanBeQuoted()
+    public function testIdLeftCanBeQuoted(): void
     {
         /* -- RFC 2822, 3.6.4.
          id-left         =       dot-atom-text / no-fold-quote / obs-id-left
@@ -81,7 +81,7 @@ class IdentificationHeaderTest extends TestCase
         $this->assertEquals('<"ab"@c>', $header->getBodyAsString());
     }
 
-    public function testIdLeftCanContainAnglesAsQuotedPairs()
+    public function testIdLeftCanContainAnglesAsQuotedPairs(): void
     {
         /* -- RFC 2822, 3.6.4.
          no-fold-quote   =       DQUOTE *(qtext / quoted-pair) DQUOTE
@@ -92,21 +92,21 @@ class IdentificationHeaderTest extends TestCase
         $this->assertEquals('<"a\\<\\>b"@c>', $header->getBodyAsString());
     }
 
-    public function testIdLeftCanBeDotAtom()
+    public function testIdLeftCanBeDotAtom(): void
     {
         $header = new IdentificationHeader('References', 'a.b+&%$.c@d');
         $this->assertEquals('a.b+&%$.c@d', $header->getId());
         $this->assertEquals('<a.b+&%$.c@d>', $header->getBodyAsString());
     }
 
-    public function testInvalidIdLeftThrowsException()
+    public function testInvalidIdLeftThrowsException(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Email "a b c@d" does not comply with addr-spec of RFC 2822.');
         new IdentificationHeader('References', 'a b c@d');
     }
 
-    public function testIdRightCanBeDotAtom()
+    public function testIdRightCanBeDotAtom(): void
     {
         /* -- RFC 2822, 3.6.4.
          id-right        =       dot-atom-text / no-fold-literal / obs-id-right
@@ -117,7 +117,7 @@ class IdentificationHeaderTest extends TestCase
         $this->assertEquals('<a@b.c+&%$.d>', $header->getBodyAsString());
     }
 
-    public function testIdRightCanBeLiteral()
+    public function testIdRightCanBeLiteral(): void
     {
         /* -- RFC 2822, 3.6.4.
          no-fold-literal =       "[" *(dtext / quoted-pair) "]"
@@ -128,21 +128,21 @@ class IdentificationHeaderTest extends TestCase
         $this->assertEquals('<a@[1.2.3.4]>', $header->getBodyAsString());
     }
 
-    public function testIdRigthIsIdnEncoded()
+    public function testIdRigthIsIdnEncoded(): void
     {
         $header = new IdentificationHeader('References', 'a@ä');
         $this->assertEquals('a@ä', $header->getId());
         $this->assertEquals('<a@xn--4ca>', $header->getBodyAsString());
     }
 
-    public function testInvalidIdRightThrowsException()
+    public function testInvalidIdRightThrowsException(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Email "a@b c d" does not comply with addr-spec of RFC 2822.');
         new IdentificationHeader('References', 'a@b c d');
     }
 
-    public function testMissingAtSignThrowsException()
+    public function testMissingAtSignThrowsException(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Email "abc" does not comply with addr-spec of RFC 2822.');
@@ -152,20 +152,20 @@ class IdentificationHeaderTest extends TestCase
         new IdentificationHeader('References', 'abc');
     }
 
-    public function testSetBody()
+    public function testSetBody(): void
     {
         $header = new IdentificationHeader('Message-ID', 'c@d');
         $header->setBody('a@b');
         $this->assertEquals(['a@b'], $header->getIds());
     }
 
-    public function testGetBody()
+    public function testGetBody(): void
     {
         $header = new IdentificationHeader('Message-ID', 'a@b');
         $this->assertEquals(['a@b'], $header->getBody());
     }
 
-    public function testStringValue()
+    public function testStringValue(): void
     {
         $header = new IdentificationHeader('References', ['a@b', 'x@y']);
         $this->assertEquals('References: <a@b> <x@y>', $header->toString());

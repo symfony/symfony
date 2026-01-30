@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class DisallowRobotsIndexingListenerTest extends TestCase
 {
     #[DataProvider('provideResponses')]
-    public function testInvoke(?string $expected, array $responseArgs)
+    public function testInvoke(?string $expected, array $responseArgs): void
     {
         $response = new Response(...$responseArgs);
         $listener = new DisallowRobotsIndexingListener();

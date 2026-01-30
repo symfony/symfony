@@ -24,7 +24,7 @@ use Symfony\Component\VarDumper\Dumper\ContextualizedDumper;
 #[BackupGlobals(true)]
 class ContextualizedDumperTest extends TestCase
 {
-    public function testContextualizedCliDumper()
+    public function testContextualizedCliDumper(): void
     {
         $_ENV['SYMFONY_IDE'] = $_SERVER['SYMFONY_IDE'] = '';
         $wrappedDumper = new CliDumper('php://output');

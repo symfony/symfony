@@ -29,14 +29,14 @@ class WorkflowValidatorPassTest extends TestCase
         $this->compilerPass = new WorkflowValidatorPass();
     }
 
-    public function testNothingToDo()
+    public function testNothingToDo(): void
     {
         $this->compilerPass->process($this->container);
 
         $this->assertFalse(DefinitionValidator::$called);
     }
 
-    public function testValidate()
+    public function testValidate(): void
     {
         $this
             ->container

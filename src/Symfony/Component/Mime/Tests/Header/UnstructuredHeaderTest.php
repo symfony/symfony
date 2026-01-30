@@ -16,19 +16,19 @@ use Symfony\Component\Mime\Header\UnstructuredHeader;
 
 class UnstructuredHeaderTest extends TestCase
 {
-    public function testGetNameReturnsNameVerbatim()
+    public function testGetNameReturnsNameVerbatim(): void
     {
         $header = new UnstructuredHeader('Subject', '');
         $this->assertEquals('Subject', $header->getName());
     }
 
-    public function testGetValueReturnsValueVerbatim()
+    public function testGetValueReturnsValueVerbatim(): void
     {
         $header = new UnstructuredHeader('Subject', 'Test');
         $this->assertEquals('Test', $header->getValue());
     }
 
-    public function testBasicStructureIsKeyValuePair()
+    public function testBasicStructureIsKeyValuePair(): void
     {
         /* -- RFC 2822, 2.2
         Header fields are lines composed of a field name, followed by a colon
@@ -38,7 +38,7 @@ class UnstructuredHeaderTest extends TestCase
         $this->assertEquals('Subject: Test', $header->toString());
     }
 
-    public function testLongHeadersAreFoldedAtWordBoundary()
+    public function testLongHeadersAreFoldedAtWordBoundary(): void
     {
         /* -- RFC 2822, 2.2.3
         Each header field is logically a single line of characters comprising
@@ -65,7 +65,7 @@ class UnstructuredHeaderTest extends TestCase
         );
     }
 
-    public function testPrintableAsciiOnlyAppearsInHeaders()
+    public function testPrintableAsciiOnlyAppearsInHeaders(): void
     {
         /* -- RFC 2822, 2.2.
         A field name MUST be composed of printable US-ASCII characters (i.e.,
@@ -79,7 +79,7 @@ class UnstructuredHeaderTest extends TestCase
         $this->assertMatchesRegularExpression('~^[^:\x00-\x20\x80-\xFF]+: [^\x80-\xFF\r\n]+$~s', $header->toString());
     }
 
-    public function testEncodedWordsFollowGeneralStructure()
+    public function testEncodedWordsFollowGeneralStructure(): void
     {
         /* -- RFC 2047, 1.
         Generally, an "encoded-word" is a sequence of printable ASCII
@@ -92,7 +92,7 @@ class UnstructuredHeaderTest extends TestCase
         $this->assertMatchesRegularExpression('~^X-Test: \=?.*?\?.*?\?.*?\?=$~s', $header->toString());
     }
 
-    public function testEncodedWordIncludesCharsetAndEncodingMethodAndText()
+    public function testEncodedWordIncludesCharsetAndEncodingMethodAndText(): void
     {
         /* -- RFC 2047, 2.
         An 'encoded-word' is defined by the following ABNF grammar.  The
@@ -108,7 +108,7 @@ class UnstructuredHeaderTest extends TestCase
         $this->assertEquals('X-Test: =?'.$header->getCharset().'?Q?=8F?=', $header->toString());
     }
 
-    public function testEncodedWordsAreUsedToEncodedNonPrintableAscii()
+    public function testEncodedWordsAreUsedToEncodedNonPrintableAscii(): void
     {
         // SPACE and TAB permitted
         $nonPrintableBytes = array_merge(range(0x00, 0x08), range(0x10, 0x19), [0x7F]);
@@ -121,7 +121,7 @@ class UnstructuredHeaderTest extends TestCase
         }
     }
 
-    public function testEncodedWordsAreUsedToEncode8BitOctets()
+    public function testEncodedWordsAreUsedToEncode8BitOctets(): void
     {
         foreach (range(0x80, 0xFF) as $byte) {
             $char = pack('C', $byte);
@@ -132,7 +132,7 @@ class UnstructuredHeaderTest extends TestCase
         }
     }
 
-    public function testEncodedWordsAreNoMoreThan75CharsPerLine()
+    public function testEncodedWordsAreNoMoreThan75CharsPerLine(): void
     {
         /* -- RFC 2047, 2.
         An 'encoded-word' may not be more than 75 characters long, including
@@ -156,7 +156,7 @@ class UnstructuredHeaderTest extends TestCase
         $this->assertEquals('X-Test: =?'.$header->getCharset().'?Q?=8F?=', $header->toString());
     }
 
-    public function testFWSPIsUsedWhenEncoderReturnsMultipleLines()
+    public function testFWSPIsUsedWhenEncoderReturnsMultipleLines(): void
     {
         /* --RFC 2047, 2.
         If it is desirable to encode more text than will fit in an 'encoded-word' of
@@ -173,7 +173,7 @@ class UnstructuredHeaderTest extends TestCase
         $this->assertEquals('X-Test: =?'.$header->getCharset().'?Q?=8Fline=5Fone=5Fhere?='."\r\n".' =?'.$header->getCharset().'?Q?line=5Ftwo=5Fhere?=', $header->toString());
     }
 
-    public function testAdjacentWordsAreEncodedTogether()
+    public function testAdjacentWordsAreEncodedTogether(): void
     {
         /* -- RFC 2047, 5 (1)
          Ordinary ASCII text and 'encoded-word's may appear together in the
@@ -204,7 +204,7 @@ class UnstructuredHeaderTest extends TestCase
         );
     }
 
-    public function testLanguageInformationAppearsInEncodedWords()
+    public function testLanguageInformationAppearsInEncodedWords(): void
     {
         /* -- RFC 2231, 5.
         5.  Language specification in Encoded Words
@@ -230,14 +230,14 @@ class UnstructuredHeaderTest extends TestCase
         $this->assertEquals('Subject: =?iso-8859-1*en?Q?fo=8Fbar?=', $header->toString());
     }
 
-    public function testSetBody()
+    public function testSetBody(): void
     {
         $header = new UnstructuredHeader('X-Test', '');
         $header->setBody('test');
         $this->assertEquals('test', $header->getValue());
     }
 
-    public function testGetBody()
+    public function testGetBody(): void
     {
         $header = new UnstructuredHeader('Subject', 'test');
         $this->assertEquals('test', $header->getBody());

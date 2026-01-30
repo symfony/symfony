@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class RemoveBuildParametersPassTest extends TestCase
 {
-    public function testBuildParametersShouldBeRemoved()
+    public function testBuildParametersShouldBeRemoved(): void
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('foo', 'Foo');
@@ -31,7 +31,7 @@ class RemoveBuildParametersPassTest extends TestCase
         $this->assertSame(['.bar' => 'Bar'], $pass->getRemovedParameters(), '".bar" parameter must be returned with its value.');
     }
 
-    public function testArrayBuildParametersArePreservedWhenConfigured()
+    public function testArrayBuildParametersArePreservedWhenConfigured(): void
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('foo', 'Foo');
@@ -48,7 +48,7 @@ class RemoveBuildParametersPassTest extends TestCase
         $this->assertSame(['.scalar' => 'Bar'], $pass->getRemovedParameters(), 'Only ".scalar" parameter must be returned as removed.');
     }
 
-    public function testNonArrayBuildParametersAreAlwaysRemoved()
+    public function testNonArrayBuildParametersAreAlwaysRemoved(): void
     {
         $builder = new ContainerBuilder();
         $builder->setParameter('.scalar', 'Bar');

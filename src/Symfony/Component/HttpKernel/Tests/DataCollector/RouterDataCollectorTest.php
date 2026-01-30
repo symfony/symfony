@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class RouterDataCollectorTest extends TestCase
 {
-    public function testRouteRedirectResponse()
+    public function testRouteRedirectResponse(): void
     {
         $collector = new RouterDataCollector();
 
@@ -38,7 +38,7 @@ class RouterDataCollectorTest extends TestCase
         $this->assertEquals('n/a', $collector->getTargetRoute());
     }
 
-    public function testRouteNotRedirectResponse()
+    public function testRouteNotRedirectResponse(): void
     {
         $collector = new RouterDataCollector();
 
@@ -55,7 +55,7 @@ class RouterDataCollectorTest extends TestCase
         $this->assertNull($collector->getTargetRoute());
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $collector = new RouterDataCollector();
 
@@ -73,7 +73,7 @@ class RouterDataCollectorTest extends TestCase
         $this->assertNull($collector->getTargetRoute());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $collector = new RouterDataCollector();
 
@@ -84,6 +84,6 @@ class RouterDataCollectorTest extends TestCase
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
 
-        return new ControllerEvent($kernel, static function () {}, $request, null);
+        return new ControllerEvent($kernel, static function (): void {}, $request, null);
     }
 }

@@ -25,7 +25,7 @@ class ClockTest extends TestCase
 {
     use ClockSensitiveTrait;
 
-    public function testMockClock()
+    public function testMockClock(): void
     {
         $this->assertInstanceOf(NativeClock::class, Clock::get());
 
@@ -34,26 +34,26 @@ class ClockTest extends TestCase
         $this->assertSame(Clock::get(), $clock);
     }
 
-    public function testNativeClock()
+    public function testNativeClock(): void
     {
         $this->assertInstanceOf(DatePoint::class, now());
         $this->assertInstanceOf(NativeClock::class, Clock::get());
     }
 
-    public function testNowModifier()
+    public function testNowModifier(): void
     {
         $this->assertSame('2023-08-14', now('2023-08-14')->format('Y-m-d'));
         $this->assertSame('Europe/Paris', now('Europe/Paris')->getTimezone()->getName());
         $this->assertSame('UTC', now('UTC')->getTimezone()->getName());
     }
 
-    public function testInvalidNowModifier()
+    public function testInvalidNowModifier(): void
     {
         $this->expectException(\DateMalformedStringException::class);
         now('invalid date');
     }
 
-    public function testMockClockDisable()
+    public function testMockClockDisable(): void
     {
         $this->assertInstanceOf(NativeClock::class, Clock::get());
 
@@ -61,7 +61,7 @@ class ClockTest extends TestCase
         $this->assertInstanceOf(NativeClock::class, self::mockTime(false));
     }
 
-    public function testMockClockFreeze()
+    public function testMockClockFreeze(): void
     {
         self::mockTime(new \DateTimeImmutable('2021-12-19'));
 
@@ -72,7 +72,7 @@ class ClockTest extends TestCase
         $this->assertSame('2021-12-20', now()->format('Y-m-d'));
     }
 
-    public function testPsrClock()
+    public function testPsrClock(): void
     {
         $psrClock = new class implements ClockInterface {
             public function now(): \DateTimeImmutable

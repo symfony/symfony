@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\StreamedJsonResponse;
 
 class StreamedJsonResponseTest extends TestCase
 {
-    public function testResponseSimpleList()
+    public function testResponseSimpleList(): void
     {
         $content = $this->createSendResponse(
             [
@@ -30,14 +30,14 @@ class StreamedJsonResponseTest extends TestCase
         $this->assertSame('{"_embedded":{"articles":["Article 1","Article 2","Article 3"],"news":["News 1","News 2","News 3"]}}', $content);
     }
 
-    public function testResponseSimpleGenerator()
+    public function testResponseSimpleGenerator(): void
     {
         $content = $this->createSendResponse($this->generatorSimple('Article'));
 
         $this->assertSame('["Article 1","Article 2","Article 3"]', $content);
     }
 
-    public function testResponseNestedGenerator()
+    public function testResponseNestedGenerator(): void
     {
         $content = $this->createSendResponse((function (): iterable {
             yield 'articles' => $this->generatorSimple('Article');
@@ -47,7 +47,7 @@ class StreamedJsonResponseTest extends TestCase
         $this->assertSame('{"articles":["Article 1","Article 2","Article 3"],"news":["News 1","News 2","News 3"]}', $content);
     }
 
-    public function testResponseEmptyList()
+    public function testResponseEmptyList(): void
     {
         $content = $this->createSendResponse(
             [
@@ -60,7 +60,7 @@ class StreamedJsonResponseTest extends TestCase
         $this->assertSame('{"_embedded":{"articles":[]}}', $content);
     }
 
-    public function testResponseObjectsList()
+    public function testResponseObjectsList(): void
     {
         $content = $this->createSendResponse(
             [
@@ -73,7 +73,7 @@ class StreamedJsonResponseTest extends TestCase
         $this->assertSame('{"_embedded":{"articles":[{"title":"Article 1"},{"title":"Article 2"},{"title":"Article 3"}]}}', $content);
     }
 
-    public function testResponseWithoutGenerator()
+    public function testResponseWithoutGenerator(): void
     {
         // while it is not the intended usage, all kind of iterables should be supported for good DX
         $content = $this->createSendResponse(
@@ -87,7 +87,7 @@ class StreamedJsonResponseTest extends TestCase
         $this->assertSame('{"_embedded":{"articles":["Article 1","Article 2","Article 3"]}}', $content);
     }
 
-    public function testResponseWithPlaceholder()
+    public function testResponseWithPlaceholder(): void
     {
         // the placeholder must not conflict with generator injection
         $content = $this->createSendResponse(
@@ -104,7 +104,7 @@ class StreamedJsonResponseTest extends TestCase
         $this->assertSame('{"_embedded":{"articles":[{"title":"Article 1"},{"title":"Article 2"},{"title":"Article 3"}],"placeholder":"__symfony_json__","news":["News 1","News 2","News 3"]},"placeholder":"__symfony_json__"}', $content);
     }
 
-    public function testResponseWithMixedKeyType()
+    public function testResponseWithMixedKeyType(): void
     {
         $content = $this->createSendResponse(
             [
@@ -128,7 +128,7 @@ class StreamedJsonResponseTest extends TestCase
         $this->assertSame('{"_embedded":{"list":["test","value"],"map":{"key":"value","0":"test"},"integer":{"1":"one","3":"three"}}}', $content);
     }
 
-    public function testResponseOtherTraversable()
+    public function testResponseOtherTraversable(): void
     {
         $arrayObject = new \ArrayObject(['__symfony_json__' => '__symfony_json__']);
 
@@ -166,7 +166,7 @@ class StreamedJsonResponseTest extends TestCase
         $this->assertSame('{"arrayObject":{"__symfony_json__":"__symfony_json__"},"iteratorAggregate":["__symfony_json__"],"jsonSerializable":{"__symfony_json__":"__symfony_json__"},"articles":[{"title":"Article 1"},{"title":"Article 2"},{"title":"Article 3"}]}', $content);
     }
 
-    public function testPlaceholderAsKeyAndValueInStructure()
+    public function testPlaceholderAsKeyAndValueInStructure(): void
     {
         $content = $this->createSendResponse(
             [
@@ -178,14 +178,14 @@ class StreamedJsonResponseTest extends TestCase
         $this->assertSame('{"__symfony_json__":"__symfony_json__","articles":[{"title":"Article 1"},{"title":"Article 2"},{"title":"Article 3"}]}', $content);
     }
 
-    public function testResponseStatusCode()
+    public function testResponseStatusCode(): void
     {
         $response = new StreamedJsonResponse([], 201);
 
         $this->assertSame(201, $response->getStatusCode());
     }
 
-    public function testPlaceholderAsObjectStructure()
+    public function testPlaceholderAsObjectStructure(): void
     {
         $object = new class {
             public $__symfony_json__ = 'foo';
@@ -203,21 +203,21 @@ class StreamedJsonResponseTest extends TestCase
         $this->assertSame('{"object":{"__symfony_json__":"foo","bar":"__symfony_json__"},"articles":[{"title":"Article 1"},{"title":"Article 2"},{"title":"Article 3"}]}', $content);
     }
 
-    public function testResponseHeaders()
+    public function testResponseHeaders(): void
     {
         $response = new StreamedJsonResponse([], 200, ['X-Test' => 'Test']);
 
         $this->assertSame('Test', $response->headers->get('X-Test'));
     }
 
-    public function testCustomContentType()
+    public function testCustomContentType(): void
     {
         $response = new StreamedJsonResponse([], 200, ['Content-Type' => 'application/json+stream']);
 
         $this->assertSame('application/json+stream', $response->headers->get('Content-Type'));
     }
 
-    public function testEncodingOptions()
+    public function testEncodingOptions(): void
     {
         $response = new StreamedJsonResponse([
             '_embedded' => [

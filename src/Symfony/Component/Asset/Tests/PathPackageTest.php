@@ -21,7 +21,7 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 class PathPackageTest extends TestCase
 {
     #[DataProvider('getConfigs')]
-    public function testGetUrl($basePath, $format, $path, $expected)
+    public function testGetUrl($basePath, $format, $path, $expected): void
     {
         $package = new PathPackage($basePath, new StaticVersionStrategy('v1', $format));
         $this->assertSame($expected, $package->getUrl($path));
@@ -50,7 +50,7 @@ class PathPackageTest extends TestCase
     }
 
     #[DataProvider('getContextConfigs')]
-    public function testGetUrlWithContext($basePathRequest, $basePath, $format, $path, $expected)
+    public function testGetUrlWithContext($basePathRequest, $basePath, $format, $path, $expected): void
     {
         $package = new PathPackage($basePath, new StaticVersionStrategy('v1', $format), $this->getContext($basePathRequest));
 
@@ -74,7 +74,7 @@ class PathPackageTest extends TestCase
         ];
     }
 
-    public function testVersionStrategyGivesAbsoluteURL()
+    public function testVersionStrategyGivesAbsoluteURL(): void
     {
         $versionStrategy = $this->createStub(VersionStrategyInterface::class);
         $versionStrategy

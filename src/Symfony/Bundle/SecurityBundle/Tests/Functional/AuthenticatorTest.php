@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class AuthenticatorTest extends AbstractWebTestCase
 {
     #[DataProvider('provideEmails')]
-    public function testFirewallUserProvider($email, $withinFirewall)
+    public function testFirewallUserProvider($email, $withinFirewall): void
     {
         $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'firewall_user_provider.yml']);
 
@@ -32,7 +32,7 @@ class AuthenticatorTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideEmails')]
-    public function testWithoutUserProvider($email, $withinFirewall)
+    public function testWithoutUserProvider($email, $withinFirewall): void
     {
         $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'no_user_provider.yml']);
 
@@ -50,7 +50,7 @@ class AuthenticatorTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideEmailsWithFirewalls')]
-    public function testLoginUsersWithMultipleFirewalls(string $username, string $firewallContext)
+    public function testLoginUsersWithMultipleFirewalls(string $username, string $firewallContext): void
     {
         $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'multiple_firewall_user_provider.yml']);
         $client->request('GET', '/main/login/check');
@@ -71,7 +71,7 @@ class AuthenticatorTest extends AbstractWebTestCase
         yield ['john@example.org', 'custom'];
     }
 
-    public function testMultipleFirewalls()
+    public function testMultipleFirewalls(): void
     {
         $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'multiple_firewalls.yml']);
 
@@ -84,7 +84,7 @@ class AuthenticatorTest extends AbstractWebTestCase
         $this->assertResponseRedirects('http://localhost/login');
     }
 
-    public function testCustomSuccessHandler()
+    public function testCustomSuccessHandler(): void
     {
         $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'custom_handlers.yml']);
 
@@ -101,7 +101,7 @@ class AuthenticatorTest extends AbstractWebTestCase
         $this->assertResponseRedirects('http://localhost/firewall1/dummy');
     }
 
-    public function testCustomFailureHandler()
+    public function testCustomFailureHandler(): void
     {
         $client = $this->createClient(['test_case' => 'Authenticator', 'root_config' => 'custom_handlers.yml']);
 

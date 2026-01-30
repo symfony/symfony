@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Command\StopWorkersCommand;
 
 class StopWorkersCommandTest extends TestCase
 {
-    public function testItSetsCacheItem()
+    public function testItSetsCacheItem(): void
     {
         $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItem = $this->createMock(CacheItemInterface::class);
@@ -33,7 +33,7 @@ class StopWorkersCommandTest extends TestCase
         $tester->execute([]);
     }
 
-    public function testSuccessMessageGoesToStdout()
+    public function testSuccessMessageGoesToStdout(): void
     {
         $cachePool = $this->createStub(CacheItemPoolInterface::class);
         $cacheItem = $this->createStub(CacheItemInterface::class);

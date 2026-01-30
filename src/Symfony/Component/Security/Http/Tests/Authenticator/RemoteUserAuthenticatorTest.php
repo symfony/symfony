@@ -23,14 +23,14 @@ use Symfony\Component\Security\Http\Authenticator\RemoteUserAuthenticator;
 class RemoteUserAuthenticatorTest extends TestCase
 {
     #[DataProvider('provideAuthenticators')]
-    public function testSupport(InMemoryUserProvider $userProvider, RemoteUserAuthenticator $authenticator, $parameterName)
+    public function testSupport(InMemoryUserProvider $userProvider, RemoteUserAuthenticator $authenticator, $parameterName): void
     {
         $request = $this->createRequest([$parameterName => 'TheUsername']);
 
         $this->assertTrue($authenticator->supports($request));
     }
 
-    public function testSupportNoUser()
+    public function testSupportNoUser(): void
     {
         $authenticator = new RemoteUserAuthenticator(new InMemoryUserProvider(), new TokenStorage(), 'main');
 
@@ -38,7 +38,7 @@ class RemoteUserAuthenticatorTest extends TestCase
         $this->assertFalse($authenticator->supports($this->createRequest(['REMOTE_USER' => ''])));
     }
 
-    public function testSupportTokenStorageWithToken()
+    public function testSupportTokenStorageWithToken(): void
     {
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new PreAuthenticatedToken(new InMemoryUser('username', null), 'main'));
@@ -50,7 +50,7 @@ class RemoteUserAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideAuthenticators')]
-    public function testAuthenticate(InMemoryUserProvider $userProvider, RemoteUserAuthenticator $authenticator, $parameterName)
+    public function testAuthenticate(InMemoryUserProvider $userProvider, RemoteUserAuthenticator $authenticator, $parameterName): void
     {
         $request = $this->createRequest([$parameterName => 'TheUsername']);
 

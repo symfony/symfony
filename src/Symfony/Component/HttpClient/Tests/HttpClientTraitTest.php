@@ -28,7 +28,7 @@ class HttpClientTraitTest extends TestCase
     private const RFC3986_BASE = 'http://a/b/c/d;p?q';
 
     #[DataProvider('providePrepareRequestUrl')]
-    public function testPrepareRequestUrl(string $expected, string $url, array $query = [])
+    public function testPrepareRequestUrl(string $expected, string $url, array $query = []): void
     {
         $defaults = [
             'base_uri' => 'http://example.com?c=c',
@@ -52,7 +52,7 @@ class HttpClientTraitTest extends TestCase
         yield ['http://example.com/?b=', 'http://example.com/', ['a' => null, 'b' => '']];
     }
 
-    public function testPrepareRequestWithBodyIsArray()
+    public function testPrepareRequestWithBodyIsArray(): void
     {
         $defaults = [
             'base_uri' => 'http://example.com?c=c',
@@ -71,7 +71,7 @@ class HttpClientTraitTest extends TestCase
         $this->assertContains('Content-Type: application/x-www-form-urlencoded; charset=utf-8', $options['headers']);
     }
 
-    public function testNormalizeBodyMultipart()
+    public function testNormalizeBodyMultipart(): void
     {
         $file = fopen('php://memory', 'r+');
         stream_context_set_option($file, 'http', 'filename', 'test.txt');
@@ -117,7 +117,7 @@ class HttpClientTraitTest extends TestCase
     #[RequiresPhpExtension('openssl')]
     #[DataProvider('provideNormalizeBodyMultipartForwardStream')]
     #[Group('network')]
-    public function testNormalizeBodyMultipartForwardStream($stream)
+    public function testNormalizeBodyMultipartForwardStream($stream): void
     {
         $body = [
             'logo' => $stream(),
@@ -156,7 +156,7 @@ class HttpClientTraitTest extends TestCase
     }
 
     #[DataProvider('provideResolveUrl')]
-    public function testResolveUrl(string $base, string $url, string $expected)
+    public function testResolveUrl(string $base, string $url, string $expected): void
     {
         $this->assertSame($expected, implode('', self::resolveUrl(self::parseUrl($url), self::parseUrl($base))));
     }
@@ -229,14 +229,14 @@ class HttpClientTraitTest extends TestCase
         ];
     }
 
-    public function testResolveUrlWithoutScheme()
+    public function testResolveUrlWithoutScheme(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unsupported scheme in "localhost:8080": "http" or "https" expected.');
         self::resolveUrl(self::parseUrl('localhost:8080'), null);
     }
 
-    public function testResolveBaseUrlWithoutScheme()
+    public function testResolveBaseUrlWithoutScheme(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unsupported scheme in "localhost:8081": "http" or "https" expected.');
@@ -255,7 +255,7 @@ b'])]
     #[TestWith([' foo'])]
     #[TestWith(['foo '])]
     #[TestWith(['//'])]
-    public function testParseMalformedUrl(string $url)
+    public function testParseMalformedUrl(string $url): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Malformed URL');
@@ -263,7 +263,7 @@ b'])]
     }
 
     #[DataProvider('provideParseUrl')]
-    public function testParseUrl(array $expected, string $url, array $query = [])
+    public function testParseUrl(array $expected, string $url, array $query = []): void
     {
         $expected = array_combine(['scheme', 'authority', 'path', 'query', 'fragment'], $expected);
 
@@ -292,7 +292,7 @@ b'])]
     }
 
     #[DataProvider('provideRemoveDotSegments')]
-    public function testRemoveDotSegments($expected, $url)
+    public function testRemoveDotSegments($expected, $url): void
     {
         $this->assertSame($expected, self::removeDotSegments($url));
     }
@@ -311,35 +311,35 @@ b'])]
         yield ['/a///b', '/a///b'];
     }
 
-    public function testAuthBearerOption()
+    public function testAuthBearerOption(): void
     {
         [, $options] = self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => 'foobar'], HttpClientInterface::OPTIONS_DEFAULTS);
         $this->assertSame(['Accept: */*', 'Authorization: Bearer foobar'], $options['headers']);
         $this->assertSame(['Authorization: Bearer foobar'], $options['normalized_headers']['authorization']);
     }
 
-    public function testInvalidAuthBearerOption()
+    public function testInvalidAuthBearerOption(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "auth_bearer" must be a string, "stdClass" given.');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => new \stdClass()], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
-    public function testInvalidAuthBearerValue()
+    public function testInvalidAuthBearerValue(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid character found in option "auth_bearer": "a\nb".');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => "a\nb"], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
-    public function testSetAuthBasicAndBearerOptions()
+    public function testSetAuthBasicAndBearerOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Define either the "auth_basic" or the "auth_bearer" option, setting both is not supported.');
         self::prepareRequest('POST', 'http://example.com', ['auth_bearer' => 'foo', 'auth_basic' => 'foo:bar'], HttpClientInterface::OPTIONS_DEFAULTS);
     }
 
-    public function testSetJSONAndBodyOptions()
+    public function testSetJSONAndBodyOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Define either the "json" or the "body" option, setting both is not supported');
@@ -355,7 +355,7 @@ b'])]
     }
 
     #[DataProvider('providePrepareAuthBasic')]
-    public function testPrepareAuthBasic($arg, $result)
+    public function testPrepareAuthBasic($arg, $result): void
     {
         [, $options] = $this->prepareRequest('POST', 'http://example.com', ['auth_basic' => $arg], HttpClientInterface::OPTIONS_DEFAULTS);
         $this->assertSame('Authorization: Basic '.$result, $options['normalized_headers']['authorization'][0]);
@@ -372,19 +372,19 @@ b'])]
     }
 
     #[DataProvider('provideFingerprints')]
-    public function testNormalizePeerFingerprint($fingerprint, $expected)
+    public function testNormalizePeerFingerprint($fingerprint, $expected): void
     {
         self::assertSame($expected, $this->normalizePeerFingerprint($fingerprint));
     }
 
-    public function testNormalizePeerFingerprintException()
+    public function testNormalizePeerFingerprintException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot auto-detect fingerprint algorithm for "foo".');
         $this->normalizePeerFingerprint('foo');
     }
 
-    public function testNormalizePeerFingerprintTypeException()
+    public function testNormalizePeerFingerprintTypeException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Option "peer_fingerprint" must be string or array, "stdClass" given.');

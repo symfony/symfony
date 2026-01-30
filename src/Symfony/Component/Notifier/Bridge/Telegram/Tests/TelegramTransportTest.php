@@ -53,7 +53,7 @@ final class TelegramTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendWithErrorResponseThrowsTransportException()
+    public function testSendWithErrorResponseThrowsTransportException(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/post.+testDescription.+400/');
@@ -65,7 +65,7 @@ final class TelegramTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithErrorResponseThrowsTransportExceptionForEdit()
+    public function testSendWithErrorResponseThrowsTransportExceptionForEdit(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/edit.+testDescription.+404/');
@@ -79,7 +79,7 @@ final class TelegramTransportTest extends TransportTestCase
         );
     }
 
-    public function testSendWithOptions()
+    public function testSendWithOptions(): void
     {
         $response = new JsonMockResponse([
             'ok' => true,
@@ -123,7 +123,7 @@ final class TelegramTransportTest extends TransportTestCase
         $this->assertSame('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
-    public function testSendWithOptionForEditMessage()
+    public function testSendWithOptionForEditMessage(): void
     {
         $response = new JsonMockResponse([
             'ok' => true,
@@ -159,7 +159,7 @@ final class TelegramTransportTest extends TransportTestCase
         ));
     }
 
-    public function testSendWithOptionToAnswerCallbackQuery()
+    public function testSendWithOptionToAnswerCallbackQuery(): void
     {
         $response = new JsonMockResponse([
             'ok' => true,
@@ -179,7 +179,7 @@ final class TelegramTransportTest extends TransportTestCase
         ));
     }
 
-    public function testSendWithChannelOverride()
+    public function testSendWithChannelOverride(): void
     {
         $channelOverride = 'channelOverride';
 
@@ -227,7 +227,7 @@ final class TelegramTransportTest extends TransportTestCase
         $this->assertSame('telegram://api.telegram.org?channel=defaultChannel', $sentMessage->getTransport());
     }
 
-    public function testSendWithMarkdownShouldEscapeSpecialCharacters()
+    public function testSendWithMarkdownShouldEscapeSpecialCharacters(): void
     {
         $response = new JsonMockResponse([
             'ok' => true,
@@ -423,7 +423,7 @@ final class TelegramTransportTest extends TransportTestCase
         string $endpoint,
         array $expectedBody,
         array $responseContent,
-    ) {
+    ): void {
         $response = new JsonMockResponse([
             'ok' => true,
             'result' => array_merge([
@@ -569,7 +569,7 @@ final class TelegramTransportTest extends TransportTestCase
         string $endpoint,
         array $expectedBody,
         array $responseContent,
-    ) {
+    ): void {
         $response = new JsonMockResponse([
             'ok' => true,
             'result' => array_merge([
@@ -770,7 +770,7 @@ final class TelegramTransportTest extends TransportTestCase
         string $fileOption,
         array $expectedParameters,
         array $responseContent,
-    ) {
+    ): void {
         $response = new JsonMockResponse([
             'ok' => true,
             'result' => array_merge([
@@ -846,7 +846,7 @@ final class TelegramTransportTest extends TransportTestCase
         $this->assertSame('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
-    public function testSendLocationWithOptions()
+    public function testSendLocationWithOptions(): void
     {
         $response = new JsonMockResponse([
             'ok' => true,
@@ -899,7 +899,7 @@ final class TelegramTransportTest extends TransportTestCase
         $this->assertSame('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
-    public function testSendVenueWithOptions()
+    public function testSendVenueWithOptions(): void
     {
         $response = new JsonMockResponse([
             'ok' => true,
@@ -962,7 +962,7 @@ final class TelegramTransportTest extends TransportTestCase
         $this->assertSame('telegram://api.telegram.org?channel=testChannel', $sentMessage->getTransport());
     }
 
-    public function testSendContactWithOptions()
+    public function testSendContactWithOptions(): void
     {
         $vCard = <<<V_CARD
             BEGIN:VCARD
@@ -1057,7 +1057,7 @@ final class TelegramTransportTest extends TransportTestCase
     }
 
     #[DataProvider('exclusiveOptionsDataProvider')]
-    public function testUsingMultipleExclusiveOptionsWillProvideExceptions(TelegramOptions $messageOptions)
+    public function testUsingMultipleExclusiveOptionsWillProvideExceptions(TelegramOptions $messageOptions): void
     {
         $client = new MockHttpClient(static function (string $method, string $url, array $options = []): ResponseInterface {
             self::fail('Telegram API should not be called');

@@ -59,34 +59,34 @@ final class MercureTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testCanSetCustomPort()
+    public function testCanSetCustomPort(): void
     {
         $this->markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
     }
 
-    public function testCanSetCustomHost()
+    public function testCanSetCustomHost(): void
     {
         $this->markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
     }
 
-    public function testCanSetCustomHostAndPort()
+    public function testCanSetCustomHostAndPort(): void
     {
         $this->markTestSkipped("Mercure transport doesn't use a regular HTTP Dsn");
     }
 
-    public function testConstructWithWrongTopicsThrows()
+    public function testConstructWithWrongTopicsThrows(): void
     {
         $this->expectException(\TypeError::class);
         self::createTransport(null, null, 'publisherId', new \stdClass());
     }
 
-    public function testSendWithNonMercureOptionsThrows()
+    public function testSendWithNonMercureOptionsThrows(): void
     {
         $this->expectException(LogicException::class);
         self::createTransport()->send(new ChatMessage('testMessage', $this->createStub(MessageOptionsInterface::class)));
     }
 
-    public function testSendWithTransportFailureThrows()
+    public function testSendWithTransportFailureThrows(): void
     {
         $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), static function (): void {
             throw new MercureRuntimeException('Cannot connect to mercure');
@@ -98,7 +98,7 @@ final class MercureTransportTest extends TransportTestCase
         self::createTransport(null, $hub)->send(new ChatMessage('subject'));
     }
 
-    public function testSendWithWrongTokenThrows()
+    public function testSendWithWrongTokenThrows(): void
     {
         $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), static function (): void {
             throw new InvalidArgumentException('The provided JWT is not valid');
@@ -110,7 +110,7 @@ final class MercureTransportTest extends TransportTestCase
         self::createTransport(null, $hub)->send(new ChatMessage('subject'));
     }
 
-    public function testSendWithMercureOptions()
+    public function testSendWithMercureOptions(): void
     {
         $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update): string {
             $this->assertSame(['/topic/1', '/topic/2'], $update->getTopics());
@@ -126,7 +126,7 @@ final class MercureTransportTest extends TransportTestCase
         self::createTransport(null, $hub)->send(new ChatMessage('subject', new MercureOptions(['/topic/1', '/topic/2'], true, 'id', 'type', 1, ['tag' => '1234', 'body' => 'TEST'])));
     }
 
-    public function testSendWithMercureOptionsButWithoutOptionTopic()
+    public function testSendWithMercureOptionsButWithoutOptionTopic(): void
     {
         $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update): string {
             $this->assertSame(['https://symfony.com/notifier'], $update->getTopics());
@@ -142,7 +142,7 @@ final class MercureTransportTest extends TransportTestCase
         self::createTransport(null, $hub)->send(new ChatMessage('subject', new MercureOptions(null, true, 'id', 'type', 1)));
     }
 
-    public function testSendWithoutMercureOptions()
+    public function testSendWithoutMercureOptions(): void
     {
         $hub = new MockHub('https://foo.com/.well-known/mercure', new StaticTokenProvider('foo'), function (Update $update): string {
             $this->assertSame(['https://symfony.com/notifier'], $update->getTopics());
@@ -155,7 +155,7 @@ final class MercureTransportTest extends TransportTestCase
         self::createTransport(null, $hub)->send(new ChatMessage('subject'));
     }
 
-    public function testSendSuccessfully()
+    public function testSendSuccessfully(): void
     {
         $messageId = 'urn:uuid:a7045be0-a75d-4d40-8bd2-29fa4e5dd10b';
 

@@ -43,7 +43,7 @@ class ArrayChoiceListTest extends AbstractChoiceListTestCase
         return ['0', '1', '2', '3', '4', '5', '6', '7', '8'];
     }
 
-    public function testCreateChoiceListWithValueCallback()
+    public function testCreateChoiceListWithValueCallback(): void
     {
         $callback = static fn ($choice) => ':'.$choice;
 
@@ -56,7 +56,7 @@ class ArrayChoiceListTest extends AbstractChoiceListTestCase
         $this->assertSame([1 => ':foo', 2 => ':baz'], $choiceList->getValuesForChoices([1 => 'foo', 2 => 'baz']));
     }
 
-    public function testCreateChoiceListWithoutValueCallbackAndDuplicateFreeToStringChoices()
+    public function testCreateChoiceListWithoutValueCallbackAndDuplicateFreeToStringChoices(): void
     {
         $choiceList = new ArrayChoiceList([2 => 'foo', 7 => 'bar', 10 => 123]);
 
@@ -67,7 +67,7 @@ class ArrayChoiceListTest extends AbstractChoiceListTestCase
         $this->assertSame([1 => 'foo', 2 => '123'], $choiceList->getValuesForChoices([1 => 'foo', 2 => 123]));
     }
 
-    public function testCreateChoiceListWithoutValueCallbackAndToStringDuplicates()
+    public function testCreateChoiceListWithoutValueCallbackAndToStringDuplicates(): void
     {
         $choiceList = new ArrayChoiceList([2 => 'foo', 7 => '123', 10 => 123]);
 
@@ -78,7 +78,7 @@ class ArrayChoiceListTest extends AbstractChoiceListTestCase
         $this->assertSame([1 => '0', 2 => '2'], $choiceList->getValuesForChoices([1 => 'foo', 2 => 123]));
     }
 
-    public function testCreateChoiceListWithoutValueCallbackAndMixedChoices()
+    public function testCreateChoiceListWithoutValueCallbackAndMixedChoices(): void
     {
         $object = new \stdClass();
         $choiceList = new ArrayChoiceList([2 => 'foo', 5 => [7 => '123'], 10 => $object]);
@@ -90,7 +90,7 @@ class ArrayChoiceListTest extends AbstractChoiceListTestCase
         $this->assertSame([1 => '0', 2 => '2'], $choiceList->getValuesForChoices([1 => 'foo', 2 => $object]));
     }
 
-    public function testCreateChoiceListWithGroupedChoices()
+    public function testCreateChoiceListWithGroupedChoices(): void
     {
         $choiceList = new ArrayChoiceList([
             'Group 1' => ['A' => 'a', 'B' => 'b'],
@@ -108,7 +108,7 @@ class ArrayChoiceListTest extends AbstractChoiceListTestCase
         $this->assertSame([1 => 'a', 2 => 'b'], $choiceList->getValuesForChoices([1 => 'a', 2 => 'b']));
     }
 
-    public function testCompareChoicesByIdentityByDefault()
+    public function testCompareChoicesByIdentityByDefault(): void
     {
         $callback = static fn ($choice) => $choice->value;
 
@@ -120,14 +120,14 @@ class ArrayChoiceListTest extends AbstractChoiceListTestCase
         $this->assertSame([2 => 'value2'], $choiceList->getValuesForChoices([2 => (object) ['value' => 'value2']]));
     }
 
-    public function testGetChoicesForValuesWithContainingNull()
+    public function testGetChoicesForValuesWithContainingNull(): void
     {
         $choiceList = new ArrayChoiceList(['Null' => null]);
 
         $this->assertSame([0 => null], $choiceList->getChoicesForValues(['0']));
     }
 
-    public function testGetChoicesForValuesWithContainingFalseAndNull()
+    public function testGetChoicesForValuesWithContainingFalseAndNull(): void
     {
         $choiceList = new ArrayChoiceList(['False' => false, 'Null' => null]);
 
@@ -135,7 +135,7 @@ class ArrayChoiceListTest extends AbstractChoiceListTestCase
         $this->assertSame([0 => false], $choiceList->getChoicesForValues(['0']));
     }
 
-    public function testGetChoicesForValuesWithContainingEmptyStringAndNull()
+    public function testGetChoicesForValuesWithContainingEmptyStringAndNull(): void
     {
         $choiceList = new ArrayChoiceList(['Empty String' => '', 'Null' => null]);
 
@@ -143,7 +143,7 @@ class ArrayChoiceListTest extends AbstractChoiceListTestCase
         $this->assertSame([0 => null], $choiceList->getChoicesForValues(['1']));
     }
 
-    public function testGetChoicesForValuesWithContainingEmptyStringAndBooleans()
+    public function testGetChoicesForValuesWithContainingEmptyStringAndBooleans(): void
     {
         $choiceList = new ArrayChoiceList(['Empty String' => '', 'True' => true, 'False' => false]);
 
@@ -152,7 +152,7 @@ class ArrayChoiceListTest extends AbstractChoiceListTestCase
         $this->assertSame([0 => false], $choiceList->getChoicesForValues(['0']));
     }
 
-    public function testGetChoicesForValuesWithContainingEmptyStringAndFloats()
+    public function testGetChoicesForValuesWithContainingEmptyStringAndFloats(): void
     {
         $choiceList = new ArrayChoiceList(['Empty String' => '', '1/3' => 0.3, '1/2' => 0.5]);
 

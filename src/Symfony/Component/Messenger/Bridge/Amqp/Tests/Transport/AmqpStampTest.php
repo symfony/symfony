@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
 #[RequiresPhpExtension('amqp')]
 class AmqpStampTest extends TestCase
 {
-    public function testRoutingKeyOnly()
+    public function testRoutingKeyOnly(): void
     {
         $stamp = new AmqpStamp('routing_key');
         $this->assertSame('routing_key', $stamp->getRoutingKey());
@@ -26,7 +26,7 @@ class AmqpStampTest extends TestCase
         $this->assertSame([], $stamp->getAttributes());
     }
 
-    public function testFlagsAndAttributes()
+    public function testFlagsAndAttributes(): void
     {
         $stamp = new AmqpStamp(null, \AMQP_DURABLE, ['delivery_mode' => 'unknown']);
         $this->assertNull($stamp->getRoutingKey());
@@ -34,7 +34,7 @@ class AmqpStampTest extends TestCase
         $this->assertSame(['delivery_mode' => 'unknown'], $stamp->getAttributes());
     }
 
-    public function testCreateFromAmqpEnvelope()
+    public function testCreateFromAmqpEnvelope(): void
     {
         $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
         $amqpEnvelope->method('getRoutingKey')->willReturn('routingkey');
@@ -53,7 +53,7 @@ class AmqpStampTest extends TestCase
         $this->assertSame(\AMQP_NOPARAM, $stamp->getFlags());
     }
 
-    public function testCreateFromAmqpEnvelopeWithPreviousStamp()
+    public function testCreateFromAmqpEnvelopeWithPreviousStamp(): void
     {
         $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
         $amqpEnvelope->method('getRoutingKey')->willReturn('routingkey');

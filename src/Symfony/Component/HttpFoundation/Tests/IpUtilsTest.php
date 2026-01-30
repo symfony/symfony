@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 
 class IpUtilsTest extends TestCase
 {
-    public function testSeparateCachesPerProtocol()
+    public function testSeparateCachesPerProtocol(): void
     {
         $ip = '192.168.52.1';
         $subnet = '192.168.0.0/16';
@@ -34,7 +34,7 @@ class IpUtilsTest extends TestCase
     }
 
     #[DataProvider('getIpv4Data')]
-    public function testIpv4($matches, $remoteAddr, $cidr)
+    public function testIpv4($matches, $remoteAddr, $cidr): void
     {
         $this->assertSame($matches, IpUtils::checkIp($remoteAddr, $cidr));
     }
@@ -59,7 +59,7 @@ class IpUtilsTest extends TestCase
     }
 
     #[DataProvider('getIpv6Data')]
-    public function testIpv6($matches, $remoteAddr, $cidr)
+    public function testIpv6($matches, $remoteAddr, $cidr): void
     {
         if (!\defined('AF_INET6')) {
             $this->markTestSkipped('Only works when PHP is compiled without the option "disable-ipv6".');
@@ -93,7 +93,7 @@ class IpUtilsTest extends TestCase
     }
 
     #[RequiresPhpExtension('sockets')]
-    public function testAnIpv6WithOptionDisabledIpv6()
+    public function testAnIpv6WithOptionDisabledIpv6(): void
     {
         $this->expectException(\RuntimeException::class);
         if (\defined('AF_INET6')) {
@@ -104,7 +104,7 @@ class IpUtilsTest extends TestCase
     }
 
     #[DataProvider('invalidIpAddressData')]
-    public function testInvalidIpAddressesDoNotMatch($requestIp, $proxyIp)
+    public function testInvalidIpAddressesDoNotMatch($requestIp, $proxyIp): void
     {
         $this->assertFalse(IpUtils::checkIp4($requestIp, $proxyIp));
     }
@@ -119,7 +119,7 @@ class IpUtilsTest extends TestCase
     }
 
     #[DataProvider('anonymizedIpData')]
-    public function testAnonymize($ip, $expected)
+    public function testAnonymize($ip, $expected): void
     {
         $this->assertSame($expected, IpUtils::anonymize($ip));
     }
@@ -144,7 +144,7 @@ class IpUtilsTest extends TestCase
     }
 
     #[DataProvider('anonymizedIpDataWithBytes')]
-    public function testAnonymizeWithBytes($ip, $expected, $bytesForV4, $bytesForV6)
+    public function testAnonymizeWithBytes($ip, $expected, $bytesForV4, $bytesForV6): void
     {
         $this->assertSame($expected, IpUtils::anonymize($ip, $bytesForV4, $bytesForV6));
     }
@@ -173,7 +173,7 @@ class IpUtilsTest extends TestCase
         ];
     }
 
-    public function testAnonymizeV4WithNegativeBytes()
+    public function testAnonymizeV4WithNegativeBytes(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot anonymize less than 0 bytes.');
@@ -181,7 +181,7 @@ class IpUtilsTest extends TestCase
         IpUtils::anonymize('anything', -1, 8);
     }
 
-    public function testAnonymizeV6WithNegativeBytes()
+    public function testAnonymizeV6WithNegativeBytes(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot anonymize less than 0 bytes.');
@@ -189,7 +189,7 @@ class IpUtilsTest extends TestCase
         IpUtils::anonymize('anything', 1, -1);
     }
 
-    public function testAnonymizeV4WithTooManyBytes()
+    public function testAnonymizeV4WithTooManyBytes(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot anonymize more than 4 bytes for IPv4 and 16 bytes for IPv6.');
@@ -197,7 +197,7 @@ class IpUtilsTest extends TestCase
         IpUtils::anonymize('anything', 5, 8);
     }
 
-    public function testAnonymizeV6WithTooManyBytes()
+    public function testAnonymizeV6WithTooManyBytes(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot anonymize more than 4 bytes for IPv4 and 16 bytes for IPv6.');
@@ -206,7 +206,7 @@ class IpUtilsTest extends TestCase
     }
 
     #[DataProvider('getIp4SubnetMaskZeroData')]
-    public function testIp4SubnetMaskZero($matches, $remoteAddr, $cidr)
+    public function testIp4SubnetMaskZero($matches, $remoteAddr, $cidr): void
     {
         $this->assertSame($matches, IpUtils::checkIp4($remoteAddr, $cidr));
     }
@@ -221,7 +221,7 @@ class IpUtilsTest extends TestCase
     }
 
     #[DataProvider('getIsPrivateIpData')]
-    public function testIsPrivateIp(string $ip, bool $matches)
+    public function testIsPrivateIp(string $ip, bool $matches): void
     {
         $this->assertSame($matches, IpUtils::isPrivateIp($ip));
     }
@@ -249,7 +249,7 @@ class IpUtilsTest extends TestCase
         ];
     }
 
-    public function testCacheSizeLimit()
+    public function testCacheSizeLimit(): void
     {
         $ref = new \ReflectionClass(IpUtils::class);
 

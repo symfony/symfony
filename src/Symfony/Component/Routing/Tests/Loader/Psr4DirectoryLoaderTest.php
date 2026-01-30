@@ -28,7 +28,7 @@ use Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\SubNamespace\MyCont
 
 class Psr4DirectoryLoaderTest extends TestCase
 {
-    public function testTopLevelController()
+    public function testTopLevelController(): void
     {
         $route = $this->loadPsr4Controllers()->get('my_route');
 
@@ -36,7 +36,7 @@ class Psr4DirectoryLoaderTest extends TestCase
         $this->assertSame(MyController::class.'::__invoke', $route->getDefault('_controller'));
     }
 
-    public function testNestedController()
+    public function testNestedController(): void
     {
         $collection = $this->loadPsr4Controllers();
 
@@ -51,7 +51,7 @@ class Psr4DirectoryLoaderTest extends TestCase
         $this->assertSame(MyOtherController::class.'::secondAction', $route->getDefault('_controller'));
     }
 
-    public function testTraitController()
+    public function testTraitController(): void
     {
         $route = $this->loadPsr4Controllers()->get('my_controller_with_a_trait');
 
@@ -59,7 +59,7 @@ class Psr4DirectoryLoaderTest extends TestCase
         $this->assertSame(MyControllerWithATrait::class.'::someAction', $route->getDefault('_controller'));
     }
 
-    public function testAbstractController()
+    public function testAbstractController(): void
     {
         $route = $this->loadPsr4Controllers()->get('my_child_controller_from_abstract');
 
@@ -68,7 +68,7 @@ class Psr4DirectoryLoaderTest extends TestCase
     }
 
     #[DataProvider('provideNamespacesThatNeedTrimming')]
-    public function testPsr4NamespaceTrim(string $namespace)
+    public function testPsr4NamespaceTrim(string $namespace): void
     {
         $route = $this->getLoader()
             ->load(
@@ -91,7 +91,7 @@ class Psr4DirectoryLoaderTest extends TestCase
     }
 
     #[DataProvider('provideInvalidPsr4Namespaces')]
-    public function testInvalidPsr4Namespace(string $namespace, string $expectedExceptionMessage)
+    public function testInvalidPsr4Namespace(string $namespace, string $expectedExceptionMessage): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);

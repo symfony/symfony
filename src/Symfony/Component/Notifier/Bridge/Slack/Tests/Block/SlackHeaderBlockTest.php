@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Exception\LengthException;
 
 final class SlackHeaderBlockTest extends TestCase
 {
-    public function testCanBeInstantiated()
+    public function testCanBeInstantiated(): void
     {
         $header = new SlackHeaderBlock('header text');
         $header->id('header_id');
@@ -32,7 +32,7 @@ final class SlackHeaderBlockTest extends TestCase
         ], $header->toArray());
     }
 
-    public function testThrowsWhenTextExceedsCharacterLimit()
+    public function testThrowsWhenTextExceedsCharacterLimit(): void
     {
         $this->expectException(LengthException::class);
         $this->expectExceptionMessage('Maximum length for the text is 150 characters.');
@@ -40,7 +40,7 @@ final class SlackHeaderBlockTest extends TestCase
         new SlackHeaderBlock(str_repeat('h', 151));
     }
 
-    public function testThrowsWhenBlockIdExceedsCharacterLimit()
+    public function testThrowsWhenBlockIdExceedsCharacterLimit(): void
     {
         $this->expectException(LengthException::class);
         $this->expectExceptionMessage('Maximum length for the block id is 255 characters.');

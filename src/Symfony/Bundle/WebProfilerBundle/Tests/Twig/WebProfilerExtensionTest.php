@@ -21,7 +21,7 @@ use Twig\Loader\ArrayLoader;
 class WebProfilerExtensionTest extends TestCase
 {
     #[DataProvider('provideMessages')]
-    public function testDumpHeaderIsDisplayed(string $message, array $context, bool $dump1HasHeader, bool $dump2HasHeader)
+    public function testDumpHeaderIsDisplayed(string $message, array $context, bool $dump1HasHeader, bool $dump2HasHeader): void
     {
         $twigEnvironment = new Environment(new ArrayLoader());
         $varCloner = new VarCloner();

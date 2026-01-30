@@ -27,13 +27,13 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 #[RunTestsInSeparateProcesses]
 class NullSessionHandlerTest extends TestCase
 {
-    public function testSaveHandlers()
+    public function testSaveHandlers(): void
     {
         $this->getStorage();
         $this->assertEquals('user', \ini_get('session.save_handler'));
     }
 
-    public function testSession()
+    public function testSession(): void
     {
         session_id('nullsessionstorage');
         $storage = $this->getStorage();
@@ -43,7 +43,7 @@ class NullSessionHandlerTest extends TestCase
         $this->assertEquals('unique', $session->get('something'));
     }
 
-    public function testNothingIsPersisted()
+    public function testNothingIsPersisted(): void
     {
         session_id('nullsessionstorage');
         $storage = $this->getStorage();

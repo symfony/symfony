@@ -20,7 +20,7 @@ use Symfony\Component\HttpClient\Exception\JsonException;
  */
 class ServerSentEventTest extends TestCase
 {
-    public function testParse()
+    public function testParse(): void
     {
         $rawData = <<<STR
             data: test
@@ -36,7 +36,7 @@ class ServerSentEventTest extends TestCase
         $this->assertSame('testEvent', $sse->getType());
     }
 
-    public function testParseValid()
+    public function testParseValid(): void
     {
         $rawData = <<<STR
             event: testEvent
@@ -50,7 +50,7 @@ class ServerSentEventTest extends TestCase
         $this->assertSame('testEvent', $sse->getType());
     }
 
-    public function testParseRetry()
+    public function testParseRetry(): void
     {
         $rawData = <<<STR
             retry: 12
@@ -62,7 +62,7 @@ class ServerSentEventTest extends TestCase
         $this->assertSame(0.012, $sse->getRetry());
     }
 
-    public function testParseNewLine()
+    public function testParseNewLine(): void
     {
         $rawData = <<<STR
 
@@ -78,7 +78,7 @@ class ServerSentEventTest extends TestCase
         $this->assertSame("<tag>\n\n  <foo />\n\n\n</tag>", $sse->getData());
     }
 
-    public function testGetArrayData()
+    public function testGetArrayData(): void
     {
         $this->assertSame(['foo' => 'bar'], (new ServerSentEvent(<<<STR
             id: 33
@@ -87,7 +87,7 @@ class ServerSentEventTest extends TestCase
         ))->getArrayData());
     }
 
-    public function testGetArrayDataWithNoContent()
+    public function testGetArrayDataWithNoContent(): void
     {
         $this->expectException(JsonException::class);
         $this->expectExceptionMessage('Server-Sent Event data is empty.');
@@ -95,7 +95,7 @@ class ServerSentEventTest extends TestCase
         (new ServerSentEvent(''))->getArrayData();
     }
 
-    public function testGetArrayDataWithInvalidJson()
+    public function testGetArrayDataWithInvalidJson(): void
     {
         $this->expectException(JsonException::class);
         $this->expectExceptionMessage('Decoding Server-Sent Event "33" failed: Syntax error');
@@ -107,7 +107,7 @@ class ServerSentEventTest extends TestCase
         ))->getArrayData();
     }
 
-    public function testGetArrayDataWithNonArrayJson()
+    public function testGetArrayDataWithNonArrayJson(): void
     {
         $this->expectException(JsonException::class);
         $this->expectExceptionMessage('JSON content was expected to decode to an array, "string" returned in Server-Sent Event "33".');

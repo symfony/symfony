@@ -45,7 +45,7 @@ abstract class AbstractRedisAdapterTestCase extends AdapterTestCase
     }
 
     #[RunInSeparateProcess]
-    public function testClearWithPrefix()
+    public function testClearWithPrefix(): void
     {
         $cache = $this->createCachePool(0, __FUNCTION__);
 

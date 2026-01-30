@@ -45,7 +45,7 @@ final class BrevoTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendWithErrorResponseThrowsTransportException()
+    public function testSendWithErrorResponseThrowsTransportException(): void
     {
         $client = new MockHttpClient(static fn (): ResponseInterface => new MockResponse(json_encode(['code' => 400, 'message' => 'bad request']), ['http_code' => 400]));
 

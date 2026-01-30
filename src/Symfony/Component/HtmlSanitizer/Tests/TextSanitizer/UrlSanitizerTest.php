@@ -18,7 +18,7 @@ use Symfony\Component\HtmlSanitizer\TextSanitizer\UrlSanitizer;
 class UrlSanitizerTest extends TestCase
 {
     #[DataProvider('provideSanitize')]
-    public function testSanitize(?string $input, ?array $allowedSchemes, ?array $allowedHosts, bool $forceHttps, bool $allowRelative, ?string $expected)
+    public function testSanitize(?string $input, ?array $allowedSchemes, ?array $allowedHosts, bool $forceHttps, bool $allowRelative, ?string $expected): void
     {
         $this->assertSame($expected, UrlSanitizer::sanitize($input, $allowedSchemes, $forceHttps, $allowedHosts, $allowRelative));
     }
@@ -303,7 +303,7 @@ class UrlSanitizerTest extends TestCase
     }
 
     #[DataProvider('provideParse')]
-    public function testParse(string $url, ?array $expected)
+    public function testParse(string $url, ?array $expected): void
     {
         $parsed = UrlSanitizer::parse($url);
 

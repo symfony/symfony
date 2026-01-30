@@ -21,7 +21,7 @@ class TimezoneTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = TimezoneType::class;
 
-    public function testTimezonesAreSelectable()
+    public function testTimezonesAreSelectable(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE)
             ->createView()->vars['choices'];
@@ -30,12 +30,12 @@ class TimezoneTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('America/New_York', 'America/New_York', 'America / New York'), $choices);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'Africa/Kinshasa', $expectedData = 'Africa/Kinshasa')
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'Africa/Kinshasa', $expectedData = 'Africa/Kinshasa'): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => $emptyData,
@@ -47,7 +47,7 @@ class TimezoneTypeTest extends BaseTypeTestCase
         $this->assertSame($expectedData, $form->getData());
     }
 
-    public function testDateTimeZoneInput()
+    public function testDateTimeZoneInput(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, new \DateTimeZone('America/New_York'), ['input' => 'datetimezone']);
 
@@ -66,7 +66,7 @@ class TimezoneTypeTest extends BaseTypeTestCase
         $this->assertEquals([new \DateTimeZone('Europe/Amsterdam'), new \DateTimeZone('Europe/Paris')], $form->getData());
     }
 
-    public function testDateTimeZoneInputWithBc()
+    public function testDateTimeZoneInputWithBc(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'datetimezone']);
         $form->submit('Europe/Saratov');
@@ -76,7 +76,7 @@ class TimezoneTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testIntlTimeZoneInput()
+    public function testIntlTimeZoneInput(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, \IntlTimeZone::createTimeZone('America/New_York'), ['input' => 'intltimezone']);
 
@@ -96,7 +96,7 @@ class TimezoneTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testIntlTimeZoneInputWithBc()
+    public function testIntlTimeZoneInputWithBc(): void
     {
         $reflector = new \ReflectionExtension('intl');
         ob_start();
@@ -117,7 +117,7 @@ class TimezoneTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testIntlTimeZoneInputWithBcAndIntl()
+    public function testIntlTimeZoneInputWithBcAndIntl(): void
     {
         $reflector = new \ReflectionExtension('intl');
         ob_start();
@@ -137,7 +137,7 @@ class TimezoneTypeTest extends BaseTypeTestCase
         $this->assertNotContains('Europe/Saratov', $form->getConfig()->getAttribute('choice_list')->getValues());
     }
 
-    public function testTimezonesAreSelectableWithIntl()
+    public function testTimezonesAreSelectableWithIntl(): void
     {
         IntlTestHelper::requireIntl($this);
 
@@ -149,7 +149,7 @@ class TimezoneTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testChoiceTranslationLocaleOptionWithIntl()
+    public function testChoiceTranslationLocaleOptionWithIntl(): void
     {
         $choices = $this->factory
             ->create(static::TESTED_TYPE, null, [
@@ -162,7 +162,7 @@ class TimezoneTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('Etc/UTC', 'Etc/UTC', 'за всесвітнім координованим часом'), $choices);
     }
 
-    public function testChoiceTranslationLocaleOptionWithoutIntl()
+    public function testChoiceTranslationLocaleOptionWithoutIntl(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The "choice_translation_locale" option can only be used if the "intl" option is set to true.');

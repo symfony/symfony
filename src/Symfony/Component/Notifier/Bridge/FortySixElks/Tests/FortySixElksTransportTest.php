@@ -46,7 +46,7 @@ class FortySixElksTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendSuccessfully()
+    public function testSendSuccessfully(): void
     {
         $client = new MockHttpClient(new MockResponse(file_get_contents(__DIR__.'/Fixtures/success-response.json')));
         $transport = $this->createTransport($client);
@@ -57,7 +57,7 @@ class FortySixElksTransportTest extends TransportTestCase
     }
 
     #[DataProvider('errorProvider')]
-    public function testExceptionIsThrownWhenSendFailed(int $statusCode, string $content, string $expectedExceptionMessage)
+    public function testExceptionIsThrownWhenSendFailed(int $statusCode, string $content, string $expectedExceptionMessage): void
     {
         $client = new MockHttpClient(new MockResponse($content, ['http_code' => $statusCode]));
         $transport = $this->createTransport($client);

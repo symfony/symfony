@@ -24,7 +24,7 @@ class BackedEnumNormalizerContextBuilderTest extends TestCase
         $this->contextBuilder = new BackedEnumNormalizerContextBuilder();
     }
 
-    public function testWithers()
+    public function testWithers(): void
     {
         $context = $this->contextBuilder->withAllowInvalidValues(true)->toArray();
         self::assertSame([BackedEnumNormalizer::ALLOW_INVALID_VALUES => true], $context);

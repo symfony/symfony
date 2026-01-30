@@ -37,7 +37,7 @@ class ClassExistsMockTest extends TestCase
         ]);
     }
 
-    public function testClassExists()
+    public function testClassExists(): void
     {
         $this->assertFalse(class_exists(ExistingClass::class));
         $this->assertFalse(class_exists(ExistingClass::class, false));
@@ -57,7 +57,7 @@ class ClassExistsMockTest extends TestCase
         $this->assertFalse(class_exists('\\NonExistingClassReal', false));
     }
 
-    public function testEnumExistsOnClasses()
+    public function testEnumExistsOnClasses(): void
     {
         $this->assertFalse(enum_exists(ExistingClass::class));
         $this->assertFalse(enum_exists(ExistingClass::class, false));
@@ -77,7 +77,7 @@ class ClassExistsMockTest extends TestCase
         $this->assertFalse(enum_exists('\\NonExistingClassReal', false));
     }
 
-    public function testInterfaceExists()
+    public function testInterfaceExists(): void
     {
         $this->assertFalse(interface_exists(ExistingInterface::class));
         $this->assertFalse(interface_exists(ExistingInterface::class, false));
@@ -97,7 +97,7 @@ class ClassExistsMockTest extends TestCase
         $this->assertFalse(interface_exists('\\NonExistingInterfaceReal', false));
     }
 
-    public function testTraitExists()
+    public function testTraitExists(): void
     {
         $this->assertFalse(trait_exists(ExistingTrait::class));
         $this->assertFalse(trait_exists(ExistingTrait::class, false));
@@ -117,7 +117,7 @@ class ClassExistsMockTest extends TestCase
         $this->assertFalse(trait_exists('\\NonExistingTraitReal', false));
     }
 
-    public function testEnumExists()
+    public function testEnumExists(): void
     {
         $this->assertTrue(enum_exists('NonExistingEnum'));
         $this->assertTrue(enum_exists('NonExistingEnum', false));
@@ -129,7 +129,7 @@ class ClassExistsMockTest extends TestCase
         $this->assertFalse(enum_exists('\\NonExistingEnumReal', false));
     }
 
-    public function testClassExistsOnEnums()
+    public function testClassExistsOnEnums(): void
     {
         $this->assertTrue(class_exists('NonExistingEnum'));
         $this->assertTrue(class_exists('NonExistingEnum', false));

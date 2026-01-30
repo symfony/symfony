@@ -16,7 +16,7 @@ use Symfony\Component\Mime\Encoder\Base64MimeHeaderEncoder;
 
 class Base64MimeHeaderEncoderTest extends TestCase
 {
-    public function testNameIsB()
+    public function testNameIsB(): void
     {
         $this->assertEquals('B', (new Base64MimeHeaderEncoder())->getName());
     }

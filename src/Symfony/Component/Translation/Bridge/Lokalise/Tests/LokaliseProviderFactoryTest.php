@@ -49,7 +49,7 @@ class LokaliseProviderFactoryTest extends AbstractProviderFactoryTestCase
         yield ['lokalise://default'];
     }
 
-    public function testBaseUri()
+    public function testBaseUri(): void
     {
         $response = new JsonMockResponse(['files' => []]);
         $httpClient = new MockHttpClient([$response]);

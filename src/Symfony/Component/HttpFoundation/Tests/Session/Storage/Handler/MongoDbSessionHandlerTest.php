@@ -65,7 +65,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->storage = new MongoDbSessionHandler($this->manager, $this->options);
     }
 
-    public function testCreateFromClient()
+    public function testCreateFromClient(): void
     {
         $client = $this->createMock(Client::class);
         $client->expects($this->once())
@@ -91,7 +91,7 @@ class MongoDbSessionHandlerTest extends TestCase
     }
 
     #[DataProvider('provideInvalidOptions')]
-    public function testConstructorShouldThrowExceptionForMissingOptions(array $options)
+    public function testConstructorShouldThrowExceptionForMissingOptions(array $options): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new MongoDbSessionHandler($this->manager, $options);
@@ -104,35 +104,35 @@ class MongoDbSessionHandlerTest extends TestCase
         yield 'database missing' => [['collection' => 'foo']];
     }
 
-    public function testOpenMethodAlwaysReturnTrue()
+    public function testOpenMethodAlwaysReturnTrue(): void
     {
         $this->assertTrue($this->storage->open('test', 'test'), 'The "open" method should always return true');
     }
 
-    public function testCloseMethodAlwaysReturnTrue()
+    public function testCloseMethodAlwaysReturnTrue(): void
     {
         $this->assertTrue($this->storage->close(), 'The "close" method should always return true');
     }
 
-    public function testRead()
+    public function testRead(): void
     {
         $this->insertSession('foo', 'bar', 0);
         $this->assertEquals('bar', $this->storage->read('foo'));
     }
 
-    public function testReadNotFound()
+    public function testReadNotFound(): void
     {
         $this->insertSession('foo', 'bar', 0);
         $this->assertEquals('', $this->storage->read('foobar'));
     }
 
-    public function testReadExpired()
+    public function testReadExpired(): void
     {
         $this->insertSession('foo', 'bar', -100_000);
         $this->assertEquals('', $this->storage->read('foo'));
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $expectedTime = (new \DateTimeImmutable())->getTimestamp();
         $expectedExpiry = $expectedTime + (int) \ini_get('session.gc_maxlifetime');
@@ -149,7 +149,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->assertGreaterThanOrEqual($expectedExpiry, round((string) $sessions[0]->expires_at / 1000));
     }
 
-    public function testReplaceSessionData()
+    public function testReplaceSessionData(): void
     {
         $this->storage->write('foo', 'bar');
         $this->storage->write('baz', 'qux');
@@ -160,7 +160,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->assertEquals('foobar', $sessions[0]->data->getData());
     }
 
-    public function testDestroy()
+    public function testDestroy(): void
     {
         $this->storage->write('foo', 'bar');
         $this->storage->write('baz', 'qux');
@@ -174,7 +174,7 @@ class MongoDbSessionHandlerTest extends TestCase
         $this->assertEquals('baz', $sessions[0]->_id);
     }
 
-    public function testGc()
+    public function testGc(): void
     {
         $this->insertSession('foo', 'bar', -100_000);
         $this->insertSession('bar', 'bar', -100_000);

@@ -17,12 +17,12 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class ObjectTypeTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertSame(self::class, (string) new ObjectType(self::class));
     }
 
-    public function testIsIdentifiedBy()
+    public function testIsIdentifiedBy(): void
     {
         $this->assertFalse((new ObjectType(self::class))->isIdentifiedBy(TypeIdentifier::ARRAY));
         $this->assertTrue((new ObjectType(self::class))->isIdentifiedBy(TypeIdentifier::OBJECT));
@@ -36,7 +36,7 @@ class ObjectTypeTest extends TestCase
         $this->assertTrue((new ObjectType(self::class))->isIdentifiedBy('array', 'object'));
     }
 
-    public function testAccepts()
+    public function testAccepts(): void
     {
         $this->assertFalse((new ObjectType(self::class))->accepts('string'));
         $this->assertFalse((new ObjectType(self::class))->accepts(new \stdClass()));

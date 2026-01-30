@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class ExpressionTest extends TestCase
 {
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(ExpressionDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
@@ -43,7 +43,7 @@ class ExpressionTest extends TestCase
         self::assertFalse($cConstraint->negate);
     }
 
-    public function testMissingPattern()
+    public function testMissingPattern(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage(\sprintf('The options "expression" must be set for constraint "%s".', Expression::class));

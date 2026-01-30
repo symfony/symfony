@@ -41,17 +41,17 @@ class ORMQueryBuilderLoaderTest extends TestCase
         }
     }
 
-    public function testIdentifierTypeIsStringArray()
+    public function testIdentifierTypeIsStringArray(): void
     {
         $this->checkIdentifierType(SingleStringIdEntity::class, ArrayParameterType::STRING);
     }
 
-    public function testIdentifierTypeIsIntegerArray()
+    public function testIdentifierTypeIsIntegerArray(): void
     {
         $this->checkIdentifierType(SingleIntIdEntity::class, ArrayParameterType::INTEGER);
     }
 
-    protected function checkIdentifierType(string $classname, $expectedType)
+    protected function checkIdentifierType(string $classname, $expectedType): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
@@ -82,7 +82,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
         $loader->getEntitiesByIds('id', [1, 2]);
     }
 
-    public function testFilterNonIntegerValues()
+    public function testFilterNonIntegerValues(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
@@ -114,7 +114,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     }
 
     #[DataProvider('provideGuidEntityClasses')]
-    public function testFilterEmptyUuids(string $entityClass)
+    public function testFilterEmptyUuids(string $entityClass): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
@@ -146,7 +146,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     }
 
     #[DataProvider('provideUidEntityClasses')]
-    public function testFilterUid(string $entityClass)
+    public function testFilterUid(string $entityClass): void
     {
         if (Type::hasType('uuid')) {
             Type::overrideType('uuid', UuidType::class);
@@ -190,7 +190,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
     }
 
     #[DataProvider('provideUidEntityClasses')]
-    public function testUidThrowProperException(string $entityClass)
+    public function testUidThrowProperException(string $entityClass): void
     {
         if (Type::hasType('uuid')) {
             Type::overrideType('uuid', UuidType::class);
@@ -225,7 +225,7 @@ class ORMQueryBuilderLoaderTest extends TestCase
         $loader->getEntitiesByIds('id', ['hello']);
     }
 
-    public function testEmbeddedIdentifierName()
+    public function testEmbeddedIdentifierName(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 

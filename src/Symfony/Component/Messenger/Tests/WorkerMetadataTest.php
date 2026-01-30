@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\WorkerMetadata;
  */
 class WorkerMetadataTest extends TestCase
 {
-    public function testItReturnsDefaultValuesIfNoneProvided()
+    public function testItReturnsDefaultValuesIfNoneProvided(): void
     {
         $metadata = new WorkerMetadata([]);
 
@@ -27,7 +27,7 @@ class WorkerMetadataTest extends TestCase
         $this->assertSame([], $metadata->getTransportNames());
     }
 
-    public function testItReturnsProvidedMetadata()
+    public function testItReturnsProvidedMetadata(): void
     {
         $data = [
             'queueNames' => ['c', 'b', 'a'],
@@ -40,7 +40,7 @@ class WorkerMetadataTest extends TestCase
         $this->assertSame($data['transportNames'], $metadata->getTransportNames());
     }
 
-    public function testItSetsMetadataViaSetter()
+    public function testItSetsMetadataViaSetter(): void
     {
         $data = [
             'queueNames' => ['c', 'b', 'a'],

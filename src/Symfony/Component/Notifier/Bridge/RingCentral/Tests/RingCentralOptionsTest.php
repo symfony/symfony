@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\RingCentral\RingCentralOptions;
 
 class RingCentralOptionsTest extends TestCase
 {
-    public function testRingCentralOptions()
+    public function testRingCentralOptions(): void
     {
         $ringCentralOptions = (new RingCentralOptions())
             ->country('test_country_id', 'test_country_iso_code', 'test_country_name', 'test_country_uri', 'test_country_calling_code');

@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class SesHttpAsyncAwsTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(SesHttpAsyncAwsTransport $transport, string $expected)
+    public function testToString(SesHttpAsyncAwsTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -71,7 +71,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
         ];
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -115,7 +115,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
         $this->assertSame('foobar', $message->getMessageId());
     }
 
-    public function testSendThrowsForErrorResponse()
+    public function testSendThrowsForErrorResponse(): void
     {
         $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
             $json = json_encode([

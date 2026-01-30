@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class ObjectLoaderTest extends TestCase
 {
-    public function testLoadCallsServiceAndReturnsCollection()
+    public function testLoadCallsServiceAndReturnsCollection(): void
     {
         $loader = new TestObjectLoader('some-env');
 
@@ -42,7 +42,7 @@ class ObjectLoaderTest extends TestCase
     }
 
     #[DataProvider('getBadResourceStrings')]
-    public function testExceptionWithoutSyntax(string $resourceString)
+    public function testExceptionWithoutSyntax(string $resourceString): void
     {
         $loader = new TestObjectLoader();
 
@@ -63,7 +63,7 @@ class ObjectLoaderTest extends TestCase
         ];
     }
 
-    public function testExceptionOnNoObjectReturned()
+    public function testExceptionOnNoObjectReturned(): void
     {
         $loader = new TestObjectLoader();
         $loader->loaderMap = ['my_service' => 'NOT_AN_OBJECT'];
@@ -73,7 +73,7 @@ class ObjectLoaderTest extends TestCase
         $loader->load('my_service::method');
     }
 
-    public function testExceptionOnBadMethod()
+    public function testExceptionOnBadMethod(): void
     {
         $loader = new TestObjectLoader();
         $loader->loaderMap = ['my_service' => new \stdClass()];
@@ -83,7 +83,7 @@ class ObjectLoaderTest extends TestCase
         $loader->load('my_service::method');
     }
 
-    public function testExceptionOnMethodNotReturningCollection()
+    public function testExceptionOnMethodNotReturningCollection(): void
     {
         $service = $this->createMock(CustomRouteLoader::class);
 

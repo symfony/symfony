@@ -27,7 +27,7 @@ abstract class AbstractMimeTypeGuesserTestCase extends TestCase
 
     abstract protected function getGuesser(): MimeTypeGuesserInterface;
 
-    public function testGuessWithLeadingDash()
+    public function testGuessWithLeadingDash(): void
     {
         if (!$this->getGuesser()->isGuesserSupported()) {
             $this->markTestSkipped('Guesser is not supported');
@@ -42,7 +42,7 @@ abstract class AbstractMimeTypeGuesserTestCase extends TestCase
         }
     }
 
-    public function testGuessImageWithoutExtension()
+    public function testGuessImageWithoutExtension(): void
     {
         if (!$this->getGuesser()->isGuesserSupported()) {
             $this->markTestSkipped('Guesser is not supported');
@@ -51,7 +51,7 @@ abstract class AbstractMimeTypeGuesserTestCase extends TestCase
         $this->assertEquals('image/gif', $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/test'));
     }
 
-    public function testGuessImageWithDirectory()
+    public function testGuessImageWithDirectory(): void
     {
         if (!$this->getGuesser()->isGuesserSupported()) {
             $this->markTestSkipped('Guesser is not supported');
@@ -61,7 +61,7 @@ abstract class AbstractMimeTypeGuesserTestCase extends TestCase
         $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/directory');
     }
 
-    public function testGuessImageWithKnownExtension()
+    public function testGuessImageWithKnownExtension(): void
     {
         if (!$this->getGuesser()->isGuesserSupported()) {
             $this->markTestSkipped('Guesser is not supported');
@@ -70,7 +70,7 @@ abstract class AbstractMimeTypeGuesserTestCase extends TestCase
         $this->assertEquals('image/gif', $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/test.gif'));
     }
 
-    public function testGuessFileWithUnknownExtension()
+    public function testGuessFileWithUnknownExtension(): void
     {
         if (!$this->getGuesser()->isGuesserSupported()) {
             $this->markTestSkipped('Guesser is not supported');
@@ -79,7 +79,7 @@ abstract class AbstractMimeTypeGuesserTestCase extends TestCase
         $this->assertEquals('application/octet-stream', $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/.unknownextension'));
     }
 
-    public function testGuessWithDuplicatedFileType()
+    public function testGuessWithDuplicatedFileType(): void
     {
         if (!$this->getGuesser()->isGuesserSupported()) {
             $this->markTestSkipped('Guesser is not supported');
@@ -88,7 +88,7 @@ abstract class AbstractMimeTypeGuesserTestCase extends TestCase
         $this->assertEquals('application/vnd.openxmlformats-officedocument.wordprocessingml.document', $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/test.docx'));
     }
 
-    public function testGuessWithIncorrectPath()
+    public function testGuessWithIncorrectPath(): void
     {
         if (!$this->getGuesser()->isGuesserSupported()) {
             $this->markTestSkipped('Guesser is not supported');
@@ -98,7 +98,7 @@ abstract class AbstractMimeTypeGuesserTestCase extends TestCase
         $this->getGuesser()->guessMimeType(__DIR__.'/Fixtures/mimetypes/not_here');
     }
 
-    public function testGuessWithNonReadablePath()
+    public function testGuessWithNonReadablePath(): void
     {
         if (!$this->getGuesser()->isGuesserSupported()) {
             $this->markTestSkipped('Guesser is not supported');

@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\AppReference;
 
 class AppReferenceTest extends TestCase
 {
-    public function testConfigWithBasicServices()
+    public function testConfigWithBasicServices(): void
     {
         $config = [
             'services' => [
@@ -43,7 +43,7 @@ class AppReferenceTest extends TestCase
         $this->assertSame($config, $result);
     }
 
-    public function testConfigWithWhenEnv()
+    public function testConfigWithWhenEnv(): void
     {
         $config = [
             'services' => [
@@ -81,7 +81,7 @@ class AppReferenceTest extends TestCase
         $this->assertSame($config, $result);
     }
 
-    public function testConfigWithoutServices()
+    public function testConfigWithoutServices(): void
     {
         $config = [
             'parameters' => [
@@ -97,7 +97,7 @@ class AppReferenceTest extends TestCase
         $this->assertSame($config, $result);
     }
 
-    public function testConfigWithExistingDefaults()
+    public function testConfigWithExistingDefaults(): void
     {
         $config = [
             'services' => [
@@ -127,7 +127,7 @@ class AppReferenceTest extends TestCase
         $this->assertSame($config, $result);
     }
 
-    public function testConfigWithWhenEnvWithoutServices()
+    public function testConfigWithWhenEnvWithoutServices(): void
     {
         $config = [
             'services' => [

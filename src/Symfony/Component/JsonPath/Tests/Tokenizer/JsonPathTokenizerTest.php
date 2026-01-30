@@ -21,7 +21,7 @@ use Symfony\Component\JsonPath\Tokenizer\TokenType;
 class JsonPathTokenizerTest extends TestCase
 {
     #[DataProvider('simplePathProvider')]
-    public function testSimplePath(string $path, array $expectedTokens)
+    public function testSimplePath(string $path, array $expectedTokens): void
     {
         $jsonPath = new JsonPath($path);
         $tokens = JsonPathTokenizer::tokenize($jsonPath);
@@ -62,7 +62,7 @@ class JsonPathTokenizerTest extends TestCase
     }
 
     #[DataProvider('bracketNotationProvider')]
-    public function testBracketNotation(string $path, array $expectedTokens)
+    public function testBracketNotation(string $path, array $expectedTokens): void
     {
         $jsonPath = new JsonPath($path);
         $tokens = JsonPathTokenizer::tokenize($jsonPath);
@@ -100,7 +100,7 @@ class JsonPathTokenizerTest extends TestCase
     }
 
     #[DataProvider('filterExpressionProvider')]
-    public function testFilterExpressions(string $path, array $expectedTokens)
+    public function testFilterExpressions(string $path, array $expectedTokens): void
     {
         $jsonPath = new JsonPath($path);
         $tokens = JsonPathTokenizer::tokenize($jsonPath);
@@ -143,7 +143,7 @@ class JsonPathTokenizerTest extends TestCase
     }
 
     #[DataProvider('complexPathProvider')]
-    public function testComplexPaths(string $path, array $expectedTokens)
+    public function testComplexPaths(string $path, array $expectedTokens): void
     {
         $jsonPath = new JsonPath($path);
         $tokens = JsonPathTokenizer::tokenize($jsonPath);
@@ -191,7 +191,7 @@ class JsonPathTokenizerTest extends TestCase
         ];
     }
 
-    public function testTokenizeThrowsExceptionForEmptyExpression()
+    public function testTokenizeThrowsExceptionForEmptyExpression(): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessage('JSONPath syntax error: empty JSONPath expression.');
@@ -199,7 +199,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath(''));
     }
 
-    public function testTokenizeThrowsExceptionWhenNotStartingWithDollar()
+    public function testTokenizeThrowsExceptionWhenNotStartingWithDollar(): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessage('JSONPath syntax error: expression must start with $');
@@ -207,7 +207,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('store.book'));
     }
 
-    public function testTokenizeThrowsExceptionForUnmatchedClosingBracket()
+    public function testTokenizeThrowsExceptionForUnmatchedClosingBracket(): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessage('JSONPath syntax error at position 7: unmatched closing bracket.');
@@ -215,7 +215,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('$.store]'));
     }
 
-    public function testTokenizeThrowsExceptionForEmptyBrackets()
+    public function testTokenizeThrowsExceptionForEmptyBrackets(): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessage('JSONPath syntax error at position 8: empty brackets are not allowed.');
@@ -223,7 +223,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('$.store[]'));
     }
 
-    public function testTokenizeThrowsExceptionForUnexpectedCharsBeforeFilter()
+    public function testTokenizeThrowsExceptionForUnexpectedCharsBeforeFilter(): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessage('JSONPath syntax error at position 11: unexpected characters before filter expression.');
@@ -231,7 +231,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('$.store[abc?(@.price > 10)]'));
     }
 
-    public function testTokenizeThrowsExceptionForUnmatchedParenthesisInFilter()
+    public function testTokenizeThrowsExceptionForUnmatchedParenthesisInFilter(): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessage('JSONPath syntax error at position 23: unmatched closing parenthesis in filter.');
@@ -239,7 +239,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('$.store[?(@.price > 10))]'));
     }
 
-    public function testTokenizeThrowsExceptionForPathEndingWithDot()
+    public function testTokenizeThrowsExceptionForPathEndingWithDot(): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessage('JSONPath syntax error at position 7: path cannot end with a dot.');
@@ -247,7 +247,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('$.store.'));
     }
 
-    public function testTokenizeThrowsExceptionForUnclosedBracket()
+    public function testTokenizeThrowsExceptionForUnclosedBracket(): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessage('JSONPath syntax error at position 8: unclosed bracket.');
@@ -255,7 +255,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('$.store[0'));
     }
 
-    public function testTokenizeThrowsExceptionForUnclosedStringLiteral()
+    public function testTokenizeThrowsExceptionForUnclosedStringLiteral(): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessage('JSONPath syntax error at position 16: unclosed string literal.');
@@ -263,7 +263,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('$.store["unclosed'));
     }
 
-    public function testTokenizeThrowsExceptionForUnclosedSingleQuotedString()
+    public function testTokenizeThrowsExceptionForUnclosedSingleQuotedString(): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessage('JSONPath syntax error at position 16: unclosed string literal.');
@@ -271,7 +271,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath("$.store['unclosed"));
     }
 
-    public function testTokenizeThrowsExceptionForNestedUnmatchedBrackets()
+    public function testTokenizeThrowsExceptionForNestedUnmatchedBrackets(): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessage('JSONPath syntax error at position 10: unclosed bracket.');
@@ -279,7 +279,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('$.store[[0]'));
     }
 
-    public function testTokenizeThrowsExceptionForMultipleUnmatchedClosingBrackets()
+    public function testTokenizeThrowsExceptionForMultipleUnmatchedClosingBrackets(): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessage('JSONPath syntax error at position 10: unmatched closing bracket.');
@@ -287,7 +287,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('$.store[0]]]'));
     }
 
-    public function testTokenizeThrowsExceptionForInvalidFilterSyntax()
+    public function testTokenizeThrowsExceptionForInvalidFilterSyntax(): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessage('JSONPath syntax error at position 22: unclosed parenthesis.');
@@ -295,7 +295,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('$.store[?(@.price > 10]'));
     }
 
-    public function testTokenizeThrowsExceptionForConsecutiveDotsWithoutRecursive()
+    public function testTokenizeThrowsExceptionForConsecutiveDotsWithoutRecursive(): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessage('JSONPath syntax error at position 9: invalid character "." in property name');
@@ -304,7 +304,7 @@ class JsonPathTokenizerTest extends TestCase
     }
 
     #[DataProvider('provideValidUtf8Chars')]
-    public function testUtf8ValidChars(string $propertyName)
+    public function testUtf8ValidChars(string $propertyName): void
     {
         $jsonPath = new JsonPath(\sprintf('$.%s', $propertyName));
         $tokens = JsonPathTokenizer::tokenize($jsonPath);
@@ -329,7 +329,7 @@ class JsonPathTokenizerTest extends TestCase
     }
 
     #[DataProvider('provideInvalidUtf8PropertyName')]
-    public function testUtf8InvalidPropertyName(string $propertyName)
+    public function testUtf8InvalidPropertyName(string $propertyName): void
     {
         $this->expectException(InvalidJsonPathException::class);
         $this->expectExceptionMessageMatches('/JSONPath syntax error.*: invalid character in property name "(.*)"/');
@@ -350,7 +350,7 @@ class JsonPathTokenizerTest extends TestCase
         ];
     }
 
-    public function testQuotedTrueFalseNullShouldNotThrow()
+    public function testQuotedTrueFalseNullShouldNotThrow(): void
     {
         foreach (['True', 'False', 'Null'] as $value) {
             JsonPathTokenizer::tokenize(

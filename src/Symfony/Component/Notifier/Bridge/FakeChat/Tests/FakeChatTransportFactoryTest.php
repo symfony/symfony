@@ -28,7 +28,7 @@ final class FakeChatTransportFactoryTest extends AbstractTransportFactoryTestCas
     use IncompleteDsnTestTrait;
     use MissingRequiredOptionTestTrait;
 
-    public function testMissingRequiredMailerDependency()
+    public function testMissingRequiredMailerDependency(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot create a transport for scheme "fakechat+email" without providing an implementation of "Symfony\Component\Mailer\MailerInterface".');
@@ -37,7 +37,7 @@ final class FakeChatTransportFactoryTest extends AbstractTransportFactoryTestCas
         $factory->create(new Dsn('fakechat+email://default?to=recipient@email.net&from=sender@email.net'));
     }
 
-    public function testMissingRequiredLoggerDependency()
+    public function testMissingRequiredLoggerDependency(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot create a transport for scheme "fakechat+logger" without providing an implementation of "Psr\Log\LoggerInterface".');
@@ -46,7 +46,7 @@ final class FakeChatTransportFactoryTest extends AbstractTransportFactoryTestCas
         $factory->create(new Dsn('fakechat+logger://default'));
     }
 
-    public function testMissingOptionalLoggerDependency()
+    public function testMissingOptionalLoggerDependency(): void
     {
         $factory = new FakeChatTransportFactory($this->createStub(MailerInterface::class));
         $transport = $factory->create(new Dsn('fakechat+email://default?to=recipient@email.net&from=sender@email.net'));
@@ -54,7 +54,7 @@ final class FakeChatTransportFactoryTest extends AbstractTransportFactoryTestCas
         $this->assertSame('fakechat+email://default?to=recipient@email.net&from=sender@email.net', (string) $transport);
     }
 
-    public function testMissingOptionalMailerDependency()
+    public function testMissingOptionalMailerDependency(): void
     {
         $factory = new FakeChatTransportFactory(null, $this->createStub(LoggerInterface::class));
         $transport = $factory->create(new Dsn('fakechat+logger://default'));

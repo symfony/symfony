@@ -17,7 +17,7 @@ use Symfony\Component\Workflow\Tests\Subject;
 
 class MethodMarkingStoreTest extends TestCase
 {
-    public function testGetSetMarkingWithMultipleState()
+    public function testGetSetMarkingWithMultipleState(): void
     {
         $subject = new Subject();
 
@@ -39,7 +39,7 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertEquals($marking, $marking2);
     }
 
-    public function testGetSetMarkingWithSingleState()
+    public function testGetSetMarkingWithSingleState(): void
     {
         $subject = new Subject();
 
@@ -61,7 +61,7 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertEquals($marking, $marking2);
     }
 
-    public function testGetSetMarkingWithSingleStateAndAlmostEmptyPlaceName()
+    public function testGetSetMarkingWithSingleStateAndAlmostEmptyPlaceName(): void
     {
         $subject = new Subject(0);
 
@@ -72,7 +72,7 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertCount(1, $marking->getPlaces());
     }
 
-    public function testGetMarkingWithValueObject()
+    public function testGetMarkingWithValueObject(): void
     {
         $subject = new Subject($this->createValueObject('first_place'));
 
@@ -84,7 +84,7 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertSame('first_place', (string) $subject->getMarking());
     }
 
-    public function testGetMarkingWithBackedEnum()
+    public function testGetMarkingWithBackedEnum(): void
     {
         $subject = new SubjectWithEnum(TestEnum::Foo);
 
@@ -102,7 +102,7 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertSame(TestEnum::Bar, $subject->getMarking());
     }
 
-    public function testGetMarkingWithUninitializedProperty()
+    public function testGetMarkingWithUninitializedProperty(): void
     {
         $subject = new SubjectWithType();
 
@@ -113,7 +113,7 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertCount(0, $marking->getPlaces());
     }
 
-    public function testGetMarkingWithUninitializedProperty2()
+    public function testGetMarkingWithUninitializedProperty2(): void
     {
         $subject = new SubjectWithType();
 
@@ -125,7 +125,7 @@ class MethodMarkingStoreTest extends TestCase
         $markingStore->getMarking($subject);
     }
 
-    public function testGetMarkingWithUninitializedPropertyInheritance()
+    public function testGetMarkingWithUninitializedPropertyInheritance(): void
     {
         $subject = new ChildInheritingProperty();
 
@@ -135,7 +135,7 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertCount(0, $marking->getPlaces());
     }
 
-    public function testGetMarkingWithSameSubjectMultipleTimes()
+    public function testGetMarkingWithSameSubjectMultipleTimes(): void
     {
         $subject1 = new Subject('first_place');
         $subject2 = new Subject('second_place');
@@ -152,7 +152,7 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertSame(['third_place' => 1], $marking3->getPlaces());
     }
 
-    public function testSetMarkingWithMultipleSubjectsSharingCachedSetter()
+    public function testSetMarkingWithMultipleSubjectsSharingCachedSetter(): void
     {
         $subject1 = new Subject();
         $subject2 = new Subject();
@@ -185,7 +185,7 @@ class MethodMarkingStoreTest extends TestCase
         $this->assertSame(['context3' => 'value3'], $subject3->getContext());
     }
 
-    public function testSetMarkingWithMultipleSubjectsSharingCachedSetterMultipleState()
+    public function testSetMarkingWithMultipleSubjectsSharingCachedSetterMultipleState(): void
     {
         $subject1 = new Subject();
         $subject2 = new Subject();

@@ -30,7 +30,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         return new ExpressionValidator();
     }
 
-    public function testExpressionIsEvaluatedWithNullValue()
+    public function testExpressionIsEvaluatedWithNullValue(): void
     {
         $constraint = new Expression(
             expression: 'false',
@@ -45,7 +45,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testExpressionIsEvaluatedWithEmptyStringValue()
+    public function testExpressionIsEvaluatedWithEmptyStringValue(): void
     {
         $constraint = new Expression(
             expression: 'false',
@@ -60,7 +60,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testSucceedingExpressionAtObjectLevel()
+    public function testSucceedingExpressionAtObjectLevel(): void
     {
         $constraint = new Expression('this.data == 1');
 
@@ -74,7 +74,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testFailingExpressionAtObjectLevel()
+    public function testFailingExpressionAtObjectLevel(): void
     {
         $constraint = new Expression(
             expression: 'this.data == 1',
@@ -94,7 +94,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testSucceedingExpressionAtObjectLevelWithToString()
+    public function testSucceedingExpressionAtObjectLevelWithToString(): void
     {
         $constraint = new Expression('this.data == 1');
 
@@ -108,7 +108,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testFailingExpressionAtObjectLevelWithToString()
+    public function testFailingExpressionAtObjectLevelWithToString(): void
     {
         $constraint = new Expression(
             expression: 'this.data == 1',
@@ -128,7 +128,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testSucceedingExpressionAtPropertyLevel()
+    public function testSucceedingExpressionAtPropertyLevel(): void
     {
         $constraint = new Expression('value == this.data');
 
@@ -144,7 +144,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testFailingExpressionAtPropertyLevel()
+    public function testFailingExpressionAtPropertyLevel(): void
     {
         $constraint = new Expression(
             expression: 'value == this.data',
@@ -167,7 +167,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testSucceedingExpressionAtNestedPropertyLevel()
+    public function testSucceedingExpressionAtNestedPropertyLevel(): void
     {
         $constraint = new Expression('value == this.data');
 
@@ -186,7 +186,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testFailingExpressionAtNestedPropertyLevel()
+    public function testFailingExpressionAtNestedPropertyLevel(): void
     {
         $constraint = new Expression(
             expression: 'value == this.data',
@@ -216,7 +216,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
      * When validatePropertyValue() is called with a class name
      * https://github.com/symfony/symfony/pull/11498.
      */
-    public function testSucceedingExpressionAtPropertyLevelWithoutRoot()
+    public function testSucceedingExpressionAtPropertyLevelWithoutRoot(): void
     {
         $constraint = new Expression('value == "1"');
 
@@ -233,7 +233,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
      * When validatePropertyValue() is called with a class name
      * https://github.com/symfony/symfony/pull/11498.
      */
-    public function testFailingExpressionAtPropertyLevelWithoutRoot()
+    public function testFailingExpressionAtPropertyLevelWithoutRoot(): void
     {
         $constraint = new Expression(
             expression: 'value == "1"',
@@ -253,7 +253,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testExpressionLanguageUsage()
+    public function testExpressionLanguageUsage(): void
     {
         $constraint = new Expression(expression: 'false');
 
@@ -275,7 +275,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->assertTrue($used, 'Failed asserting that custom ExpressionLanguage instance is used.');
     }
 
-    public function testPassingCustomValues()
+    public function testPassingCustomValues(): void
     {
         $constraint = new Expression(
             expression: 'value + custom == 2',
@@ -289,7 +289,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testViolationOnPass()
+    public function testViolationOnPass(): void
     {
         $constraint = new Expression(
             expression: 'value + custom != 2',
@@ -308,7 +308,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testIsValidExpression()
+    public function testIsValidExpression(): void
     {
         $constraints = [new NotNull(), new Range(min: 2)];
 
@@ -329,7 +329,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testIsValidExpressionInvalid()
+    public function testIsValidExpressionInvalid(): void
     {
         $constraints = [new Range(min: 2, max: 5)];
 
@@ -357,7 +357,7 @@ class ExpressionValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideCompileIsValid')]
-    public function testCompileIsValid(string $expression, array $names, string $expected)
+    public function testCompileIsValid(string $expression, array $names, string $expected): void
     {
         $expressionLanguage = new ExpressionLanguage();
         $expressionLanguage->registerProvider(new ExpressionLanguageProvider());

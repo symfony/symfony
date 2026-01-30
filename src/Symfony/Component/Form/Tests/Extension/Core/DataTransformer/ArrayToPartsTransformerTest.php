@@ -27,7 +27,7 @@ class ArrayToPartsTransformerTest extends TestCase
         ]);
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $input = [
             'a' => '1',
@@ -54,7 +54,7 @@ class ArrayToPartsTransformerTest extends TestCase
         $this->assertSame($output, $this->transformer->transform($input));
     }
 
-    public function testTransformEmpty()
+    public function testTransformEmpty(): void
     {
         $output = [
             'first' => null,
@@ -64,13 +64,13 @@ class ArrayToPartsTransformerTest extends TestCase
         $this->assertSame($output, $this->transformer->transform(null));
     }
 
-    public function testTransformRequiresArray()
+    public function testTransformRequiresArray(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->transformer->transform('12345');
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $input = [
             'first' => [
@@ -97,7 +97,7 @@ class ArrayToPartsTransformerTest extends TestCase
         $this->assertSame($output, $this->transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformCompletelyEmpty()
+    public function testReverseTransformCompletelyEmpty(): void
     {
         $input = [
             'first' => '',
@@ -107,7 +107,7 @@ class ArrayToPartsTransformerTest extends TestCase
         $this->assertNull($this->transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformCompletelyNull()
+    public function testReverseTransformCompletelyNull(): void
     {
         $input = [
             'first' => null,
@@ -117,7 +117,7 @@ class ArrayToPartsTransformerTest extends TestCase
         $this->assertNull($this->transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformPartiallyNull()
+    public function testReverseTransformPartiallyNull(): void
     {
         $this->expectException(TransformationFailedException::class);
         $input = [
@@ -132,7 +132,7 @@ class ArrayToPartsTransformerTest extends TestCase
         $this->transformer->reverseTransform($input);
     }
 
-    public function testReverseTransformRequiresArray()
+    public function testReverseTransformRequiresArray(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->transformer->reverseTransform('12345');

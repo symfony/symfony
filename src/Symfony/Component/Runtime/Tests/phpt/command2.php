@@ -18,7 +18,7 @@ require __DIR__.'/autoload.php';
 return static function (Command $command, InputInterface $input, OutputInterface $output, array $context) {
     $command->addArgument('name', null, 'Who should I greet?', 'World');
 
-    return static function () use ($input, $output, $context) {
+    return static function () use ($input, $output, $context): void {
         $output->writeln(sprintf('Hello %s', $input->getArgument('name')));
         $output->write('OK Command '.$context['SOME_VAR']);
     };

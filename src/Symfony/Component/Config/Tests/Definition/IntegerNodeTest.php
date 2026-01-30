@@ -19,14 +19,14 @@ use Symfony\Component\Config\Definition\IntegerNode;
 class IntegerNodeTest extends TestCase
 {
     #[DataProvider('getValidValues')]
-    public function testNormalize(int $value)
+    public function testNormalize(int $value): void
     {
         $node = new IntegerNode('test');
         $this->assertSame($value, $node->normalize($value));
     }
 
     #[DataProvider('getValidValues')]
-    public function testValidNonEmptyValues(int $value)
+    public function testValidNonEmptyValues(int $value): void
     {
         $node = new IntegerNode('test');
         $node->setAllowEmptyValue(false);
@@ -44,7 +44,7 @@ class IntegerNodeTest extends TestCase
     }
 
     #[DataProvider('getInvalidValues')]
-    public function testNormalizeThrowsExceptionOnInvalidValues($value)
+    public function testNormalizeThrowsExceptionOnInvalidValues($value): void
     {
         $node = new IntegerNode('test');
 

@@ -26,7 +26,7 @@ class VideoTest extends TestCase
         }
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(VideoDummy::class);
         $loader = new AttributeLoader();

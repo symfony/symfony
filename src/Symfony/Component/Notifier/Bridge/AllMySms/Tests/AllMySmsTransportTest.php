@@ -46,7 +46,7 @@ final class AllMySmsTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSentMessageInfo()
+    public function testSentMessageInfo(): void
     {
         $smsMessage = new SmsMessage('0611223344', 'lorem ipsum');
 

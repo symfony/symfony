@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum;
 
 class InputBagTest extends TestCase
 {
-    public function testGet()
+    public function testGet(): void
     {
         $bag = new InputBag(['foo' => 'bar', 'null' => null, 'int' => 1, 'float' => 1.0, 'bool' => false, 'stringable' => new class implements \Stringable {
             public function __toString(): string
@@ -36,7 +36,7 @@ class InputBagTest extends TestCase
         $this->assertFalse($bag->get('bool'), '->get() gets the value of a bool parameter');
     }
 
-    public function testGetIntError()
+    public function testGetIntError(): void
     {
         $bag = new InputBag(['foo' => 'bar']);
 
@@ -46,7 +46,7 @@ class InputBagTest extends TestCase
         $bag->getInt('foo');
     }
 
-    public function testGetBooleanError()
+    public function testGetBooleanError(): void
     {
         $bag = new InputBag(['foo' => 'bar']);
 
@@ -56,7 +56,7 @@ class InputBagTest extends TestCase
         $bag->getBoolean('foo');
     }
 
-    public function testGetString()
+    public function testGetString(): void
     {
         $bag = new InputBag(['integer' => 123, 'bool_true' => true, 'bool_false' => false, 'string' => 'abc', 'stringable' => new class implements \Stringable {
             public function __toString(): string
@@ -74,7 +74,7 @@ class InputBagTest extends TestCase
         $this->assertSame('strval', $bag->getString('stringable'), '->getString() gets a value of a stringable parameter as string');
     }
 
-    public function testGetStringExceptionWithArray()
+    public function testGetStringExceptionWithArray(): void
     {
         $bag = new InputBag(['key' => ['abc']]);
 
@@ -84,14 +84,14 @@ class InputBagTest extends TestCase
         $bag->getString('key');
     }
 
-    public function testGetDoesNotUseDeepByDefault()
+    public function testGetDoesNotUseDeepByDefault(): void
     {
         $bag = new InputBag(['foo' => ['bar' => 'moo']]);
 
         $this->assertNull($bag->get('foo[bar]'));
     }
 
-    public function testFilterArray()
+    public function testFilterArray(): void
     {
         $bag = new InputBag([
             'foo' => ['12', '8'],
@@ -101,7 +101,7 @@ class InputBagTest extends TestCase
         $this->assertSame([12, 8], $result);
     }
 
-    public function testFilterCallback()
+    public function testFilterCallback(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('A Closure must be passed to "Symfony\Component\HttpFoundation\InputBag::filter()" when FILTER_CALLBACK is used, "string" given.');
@@ -110,7 +110,7 @@ class InputBagTest extends TestCase
         $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => 'strtoupper']);
     }
 
-    public function testFilterClosure()
+    public function testFilterClosure(): void
     {
         $bag = new InputBag(['foo' => 'bar']);
         $result = $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => strtoupper(...)]);
@@ -118,7 +118,7 @@ class InputBagTest extends TestCase
         $this->assertSame('BAR', $result);
     }
 
-    public function testSetWithNonScalarOrArray()
+    public function testSetWithNonScalarOrArray(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected a scalar, or an array as a 2nd argument to "Symfony\Component\HttpFoundation\InputBag::set()", "Symfony\Component\HttpFoundation\InputBag" given.');
@@ -127,7 +127,7 @@ class InputBagTest extends TestCase
         $bag->set('foo', new InputBag());
     }
 
-    public function testGettingANonStringValue()
+    public function testGettingANonStringValue(): void
     {
         $this->expectException(BadRequestException::class);
         $this->expectExceptionMessage('Input value "foo" contains a non-scalar value.');
@@ -136,7 +136,7 @@ class InputBagTest extends TestCase
         $bag->get('foo');
     }
 
-    public function testGetWithNonStringDefaultValue()
+    public function testGetWithNonStringDefaultValue(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected a scalar value as a 2nd argument to "Symfony\Component\HttpFoundation\InputBag::get()", "array" given.');
@@ -145,7 +145,7 @@ class InputBagTest extends TestCase
         $bag->get('foo', ['a', 'b']);
     }
 
-    public function testFilterArrayWithoutArrayFlag()
+    public function testFilterArrayWithoutArrayFlag(): void
     {
         $this->expectException(BadRequestException::class);
         $this->expectExceptionMessage('Input value "foo" contains an array, but "FILTER_REQUIRE_ARRAY" or "FILTER_FORCE_ARRAY" flags were not set.');
@@ -154,7 +154,7 @@ class InputBagTest extends TestCase
         $bag->filter('foo', \FILTER_VALIDATE_INT);
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $bag = new InputBag(['foo' => 'bar']);
         $bag->add(['baz' => 'qux']);
@@ -163,7 +163,7 @@ class InputBagTest extends TestCase
         $this->assertSame('qux', $bag->get('baz'), '->add() adds new parameters');
     }
 
-    public function testReplace()
+    public function testReplace(): void
     {
         $bag = new InputBag(['foo' => 'bar']);
         $bag->replace(['baz' => 'qux']);
@@ -172,14 +172,14 @@ class InputBagTest extends TestCase
         $this->assertSame('qux', $bag->get('baz'), '->replace() adds new parameters');
     }
 
-    public function testGetEnum()
+    public function testGetEnum(): void
     {
         $bag = new InputBag(['valid-value' => 1]);
 
         $this->assertSame(FooEnum::Bar, $bag->getEnum('valid-value', FooEnum::class));
     }
 
-    public function testGetEnumThrowsExceptionWithInvalidValue()
+    public function testGetEnumThrowsExceptionWithInvalidValue(): void
     {
         $bag = new InputBag(['invalid-value' => 2]);
 
@@ -189,7 +189,7 @@ class InputBagTest extends TestCase
         $this->assertNull($bag->getEnum('invalid-value', FooEnum::class));
     }
 
-    public function testGetAlnumExceptionWithArray()
+    public function testGetAlnumExceptionWithArray(): void
     {
         $bag = new InputBag(['word' => ['foo_BAR_012']]);
 
@@ -199,7 +199,7 @@ class InputBagTest extends TestCase
         $bag->getAlnum('word');
     }
 
-    public function testGetAlphaExceptionWithArray()
+    public function testGetAlphaExceptionWithArray(): void
     {
         $bag = new InputBag(['word' => ['foo_BAR_012']]);
 
@@ -209,7 +209,7 @@ class InputBagTest extends TestCase
         $bag->getAlpha('word');
     }
 
-    public function testGetDigitsExceptionWithArray()
+    public function testGetDigitsExceptionWithArray(): void
     {
         $bag = new InputBag(['word' => ['foo_BAR_012']]);
 

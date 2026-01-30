@@ -34,7 +34,7 @@ trait CircularReferenceTestTrait
     }
 
     #[DataProvider('provideUnableToNormalizeCircularReference')]
-    public function testUnableToNormalizeCircularReference(array $defaultContext, array $context, int $expectedLimit)
+    public function testUnableToNormalizeCircularReference(array $defaultContext, array $context, int $expectedLimit): void
     {
         $normalizer = $this->getNormalizerForCircularReference($defaultContext);
 
@@ -45,7 +45,7 @@ trait CircularReferenceTestTrait
         $normalizer->normalize($obj, null, $context);
     }
 
-    public function testCircularReferenceHandler()
+    public function testCircularReferenceHandler(): void
     {
         $normalizer = $this->getNormalizerForCircularReference([]);
 

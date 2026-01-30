@@ -59,33 +59,33 @@ class GreaterThanValidatorWithPositiveConstraintTest extends AbstractComparisonV
     }
 
     #[DataProvider('provideInvalidConstraintOptions')]
-    public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options)
+    public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options): void
     {
         $this->markTestSkipped('Value option always set for Positive constraint.');
     }
 
-    public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
+    public function testThrowsConstraintExceptionIfBothValueAndPropertyPath(): void
     {
         $this->markTestSkipped('Value option is set for Positive constraint automatically');
     }
 
-    public function testNoViolationOnNullObjectWithPropertyPath()
+    public function testNoViolationOnNullObjectWithPropertyPath(): void
     {
         $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
     }
 
-    public function testInvalidValuePath()
+    public function testInvalidValuePath(): void
     {
         $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
     }
 
     #[DataProvider('provideValidComparisonsToPropertyPath')]
-    public function testValidComparisonToPropertyPath($comparedValue)
+    public function testValidComparisonToPropertyPath($comparedValue): void
     {
         $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
     }
 
-    public function testInvalidComparisonToPropertyPathAddsPathAsParameter()
+    public function testInvalidComparisonToPropertyPathAddsPathAsParameter(): void
     {
         $this->markTestSkipped('PropertyPath option is not used in Positive constraint');
     }

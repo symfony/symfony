@@ -32,7 +32,7 @@ class DoctrinePostgreSqlPgbouncerIntegrationTest extends TestCase
     private Connection $driverConnection;
     private PostgreSqlConnection $connection;
 
-    public function testSendAndGetWithAutoSetupEnabledAndNotSetupAlready()
+    public function testSendAndGetWithAutoSetupEnabledAndNotSetupAlready(): void
     {
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
 
@@ -43,7 +43,7 @@ class DoctrinePostgreSqlPgbouncerIntegrationTest extends TestCase
         $this->assertNull($this->connection->get());
     }
 
-    public function testSendAndGetWithAutoSetupEnabledAndSetupAlready()
+    public function testSendAndGetWithAutoSetupEnabledAndSetupAlready(): void
     {
         $this->connection->setup();
 

@@ -38,12 +38,12 @@ class StoreTest extends TestCase
         HttpCacheTestCase::clearDirectory(sys_get_temp_dir().'/http_cache');
     }
 
-    public function testReadsAnEmptyArrayWithReadWhenNothingCachedAtKey()
+    public function testReadsAnEmptyArrayWithReadWhenNothingCachedAtKey(): void
     {
         $this->assertSame([], $this->getStoreMetadata('/nothing'));
     }
 
-    public function testUnlockFileThatDoesExist()
+    public function testUnlockFileThatDoesExist(): void
     {
         $this->storeSimpleEntry();
         $this->store->lock($this->request);
@@ -51,12 +51,12 @@ class StoreTest extends TestCase
         $this->assertTrue($this->store->unlock($this->request));
     }
 
-    public function testUnlockFileThatDoesNotExist()
+    public function testUnlockFileThatDoesNotExist(): void
     {
         $this->assertFalse($this->store->unlock($this->request));
     }
 
-    public function testRemovesEntriesForKeyWithPurge()
+    public function testRemovesEntriesForKeyWithPurge(): void
     {
         $request = Request::create('/foo');
         $this->store->write($request, new Response('foo'));
@@ -74,14 +74,14 @@ class StoreTest extends TestCase
         $this->assertFalse($this->store->purge('/bar'));
     }
 
-    public function testStoresACacheEntry()
+    public function testStoresACacheEntry(): void
     {
         $cacheKey = $this->storeSimpleEntry();
 
         $this->assertNotEmpty($this->getStoreMetadata($cacheKey));
     }
 
-    public function testSetsTheXContentDigestResponseHeaderBeforeStoring()
+    public function testSetsTheXContentDigestResponseHeaderBeforeStoring(): void
     {
         $cacheKey = $this->storeSimpleEntry();
         $entries = $this->getStoreMetadata($cacheKey);
@@ -90,7 +90,7 @@ class StoreTest extends TestCase
         $this->assertEquals('en6c78e0e3bd51d358d01e758642b85fb8', $res['x-content-digest'][0]);
     }
 
-    public function testDoesNotTrustXContentDigestFromUpstream()
+    public function testDoesNotTrustXContentDigestFromUpstream(): void
     {
         $response = new Response('test', 200, ['X-Content-Digest' => 'untrusted-from-elsewhere']);
 
@@ -102,7 +102,7 @@ class StoreTest extends TestCase
         $this->assertEquals('en6c78e0e3bd51d358d01e758642b85fb8', $response->headers->get('X-Content-Digest'));
     }
 
-    public function testWritesResponseEvenIfXContentDigestIsPresent()
+    public function testWritesResponseEvenIfXContentDigestIsPresent(): void
     {
         // Prime the store
         $this->store->write($this->request, new Response('test', 200, ['X-Content-Digest' => 'untrusted-from-elsewhere']));
@@ -111,7 +111,7 @@ class StoreTest extends TestCase
         $this->assertNotNull($response);
     }
 
-    public function testWritingARestoredResponseDoesNotCorruptCache()
+    public function testWritingARestoredResponseDoesNotCorruptCache(): void
     {
         /*
          * This covers the regression reported in https://github.com/symfony/symfony/issues/37174.
@@ -144,7 +144,7 @@ class StoreTest extends TestCase
         $this->assertEquals($path, $response->headers->get('X-Body-File'));
     }
 
-    public function testFindsAStoredEntryWithLookup()
+    public function testFindsAStoredEntryWithLookup(): void
     {
         $this->storeSimpleEntry();
         $response = $this->store->lookup($this->request);
@@ -153,14 +153,14 @@ class StoreTest extends TestCase
         $this->assertInstanceOf(Response::class, $response);
     }
 
-    public function testDoesNotFindAnEntryWithLookupWhenNoneExists()
+    public function testDoesNotFindAnEntryWithLookupWhenNoneExists(): void
     {
         $request = Request::create('/test', 'get', [], [], [], ['HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar']);
 
         $this->assertNull($this->store->lookup($request));
     }
 
-    public function testCanonizesUrlsForCacheKeys()
+    public function testCanonizesUrlsForCacheKeys(): void
     {
         $this->storeSimpleEntry($path = '/test?x=y&p=q');
         $hitsReq = Request::create($path);
@@ -170,7 +170,7 @@ class StoreTest extends TestCase
         $this->assertNull($this->store->lookup($missReq));
     }
 
-    public function testDoesNotFindAnEntryWithLookupWhenTheBodyDoesNotExist()
+    public function testDoesNotFindAnEntryWithLookupWhenTheBodyDoesNotExist(): void
     {
         $this->storeSimpleEntry();
         $this->assertNotNull($this->response->headers->get('X-Content-Digest'));
@@ -179,7 +179,7 @@ class StoreTest extends TestCase
         $this->assertNull($this->store->lookup($this->request));
     }
 
-    public function testRestoresResponseHeadersProperlyWithLookup()
+    public function testRestoresResponseHeadersProperlyWithLookup(): void
     {
         $this->storeSimpleEntry();
         $response = $this->store->lookup($this->request);
@@ -187,14 +187,14 @@ class StoreTest extends TestCase
         $this->assertEquals($response->headers->all(), array_merge(['content-length' => 4, 'x-body-file' => [$this->getStorePath($response->headers->get('X-Content-Digest'))]], $this->response->headers->all()));
     }
 
-    public function testRestoresResponseContentFromEntityStoreWithLookup()
+    public function testRestoresResponseContentFromEntityStoreWithLookup(): void
     {
         $this->storeSimpleEntry();
         $response = $this->store->lookup($this->request);
         $this->assertEquals($this->getStorePath('en'.hash('xxh128', 'test')), $response->headers->get('X-Body-File'));
     }
 
-    public function testInvalidatesMetaAndEntityStoreEntriesWithInvalidate()
+    public function testInvalidatesMetaAndEntityStoreEntriesWithInvalidate(): void
     {
         $this->storeSimpleEntry();
         $this->store->invalidate($this->request);
@@ -203,14 +203,14 @@ class StoreTest extends TestCase
         $this->assertFalse($response->isFresh());
     }
 
-    public function testSucceedsQuietlyWhenInvalidateCalledWithNoMatchingEntries()
+    public function testSucceedsQuietlyWhenInvalidateCalledWithNoMatchingEntries(): void
     {
         $req = Request::create('/test');
         $this->store->invalidate($req);
         $this->assertNull($this->store->lookup($this->request));
     }
 
-    public function testDoesNotReturnEntriesThatVaryWithLookup()
+    public function testDoesNotReturnEntriesThatVaryWithLookup(): void
     {
         $req1 = Request::create('/test', 'get', [], [], [], ['HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar']);
         $req2 = Request::create('/test', 'get', [], [], [], ['HTTP_FOO' => 'Bling', 'HTTP_BAR' => 'Bam']);
@@ -220,7 +220,7 @@ class StoreTest extends TestCase
         $this->assertNull($this->store->lookup($req2));
     }
 
-    public function testDoesNotReturnEntriesThatSlightlyVaryWithLookup()
+    public function testDoesNotReturnEntriesThatSlightlyVaryWithLookup(): void
     {
         $req1 = Request::create('/test', 'get', [], [], [], ['HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar']);
         $req2 = Request::create('/test', 'get', [], [], [], ['HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bam']);
@@ -230,7 +230,7 @@ class StoreTest extends TestCase
         $this->assertNull($this->store->lookup($req2));
     }
 
-    public function testStoresMultipleResponsesForEachVaryCombination()
+    public function testStoresMultipleResponsesForEachVaryCombination(): void
     {
         $req1 = Request::create('/test', 'get', [], [], [], ['HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar']);
         $res1 = new Response('test 1', 200, ['Vary' => 'Foo Bar']);
@@ -251,7 +251,7 @@ class StoreTest extends TestCase
         $this->assertCount(3, $this->getStoreMetadata($key));
     }
 
-    public function testOverwritesNonVaryingResponseWithStore()
+    public function testOverwritesNonVaryingResponseWithStore(): void
     {
         $req1 = Request::create('/test', 'get', [], [], [], ['HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar']);
         $res1 = new Response('test 1', 200, ['Vary' => 'Foo Bar']);
@@ -271,7 +271,7 @@ class StoreTest extends TestCase
         $this->assertCount(2, $this->getStoreMetadata($key));
     }
 
-    public function testLocking()
+    public function testLocking(): void
     {
         $req = Request::create('/test', 'get', [], [], [], ['HTTP_FOO' => 'Foo', 'HTTP_BAR' => 'Bar']);
         $this->assertTrue($this->store->lock($req));
@@ -283,7 +283,7 @@ class StoreTest extends TestCase
         $this->assertFalse($this->store->isLocked($req));
     }
 
-    public function testPurgeHttps()
+    public function testPurgeHttps(): void
     {
         $request = Request::create('https://example.com/foo');
         $this->store->write($request, new Response('foo'));
@@ -294,7 +294,7 @@ class StoreTest extends TestCase
         $this->assertSame([], $this->getStoreMetadata($request));
     }
 
-    public function testPurgeHttpAndHttps()
+    public function testPurgeHttpAndHttps(): void
     {
         $requestHttp = Request::create('https://example.com/foo');
         $this->store->write($requestHttp, new Response('foo'));
@@ -310,7 +310,7 @@ class StoreTest extends TestCase
         $this->assertSame([], $this->getStoreMetadata($requestHttps));
     }
 
-    public function testDoesNotStorePrivateHeaders()
+    public function testDoesNotStorePrivateHeaders(): void
     {
         $request = Request::create('https://example.com/foo');
         $response = new Response('foo');
@@ -321,7 +321,7 @@ class StoreTest extends TestCase
         $this->assertNotEmpty($response->headers->getCookies());
     }
 
-    public function testDiscardsInvalidBodyEval()
+    public function testDiscardsInvalidBodyEval(): void
     {
         $request = Request::create('https://example.com/foo');
         $response = new Response('foo', 200, ['X-Body-Eval' => 'SSI']);
@@ -337,7 +337,7 @@ class StoreTest extends TestCase
         $this->assertNull($this->store->lookup($request));
     }
 
-    public function testLoadsBodyEval()
+    public function testLoadsBodyEval(): void
     {
         $request = Request::create('https://example.com/foo');
         $content = str_repeat('a', 24).'b'.str_repeat('a', 24);
@@ -352,7 +352,7 @@ class StoreTest extends TestCase
      * Basic case when the second header has a different value.
      * Both responses should be cached.
      */
-    public function testWriteWithMultipleVaryAndCachedAllResponse()
+    public function testWriteWithMultipleVaryAndCachedAllResponse(): void
     {
         $req1 = Request::create('/foo', 'get', [], [], [], ['HTTP_FOO' => 'foo', 'HTTP_BAR' => 'bar']);
         $content = str_repeat('a', 24).'b'.str_repeat('a', 24);
@@ -378,7 +378,7 @@ class StoreTest extends TestCase
      * Basic case when the second header has the same value on both requests.
      * The last response should be cached.
      */
-    public function testWriteWithMultipleVaryAndCachedLastResponse()
+    public function testWriteWithMultipleVaryAndCachedLastResponse(): void
     {
         $req1 = Request::create('/foo', 'get', [], [], [], ['HTTP_FOO' => 'foo', 'HTTP_BAR' => 'bar']);
         $content = str_repeat('a', 24).'b'.str_repeat('a', 24);
@@ -404,7 +404,7 @@ class StoreTest extends TestCase
      * Case when a vary value has been removed.
      * Both responses should be cached.
      */
-    public function testWriteWithChangingVary()
+    public function testWriteWithChangingVary(): void
     {
         $req1 = Request::create('/foo', 'get', [], [], [], ['HTTP_FOO' => 'foo', 'HTTP_BAR' => 'bar']);
         $content = str_repeat('a', 24).'b'.str_repeat('a', 24);
@@ -427,7 +427,7 @@ class StoreTest extends TestCase
      * Case when a vary value has been removed and headers of the new vary list are the same.
      * The last response should be cached.
      */
-    public function testWriteWithRemoveVaryAndAllHeadersOnTheList()
+    public function testWriteWithRemoveVaryAndAllHeadersOnTheList(): void
     {
         $req1 = Request::create('/foo', 'get', [], [], [], ['HTTP_FOO' => 'foo', 'HTTP_FOOBAR' => 'bar']);
         $content = str_repeat('a', 24).'b'.str_repeat('a', 24);
@@ -450,7 +450,7 @@ class StoreTest extends TestCase
      * Case when a vary value has been added and headers of the new vary list are the same.
      * The last response should be cached.
      */
-    public function testWriteWithAddingVaryAndAllHeadersOnTheList()
+    public function testWriteWithAddingVaryAndAllHeadersOnTheList(): void
     {
         $req1 = Request::create('/foo', 'get', [], [], [], ['HTTP_FOO' => 'foo', 'HTTP_FOOBAR' => 'bar']);
         $content = str_repeat('a', 24).'b'.str_repeat('a', 24);
@@ -500,7 +500,7 @@ class StoreTest extends TestCase
         return $m->invoke($this->store, $key);
     }
 
-    public function testQueryMethodCacheKeyIncludesBody()
+    public function testQueryMethodCacheKeyIncludesBody(): void
     {
         $response = new Response('test', 200, ['Cache-Control' => 'max-age=420']);
 
@@ -523,7 +523,7 @@ class StoreTest extends TestCase
         $this->assertNotNull($this->store->lookup($request3));
     }
 
-    public function testQueryMethodCacheKeyDiffersFromGet()
+    public function testQueryMethodCacheKeyDiffersFromGet(): void
     {
         $response = new Response('test', 200, ['Cache-Control' => 'max-age=420']);
 
@@ -542,7 +542,7 @@ class StoreTest extends TestCase
         $this->assertNotNull($this->store->lookup($queryRequest));
     }
 
-    public function testOtherMethodsCacheKeyIgnoresBody()
+    public function testOtherMethodsCacheKeyIgnoresBody(): void
     {
         $response1 = new Response('test 1', 200, ['Cache-Control' => 'max-age=420']);
         $response2 = new Response('test 2', 200, ['Cache-Control' => 'max-age=420']);
@@ -564,7 +564,7 @@ class StoreTest extends TestCase
         $this->assertSame($lookup1->getContent(), $lookup2->getContent());
     }
 
-    public function testQueryMethodCacheKeyAvoidsBoundaryCollisions()
+    public function testQueryMethodCacheKeyAvoidsBoundaryCollisions(): void
     {
         $response = new Response('test', 200, ['Cache-Control' => 'max-age=420']);
 

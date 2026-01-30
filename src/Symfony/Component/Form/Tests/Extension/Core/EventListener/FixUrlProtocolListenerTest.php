@@ -22,7 +22,7 @@ use Symfony\Component\Form\FormEvent;
 class FixUrlProtocolListenerTest extends TestCase
 {
     #[DataProvider('provideUrlToFix')]
-    public function testFixUrl($data)
+    public function testFixUrl($data): void
     {
         $form = new Form(new FormConfigBuilder('name', null, new EventDispatcher()));
         $event = new FormEvent($form, $data);
@@ -46,7 +46,7 @@ class FixUrlProtocolListenerTest extends TestCase
     }
 
     #[DataProvider('provideUrlToSkip')]
-    public function testSkipUrl($url)
+    public function testSkipUrl($url): void
     {
         $form = new Form(new FormConfigBuilder('name', null, new EventDispatcher()));
         $event = new FormEvent($form, $url);

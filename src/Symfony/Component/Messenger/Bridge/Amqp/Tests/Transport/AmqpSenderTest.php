@@ -25,7 +25,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 #[RequiresPhpExtension('amqp')]
 class AmqpSenderTest extends TestCase
 {
-    public function testItSendsTheEncodedMessage()
+    public function testItSendsTheEncodedMessage(): void
     {
         $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
@@ -40,7 +40,7 @@ class AmqpSenderTest extends TestCase
         $sender->send($envelope);
     }
 
-    public function testItSendsTheEncodedMessageUsingARoutingKey()
+    public function testItSendsTheEncodedMessageUsingARoutingKey(): void
     {
         $envelope = (new Envelope(new DummyMessage('Oy')))->with($stamp = new AmqpStamp('rk'));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
@@ -55,7 +55,7 @@ class AmqpSenderTest extends TestCase
         $sender->send($envelope);
     }
 
-    public function testItSendsTheEncodedMessageWithoutHeaders()
+    public function testItSendsTheEncodedMessageWithoutHeaders(): void
     {
         $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = ['body' => '...'];
@@ -70,7 +70,7 @@ class AmqpSenderTest extends TestCase
         $sender->send($envelope);
     }
 
-    public function testContentTypeHeaderIsMovedToAttribute()
+    public function testContentTypeHeaderIsMovedToAttribute(): void
     {
         $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class, 'Content-Type' => 'application/json']];
@@ -87,7 +87,7 @@ class AmqpSenderTest extends TestCase
         $sender->send($envelope);
     }
 
-    public function testContentTypeHeaderDoesNotOverwriteAttribute()
+    public function testContentTypeHeaderDoesNotOverwriteAttribute(): void
     {
         $envelope = (new Envelope(new DummyMessage('Oy')))->with($stamp = new AmqpStamp('rk', \AMQP_NOPARAM, ['content_type' => 'custom']));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class, 'Content-Type' => 'application/json']];
@@ -103,7 +103,7 @@ class AmqpSenderTest extends TestCase
         $sender->send($envelope);
     }
 
-    public function testItThrowsATransportExceptionIfItCannotSendTheMessage()
+    public function testItThrowsATransportExceptionIfItCannotSendTheMessage(): void
     {
         $this->expectException(TransportException::class);
         $envelope = new Envelope(new DummyMessage('Oy'));
@@ -119,7 +119,7 @@ class AmqpSenderTest extends TestCase
         $sender->send($envelope);
     }
 
-    public function testTransportMessageIdStampIsCreatedIfMessageIdIsSet()
+    public function testTransportMessageIdStampIsCreatedIfMessageIdIsSet(): void
     {
         $id = '01946fcb-4bcb-7aa7-9727-dac1c0374443';
         $stamp = new AmqpStamp(null, \AMQP_NOPARAM, ['message_id' => $id]);
@@ -141,7 +141,7 @@ class AmqpSenderTest extends TestCase
         $this->assertSame($id, $transportMessageIdStamp->getId());
     }
 
-    public function testTransportMessageIdStampIsNotCreatedIfMessageIdIsNotSet()
+    public function testTransportMessageIdStampIsNotCreatedIfMessageIdIsNotSet(): void
     {
         $stamp = new AmqpStamp(null, \AMQP_NOPARAM, []);
 

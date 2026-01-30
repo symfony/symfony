@@ -16,7 +16,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class ExpressionTest extends TestCase
 {
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $expression = new Expression('kernel.boot()');
 

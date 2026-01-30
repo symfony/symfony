@@ -31,7 +31,7 @@ class CallbacksObject
         return $this->bar;
     }
 
-    public function setBar($bar)
+    public function setBar($bar): void
     {
         $this->bar = $bar;
     }
@@ -41,7 +41,7 @@ class CallbacksObject
         return $this->foo;
     }
 
-    public function setFoo(?string $foo)
+    public function setFoo(?string $foo): void
     {
         $this->foo = $foo;
     }

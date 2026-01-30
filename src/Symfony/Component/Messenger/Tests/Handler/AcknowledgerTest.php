@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Handler\Acknowledger;
 
 class AcknowledgerTest extends TestCase
 {
-    public function testNackAfterAckThrowsIsAllowed()
+    public function testNackAfterAckThrowsIsAllowed(): void
     {
         $ackCalls = 0;
         $nackCalls = 0;

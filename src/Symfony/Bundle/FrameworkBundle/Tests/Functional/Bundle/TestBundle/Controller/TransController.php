@@ -15,7 +15,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class TransController
 {
-    public function index(TranslatorInterface $translator)
+    public function index(TranslatorInterface $translator): void
     {
         $translator->trans('hello_from_controller');
     }

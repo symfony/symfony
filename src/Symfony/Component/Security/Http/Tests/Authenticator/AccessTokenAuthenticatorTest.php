@@ -33,7 +33,7 @@ class AccessTokenAuthenticatorTest extends TestCase
         $this->userProvider = new InMemoryUserProvider(['test' => ['password' => 's$cr$t']]);
     }
 
-    public function testAuthenticateWithoutAccessToken()
+    public function testAuthenticateWithoutAccessToken(): void
     {
         $request = Request::create('/test');
 
@@ -55,7 +55,7 @@ class AccessTokenAuthenticatorTest extends TestCase
         $authenticator->authenticate($request);
     }
 
-    public function testAuthenticateWithoutProvider()
+    public function testAuthenticateWithoutProvider(): void
     {
         $request = Request::create('/test');
 
@@ -83,7 +83,7 @@ class AccessTokenAuthenticatorTest extends TestCase
         $this->assertEquals('john', $passport->getUser()->getUserIdentifier());
     }
 
-    public function testAuthenticateWithoutUserLoader()
+    public function testAuthenticateWithoutUserLoader(): void
     {
         $request = Request::create('/test');
 
@@ -111,7 +111,7 @@ class AccessTokenAuthenticatorTest extends TestCase
         $this->assertEquals('test', $passport->getUser()->getUserIdentifier());
     }
 
-    public function testAuthenticateWithUserLoader()
+    public function testAuthenticateWithUserLoader(): void
     {
         $request = Request::create('/test');
 
@@ -139,7 +139,7 @@ class AccessTokenAuthenticatorTest extends TestCase
         $this->assertEquals('john', $passport->getUser()->getUserIdentifier());
     }
 
-    public function testAuthenticateWithFallbackUserLoader()
+    public function testAuthenticateWithFallbackUserLoader(): void
     {
         $request = Request::create('/test');
 
@@ -168,7 +168,7 @@ class AccessTokenAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideAccessTokenHeaderRegex')]
-    public function testAccessTokenHeaderRegex(string $input, ?string $expectedToken)
+    public function testAccessTokenHeaderRegex(string $input, ?string $expectedToken): void
     {
         // Given
         $extractor = new HeaderAccessTokenExtractor();

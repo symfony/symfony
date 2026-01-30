@@ -26,7 +26,7 @@ class MailomatApiTransportTest extends TestCase
     private const KEY = 'K3Y';
 
     #[DataProvider('getTransportData')]
-    public function testToString(MailomatApiTransport $transport, string $expected)
+    public function testToString(MailomatApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -49,7 +49,7 @@ class MailomatApiTransportTest extends TestCase
         ];
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -104,7 +104,7 @@ class MailomatApiTransportTest extends TestCase
         $this->assertSame('foobar', $message->getMessageId());
     }
 
-    public function testSendThrowsForErrorResponse()
+    public function testSendThrowsForErrorResponse(): void
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(
             [

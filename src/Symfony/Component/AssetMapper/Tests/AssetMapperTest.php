@@ -23,7 +23,7 @@ class AssetMapperTest extends TestCase
 {
     private MappedAssetFactoryInterface&MockObject $mappedAssetFactory;
 
-    public function testGetAsset()
+    public function testGetAsset(): void
     {
         $assetMapper = $this->createAssetMapper();
 
@@ -39,7 +39,7 @@ class AssetMapperTest extends TestCase
         $this->assertNull($assetMapper->getAsset('non-existent.js'));
     }
 
-    public function testGetPublicPath()
+    public function testGetPublicPath(): void
     {
         $assetMapper = $this->createAssetMapper();
 
@@ -54,7 +54,7 @@ class AssetMapperTest extends TestCase
         $this->assertSame('/final-assets/file4.checksumfrommanifest.js', $assetMapper->getPublicPath('file4.js'));
     }
 
-    public function testAllAssets()
+    public function testAllAssets(): void
     {
         $assetMapper = $this->createAssetMapper();
 
@@ -73,7 +73,7 @@ class AssetMapperTest extends TestCase
         $this->assertInstanceOf(MappedAsset::class, $assets[0]);
     }
 
-    public function testGetAssetFromFilesystemPath()
+    public function testGetAssetFromFilesystemPath(): void
     {
         $assetMapper = $this->createAssetMapper();
 

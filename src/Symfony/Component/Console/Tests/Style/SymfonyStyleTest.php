@@ -49,7 +49,7 @@ class SymfonyStyleTest extends TestCase
     }
 
     #[DataProvider('inputCommandToOutputFilesProvider')]
-    public function testOutputs($inputCommandFilepath, $outputFilepath)
+    public function testOutputs($inputCommandFilepath, $outputFilepath): void
     {
         $code = require $inputCommandFilepath;
         $this->command->setCode($code);
@@ -58,7 +58,7 @@ class SymfonyStyleTest extends TestCase
     }
 
     #[DataProvider('inputInteractiveCommandToOutputFilesProvider')]
-    public function testInteractiveOutputs($inputCommandFilepath, $outputFilepath)
+    public function testInteractiveOutputs($inputCommandFilepath, $outputFilepath): void
     {
         $code = require $inputCommandFilepath;
         $this->command->setCode($code);
@@ -80,7 +80,7 @@ class SymfonyStyleTest extends TestCase
         return array_map(null, glob($baseDir.'/command/command_*.php'), glob($baseDir.'/output/output_*.txt'));
     }
 
-    public function testOutputProgressIterate()
+    public function testOutputProgressIterate(): void
     {
         $code = require __DIR__.'/../Fixtures/Style/SymfonyStyle/progress/command_progress_iterate.php';
 
@@ -95,7 +95,7 @@ class SymfonyStyleTest extends TestCase
         $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
     }
 
-    public function testGetErrorStyle()
+    public function testGetErrorStyle(): void
     {
         $input = $this->createStub(InputInterface::class);
 
@@ -120,7 +120,7 @@ class SymfonyStyleTest extends TestCase
         $io->getErrorStyle()->write('');
     }
 
-    public function testCreateTableWithConsoleOutput()
+    public function testCreateTableWithConsoleOutput(): void
     {
         $input = $this->createStub(InputInterface::class);
         $output = $this->createMock(ConsoleOutputInterface::class);
@@ -137,7 +137,7 @@ class SymfonyStyleTest extends TestCase
         $style->createTable();
     }
 
-    public function testCreateTableWithoutConsoleOutput()
+    public function testCreateTableWithoutConsoleOutput(): void
     {
         $input = $this->createStub(InputInterface::class);
         $output = $this->createStub(OutputInterface::class);
@@ -153,7 +153,7 @@ class SymfonyStyleTest extends TestCase
         $style->createTable()->appendRow(['row']);
     }
 
-    public function testCreateTree()
+    public function testCreateTree(): void
     {
         $output = $this->createStub(OutputInterface::class);
         $output
@@ -166,7 +166,7 @@ class SymfonyStyleTest extends TestCase
         $this->assertInstanceOf(TreeHelper::class, $tree);
     }
 
-    public function testTree()
+    public function testTree(): void
     {
         $input = $this->createStub(InputInterface::class);
         $output = new BufferedOutput();
@@ -189,7 +189,7 @@ class SymfonyStyleTest extends TestCase
         );
     }
 
-    public function testCreateTreeWithArray()
+    public function testCreateTreeWithArray(): void
     {
         $input = $this->createStub(InputInterface::class);
         $output = new BufferedOutput();
@@ -212,7 +212,7 @@ class SymfonyStyleTest extends TestCase
         );
     }
 
-    public function testCreateTreeWithIterable()
+    public function testCreateTreeWithIterable(): void
     {
         $input = $this->createStub(InputInterface::class);
         $output = new BufferedOutput();
@@ -235,7 +235,7 @@ class SymfonyStyleTest extends TestCase
         );
     }
 
-    public function testCreateTreeWithConsoleOutput()
+    public function testCreateTreeWithConsoleOutput(): void
     {
         $input = $this->createStub(InputInterface::class);
         $output = $this->createMock(ConsoleOutputInterface::class);
@@ -252,7 +252,7 @@ class SymfonyStyleTest extends TestCase
         $style->createTree([]);
     }
 
-    public function testGetErrorStyleUsesTheCurrentOutputIfNoErrorOutputIsAvailable()
+    public function testGetErrorStyleUsesTheCurrentOutputIfNoErrorOutputIsAvailable(): void
     {
         $output = $this->createStub(OutputInterface::class);
         $output
@@ -264,7 +264,7 @@ class SymfonyStyleTest extends TestCase
         $this->assertInstanceOf(SymfonyStyle::class, $style->getErrorStyle());
     }
 
-    public function testMemoryConsumption()
+    public function testMemoryConsumption(): void
     {
         $io = new SymfonyStyle(new ArrayInput([]), new NullOutput());
         $str = 'teststr';
@@ -278,7 +278,7 @@ class SymfonyStyleTest extends TestCase
         $this->assertSame(0, memory_get_usage() - $start);
     }
 
-    public function testAskAndClearExpectFullSectionCleared()
+    public function testAskAndClearExpectFullSectionCleared(): void
     {
         $answer = 'Answer';
         $inputStream = fopen('php://memory', 'r+');

@@ -17,7 +17,7 @@ use Symfony\Component\JsonStreamer\ValueTransformer\StringToDateTimeValueTransfo
 
 class StringToDateTimeValueTransformerTest extends TestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $valueTransformer = new StringToDateTimeValueTransformer();
 
@@ -32,7 +32,7 @@ class StringToDateTimeValueTransformerTest extends TestCase
         );
     }
 
-    public function testTransformThrowWhenInvalidJsonValue()
+    public function testTransformThrowWhenInvalidJsonValue(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The JSON value is either not an string, or an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.');
@@ -40,7 +40,7 @@ class StringToDateTimeValueTransformerTest extends TestCase
         (new StringToDateTimeValueTransformer())->transform(true, []);
     }
 
-    public function testTransformThrowWhenInvalidDateTimeString()
+    public function testTransformThrowWhenInvalidDateTimeString(): void
     {
         $valueTransformer = new StringToDateTimeValueTransformer();
 

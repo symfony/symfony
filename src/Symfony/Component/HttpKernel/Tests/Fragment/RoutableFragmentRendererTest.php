@@ -20,13 +20,13 @@ use Symfony\Component\HttpKernel\Fragment\RoutableFragmentRenderer;
 class RoutableFragmentRendererTest extends TestCase
 {
     #[DataProvider('getGenerateFragmentUriData')]
-    public function testGenerateFragmentUri($uri, $controller)
+    public function testGenerateFragmentUri($uri, $controller): void
     {
         $this->assertEquals($uri, $this->callGenerateFragmentUriMethod($controller, Request::create('/')));
     }
 
     #[DataProvider('getGenerateFragmentUriData')]
-    public function testGenerateAbsoluteFragmentUri($uri, $controller)
+    public function testGenerateAbsoluteFragmentUri($uri, $controller): void
     {
         $this->assertEquals('http://localhost'.$uri, $this->callGenerateFragmentUriMethod($controller, Request::create('/'), true));
     }
@@ -43,7 +43,7 @@ class RoutableFragmentRendererTest extends TestCase
         ];
     }
 
-    public function testGenerateFragmentUriWithARequest()
+    public function testGenerateFragmentUriWithARequest(): void
     {
         $request = Request::create('/');
         $request->attributes->set('_format', 'json');
@@ -54,7 +54,7 @@ class RoutableFragmentRendererTest extends TestCase
     }
 
     #[DataProvider('getGenerateFragmentUriDataWithNonScalar')]
-    public function testGenerateFragmentUriWithNonScalar($controller)
+    public function testGenerateFragmentUriWithNonScalar($controller): void
     {
         $this->expectException(\LogicException::class);
         $this->callGenerateFragmentUriMethod($controller, Request::create('/'));

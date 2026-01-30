@@ -129,7 +129,7 @@ class FrenchInflectorTest extends TestCase
     }
 
     #[DataProvider('pluralizeProvider')]
-    public function testSingularize(string $singular, string $plural)
+    public function testSingularize(string $singular, string $plural): void
     {
         $this->assertSame([$singular], (new FrenchInflector())->singularize($plural));
         // test casing: if the first letter was uppercase, it should remain so
@@ -137,7 +137,7 @@ class FrenchInflectorTest extends TestCase
     }
 
     #[DataProvider('pluralizeProvider')]
-    public function testPluralize(string $singular, string $plural)
+    public function testPluralize(string $singular, string $plural): void
     {
         $this->assertSame([$plural], (new FrenchInflector())->pluralize($singular));
         // test casing: if the first letter was uppercase, it should remain so

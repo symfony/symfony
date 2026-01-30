@@ -44,7 +44,7 @@ final class DiscordTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendWithErrorResponseThrows()
+    public function testSendWithErrorResponseThrows(): void
     {
         $client = new MockHttpClient(new MockResponse(json_encode(['message' => 'testDescription', 'code' => 'testErrorCode']), ['http_code' => 400]));
 

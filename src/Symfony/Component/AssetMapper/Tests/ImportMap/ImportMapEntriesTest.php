@@ -18,7 +18,7 @@ use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 
 class ImportMapEntriesTest extends TestCase
 {
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $entry1 = ImportMapEntry::createLocal('entry1', ImportMapType::JS, 'path1', true);
         $entry2 = ImportMapEntry::createLocal('entry2', ImportMapType::CSS, 'path2', false);
@@ -29,7 +29,7 @@ class ImportMapEntriesTest extends TestCase
         $this->assertSame([$entry1, $entry2], iterator_to_array($entries));
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $entries = new ImportMapEntries([ImportMapEntry::createLocal('entry1', ImportMapType::JS, 'path1', true)]);
 
@@ -37,7 +37,7 @@ class ImportMapEntriesTest extends TestCase
         $this->assertFalse($entries->has('entry2'));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $entry = ImportMapEntry::createLocal('entry1', ImportMapType::JS, 'path1', false);
         $entries = new ImportMapEntries([$entry]);
@@ -45,7 +45,7 @@ class ImportMapEntriesTest extends TestCase
         $this->assertSame($entry, $entries->get('entry1'));
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $entries = new ImportMapEntries([ImportMapEntry::createLocal('entry1', ImportMapType::JS, 'path1', true)]);
         $entries->remove('entry1');

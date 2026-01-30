@@ -31,7 +31,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class PostmarkApiTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(PostmarkApiTransport $transport, string $expected)
+    public function testToString(PostmarkApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -54,7 +54,7 @@ class PostmarkApiTransportTest extends TestCase
         ];
     }
 
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
@@ -70,7 +70,7 @@ class PostmarkApiTransportTest extends TestCase
         $this->assertEquals(['Name' => 'foo', 'Value' => 'bar'], $payload['Headers'][0]);
     }
 
-    public function testBypassHeaders()
+    public function testBypassHeaders(): void
     {
         $email = (new Email())->date(new \DateTimeImmutable());
         $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
@@ -82,7 +82,7 @@ class PostmarkApiTransportTest extends TestCase
         $this->assertArrayNotHasKey('Headers', $payload);
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -113,7 +113,7 @@ class PostmarkApiTransportTest extends TestCase
         $this->assertSame('foobar', $message->getMessageId());
     }
 
-    public function testSendThrowsForErrorResponse()
+    public function testSendThrowsForErrorResponse(): void
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['Message' => 'i\'m a teapot', 'ErrorCode' => 418], [
             'http_code' => 418,
@@ -132,7 +132,7 @@ class PostmarkApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testSendDeliveryEventIsDispatched()
+    public function testSendDeliveryEventIsDispatched(): void
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['Message' => 'Inactive recipient', 'ErrorCode' => 406], [
             'http_code' => 422,
@@ -163,7 +163,7 @@ class PostmarkApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testTagAndMetadataAndMessageStreamHeaders()
+    public function testTagAndMetadataAndMessageStreamHeaders(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('password-reset'));
@@ -186,7 +186,7 @@ class PostmarkApiTransportTest extends TestCase
         $this->assertSame('broadcasts', $payload['MessageStream']);
     }
 
-    public function testMultipleTagsAreNotAllowed()
+    public function testMultipleTagsAreNotAllowed(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('tag1'));

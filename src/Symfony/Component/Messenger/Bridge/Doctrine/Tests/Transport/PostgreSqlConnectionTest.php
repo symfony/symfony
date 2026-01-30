@@ -24,7 +24,7 @@ use Symfony\Component\Messenger\Bridge\Doctrine\Transport\PostgreSqlConnection;
  */
 class PostgreSqlConnectionTest extends TestCase
 {
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Cannot serialize '.PostgreSqlConnection::class);
@@ -36,7 +36,7 @@ class PostgreSqlConnectionTest extends TestCase
         serialize($connection);
     }
 
-    public function testUnserialize()
+    public function testUnserialize(): void
     {
         $this->expectException(\BadMethodCallException::class);
         $this->expectExceptionMessage('Cannot unserialize '.PostgreSqlConnection::class);
@@ -48,7 +48,7 @@ class PostgreSqlConnectionTest extends TestCase
         $connection->__unserialize([]);
     }
 
-    public function testListenOnConnection()
+    public function testListenOnConnection(): void
     {
         $driverConnection = $this->createMock(Connection::class);
         $driverConnection->method('executeStatement')->willReturn(1);
@@ -107,7 +107,7 @@ class PostgreSqlConnectionTest extends TestCase
         $this->assertFalse($connection->isListening());
     }
 
-    public function testIsListeningReturnsFalseWhenGetHasNotBeenCalled()
+    public function testIsListeningReturnsFalseWhenGetHasNotBeenCalled(): void
     {
         $driverConnection = $this->createStub(\Doctrine\DBAL\Connection::class);
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $driverConnection);

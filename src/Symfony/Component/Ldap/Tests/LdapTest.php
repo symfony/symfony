@@ -21,7 +21,7 @@ use Symfony\Component\Ldap\Ldap;
 
 class LdapTest extends TestCase
 {
-    public function testLdapBind()
+    public function testLdapBind(): void
     {
         $connection = $this->createMock(ConnectionInterface::class);
         $connection
@@ -39,7 +39,7 @@ class LdapTest extends TestCase
         $ldap->bind('foo', 'bar');
     }
 
-    public function testLdapEscape()
+    public function testLdapEscape(): void
     {
         $adapter = $this->createMock(AdapterInterface::class);
         $adapter
@@ -53,7 +53,7 @@ class LdapTest extends TestCase
         $ldap->escape('foo', 'bar', 0);
     }
 
-    public function testLdapQuery()
+    public function testLdapQuery(): void
     {
         $adapter = $this->createMock(AdapterInterface::class);
         $adapter
@@ -67,13 +67,13 @@ class LdapTest extends TestCase
     }
 
     #[RequiresPhpExtension('ldap')]
-    public function testLdapCreate()
+    public function testLdapCreate(): void
     {
         $ldap = Ldap::create('ext_ldap');
         $this->assertInstanceOf(Ldap::class, $ldap);
     }
 
-    public function testCreateWithInvalidAdapterName()
+    public function testCreateWithInvalidAdapterName(): void
     {
         $this->expectException(DriverNotFoundException::class);
         Ldap::create('foo');

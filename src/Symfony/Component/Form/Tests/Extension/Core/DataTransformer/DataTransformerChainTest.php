@@ -17,7 +17,7 @@ use Symfony\Component\Form\Tests\Fixtures\FixedDataTransformer;
 
 class DataTransformerChainTest extends TestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $chain = new DataTransformerChain([
             new FixedDataTransformer(['foo' => 'bar']),
@@ -27,7 +27,7 @@ class DataTransformerChainTest extends TestCase
         $this->assertEquals('baz', $chain->transform('foo'));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $chain = new DataTransformerChain([
             new FixedDataTransformer(['baz' => 'bar']),

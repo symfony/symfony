@@ -18,7 +18,7 @@ use Symfony\Component\Scheduler\Trigger\CronExpressionTrigger;
 class CronExpressionTriggerTest extends TestCase
 {
     #[DataProvider('hashedExpressionProvider')]
-    public function testHashedExpressionParsing(string $input, string $expected)
+    public function testHashedExpressionParsing(string $input, string $expected): void
     {
         $triggerA = CronExpressionTrigger::fromSpec($input, 'my task');
         $triggerB = CronExpressionTrigger::fromSpec($input, 'my task');
@@ -56,27 +56,27 @@ class CronExpressionTriggerTest extends TestCase
         ];
     }
 
-    public function testHashFieldsAreRandomizedIndependently()
+    public function testHashFieldsAreRandomizedIndependently(): void
     {
         $parts = explode(' ', (string) CronExpressionTrigger::fromSpec('#(1-6) #(1-6) #(1-6) #(1-6) #(1-6)', 'some context'));
 
         $this->assertNotCount(1, array_unique($parts));
     }
 
-    public function testFromHashWithStandardExpression()
+    public function testFromHashWithStandardExpression(): void
     {
         $this->assertSame('56 20 1 9 0', (string) CronExpressionTrigger::fromSpec('56 20 1 9 0', 'some context'));
         $this->assertSame('0 0 * * *', (string) CronExpressionTrigger::fromSpec('@daily'));
     }
 
-    public function testDefaultTimezone()
+    public function testDefaultTimezone(): void
     {
         $now = new \DateTimeImmutable('Europe/Paris');
         $trigger = CronExpressionTrigger::fromSpec('0 12 * * *');
         $this->assertSame('Europe/Paris', $trigger->getNextRunDate($now)->getTimezone()->getName());
     }
 
-    public function testTimezoneIsUsed()
+    public function testTimezoneIsUsed(): void
     {
         $now = new \DateTimeImmutable('Europe/Paris');
         $timezone = new \DateTimeZone('UTC');

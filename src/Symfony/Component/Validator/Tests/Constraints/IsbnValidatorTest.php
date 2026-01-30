@@ -120,7 +120,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
         );
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $constraint = new Isbn();
 
@@ -129,7 +129,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $constraint = new Isbn();
 
@@ -138,7 +138,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $constraint = new Isbn();
@@ -147,7 +147,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidIsbn10')]
-    public function testValidIsbn10($isbn)
+    public function testValidIsbn10($isbn): void
     {
         $constraint = new Isbn(type: 'isbn10');
 
@@ -156,7 +156,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testInvalidIsbn10Named()
+    public function testInvalidIsbn10Named(): void
     {
         $this->validator->validate(
             '978-2723442282',
@@ -170,7 +170,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidIsbn13')]
-    public function testValidIsbn13($isbn)
+    public function testValidIsbn13($isbn): void
     {
         $constraint = new Isbn(type: 'isbn13');
 
@@ -180,7 +180,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidIsbn13')]
-    public function testInvalidIsbn13Named($isbn, $code)
+    public function testInvalidIsbn13Named($isbn, $code): void
     {
         $constraint = new Isbn(
             type: Isbn::ISBN_13,
@@ -196,7 +196,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidIsbn')]
-    public function testValidIsbnAny($isbn)
+    public function testValidIsbnAny($isbn): void
     {
         $constraint = new Isbn();
 
@@ -206,7 +206,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidIsbn10')]
-    public function testInvalidIsbnAnyIsbn10($isbn, $code)
+    public function testInvalidIsbnAnyIsbn10($isbn, $code): void
     {
         $constraint = new Isbn(bothIsbnMessage: 'myMessage');
 
@@ -224,7 +224,7 @@ class IsbnValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidIsbn13')]
-    public function testInvalidIsbnAnyIsbn13($isbn, $code)
+    public function testInvalidIsbnAnyIsbn13($isbn, $code): void
     {
         $constraint = new Isbn(bothIsbnMessage: 'myMessage');
 

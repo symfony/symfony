@@ -19,14 +19,14 @@ use Symfony\Component\Config\Definition\FloatNode;
 class FloatNodeTest extends TestCase
 {
     #[DataProvider('getValidValues')]
-    public function testNormalize(int|float $value)
+    public function testNormalize(int|float $value): void
     {
         $node = new FloatNode('test');
         $this->assertSame($value, $node->normalize($value));
     }
 
     #[DataProvider('getValidValues')]
-    public function testValidNonEmptyValues(int|float $value)
+    public function testValidNonEmptyValues(int|float $value): void
     {
         $node = new FloatNode('test');
         $node->setAllowEmptyValue(false);
@@ -49,7 +49,7 @@ class FloatNodeTest extends TestCase
     }
 
     #[DataProvider('getInvalidValues')]
-    public function testNormalizeThrowsExceptionOnInvalidValues($value)
+    public function testNormalizeThrowsExceptionOnInvalidValues($value): void
     {
         $node = new FloatNode('test');
 

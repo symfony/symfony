@@ -20,7 +20,7 @@ use Symfony\Component\VarExporter\Tests\Fixtures\LazyProxy\Php82NullStandaloneRe
 class ProxyHelperTest extends TestCase
 {
     #[DataProvider('provideExportSignature')]
-    public function testExportSignature(string $expected, \ReflectionMethod $method)
+    public function testExportSignature(string $expected, \ReflectionMethod $method): void
     {
         $this->assertSame($expected, ProxyHelper::exportSignature($method));
     }
@@ -41,7 +41,7 @@ class ProxyHelperTest extends TestCase
         }
     }
 
-    public function testExportSignatureFQ()
+    public function testExportSignatureFQ(): void
     {
         $expected = <<<'EOPHP'
             public function bar($a = \Symfony\Component\VarExporter\Tests\Bar::BAZ,
@@ -59,7 +59,7 @@ class ProxyHelperTest extends TestCase
         $this->assertSame($expected, str_replace(', $', ",\n$", ProxyHelper::exportSignature(new \ReflectionMethod(TestSignatureFQ::class, 'bar'))));
     }
 
-    public function testGenerateLazyProxy()
+    public function testGenerateLazyProxy(): void
     {
         $expected = <<<'EOPHP'
              extends \Symfony\Component\VarExporter\Tests\TestForProxyHelper implements \Symfony\Component\VarExporter\LazyObjectInterface
@@ -158,7 +158,7 @@ class ProxyHelperTest extends TestCase
         $this->assertSame($expected, ProxyHelper::generateLazyProxy(new \ReflectionClass(TestForProxyHelper::class)));
     }
 
-    public function testGenerateLazyProxyForInterfaces()
+    public function testGenerateLazyProxyForInterfaces(): void
     {
         $expected = <<<'EOPHP'
              implements \Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface1, \Symfony\Component\VarExporter\Tests\TestForProxyHelperInterface2, \Symfony\Component\VarExporter\LazyObjectInterface
@@ -205,7 +205,7 @@ class ProxyHelperTest extends TestCase
     }
 
     #[DataProvider('classWithUnserializeMagicMethodProvider')]
-    public function testGenerateLazyProxyForClassWithUnserializeMagicMethod(object $obj, string $expected)
+    public function testGenerateLazyProxyForClassWithUnserializeMagicMethod(object $obj, string $expected): void
     {
         $this->assertStringContainsString($expected, ProxyHelper::generateLazyProxy(new \ReflectionClass($obj::class)));
     }
@@ -246,7 +246,7 @@ class ProxyHelperTest extends TestCase
             EOPHP];
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $expected = <<<'EOPHP'
 
@@ -268,7 +268,7 @@ class ProxyHelperTest extends TestCase
         $this->assertStringContainsString($expected, ProxyHelper::generateLazyProxy($class));
     }
 
-    public function testNullStandaloneReturnType()
+    public function testNullStandaloneReturnType(): void
     {
         self::assertStringContainsString(
             'public function foo(): null',
@@ -276,7 +276,7 @@ class ProxyHelperTest extends TestCase
         );
     }
 
-    public function testPropertyHooks()
+    public function testPropertyHooks(): void
     {
         $proxyCode = ProxyHelper::generateLazyProxy(new \ReflectionClass(Hooked::class));
         self::assertStringContainsString('public int $notBacked {', $proxyCode);
@@ -294,7 +294,7 @@ abstract class TestForProxyHelper
     {
     }
 
-    public function &foo3(Bar &$b, string &...$c)
+    public function &foo3(Bar &$b, string &...$c): void
     {
     }
 
@@ -302,7 +302,7 @@ abstract class TestForProxyHelper
     {
     }
 
-    public function foo5($b = new \stdClass([0 => 123]).Bar.Bar::BAR."a\0b")
+    public function foo5($b = new \stdClass([0 => 123]).Bar.Bar::BAR."a\0b"): void
     {
     }
 
@@ -312,15 +312,15 @@ abstract class TestForProxyHelper
 
     abstract protected function foo7();
 
-    public static function foo8()
+    public static function foo8(): void
     {
     }
 
-    public function foo9($a = self::BOB, $b = ['$a', '$a\n', "\$a\n"], $c = ['$a', '$a\n', "\$a\n", new \stdClass()])
+    public function foo9($a = self::BOB, $b = ['$a', '$a\n', "\$a\n"], $c = ['$a', '$a\n', "\$a\n", new \stdClass()]): void
     {
     }
 
-    public function foo10($a = [namespace\M_PI, new M_PI()])
+    public function foo10($a = [namespace\M_PI, new M_PI()]): void
     {
     }
 }
@@ -350,6 +350,6 @@ class TestSignatureFQ extends \stdClass
         $i = new \Qux(),
         $j = parent::BAZ,
         $k = Bar,
-    ) {
+    ): void {
     }
 }

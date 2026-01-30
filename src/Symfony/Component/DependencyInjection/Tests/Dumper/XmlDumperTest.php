@@ -40,21 +40,21 @@ class XmlDumperTest extends TestCase
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures');
     }
 
-    public function testDump()
+    public function testDump(): void
     {
         $dumper = new XmlDumper(new ContainerBuilder());
 
         $this->assertXmlStringEqualsGeneratedXmlFile('services1.xml', $dumper->dump(), '->dump() dumps an empty container as an empty XML file');
     }
 
-    public function testExportParameters()
+    public function testExportParameters(): void
     {
         $container = include self::$fixturesPath.'/containers/container8.php';
         $dumper = new XmlDumper($container);
         $this->assertXmlStringEqualsGeneratedXmlFile('services8.xml', $dumper->dump(), '->dump() dumps parameters');
     }
 
-    public function testAddService()
+    public function testAddService(): void
     {
         $container = include self::$fixturesPath.'/containers/container9.php';
         $dumper = new XmlDumper($container);
@@ -72,7 +72,7 @@ class XmlDumperTest extends TestCase
         }
     }
 
-    public function testDumpAnonymousServices()
+    public function testDumpAnonymousServices(): void
     {
         $container = include self::$fixturesPath.'/containers/container11.php';
         $dumper = new XmlDumper($container);
@@ -94,7 +94,7 @@ class XmlDumperTest extends TestCase
 ', $dumper->dump());
     }
 
-    public function testDumpEntities()
+    public function testDumpEntities(): void
     {
         $container = include self::$fixturesPath.'/containers/container12.php';
         $dumper = new XmlDumper($container);
@@ -112,7 +112,7 @@ class XmlDumperTest extends TestCase
     }
 
     #[DataProvider('provideDecoratedServicesData')]
-    public function testDumpDecoratedServices($expectedXmlDump, $container)
+    public function testDumpDecoratedServices($expectedXmlDump, $container): void
     {
         $dumper = new XmlDumper($container);
         $this->assertEquals($expectedXmlDump, $dumper->dump());
@@ -151,7 +151,7 @@ class XmlDumperTest extends TestCase
     }
 
     #[DataProvider('provideCompiledContainerData')]
-    public function testCompiledContainerCanBeDumped($containerFile)
+    public function testCompiledContainerCanBeDumped($containerFile): void
     {
         $fixturesPath = __DIR__.'/../Fixtures';
         $container = require $fixturesPath.'/containers/'.$containerFile.'.php';
@@ -173,7 +173,7 @@ class XmlDumperTest extends TestCase
         ];
     }
 
-    public function testDumpInlinedServices()
+    public function testDumpInlinedServices(): void
     {
         $container = include self::$fixturesPath.'/containers/container21.php';
         $dumper = new XmlDumper($container);
@@ -181,7 +181,7 @@ class XmlDumperTest extends TestCase
         $this->assertXmlStringEqualsGeneratedXmlFile('services21.xml', $dumper->dump());
     }
 
-    public function testDumpAutowireData()
+    public function testDumpAutowireData(): void
     {
         $container = include self::$fixturesPath.'/containers/container24.php';
         $dumper = new XmlDumper($container);
@@ -189,7 +189,7 @@ class XmlDumperTest extends TestCase
         $this->assertXmlStringEqualsGeneratedXmlFile('services24.xml', $dumper->dump());
     }
 
-    public function testTaggedArguments()
+    public function testTaggedArguments(): void
     {
         $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo');
         $taggedIterator2 = new TaggedIteratorArgument('foo_tag', null, false, ['baz']);
@@ -233,7 +233,7 @@ class XmlDumperTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testLegacyTaggedArguments()
+    public function testLegacyTaggedArguments(): void
     {
         $taggedIterator = new TaggedIteratorArgument('foo_tag', 'barfoo', 'foobar', false, 'getPriority');
         $taggedIterator2 = new TaggedIteratorArgument('foo_tag', null, null, false, null, ['baz']);
@@ -275,7 +275,7 @@ class XmlDumperTest extends TestCase
         $this->assertXmlStringEqualsGeneratedXmlFile('legacy_services_with_tagged_arguments.xml', $dumper->dump());
     }
 
-    public function testServiceClosure()
+    public function testServiceClosure(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'Foo')
@@ -286,7 +286,7 @@ class XmlDumperTest extends TestCase
         $this->assertXmlStringEqualsGeneratedXmlFile('services_with_service_closure.xml', $dumper->dump());
     }
 
-    public function testDumpAbstractServices()
+    public function testDumpAbstractServices(): void
     {
         $container = include self::$fixturesPath.'/containers/container_abstract.php';
         $dumper = new XmlDumper($container);
@@ -294,7 +294,7 @@ class XmlDumperTest extends TestCase
         $this->assertXmlStringEqualsGeneratedXmlFile('services_abstract.xml', $dumper->dump());
     }
 
-    public function testDumpHandlesEnumeration()
+    public function testDumpHandlesEnumeration(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -312,7 +312,7 @@ class XmlDumperTest extends TestCase
     }
 
     #[DataProvider('provideDefaultClasses')]
-    public function testDumpHandlesDefaultAttribute($class, $expectedFile)
+    public function testDumpHandlesDefaultAttribute($class, $expectedFile): void
     {
         $container = new ContainerBuilder();
         $container
@@ -335,7 +335,7 @@ class XmlDumperTest extends TestCase
         yield [FooClassWithDefaultEnumAttribute::class, 'services_with_default_enumeration.xml'];
     }
 
-    public function testDumpServiceWithAbstractArgument()
+    public function testDumpServiceWithAbstractArgument(): void
     {
         $container = new ContainerBuilder();
         $container->register(FooWithAbstractArgument::class, FooWithAbstractArgument::class)
@@ -346,7 +346,7 @@ class XmlDumperTest extends TestCase
         $this->assertXmlStringEqualsGeneratedXmlFile('services_with_abstract_argument.xml', $dumper->dump());
     }
 
-    public function testDumpNonScalarTags()
+    public function testDumpNonScalarTags(): void
     {
         $container = include self::$fixturesPath.'/containers/container_non_scalar_tags.php';
         $dumper = new XmlDumper($container);

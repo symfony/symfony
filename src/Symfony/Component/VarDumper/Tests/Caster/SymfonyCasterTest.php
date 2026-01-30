@@ -21,7 +21,7 @@ final class SymfonyCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testCastUuid()
+    public function testCastUuid(): void
     {
         $uuid = new UuidV4('83a9db35-3c8c-4040-b3c1-02eccc00b419');
         $expectedDump = <<<EODUMP
@@ -46,7 +46,7 @@ final class SymfonyCasterTest extends TestCase
         $this->assertDumpEquals($expectedDump, $uuid);
     }
 
-    public function testCastUlid()
+    public function testCastUlid(): void
     {
         $ulid = new Ulid('01F7B252SZQGTSQGYSGACASAW6');
         $expectedDump = <<<EODUMP

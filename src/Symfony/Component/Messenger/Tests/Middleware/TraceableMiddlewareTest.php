@@ -27,7 +27,7 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  */
 class TraceableMiddlewareTest extends MiddlewareTestCase
 {
-    public function testHandle()
+    public function testHandle(): void
     {
         $busId = 'command_bus';
         $envelope = new Envelope(new DummyMessage('Hello'));
@@ -82,7 +82,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         $this->assertSame(1, $middleware->calls);
     }
 
-    public function testHandleWithException()
+    public function testHandleWithException(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Thrown from next middleware.');
@@ -110,7 +110,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         $traced->handle(new Envelope(new DummyMessage('Hello')), new StackMiddleware(new \ArrayIterator([null, $middleware])));
     }
 
-    public function testHandleWhenStopwatchHasBeenReset()
+    public function testHandleWhenStopwatchHasBeenReset(): void
     {
         $busId = 'command_bus';
         $envelope = new Envelope(new DummyMessage('Hello'));
@@ -141,7 +141,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         $this->assertSame(1, $middleware->calls);
     }
 
-    public function testClonedTraceableStackUnstacksIndependently()
+    public function testClonedTraceableStackUnstacksIndependently(): void
     {
         // import TraceableStack
         class_exists(TraceableMiddleware::class);
@@ -172,7 +172,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         self::assertNotSame($stackMiddleware, $clonedStackTail, 'stackMiddleware was also cloned');
     }
 
-    public function testClonedTraceableStackUsesSameStopwatch()
+    public function testClonedTraceableStackUsesSameStopwatch(): void
     {
         // import TraceableStack
         class_exists(TraceableMiddleware::class);

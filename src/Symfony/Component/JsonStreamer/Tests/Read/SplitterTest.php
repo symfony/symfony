@@ -18,13 +18,13 @@ use Symfony\Component\JsonStreamer\Read\Splitter;
 
 class SplitterTest extends TestCase
 {
-    public function testSplitNull()
+    public function testSplitNull(): void
     {
         $this->assertListBoundaries(null, 'null');
         $this->assertDictBoundaries(null, 'null');
     }
 
-    public function testSplitList()
+    public function testSplitList(): void
     {
         $this->assertListBoundaries([], '[]');
         $this->assertListBoundaries([[1, 3]], '[100]');
@@ -33,7 +33,7 @@ class SplitterTest extends TestCase
         $this->assertListBoundaries([[1, 1], [3, 7]], '[1,{"2":3}]');
     }
 
-    public function testSplitDict()
+    public function testSplitDict(): void
     {
         $this->assertDictBoundaries([], '{}');
         $this->assertDictBoundaries(['k' => [5, 2]], '{"k":10}');
@@ -41,7 +41,7 @@ class SplitterTest extends TestCase
     }
 
     #[DataProvider('splitDictInvalidDataProvider')]
-    public function testSplitDictInvalidThrowException(string $expectedMessage, string $content)
+    public function testSplitDictInvalidThrowException(string $expectedMessage, string $content): void
     {
         $this->expectException(InvalidStreamException::class);
         $this->expectExceptionMessage($expectedMessage);
@@ -74,7 +74,7 @@ class SplitterTest extends TestCase
     }
 
     #[DataProvider('splitListInvalidDataProvider')]
-    public function testSplitListInvalidThrowException(string $expectedMessage, string $content)
+    public function testSplitListInvalidThrowException(string $expectedMessage, string $content): void
     {
         $this->expectException(InvalidStreamException::class);
         $this->expectExceptionMessage($expectedMessage);

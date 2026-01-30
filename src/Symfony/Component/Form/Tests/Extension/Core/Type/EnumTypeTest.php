@@ -29,13 +29,13 @@ class EnumTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = EnumType::class;
 
-    public function testClassOptionIsRequired()
+    public function testClassOptionIsRequired(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->factory->createNamed('name', $this->getTestedType());
     }
 
-    public function testInvalidClassOption()
+    public function testInvalidClassOption(): void
     {
         $this->expectException(InvalidOptionsException::class);
         $this->factory->createNamed('name', $this->getTestedType(), null, [
@@ -43,7 +43,7 @@ class EnumTypeTest extends BaseTypeTestCase
         ]);
     }
 
-    public function testInvalidClassOptionType()
+    public function testInvalidClassOptionType(): void
     {
         $this->expectException(InvalidOptionsException::class);
         $this->factory->createNamed('name', $this->getTestedType(), null, [
@@ -52,7 +52,7 @@ class EnumTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('provideSingleSubmitData')]
-    public function testSubmitSingleNonExpanded(string $class, string $submittedData, \UnitEnum $expectedData)
+    public function testSubmitSingleNonExpanded(string $class, string $submittedData, \UnitEnum $expectedData): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => false,
@@ -68,7 +68,7 @@ class EnumTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('provideSingleSubmitData')]
-    public function testSubmitSingleExpanded(string $class, string $submittedData, \UnitEnum $expectedData)
+    public function testSubmitSingleExpanded(string $class, string $submittedData, \UnitEnum $expectedData): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => false,
@@ -104,7 +104,7 @@ class EnumTypeTest extends BaseTypeTestCase
         ];
     }
 
-    public function testSubmitSingleNonExpandedInvalidChoice()
+    public function testSubmitSingleNonExpandedInvalidChoice(): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => false,
@@ -119,7 +119,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertFalse($form->isSynchronized());
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         $form = $this->factory->create($this->getTestedType(), null, $this->getTestOptions());
 
@@ -131,7 +131,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertTrue($form->isSynchronized());
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null)
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null): void
     {
         $emptyData = Suit::Hearts->value;
 
@@ -147,7 +147,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertSame(Suit::Hearts, $form->getData());
     }
 
-    public function testSubmitMultipleChoiceWithEmptyData()
+    public function testSubmitMultipleChoiceWithEmptyData(): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => true,
@@ -161,7 +161,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertSame([Suit::Diamonds], $form->getData());
     }
 
-    public function testSubmitSingleChoiceExpandedWithEmptyData()
+    public function testSubmitSingleChoiceExpandedWithEmptyData(): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => false,
@@ -175,7 +175,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertSame(Suit::Hearts, $form->getData());
     }
 
-    public function testSubmitMultipleChoiceExpandedWithEmptyData()
+    public function testSubmitMultipleChoiceExpandedWithEmptyData(): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => true,
@@ -190,7 +190,7 @@ class EnumTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('provideMultiSubmitData')]
-    public function testSubmitMultipleNonExpanded(string $class, array $submittedValues, array $expectedValues)
+    public function testSubmitMultipleNonExpanded(string $class, array $submittedValues, array $expectedValues): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => true,
@@ -206,7 +206,7 @@ class EnumTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('provideMultiSubmitData')]
-    public function testSubmitMultipleExpanded(string $class, array $submittedValues, array $expectedValues)
+    public function testSubmitMultipleExpanded(string $class, array $submittedValues, array $expectedValues): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => true,
@@ -242,7 +242,7 @@ class EnumTypeTest extends BaseTypeTestCase
         ];
     }
 
-    public function testChoiceLabel()
+    public function testChoiceLabel(): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => false,
@@ -255,7 +255,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertSame('Yes', $view->children[0]->vars['label']);
     }
 
-    public function testChoiceLabelTranslatable()
+    public function testChoiceLabelTranslatable(): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => false,
@@ -269,7 +269,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertEquals('Left', $view->children[0]->vars['label']->trans(new IdentityTranslator()));
     }
 
-    public function testChoices()
+    public function testChoices(): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => false,
@@ -288,7 +288,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertSame('No', $view->children[1]->vars['label']);
     }
 
-    public function testChoicesWithLabels()
+    public function testChoicesWithLabels(): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => false,
@@ -306,7 +306,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertSame('no', $view->children[1]->vars['label']);
     }
 
-    public function testGroupedEnumChoices()
+    public function testGroupedEnumChoices(): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => false,
@@ -325,7 +325,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertSame('FourtyTwo', $view->vars['choices']['Group 2']->choices[2]->label);
     }
 
-    public function testGroupedEnumChoicesWithCustomLabels()
+    public function testGroupedEnumChoicesWithCustomLabels(): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => false,
@@ -353,7 +353,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertSame('Custom 42', $view->vars['choices']['Group 2']->choices[2]->label);
     }
 
-    public function testMixedGroupedAndSingleChoices()
+    public function testMixedGroupedAndSingleChoices(): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => false,
@@ -378,7 +378,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertSame('Custom 42', $customChoice->label);
     }
 
-    public function testMixedLabeledAndUnlabeledChoices()
+    public function testMixedLabeledAndUnlabeledChoices(): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => false,
@@ -398,7 +398,7 @@ class EnumTypeTest extends BaseTypeTestCase
         $this->assertSame('Custom 42', $children[2]->vars['label']);
     }
 
-    public function testEnumChoicesWithNumericCustomLabels()
+    public function testEnumChoicesWithNumericCustomLabels(): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'multiple' => false,

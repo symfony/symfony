@@ -35,7 +35,7 @@ class CrossCheckTest extends TestCase
     #[DataProvider('crossCheckYamlLoadersDumpers')]
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testYamlCrossCheck($fixture)
+    public function testYamlCrossCheck($fixture): void
     {
         $tmp = tempnam(sys_get_temp_dir(), 'sf');
 

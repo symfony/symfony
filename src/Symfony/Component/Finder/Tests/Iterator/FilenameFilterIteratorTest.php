@@ -17,7 +17,7 @@ use Symfony\Component\Finder\Iterator\FilenameFilterIterator;
 class FilenameFilterIteratorTest extends IteratorTestCase
 {
     #[DataProvider('getAcceptData')]
-    public function testAccept($matchPatterns, $noMatchPatterns, $expected)
+    public function testAccept($matchPatterns, $noMatchPatterns, $expected): void
     {
         $inner = new InnerNameIterator(['test.php', 'test.py', 'foo.php']);
 

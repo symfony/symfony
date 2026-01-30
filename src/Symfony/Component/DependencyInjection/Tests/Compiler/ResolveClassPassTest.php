@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
 class ResolveClassPassTest extends TestCase
 {
     #[DataProvider('provideValidClassId')]
-    public function testResolveClassFromId($serviceId)
+    public function testResolveClassFromId($serviceId): void
     {
         $container = new ContainerBuilder();
         $def = $container->register($serviceId);
@@ -38,7 +38,7 @@ class ResolveClassPassTest extends TestCase
     }
 
     #[DataProvider('provideInvalidClassId')]
-    public function testWontResolveClassFromId($serviceId)
+    public function testWontResolveClassFromId($serviceId): void
     {
         $container = new ContainerBuilder();
         $def = $container->register($serviceId);
@@ -55,7 +55,7 @@ class ResolveClassPassTest extends TestCase
         yield [\DateTimeImmutable::class];
     }
 
-    public function testNonFqcnChildDefinition()
+    public function testNonFqcnChildDefinition(): void
     {
         $container = new ContainerBuilder();
         $parent = $container->register('App\Foo.parent', 'App\Foo');
@@ -67,7 +67,7 @@ class ResolveClassPassTest extends TestCase
         $this->assertNull($child->getClass());
     }
 
-    public function testClassFoundChildDefinition()
+    public function testClassFoundChildDefinition(): void
     {
         $container = new ContainerBuilder();
         $parent = $container->register('foo.parent', 'App\Foo');
@@ -79,7 +79,7 @@ class ResolveClassPassTest extends TestCase
         $this->assertSame(self::class, $child->getClass());
     }
 
-    public function testAmbiguousChildDefinition()
+    public function testAmbiguousChildDefinition(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Service definition "App\Foo\Child" has a parent but no class, and its name looks like a FQCN. Either the class is missing or you want to inherit it from the parent service. To resolve this ambiguity, please rename this service to a non-FQCN (e.g. using dots), or create the missing class.');
@@ -90,7 +90,7 @@ class ResolveClassPassTest extends TestCase
         (new ResolveClassPass())->process($container);
     }
 
-    public function testSkipsDefinitionsWithErrors()
+    public function testSkipsDefinitionsWithErrors(): void
     {
         $container = new ContainerBuilder();
         $def = $container->register('App\SomeClass');
@@ -102,7 +102,7 @@ class ResolveClassPassTest extends TestCase
         $this->assertNull($def->getClass());
     }
 
-    public function testInvalidClassNameDefinition()
+    public function testInvalidClassNameDefinition(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Service id "Acme\UnknownClass" looks like a FQCN but no corresponding class or interface exists. To resolve this ambiguity, please rename this service to a non-FQCN (e.g. using dots), or create the missing class or interface.');
@@ -112,12 +112,12 @@ class ResolveClassPassTest extends TestCase
         (new ResolveClassPass())->process($container);
     }
 
-    public function testInvalidClassWhoseImplementedInterfaceIsMissingDefinition()
+    public function testInvalidClassWhoseImplementedInterfaceIsMissingDefinition(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Service id "Acme\ClassImplementsUnavailableInterface" looks like a FQCN but no corresponding class or interface exists. To resolve this ambiguity, please rename this service to a non-FQCN (e.g. using dots), or create the missing class or interface.');
 
-        $autoloader = static function (string $class) {
+        $autoloader = static function (string $class): void {
             if ('Acme\ClassImplementsUnavailableInterface' === $class) {
                 new class implements UnavailableInterface {};
             }

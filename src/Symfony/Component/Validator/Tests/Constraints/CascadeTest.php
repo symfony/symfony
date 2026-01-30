@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class CascadeTest extends TestCase
 {
-    public function testCascadeAttribute()
+    public function testCascadeAttribute(): void
     {
         $metadata = new ClassMetadata(CascadeDummy::class);
         $loader = new AttributeLoader();
@@ -28,7 +28,7 @@ class CascadeTest extends TestCase
         self::assertSame(CascadingStrategy::CASCADE, $metadata->getCascadingStrategy());
     }
 
-    public function testExcludeProperties()
+    public function testExcludeProperties(): void
     {
         $constraint = new Cascade(['foo', 'bar']);
 

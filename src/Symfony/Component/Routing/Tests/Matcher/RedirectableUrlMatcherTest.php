@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RedirectableUrlMatcherTest extends UrlMatcherTest
 {
-    public function testMissingTrailingSlash()
+    public function testMissingTrailingSlash(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
@@ -29,7 +29,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher->match('/foo');
     }
 
-    public function testExtraTrailingSlash()
+    public function testExtraTrailingSlash(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo'));
@@ -39,7 +39,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher->match('/foo/');
     }
 
-    public function testRedirectWhenNoSlashForNonSafeMethod()
+    public function testRedirectWhenNoSlashForNonSafeMethod(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
@@ -53,7 +53,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher->match('/foo');
     }
 
-    public function testSchemeRedirectRedirectsToFirstScheme()
+    public function testSchemeRedirectRedirectsToFirstScheme(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', [], [], [], '', ['FTP', 'HTTPS']));
@@ -68,7 +68,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher->match('/foo');
     }
 
-    public function testNoSchemaRedirectIfOneOfMultipleSchemesMatches()
+    public function testNoSchemaRedirectIfOneOfMultipleSchemesMatches(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', [], [], [], '', ['https', 'http']));
@@ -80,7 +80,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher->match('/foo');
     }
 
-    public function testSchemeRedirectWithParams()
+    public function testSchemeRedirectWithParams(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{bar}', [], [], [], '', ['https']));
@@ -95,7 +95,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $this->assertEquals(['_route' => 'foo', 'bar' => 'baz', 'redirect' => 'value'], $matcher->match('/foo/baz'));
     }
 
-    public function testSchemeRedirectForRoot()
+    public function testSchemeRedirectForRoot(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/', [], [], [], '', ['https']));
@@ -109,7 +109,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $this->assertEquals(['_route' => 'foo', 'redirect' => 'value'], $matcher->match('/'));
     }
 
-    public function testSlashRedirectWithParams()
+    public function testSlashRedirectWithParams(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{bar}/'));
@@ -124,7 +124,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $this->assertEquals(['_route' => 'foo', 'bar' => 'baz', 'redirect' => 'value'], $matcher->match('/foo/baz'));
     }
 
-    public function testRedirectPreservesUrlEncoding()
+    public function testRedirectPreservesUrlEncoding(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo:bar/'));
@@ -134,7 +134,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher->match('/foo%3Abar');
     }
 
-    public function testSchemeRequirement()
+    public function testSchemeRequirement(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', [], [], [], '', ['https']));
@@ -143,7 +143,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $this->assertSame(['_route' => 'foo'], $matcher->match('/foo'));
     }
 
-    public function testFallbackPage()
+    public function testFallbackPage(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
@@ -162,7 +162,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $this->assertSame(['_route' => 'foo'], $matcher->match('/foo/'));
     }
 
-    public function testMissingTrailingSlashAndScheme()
+    public function testMissingTrailingSlashAndScheme(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', (new Route('/foo/'))->setSchemes(['https']));
@@ -172,7 +172,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $matcher->match('/foo');
     }
 
-    public function testSlashAndVerbPrecedenceWithRedirection()
+    public function testSlashAndVerbPrecedenceWithRedirection(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/api/customers/{customerId}/contactpersons', [], [], [], '', [], ['post']));
@@ -189,7 +189,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $this->assertEquals($expected, $matcher->match('/api/customers/123/contactpersons'));
     }
 
-    public function testNonGreedyTrailingRequirement()
+    public function testNonGreedyTrailingRequirement(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/{a}', [], ['a' => '\d+']));
@@ -200,7 +200,7 @@ class RedirectableUrlMatcherTest extends UrlMatcherTest
         $this->assertEquals(['_route' => 'a', 'a' => '123'], $matcher->match('/123/'));
     }
 
-    public function testTrailingRequirementWithDefaultA()
+    public function testTrailingRequirementWithDefaultA(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/fr-fr/{a}', ['a' => 'aaa'], ['a' => '.+']));

@@ -42,7 +42,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 
 class SecurityTest extends TestCase
 {
-    public function testGetToken()
+    public function testGetToken(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('foo', 'bar'), 'provider');
         $tokenStorage = new TokenStorage();
@@ -55,7 +55,7 @@ class SecurityTest extends TestCase
     }
 
     #[DataProvider('getUserTests')]
-    public function testGetUser($userInToken, $expectedUser)
+    public function testGetUser($userInToken, $expectedUser): void
     {
         if (null === $userInToken) {
             $token = new NullToken();
@@ -80,7 +80,7 @@ class SecurityTest extends TestCase
         yield [$user, $user];
     }
 
-    public function testIsGranted()
+    public function testIsGranted(): void
     {
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
@@ -95,7 +95,7 @@ class SecurityTest extends TestCase
         $this->assertTrue($security->isGranted('SOME_ATTRIBUTE', 'SOME_SUBJECT'));
     }
 
-    public function testAccessDecision()
+    public function testAccessDecision(): void
     {
         $authorizationChecker = $this->createMock(AuthorizationCheckerInterface::class);
 
@@ -117,7 +117,7 @@ class SecurityTest extends TestCase
         $this->assertTrue($accessDecision->isGranted);
     }
 
-    public function testAccessDecisionForUser()
+    public function testAccessDecisionForUser(): void
     {
         $user = new InMemoryUser('test_user', 'password');
         $userAuthorizationChecker = $this->createMock(UserAuthorizationCheckerInterface::class);
@@ -141,7 +141,7 @@ class SecurityTest extends TestCase
     }
 
     #[DataProvider('getFirewallConfigTests')]
-    public function testGetFirewallConfig(Request $request, ?FirewallConfig $expectedFirewallConfig)
+    public function testGetFirewallConfig(Request $request, ?FirewallConfig $expectedFirewallConfig): void
     {
         $firewallMap = $this->createMock(FirewallMap::class);
 
@@ -164,7 +164,7 @@ class SecurityTest extends TestCase
         yield [$request, new FirewallConfig('main', 'acme_user_checker')];
     }
 
-    public function testLogin()
+    public function testLogin(): void
     {
         $request = new Request();
         $authenticator = $this->createStub(AuthenticatorInterface::class);
@@ -208,7 +208,7 @@ class SecurityTest extends TestCase
         $security->login($user, badges: [$badge], attributes: ['foo' => 'bar']);
     }
 
-    public function testLoginReturnsAuthenticatorResponse()
+    public function testLoginReturnsAuthenticatorResponse(): void
     {
         $request = new Request();
         $authenticator = $this->createStub(AuthenticatorInterface::class);
@@ -253,7 +253,7 @@ class SecurityTest extends TestCase
         $this->assertEquals('authenticator response', $response->getContent());
     }
 
-    public function testLoginWithoutAuthenticatorThrows()
+    public function testLoginWithoutAuthenticatorThrows(): void
     {
         $request = new Request();
         $requestStack = new RequestStack();
@@ -278,7 +278,7 @@ class SecurityTest extends TestCase
         $security->login($user);
     }
 
-    public function testLoginWithoutRequestContext()
+    public function testLoginWithoutRequestContext(): void
     {
         $requestStack = new RequestStack();
         $user = new InMemoryUser('John', 'password');
@@ -294,7 +294,7 @@ class SecurityTest extends TestCase
         $security->login($user);
     }
 
-    public function testLoginFailsWhenTooManyAuthenticatorsFound()
+    public function testLoginFailsWhenTooManyAuthenticatorsFound(): void
     {
         $request = new Request();
         $authenticator = $this->createStub(AuthenticatorInterface::class);
@@ -331,7 +331,7 @@ class SecurityTest extends TestCase
         $security->login($user);
     }
 
-    public function testLogout()
+    public function testLogout(): void
     {
         $request = new Request();
         $requestStack = new RequestStack();
@@ -370,7 +370,7 @@ class SecurityTest extends TestCase
         $this->assertNull($tokenStorage->getToken());
     }
 
-    public function testLogoutWithoutFirewall()
+    public function testLogoutWithoutFirewall(): void
     {
         $request = new Request();
         $requestStack = new RequestStack();
@@ -397,7 +397,7 @@ class SecurityTest extends TestCase
         $security->logout(false);
     }
 
-    public function testLogoutWithResponse()
+    public function testLogoutWithResponse(): void
     {
         $request = new Request();
         $requestStack = new RequestStack();
@@ -442,7 +442,7 @@ class SecurityTest extends TestCase
         $this->assertNull($tokenStorage->getToken());
     }
 
-    public function testLogoutWithValidCsrf()
+    public function testLogoutWithValidCsrf(): void
     {
         $request = new Request(['_csrf_token' => 'dummytoken']);
         $requestStack = new RequestStack();
@@ -491,7 +491,7 @@ class SecurityTest extends TestCase
         $this->assertNull($tokenStorage->getToken());
     }
 
-    public function testLogoutWithoutRequestContext()
+    public function testLogoutWithoutRequestContext(): void
     {
         $requestStack = new RequestStack();
 

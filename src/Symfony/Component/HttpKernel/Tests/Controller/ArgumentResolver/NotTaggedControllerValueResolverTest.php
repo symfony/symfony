@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 
 class NotTaggedControllerValueResolverTest extends TestCase
 {
-    public function testDoNotSupportWhenControllerExists()
+    public function testDoNotSupportWhenControllerExists(): void
     {
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([
             'App\\Controller\\Mine::method' => static fn () => new ServiceLocator([
@@ -32,7 +32,7 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
-    public function testDoNotSupportEmptyController()
+    public function testDoNotSupportEmptyController(): void
     {
         $resolver = new NotTaggedControllerValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', \stdClass::class, false, false, null);
@@ -40,7 +40,7 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
-    public function testController()
+    public function testController(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');
@@ -50,7 +50,7 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
-    public function testControllerWithATrailingBackSlash()
+    public function testControllerWithATrailingBackSlash(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');
@@ -60,7 +60,7 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
-    public function testControllerWithMethodNameStartUppercase()
+    public function testControllerWithMethodNameStartUppercase(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');
@@ -70,7 +70,7 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
-    public function testControllerNameIsAnArray()
+    public function testControllerNameIsAnArray(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::method()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');
@@ -80,7 +80,7 @@ class NotTaggedControllerValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
-    public function testInvokableController()
+    public function testInvokableController(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Could not resolve argument $dummy of "App\Controller\Mine::__invoke()", maybe you forgot to register the controller as a service or missed tagging it with the "controller.service_arguments"?');

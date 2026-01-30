@@ -74,7 +74,7 @@ final class SmsapiTransportTest extends TransportTestCase
     }
 
     #[DataProvider('responseProvider')]
-    public function testThrowExceptionWhenMessageWasNotSent(int $statusCode, string $content, string $errorMessage)
+    public function testThrowExceptionWhenMessageWasNotSent(int $statusCode, string $content, string $errorMessage): void
     {
         $client = $this->createClient($statusCode, $content);
         $transport = self::createTransport($client);

@@ -20,7 +20,7 @@ trait SkipNullValuesTestTrait
 {
     abstract protected function getNormalizerForSkipNullValues(): NormalizerInterface;
 
-    public function testSkipNullValues()
+    public function testSkipNullValues(): void
     {
         $dummy = new ObjectDummy();
         $dummy->bar = 'present';

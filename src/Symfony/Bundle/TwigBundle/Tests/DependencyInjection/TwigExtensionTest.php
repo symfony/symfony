@@ -32,7 +32,7 @@ use Twig\Environment;
 
 class TwigExtensionTest extends TestCase
 {
-    public function testLoadEmptyConfiguration()
+    public function testLoadEmptyConfiguration(): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -61,7 +61,7 @@ class TwigExtensionTest extends TestCase
     }
 
     #[DataProvider('getFormatsAndBuildDir')]
-    public function testLoadFullConfiguration(string $format, ?string $buildDir)
+    public function testLoadFullConfiguration(string $format, ?string $buildDir): void
     {
         $container = $this->createContainer($buildDir);
         $container->registerExtension(new TwigExtension());
@@ -100,7 +100,7 @@ class TwigExtensionTest extends TestCase
     }
 
     #[DataProvider('getFormatsAndBuildDir')]
-    public function testLoadNoCacheConfiguration(string $format, ?string $buildDir)
+    public function testLoadNoCacheConfiguration(string $format, ?string $buildDir): void
     {
         $container = $this->createContainer($buildDir);
         $container->registerExtension(new TwigExtension());
@@ -115,7 +115,7 @@ class TwigExtensionTest extends TestCase
     }
 
     #[DataProvider('getFormatsAndBuildDir')]
-    public function testLoadPathCacheConfiguration(string $format, ?string $buildDir)
+    public function testLoadPathCacheConfiguration(string $format, ?string $buildDir): void
     {
         $container = $this->createContainer($buildDir);
         $container->registerExtension(new TwigExtension());
@@ -130,7 +130,7 @@ class TwigExtensionTest extends TestCase
     }
 
     #[DataProvider('getFormatsAndBuildDir')]
-    public function testLoadProdCacheConfiguration(string $format, ?string $buildDir)
+    public function testLoadProdCacheConfiguration(string $format, ?string $buildDir): void
     {
         $container = $this->createContainer($buildDir);
         $container->registerExtension(new TwigExtension());
@@ -145,7 +145,7 @@ class TwigExtensionTest extends TestCase
     }
 
     #[DataProvider('getFormats')]
-    public function testLoadCustomTemplateEscapingGuesserConfiguration(string $format)
+    public function testLoadCustomTemplateEscapingGuesserConfiguration(string $format): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -157,7 +157,7 @@ class TwigExtensionTest extends TestCase
     }
 
     #[DataProvider('getFormats')]
-    public function testLoadDefaultTemplateEscapingGuesserConfiguration(string $format)
+    public function testLoadDefaultTemplateEscapingGuesserConfiguration(string $format): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -169,7 +169,7 @@ class TwigExtensionTest extends TestCase
     }
 
     #[DataProvider('getFormats')]
-    public function testLoadCustomDateFormats(string $fileFormat)
+    public function testLoadCustomDateFormats(string $fileFormat): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -186,7 +186,7 @@ class TwigExtensionTest extends TestCase
         $this->assertSame('.', $environmentConfigurator->getArgument(5));
     }
 
-    public function testGlobalsWithDifferentTypesAndValues()
+    public function testGlobalsWithDifferentTypesAndValues(): void
     {
         $globals = [
             'array' => [],
@@ -216,7 +216,7 @@ class TwigExtensionTest extends TestCase
     }
 
     #[DataProvider('getFormats')]
-    public function testTwigLoaderPaths(string $format)
+    public function testTwigLoaderPaths(string $format): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -264,7 +264,7 @@ class TwigExtensionTest extends TestCase
     }
 
     #[DataProvider('stopwatchExtensionAvailabilityProvider')]
-    public function testStopwatchExtensionAvailability(bool $debug, bool $stopwatchEnabled, bool $expected)
+    public function testStopwatchExtensionAvailability(bool $debug, bool $stopwatchEnabled, bool $expected): void
     {
         $container = $this->createContainer();
         $container->setParameter('kernel.debug', $debug);
@@ -292,7 +292,7 @@ class TwigExtensionTest extends TestCase
         ];
     }
 
-    public function testRuntimeLoader()
+    public function testRuntimeLoader(): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new TwigExtension());
@@ -317,7 +317,7 @@ class TwigExtensionTest extends TestCase
     }
 
     #[DataProvider('getFormats')]
-    public function testCustomHtmlToTextConverterService(string $format)
+    public function testCustomHtmlToTextConverterService(string $format): void
     {
         if (!class_exists(Mailer::class)) {
             $this->markTestSkipped('The "twig.mime_body_renderer" service requires the Mailer component');

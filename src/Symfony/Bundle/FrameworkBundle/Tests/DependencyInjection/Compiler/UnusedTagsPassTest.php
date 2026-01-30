@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class UnusedTagsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $pass = new UnusedTagsPass();
 
@@ -32,7 +32,7 @@ class UnusedTagsPassTest extends TestCase
         $this->assertSame([\sprintf('%s: Tag "kenrel.event_subscriber" was defined on service(s) "foo", "bar", but was never used. Did you mean "kernel.event_subscriber"?', UnusedTagsPass::class)], $container->getCompiler()->getLog());
     }
 
-    public function testMissingKnownTags()
+    public function testMissingKnownTags(): void
     {
         if (\dirname((new \ReflectionClass(ContainerBuilder::class))->getFileName(), 3) !== \dirname(__DIR__, 5)) {
             $this->markTestSkipped('Tests are not run from the root symfony/symfony metapackage.');

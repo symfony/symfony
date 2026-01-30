@@ -30,7 +30,7 @@ class LintCommandTest extends TestCase
 {
     private array $files;
 
-    public function testLintCorrectFile()
+    public function testLintCorrectFile(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('{{ foo }}');
@@ -41,7 +41,7 @@ class LintCommandTest extends TestCase
         $this->assertStringContainsString('OK in', trim($tester->getDisplay()));
     }
 
-    public function testLintIncorrectFile()
+    public function testLintIncorrectFile(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('{{ foo');
@@ -52,7 +52,7 @@ class LintCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/ERROR  in \S+ \(line /', trim($tester->getDisplay()));
     }
 
-    public function testLintFileNotReadable()
+    public function testLintFileNotReadable(): void
     {
         $this->expectException(\RuntimeException::class);
         $tester = $this->createCommandTester();
@@ -62,7 +62,7 @@ class LintCommandTest extends TestCase
         $tester->execute(['filename' => [$filename]], ['decorated' => false]);
     }
 
-    public function testLintFileCompileTimeException()
+    public function testLintFileCompileTimeException(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile("{{ 2|number_format(2, decimal_point='.', ',') }}");
@@ -77,7 +77,7 @@ class LintCommandTest extends TestCase
      * When deprecations are not reported by the command, the testsuite reporter will catch them so we need to mark the test as ignoring deprecations.
      */
     #[IgnoreDeprecations]
-    public function testLintFileWithNotReportedDeprecation()
+    public function testLintFileWithNotReportedDeprecation(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('{{ foo|deprecated_filter }}');
@@ -88,7 +88,7 @@ class LintCommandTest extends TestCase
         $this->assertStringContainsString('OK in', trim($tester->getDisplay()));
     }
 
-    public function testLintFileWithReportedDeprecation()
+    public function testLintFileWithReportedDeprecation(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('{{ foo|deprecated_filter }}');
@@ -100,7 +100,7 @@ class LintCommandTest extends TestCase
         $this->assertStringContainsString('Filter "deprecated_filter" is deprecated', trim($tester->getDisplay()));
     }
 
-    public function testLintFileWithMultipleReportedDeprecation()
+    public function testLintFileWithMultipleReportedDeprecation(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile("{{ foo|deprecated_filter }}\n{{ bar|deprecated_filter }}");
@@ -114,7 +114,7 @@ class LintCommandTest extends TestCase
     }
 
     #[Group('tty')]
-    public function testLintDefaultPaths()
+    public function testLintDefaultPaths(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute([], ['verbosity' => OutputInterface::VERBOSITY_VERBOSE, 'decorated' => false]);
@@ -123,7 +123,7 @@ class LintCommandTest extends TestCase
         self::assertStringContainsString('OK in', trim($tester->getDisplay()));
     }
 
-    public function testLintIncorrectFileWithGithubFormat()
+    public function testLintIncorrectFileWithGithubFormat(): void
     {
         $filename = $this->createFile('{{ foo');
         $tester = $this->createCommandTester();
@@ -132,7 +132,7 @@ class LintCommandTest extends TestCase
         self::assertStringMatchesFormat('%A::error file=%s,line=1,col=0::Unexpected token "end of template" ("end of print statement" expected).%A', trim($tester->getDisplay()));
     }
 
-    public function testLintAutodetectsGithubActionEnvironment()
+    public function testLintAutodetectsGithubActionEnvironment(): void
     {
         $prev = getenv('GITHUB_ACTIONS');
         putenv('GITHUB_ACTIONS');
@@ -151,7 +151,7 @@ class LintCommandTest extends TestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $tester = new CommandCompletionTester($this->createCommand());
 

@@ -17,7 +17,7 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 class JitterTriggerTest extends TestCase
 {
-    public function testCanAddJitter()
+    public function testCanAddJitter(): void
     {
         $time = new \DateTimeImmutable();
         $inner = $this->createStub(TriggerInterface::class);

@@ -18,7 +18,7 @@ use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 
 class PushyOptionsTest extends TestCase
 {
-    public function testPushyOptions()
+    public function testPushyOptions(): void
     {
         $options = (new PushyOptions())
             ->to('device')
@@ -48,7 +48,7 @@ class PushyOptionsTest extends TestCase
         ], $options->toArray());
     }
 
-    public function testTimeToLiveTooBig()
+    public function testTimeToLiveTooBig(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Pushy notification time to live cannot exceed 365 days.');
@@ -57,7 +57,7 @@ class PushyOptionsTest extends TestCase
             ->ttl(86400 * 400);
     }
 
-    public function testScheduleTooBig()
+    public function testScheduleTooBig(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Pushy notification schedule time cannot exceed 1 year.');
@@ -66,7 +66,7 @@ class PushyOptionsTest extends TestCase
             ->schedule(time() + (86400 * 400));
     }
 
-    public function testCollapseKeyTooLong()
+    public function testCollapseKeyTooLong(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Pushy notification collapse key cannot be longer than 32 characters.');

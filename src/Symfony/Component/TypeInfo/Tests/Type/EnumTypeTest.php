@@ -17,12 +17,12 @@ use Symfony\Component\TypeInfo\Type\EnumType;
 
 class EnumTypeTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertSame(DummyEnum::class, (string) new EnumType(DummyEnum::class));
     }
 
-    public function testAccepts()
+    public function testAccepts(): void
     {
         $type = new EnumType(DummyEnum::class);
 

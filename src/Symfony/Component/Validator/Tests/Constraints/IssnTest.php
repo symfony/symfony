@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class IssnTest extends TestCase
 {
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(IssnDummy::class);
         $loader = new AttributeLoader();

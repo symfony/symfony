@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class RegisterDatePointTypePassTest extends TestCase
 {
-    public function testRegistered()
+    public function testRegistered(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('doctrine.dbal.connection_factory.types', ['foo' => 'bar']);

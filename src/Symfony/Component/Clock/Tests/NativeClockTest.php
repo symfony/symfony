@@ -16,7 +16,7 @@ use Symfony\Component\Clock\NativeClock;
 
 class NativeClockTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $clock = new NativeClock('UTC');
         $this->assertSame('UTC', $clock->now()->getTimezone()->getName());
@@ -29,7 +29,7 @@ class NativeClockTest extends TestCase
         $this->assertSame($tz, $clock->now()->getTimezone()->getName());
     }
 
-    public function testNow()
+    public function testNow(): void
     {
         $clock = new NativeClock();
         $before = new \DateTimeImmutable();
@@ -42,7 +42,7 @@ class NativeClockTest extends TestCase
         $this->assertLessThan($after, $now);
     }
 
-    public function testSleep()
+    public function testSleep(): void
     {
         $clock = new NativeClock();
         $tz = $clock->now()->getTimezone()->getName();
@@ -58,7 +58,7 @@ class NativeClockTest extends TestCase
         $this->assertSame($tz, $clock->now()->getTimezone()->getName());
     }
 
-    public function testWithTimeZone()
+    public function testWithTimeZone(): void
     {
         $clock = new NativeClock();
         $utcClock = $clock->withTimeZone('UTC');

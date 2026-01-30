@@ -56,19 +56,19 @@ class AttributeLoaderTest extends TestCase
         $this->loader = new AttributeLoader();
     }
 
-    public function testInterface()
+    public function testInterface(): void
     {
         $this->assertInstanceOf(LoaderInterface::class, $this->loader);
     }
 
-    public function testLoadClassMetadataReturnsTrueIfSuccessful()
+    public function testLoadClassMetadataReturnsTrueIfSuccessful(): void
     {
         $classMetadata = new ClassMetadata(GroupDummy::class);
 
         $this->assertTrue($this->loader->loadClassMetadata($classMetadata));
     }
 
-    public function testLoadGroups()
+    public function testLoadGroups(): void
     {
         $classMetadata = new ClassMetadata(GroupDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
@@ -76,7 +76,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertEquals(TestClassMetadataFactory::createClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Attributes'), $classMetadata);
     }
 
-    public function testLoadDiscriminatorMap()
+    public function testLoadDiscriminatorMap(): void
     {
         $classMetadata = new ClassMetadata(AbstractDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
@@ -93,7 +93,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertEquals($expected, $classMetadata);
     }
 
-    public function testLoadMaxDepth()
+    public function testLoadMaxDepth(): void
     {
         $classMetadata = new ClassMetadata(MaxDepthDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
@@ -103,7 +103,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertEquals(3, $attributesMetadata['bar']->getMaxDepth());
     }
 
-    public function testLoadSerializedName()
+    public function testLoadSerializedName(): void
     {
         $classMetadata = new ClassMetadata(SerializedNameDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
@@ -113,7 +113,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertEquals('qux', $attributesMetadata['bar']->getSerializedName());
     }
 
-    public function testLoadSerializedPath()
+    public function testLoadSerializedPath(): void
     {
         $classMetadata = new ClassMetadata(SerializedPathDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
@@ -123,7 +123,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertEquals(new PropertyPath('[three][four]'), $attributesMetadata['seven']->getSerializedPath());
     }
 
-    public function testLoadSerializedPathInConstructor()
+    public function testLoadSerializedPathInConstructor(): void
     {
         $classMetadata = new ClassMetadata(SerializedPathInConstructorDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
@@ -132,7 +132,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertEquals(new PropertyPath('[one][two]'), $attributesMetadata['three']->getSerializedPath());
     }
 
-    public function testLoadClassMetadataAndMerge()
+    public function testLoadClassMetadataAndMerge(): void
     {
         $classMetadata = new ClassMetadata(GroupDummy::class);
         $parentClassMetadata = new ClassMetadata(GroupDummyParent::class);
@@ -145,7 +145,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertEquals(TestClassMetadataFactory::createClassMetadata('Symfony\Component\Serializer\Tests\Fixtures\Attributes', true), $classMetadata);
     }
 
-    public function testLoadIgnore()
+    public function testLoadIgnore(): void
     {
         $classMetadata = new ClassMetadata(IgnoreDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
@@ -156,12 +156,12 @@ class AttributeLoaderTest extends TestCase
         $this->assertTrue($attributesMetadata['beIgnored']->isIgnored());
     }
 
-    public function testLoadContextsPropertiesPromoted()
+    public function testLoadContextsPropertiesPromoted(): void
     {
         $this->assertLoadedContexts(ContextDummyPromotedProperties::class, ContextDummyParent::class);
     }
 
-    public function testThrowsOnContextOnInvalidMethod()
+    public function testThrowsOnContextOnInvalidMethod(): void
     {
         $this->expectException(MappingException::class);
         $this->expectExceptionMessage(\sprintf('Context on "%s::badMethod()" cannot be added', BadMethodContextDummy::class));
@@ -173,7 +173,7 @@ class AttributeLoaderTest extends TestCase
         $loader->loadClassMetadata($classMetadata);
     }
 
-    public function testCanHandleUnrelatedIgnoredMethods()
+    public function testCanHandleUnrelatedIgnoredMethods(): void
     {
         $metadata = new ClassMetadata(Entity45016::class);
         $loader = $this->getLoaderForContextMapping();
@@ -183,7 +183,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertSame(['id'], array_keys($metadata->getAttributesMetadata()));
     }
 
-    public function testIgnoreGetterWithRequiredParameterIfIgnoreAttributeIsUsed()
+    public function testIgnoreGetterWithRequiredParameterIfIgnoreAttributeIsUsed(): void
     {
         $classMetadata = new ClassMetadata(IgnoreDummyAdditionalGetter::class);
         $this->getLoaderForContextMapping()->loadClassMetadata($classMetadata);
@@ -193,7 +193,7 @@ class AttributeLoaderTest extends TestCase
         self::assertArrayHasKey('extraValue2', $attributes);
     }
 
-    public function testIgnoreGetterWithRequiredParameterIfIgnoreAttributeIsNotUsed()
+    public function testIgnoreGetterWithRequiredParameterIfIgnoreAttributeIsNotUsed(): void
     {
         $classMetadata = new ClassMetadata(IgnoreDummyAdditionalGetterWithoutIgnoreAttributes::class);
         $this->getLoaderForContextMapping()->loadClassMetadata($classMetadata);
@@ -203,7 +203,7 @@ class AttributeLoaderTest extends TestCase
         self::assertArrayHasKey('extraValue2', $attributes);
     }
 
-    public function testLoadGroupsOnClass()
+    public function testLoadGroupsOnClass(): void
     {
         $classMetadata = new ClassMetadata(GroupClassDummy::class);
         $this->loader->loadClassMetadata($classMetadata);
@@ -221,7 +221,7 @@ class AttributeLoaderTest extends TestCase
         self::assertSame(['a'], $attributesMetadata['baz']->getGroups());
     }
 
-    public function testLoadWithInvalidAttribute()
+    public function testLoadWithInvalidAttribute(): void
     {
         $this->expectException(MappingException::class);
         $this->expectExceptionMessage('Could not instantiate attribute "Symfony\Component\Serializer\Attribute\Groups" on "Symfony\Component\Serializer\Tests\Fixtures\Attributes\BadAttributeDummy::myMethod()".');
@@ -231,7 +231,7 @@ class AttributeLoaderTest extends TestCase
         $this->loader->loadClassMetadata($classMetadata);
     }
 
-    public function testIgnoresAccessorishGetters()
+    public function testIgnoresAccessorishGetters(): void
     {
         $classMetadata = new ClassMetadata(AccessorishGetters::class);
         $this->loader->loadClassMetadata($classMetadata);
@@ -247,7 +247,7 @@ class AttributeLoaderTest extends TestCase
         self::assertArrayNotHasKey('h', $attributesMetadata);
     }
 
-    public function testGetMappedClasses()
+    public function testGetMappedClasses(): void
     {
         $mappedClasses = [
             'App\Entity\User' => ['App\Entity\User'],
@@ -258,7 +258,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertSame(['App\Entity\User', 'App\Entity\Product'], $loader->getMappedClasses());
     }
 
-    public function testLoadClassMetadataReturnsFalseForUnmappedClass()
+    public function testLoadClassMetadataReturnsFalseForUnmappedClass(): void
     {
         $loader = new AttributeLoader(false, ['App\Entity\User' => ['App\Entity\User']]);
         $classMetadata = new ClassMetadata('App\Entity\Product');
@@ -266,7 +266,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertFalse($loader->loadClassMetadata($classMetadata));
     }
 
-    public function testLoadClassMetadataForMappedClassWithAttributes()
+    public function testLoadClassMetadataForMappedClassWithAttributes(): void
     {
         $loader = new AttributeLoader(false, [GroupDummy::class => [GroupDummy::class]]);
         $classMetadata = new ClassMetadata(GroupDummy::class);
@@ -275,7 +275,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertNotEmpty($classMetadata->getAttributesMetadata());
     }
 
-    public function testLoadClassMetadataFromExplicitAttributeMappings()
+    public function testLoadClassMetadataFromExplicitAttributeMappings(): void
     {
         $targetClass = _AttrMap_Target::class;
         $sourceClass = _AttrMap_Source::class;
@@ -287,7 +287,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertContains('default', $classMetadata->getAttributesMetadata()['name']->getGroups());
     }
 
-    public function testLoadClassMetadataWithClassLevelAttributes()
+    public function testLoadClassMetadataWithClassLevelAttributes(): void
     {
         $targetClass = _AttrMap_Target::class;
         $sourceClass = _AttrMap_ClassLevelSource::class;

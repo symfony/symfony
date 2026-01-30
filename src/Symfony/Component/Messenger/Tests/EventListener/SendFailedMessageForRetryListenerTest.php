@@ -31,7 +31,7 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 class SendFailedMessageForRetryListenerTest extends TestCase
 {
-    public function testNoRetryStrategyCausesNoRetry()
+    public function testNoRetryStrategyCausesNoRetry(): void
     {
         $sender = $this->createMock(SenderInterface::class);
         $sender->expects($this->never())->method('send');
@@ -52,7 +52,7 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $this->assertFalse($sentForRetryStamp->isSent);
     }
 
-    public function testIsRetryableFalseCausesNoRetry()
+    public function testIsRetryableFalseCausesNoRetry(): void
     {
         $sender = $this->createMock(SenderInterface::class);
         $sender->expects($this->never())->method('send');
@@ -75,7 +75,7 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $this->assertFalse($sentForRetryStamp->isSent);
     }
 
-    public function testRecoverableStrategyCausesRetry()
+    public function testRecoverableStrategyCausesRetry(): void
     {
         $sender = $this->createMock(SenderInterface::class);
         $sender->expects($this->once())->method('send')->willReturnCallback(function (Envelope $envelope) {
@@ -115,7 +115,7 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $this->assertTrue($sentForRetryStamp->isSent);
     }
 
-    public function testRecoverableExceptionRetryDelayOverridesStrategy()
+    public function testRecoverableExceptionRetryDelayOverridesStrategy(): void
     {
         $sender = $this->createMock(SenderInterface::class);
         $sender->expects($this->once())->method('send')->willReturnCallback(function (Envelope $envelope) {
@@ -148,7 +148,7 @@ class SendFailedMessageForRetryListenerTest extends TestCase
     }
 
     #[DataProvider('provideRetryDelays')]
-    public function testWrappedRecoverableExceptionRetryDelayOverridesStrategy(array $retries, int $expectedDelay)
+    public function testWrappedRecoverableExceptionRetryDelayOverridesStrategy(array $retries, int $expectedDelay): void
     {
         $sender = $this->createMock(SenderInterface::class);
         $sender->expects($this->once())->method('send')->willReturnCallback(function (Envelope $envelope) use ($expectedDelay) {
@@ -201,7 +201,7 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         ];
     }
 
-    public function testEnvelopeIsSentToTransportOnRetry()
+    public function testEnvelopeIsSentToTransportOnRetry(): void
     {
         $exception = new \Exception('no!');
         $envelope = new Envelope(new \stdClass());
@@ -245,7 +245,7 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $this->assertTrue($sentForRetryStamp->isSent);
     }
 
-    public function testEnvelopeIsSentToTransportOnRetryWithExceptionPassedToRetryStrategy()
+    public function testEnvelopeIsSentToTransportOnRetryWithExceptionPassedToRetryStrategy(): void
     {
         $exception = new \Exception('no!');
         $envelope = new Envelope(new \stdClass());
@@ -286,7 +286,7 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $this->assertTrue($sentForRetryStamp->isSent);
     }
 
-    public function testEnvelopeKeepOnlyTheLast10Stamps()
+    public function testEnvelopeKeepOnlyTheLast10Stamps(): void
     {
         $exception = new \Exception('no!');
         $stamps = array_merge(
@@ -326,7 +326,7 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $this->assertTrue($sentForRetryStamp->isSent);
     }
 
-    public function testRetriedEnvelopePassesToRetriedEvent()
+    public function testRetriedEnvelopePassesToRetriedEvent(): void
     {
         $exception = new \Exception('no!');
         $envelope = new Envelope(new \stdClass());

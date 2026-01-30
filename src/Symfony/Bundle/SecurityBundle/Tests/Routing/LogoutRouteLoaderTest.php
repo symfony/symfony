@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class LogoutRouteLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $logoutPaths = [
             'main' => '/logout',

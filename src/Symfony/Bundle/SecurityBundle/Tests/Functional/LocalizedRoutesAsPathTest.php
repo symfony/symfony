@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
 class LocalizedRoutesAsPathTest extends AbstractWebTestCase
 {
     #[DataProvider('getLocales')]
-    public function testLoginLogoutProcedure(string $locale)
+    public function testLoginLogoutProcedure(string $locale): void
     {
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes.yml']);
 
@@ -37,7 +37,7 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
 
     #[Group('issue-32995')]
     #[DataProvider('getLocales')]
-    public function testLoginFailureWithLocalizedFailurePath(string $locale)
+    public function testLoginFailureWithLocalizedFailurePath(string $locale): void
     {
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'localized_form_failure_handler.yml']);
 
@@ -51,7 +51,7 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
     }
 
     #[DataProvider('getLocales')]
-    public function testAccessRestrictedResource(string $locale)
+    public function testAccessRestrictedResource(string $locale): void
     {
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes.yml']);
 
@@ -60,7 +60,7 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
     }
 
     #[DataProvider('getLocales')]
-    public function testAccessRestrictedResourceWithForward(string $locale)
+    public function testAccessRestrictedResourceWithForward(string $locale): void
     {
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes_with_forward.yml']);
 

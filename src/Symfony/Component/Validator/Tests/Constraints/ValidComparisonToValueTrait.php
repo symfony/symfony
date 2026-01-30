@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 trait ValidComparisonToValueTrait
 {
     #[DataProvider('provideAllValidComparisons')]
-    public function testValidComparisonToValue($dirtyValue, $comparisonValue)
+    public function testValidComparisonToValue($dirtyValue, $comparisonValue): void
     {
         $constraint = $this->createConstraint(['value' => $comparisonValue]);
 

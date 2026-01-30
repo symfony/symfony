@@ -15,7 +15,7 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 class TestManagerRegistry extends ManagerRegistry
 {
-    public function setTestContainer($container)
+    public function setTestContainer($container): void
     {
         $this->container = $container;
     }

@@ -40,7 +40,7 @@ trait BlockingStoreTestTrait
     #[RequiresPhpExtension('pcntl')]
     #[RequiresPhpExtension('posix')]
     #[RequiresFunction('pcntl_sigwaitinfo')]
-    public function testBlockingLocks()
+    public function testBlockingLocks(): void
     {
         // Amount of microseconds we should wait without slowing things down too much
         $clockDelay = 50000;

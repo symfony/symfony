@@ -186,7 +186,7 @@ class BinaryNodeTest extends AbstractNodeTestCase
         ];
     }
 
-    public function testEvaluateMatchesWithInvalidRegexp()
+    public function testEvaluateMatchesWithInvalidRegexp(): void
     {
         $node = new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('this is not a regexp'));
 
@@ -195,7 +195,7 @@ class BinaryNodeTest extends AbstractNodeTestCase
         $node->evaluate([], []);
     }
 
-    public function testEvaluateMatchesWithInvalidRegexpAsExpression()
+    public function testEvaluateMatchesWithInvalidRegexpAsExpression(): void
     {
         $node = new BinaryNode('matches', new ConstantNode('abc'), new NameNode('regexp'));
 
@@ -204,7 +204,7 @@ class BinaryNodeTest extends AbstractNodeTestCase
         $node->evaluate([], ['regexp' => 'this is not a regexp']);
     }
 
-    public function testCompileMatchesWithInvalidRegexp()
+    public function testCompileMatchesWithInvalidRegexp(): void
     {
         $node = new BinaryNode('matches', new ConstantNode('abc'), new ConstantNode('this is not a regexp'));
 
@@ -214,7 +214,7 @@ class BinaryNodeTest extends AbstractNodeTestCase
         $node->compile($compiler);
     }
 
-    public function testCompileMatchesWithInvalidRegexpAsExpression()
+    public function testCompileMatchesWithInvalidRegexpAsExpression(): void
     {
         $node = new BinaryNode('matches', new ConstantNode('abc'), new NameNode('regexp'));
 
@@ -225,7 +225,7 @@ class BinaryNodeTest extends AbstractNodeTestCase
         eval('$regexp = "this is not a regexp"; '.$compiler->getSource().';');
     }
 
-    public function testCompileMatchesWithBooleanBinaryNode()
+    public function testCompileMatchesWithBooleanBinaryNode(): void
     {
         $binaryNode = new BinaryNode('||', new ConstantNode(true), new ConstantNode(false));
         $node = new BinaryNode('matches', new ConstantNode('abc'), $binaryNode);
@@ -236,7 +236,7 @@ class BinaryNodeTest extends AbstractNodeTestCase
         $node->compile($compiler);
     }
 
-    public function testCompileMatchesWithStringBinaryNode()
+    public function testCompileMatchesWithStringBinaryNode(): void
     {
         $binaryNode = new BinaryNode('~', new ConstantNode('a'), new ConstantNode('b'));
         $node = new BinaryNode('matches', new ConstantNode('abc'), $binaryNode);
@@ -246,7 +246,7 @@ class BinaryNodeTest extends AbstractNodeTestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testDivisionByZero()
+    public function testDivisionByZero(): void
     {
         $node = new BinaryNode('/', new ConstantNode(1), new ConstantNode(0));
 
@@ -256,7 +256,7 @@ class BinaryNodeTest extends AbstractNodeTestCase
         $node->evaluate([], []);
     }
 
-    public function testModuloByZero()
+    public function testModuloByZero(): void
     {
         $node = new BinaryNode('%', new ConstantNode(1), new ConstantNode(0));
 
@@ -268,7 +268,7 @@ class BinaryNodeTest extends AbstractNodeTestCase
 
     #[TestWith([1])]
     #[TestWith(['true'])]
-    public function testInOperatorStrictness(mixed $value)
+    public function testInOperatorStrictness(mixed $value): void
     {
         $array = new ArrayNode();
         $array->addElement(new ConstantNode('1'));
@@ -279,7 +279,7 @@ class BinaryNodeTest extends AbstractNodeTestCase
         $this->assertFalse($node->evaluate([], []));
     }
 
-    public function testEvaluateUnsupportedOperator()
+    public function testEvaluateUnsupportedOperator(): void
     {
         $node = new BinaryNode('unsupported', new ConstantNode(1), new ConstantNode(2));
 

@@ -33,7 +33,7 @@ class SerializerContextBuilderTest extends TestCase
      * @param array<string, mixed> $values
      */
     #[DataProvider('withersDataProvider')]
-    public function testWithers(array $values)
+    public function testWithers(array $values): void
     {
         $context = $this->contextBuilder
             ->withEmptyArrayAsObject($values[Serializer::EMPTY_ARRAY_AS_OBJECT])

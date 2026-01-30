@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Tests\File\FakeFile;
 
 class BinaryFileResponseTest extends ResponseTestCase
 {
-    public function testConstruction()
+    public function testConstruction(): void
     {
         $file = __DIR__.'/../README.md';
         $response = new BinaryFileResponse($file, 404, ['X-Header' => 'Foo'], true, null, true, true);
@@ -37,7 +37,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals('inline; filename=README.md', $response->headers->get('Content-Disposition'));
     }
 
-    public function testConstructWithNonAsciiFilename()
+    public function testConstructWithNonAsciiFilename(): void
     {
         touch(sys_get_temp_dir().'/fööö.html');
 
@@ -48,20 +48,20 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertSame('fööö.html', $response->getFile()->getFilename());
     }
 
-    public function testSetContent()
+    public function testSetContent(): void
     {
         $this->expectException(\LogicException::class);
         $response = new BinaryFileResponse(__FILE__);
         $response->setContent('foo');
     }
 
-    public function testGetContent()
+    public function testGetContent(): void
     {
         $response = new BinaryFileResponse(__FILE__);
         $this->assertFalse($response->getContent());
     }
 
-    public function testSetContentDispositionGeneratesSafeFallbackFilename()
+    public function testSetContentDispositionGeneratesSafeFallbackFilename(): void
     {
         $response = new BinaryFileResponse(__FILE__);
         $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, 'föö.html');
@@ -69,7 +69,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertSame('attachment; filename=f__.html; filename*=utf-8\'\'f%C3%B6%C3%B6.html', $response->headers->get('Content-Disposition'));
     }
 
-    public function testSetContentDispositionGeneratesSafeFallbackFilenameForWronglyEncodedFilename()
+    public function testSetContentDispositionGeneratesSafeFallbackFilenameForWronglyEncodedFilename(): void
     {
         $response = new BinaryFileResponse(__FILE__);
 
@@ -81,7 +81,7 @@ class BinaryFileResponseTest extends ResponseTestCase
     }
 
     #[DataProvider('provideRanges')]
-    public function testRequests($requestRange, $offset, $length, $responseRange)
+    public function testRequests($requestRange, $offset, $length, $responseRange): void
     {
         $response = (new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream']))->setAutoEtag();
 
@@ -111,7 +111,7 @@ class BinaryFileResponseTest extends ResponseTestCase
     }
 
     #[DataProvider('provideRanges')]
-    public function testRequestsWithoutEtag($requestRange, $offset, $length, $responseRange)
+    public function testRequestsWithoutEtag($requestRange, $offset, $length, $responseRange): void
     {
         $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream']);
 
@@ -151,7 +151,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         ];
     }
 
-    public function testRangeRequestsWithoutLastModifiedDate()
+    public function testRangeRequestsWithoutLastModifiedDate(): void
     {
         // prevent auto last modified
         $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream'], true, null, false, false);
@@ -171,7 +171,7 @@ class BinaryFileResponseTest extends ResponseTestCase
     }
 
     #[DataProvider('provideFullFileRanges')]
-    public function testFullFileRequests($requestRange)
+    public function testFullFileRequests($requestRange): void
     {
         $response = (new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream']))->setAutoEtag();
 
@@ -205,7 +205,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         ];
     }
 
-    public function testRangeOnPostMethod()
+    public function testRangeOnPostMethod(): void
     {
         $request = Request::create('/', 'POST');
         $request->headers->set('Range', 'bytes=10-20');
@@ -225,7 +225,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertNull($response->headers->get('Content-Range'));
     }
 
-    public function testUnpreparedResponseSendsFullFile()
+    public function testUnpreparedResponseSendsFullFile(): void
     {
         $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 200);
 
@@ -239,7 +239,7 @@ class BinaryFileResponseTest extends ResponseTestCase
     }
 
     #[DataProvider('provideInvalidRanges')]
-    public function testInvalidRequests($requestRange)
+    public function testInvalidRequests($requestRange): void
     {
         $response = (new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream']))->setAutoEtag();
 
@@ -264,7 +264,7 @@ class BinaryFileResponseTest extends ResponseTestCase
     }
 
     #[DataProvider('provideXSendfileFiles')]
-    public function testXSendfile($file)
+    public function testXSendfile($file): void
     {
         $request = Request::create('/');
         $request->headers->set('X-Sendfile-Type', 'X-Sendfile');
@@ -288,7 +288,7 @@ class BinaryFileResponseTest extends ResponseTestCase
     }
 
     #[DataProvider('getSampleXAccelMappings')]
-    public function testXAccelMapping($realpath, $mapping, $virtual)
+    public function testXAccelMapping($realpath, $mapping, $virtual): void
     {
         $request = Request::create('/');
         $request->headers->set('X-Sendfile-Type', 'X-Accel-Redirect');
@@ -314,7 +314,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals($virtual, $header);
     }
 
-    public function testDeleteFileAfterSend()
+    public function testDeleteFileAfterSend(): void
     {
         $request = Request::create('/');
 
@@ -332,7 +332,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertFileDoesNotExist($path);
     }
 
-    public function testAcceptRangeOnUnsafeMethods()
+    public function testAcceptRangeOnUnsafeMethods(): void
     {
         $request = Request::create('/', 'POST');
         $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream']);
@@ -341,7 +341,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertEquals('none', $response->headers->get('Accept-Ranges'));
     }
 
-    public function testAcceptRangeNotOverridden()
+    public function testAcceptRangeNotOverridden(): void
     {
         $request = Request::create('/', 'POST');
         $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif', 200, ['Content-Type' => 'application/octet-stream']);
@@ -362,7 +362,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         ];
     }
 
-    public function testStream()
+    public function testStream(): void
     {
         $request = Request::create('/');
         $response = new BinaryFileResponse(new Stream(__DIR__.'/../README.md'), 200, ['Content-Type' => 'text/plain']);
@@ -371,7 +371,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertNull($response->headers->get('Content-Length'));
     }
 
-    public function testPrepareNotAddingContentTypeHeaderIfNoContentResponse()
+    public function testPrepareNotAddingContentTypeHeaderIfNoContentResponse(): void
     {
         $request = Request::create('/');
         $request->headers->set('If-Modified-Since', date('D, d M Y H:i:s').' GMT');
@@ -386,7 +386,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertFalse($response->headers->has('Content-Type'));
     }
 
-    public function testContentTypeIsCorrectlyDetected()
+    public function testContentTypeIsCorrectlyDetected(): void
     {
         $file = new File(__DIR__.'/File/Fixtures/test.gif');
 
@@ -405,7 +405,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertSame('image/gif', $response->headers->get('Content-Type'));
     }
 
-    public function testContentTypeIsNotGuessedWhenTheFileWasNotModified()
+    public function testContentTypeIsNotGuessedWhenTheFileWasNotModified(): void
     {
         $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif');
         $response->setAutoLastModified();
@@ -433,7 +433,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         }
     }
 
-    public function testCreateFromTemporaryFile()
+    public function testCreateFromTemporaryFile(): void
     {
         $file = new \SplTempFileObject();
         $file->fwrite('foo,bar');
@@ -457,7 +457,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $this->assertSame('foo,bar', $string);
     }
 
-    public function testSetChunkSizeTooSmall()
+    public function testSetChunkSizeTooSmall(): void
     {
         $response = new BinaryFileResponse(__DIR__.'/File/Fixtures/test.gif');
 
@@ -467,7 +467,7 @@ class BinaryFileResponseTest extends ResponseTestCase
         $response->setChunkSize(0);
     }
 
-    public function testCreateFromTemporaryFileWithoutMimeType()
+    public function testCreateFromTemporaryFileWithoutMimeType(): void
     {
         $file = new \SplTempFileObject();
         $file->fwrite('foo,bar');

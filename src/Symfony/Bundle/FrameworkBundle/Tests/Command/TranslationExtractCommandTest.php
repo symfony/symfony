@@ -32,7 +32,7 @@ class TranslationExtractCommandTest extends TestCase
     private Filesystem $fs;
     private string $translationDir;
 
-    public function testDumpMessagesAndClean()
+    public function testDumpMessagesAndClean(): void
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true]);
@@ -40,7 +40,7 @@ class TranslationExtractCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
-    public function testDumpMessagesAsTreeAndClean()
+    public function testDumpMessagesAsTreeAndClean(): void
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--as-tree' => 1]);
@@ -48,7 +48,7 @@ class TranslationExtractCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
-    public function testDumpSortedMessagesAndClean()
+    public function testDumpSortedMessagesAndClean(): void
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'asc']);
@@ -56,7 +56,7 @@ class TranslationExtractCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/3 messages were successfully extracted/', $tester->getDisplay());
     }
 
-    public function testDumpReverseSortedMessagesAndClean()
+    public function testDumpReverseSortedMessagesAndClean(): void
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'desc']);
@@ -64,7 +64,7 @@ class TranslationExtractCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/3 messages were successfully extracted/', $tester->getDisplay());
     }
 
-    public function testDumpSortWithoutValueAndClean()
+    public function testDumpSortWithoutValueAndClean(): void
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort']);
@@ -72,14 +72,14 @@ class TranslationExtractCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/3 messages were successfully extracted/', $tester->getDisplay());
     }
 
-    public function testDumpWrongSortAndClean()
+    public function testDumpWrongSortAndClean(): void
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--sort' => 'test']);
         $this->assertMatchesRegularExpression('/\[ERROR\] Wrong sort order/', $tester->getDisplay());
     }
 
-    public function testDumpMessagesAndCleanInRootDirectory()
+    public function testDumpMessagesAndCleanInRootDirectory(): void
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']], [], null, [$this->translationDir.'/trans'], [$this->translationDir.'/views']);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', '--dump-messages' => true, '--clean' => true]);
@@ -87,7 +87,7 @@ class TranslationExtractCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
-    public function testDumpTwoMessagesAndClean()
+    public function testDumpTwoMessagesAndClean(): void
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'bar' => 'bar']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true]);
@@ -96,7 +96,7 @@ class TranslationExtractCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/2 messages were successfully extracted/', $tester->getDisplay());
     }
 
-    public function testDumpMessagesForSpecificDomain()
+    public function testDumpMessagesForSpecificDomain(): void
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo'], 'mydomain' => ['bar' => 'bar']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--dump-messages' => true, '--clean' => true, '--domain' => 'mydomain']);
@@ -104,42 +104,42 @@ class TranslationExtractCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/1 message was successfully extracted/', $tester->getDisplay());
     }
 
-    public function testWriteMessages()
+    public function testWriteMessages(): void
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']], writerMessages: ['foo', 'test', 'bar']);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--force' => true]);
         $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
-    public function testWriteSortMessages()
+    public function testWriteSortMessages(): void
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']], writerMessages: ['bar', 'foo', 'test']);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--force' => true, '--sort' => 'asc']);
         $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
-    public function testWriteReverseSortedMessages()
+    public function testWriteReverseSortedMessages(): void
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo', 'test' => 'test', 'bar' => 'bar']], writerMessages: ['test', 'foo', 'bar']);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--force' => true, '--sort' => 'desc']);
         $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
-    public function testWriteMessagesInRootDirectory()
+    public function testWriteMessagesInRootDirectory(): void
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', '--force' => true]);
         $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
-    public function testWriteMessagesForSpecificDomain()
+    public function testWriteMessagesForSpecificDomain(): void
     {
         $tester = $this->createCommandTester(['messages' => ['foo' => 'foo'], 'mydomain' => ['bar' => 'bar']]);
         $tester->execute(['command' => 'translation:extract', 'locale' => 'en', 'bundle' => 'foo', '--force' => true, '--domain' => 'mydomain']);
         $this->assertMatchesRegularExpression('/Translation files were successfully updated./', $tester->getDisplay());
     }
 
-    public function testFilterDuplicateTransPaths()
+    public function testFilterDuplicateTransPaths(): void
     {
         $transPaths = [
             $this->translationDir.'/a/test/folder/with/a/subfolder',
@@ -179,7 +179,7 @@ class TranslationExtractCommandTest extends TestCase
     }
 
     #[DataProvider('removeNoFillProvider')]
-    public function testRemoveNoFillTranslationsMethod($noFillCounter, $messages)
+    public function testRemoveNoFillTranslationsMethod($noFillCounter, $messages): void
     {
         // Preparing mock
         $operation = $this->createMock(MessageCatalogueInterface::class);
@@ -238,7 +238,7 @@ class TranslationExtractCommandTest extends TestCase
         $extractor
             ->method('extract')
             ->willReturnCallback(
-                static function ($path, $catalogue) use ($extractedMessages) {
+                static function ($path, $catalogue) use ($extractedMessages): void {
                     foreach ($extractedMessages as $domain => $messages) {
                         $catalogue->add($messages, $domain);
                     }
@@ -249,7 +249,7 @@ class TranslationExtractCommandTest extends TestCase
         $loader
             ->method('read')
             ->willReturnCallback(
-                static function ($path, $catalogue) use ($loadedMessages) {
+                static function ($path, $catalogue) use ($loadedMessages): void {
                     $catalogue->add($loadedMessages);
                 }
             );
@@ -264,7 +264,7 @@ class TranslationExtractCommandTest extends TestCase
             $writer
                 ->method('write')
                 ->willReturnCallback(
-                    function (MessageCatalogue $catalogue) use ($writerMessages) {
+                    function (MessageCatalogue $catalogue) use ($writerMessages): void {
                         $this->assertSame($writerMessages, array_keys($catalogue->all()['messages']));
                     }
                 );

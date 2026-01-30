@@ -20,7 +20,7 @@ use Symfony\Component\Scheduler\Scheduler;
 
 class SchedulerTest extends TestCase
 {
-    public function testCanRunAndStop()
+    public function testCanRunAndStop(): void
     {
         $handler = new Handler();
         $handler->clock = $clock = new MockClock();

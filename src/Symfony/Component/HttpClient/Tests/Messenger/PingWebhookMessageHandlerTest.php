@@ -23,7 +23,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
  */
 final class PingWebhookMessageHandlerTest extends TestCase
 {
-    public function testSuccessfulPing()
+    public function testSuccessfulPing(): void
     {
         $client = new MockHttpClient([
             function ($method, $url) {
@@ -41,7 +41,7 @@ final class PingWebhookMessageHandlerTest extends TestCase
         $this->assertSame('https://endpoint.com/key', $response->getInfo('url'));
     }
 
-    public function testPingErrorThrowsException()
+    public function testPingErrorThrowsException(): void
     {
         $client = new MockHttpClient([
             function ($method, $url) {
@@ -59,7 +59,7 @@ final class PingWebhookMessageHandlerTest extends TestCase
         $handler(new PingWebhookMessage('POST', 'https://endpoint.com/key'));
     }
 
-    public function testPingErrorDoesNotThrowException()
+    public function testPingErrorDoesNotThrowException(): void
     {
         $client = new MockHttpClient([
             function ($method, $url) {

@@ -17,7 +17,7 @@ use Symfony\Component\Mime\Part\TextPart;
 
 class RelatedPartTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $r = new RelatedPart($a = new TextPart('content'), $b = new TextPart('HTML content', 'utf-8', 'html'), $c = new TextPart('HTML content again', 'utf-8', 'html'));
         $this->assertEquals('multipart', $r->getMediaType());

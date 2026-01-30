@@ -24,7 +24,7 @@ use Twig\TemplateWrapper;
 
 class TranslationExtensionTest extends TestCase
 {
-    public function testEscaping()
+    public function testEscaping(): void
     {
         $output = $this->getTemplate('{% trans %}Percent: %value%%% (%msg%){% endtrans %}')->render(['value' => 12, 'msg' => 'approx.']);
 
@@ -32,7 +32,7 @@ class TranslationExtensionTest extends TestCase
     }
 
     #[DataProvider('getTransTests')]
-    public function testTrans($template, $expected, array $variables = [])
+    public function testTrans($template, $expected, array $variables = []): void
     {
         if ($expected != $this->getTemplate($template)->render($variables)) {
             echo $template."\n";
@@ -47,14 +47,14 @@ class TranslationExtensionTest extends TestCase
         $this->assertEquals($expected, $this->getTemplate($template)->render($variables));
     }
 
-    public function testTransUnknownKeyword()
+    public function testTransUnknownKeyword(): void
     {
         $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage('Unexpected token. Twig was looking for the "with", "from", or "into" keyword in "index" at line 3.');
         $this->getTemplate("{% trans \n\nfoo %}{% endtrans %}")->render();
     }
 
-    public function testTransComplexBody()
+    public function testTransComplexBody(): void
     {
         $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage('A message inside a trans tag must be a simple text in "index" at line 2.');
@@ -138,7 +138,7 @@ class TranslationExtensionTest extends TestCase
         ];
     }
 
-    public function testDefaultTranslationDomain()
+    public function testDefaultTranslationDomain(): void
     {
         $templates = [
             'index' => '
@@ -172,7 +172,7 @@ class TranslationExtensionTest extends TestCase
         $this->assertEquals('foo (foo)foo (custom)foo (foo)foo (custom)foo (foo)foo (custom)', trim($template->render([])));
     }
 
-    public function testDefaultTranslationDomainWithNamedArguments()
+    public function testDefaultTranslationDomainWithNamedArguments(): void
     {
         $templates = [
             'index' => '
@@ -206,7 +206,7 @@ class TranslationExtensionTest extends TestCase
         $this->assertEquals('foo (custom)foo (foo)foo (custom)foo (custom)foo (fr)foo (custom)foo (fr)', trim($template->render([])));
     }
 
-    public function testDefaultTranslationDomainWithExpression()
+    public function testDefaultTranslationDomainWithExpression(): void
     {
         $templates = [
             'index' => '
@@ -235,7 +235,7 @@ class TranslationExtensionTest extends TestCase
         $this->assertEquals('foo (foo)', trim($template->render(['custom_domain' => 'foo'])));
     }
 
-    public function testDefaultTranslationDomainWithExpressionAndInheritance()
+    public function testDefaultTranslationDomainWithExpressionAndInheritance(): void
     {
         $templates = [
             'index' => '

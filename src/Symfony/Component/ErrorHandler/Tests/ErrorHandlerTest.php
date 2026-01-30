@@ -40,7 +40,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testRegister()
+    public function testRegister(): void
     {
         $handler = ErrorHandler::register();
 
@@ -71,7 +71,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testErrorGetLast()
+    public function testErrorGetLast(): void
     {
         $logger = new NullLogger();
         $handler = ErrorHandler::register();
@@ -94,7 +94,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testNotice()
+    public function testNotice(): void
     {
         ErrorHandler::register();
 
@@ -125,13 +125,13 @@ class ErrorHandlerTest extends TestCase
     }
 
     // dummy function to test trace in error handler.
-    public static function triggerNotice($that)
+    public static function triggerNotice($that): void
     {
         $that->assertSame('', $foo.$foo.$bar);
     }
 
     #[WithoutErrorHandler]
-    public function testFailureCall()
+    public function testFailureCall(): void
     {
         $this->expectException(\ErrorException::class);
         $this->expectExceptionMessageMatches('/^fopen\(unknown\.txt\): [Ff]ailed to open stream: No such file or directory$/');
@@ -140,7 +140,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testCallRestoreErrorHandler()
+    public function testCallRestoreErrorHandler(): void
     {
         $prev = set_error_handler('var_dump');
         try {
@@ -157,7 +157,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testCallErrorExceptionInfo()
+    public function testCallErrorExceptionInfo(): void
     {
         try {
             ErrorHandler::call([self::class, 'triggerNotice'], $this);
@@ -176,7 +176,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testSuccessCall()
+    public function testSuccessCall(): void
     {
         touch($filename = tempnam(sys_get_temp_dir(), 'sf_error_handler_'));
 
@@ -186,7 +186,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testConstruct()
+    public function testConstruct(): void
     {
         try {
             $handler = ErrorHandler::register();
@@ -199,7 +199,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testDefaultLogger()
+    public function testDefaultLogger(): void
     {
         try {
             $logger = new NullLogger();
@@ -233,7 +233,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testHandleError()
+    public function testHandleError(): void
     {
         try {
             $handler = ErrorHandler::register();
@@ -280,7 +280,7 @@ class ErrorHandlerTest extends TestCase
 
             $logger = $this->createMock(LoggerInterface::class);
 
-            $warnArgCheck = function ($logLevel, $message, $context) {
+            $warnArgCheck = function ($logLevel, $message, $context): void {
                 $this->assertEquals('info', $logLevel);
                 $this->assertEquals('User Deprecated: foo', $message);
                 $this->assertArrayHasKey('exception', $context);
@@ -306,7 +306,7 @@ class ErrorHandlerTest extends TestCase
             $logger = $this->createMock(LoggerInterface::class);
 
             $line = null;
-            $logArgCheck = function ($level, $message, $context) use (&$line) {
+            $logArgCheck = function ($level, $message, $context) use (&$line): void {
                 $this->assertArrayHasKey('exception', $context);
                 $exception = $context['exception'];
 
@@ -339,7 +339,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testHandleErrorWithAnonymousClass()
+    public function testHandleErrorWithAnonymousClass(): void
     {
         $anonymousObject = new class extends \stdClass {
         };
@@ -358,9 +358,9 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testHandleDeprecation()
+    public function testHandleDeprecation(): void
     {
-        $logArgCheck = function ($level, $message, $context) {
+        $logArgCheck = function ($level, $message, $context): void {
             $this->assertEquals(LogLevel::INFO, $level);
             $this->assertArrayHasKey('exception', $context);
             $exception = $context['exception'];
@@ -382,13 +382,13 @@ class ErrorHandlerTest extends TestCase
 
     #[DataProvider('handleExceptionProvider')]
     #[WithoutErrorHandler]
-    public function testHandleException(string $expectedMessage, \Throwable $exception, ?string $enhancedMessage = null)
+    public function testHandleException(string $expectedMessage, \Throwable $exception, ?string $enhancedMessage = null): void
     {
         try {
             $logger = $this->createMock(LoggerInterface::class);
             $handler = ErrorHandler::register();
 
-            $logArgCheck = function ($level, $message, $context) use ($expectedMessage, $exception) {
+            $logArgCheck = function ($level, $message, $context) use ($expectedMessage, $exception): void {
                 $this->assertSame('critical', $level);
                 $this->assertSame($expectedMessage, $message);
                 $this->assertArrayHasKey('exception', $context);
@@ -412,7 +412,7 @@ class ErrorHandlerTest extends TestCase
                 $this->assertSame($enhancedMessage ?? $exception->getMessage(), $e->getMessage());
             }
 
-            $handler->setExceptionHandler(function ($e) use ($exception, $enhancedMessage) {
+            $handler->setExceptionHandler(function ($e) use ($exception, $enhancedMessage): void {
                 $this->assertInstanceOf($exception::class, $e);
                 $this->assertSame($enhancedMessage ?? $exception->getMessage(), $e->getMessage());
             });
@@ -443,7 +443,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testBootstrappingLogger()
+    public function testBootstrappingLogger(): void
     {
         $bootLogger = new BufferingLogger();
         $handler = new ErrorHandler($bootLogger);
@@ -494,7 +494,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testSettingLoggerWhenExceptionIsBuffered()
+    public function testSettingLoggerWhenExceptionIsBuffered(): void
     {
         $bootLogger = new BufferingLogger();
         $handler = new ErrorHandler($bootLogger);
@@ -506,7 +506,7 @@ class ErrorHandlerTest extends TestCase
             ->method('log')
             ->with(LogLevel::CRITICAL, 'Uncaught Exception: Foo message', ['exception' => $exception]);
 
-        $handler->setExceptionHandler(static function () use ($handler, $mockLogger) {
+        $handler->setExceptionHandler(static function () use ($handler, $mockLogger): void {
             $handler->setDefaultLogger($mockLogger);
         });
 
@@ -514,7 +514,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testHandleFatalError()
+    public function testHandleFatalError(): void
     {
         try {
             $logger = $this->createMock(LoggerInterface::class);
@@ -527,7 +527,7 @@ class ErrorHandlerTest extends TestCase
                 'line' => 123,
             ];
 
-            $logArgCheck = function ($level, $message, $context) {
+            $logArgCheck = function ($level, $message, $context): void {
                 $this->assertEquals('Fatal Parse Error: foo', $message);
                 $this->assertArrayHasKey('exception', $context);
                 $this->assertInstanceOf(FatalError::class, $context['exception']);
@@ -550,12 +550,12 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testHandleErrorException()
+    public function testHandleErrorException(): void
     {
         $exception = new \Error("Class 'IReallyReallyDoNotExistAnywhereInTheRepositoryISwear' not found");
 
         $handler = new ErrorHandler();
-        $handler->setExceptionHandler(static function () use (&$args) {
+        $handler->setExceptionHandler(static function () use (&$args): void {
             $args = \func_get_args();
         });
 
@@ -566,11 +566,11 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testCustomExceptionHandler()
+    public function testCustomExceptionHandler(): void
     {
         $this->expectException(\Exception::class);
         $handler = new ErrorHandler();
-        $handler->setExceptionHandler(static function ($e) use ($handler) {
+        $handler->setExceptionHandler(static function ($e) use ($handler): void {
             $handler->setExceptionHandler(null);
             $handler->handleException($e);
         });
@@ -579,7 +579,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testRenderException()
+    public function testRenderException(): void
     {
         $handler = new ErrorHandler();
         $handler->setExceptionHandler([$handler, 'renderException']);
@@ -593,7 +593,7 @@ class ErrorHandlerTest extends TestCase
 
     #[DataProvider('errorHandlerWhenLoggingProvider')]
     #[WithoutErrorHandler]
-    public function testErrorHandlerWhenLogging(bool $previousHandlerWasDefined, bool $loggerSetsAnotherHandler, bool $nextHandlerIsDefined)
+    public function testErrorHandlerWhenLogging(bool $previousHandlerWasDefined, bool $loggerSetsAnotherHandler, bool $nextHandlerIsDefined): void
     {
         try {
             if ($previousHandlerWasDefined) {
@@ -645,13 +645,13 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testAssertQuietEval()
+    public function testAssertQuietEval(): void
     {
         if ('-1' === \ini_get('zend.assertions')) {
             $this->markTestSkipped('zend.assertions is forcibly disabled');
         }
 
-        set_error_handler(static function () {});
+        set_error_handler(static function (): void {});
         $ini = [
             ini_set('zend.assertions', 1),
             ini_set('assert.active', 1),
@@ -687,7 +687,7 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
-    public function testHandleTriggerDeprecation()
+    public function testHandleTriggerDeprecation(): void
     {
         try {
             $handler = ErrorHandler::register();

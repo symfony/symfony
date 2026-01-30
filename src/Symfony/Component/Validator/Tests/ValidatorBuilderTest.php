@@ -28,81 +28,81 @@ class ValidatorBuilderTest extends TestCase
         $this->builder = new ValidatorBuilder();
     }
 
-    public function testAddObjectInitializer()
+    public function testAddObjectInitializer(): void
     {
         $this->assertSame($this->builder, $this->builder->addObjectInitializer(
             $this->createStub(ObjectInitializerInterface::class)
         ));
     }
 
-    public function testAddObjectInitializers()
+    public function testAddObjectInitializers(): void
     {
         $this->assertSame($this->builder, $this->builder->addObjectInitializers([]));
     }
 
-    public function testAddXmlMapping()
+    public function testAddXmlMapping(): void
     {
         $this->assertSame($this->builder, $this->builder->addXmlMapping('mapping'));
     }
 
-    public function testAddXmlMappings()
+    public function testAddXmlMappings(): void
     {
         $this->assertSame($this->builder, $this->builder->addXmlMappings([]));
     }
 
-    public function testAddYamlMapping()
+    public function testAddYamlMapping(): void
     {
         $this->assertSame($this->builder, $this->builder->addYamlMapping('mapping'));
     }
 
-    public function testAddYamlMappings()
+    public function testAddYamlMappings(): void
     {
         $this->assertSame($this->builder, $this->builder->addYamlMappings([]));
     }
 
-    public function testAddMethodMapping()
+    public function testAddMethodMapping(): void
     {
         $this->assertSame($this->builder, $this->builder->addMethodMapping('mapping'));
     }
 
-    public function testAddMethodMappings()
+    public function testAddMethodMappings(): void
     {
         $this->assertSame($this->builder, $this->builder->addMethodMappings([]));
     }
 
-    public function testDisableAttributeMapping()
+    public function testDisableAttributeMapping(): void
     {
         $this->assertSame($this->builder, $this->builder->disableAttributeMapping());
     }
 
-    public function testSetMappingCache()
+    public function testSetMappingCache(): void
     {
         $this->assertSame($this->builder, $this->builder->setMappingCache($this->createStub(CacheItemPoolInterface::class)));
     }
 
-    public function testSetConstraintValidatorFactory()
+    public function testSetConstraintValidatorFactory(): void
     {
         $this->assertSame($this->builder, $this->builder->setConstraintValidatorFactory(
             $this->createStub(ConstraintValidatorFactoryInterface::class))
         );
     }
 
-    public function testSetTranslator()
+    public function testSetTranslator(): void
     {
         $this->assertSame($this->builder, $this->builder->setTranslator(new IdentityTranslator()));
     }
 
-    public function testSetTranslationDomain()
+    public function testSetTranslationDomain(): void
     {
         $this->assertSame($this->builder, $this->builder->setTranslationDomain('TRANS_DOMAIN'));
     }
 
-    public function testDisableTranslation()
+    public function testDisableTranslation(): void
     {
         $this->assertSame($this->builder, $this->builder->disableTranslation());
     }
 
-    public function testGetValidator()
+    public function testGetValidator(): void
     {
         $this->assertInstanceOf(RecursiveValidator::class, $this->builder->getValidator());
     }

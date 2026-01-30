@@ -20,7 +20,7 @@ class SqliteCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testSqlite3Result()
+    public function testSqlite3Result(): void
     {
         $db = new \SQLite3(':memory:');
         $db->exec('CREATE TABLE foo (id INTEGER PRIMARY KEY, bar TEXT)');

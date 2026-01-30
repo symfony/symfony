@@ -50,7 +50,7 @@ final class GoogleChatTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendWithEmptyArrayResponseThrowsTransportException()
+    public function testSendWithEmptyArrayResponseThrowsTransportException(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Unable to post the Google Chat message: "[]"');
@@ -65,7 +65,7 @@ final class GoogleChatTransportTest extends TransportTestCase
         $this->assertSame('spaces/My-Space/messages/abcdefg.hijklmno', $sentMessage->getMessageId());
     }
 
-    public function testSendWithErrorResponseThrowsTransportException()
+    public function testSendWithErrorResponseThrowsTransportException(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('API key not valid. Please pass a valid API key.');
@@ -79,7 +79,7 @@ final class GoogleChatTransportTest extends TransportTestCase
         $this->assertSame('spaces/My-Space/messages/abcdefg.hijklmno', $sentMessage->getMessageId());
     }
 
-    public function testSendWithOptions()
+    public function testSendWithOptions(): void
     {
         $message = 'testMessage';
 
@@ -100,7 +100,7 @@ final class GoogleChatTransportTest extends TransportTestCase
         $this->assertSame('spaces/My-Space/messages/abcdefg.hijklmno', $sentMessage->getMessageId());
     }
 
-    public function testSendWithNotification()
+    public function testSendWithNotification(): void
     {
         $notification = new Notification('testMessage');
         $chatMessage = ChatMessage::fromNotification($notification);
@@ -122,7 +122,7 @@ final class GoogleChatTransportTest extends TransportTestCase
         $this->assertSame('spaces/My-Space/messages/abcdefg.hijklmno', $sentMessage->getMessageId());
     }
 
-    public function testSendWithInvalidOptions()
+    public function testSendWithInvalidOptions(): void
     {
         $options = $this->createStub(MessageOptionsInterface::class);
         $this->expectException(UnsupportedOptionsException::class);
@@ -135,7 +135,7 @@ final class GoogleChatTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('testMessage', $options));
     }
 
-    public function testSendWith200ResponseButNotOk()
+    public function testSendWith200ResponseButNotOk(): void
     {
         $message = 'testMessage';
 

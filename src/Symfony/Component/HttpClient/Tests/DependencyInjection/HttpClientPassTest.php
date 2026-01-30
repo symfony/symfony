@@ -21,7 +21,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class HttpClientPassTest extends TestCase
 {
-    public function testItRequiresDataCollector()
+    public function testItRequiresDataCollector(): void
     {
         $container = $this->buildContainerBuilder('http_client');
         $sut = new HttpClientPass();
@@ -30,7 +30,7 @@ class HttpClientPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('.debug.http_client'));
     }
 
-    public function testItDecoratesHttpClientWithTraceableHttpClient()
+    public function testItDecoratesHttpClientWithTraceableHttpClient(): void
     {
         $container = $this->buildContainerBuilder('foo');
         $container->register('data_collector.http_client', HttpClientDataCollector::class);
@@ -41,7 +41,7 @@ class HttpClientPassTest extends TestCase
         $this->assertSame(['foo', null, 100], $container->getDefinition('.debug.foo')->getDecoratedService());
     }
 
-    public function testItRegistersDebugHttpClientToCollector()
+    public function testItRegistersDebugHttpClientToCollector(): void
     {
         $container = $this->buildContainerBuilder('foo_client');
         $container->register('data_collector.http_client', HttpClientDataCollector::class);

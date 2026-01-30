@@ -19,7 +19,7 @@ use Symfony\Component\Webhook\Test\AbstractRequestParserTestCase;
 
 class VonageRequestParserTest extends AbstractRequestParserTestCase
 {
-    public function testMissingAuthorizationTokenThrows()
+    public function testMissingAuthorizationTokenThrows(): void
     {
         $request = $this->createRequest('{}');
         $request->headers->remove('Authorization');
@@ -31,7 +31,7 @@ class VonageRequestParserTest extends AbstractRequestParserTestCase
         $parser->parse($request, $this->getSecret());
     }
 
-    public function testInvalidAuthorizationTokenThrows()
+    public function testInvalidAuthorizationTokenThrows(): void
     {
         $request = $this->createRequest('{}');
         $request->headers->set('Authorization', 'Invalid Header');

@@ -21,7 +21,7 @@ use Symfony\Component\Console\Input\StringInput;
 class StringInputTest extends TestCase
 {
     #[DataProvider('getTokenizeData')]
-    public function testTokenize($input, $tokens, $message)
+    public function testTokenize($input, $tokens, $message): void
     {
         $input = new StringInput($input);
         $r = new \ReflectionClass(ArgvInput::class);
@@ -29,7 +29,7 @@ class StringInputTest extends TestCase
         $this->assertSame($tokens, $p->getValue($input), $message);
     }
 
-    public function testInputOptionWithGivenString()
+    public function testInputOptionWithGivenString(): void
     {
         $definition = new InputDefinition(
             [new InputOption('foo', null, InputOption::VALUE_REQUIRED)]
@@ -73,7 +73,7 @@ class StringInputTest extends TestCase
         ];
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $input = new StringInput('-f foo');
         $this->assertSame('-f foo', (string) $input);

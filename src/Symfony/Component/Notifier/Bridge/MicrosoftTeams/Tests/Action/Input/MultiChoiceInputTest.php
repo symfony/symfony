@@ -23,7 +23,7 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
         return new MultiChoiceInput();
     }
 
-    public function testTarget()
+    public function testTarget(): void
     {
         $input = $this->createInput()
             ->choice($display = 'DISPLAY', $value = 'VALUE');
@@ -36,7 +36,7 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
         );
     }
 
-    public function testIsMultiSelectWithTrue()
+    public function testIsMultiSelectWithTrue(): void
     {
         $input = $this->createInput()
             ->isMultiSelect(true);
@@ -44,7 +44,7 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
         $this->assertTrue($input->toArray()['isMultiSelect']);
     }
 
-    public function testIsMultiSelectWithFalse()
+    public function testIsMultiSelectWithFalse(): void
     {
         $input = $this->createInput()
             ->isMultiSelect(false);
@@ -53,7 +53,7 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
     }
 
     #[DataProvider('styles')]
-    public function testStyle(string $value)
+    public function testStyle(string $value): void
     {
         $input = $this->createInput()
             ->style($value);
@@ -71,14 +71,14 @@ final class MultiChoiceInputTest extends AbstractInputTestCase
     }
 
     #[DataProvider('styles')]
-    public function testStyleThrowsWithUnknownStyle(string $value)
+    public function testStyleThrowsWithUnknownStyle(string $value): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         $this->createInput()->style('red');
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $this->assertSame(
             [

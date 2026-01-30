@@ -20,7 +20,7 @@ use Symfony\Component\RateLimiter\RateLimit;
 class AbstractRequestRateLimiterTest extends TestCase
 {
     #[DataProvider('provideRateLimits')]
-    public function testConsume(array $rateLimits, ?RateLimit $expected)
+    public function testConsume(array $rateLimits, ?RateLimit $expected): void
     {
         $rateLimiter = new MockAbstractRequestRateLimiter(array_map(function (RateLimit $rateLimit) {
             $limiter = $this->createStub(LimiterInterface::class);
@@ -32,7 +32,7 @@ class AbstractRequestRateLimiterTest extends TestCase
         $this->assertSame($expected, $rateLimiter->consume(new Request()));
     }
 
-    public function testConsumeWithoutLimiterAddsSpecialNoLimiter()
+    public function testConsumeWithoutLimiterAddsSpecialNoLimiter(): void
     {
         $rateLimiter = new MockAbstractRequestRateLimiter([]);
 
@@ -47,7 +47,7 @@ class AbstractRequestRateLimiterTest extends TestCase
         }
     }
 
-    public function testResetLimiters()
+    public function testResetLimiters(): void
     {
         $rateLimiter = new MockAbstractRequestRateLimiter([
             $limiter1 = $this->createMock(LimiterInterface::class),

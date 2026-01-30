@@ -26,7 +26,7 @@ final class ExpectedDeprecationAnnotationTest extends TestCase
      * @expectedDeprecation foo
      */
     #[Group('legacy')]
-    public function testOne()
+    public function testOne(): void
     {
         @trigger_error('foo', \E_USER_DEPRECATED);
     }
@@ -40,7 +40,7 @@ final class ExpectedDeprecationAnnotationTest extends TestCase
      * @expectedDeprecation bar
      */
     #[Group('legacy')]
-    public function testMany()
+    public function testMany(): void
     {
         @trigger_error('foo', \E_USER_DEPRECATED);
         @trigger_error('bar', \E_USER_DEPRECATED);

@@ -25,7 +25,7 @@ use Symfony\Component\Uid\UuidV4;
 class UlidTest extends TestCase
 {
     #[Group('time-sensitive')]
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $a = new Ulid();
         $b = new Ulid();
@@ -41,7 +41,7 @@ class UlidTest extends TestCase
         $this->assertSame(1, $c - $b);
     }
 
-    public function testWithInvalidUlid()
+    public function testWithInvalidUlid(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid ULID.');
@@ -49,7 +49,7 @@ class UlidTest extends TestCase
         new Ulid('this is not a ulid');
     }
 
-    public function testBinary()
+    public function testBinary(): void
     {
         $ulid = new Ulid('00000000000000000000000000');
         $this->assertSame("\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", $ulid->toBinary());
@@ -60,13 +60,13 @@ class UlidTest extends TestCase
         $this->assertTrue($ulid->equals(Ulid::fromString(hex2bin('7fffffffffffffffffffffffffffffff'))));
     }
 
-    public function toHex()
+    public function toHex(): void
     {
         $ulid = Ulid::fromString('1BVXue8CnY8ogucrHX3TeF');
         $this->assertSame('0x0177058f4dacd0b2a990a49af02bc008', $ulid->toHex());
     }
 
-    public function testFromUuid()
+    public function testFromUuid(): void
     {
         $uuid = new UuidV4();
 
@@ -78,7 +78,7 @@ class UlidTest extends TestCase
         $this->assertTrue($ulid->equals(Ulid::fromString($uuid)));
     }
 
-    public function testBase58()
+    public function testBase58(): void
     {
         $ulid = new Ulid('00000000000000000000000000');
         $this->assertSame('1111111111111111111111', $ulid->toBase58());
@@ -89,7 +89,7 @@ class UlidTest extends TestCase
     }
 
     #[Group('time-sensitive')]
-    public function testGetDateTime()
+    public function testGetDateTime(): void
     {
         $time = microtime(false);
         $ulid = new Ulid();
@@ -103,7 +103,7 @@ class UlidTest extends TestCase
         $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', '281474976710.655'), (new Ulid('7ZZZZZZZZZ79KA1307SR9X4MV3'))->getDateTime());
     }
 
-    public function testIsValid()
+    public function testIsValid(): void
     {
         $this->assertFalse(Ulid::isValid('not a ulid'));
         $this->assertTrue(Ulid::isValid('00000000000000000000000000'));
@@ -116,7 +116,7 @@ class UlidTest extends TestCase
         $this->assertTrue(Ulid::isValid(new Ulid()->toRfc4122(), Ulid::FORMAT_RFC_4122));
     }
 
-    public function testIsValidWithVariousFormat()
+    public function testIsValidWithVariousFormat(): void
     {
         $ulid = new Ulid();
 
@@ -153,7 +153,7 @@ class UlidTest extends TestCase
         $this->assertFalse(Ulid::isValid('30J7CNpDMfXPZrCsn4Cgey', Ulid::FORMAT_BASE_58), 'Fake base-58 string with the "O" forbidden char is not valid');
     }
 
-    public function testEquals()
+    public function testEquals(): void
     {
         $a = new Ulid();
         $b = new Ulid();
@@ -164,7 +164,7 @@ class UlidTest extends TestCase
     }
 
     #[Group('time-sensitive')]
-    public function testCompare()
+    public function testCompare(): void
     {
         $a = new Ulid();
         $b = new Ulid();
@@ -180,7 +180,7 @@ class UlidTest extends TestCase
         $this->assertGreaterThan(0, $c->compare($b));
     }
 
-    public function testFromBinary()
+    public function testFromBinary(): void
     {
         $this->assertEquals(
             Ulid::fromString("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08"),
@@ -189,7 +189,7 @@ class UlidTest extends TestCase
     }
 
     #[DataProvider('provideInvalidBinaryFormat')]
-    public function testFromBinaryInvalidFormat(string $ulid)
+    public function testFromBinaryInvalidFormat(string $ulid): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -205,7 +205,7 @@ class UlidTest extends TestCase
         ];
     }
 
-    public function testFromBase58()
+    public function testFromBase58(): void
     {
         $this->assertEquals(
             Ulid::fromString('1BVXue8CnY8ogucrHX3TeF'),
@@ -214,7 +214,7 @@ class UlidTest extends TestCase
     }
 
     #[DataProvider('provideInvalidBase58Format')]
-    public function testFromBase58InvalidFormat(string $ulid)
+    public function testFromBase58InvalidFormat(string $ulid): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -230,7 +230,7 @@ class UlidTest extends TestCase
         ];
     }
 
-    public function testFromBase32()
+    public function testFromBase32(): void
     {
         $this->assertEquals(
             Ulid::fromString('01EW2RYKDCT2SAK454KBR2QG08'),
@@ -239,7 +239,7 @@ class UlidTest extends TestCase
     }
 
     #[DataProvider('provideInvalidBase32Format')]
-    public function testFromBase32InvalidFormat(string $ulid)
+    public function testFromBase32InvalidFormat(string $ulid): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -255,7 +255,7 @@ class UlidTest extends TestCase
         ];
     }
 
-    public function testFromRfc4122()
+    public function testFromRfc4122(): void
     {
         $this->assertEquals(
             Ulid::fromString('0177058f-4dac-d0b2-a990-a49af02bc008'),
@@ -264,7 +264,7 @@ class UlidTest extends TestCase
     }
 
     #[DataProvider('provideInvalidRfc4122Format')]
-    public function testFromRfc4122InvalidFormat(string $ulid)
+    public function testFromRfc4122InvalidFormat(string $ulid): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -280,12 +280,12 @@ class UlidTest extends TestCase
         ];
     }
 
-    public function testFromStringOnExtendedClassReturnsStatic()
+    public function testFromStringOnExtendedClassReturnsStatic(): void
     {
         $this->assertInstanceOf(CustomUlid::class, CustomUlid::fromString((new CustomUlid())->toBinary()));
     }
 
-    public function testFromStringBase58Padding()
+    public function testFromStringBase58Padding(): void
     {
         $this->assertInstanceOf(Ulid::class, Ulid::fromString('111111111u9QRyVM94rdmZ'));
     }
@@ -293,7 +293,7 @@ class UlidTest extends TestCase
     #[TestWith(['00000000-0000-0000-0000-000000000000'])]
     #[TestWith(['1111111111111111111111'])]
     #[TestWith(['00000000000000000000000000'])]
-    public function testNilUlid(string $ulid)
+    public function testNilUlid(string $ulid): void
     {
         $ulid = Ulid::fromString($ulid);
 
@@ -301,14 +301,14 @@ class UlidTest extends TestCase
         $this->assertSame('00000000000000000000000000', (string) $ulid);
     }
 
-    public function testNewNilUlid()
+    public function testNewNilUlid(): void
     {
         $this->assertSame('00000000000000000000000000', (string) new NilUlid());
     }
 
     #[TestWith(['ffffffff-ffff-ffff-ffff-ffffffffffff'])]
     #[TestWith(['7zzzzzzzzzzzzzzzzzzzzzzzzz'])]
-    public function testMaxUlid(string $ulid)
+    public function testMaxUlid(string $ulid): void
     {
         $ulid = Ulid::fromString($ulid);
 
@@ -316,12 +316,12 @@ class UlidTest extends TestCase
         $this->assertSame('7ZZZZZZZZZZZZZZZZZZZZZZZZZ', (string) $ulid);
     }
 
-    public function testNewMaxUlid()
+    public function testNewMaxUlid(): void
     {
         $this->assertSame('7ZZZZZZZZZZZZZZZZZZZZZZZZZ', (string) new MaxUlid());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertSame('01HK77WP8T7107EZH9CNAES202', (new Ulid('01HK77WP8T7107EZH9CNAES202'))->toString());
     }

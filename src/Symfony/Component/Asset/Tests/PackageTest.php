@@ -20,7 +20,7 @@ use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 class PackageTest extends TestCase
 {
     #[DataProvider('getConfigs')]
-    public function testGetUrl($version, $format, $path, $expected)
+    public function testGetUrl($version, $format, $path, $expected): void
     {
         $package = new Package($version ? new StaticVersionStrategy($version, $format) : new EmptyVersionStrategy());
         $this->assertSame($expected, $package->getUrl($path));
@@ -46,7 +46,7 @@ class PackageTest extends TestCase
         ];
     }
 
-    public function testGetVersion()
+    public function testGetVersion(): void
     {
         $package = new Package(new StaticVersionStrategy('v1'));
         $this->assertSame('v1', $package->getVersion('/foo'));

@@ -26,7 +26,7 @@ use Symfony\Component\VarDumper\Server\Connection;
  */
 class DumpDataCollectorTest extends TestCase
 {
-    public function testDump()
+    public function testDump(): void
     {
         $data = new Data([[123]]);
         $data = $data->withContext(['label' => 'foo']);
@@ -65,7 +65,7 @@ class DumpDataCollectorTest extends TestCase
         $this->assertInstanceOf(DumpDataCollector::class, unserialize($serialized));
     }
 
-    public function testDumpWithServerConnection()
+    public function testDumpWithServerConnection(): void
     {
         $data = new Data([[123]]);
 
@@ -83,7 +83,7 @@ class DumpDataCollectorTest extends TestCase
         $this->assertStringMatchesFormat('%a;a:%d:{i:0;a:6:{s:4:"data";%c:39:"Symfony\Component\VarDumper\Cloner\Data":%a', serialize($collector));
     }
 
-    public function testCollectDefault()
+    public function testCollectDefault(): void
     {
         $data = new Data([[123]]);
 
@@ -101,7 +101,7 @@ class DumpDataCollectorTest extends TestCase
         serialize($collector);
     }
 
-    public function testCollectHtml()
+    public function testCollectHtml(): void
     {
         $data = new Data([[123]]);
 
@@ -129,7 +129,7 @@ class DumpDataCollectorTest extends TestCase
         serialize($collector);
     }
 
-    public function testFlush()
+    public function testFlush(): void
     {
         $data = new Data([[456]]);
         $collector = new DumpDataCollector();
@@ -142,7 +142,7 @@ class DumpDataCollectorTest extends TestCase
         $this->assertSame("DumpDataCollectorTest.php on line {$line}:\n456\n", $output);
     }
 
-    public function testFlushNothingWhenDataDumperIsProvided()
+    public function testFlushNothingWhenDataDumperIsProvided(): void
     {
         $data = new Data([[456]]);
         $dumper = new CliDumper('php://output');
@@ -160,7 +160,7 @@ class DumpDataCollectorTest extends TestCase
         $this->assertSame('', ob_get_clean());
     }
 
-    public function testNullContentTypeWithNoDebugEnv()
+    public function testNullContentTypeWithNoDebugEnv(): void
     {
         $request = new Request();
         $requestStack = new RequestStack();

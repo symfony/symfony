@@ -52,7 +52,7 @@ class FormValidatorFunctionalTest extends TestCase
             ->getFormFactory();
     }
 
-    public function testDataConstraintsInvalidateFormEvenIfFieldIsNotSubmitted()
+    public function testDataConstraintsInvalidateFormEvenIfFieldIsNotSubmitted(): void
     {
         $form = $this->formFactory->create(FooType::class);
         $form->submit(['baz' => 'foobar'], false);
@@ -63,7 +63,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertCount(1, $form->get('bar')->getErrors());
     }
 
-    public function testFieldConstraintsDoNotInvalidateFormIfFieldIsNotSubmitted()
+    public function testFieldConstraintsDoNotInvalidateFormIfFieldIsNotSubmitted(): void
     {
         $form = $this->formFactory->create(FooType::class);
         $form->submit(['bar' => 'foobar'], false);
@@ -72,7 +72,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertTrue($form->isValid());
     }
 
-    public function testFieldConstraintsInvalidateFormIfFieldIsSubmitted()
+    public function testFieldConstraintsInvalidateFormIfFieldIsSubmitted(): void
     {
         $form = $this->formFactory->create(FooType::class);
         $form->submit(['bar' => 'foobar', 'baz' => ''], false);
@@ -85,7 +85,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertFalse($form->get('baz')->isValid());
     }
 
-    public function testNonCompositeConstraintValidatedOnce()
+    public function testNonCompositeConstraintValidatedOnce(): void
     {
         $form = $this->formFactory->create(TextType::class, null, [
             'constraints' => [new NotBlank(groups: ['foo', 'bar'])],
@@ -100,7 +100,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertSame('data', $violations[0]->getPropertyPath());
     }
 
-    public function testCompositeConstraintValidatedInEachGroup()
+    public function testCompositeConstraintValidatedInEachGroup(): void
     {
         $form = $this->formFactory->create(FormType::class, null, [
             'constraints' => [
@@ -127,7 +127,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertSame('data[field2]', $violations[1]->getPropertyPath());
     }
 
-    public function testCompositeConstraintValidatedInSequence()
+    public function testCompositeConstraintValidatedInSequence(): void
     {
         $form = $this->formFactory->create(FormType::class, null, [
             'constraints' => [
@@ -153,7 +153,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertSame('data[field1]', $violations[0]->getPropertyPath());
     }
 
-    public function testFieldsValidateInSequence()
+    public function testFieldsValidateInSequence(): void
     {
         $form = $this->formFactory->create(FormType::class, null, [
             'validation_groups' => new GroupSequence(['group1', 'group2']),
@@ -174,7 +174,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
     }
 
-    public function testFieldsValidateInSequenceWithNestedGroupsArray()
+    public function testFieldsValidateInSequenceWithNestedGroupsArray(): void
     {
         $form = $this->formFactory->create(FormType::class, null, [
             'validation_groups' => new GroupSequence([['group1', 'group2'], 'group3']),
@@ -199,7 +199,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertInstanceOf(Length::class, $errors[1]->getCause()->getConstraint());
     }
 
-    public function testConstraintsInDifferentGroupsOnSingleField()
+    public function testConstraintsInDifferentGroupsOnSingleField(): void
     {
         $form = $this->formFactory->create(FormType::class, null, [
             'validation_groups' => new GroupSequence(['group1', 'group2']),
@@ -224,7 +224,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
     }
 
-    public function testConstraintsInDifferentGroupsOnSingleFieldWithAdditionalFieldThatHasNoConstraintsAddedBeforeTheFieldWithConstraints()
+    public function testConstraintsInDifferentGroupsOnSingleFieldWithAdditionalFieldThatHasNoConstraintsAddedBeforeTheFieldWithConstraints(): void
     {
         $form = $this->formFactory->create(FormType::class, null, [
             'validation_groups' => new GroupSequence(['group1', 'group2']),
@@ -250,7 +250,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
     }
 
-    public function testCascadeValidationToChildFormsUsingPropertyPaths()
+    public function testCascadeValidationToChildFormsUsingPropertyPaths(): void
     {
         $form = $this->formFactory->create(FormType::class, null, [
             'validation_groups' => ['group1', 'group2'],
@@ -279,7 +279,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertSame('children[field2].data', $violations[1]->getPropertyPath());
     }
 
-    public function testCascadeValidationToChildFormsWithTwoValidConstraints()
+    public function testCascadeValidationToChildFormsWithTwoValidConstraints(): void
     {
         $form = $this->formFactory->create(ReviewType::class);
 
@@ -295,7 +295,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertSame('children[author].data.email', $violations[0]->getPropertyPath());
     }
 
-    public function testCascadeValidationToChildFormsWithTwoValidConstraints2()
+    public function testCascadeValidationToChildFormsWithTwoValidConstraints2(): void
     {
         $form = $this->formFactory->create(ReviewType::class);
 
@@ -312,7 +312,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertSame('children[author].data.email', $violations[1]->getPropertyPath());
     }
 
-    public function testCascadeValidationToArrayChildForm()
+    public function testCascadeValidationToArrayChildForm(): void
     {
         $form = $this->formFactory->create(FormType::class, null, [
             'data_class' => Review::class,
@@ -341,7 +341,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertSame('children[customers].data[0].email', $violations[1]->getPropertyPath());
     }
 
-    public function testCascadeValidationToChildFormsUsingPropertyPathsValidatedInSequence()
+    public function testCascadeValidationToChildFormsUsingPropertyPathsValidatedInSequence(): void
     {
         $form = $this->formFactory->create(FormType::class, null, [
             'validation_groups' => new GroupSequence(['group1', 'group2']),
@@ -368,7 +368,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertSame('children[field1].data', $violations[0]->getPropertyPath());
     }
 
-    public function testContextIsPopulatedWithFormBeingValidated()
+    public function testContextIsPopulatedWithFormBeingValidated(): void
     {
         $form = $this->formFactory->create(FormType::class)
             ->add('field1', null, [
@@ -387,7 +387,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertCount(0, $violations);
     }
 
-    public function testContextIsPopulatedWithFormBeingValidatedUsingGroupSequence()
+    public function testContextIsPopulatedWithFormBeingValidatedUsingGroupSequence(): void
     {
         $form = $this->formFactory->create(FormType::class, null, [
             'validation_groups' => new GroupSequence(['group1']),
@@ -411,7 +411,7 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertCount(0, $violations);
     }
 
-    public function testSubmitFormChoiceInvalid()
+    public function testSubmitFormChoiceInvalid(): void
     {
         $form = $this->formFactory->create(DateType::class, null, [
             'widget' => 'choice',
@@ -433,22 +433,22 @@ class FormValidatorFunctionalTest extends TestCase
         $this->assertSame($form->get('month'), $form->getErrors()[1]->getOrigin());
     }
 
-    public function testDoNotAddInvalidMessageIfChildFormIsAlreadyNotSynchronized()
+    public function testDoNotAddInvalidMessageIfChildFormIsAlreadyNotSynchronized(): void
     {
         $formBuilder = $this->formFactory->createBuilder()
             ->add('field1')
             ->add('field2')
             ->addModelTransformer(new CallbackTransformer(
-                static function () {
+                static function (): void {
                 },
-                static function () {
+                static function (): void {
                     throw new TransformationFailedException('This value is invalid.');
                 }
             ));
         $formBuilder->get('field2')->addModelTransformer(new CallbackTransformer(
-            static function () {
+            static function (): void {
             },
-            static function () {
+            static function (): void {
                 throw new TransformationFailedException('This value is invalid.');
             }
         ));

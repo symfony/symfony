@@ -33,7 +33,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         ]);
     }
 
-    public function testSetData()
+    public function testSetData(): void
     {
         $this->form->setData('foobar');
 
@@ -41,7 +41,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         $this->assertSame('foobar', $this->form['second']->getData());
     }
 
-    public function testSetOptions()
+    public function testSetOptions(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'type' => TextTypeTest::TESTED_TYPE,
@@ -54,7 +54,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         $this->assertTrue($form['second']->isRequired());
     }
 
-    public function testSetOptionsPerChild()
+    public function testSetOptionsPerChild(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             // the global required value cannot be overridden
@@ -69,7 +69,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         $this->assertTrue($form['second']->isRequired());
     }
 
-    public function testSetRequired()
+    public function testSetRequired(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => false,
@@ -80,7 +80,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         $this->assertFalse($form['second']->isRequired());
     }
 
-    public function testMappedOverridesDefault()
+    public function testMappedOverridesDefault(): void
     {
         $form = $this->factory->create(NotMappedType::class);
         $this->assertFalse($form->getConfig()->getMapped());
@@ -94,7 +94,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('notMappedConfigurationKeys')]
-    public function testNotMappedInnerIsOverridden($configurationKey)
+    public function testNotMappedInnerIsOverridden($configurationKey): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'type' => TextTypeTest::TESTED_TYPE,
@@ -113,7 +113,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         ];
     }
 
-    public function testSetInvalidOptions()
+    public function testSetInvalidOptions(): void
     {
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
@@ -122,7 +122,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         ]);
     }
 
-    public function testSetInvalidFirstOptions()
+    public function testSetInvalidFirstOptions(): void
     {
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
@@ -131,7 +131,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         ]);
     }
 
-    public function testSetInvalidSecondOptions()
+    public function testSetInvalidSecondOptions(): void
     {
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
@@ -140,7 +140,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         ]);
     }
 
-    public function testSetErrorBubblingToTrue()
+    public function testSetErrorBubblingToTrue(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'error_bubbling' => true,
@@ -151,7 +151,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         $this->assertTrue($form['second']->getConfig()->getOption('error_bubbling'));
     }
 
-    public function testSetErrorBubblingToFalse()
+    public function testSetErrorBubblingToFalse(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'error_bubbling' => false,
@@ -162,7 +162,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         $this->assertFalse($form['second']->getConfig()->getOption('error_bubbling'));
     }
 
-    public function testSetErrorBubblingIndividually()
+    public function testSetErrorBubblingIndividually(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'error_bubbling' => true,
@@ -175,7 +175,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         $this->assertTrue($form['second']->getConfig()->getOption('error_bubbling'));
     }
 
-    public function testSetOptionsPerChildAndOverwrite()
+    public function testSetOptionsPerChildAndOverwrite(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'type' => TextTypeTest::TESTED_TYPE,
@@ -190,7 +190,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('emptyDataProvider')]
-    public function testSubmitNullForTextTypeWithEmptyDataOptionSetToEmptyString($emptyData, $submittedData, $expected)
+    public function testSubmitNullForTextTypeWithEmptyDataOptionSetToEmptyString($emptyData, $submittedData, $expected): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'type' => TextType::class,
@@ -217,7 +217,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         yield [null, ['first' => '', 'second' => ''], null];
     }
 
-    public function testSubmitUnequal()
+    public function testSubmitUnequal(): void
     {
         $input = ['first' => 'foo', 'second' => 'bar'];
 
@@ -230,7 +230,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         $this->assertNull($this->form->getData());
     }
 
-    public function testSubmitEqual()
+    public function testSubmitEqual(): void
     {
         $input = ['first' => 'foo', 'second' => 'foo'];
 
@@ -243,7 +243,7 @@ class RepeatedTypeTest extends BaseTypeTestCase
         $this->assertSame('foo', $this->form->getData());
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, ['first' => null, 'second' => null]);
     }

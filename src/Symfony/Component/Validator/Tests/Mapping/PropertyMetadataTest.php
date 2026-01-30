@@ -26,14 +26,14 @@ class PropertyMetadataTest extends TestCase
     private const CLASSNAME_74_PROXY = 'Symfony\Component\Validator\Tests\Fixtures\Entity_74_Proxy';
     private const PARENTCLASS = EntityParent::class;
 
-    public function testInvalidPropertyName()
+    public function testInvalidPropertyName(): void
     {
         $this->expectException(ValidatorException::class);
 
         new PropertyMetadata(self::CLASSNAME, 'foobar');
     }
 
-    public function testGetPropertyValueFromPrivateProperty()
+    public function testGetPropertyValueFromPrivateProperty(): void
     {
         $entity = new Entity('foobar');
         $metadata = new PropertyMetadata(self::CLASSNAME, 'internal');
@@ -41,7 +41,7 @@ class PropertyMetadataTest extends TestCase
         $this->assertEquals('foobar', $metadata->getPropertyValue($entity));
     }
 
-    public function testGetPropertyValueFromOverriddenPrivateProperty()
+    public function testGetPropertyValueFromOverriddenPrivateProperty(): void
     {
         $entity = new Entity('foobar');
         $metadata = new PropertyMetadata(self::PARENTCLASS, 'data');
@@ -50,7 +50,7 @@ class PropertyMetadataTest extends TestCase
         $this->assertEquals('Overridden data', $metadata->getPropertyValue($entity));
     }
 
-    public function testGetPropertyValueFromRemovedProperty()
+    public function testGetPropertyValueFromRemovedProperty(): void
     {
         $entity = new Entity('foobar');
 
@@ -62,7 +62,7 @@ class PropertyMetadataTest extends TestCase
         $metadata->getPropertyValue($entity);
     }
 
-    public function testGetPropertyValueFromUninitializedProperty()
+    public function testGetPropertyValueFromUninitializedProperty(): void
     {
         $entity = new Entity_74();
         $metadata = new PropertyMetadata(self::CLASSNAME_74, 'uninitialized');
@@ -70,7 +70,7 @@ class PropertyMetadataTest extends TestCase
         $this->assertNull($metadata->getPropertyValue($entity));
     }
 
-    public function testGetPropertyValueFromUninitializedPropertyShouldNotReturnNullIfMagicGetIsPresent()
+    public function testGetPropertyValueFromUninitializedPropertyShouldNotReturnNullIfMagicGetIsPresent(): void
     {
         $entity = new Entity_74_Proxy();
         $metadata = new PropertyMetadata(self::CLASSNAME_74_PROXY, 'uninitialized');

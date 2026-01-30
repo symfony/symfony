@@ -17,7 +17,7 @@ use Symfony\Component\Console\Helper\TableCellStyle;
 
 class TableCellStyleTest extends TestCase
 {
-    public function testCreateTableCellStyle()
+    public function testCreateTableCellStyle(): void
     {
         $tableCellStyle = new TableCellStyle(['fg' => 'red']);
         $this->assertEquals('red', $tableCellStyle->getOptions()['fg']);

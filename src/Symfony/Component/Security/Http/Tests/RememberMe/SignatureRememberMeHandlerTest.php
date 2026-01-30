@@ -44,7 +44,7 @@ class SignatureRememberMeHandlerTest extends TestCase
     }
 
     #[Group('time-sensitive')]
-    public function testCreateRememberMeCookie()
+    public function testCreateRememberMeCookie(): void
     {
         $user = new InMemoryUser('wouter', null);
         $signature = $this->signatureHasher->computeSignatureHash($user, $expire = time() + 31536000);
@@ -59,7 +59,7 @@ class SignatureRememberMeHandlerTest extends TestCase
         $this->assertEquals(':d291dGVy:'.$expire.':'.$signature, $cookie->getValue());
     }
 
-    public function testClearRememberMeCookie()
+    public function testClearRememberMeCookie(): void
     {
         $this->handler->clearRememberMeCookie();
 
@@ -70,7 +70,7 @@ class SignatureRememberMeHandlerTest extends TestCase
         $this->assertNull($cookie->getValue());
     }
 
-    public function testConsumeRememberMeCookieValid()
+    public function testConsumeRememberMeCookieValid(): void
     {
         $user = new InMemoryUser('wouter', null);
         $signature = $this->signatureHasher->computeSignatureHash($user, $expire = time() + 3600);
@@ -86,14 +86,14 @@ class SignatureRememberMeHandlerTest extends TestCase
         $this->assertNotEquals((new RememberMeDetails('wouter', $expire, $signature))->toString(), $cookie->getValue());
     }
 
-    public function testConsumeRememberMeCookieInvalidHash()
+    public function testConsumeRememberMeCookieInvalidHash(): void
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('The cookie\'s hash is invalid.');
         $this->handler->consumeRememberMeCookie(new RememberMeDetails('wouter', time() + 600, 'badsignature'));
     }
 
-    public function testConsumeRememberMeCookieExpired()
+    public function testConsumeRememberMeCookieExpired(): void
     {
         $user = new InMemoryUser('wouter', null);
         $signature = $this->signatureHasher->computeSignatureHash($user, 360);

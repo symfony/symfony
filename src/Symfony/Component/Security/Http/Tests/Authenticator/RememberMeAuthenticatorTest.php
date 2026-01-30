@@ -37,7 +37,7 @@ class RememberMeAuthenticatorTest extends TestCase
         $this->authenticator = new RememberMeAuthenticator($this->rememberMeHandler, $this->tokenStorage, '_remember_me_cookie');
     }
 
-    public function testSupportsTokenStorageWithToken()
+    public function testSupportsTokenStorageWithToken(): void
     {
         $this->tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('username', 'credentials'), 'main'));
 
@@ -45,7 +45,7 @@ class RememberMeAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideSupportsData')]
-    public function testSupports($request, $support)
+    public function testSupports($request, $support): void
     {
         $this->assertSame($support, $this->authenticator->supports($request));
     }
@@ -65,7 +65,7 @@ class RememberMeAuthenticatorTest extends TestCase
         yield [$request, false];
     }
 
-    public function testAuthenticate()
+    public function testAuthenticate(): void
     {
         $rememberMeHandler = $this->createMock(RememberMeHandlerInterface::class);
         $rememberMeDetails = new RememberMeDetails('wouter', 1, 'secret');
@@ -76,7 +76,7 @@ class RememberMeAuthenticatorTest extends TestCase
         $passport->getUser(); // trigger the user loader
     }
 
-    public function testAuthenticateLegacyCookieFormat()
+    public function testAuthenticateLegacyCookieFormat(): void
     {
         $rememberMeHandler = $this->createMock(RememberMeHandlerInterface::class);
         $rememberMeDetails = new RememberMeDetails('wouter', 1, 'secret');
@@ -87,14 +87,14 @@ class RememberMeAuthenticatorTest extends TestCase
         $passport->getUser(); // trigger the user loader
     }
 
-    public function testAuthenticateWithoutToken()
+    public function testAuthenticateWithoutToken(): void
     {
         $this->expectException(\LogicException::class);
 
         $this->authenticator->authenticate(Request::create('/'));
     }
 
-    public function testAuthenticateWithoutOldToken()
+    public function testAuthenticateWithoutOldToken(): void
     {
         $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => base64_encode('foo:bar')]);
 
@@ -103,7 +103,7 @@ class RememberMeAuthenticatorTest extends TestCase
         $this->authenticator->authenticate($request);
     }
 
-    public function testAuthenticateWithTokenWithoutDelimiter()
+    public function testAuthenticateWithTokenWithoutDelimiter(): void
     {
         $request = Request::create('/', 'GET', [], ['_remember_me_cookie' => 'invalid']);
 

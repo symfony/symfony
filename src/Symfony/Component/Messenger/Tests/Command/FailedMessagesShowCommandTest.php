@@ -43,7 +43,7 @@ class FailedMessagesShowCommandTest extends TestCase
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
-    public function testBasicRunWithServiceLocator()
+    public function testBasicRunWithServiceLocator(): void
     {
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
         $redeliveryStamp = new RedeliveryStamp(0);
@@ -81,7 +81,7 @@ class FailedMessagesShowCommandTest extends TestCase
             $tester->getDisplay(true));
     }
 
-    public function testMultipleRedeliveryFailsWithServiceLocator()
+    public function testMultipleRedeliveryFailsWithServiceLocator(): void
     {
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
         $redeliveryStamp1 = new RedeliveryStamp(0);
@@ -119,7 +119,7 @@ class FailedMessagesShowCommandTest extends TestCase
             $tester->getDisplay(true));
     }
 
-    public function testReceiverShouldBeListableWithServiceLocator()
+    public function testReceiverShouldBeListableWithServiceLocator(): void
     {
         $receiver = $this->createStub(ReceiverInterface::class);
         $failureTransportName = 'failure_receiver';
@@ -135,7 +135,7 @@ class FailedMessagesShowCommandTest extends TestCase
         $tester->execute(['id' => 15]);
     }
 
-    public function testListMessagesWithServiceLocator()
+    public function testListMessagesWithServiceLocator(): void
     {
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
         $redeliveryStamp = new RedeliveryStamp(0);
@@ -176,7 +176,7 @@ class FailedMessagesShowCommandTest extends TestCase
         $this->assertStringContainsString('Run messenger:failed:show {id} --transport=failure_receiver -vv to see message details.', $tester->getDisplay());
     }
 
-    public function testListMessagesReturnsNoMessagesFoundWithServiceLocator()
+    public function testListMessagesReturnsNoMessagesFoundWithServiceLocator(): void
     {
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->once())->method('all')->with()->willReturn([]);
@@ -192,7 +192,7 @@ class FailedMessagesShowCommandTest extends TestCase
         $this->assertStringContainsString('[OK] No failed messages were found.', $tester->getDisplay(true));
     }
 
-    public function testListMessagesReturnsPaginatedMessagesWithServiceLocator()
+    public function testListMessagesReturnsPaginatedMessagesWithServiceLocator(): void
     {
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
         $envelope = new Envelope(new \stdClass(), [
@@ -216,7 +216,7 @@ class FailedMessagesShowCommandTest extends TestCase
         $this->assertStringContainsString('Showing first 1 messages.', $tester->getDisplay(true));
     }
 
-    public function testListMessagesReturnsFilteredByClassMessage()
+    public function testListMessagesReturnsFilteredByClassMessage(): void
     {
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
         $envelope = new Envelope(new \stdClass(), [
@@ -245,7 +245,7 @@ class FailedMessagesShowCommandTest extends TestCase
         $this->assertStringContainsString('Displaying only \'namespace\otherClass\' messages', $tester->getDisplay(true));
     }
 
-    public function testListMessagesReturnsCountByClassName()
+    public function testListMessagesReturnsCountByClassName(): void
     {
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
         $envelope = new Envelope(new \stdClass(), [
@@ -266,7 +266,7 @@ class FailedMessagesShowCommandTest extends TestCase
         $this->assertStringContainsString('stdClass   2', $tester->getDisplay(true));
     }
 
-    public function testInvalidMessagesThrowsExceptionWithServiceLocator()
+    public function testInvalidMessagesThrowsExceptionWithServiceLocator(): void
     {
         $receiver = $this->createStub(ListableReceiverInterface::class);
 
@@ -283,7 +283,7 @@ class FailedMessagesShowCommandTest extends TestCase
         $tester->execute(['id' => 15]);
     }
 
-    public function testVeryVerboseOutputForSingleMessageContainsExceptionWithTraceWithServiceLocator()
+    public function testVeryVerboseOutputForSingleMessageContainsExceptionWithTraceWithServiceLocator(): void
     {
         $exception = new \RuntimeException('Things are bad!');
         $exceptionLine = __LINE__ - 1;
@@ -324,7 +324,7 @@ class FailedMessagesShowCommandTest extends TestCase
             $tester->getDisplay(true));
     }
 
-    public function testListMessagesWithServiceLocatorFromSpecificTransport()
+    public function testListMessagesWithServiceLocatorFromSpecificTransport(): void
     {
         $sentToFailureStamp = new SentToFailureTransportStamp('async');
         $redeliveryStamp = new RedeliveryStamp(0);
@@ -354,7 +354,7 @@ class FailedMessagesShowCommandTest extends TestCase
             $tester->getDisplay(true));
     }
 
-    public function testCompletingTransport()
+    public function testCompletingTransport(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
 
@@ -373,7 +373,7 @@ class FailedMessagesShowCommandTest extends TestCase
         $this->assertSame(['global_receiver', 'failure_receiver'], $suggestions);
     }
 
-    public function testCompleteId()
+    public function testCompleteId(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
 
@@ -394,7 +394,7 @@ class FailedMessagesShowCommandTest extends TestCase
         $this->assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
     }
 
-    public function testCompleteIdWithSpecifiedTransport()
+    public function testCompleteIdWithSpecifiedTransport(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
         $anotherFailureReceiverName = 'another_receiver';
@@ -416,7 +416,7 @@ class FailedMessagesShowCommandTest extends TestCase
         $this->assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
     }
 
-    public function testTableOutputGoesToStdout()
+    public function testTableOutputGoesToStdout(): void
     {
         $envelope = new Envelope(new \stdClass(), [
             new TransportMessageIdStamp('2ab50dfa1fbf'),
@@ -439,7 +439,7 @@ class FailedMessagesShowCommandTest extends TestCase
         $this->assertStringNotContainsString('2ab50dfa1fbf', $stderr);
     }
 
-    public function testPendingMessageCountGoesToStdout()
+    public function testPendingMessageCountGoesToStdout(): void
     {
         $receiver = new class implements ListableReceiverInterface, MessageCountAwareInterface {
             public function get(): iterable

@@ -28,7 +28,7 @@ final class FakeSmsTransportFactoryTest extends AbstractTransportFactoryTestCase
     use IncompleteDsnTestTrait;
     use MissingRequiredOptionTestTrait;
 
-    public function testMissingRequiredMailerDependency()
+    public function testMissingRequiredMailerDependency(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot create a transport for scheme "fakesms+email" without providing an implementation of "Symfony\Component\Mailer\MailerInterface".');
@@ -37,7 +37,7 @@ final class FakeSmsTransportFactoryTest extends AbstractTransportFactoryTestCase
         $factory->create(new Dsn('fakesms+email://default?to=recipient@email.net&from=sender@email.net'));
     }
 
-    public function testMissingRequiredDependency()
+    public function testMissingRequiredDependency(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot create a transport for scheme "fakesms+logger" without providing an implementation of "Psr\Log\LoggerInterface".');
@@ -46,7 +46,7 @@ final class FakeSmsTransportFactoryTest extends AbstractTransportFactoryTestCase
         $factory->create(new Dsn('fakesms+logger://default'));
     }
 
-    public function testMissingOptionalLoggerDependency()
+    public function testMissingOptionalLoggerDependency(): void
     {
         $factory = new FakeSmsTransportFactory($this->createStub(MailerInterface::class));
         $transport = $factory->create(new Dsn('fakesms+email://default?to=recipient@email.net&from=sender@email.net'));
@@ -54,7 +54,7 @@ final class FakeSmsTransportFactoryTest extends AbstractTransportFactoryTestCase
         $this->assertSame('fakesms+email://default?to=recipient@email.net&from=sender@email.net', (string) $transport);
     }
 
-    public function testMissingOptionalMailerDependency()
+    public function testMissingOptionalMailerDependency(): void
     {
         $factory = new FakeSmsTransportFactory(null, $this->createStub(LoggerInterface::class));
         $transport = $factory->create(new Dsn('fakesms+logger://default'));

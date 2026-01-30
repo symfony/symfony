@@ -16,23 +16,23 @@ use Symfony\Component\Finder\Iterator\LazyIterator;
 
 class LazyIteratorTest extends TestCase
 {
-    public function testLazy()
+    public function testLazy(): void
     {
-        new LazyIterator(function () {
+        new LazyIterator(function (): void {
             $this->markTestFailed('lazyIterator should not be called');
         });
 
         $this->expectNotToPerformAssertions();
     }
 
-    public function testDelegate()
+    public function testDelegate(): void
     {
         $iterator = new LazyIterator(static fn () => new Iterator(['foo', 'bar']));
 
         $this->assertCount(2, iterator_to_array($iterator));
     }
 
-    public function testInnerDestructedAtTheEnd()
+    public function testInnerDestructedAtTheEnd(): void
     {
         $count = 0;
         $iterator = new LazyIterator(static function () use (&$count) {

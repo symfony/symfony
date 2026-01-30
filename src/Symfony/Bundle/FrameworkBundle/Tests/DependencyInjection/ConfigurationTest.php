@@ -39,7 +39,7 @@ use Symfony\Component\Webhook\Controller\WebhookController;
 
 class ConfigurationTest extends TestCase
 {
-    public function testDefaultConfig()
+    public function testDefaultConfig(): void
     {
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [[
@@ -61,7 +61,7 @@ class ConfigurationTest extends TestCase
     }
 
     #[DataProvider('getTestInvalidSessionName')]
-    public function testInvalidSessionName($sessionName)
+    public function testInvalidSessionName($sessionName): void
     {
         $processor = new Processor();
 
@@ -87,7 +87,7 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    public function testAssetsCanBeEnabled()
+    public function testAssetsCanBeEnabled(): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -110,7 +110,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals($defaultConfig, $config['assets']);
     }
 
-    public function testAssetMapperCanBeEnabled()
+    public function testAssetMapperCanBeEnabled(): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -142,7 +142,7 @@ class ConfigurationTest extends TestCase
     }
 
     #[DataProvider('provideImportmapPolyfillTests')]
-    public function testAssetMapperPolyfillValue(mixed $polyfillValue, bool $isValid, mixed $expected)
+    public function testAssetMapperPolyfillValue(mixed $polyfillValue, bool $isValid, mixed $expected): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -173,7 +173,7 @@ class ConfigurationTest extends TestCase
     }
 
     #[DataProvider('provideValidAssetsPackageNameConfigurationTests')]
-    public function testValidAssetsPackageNameConfiguration($packageName)
+    public function testValidAssetsPackageNameConfiguration($packageName): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -200,7 +200,7 @@ class ConfigurationTest extends TestCase
     }
 
     #[DataProvider('provideInvalidAssetConfigurationTests')]
-    public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage)
+    public function testInvalidAssetsConfiguration(array $assetConfig, $expectedMessage): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -249,7 +249,7 @@ class ConfigurationTest extends TestCase
     }
 
     #[DataProvider('provideValidLockConfigurationTests')]
-    public function testValidLockConfiguration($lockConfig, $processedConfig)
+    public function testValidLockConfiguration($lockConfig, $processedConfig): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -307,7 +307,7 @@ class ConfigurationTest extends TestCase
         yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'flock'], ['name' => 'foo', 'value' => 'semaphore'], ['name' => 'bar', 'value' => 'semaphore']]], ['enabled' => false, 'resources' => ['foo' => ['flock', 'semaphore'], 'bar' => ['semaphore']]]];
     }
 
-    public function testLockMergeConfigs()
+    public function testLockMergeConfigs(): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -332,7 +332,7 @@ class ConfigurationTest extends TestCase
     }
 
     #[DataProvider('provideValidSemaphoreConfigurationTests')]
-    public function testValidSemaphoreConfiguration($semaphoreConfig, $processedConfig)
+    public function testValidSemaphoreConfiguration($semaphoreConfig, $processedConfig): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -378,7 +378,7 @@ class ConfigurationTest extends TestCase
         yield [['enabled' => false, 'resource' => [['name' => 'foo', 'value' => 'redis://foo'], ['name' => 'bar', 'value' => 'redis://bar']]], ['enabled' => false, 'resources' => ['foo' => 'redis://foo', 'bar' => 'redis://bar']]];
     }
 
-    public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus()
+    public function testItShowANiceMessageIfTwoMessengerBusesAreConfiguredButNoDefaultBus(): void
     {
         $expectedMessage = 'You must specify the "default_bus" if you define more than one bus.';
         $this->expectException(InvalidConfigurationException::class);
@@ -399,7 +399,7 @@ class ConfigurationTest extends TestCase
         ]);
     }
 
-    public function testBusMiddlewareDontMerge()
+    public function testBusMiddlewareDontMerge(): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -457,7 +457,7 @@ class ConfigurationTest extends TestCase
         );
     }
 
-    public function testItErrorsWhenDefaultBusDoesNotExist()
+    public function testItErrorsWhenDefaultBusDoesNotExist(): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -476,7 +476,7 @@ class ConfigurationTest extends TestCase
         ]]);
     }
 
-    public function testLockCanBeDisabled()
+    public function testLockCanBeDisabled(): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -488,7 +488,7 @@ class ConfigurationTest extends TestCase
         $this->assertFalse($config['lock']['enabled']);
     }
 
-    public function testEnabledLockNeedsResources()
+    public function testEnabledLockNeedsResources(): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -501,7 +501,7 @@ class ConfigurationTest extends TestCase
         ]]);
     }
 
-    public function testSerializerJsonDetailedErrorMessagesEnabledWhenDefaultContextIsConfigured()
+    public function testSerializerJsonDetailedErrorMessagesEnabledWhenDefaultContextIsConfigured(): void
     {
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [[
@@ -515,7 +515,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => true], $config['serializer']['default_context'] ?? []);
     }
 
-    public function testSerializerJsonDetailedErrorMessagesInDefaultContextCanBeDisabled()
+    public function testSerializerJsonDetailedErrorMessagesInDefaultContextCanBeDisabled(): void
     {
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [[
@@ -530,7 +530,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => false], $config['serializer']['default_context'] ?? []);
     }
 
-    public function testSerializerJsonDetailedErrorMessagesInDefaultContextCanBeDisabledWithSeveralConfigsBeingMerged()
+    public function testSerializerJsonDetailedErrorMessagesInDefaultContextCanBeDisabledWithSeveralConfigsBeingMerged(): void
     {
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [
@@ -554,7 +554,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame(['foo' => 'bar', JsonDecode::DETAILED_ERROR_MESSAGES => false, 'foobar' => 'baz'], $config['serializer']['default_context'] ?? []);
     }
 
-    public function testScopedHttpClientsInheritRateLimiterAndRetryFailedConfiguration()
+    public function testScopedHttpClientsInheritRateLimiterAndRetryFailedConfiguration(): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -594,7 +594,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame(999, $scopedClients['qux']['retry_failed']['delay']);
     }
 
-    public function testSerializerJsonDetailedErrorMessagesEnabledByDefaultWithDebugEnabled()
+    public function testSerializerJsonDetailedErrorMessagesEnabledByDefaultWithDebugEnabled(): void
     {
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(true), [
@@ -606,7 +606,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame([JsonDecode::DETAILED_ERROR_MESSAGES => true], $config['serializer']['default_context'] ?? []);
     }
 
-    public function testSerializerJsonDetailedErrorMessagesNotSetByDefaultWithDebugDisabled()
+    public function testSerializerJsonDetailedErrorMessagesNotSetByDefaultWithDebugDisabled(): void
     {
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(false), [
@@ -618,7 +618,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame([], $config['serializer']['default_context'] ?? []);
     }
 
-    public function testWorkflowEnumArcsNormalization()
+    public function testWorkflowEnumArcsNormalization(): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);
@@ -663,7 +663,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame([['place' => 'c', 'weight' => 1]], $transitions[1]['to']);
     }
 
-    public function testFormCsrfProtectionFieldAttrDoNotNormalizeKeys()
+    public function testFormCsrfProtectionFieldAttrDoNotNormalizeKeys(): void
     {
         $processor = new Processor();
         $config = $processor->processConfiguration(new Configuration(false), [
@@ -683,7 +683,7 @@ class ConfigurationTest extends TestCase
     #[TestWith(['GET'])]
     #[TestWith(['HEAD'])]
     #[TestWith(['TRACE'])]
-    public function testInvalidHttpMethodOverride(string $method)
+    public function testInvalidHttpMethodOverride(string $method): void
     {
         $processor = new Processor();
 
@@ -995,7 +995,7 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    public function testNamedSerializersReservedName()
+    public function testNamedSerializersReservedName(): void
     {
         $processor = new Processor();
         $configuration = new Configuration(true);

@@ -27,7 +27,7 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 {
     private string $entityManagerName = 'default';
 
-    public function testMiddlewarePingOk()
+    public function testMiddlewarePingOk(): void
     {
         $connection = $this->createMock(Connection::class);
         $connection->method('isConnected')->willReturn(true);
@@ -63,7 +63,7 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock());
     }
 
-    public function testMiddlewarePingResetEntityManager()
+    public function testMiddlewarePingResetEntityManager(): void
     {
         $connection = $this->createStub(Connection::class);
         $connection->method('isConnected')->willReturn(true);
@@ -96,7 +96,7 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock());
     }
 
-    public function testInvalidEntityManagerThrowsException()
+    public function testInvalidEntityManagerThrowsException(): void
     {
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->never())->method('getDatabasePlatform');
@@ -112,7 +112,7 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
         $middleware->handle(new Envelope(new \stdClass()), $this->getStackMock(false));
     }
 
-    public function testMiddlewareNoPingInNonWorkerContext()
+    public function testMiddlewareNoPingInNonWorkerContext(): void
     {
         $connection = $this->createMock(Connection::class);
         $entityManager = $this->createStub(EntityManagerInterface::class);
@@ -133,7 +133,7 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock());
     }
 
-    public function testMiddlewarePingsAllConnectionsWhenEntityManagerNameIsNull()
+    public function testMiddlewarePingsAllConnectionsWhenEntityManagerNameIsNull(): void
     {
         $firstConnection = $this->connectionExpectingOnePing();
         $secondConnection = $this->connectionExpectingOnePing();
@@ -151,7 +151,7 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock());
     }
 
-    public function testMiddlewareResetsClosedManagersWhenEntityManagerNameIsNull()
+    public function testMiddlewareResetsClosedManagersWhenEntityManagerNameIsNull(): void
     {
         $registry = $this->createRegistryForManagers([
             'open' => $this->createManagerWithConnection($this->connectionExpectingOnePing(), true),

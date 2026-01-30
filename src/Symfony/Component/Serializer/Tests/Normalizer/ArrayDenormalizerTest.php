@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class ArrayDenormalizerTest extends TestCase
 {
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $series = [
             [[['foo' => 'one', 'bar' => 'two']], new ArrayDummy('one', 'two')],
@@ -54,7 +54,7 @@ class ArrayDenormalizerTest extends TestCase
         );
     }
 
-    public function testSupportsValidArray()
+    public function testSupportsValidArray(): void
     {
         $nestedDenormalizer = $this->createMock(DenormalizerInterface::class);
         $nestedDenormalizer->expects($this->once())
@@ -77,7 +77,7 @@ class ArrayDenormalizerTest extends TestCase
         );
     }
 
-    public function testSupportsInvalidArray()
+    public function testSupportsInvalidArray(): void
     {
         $nestedDenormalizer = $this->createStub(DenormalizerInterface::class);
         $nestedDenormalizer
@@ -97,7 +97,7 @@ class ArrayDenormalizerTest extends TestCase
         );
     }
 
-    public function testSupportsNoArray()
+    public function testSupportsNoArray(): void
     {
         $denormalizer = new ArrayDenormalizer();
         $denormalizer->setDenormalizer($this->createStub(DenormalizerInterface::class));
@@ -110,7 +110,7 @@ class ArrayDenormalizerTest extends TestCase
         );
     }
 
-    public function testDenormalizeWithoutDenormalizer()
+    public function testDenormalizeWithoutDenormalizer(): void
     {
         $arrayDenormalizer = new ArrayDenormalizer();
 
@@ -118,7 +118,7 @@ class ArrayDenormalizerTest extends TestCase
         $arrayDenormalizer->denormalize([], 'string[]');
     }
 
-    public function testSupportsDenormalizationWithoutDenormalizer()
+    public function testSupportsDenormalizationWithoutDenormalizer(): void
     {
         $arrayDenormalizer = new ArrayDenormalizer();
 

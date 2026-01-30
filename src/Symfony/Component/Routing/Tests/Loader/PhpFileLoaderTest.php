@@ -28,7 +28,7 @@ use Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\MyController;
 
 class PhpFileLoaderTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $loader = new PhpFileLoader($this->createStub(FileLocatorInterface::class));
 
@@ -39,7 +39,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertFalse($loader->supports('foo.php', 'foo'), '->supports() checks the resource type if specified');
     }
 
-    public function testLoadWithRoute()
+    public function testLoadWithRoute(): void
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('validpattern.php');
@@ -59,7 +59,7 @@ class PhpFileLoaderTest extends TestCase
         }
     }
 
-    public function testLoadWithImport()
+    public function testLoadWithImport(): void
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('validresource.php');
@@ -78,7 +78,7 @@ class PhpFileLoaderTest extends TestCase
         }
     }
 
-    public function testThatDefiningVariableInConfigFileHasNoSideEffects()
+    public function testThatDefiningVariableInConfigFileHasNoSideEffects(): void
     {
         $locator = new FileLocator([__DIR__.'/../Fixtures']);
         $loader = new PhpFileLoader($locator);
@@ -93,7 +93,7 @@ class PhpFileLoaderTest extends TestCase
         );
     }
 
-    public function testLoadingRouteWithDefaults()
+    public function testLoadingRouteWithDefaults(): void
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routes = $loader->load('defaults.php');
@@ -107,7 +107,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('html', $defaultsRoute->getDefault('_format'));
     }
 
-    public function testLoadingRouteWithCollectionDefaults()
+    public function testLoadingRouteWithCollectionDefaults(): void
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routes = $loader->load('collection-defaults.php');
@@ -132,7 +132,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('html', $defaultsRoute->getDefault('_format'));
     }
 
-    public function testLoadingImportedRoutesWithDefaults()
+    public function testLoadingImportedRoutesWithDefaults(): void
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routes = $loader->load('importer-with-defaults.php');
@@ -156,7 +156,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes, $routes);
     }
 
-    public function testLoadingUtf8Route()
+    public function testLoadingUtf8Route(): void
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('utf8.php');
@@ -174,7 +174,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes, $routes);
     }
 
-    public function testLoadingUtf8ImportedRoutes()
+    public function testLoadingUtf8ImportedRoutes(): void
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('importer-with-utf8.php');
@@ -194,7 +194,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes, $routes);
     }
 
-    public function testRoutingConfigurator()
+    public function testRoutingConfigurator(): void
     {
         $locator = new FileLocator([__DIR__.'/../Fixtures']);
         $loader = new PhpFileLoader($locator);
@@ -247,7 +247,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedCollectionObject, $routeCollectionObject);
     }
 
-    public function testRoutingConfiguratorCanImportGlobPatterns()
+    public function testRoutingConfiguratorCanImportGlobPatterns(): void
     {
         $locator = new FileLocator([__DIR__.'/../Fixtures/glob']);
         $loader = new PhpFileLoader($locator);
@@ -260,7 +260,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('AppBundle:Baz:view', $route->getDefault('_controller'));
     }
 
-    public function testRoutingI18nConfigurator()
+    public function testRoutingI18nConfigurator(): void
     {
         $locator = new FileLocator([__DIR__.'/../Fixtures']);
         $loader = new PhpFileLoader($locator);
@@ -281,7 +281,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedCollection, $routeCollection);
     }
 
-    public function testImportingRoutesWithHostsInImporter()
+    public function testImportingRoutesWithHostsInImporter(): void
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
         $routes = $loader->load('importer-with-host.php');
@@ -291,7 +291,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('php'), $routes);
     }
 
-    public function testImportingRoutesWithLocalesAndHostInImporter()
+    public function testImportingRoutesWithLocalesAndHostInImporter(): void
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
         $routes = $loader->load('importer-with-locale-and-host.php');
@@ -301,7 +301,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('php'), $routes);
     }
 
-    public function testImportingRoutesWithoutHostInImporter()
+    public function testImportingRoutesWithoutHostInImporter(): void
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
         $routes = $loader->load('importer-without-host.php');
@@ -311,7 +311,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('php'), $routes);
     }
 
-    public function testImportingRoutesWithSingleHostInImporter()
+    public function testImportingRoutesWithSingleHostInImporter(): void
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
         $routes = $loader->load('importer-with-single-host.php');
@@ -321,7 +321,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('php'), $routes);
     }
 
-    public function testAddingRouteWithHosts()
+    public function testAddingRouteWithHosts(): void
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
         $routes = $loader->load('route-with-hosts.php');
@@ -331,7 +331,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('php'), $routes);
     }
 
-    public function testImportingAliases()
+    public function testImportingAliases(): void
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/alias']));
         $routes = $loader->load('alias.php');
@@ -341,7 +341,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('php'), $routes);
     }
 
-    public function testWhenEnv()
+    public function testWhenEnv(): void
     {
         $locator = new FileLocator([__DIR__.'/../Fixtures']);
         $loader = new PhpFileLoader($locator, 'some-env');
@@ -351,7 +351,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('/b', $routes->get('b')->getPath());
     }
 
-    public function testLoadsArrayRoutes()
+    public function testLoadsArrayRoutes(): void
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routes = $loader->load('array_routes.php');
@@ -360,7 +360,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame(['GET'], $routes->get('b')->getMethods());
     }
 
-    public function testWhenEnvWithArray()
+    public function testWhenEnvWithArray(): void
     {
         $locator = new FileLocator([__DIR__.'/../Fixtures']);
         $loader = new PhpFileLoader($locator, 'some-env');
@@ -369,7 +369,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('/x', $routes->get('x')->getPath());
     }
 
-    public function testYamlImportsAreResolvedWhenProcessingPhpReturnedArrays()
+    public function testYamlImportsAreResolvedWhenProcessingPhpReturnedArrays(): void
     {
         $locator = new FileLocator([__DIR__.'/../Fixtures']);
         $loader = new PhpFileLoader($locator);
@@ -385,7 +385,7 @@ class PhpFileLoaderTest extends TestCase
     }
 
     #[DataProvider('providePsr4ConfigFiles')]
-    public function testImportAttributesWithPsr4Prefix(string $configFile)
+    public function testImportAttributesWithPsr4Prefix(string $configFile): void
     {
         $locator = new FileLocator(\dirname(__DIR__).'/Fixtures');
         new LoaderResolver([
@@ -412,7 +412,7 @@ class PhpFileLoaderTest extends TestCase
         ];
     }
 
-    public function testImportAttributesFromClass()
+    public function testImportAttributesFromClass(): void
     {
         new LoaderResolver([
             $loader = new PhpFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures')),

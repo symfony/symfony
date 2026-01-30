@@ -18,7 +18,7 @@ use Symfony\Component\Lock\Serializer\LockKeyNormalizer;
 
 class LockKeyNormalizerTest extends TestCase
 {
-    public function testNormalizeAndDenormalize()
+    public function testNormalizeAndDenormalize(): void
     {
         $key = new Key(__METHOD__);
         $key->reduceLifetime(1);
@@ -30,7 +30,7 @@ class LockKeyNormalizerTest extends TestCase
         $this->assertEqualsWithDelta($key->getRemainingLifetime(), $copy->getRemainingLifetime(), 0.001);
     }
 
-    public function testNormalizingUnserializableLockThrows()
+    public function testNormalizingUnserializableLockThrows(): void
     {
         $key = new Key(__METHOD__);
         $key->markUnserializable();

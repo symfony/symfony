@@ -24,20 +24,20 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
 class TranslatorTest extends TestCase
 {
     #[DataProvider('getXpathLiteralTestData')]
-    public function testXpathLiteral($value, $literal)
+    public function testXpathLiteral($value, $literal): void
     {
         $this->assertEquals($literal, Translator::getXpathLiteral($value));
     }
 
     #[DataProvider('getCssToXPathTestData')]
-    public function testCssToXPath($css, $xpath)
+    public function testCssToXPath($css, $xpath): void
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
         $this->assertEquals($xpath, $translator->cssToXPath($css, ''));
     }
 
-    public function testCssToXPathPseudoElement()
+    public function testCssToXPathPseudoElement(): void
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
@@ -47,7 +47,7 @@ class TranslatorTest extends TestCase
         $translator->cssToXPath('e::first-line');
     }
 
-    public function testGetExtensionNotExistsExtension()
+    public function testGetExtensionNotExistsExtension(): void
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
@@ -57,7 +57,7 @@ class TranslatorTest extends TestCase
         $translator->getExtension('fake');
     }
 
-    public function testAddCombinationNotExistsExtension()
+    public function testAddCombinationNotExistsExtension(): void
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
@@ -70,7 +70,7 @@ class TranslatorTest extends TestCase
         $translator->addCombination('fake', $xpath, $combinedXpath);
     }
 
-    public function testAddFunctionNotExistsFunction()
+    public function testAddFunctionNotExistsFunction(): void
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
@@ -82,7 +82,7 @@ class TranslatorTest extends TestCase
         $translator->addFunction($xpath, $function);
     }
 
-    public function testAddPseudoClassNotExistsClass()
+    public function testAddPseudoClassNotExistsClass(): void
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
@@ -93,7 +93,7 @@ class TranslatorTest extends TestCase
         $translator->addPseudoClass($xpath, 'fake');
     }
 
-    public function testAddAttributeMatchingClassNotExistsClass()
+    public function testAddAttributeMatchingClassNotExistsClass(): void
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
@@ -105,7 +105,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getXmlLangTestData')]
-    public function testXmlLang($css, array $elementsId)
+    public function testXmlLang($css, array $elementsId): void
     {
         $translator = new Translator();
         $document = new \SimpleXMLElement(file_get_contents(__DIR__.'/Fixtures/lang.xml'));
@@ -117,7 +117,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getHtmlIdsTestData')]
-    public function testHtmlIds($css, array $elementsId)
+    public function testHtmlIds($css, array $elementsId): void
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
@@ -138,7 +138,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getHtmlShakespearTestData')]
-    public function testHtmlShakespear($css, $count)
+    public function testHtmlShakespear($css, $count): void
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));
@@ -151,7 +151,7 @@ class TranslatorTest extends TestCase
         $this->assertCount($count, $elements);
     }
 
-    public function testOnlyOfTypeFindsSingleChildrenOfGivenType()
+    public function testOnlyOfTypeFindsSingleChildrenOfGivenType(): void
     {
         $translator = new Translator();
         $translator->registerExtension(new HtmlExtension($translator));

@@ -16,7 +16,7 @@ use Symfony\Component\Form\ChoiceList\LazyChoiceList;
 
 trait ChoiceListAssertionTrait
 {
-    private function assertEqualsArrayChoiceList(ArrayChoiceList $expected, $actual)
+    private function assertEqualsArrayChoiceList(ArrayChoiceList $expected, $actual): void
     {
         $this->assertInstanceOf(ArrayChoiceList::class, $actual);
         $this->assertEquals($expected->getChoices(), $actual->getChoices());
@@ -24,7 +24,7 @@ trait ChoiceListAssertionTrait
         $this->assertEquals($expected->getOriginalKeys(), $actual->getOriginalKeys());
     }
 
-    private function assertEqualsLazyChoiceList(LazyChoiceList $expected, $actual)
+    private function assertEqualsLazyChoiceList(LazyChoiceList $expected, $actual): void
     {
         $this->assertInstanceOf(LazyChoiceList::class, $actual);
         $this->assertEquals($expected->getChoices(), $actual->getChoices());

@@ -28,7 +28,7 @@ use Symfony\Component\Serializer\Serializer;
 
 class MapDenormalizationTest extends TestCase
 {
-    public function testMapOfStringToNullableObject()
+    public function testMapOfStringToNullableObject(): void
     {
         $normalizedData = $this->getSerializer()->denormalize([
             'map' => [
@@ -52,7 +52,7 @@ class MapDenormalizationTest extends TestCase
         $this->assertNull($normalizedData->map['assertNull']);
     }
 
-    public function testMapOfStringToAbstractNullableObject()
+    public function testMapOfStringToAbstractNullableObject(): void
     {
         $normalizedData = $this->getSerializer()->denormalize(
             [
@@ -68,7 +68,7 @@ class MapDenormalizationTest extends TestCase
         $this->assertNull($normalizedData->map['assertNull']);
     }
 
-    public function testMapOfStringToObject()
+    public function testMapOfStringToObject(): void
     {
         $normalizedData = $this->getSerializer()->denormalize(
             [
@@ -94,7 +94,7 @@ class MapDenormalizationTest extends TestCase
         $this->assertNull($normalizedData->map['assertEmptyDummyMapValue']->value);
     }
 
-    public function testMapOfStringToAbstractObject()
+    public function testMapOfStringToAbstractObject(): void
     {
         $normalizedData = $this->getSerializer()->denormalize(
             [
@@ -116,7 +116,7 @@ class MapDenormalizationTest extends TestCase
         $this->assertEquals('foo', $normalizedData->map['assertDummyMapValue']->value);
     }
 
-    public function testMapOfStringToAbstractObjectMissingTypeAttribute()
+    public function testMapOfStringToAbstractObjectMissingTypeAttribute(): void
     {
         $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('Type property "type" not found for the abstract object "Symfony\Component\Serializer\Tests\Normalizer\AbstractDummyValue".');
@@ -129,7 +129,7 @@ class MapDenormalizationTest extends TestCase
             ], DummyMapOfStringToNotNullableAbstractObject::class);
     }
 
-    public function testNullableObject()
+    public function testNullableObject(): void
     {
         $normalizedData = $this->getSerializer()->denormalize(
             [
@@ -147,7 +147,7 @@ class MapDenormalizationTest extends TestCase
         $this->assertNull($normalizedData->nullObject);
     }
 
-    public function testNotNullableObject()
+    public function testNotNullableObject(): void
     {
         $normalizedData = $this->getSerializer()->denormalize(
             [
@@ -166,7 +166,7 @@ class MapDenormalizationTest extends TestCase
         $this->assertNull($normalizedData->nullObject->value);
     }
 
-    public function testNullableAbstractObject()
+    public function testNullableAbstractObject(): void
     {
         $normalizedData = $this->getSerializer()->denormalize(
             [

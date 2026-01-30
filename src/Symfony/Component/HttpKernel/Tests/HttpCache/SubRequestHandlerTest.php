@@ -31,7 +31,7 @@ class SubRequestHandlerTest extends TestCase
         Request::setTrustedProxies(self::$globalState[0], self::$globalState[1]);
     }
 
-    public function testTrustedHeadersAreKept()
+    public function testTrustedHeadersAreKept(): void
     {
         Request::setTrustedProxies(['10.0.0.1'], -1);
         $globalState = $this->getGlobalState();
@@ -44,7 +44,7 @@ class SubRequestHandlerTest extends TestCase
         $request->headers->set('X-Forwarded-Proto', 'https');
         $request->headers->set('X-Forwarded-Prefix', '/admin');
 
-        $kernel = new TestSubRequestHandlerKernel(function ($request, $type, $catch) {
+        $kernel = new TestSubRequestHandlerKernel(function ($request, $type, $catch): void {
             $this->assertSame('127.0.0.1', $request->server->get('REMOTE_ADDR'));
             $this->assertSame('10.0.0.2', $request->getClientIp());
             $this->assertSame('Good', $request->headers->get('X-Forwarded-Host'));
@@ -58,7 +58,7 @@ class SubRequestHandlerTest extends TestCase
         $this->assertSame($globalState, $this->getGlobalState());
     }
 
-    public function testUntrustedHeadersAreRemoved()
+    public function testUntrustedHeadersAreRemoved(): void
     {
         $request = Request::create('/');
         $request->server->set('REMOTE_ADDR', '10.0.0.1');
@@ -69,7 +69,7 @@ class SubRequestHandlerTest extends TestCase
         $request->headers->set('X-Forwarded-Prefix', '/admin');
         $request->headers->set('Forwarded', 'Evil2');
 
-        $kernel = new TestSubRequestHandlerKernel(function ($request, $type, $catch) {
+        $kernel = new TestSubRequestHandlerKernel(function ($request, $type, $catch): void {
             $this->assertSame('127.0.0.1', $request->server->get('REMOTE_ADDR'));
             $this->assertSame('10.0.0.1', $request->getClientIp());
             $this->assertFalse($request->headers->has('X-Forwarded-Host'));
@@ -84,7 +84,7 @@ class SubRequestHandlerTest extends TestCase
         $this->assertSame(self::$globalState, $this->getGlobalState());
     }
 
-    public function testTrustedForwardedHeader()
+    public function testTrustedForwardedHeader(): void
     {
         Request::setTrustedProxies(['10.0.0.1'], -1);
         $globalState = $this->getGlobalState();
@@ -93,7 +93,7 @@ class SubRequestHandlerTest extends TestCase
         $request->server->set('REMOTE_ADDR', '10.0.0.1');
         $request->headers->set('Forwarded', 'for="10.0.0.2";host="foo.bar:1234";proto=https');
 
-        $kernel = new TestSubRequestHandlerKernel(function ($request, $type, $catch) {
+        $kernel = new TestSubRequestHandlerKernel(function ($request, $type, $catch): void {
             $this->assertSame('127.0.0.1', $request->server->get('REMOTE_ADDR'));
             $this->assertSame('10.0.0.2', $request->getClientIp());
             $this->assertSame('foo.bar:1234', $request->getHttpHost());
@@ -106,7 +106,7 @@ class SubRequestHandlerTest extends TestCase
         $this->assertSame($globalState, $this->getGlobalState());
     }
 
-    public function testTrustedXForwardedForHeader()
+    public function testTrustedXForwardedForHeader(): void
     {
         Request::setTrustedProxies(['10.0.0.1'], -1);
         $globalState = $this->getGlobalState();
@@ -118,7 +118,7 @@ class SubRequestHandlerTest extends TestCase
         $request->headers->set('X-Forwarded-Proto', 'https');
         $request->headers->set('X-Forwarded-Prefix', '/admin');
 
-        $kernel = new TestSubRequestHandlerKernel(function ($request, $type, $catch) {
+        $kernel = new TestSubRequestHandlerKernel(function ($request, $type, $catch): void {
             $this->assertSame('127.0.0.1', $request->server->get('REMOTE_ADDR'));
             $this->assertSame('10.0.0.2', $request->getClientIp());
             $this->assertSame('foo.bar', $request->getHttpHost());

@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class NoTemplatingEntryTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $kernel = new NoTemplatingEntryKernel('dev', true);
         $kernel->boot();
@@ -41,7 +41,7 @@ class NoTemplatingEntryTest extends TestCase
         $this->deleteTempDir();
     }
 
-    protected function deleteTempDir()
+    protected function deleteTempDir(): void
     {
         if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/NoTemplatingEntryKernel')) {
             return;
@@ -61,7 +61,7 @@ class NoTemplatingEntryKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
-        $loader->load(static function (ContainerBuilder $container) {
+        $loader->load(static function (ContainerBuilder $container): void {
             $config = [
                 'secret' => '$ecret',
                 'form' => ['enabled' => false],

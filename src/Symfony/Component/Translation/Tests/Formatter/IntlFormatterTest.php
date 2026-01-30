@@ -22,18 +22,18 @@ use Symfony\Component\Translation\Formatter\IntlFormatterInterface;
 class IntlFormatterTest extends TestCase
 {
     #[DataProvider('provideDataForFormat')]
-    public function testFormat($expected, $message, $arguments)
+    public function testFormat($expected, $message, $arguments): void
     {
         $this->assertEquals($expected, trim((new IntlFormatter())->formatIntl($message, 'en', $arguments)));
     }
 
-    public function testInvalidFormat()
+    public function testInvalidFormat(): void
     {
         $this->expectException(InvalidArgumentException::class);
         (new IntlFormatter())->formatIntl('{foo', 'en', [2]);
     }
 
-    public function testFormatWithNamedArguments()
+    public function testFormatWithNamedArguments(): void
     {
         if (version_compare(\INTL_ICU_VERSION, '4.8', '<')) {
             $this->markTestSkipped('Format with named arguments can only be run with ICU 4.8 or higher and PHP >= 5.5');
@@ -90,7 +90,7 @@ class IntlFormatterTest extends TestCase
     }
 
     #[DataProvider('percentAndBracketsAreTrimmedProvider')]
-    public function testPercentsAndBracketsAreTrimmed(string $expected, string $message, array $parameters)
+    public function testPercentsAndBracketsAreTrimmed(string $expected, string $message, array $parameters): void
     {
         $formatter = new IntlFormatter();
         $this->assertInstanceof(IntlFormatterInterface::class, $formatter);

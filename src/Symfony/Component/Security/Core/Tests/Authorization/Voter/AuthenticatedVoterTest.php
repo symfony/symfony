@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 class AuthenticatedVoterTest extends TestCase
 {
     #[DataProvider('getVoteTests')]
-    public function testVote($authenticated, $attributes, $expected)
+    public function testVote($authenticated, $attributes, $expected): void
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
@@ -55,7 +55,7 @@ class AuthenticatedVoterTest extends TestCase
     }
 
     #[DataProvider('provideAttributes')]
-    public function testSupportsAttribute(string $attribute, bool $expected)
+    public function testSupportsAttribute(string $attribute, bool $expected): void
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
@@ -75,7 +75,7 @@ class AuthenticatedVoterTest extends TestCase
         yield ['foo', false];
     }
 
-    public function testSupportsType()
+    public function testSupportsType(): void
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
@@ -85,7 +85,7 @@ class AuthenticatedVoterTest extends TestCase
     }
 
     #[DataProvider('provideOfflineAttributes')]
-    public function testOfflineToken($attributes, $expected)
+    public function testOfflineToken($attributes, $expected): void
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
@@ -99,7 +99,7 @@ class AuthenticatedVoterTest extends TestCase
     }
 
     #[DataProvider('provideUnsupportedOfflineAttributes')]
-    public function testUnsupportedOfflineToken(string $attribute)
+    public function testUnsupportedOfflineToken(string $attribute): void
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 
@@ -123,7 +123,7 @@ class AuthenticatedVoterTest extends TestCase
 
         if ('fully' === $authenticated) {
             $token = new class extends AbstractToken {
-                public function getCredentials()
+                public function getCredentials(): void
                 {
                 }
             };

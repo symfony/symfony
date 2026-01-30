@@ -25,12 +25,12 @@ use Symfony\Component\Routing\Router;
 
 class LocaleListenerTest extends TestCase
 {
-    public function testIsAnEventSubscriber()
+    public function testIsAnEventSubscriber(): void
     {
         $this->assertInstanceOf(EventSubscriberInterface::class, new LocaleListener(new RequestStack()));
     }
 
-    public function testRegisteredEvent()
+    public function testRegisteredEvent(): void
     {
         $this->assertEquals(
             [
@@ -41,7 +41,7 @@ class LocaleListenerTest extends TestCase
         );
     }
 
-    public function testDefaultLocale()
+    public function testDefaultLocale(): void
     {
         $listener = new LocaleListener(new RequestStack(), 'fr');
         $event = $this->getEvent($request = Request::create('/'));
@@ -50,7 +50,7 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('fr', $request->getLocale());
     }
 
-    public function testLocaleFromRequestAttribute()
+    public function testLocaleFromRequestAttribute(): void
     {
         $request = Request::create('/');
         $request->cookies->set(session_name(), 'value');
@@ -63,7 +63,7 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('es', $request->getLocale());
     }
 
-    public function testLocaleSetForRoutingContext()
+    public function testLocaleSetForRoutingContext(): void
     {
         // the request context is updated
         $context = $this->createMock(RequestContext::class);
@@ -79,7 +79,7 @@ class LocaleListenerTest extends TestCase
         $listener->onKernelRequest($this->getEvent($request));
     }
 
-    public function testRouterResetWithParentRequestOnKernelFinishRequest()
+    public function testRouterResetWithParentRequestOnKernelFinishRequest(): void
     {
         // the request context is updated
         $context = $this->createMock(RequestContext::class);
@@ -103,7 +103,7 @@ class LocaleListenerTest extends TestCase
         $listener->onKernelFinishRequest($event);
     }
 
-    public function testRequestLocaleIsNotOverridden()
+    public function testRequestLocaleIsNotOverridden(): void
     {
         $request = Request::create('/');
         $request->setLocale('de');
@@ -114,7 +114,7 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('de', $request->getLocale());
     }
 
-    public function testRequestPreferredLocaleFromAcceptLanguageHeader()
+    public function testRequestPreferredLocaleFromAcceptLanguageHeader(): void
     {
         $request = Request::create('/');
         $request->headers->set('Accept-Language', 'fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5');
@@ -127,7 +127,7 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('fr', $request->getLocale());
     }
 
-    public function testRequestDefaultLocaleIfNoAcceptLanguageHeaderIsPresent()
+    public function testRequestDefaultLocaleIfNoAcceptLanguageHeaderIsPresent(): void
     {
         $request = new Request();
         $listener = new LocaleListener(new RequestStack(), 'de', null, true, ['lt', 'de']);
@@ -138,7 +138,7 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('de', $request->getLocale());
     }
 
-    public function testRequestVaryByLanguageAttributeIsSetIfUsingAcceptLanguageHeader()
+    public function testRequestVaryByLanguageAttributeIsSetIfUsingAcceptLanguageHeader(): void
     {
         $request = new Request();
         $listener = new LocaleListener(new RequestStack(), 'de', null, true, ['lt', 'de']);
@@ -149,7 +149,7 @@ class LocaleListenerTest extends TestCase
         $this->assertTrue($request->attributes->get('_vary_by_language'));
     }
 
-    public function testRequestSecondPreferredLocaleFromAcceptLanguageHeader()
+    public function testRequestSecondPreferredLocaleFromAcceptLanguageHeader(): void
     {
         $request = Request::create('/');
         $request->headers->set('Accept-Language', 'fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5');
@@ -162,7 +162,7 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('en', $request->getLocale());
     }
 
-    public function testDontUseAcceptLanguageHeaderIfNotEnabled()
+    public function testDontUseAcceptLanguageHeaderIfNotEnabled(): void
     {
         $request = Request::create('/');
         $request->headers->set('Accept-Language', 'fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5');
@@ -175,7 +175,7 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('de', $request->getLocale());
     }
 
-    public function testRequestUnavailablePreferredLocaleFromAcceptLanguageHeader()
+    public function testRequestUnavailablePreferredLocaleFromAcceptLanguageHeader(): void
     {
         $request = Request::create('/');
         $request->headers->set('Accept-Language', 'fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5');
@@ -188,7 +188,7 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('de', $request->getLocale());
     }
 
-    public function testRequestNoLocaleFromAcceptLanguageHeader()
+    public function testRequestNoLocaleFromAcceptLanguageHeader(): void
     {
         $request = Request::create('/');
         $request->headers->set('Accept-Language', 'fr-FR,fr;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6,es;q=0.5');
@@ -201,7 +201,7 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('fr_FR', $request->getLocale());
     }
 
-    public function testRequestAttributeLocaleNotOverriddenFromAcceptLanguageHeader()
+    public function testRequestAttributeLocaleNotOverriddenFromAcceptLanguageHeader(): void
     {
         $request = Request::create('/');
         $request->attributes->set('_locale', 'it');
@@ -215,7 +215,7 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('it', $request->getLocale());
     }
 
-    public function testEnabledLocalesFiltersEmptyValues()
+    public function testEnabledLocalesFiltersEmptyValues(): void
     {
         $request = Request::create('/');
         $request->headers->set('Accept-Language', 'es,fr;q=0.8,en;q=0.5');

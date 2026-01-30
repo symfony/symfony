@@ -98,7 +98,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         ];
     }
 
-    public function testCompareWithNullValueAtPropertyAt()
+    public function testCompareWithNullValueAtPropertyAt(): void
     {
         $constraint = $this->createConstraint(['propertyPath' => 'value']);
         $constraint->message = 'Constraint Message';
@@ -117,7 +117,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
             ->assertRaised();
     }
 
-    public function testCompareWithUninitializedPropertyAtPropertyPath()
+    public function testCompareWithUninitializedPropertyAtPropertyPath(): void
     {
         $this->setObject(new TypedDummy());
 

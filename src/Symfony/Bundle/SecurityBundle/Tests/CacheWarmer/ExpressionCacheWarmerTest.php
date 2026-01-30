@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 
 class ExpressionCacheWarmerTest extends TestCase
 {
-    public function testWarmUp()
+    public function testWarmUp(): void
     {
         $expressions = [new Expression('A'), new Expression('B')];
 

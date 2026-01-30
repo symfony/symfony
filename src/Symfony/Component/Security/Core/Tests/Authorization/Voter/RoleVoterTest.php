@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 class RoleVoterTest extends TestCase
 {
     #[DataProvider('getVoteTests')]
-    public function testVoteUsingTokenThatReturnsRoleNames($roles, $attributes, $expected)
+    public function testVoteUsingTokenThatReturnsRoleNames($roles, $attributes, $expected): void
     {
         $voter = new RoleVoter();
 
@@ -46,7 +46,7 @@ class RoleVoterTest extends TestCase
     }
 
     #[DataProvider('provideAttributes')]
-    public function testSupportsAttribute(string $prefix, string $attribute, bool $expected)
+    public function testSupportsAttribute(string $prefix, string $attribute, bool $expected): void
     {
         $voter = new RoleVoter($prefix);
 
@@ -63,7 +63,7 @@ class RoleVoterTest extends TestCase
         yield ['ROLE_', 'foo', false];
     }
 
-    public function testSupportsType()
+    public function testSupportsType(): void
     {
         $voter = new AuthenticatedVoter(new AuthenticationTrustResolver());
 

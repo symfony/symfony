@@ -43,7 +43,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->failureHandler = $this->createStub(AuthenticationFailureHandlerInterface::class);
     }
 
-    public function testHandleWhenUsernameEmpty()
+    public function testHandleWhenUsernameEmpty(): void
     {
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The key "_username" must be a non-empty string.');
@@ -55,7 +55,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->authenticator->authenticate($request);
     }
 
-    public function testHandleWhenPasswordEmpty()
+    public function testHandleWhenPasswordEmpty(): void
     {
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The key "_password" must be a non-empty string.');
@@ -68,7 +68,7 @@ class FormLoginAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideUsernamesForLength')]
-    public function testHandleWhenUsernameLength($username, $ok)
+    public function testHandleWhenUsernameLength($username, $ok): void
     {
         if ($ok) {
             $this->expectNotToPerformAssertions();
@@ -91,7 +91,7 @@ class FormLoginAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('postOnlyDataProvider')]
-    public function testHandleNonStringUsernameWithArray($postOnly)
+    public function testHandleNonStringUsernameWithArray($postOnly): void
     {
         $request = Request::create('/login_check', 'POST', ['_username' => []]);
         $request->setSession(new Session(new MockArraySessionStorage()));
@@ -105,7 +105,7 @@ class FormLoginAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('postOnlyDataProvider')]
-    public function testHandleNonStringUsernameWithInt($postOnly)
+    public function testHandleNonStringUsernameWithInt($postOnly): void
     {
         $request = Request::create('/login_check', 'POST', ['_username' => 42]);
         $request->setSession(new Session(new MockArraySessionStorage()));
@@ -119,7 +119,7 @@ class FormLoginAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('postOnlyDataProvider')]
-    public function testHandleNonStringUsernameWithObject($postOnly)
+    public function testHandleNonStringUsernameWithObject($postOnly): void
     {
         $request = Request::create('/login_check', 'POST', ['_username' => new \stdClass()]);
         $request->setSession(new Session(new MockArraySessionStorage()));
@@ -133,7 +133,7 @@ class FormLoginAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('postOnlyDataProvider')]
-    public function testHandleNonStringUsernameWithToString($postOnly)
+    public function testHandleNonStringUsernameWithToString($postOnly): void
     {
         $usernameObject = $this->createMock(DummyUserClass::class);
         $usernameObject->expects($this->once())->method('__toString')->willReturn('someUsername');
@@ -146,7 +146,7 @@ class FormLoginAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('postOnlyDataProvider')]
-    public function testHandleNonStringPasswordWithArray(bool $postOnly)
+    public function testHandleNonStringPasswordWithArray(bool $postOnly): void
     {
         $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => []]);
         $request->setSession(new Session(new MockArraySessionStorage()));
@@ -160,7 +160,7 @@ class FormLoginAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('postOnlyDataProvider')]
-    public function testHandleNonStringPasswordWithToString(bool $postOnly)
+    public function testHandleNonStringPasswordWithToString(bool $postOnly): void
     {
         $passwordObject = new class {
             public function __toString(): string
@@ -181,7 +181,7 @@ class FormLoginAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('postOnlyDataProvider')]
-    public function testHandleNonStringCsrfTokenWithArray($postOnly)
+    public function testHandleNonStringCsrfTokenWithArray($postOnly): void
     {
         $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => 'bar', '_csrf_token' => []]);
         $request->setSession(new Session(new MockArraySessionStorage()));
@@ -195,7 +195,7 @@ class FormLoginAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('postOnlyDataProvider')]
-    public function testHandleNonStringCsrfTokenWithInt($postOnly)
+    public function testHandleNonStringCsrfTokenWithInt($postOnly): void
     {
         $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => 'bar', '_csrf_token' => 42]);
         $request->setSession(new Session(new MockArraySessionStorage()));
@@ -209,7 +209,7 @@ class FormLoginAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('postOnlyDataProvider')]
-    public function testHandleNonStringCsrfTokenWithObject($postOnly)
+    public function testHandleNonStringCsrfTokenWithObject($postOnly): void
     {
         $request = Request::create('/login_check', 'POST', ['_username' => 'foo', '_password' => 'bar', '_csrf_token' => new \stdClass()]);
         $request->setSession(new Session(new MockArraySessionStorage()));
@@ -228,7 +228,7 @@ class FormLoginAuthenticatorTest extends TestCase
         yield [false];
     }
 
-    public function testCsrfProtection()
+    public function testCsrfProtection(): void
     {
         $request = Request::create('/login_check', 'POST', ['_username' => 'wouter', '_password' => 's$cr$t']);
         $request->setSession(new Session(new MockArraySessionStorage()));
@@ -238,7 +238,7 @@ class FormLoginAuthenticatorTest extends TestCase
         $this->assertTrue($passport->hasBadge(CsrfTokenBadge::class));
     }
 
-    public function testUpgradePassword()
+    public function testUpgradePassword(): void
     {
         $request = Request::create('/login_check', 'POST', ['_username' => 'wouter', '_password' => 's$cr$t']);
         $request->setSession(new Session(new MockArraySessionStorage()));
@@ -253,7 +253,7 @@ class FormLoginAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideContentTypes')]
-    public function testSupportsFormOnly(string $contentType, bool $shouldSupport)
+    public function testSupportsFormOnly(string $contentType, bool $shouldSupport): void
     {
         $request = new Request();
         $request->headers->set('CONTENT_TYPE', $contentType);
@@ -271,7 +271,7 @@ class FormLoginAuthenticatorTest extends TestCase
         yield ['application/x-www-form-urlencoded', true];
     }
 
-    private function setUpAuthenticator(array $options = [])
+    private function setUpAuthenticator(array $options = []): void
     {
         $this->authenticator = new FormLoginAuthenticator(new HttpUtils(), $this->userProvider, $this->successHandler, $this->failureHandler, $options);
     }

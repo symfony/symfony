@@ -60,7 +60,7 @@ final class MercureTransportFactoryTest extends AbstractTransportFactoryTestCase
         yield ['somethingElse://hubId?topic=topic'];
     }
 
-    public function testNotFoundHubThrows()
+    public function testNotFoundHubThrows(): void
     {
         $hub = $this->createStub(HubInterface::class);
         $hubRegistry = new HubRegistry($hub, ['hubId' => $hub, 'anotherHubId' => $hub]);

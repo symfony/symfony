@@ -45,21 +45,21 @@ class YamlDumperTest extends TestCase
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures');
     }
 
-    public function testDump()
+    public function testDump(): void
     {
         $dumper = new YamlDumper(new ContainerBuilder());
 
         $this->assertStringEqualsGeneratedFile('services1.yml', $dumper->dump(), '->dump() dumps an empty container as an empty YAML file');
     }
 
-    public function testAddParameters()
+    public function testAddParameters(): void
     {
         $container = include self::$fixturesPath.'/containers/container8.php';
         $dumper = new YamlDumper($container);
         $this->assertEqualYamlStructure(file_get_contents(self::$fixturesPath.'/yaml/services8.yml'), $dumper->dump(), '->dump() dumps parameters');
     }
 
-    public function testAddService()
+    public function testAddService(): void
     {
         $container = include self::$fixturesPath.'/containers/container9.php';
         $dumper = new YamlDumper($container);
@@ -76,21 +76,21 @@ class YamlDumperTest extends TestCase
         }
     }
 
-    public function testDumpAutowireData()
+    public function testDumpAutowireData(): void
     {
         $container = include self::$fixturesPath.'/containers/container24.php';
         $dumper = new YamlDumper($container);
         $this->assertStringEqualsGeneratedFile('services24.yml', $dumper->dump());
     }
 
-    public function testDumpDecoratedServices()
+    public function testDumpDecoratedServices(): void
     {
         $container = include self::$fixturesPath.'/containers/container34.php';
         $dumper = new YamlDumper($container);
         $this->assertStringEqualsGeneratedFile('services34.yml', $dumper->dump());
     }
 
-    public function testDumpLoad()
+    public function testDumpLoad(): void
     {
         $container = new ContainerBuilder();
         $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
@@ -102,7 +102,7 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsGeneratedFile('services_dump_load.yml', $dumper->dump());
     }
 
-    public function testInlineServices()
+    public function testInlineServices(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'Class1')
@@ -118,7 +118,7 @@ class YamlDumperTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedArguments()
+    public function testTaggedArguments(): void
     {
         $taggedIterator = new TaggedIteratorArgument('foo', 'barfoo', 'foobar', false, 'getPriority');
         $taggedIterator2 = new TaggedIteratorArgument('foo', null, null, false, null, ['baz']);
@@ -143,7 +143,7 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsGeneratedFile('services_with_tagged_argument.yml', $dumper->dump());
     }
 
-    public function testServiceClosure()
+    public function testServiceClosure(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'Foo')
@@ -154,7 +154,7 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsGeneratedFile('services_with_service_closure.yml', $dumper->dump());
     }
 
-    public function testDumpHandlesEnumeration()
+    public function testDumpHandlesEnumeration(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -176,7 +176,7 @@ class YamlDumperTest extends TestCase
     }
 
     #[DataProvider('provideDefaultClasses')]
-    public function testDumpHandlesDefaultAttribute($class, $expectedFile)
+    public function testDumpHandlesDefaultAttribute($class, $expectedFile): void
     {
         $container = new ContainerBuilder();
         $container
@@ -199,7 +199,7 @@ class YamlDumperTest extends TestCase
         yield [FooClassWithDefaultEnumAttribute::class, 'services_with_default_enumeration.yml'];
     }
 
-    public function testDumpServiceWithAbstractArgument()
+    public function testDumpServiceWithAbstractArgument(): void
     {
         $container = new ContainerBuilder();
         $container->register(FooWithAbstractArgument::class, FooWithAbstractArgument::class)
@@ -210,7 +210,7 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsGeneratedFile('services_with_abstract_argument.yml', $dumper->dump());
     }
 
-    public function testDumpNonScalarTags()
+    public function testDumpNonScalarTags(): void
     {
         $container = include self::$fixturesPath.'/containers/container_non_scalar_tags.php';
         $dumper = new YamlDumper($container);
@@ -218,7 +218,7 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsGeneratedFile('services_with_array_tags.yml', $dumper->dump());
     }
 
-    public function testDumpResolvedEnvPlaceholders()
+    public function testDumpResolvedEnvPlaceholders(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('%env(PARAMETER_NAME)%', '%env(PARAMETER_VALUE)%');
@@ -238,7 +238,7 @@ class YamlDumperTest extends TestCase
         $this->assertStringEqualsGeneratedFile('container_with_env_placeholders.yml', $dumper->dump());
     }
 
-    private function assertEqualYamlStructure(string $expected, string $yaml, string $message = '')
+    private function assertEqualYamlStructure(string $expected, string $yaml, string $message = ''): void
     {
         $parser = new Parser();
 

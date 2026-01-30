@@ -22,53 +22,53 @@ use Symfony\Component\Config\Tests\Fixtures\TestEnum2;
 
 class EnumNodeTest extends TestCase
 {
-    public function testFinalizeValue()
+    public function testFinalizeValue(): void
     {
         $node = new EnumNode('foo', null, ['foo', 'bar', TestEnum::Bar]);
         $this->assertSame('foo', $node->finalize('foo'));
         $this->assertSame(TestEnum::Bar, $node->finalize(TestEnum::Bar));
     }
 
-    public function testConstructionWithNoValues()
+    public function testConstructionWithNoValues(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$values must contain at least one element.');
         new EnumNode('foo', null, []);
     }
 
-    public function testConstructionWithBothValuesAndEnumFqcn()
+    public function testConstructionWithBothValuesAndEnumFqcn(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$values or $enumFqcn cannot be both set.');
         new EnumNode('foo', null, [1, 2], enumFqcn: StringBackedTestEnum::class);
     }
 
-    public function testConstructionWithInvlaidEnumFqcn()
+    public function testConstructionWithInvlaidEnumFqcn(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "Symfony\Component\Config\Tests\Definition\InvalidEnum" enum does not exist.');
         new EnumNode('foo', null, enumFqcn: InvalidEnum::class);
     }
 
-    public function testConstructionWithOneValue()
+    public function testConstructionWithOneValue(): void
     {
         $node = new EnumNode('foo', null, ['foo']);
         $this->assertSame('foo', $node->finalize('foo'));
     }
 
-    public function testConstructionWithOneDistinctValue()
+    public function testConstructionWithOneDistinctValue(): void
     {
         $node = new EnumNode('foo', null, ['foo', 'foo']);
         $this->assertSame('foo', $node->finalize('foo'));
     }
 
-    public function testConstructionWithNullName()
+    public function testConstructionWithNullName(): void
     {
         $node = new EnumNode(null, null, ['foo']);
         $this->assertSame('foo', $node->finalize('foo'));
     }
 
-    public function testFinalizeWithInvalidValue()
+    public function testFinalizeWithInvalidValue(): void
     {
         $node = new EnumNode('foo', null, ['foo', 'bar', TestEnum::Foo]);
 
@@ -78,7 +78,7 @@ class EnumNodeTest extends TestCase
         $node->finalize('foobar');
     }
 
-    public function testFinalizeUnitEnumFqcnWithInvalidValue()
+    public function testFinalizeUnitEnumFqcnWithInvalidValue(): void
     {
         $node = new EnumNode('foo', null, enumFqcn: TestEnum::class);
 
@@ -88,28 +88,28 @@ class EnumNodeTest extends TestCase
         $node->finalize('foobar');
     }
 
-    public function testFinalizeWithStringEnumFqcn()
+    public function testFinalizeWithStringEnumFqcn(): void
     {
         $node = new EnumNode('foo', null, enumFqcn: StringBackedTestEnum::class);
 
         $this->assertSame(StringBackedTestEnum::Foo, $node->finalize(StringBackedTestEnum::Foo));
     }
 
-    public function testFinalizeWithIntegerEnumFqcn()
+    public function testFinalizeWithIntegerEnumFqcn(): void
     {
         $node = new EnumNode('foo', null, enumFqcn: IntegerBackedTestEnum::class);
 
         $this->assertSame(IntegerBackedTestEnum::One, $node->finalize(IntegerBackedTestEnum::One));
     }
 
-    public function testFinalizeWithUnitEnumFqcn()
+    public function testFinalizeWithUnitEnumFqcn(): void
     {
         $node = new EnumNode('foo', null, enumFqcn: TestEnum::class);
 
         $this->assertSame(TestEnum::Foo, $node->finalize(TestEnum::Foo));
     }
 
-    public function testFinalizeAnotherEnumWithEnumFqcn()
+    public function testFinalizeAnotherEnumWithEnumFqcn(): void
     {
         $node = new EnumNode('foo', null, enumFqcn: StringBackedTestEnum::class);
 
@@ -119,21 +119,21 @@ class EnumNodeTest extends TestCase
         $node->finalize(StringBackedTestEnum2::Foo);
     }
 
-    public function testFinalizeWithEnumFqcnWorksWithPlainString()
+    public function testFinalizeWithEnumFqcnWorksWithPlainString(): void
     {
         $node = new EnumNode('foo', null, enumFqcn: StringBackedTestEnum::class);
 
         $this->assertSame(StringBackedTestEnum::Foo, $node->finalize('foo'));
     }
 
-    public function testFinalizeWithEnumFqcnWorksWithInteger()
+    public function testFinalizeWithEnumFqcnWorksWithInteger(): void
     {
         $node = new EnumNode('foo', null, enumFqcn: IntegerBackedTestEnum::class);
 
         $this->assertSame(IntegerBackedTestEnum::One, $node->finalize(1));
     }
 
-    public function testFinalizeWithStringEnumFqcnWithWrongCase()
+    public function testFinalizeWithStringEnumFqcnWithWrongCase(): void
     {
         $node = new EnumNode('foo', null, enumFqcn: StringBackedTestEnum::class);
 
@@ -143,7 +143,7 @@ class EnumNodeTest extends TestCase
         $node->finalize('qux');
     }
 
-    public function testFinalizeWithStringEnumFqcnWithIntegerCase()
+    public function testFinalizeWithStringEnumFqcnWithIntegerCase(): void
     {
         $node = new EnumNode('foo', null, enumFqcn: StringBackedTestEnum::class);
 
@@ -153,7 +153,7 @@ class EnumNodeTest extends TestCase
         $node->finalize(1);
     }
 
-    public function testFinalizeWithIntegerEnumFqcnWithWrongCase()
+    public function testFinalizeWithIntegerEnumFqcnWithWrongCase(): void
     {
         $node = new EnumNode('foo', null, enumFqcn: IntegerBackedTestEnum::class);
 
@@ -163,7 +163,7 @@ class EnumNodeTest extends TestCase
         $node->finalize(3);
     }
 
-    public function testFinalizeWithIntegerEnumFqcnWithStringCase()
+    public function testFinalizeWithIntegerEnumFqcnWithStringCase(): void
     {
         $node = new EnumNode('foo', null, enumFqcn: IntegerBackedTestEnum::class);
 
@@ -173,7 +173,7 @@ class EnumNodeTest extends TestCase
         $node->finalize('my string');
     }
 
-    public function testFinalizeWithEnumFqcnWithWrongType()
+    public function testFinalizeWithEnumFqcnWithWrongType(): void
     {
         $node = new EnumNode('foo', null, enumFqcn: StringBackedTestEnum::class);
 
@@ -183,14 +183,14 @@ class EnumNodeTest extends TestCase
         $node->finalize(true);
     }
 
-    public function testWithPlaceHolderWithValidValue()
+    public function testWithPlaceHolderWithValidValue(): void
     {
         $node = new EnumNode('cookie_samesite', null, ['lax', 'strict', 'none']);
         EnumNode::setPlaceholder('custom', ['string' => 'lax']);
         $this->assertSame('custom', $node->finalize('custom'));
     }
 
-    public function testWithPlaceHolderWithInvalidValue()
+    public function testWithPlaceHolderWithInvalidValue(): void
     {
         $node = new EnumNode('cookie_samesite', null, ['lax', 'strict', 'none']);
         EnumNode::setPlaceholder('custom', ['string' => 'foo']);
@@ -199,7 +199,7 @@ class EnumNodeTest extends TestCase
         $node->finalize('custom');
     }
 
-    public function testSameStringCoercedValuesAreDifferent()
+    public function testSameStringCoercedValuesAreDifferent(): void
     {
         $node = new EnumNode('ccc', null, ['', false, null]);
         $this->assertSame('', $node->finalize(''));
@@ -207,7 +207,7 @@ class EnumNodeTest extends TestCase
         $this->assertNull($node->finalize(null));
     }
 
-    public function testNonScalarOrEnumOrNullValueThrows()
+    public function testNonScalarOrEnumOrNullValueThrows(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('"Symfony\Component\Config\Definition\EnumNode" only supports scalar, enum, or null values, "stdClass" given.');
@@ -215,7 +215,7 @@ class EnumNodeTest extends TestCase
         new EnumNode('ccc', null, [new \stdClass()]);
     }
 
-    public function testTwoDifferentEnumsThrows()
+    public function testTwoDifferentEnumsThrows(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('"Symfony\Component\Config\Definition\EnumNode" only supports one type of enum, "Symfony\Component\Config\Tests\Fixtures\TestEnum" and "Symfony\Component\Config\Tests\Fixtures\TestEnum2" passed.');
@@ -223,7 +223,7 @@ class EnumNodeTest extends TestCase
         new EnumNode('ccc', null, [...TestEnum::cases(), TestEnum2::Ccc]);
     }
 
-    public function testFinalizeNullableBackedEnum()
+    public function testFinalizeNullableBackedEnum(): void
     {
         $node = new EnumNode('status', null, enumFqcn: StringBackedTestEnum::class);
         $node->setAllowEmptyValue(true); // Equivalent to ->defaultNull() in the builder

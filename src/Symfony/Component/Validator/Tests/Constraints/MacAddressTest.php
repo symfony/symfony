@@ -21,14 +21,14 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class MacAddressTest extends TestCase
 {
-    public function testNormalizerCanBeSet()
+    public function testNormalizerCanBeSet(): void
     {
         $mac = new MacAddress(normalizer: 'trim');
 
         $this->assertEquals(trim(...), $mac->normalizer);
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(MacAddressDummy::class);
         $loader = new AttributeLoader();

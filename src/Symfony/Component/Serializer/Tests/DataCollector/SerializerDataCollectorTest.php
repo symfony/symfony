@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class SerializerDataCollectorTest extends TestCase
 {
-    public function testCollectSerialize()
+    public function testCollectSerialize(): void
     {
         $dataCollector = new SerializerDataCollector();
 
@@ -58,7 +58,7 @@ class SerializerDataCollectorTest extends TestCase
         ]], $collectedData['deserialize']);
     }
 
-    public function testCollectNormalize()
+    public function testCollectNormalize(): void
     {
         $dataCollector = new SerializerDataCollector();
 
@@ -96,7 +96,7 @@ class SerializerDataCollectorTest extends TestCase
         ]], $collectedData['denormalize']);
     }
 
-    public function testCollectEncode()
+    public function testCollectEncode(): void
     {
         $dataCollector = new SerializerDataCollector();
 
@@ -134,7 +134,7 @@ class SerializerDataCollectorTest extends TestCase
         ]], $collectedData['decode']);
     }
 
-    public function testCollectNormalization()
+    public function testCollectNormalization(): void
     {
         $dataCollector = new SerializerDataCollector();
 
@@ -190,7 +190,7 @@ class SerializerDataCollectorTest extends TestCase
         $this->assertArrayHasKey('line', $collectedData['denormalize'][0]['normalization'][ObjectNormalizer::class]);
     }
 
-    public function testCollectEncoding()
+    public function testCollectEncoding(): void
     {
         $dataCollector = new SerializerDataCollector();
 
@@ -246,7 +246,7 @@ class SerializerDataCollectorTest extends TestCase
         $this->assertArrayHasKey('line', $collectedData['decode'][0]['encoding'][CsvEncoder::class]);
     }
 
-    public function testCountHandled()
+    public function testCountHandled(): void
     {
         $dataCollector = new SerializerDataCollector();
 
@@ -264,7 +264,7 @@ class SerializerDataCollectorTest extends TestCase
         $this->assertSame(7, $dataCollector->getHandledCount());
     }
 
-    public function testGetTotalTime()
+    public function testGetTotalTime(): void
     {
         $dataCollector = new SerializerDataCollector();
 
@@ -283,7 +283,7 @@ class SerializerDataCollectorTest extends TestCase
         $this->assertSame(28.0, $dataCollector->getTotalTime());
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $dataCollector = new SerializerDataCollector();
 
@@ -297,7 +297,7 @@ class SerializerDataCollectorTest extends TestCase
         $this->assertSame([], $dataCollector->getData());
     }
 
-    public function testDoNotCollectPartialTraces()
+    public function testDoNotCollectPartialTraces(): void
     {
         $dataCollector = new SerializerDataCollector();
 
@@ -318,7 +318,7 @@ class SerializerDataCollectorTest extends TestCase
         $this->assertSame([], $data['decode']);
     }
 
-    public function testNamedSerializers()
+    public function testNamedSerializers(): void
     {
         $dataCollector = new SerializerDataCollector();
 

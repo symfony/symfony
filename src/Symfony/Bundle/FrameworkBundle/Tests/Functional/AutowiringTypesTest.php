@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class AutowiringTypesTest extends AbstractWebTestCase
 {
-    public function testEventDispatcherAutowiring()
+    public function testEventDispatcherAutowiring(): void
     {
         static::bootKernel(['debug' => false]);
 
@@ -31,7 +31,7 @@ class AutowiringTypesTest extends AbstractWebTestCase
         $this->assertInstanceOf(TraceableEventDispatcher::class, $autowiredServices->getDispatcher(), 'The debug.event_dispatcher service should be injected if the debug is enabled');
     }
 
-    public function testCacheAutowiring()
+    public function testCacheAutowiring(): void
     {
         static::bootKernel();
 

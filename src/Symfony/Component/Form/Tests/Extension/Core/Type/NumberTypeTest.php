@@ -40,7 +40,7 @@ class NumberTypeTest extends BaseTypeTestCase
         }
     }
 
-    public function testDefaultFormatting()
+    public function testDefaultFormatting(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->setData('12345.67890');
@@ -48,7 +48,7 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertSame('12345,679', $form->createView()->vars['value']);
     }
 
-    public function testDefaultFormattingWithGrouping()
+    public function testDefaultFormattingWithGrouping(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['grouping' => true]);
         $form->setData('12345.67890');
@@ -56,7 +56,7 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertSame('12.345,679', $form->createView()->vars['value']);
     }
 
-    public function testDefaultFormattingWithScale()
+    public function testDefaultFormattingWithScale(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 2]);
         $form->setData('12345.67890');
@@ -64,7 +64,7 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertSame('12345,68', $form->createView()->vars['value']);
     }
 
-    public function testDefaultFormattingWithScaleFloat()
+    public function testDefaultFormattingWithScaleFloat(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 2]);
         $form->setData(12345.67890);
@@ -72,7 +72,7 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertSame('12345,68', $form->createView()->vars['value']);
     }
 
-    public function testDefaultFormattingWithScaleAndStringInput()
+    public function testDefaultFormattingWithScaleAndStringInput(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 2, 'input' => 'string']);
         $form->setData('12345.67890');
@@ -80,7 +80,7 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertSame('12345,68', $form->createView()->vars['value']);
     }
 
-    public function testStringInputWithFloatData()
+    public function testStringInputWithFloatData(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected a numeric string.');
@@ -91,7 +91,7 @@ class NumberTypeTest extends BaseTypeTestCase
         ]);
     }
 
-    public function testStringInputWithIntData()
+    public function testStringInputWithIntData(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected a numeric string.');
@@ -102,7 +102,7 @@ class NumberTypeTest extends BaseTypeTestCase
         ]);
     }
 
-    public function testDefaultFormattingWithRounding()
+    public function testDefaultFormattingWithRounding(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_UP]);
         $form->setData('12345.54321');
@@ -110,12 +110,12 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertSame('12346', $form->createView()->vars['value']);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = '10', $expectedData = 10.0)
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = '10', $expectedData = 10.0): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => $emptyData,
@@ -127,7 +127,7 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertSame($expectedData, $form->getData());
     }
 
-    public function testSubmitNullWithEmptyDataSetToNull()
+    public function testSubmitNullWithEmptyDataSetToNull(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => null,
@@ -142,7 +142,7 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertNull($form->getData());
     }
 
-    public function testSubmitNumericInput()
+    public function testSubmitNumericInput(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'number']);
         $form->submit('1,234');
@@ -152,7 +152,7 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertSame('1,234', $form->getViewData());
     }
 
-    public function testSubmitNumericInputWithScale()
+    public function testSubmitNumericInputWithScale(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'number', 'scale' => 2]);
         $form->submit('1,234');
@@ -162,7 +162,7 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertSame('1,23', $form->getViewData());
     }
 
-    public function testSubmitStringInput()
+    public function testSubmitStringInput(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'string']);
         $form->submit('1,234');
@@ -172,7 +172,7 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertSame('1,234', $form->getViewData());
     }
 
-    public function testSubmitStringInputWithScale()
+    public function testSubmitStringInputWithScale(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'string', 'scale' => 2]);
         $form->submit('1,234');
@@ -182,7 +182,7 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertSame('1,23', $form->getViewData());
     }
 
-    public function testIgnoresDefaultLocaleToRenderHtml5NumberWidgets()
+    public function testIgnoresDefaultLocaleToRenderHtml5NumberWidgets(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'scale' => 2,
@@ -195,7 +195,7 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertSame('12345.55', $form->getViewData());
     }
 
-    public function testGroupingNotAllowedWithHtml5Widget()
+    public function testGroupingNotAllowedWithHtml5Widget(): void
     {
         $this->expectException(LogicException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
@@ -204,7 +204,7 @@ class NumberTypeTest extends BaseTypeTestCase
         ]);
     }
 
-    public function testNumericInputmode()
+    public function testNumericInputmode(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'scale' => 0,
@@ -215,7 +215,7 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertSame('numeric', $form->createView()->vars['attr']['inputmode']);
     }
 
-    public function testDecimalInputmode()
+    public function testDecimalInputmode(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'scale' => 2,
@@ -226,7 +226,7 @@ class NumberTypeTest extends BaseTypeTestCase
         $this->assertSame('decimal', $form->createView()->vars['attr']['inputmode']);
     }
 
-    public function testNoInputmodeWithHtml5Widget()
+    public function testNoInputmodeWithHtml5Widget(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'html5' => true,

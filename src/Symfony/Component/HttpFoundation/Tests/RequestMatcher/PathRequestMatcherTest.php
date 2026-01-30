@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
 class PathRequestMatcherTest extends TestCase
 {
     #[DataProvider('getData')]
-    public function test(string $regexp, bool $expected)
+    public function test(string $regexp, bool $expected): void
     {
         $matcher = new PathRequestMatcher($regexp);
         $request = Request::create('/admin/foo');
@@ -36,7 +36,7 @@ class PathRequestMatcherTest extends TestCase
         ];
     }
 
-    public function testWithLocaleIsNotSupported()
+    public function testWithLocaleIsNotSupported(): void
     {
         $matcher = new PathRequestMatcher('^/{_locale}/login$');
         $request = Request::create('/en/login');
@@ -44,7 +44,7 @@ class PathRequestMatcherTest extends TestCase
         $this->assertFalse($matcher->matches($request));
     }
 
-    public function testWithEncodedCharacters()
+    public function testWithEncodedCharacters(): void
     {
         $matcher = new PathRequestMatcher('^/admin/fo o*$');
         $request = Request::create('/admin/fo%20o');

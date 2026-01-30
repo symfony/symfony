@@ -56,7 +56,7 @@ final class OvhCloudTransportTest extends TransportTestCase
 
     #[Group('time-sensitive')]
     #[DataProvider('validMessagesProvider')]
-    public function testValidSignature(string $message)
+    public function testValidSignature(string $message): void
     {
         $smsMessage = new SmsMessage('0611223344', $message);
 
@@ -90,7 +90,7 @@ final class OvhCloudTransportTest extends TransportTestCase
         $this->assertSame('$1$'.sha1($toSign), $signature);
     }
 
-    public function testInvalidReceiver()
+    public function testInvalidReceiver(): void
     {
         $smsMessage = new SmsMessage('invalid_receiver', 'lorem ipsum');
 
@@ -112,7 +112,7 @@ final class OvhCloudTransportTest extends TransportTestCase
         $transport->send($smsMessage);
     }
 
-    public function testSentMessageInfo()
+    public function testSentMessageInfo(): void
     {
         $smsMessage = new SmsMessage('0611223344', 'lorem ipsum');
 

@@ -23,7 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class VariadicValueResolverTest extends TestCase
 {
-    public function testResolveVariadicArgument()
+    public function testResolveVariadicArgument(): void
     {
         $resolver = new VariadicValueResolver();
 
@@ -35,7 +35,7 @@ class VariadicValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 string ...$files,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -47,7 +47,7 @@ class VariadicValueResolverTest extends TestCase
         $this->assertSame(['file1.txt', 'file2.txt', 'file3.txt'], $result);
     }
 
-    public function testResolveVariadicOption()
+    public function testResolveVariadicOption(): void
     {
         $resolver = new VariadicValueResolver();
 
@@ -59,7 +59,7 @@ class VariadicValueResolverTest extends TestCase
             public function __invoke(
                 #[Option]
                 string ...$tags,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -71,7 +71,7 @@ class VariadicValueResolverTest extends TestCase
         $this->assertSame(['foo', 'bar', 'baz'], $result);
     }
 
-    public function testResolveEmptyVariadicArgument()
+    public function testResolveEmptyVariadicArgument(): void
     {
         $resolver = new VariadicValueResolver();
 
@@ -83,7 +83,7 @@ class VariadicValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 string ...$files,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -95,7 +95,7 @@ class VariadicValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testDoesNotResolveNonVariadicParameter()
+    public function testDoesNotResolveNonVariadicParameter(): void
     {
         $resolver = new VariadicValueResolver();
 
@@ -107,7 +107,7 @@ class VariadicValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 string $name,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -119,7 +119,7 @@ class VariadicValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testDoesNotResolveWithoutAttribute()
+    public function testDoesNotResolveWithoutAttribute(): void
     {
         $resolver = new VariadicValueResolver();
 
@@ -137,7 +137,7 @@ class VariadicValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testThrowsWhenArgumentValueIsNotArray()
+    public function testThrowsWhenArgumentValueIsNotArray(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The action argument "...$files" is required to be an array');
@@ -152,7 +152,7 @@ class VariadicValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 string ...$files,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -162,7 +162,7 @@ class VariadicValueResolverTest extends TestCase
         iterator_to_array($resolver->resolve('files', $input, $member));
     }
 
-    public function testThrowsWhenOptionValueIsNotArray()
+    public function testThrowsWhenOptionValueIsNotArray(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The action argument "...$tags" is required to be an array');
@@ -177,7 +177,7 @@ class VariadicValueResolverTest extends TestCase
             public function __invoke(
                 #[Option]
                 string ...$tags,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');

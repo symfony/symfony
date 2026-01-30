@@ -29,17 +29,17 @@ class HttpOptionsTest extends TestCase
     }
 
     #[DataProvider('provideSetAuthBasic')]
-    public function testSetAuthBasic(string $expected, string $user, string $password = '')
+    public function testSetAuthBasic(string $expected, string $user, string $password = ''): void
     {
         $this->assertSame($expected, (new HttpOptions())->setAuthBasic($user, $password)->toArray()['auth_basic']);
     }
 
-    public function testSetAuthBearer()
+    public function testSetAuthBearer(): void
     {
         $this->assertSame('foobar', (new HttpOptions())->setAuthBearer('foobar')->toArray()['auth_bearer']);
     }
 
-    public function testSetHeader()
+    public function testSetHeader(): void
     {
         $options = new HttpOptions();
         $options->setHeader('Accept', 'application/json');
@@ -50,7 +50,7 @@ class HttpOptionsTest extends TestCase
         $this->assertSame(['Accept' => 'application/html', 'Accept-Language' => 'en-US,en;q=0.5'], $options->toArray()['headers']);
     }
 
-    public function testSetMaxConnectDuration()
+    public function testSetMaxConnectDuration(): void
     {
         $this->assertSame(5.0, (new HttpOptions())->setMaxConnectDuration(5.0)->toArray()['max_connect_duration']);
     }

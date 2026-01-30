@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 abstract class DateIntervalTestCase extends TestCase
 {
-    public static function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual)
+    public static function assertDateIntervalEquals(\DateInterval $expected, \DateInterval $actual): void
     {
         self::assertEquals($expected->format('%RP%yY%mM%dDT%hH%iM%sS'), $actual->format('%RP%yY%mM%dDT%hH%iM%sS'));
     }

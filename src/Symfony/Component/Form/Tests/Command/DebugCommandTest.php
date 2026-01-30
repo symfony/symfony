@@ -29,7 +29,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class DebugCommandTest extends TestCase
 {
-    public function testDebugDefaults()
+    public function testDebugDefaults(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute([], ['decorated' => false]);
@@ -38,7 +38,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('Built-in form types', $tester->getDisplay());
     }
 
-    public function testDebugDeprecatedDefaults()
+    public function testDebugDeprecatedDefaults(): void
     {
         $tester = $this->createCommandTester(['Symfony\Component\Form\Tests\Console\Descriptor'], [TextType::class, FooType::class]);
         $ret = $tester->execute(['--show-deprecated' => true], ['decorated' => false]);
@@ -57,7 +57,7 @@ class DebugCommandTest extends TestCase
         );
     }
 
-    public function testDebugSingleFormType()
+    public function testDebugSingleFormType(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['class' => 'FormType'], ['decorated' => false]);
@@ -66,7 +66,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('Symfony\Component\Form\Extension\Core\Type\FormType (Block prefix: "form")', $tester->getDisplay());
     }
 
-    public function testDebugDateTimeType()
+    public function testDebugDateTimeType(): void
     {
         $tester = $this->createCommandTester();
         $tester->execute(['class' => 'DateTime'], ['decorated' => false, 'interactive' => false]);
@@ -75,7 +75,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('Symfony\Component\Form\Extension\Core\Type\DateTimeType (Block prefix: "datetime")', $tester->getDisplay());
     }
 
-    public function testDebugFormTypeOption()
+    public function testDebugFormTypeOption(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['class' => 'FormType', 'option' => 'method'], ['decorated' => false]);
@@ -84,7 +84,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('Symfony\Component\Form\Extension\Core\Type\FormType (method)', $tester->getDisplay());
     }
 
-    public function testDebugSingleFormTypeNotFound()
+    public function testDebugSingleFormTypeNotFound(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Could not find type "NonExistentType"');
@@ -92,7 +92,7 @@ class DebugCommandTest extends TestCase
         $tester->execute(['class' => 'NonExistentType'], ['decorated' => false, 'interactive' => false]);
     }
 
-    public function testDebugAmbiguousFormType()
+    public function testDebugAmbiguousFormType(): void
     {
         $expectedMessage = <<<TXT
             The type "AmbiguousType" is ambiguous.
@@ -113,7 +113,7 @@ class DebugCommandTest extends TestCase
         $tester->execute(['class' => 'AmbiguousType'], ['decorated' => false, 'interactive' => false]);
     }
 
-    public function testDebugAmbiguousFormTypeInteractive()
+    public function testDebugAmbiguousFormTypeInteractive(): void
     {
         $tester = $this->createCommandTester([
             'Symfony\Component\Form\Tests\Fixtures\Debug\A',
@@ -140,13 +140,13 @@ class DebugCommandTest extends TestCase
         );
     }
 
-    public function testDebugInvalidFormType()
+    public function testDebugInvalidFormType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->createCommandTester()->execute(['class' => 'test']);
     }
 
-    public function testDebugCustomFormTypeOption()
+    public function testDebugCustomFormTypeOption(): void
     {
         $tester = $this->createCommandTester([], [FooType::class]);
         $ret = $tester->execute(['class' => FooType::class, 'option' => 'foo'], ['decorated' => false]);
@@ -191,7 +191,7 @@ class DebugCommandTest extends TestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $formRegistry = new FormRegistry([], new ResolvedFormTypeFactory());
         $command = new DebugCommand($formRegistry);

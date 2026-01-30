@@ -20,12 +20,12 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class NullTransportTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertEquals('null', (string) (new NullTransport()));
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $nullTransport = new NullTransport(
             $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class)

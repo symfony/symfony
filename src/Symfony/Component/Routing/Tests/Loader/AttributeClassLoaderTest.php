@@ -60,7 +60,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->loader = new TraceableAttributeClassLoader($env);
     }
 
-    public function testGetResolver()
+    public function testGetResolver(): void
     {
         $this->expectException(LogicException::class);
 
@@ -69,7 +69,7 @@ class AttributeClassLoaderTest extends TestCase
     }
 
     #[DataProvider('provideTestSupportsChecksResource')]
-    public function testSupportsChecksResource($resource, $expectedSupports)
+    public function testSupportsChecksResource($resource, $expectedSupports): void
     {
         $this->assertSame($expectedSupports, $this->loader->supports($resource), '->supports() returns true if the resource is loadable');
     }
@@ -87,13 +87,13 @@ class AttributeClassLoaderTest extends TestCase
         ];
     }
 
-    public function testSupportsChecksTypeIfSpecified()
+    public function testSupportsChecksTypeIfSpecified(): void
     {
         $this->assertTrue($this->loader->supports('class', 'attribute'), '->supports() checks the resource type if specified');
         $this->assertFalse($this->loader->supports('class', 'foo'), '->supports() checks the resource type if specified');
     }
 
-    public function testSimplePathRoute()
+    public function testSimplePathRoute(): void
     {
         $routes = $this->loader->load(ActionPathController::class);
         $this->assertCount(1, $routes);
@@ -101,7 +101,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals(new Alias('action'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ActionPathController::action'));
     }
 
-    public function testRequirementsWithoutPlaceholderName()
+    public function testRequirementsWithoutPlaceholderName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('A placeholder name must be a string (0 given). Did you forget to specify the placeholder key for the requirement "foo"');
@@ -109,7 +109,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->loader->load(RequirementsWithoutPlaceholderNameController::class);
     }
 
-    public function testInvokableControllerLoader()
+    public function testInvokableControllerLoader(): void
     {
         $routes = $this->loader->load(InvokableController::class);
         $this->assertCount(1, $routes);
@@ -120,7 +120,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals(new Alias('lol'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableController::__invoke'));
     }
 
-    public function testInvokableFQCNAliasConflictController()
+    public function testInvokableFQCNAliasConflictController(): void
     {
         $routes = $this->loader->load('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableFQCNAliasConflictController');
         $this->assertCount(1, $routes);
@@ -129,7 +129,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals(new Alias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableFQCNAliasConflictController'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableFQCNAliasConflictController::__invoke'));
     }
 
-    public function testInvokableMethodControllerLoader()
+    public function testInvokableMethodControllerLoader(): void
     {
         $routes = $this->loader->load(InvokableMethodController::class);
         $this->assertCount(1, $routes);
@@ -140,7 +140,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals(new Alias('lol'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\InvokableMethodController::__invoke'));
     }
 
-    public function testInvokableLocalizedControllerLoading()
+    public function testInvokableLocalizedControllerLoading(): void
     {
         $routes = $this->loader->load(InvokableLocalizedController::class);
         $this->assertCount(2, $routes);
@@ -148,7 +148,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals('/hier', $routes->get('action.nl')->getPath());
     }
 
-    public function testLocalizedPathRoutes()
+    public function testLocalizedPathRoutes(): void
     {
         $routes = $this->loader->load(LocalizedActionPathController::class);
         $this->assertCount(2, $routes);
@@ -159,7 +159,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals('en', $routes->get('action.en')->getRequirement('_locale'));
     }
 
-    public function testLocalizedPathRoutesWithExplicitPathPropety()
+    public function testLocalizedPathRoutesWithExplicitPathPropety(): void
     {
         $routes = $this->loader->load(ExplicitLocalizedActionPathController::class);
         $this->assertCount(2, $routes);
@@ -167,7 +167,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals('/pad', $routes->get('action.nl')->getPath());
     }
 
-    public function testDefaultValuesForMethods()
+    public function testDefaultValuesForMethods(): void
     {
         $routes = $this->loader->load(DefaultValueController::class);
         $this->assertCount(7, $routes);
@@ -183,7 +183,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals(20, $routes->get('int_enum_action')->getDefault('default'));
     }
 
-    public function testMethodActionControllers()
+    public function testMethodActionControllers(): void
     {
         $routes = $this->loader->load(MethodActionControllers::class);
         $this->assertSame(['put', 'post'], array_keys($routes->all()));
@@ -193,7 +193,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals(new Alias('put'), $routes->getAlias('Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\MethodActionControllers::put'));
     }
 
-    public function testInvokableClassRouteLoadWithMethodAttribute()
+    public function testInvokableClassRouteLoadWithMethodAttribute(): void
     {
         $routes = $this->loader->load(LocalizedMethodActionControllers::class);
         $this->assertCount(4, $routes);
@@ -201,7 +201,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals('/the/path', $routes->get('post.en')->getPath());
     }
 
-    public function testGlobalDefaultsRoutesLoadWithAttribute()
+    public function testGlobalDefaultsRoutesLoadWithAttribute(): void
     {
         $routes = $this->loader->load(GlobalDefaultsClass::class);
         $this->assertCount(4, $routes);
@@ -222,7 +222,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertSame(['https'], $routes->get('redundant_scheme')->getSchemes());
     }
 
-    public function testUtf8RoutesLoadWithAttribute()
+    public function testUtf8RoutesLoadWithAttribute(): void
     {
         $routes = $this->loader->load(Utf8ActionControllers::class);
         $this->assertSame(['one', 'two'], array_keys($routes->all()));
@@ -230,7 +230,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertFalse($routes->get('two')->getOption('utf8'), 'The route must not accept utf8');
     }
 
-    public function testRouteWithPathWithPrefix()
+    public function testRouteWithPathWithPrefix(): void
     {
         $routes = $this->loader->load(PrefixedActionPathController::class);
         $this->assertCount(1, $routes);
@@ -240,7 +240,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals('frankdejonge.nl', $route->getHost());
     }
 
-    public function testLocalizedRouteWithPathWithPrefix()
+    public function testLocalizedRouteWithPathWithPrefix(): void
     {
         $routes = $this->loader->load(PrefixedActionLocalizedRouteController::class);
         $this->assertCount(2, $routes);
@@ -248,7 +248,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals('/prefix/pad', $routes->get('action.nl')->getPath());
     }
 
-    public function testLocalizedPrefixLocalizedRoute()
+    public function testLocalizedPrefixLocalizedRoute(): void
     {
         $routes = $this->loader->load(LocalizedPrefixLocalizedActionController::class);
         $this->assertCount(2, $routes);
@@ -256,7 +256,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals('/en/action', $routes->get('action.en')->getPath());
     }
 
-    public function testInvokableClassMultipleRouteLoad()
+    public function testInvokableClassMultipleRouteLoad(): void
     {
         $routeCollection = $this->loader->load(BazClass::class);
         $route = $routeCollection->get('route1');
@@ -272,47 +272,47 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals(['GET'], $route->getMethods(), '->load preserves class route methods');
     }
 
-    public function testMissingPrefixLocale()
+    public function testMissingPrefixLocale(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Route to "action" with locale "en" is missing a corresponding prefix in class "Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\LocalizedPrefixMissingLocaleActionController".');
         $this->loader->load(LocalizedPrefixMissingLocaleActionController::class);
     }
 
-    public function testMissingRouteLocale()
+    public function testMissingRouteLocale(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Route to "Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\LocalizedPrefixMissingRouteLocaleActionController::action" is missing paths for locale(s) "en".');
         $this->loader->load(LocalizedPrefixMissingRouteLocaleActionController::class);
     }
 
-    public function testRouteWithoutName()
+    public function testRouteWithoutName(): void
     {
         $routes = $this->loader->load(MissingRouteNameController::class)->all();
         $this->assertCount(1, $routes);
         $this->assertEquals('/path', reset($routes)->getPath());
     }
 
-    public function testNothingButName()
+    public function testNothingButName(): void
     {
         $routes = $this->loader->load(NothingButNameController::class)->all();
         $this->assertCount(1, $routes);
         $this->assertEquals('/', reset($routes)->getPath());
     }
 
-    public function testNonExistingClass()
+    public function testNonExistingClass(): void
     {
         $this->expectException(\LogicException::class);
         $this->loader->load('ClassThatDoesNotExist');
     }
 
-    public function testLoadingAbstractClass()
+    public function testLoadingAbstractClass(): void
     {
         $this->expectException(\LogicException::class);
         $this->loader->load(AbstractClassController::class);
     }
 
-    public function testLocalizedPrefixWithoutRouteLocale()
+    public function testLocalizedPrefixWithoutRouteLocale(): void
     {
         $routes = $this->loader->load(LocalizedPrefixWithRouteWithoutLocale::class);
         $this->assertCount(2, $routes);
@@ -320,14 +320,14 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals('/nl/suffix', $routes->get('action.nl')->getPath());
     }
 
-    public function testLoadingRouteWithPrefix()
+    public function testLoadingRouteWithPrefix(): void
     {
         $routes = $this->loader->load(RouteWithPrefixController::class);
         $this->assertCount(1, $routes);
         $this->assertEquals('/prefix/path', $routes->get('action')->getPath());
     }
 
-    public function testWhenEnv()
+    public function testWhenEnv(): void
     {
         $routes = $this->loader->load(RouteWithEnv::class);
         $this->assertCount(0, $routes);
@@ -340,7 +340,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertSame('/path5', $routes->get('action5')->getPath());
     }
 
-    public function testMethodsAndSchemes()
+    public function testMethodsAndSchemes(): void
     {
         $routes = $this->loader->load(MethodsAndSchemes::class);
 
@@ -352,7 +352,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertSame(['https'], $routes->get('string')->getSchemes());
     }
 
-    public function testLoadingExtendedRouteOnClass()
+    public function testLoadingExtendedRouteOnClass(): void
     {
         $routes = $this->loader->load(ExtendedRouteOnClassController::class);
         $this->assertCount(1, $routes);
@@ -360,7 +360,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertSame(['section' => 'foo'], $routes->get('action')->getDefaults());
     }
 
-    public function testLoadingExtendedRouteOnMethod()
+    public function testLoadingExtendedRouteOnMethod(): void
     {
         $routes = $this->loader->load(ExtendedRouteOnMethodController::class);
         $this->assertCount(1, $routes);
@@ -368,7 +368,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertSame(['section' => 'foo'], $routes->get('action')->getDefaults());
     }
 
-    public function testDefaultRouteName()
+    public function testDefaultRouteName(): void
     {
         $routeCollection = $this->loader->load(EncodingClass::class);
         $defaultName = array_keys($routeCollection->all())[0];
@@ -376,7 +376,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertSame('symfony_component_routing_tests_fixtures_attributefixtures_encodingclass_routeàction', $defaultName);
     }
 
-    public function testAliasesOnMethod()
+    public function testAliasesOnMethod(): void
     {
         $routes = $this->loader->load(AliasRouteController::class);
         $route = $routes->get('action_with_alias');
@@ -386,7 +386,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals(new Alias('action_with_alias'), $routes->getAlias('completely_different_name'));
     }
 
-    public function testThrowsWithAliasesOnClass()
+    public function testThrowsWithAliasesOnClass(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Route aliases cannot be used on non-invokable class "Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasClassController".');
@@ -394,7 +394,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->loader->load(AliasClassController::class);
     }
 
-    public function testAliasesOnInvokableClass()
+    public function testAliasesOnInvokableClass(): void
     {
         $routes = $this->loader->load(AliasInvokableController::class);
         $route = $routes->get('invokable_path');
@@ -404,7 +404,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals(new Alias('invokable_path'), $routes->getAlias('completely_different_name'));
     }
 
-    public function testDeprecatedAlias()
+    public function testDeprecatedAlias(): void
     {
         $routes = $this->loader->load(DeprecatedAliasRouteController::class);
         $route = $routes->get('action_with_deprecated_alias');
@@ -420,7 +420,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testDeprecatedAliasWithCustomMessage()
+    public function testDeprecatedAliasWithCustomMessage(): void
     {
         $routes = $this->loader->load(DeprecatedAliasCustomMessageRouteController::class);
         $route = $routes->get('action_with_deprecated_alias');
@@ -436,7 +436,7 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testMultipleDeprecatedAlias()
+    public function testMultipleDeprecatedAlias(): void
     {
         $routes = $this->loader->load(MultipleDeprecatedAliasRouteController::class);
         $route = $routes->get('action_with_multiple_deprecated_alias');

@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Transport\Transports;
 
 class TransportsTest extends TestCase
 {
-    public function testSendToTransportDefinedByMessage()
+    public function testSendToTransportDefinedByMessage(): void
     {
         $transports = new Transports([
             'one' => $one = $this->createMock(TransportInterface::class),
@@ -39,7 +39,7 @@ class TransportsTest extends TestCase
         $this->assertSame('one', $sentMessage->getTransport());
     }
 
-    public function testSendToFirstSupportedTransportIfMessageDoesNotDefineATransport()
+    public function testSendToFirstSupportedTransportIfMessageDoesNotDefineATransport(): void
     {
         $transports = new Transports([
             'one' => $one = $this->createMock(TransportInterface::class),
@@ -63,7 +63,7 @@ class TransportsTest extends TestCase
         $this->assertSame('two', $sentMessage->getTransport());
     }
 
-    public function testThrowExceptionIfNoSupportedTransportWasFound()
+    public function testThrowExceptionIfNoSupportedTransportWasFound(): void
     {
         $transports = new Transports([
             'one' => $one = $this->createStub(TransportInterface::class),
@@ -79,7 +79,7 @@ class TransportsTest extends TestCase
         $transports->send($message);
     }
 
-    public function testThrowExceptionIfTransportDefinedByMessageIsNotSupported()
+    public function testThrowExceptionIfTransportDefinedByMessageIsNotSupported(): void
     {
         $transports = new Transports([
             'one' => $one = $this->createStub(TransportInterface::class),
@@ -98,7 +98,7 @@ class TransportsTest extends TestCase
         $transports->send($message);
     }
 
-    public function testThrowExceptionIfTransportDefinedByMessageDoesNotExist()
+    public function testThrowExceptionIfTransportDefinedByMessageDoesNotExist(): void
     {
         $transports = new Transports([
             'one' => $one = $this->createStub(TransportInterface::class),

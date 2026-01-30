@@ -17,14 +17,14 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class AutowireMethodOfTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $a = new AutowireMethodOf('foo');
 
         $this->assertEquals([new Reference('foo')], $a->value);
     }
 
-    public function testBuildDefinition(?\Closure $dummy = null)
+    public function testBuildDefinition(?\Closure $dummy = null): void
     {
         $a = new AutowireMethodOf('foo');
         $r = new \ReflectionParameter([__CLASS__, __FUNCTION__], 0);

@@ -27,7 +27,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 {
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testShowList(bool $debug)
+    public function testShowList(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute([]);
@@ -45,7 +45,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpKernelExtension(bool $debug)
+    public function testDumpKernelExtension(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute(['name' => 'foo']);
@@ -57,7 +57,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpBundleName(bool $debug)
+    public function testDumpBundleName(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute(['name' => 'TestBundle']);
@@ -68,7 +68,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpBundleOption(bool $debug)
+    public function testDumpBundleOption(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute(['name' => 'TestBundle', 'path' => 'custom']);
@@ -79,7 +79,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpWithoutTitleIsValidJson(bool $debug)
+    public function testDumpWithoutTitleIsValidJson(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute(['name' => 'TestBundle', '--format' => 'json']);
@@ -90,7 +90,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpWithUnsupportedFormat(bool $debug)
+    public function testDumpWithUnsupportedFormat(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
 
@@ -105,7 +105,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testParametersValuesAreResolved(bool $debug)
+    public function testParametersValuesAreResolved(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute(['name' => 'framework']);
@@ -117,7 +117,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testParametersValuesAreFullyResolved(bool $debug)
+    public function testParametersValuesAreFullyResolved(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute(['name' => 'framework', '--resolve-env' => true]);
@@ -131,7 +131,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDefaultParameterValueIsResolvedIfConfigIsExisting(bool $debug)
+    public function testDefaultParameterValueIsResolvedIfConfigIsExisting(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute(['name' => 'framework']);
@@ -143,7 +143,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpExtensionConfigWithoutBundle(bool $debug)
+    public function testDumpExtensionConfigWithoutBundle(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute(['name' => 'test_dump']);
@@ -154,7 +154,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpUndefinedBundleOption(bool $debug)
+    public function testDumpUndefinedBundleOption(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $tester->execute(['name' => 'TestBundle', 'path' => 'foo']);
@@ -164,7 +164,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpWithPrefixedEnv(bool $debug)
+    public function testDumpWithPrefixedEnv(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $tester->execute(['name' => 'FrameworkBundle']);
@@ -174,7 +174,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpFallsBackToDefaultConfigAndResolvesParameterValue(bool $debug)
+    public function testDumpFallsBackToDefaultConfigAndResolvesParameterValue(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute(['name' => 'DefaultConfigTestBundle']);
@@ -185,7 +185,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpFallsBackToDefaultConfigAndResolvesEnvPlaceholder(bool $debug)
+    public function testDumpFallsBackToDefaultConfigAndResolvesEnvPlaceholder(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute(['name' => 'DefaultConfigTestBundle']);
@@ -196,7 +196,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpThrowsExceptionWhenDefaultConfigFallbackIsImpossible(bool $debug)
+    public function testDumpThrowsExceptionWhenDefaultConfigFallbackIsImpossible(bool $debug): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The extension with alias "extension_without_config_test" does not have configuration.');
@@ -206,7 +206,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(bool $debug, array $input, array $expectedSuggestions)
+    public function testComplete(bool $debug, array $input, array $expectedSuggestions): void
     {
         $application = $this->createApplication($debug);
 
@@ -233,7 +233,7 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         yield 'option --format, debug' => [true, ['--format', ''], ['yaml', 'json']];
     }
 
-    public function testDumpPathDeepIntoScalar()
+    public function testDumpPathDeepIntoScalar(): void
     {
         $tester = $this->createCommandTester(true);
 

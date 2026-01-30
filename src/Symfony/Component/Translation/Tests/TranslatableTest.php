@@ -20,7 +20,7 @@ use Symfony\Component\Translation\Translator;
 class TranslatableTest extends TestCase
 {
     #[DataProvider('getTransTests')]
-    public function testTrans(string $expected, TranslatableMessage $translatable, array $translation, string $locale)
+    public function testTrans(string $expected, TranslatableMessage $translatable, array $translation, string $locale): void
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
@@ -30,7 +30,7 @@ class TranslatableTest extends TestCase
     }
 
     #[DataProvider('getFlattenedTransTests')]
-    public function testFlattenedTrans($expected, $messages, $translatable)
+    public function testFlattenedTrans($expected, $messages, $translatable): void
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());

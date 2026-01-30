@@ -39,7 +39,7 @@ class EnumExistsMockTest extends TestCase
         ClassExistsMock::withMockedEnums([]);
     }
 
-    public function testClassExists()
+    public function testClassExists(): void
     {
         $this->assertFalse(class_exists(ExistingEnum::class));
         $this->assertFalse(class_exists(ExistingEnum::class, false));
@@ -57,7 +57,7 @@ class EnumExistsMockTest extends TestCase
         $this->assertFalse(class_exists('\\NonExistingEnumReal', false));
     }
 
-    public function testEnumExists()
+    public function testEnumExists(): void
     {
         $this->assertFalse(enum_exists(ExistingEnum::class));
         $this->assertFalse(enum_exists(ExistingEnum::class, false));

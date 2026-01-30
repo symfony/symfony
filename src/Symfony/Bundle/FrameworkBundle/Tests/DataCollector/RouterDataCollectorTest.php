@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class RouterDataCollectorTest extends TestCase
 {
-    public function testRouteRedirectControllerNoRouteAtrribute()
+    public function testRouteRedirectControllerNoRouteAtrribute(): void
     {
         $collector = new RouterDataCollector();
 
@@ -38,7 +38,7 @@ class RouterDataCollectorTest extends TestCase
         $this->assertEquals('n/a', $collector->getTargetRoute());
     }
 
-    public function testRouteRedirectControllerWithRouteAttribute()
+    public function testRouteRedirectControllerWithRouteAttribute(): void
     {
         $collector = new RouterDataCollector();
 

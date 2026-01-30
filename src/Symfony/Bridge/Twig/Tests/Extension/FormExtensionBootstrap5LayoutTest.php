@@ -29,7 +29,7 @@ use Twig\Loader\FilesystemLoader;
  */
 class FormExtensionBootstrap5LayoutTest extends AbstractBootstrap5LayoutTestCase
 {
-    public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
+    public function testStartTagHasNoActionAttributeWhenActionIsEmpty(): void
     {
         $form = $this->factory->create(FormType::class, null, [
             'method' => 'get',
@@ -41,7 +41,7 @@ class FormExtensionBootstrap5LayoutTest extends AbstractBootstrap5LayoutTestCase
         self::assertSame('<form name="form" method="get">', $html);
     }
 
-    public function testStartTagHasActionAttributeWhenActionIsZero()
+    public function testStartTagHasActionAttributeWhenActionIsZero(): void
     {
         $form = $this->factory->create(FormType::class, null, [
             'method' => 'get',
@@ -53,7 +53,7 @@ class FormExtensionBootstrap5LayoutTest extends AbstractBootstrap5LayoutTestCase
         self::assertSame('<form name="form" method="get" action="0">', $html);
     }
 
-    public function testMoneyWidgetInIso()
+    public function testMoneyWidgetInIso(): void
     {
         $environment = new Environment(new FilesystemLoader([
             __DIR__.'/../../Resources/views/Form',

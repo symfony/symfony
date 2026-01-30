@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 
 class PhpSerializerWithClassNotFoundSupportTest extends PhpSerializerTest
 {
-    public function testDecodingFailsWithBadClass()
+    public function testDecodingFailsWithBadClass(): void
     {
         $this->expectException(MessageDecodingFailedException::class);
 
@@ -30,7 +30,7 @@ class PhpSerializerWithClassNotFoundSupportTest extends PhpSerializerTest
         ]);
     }
 
-    public function testDecodingFailsButCreateClassNotFound()
+    public function testDecodingFailsButCreateClassNotFound(): void
     {
         $serializer = $this->createPhpSerializer();
 

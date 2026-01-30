@@ -77,14 +77,14 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
     }
 
     #[DataProvider('provideInvalidConstraintOptions')]
-    public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options)
+    public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires either the "value" or "propertyPath" option to be set.');
         $this->createConstraint($options);
     }
 
-    public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
+    public function testThrowsConstraintExceptionIfBothValueAndPropertyPath(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "value" or "propertyPath" options to be set, not both.');
@@ -95,7 +95,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
     }
 
     #[DataProvider('provideValidComparisonsToPropertyPath')]
-    public function testValidComparisonToPropertyPath($comparedValue)
+    public function testValidComparisonToPropertyPath($comparedValue): void
     {
         $constraint = $this->createConstraint(['propertyPath' => 'value']);
 
@@ -108,7 +108,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->assertNoViolation();
     }
 
-    public function testNoViolationOnNullObjectWithPropertyPath()
+    public function testNoViolationOnNullObjectWithPropertyPath(): void
     {
         $constraint = $this->createConstraint(['propertyPath' => 'propertyPath']);
 
@@ -119,7 +119,7 @@ abstract class AbstractComparisonValidatorTestCase extends ConstraintValidatorTe
         $this->assertNoViolation();
     }
 
-    public function testInvalidValuePath()
+    public function testInvalidValuePath(): void
     {
         $constraint = $this->createConstraint(['propertyPath' => 'foo']);
 

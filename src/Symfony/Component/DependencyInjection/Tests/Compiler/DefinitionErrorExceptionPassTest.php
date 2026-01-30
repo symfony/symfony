@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class DefinitionErrorExceptionPassTest extends TestCase
 {
-    public function testThrowsException()
+    public function testThrowsException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Things went wrong!');
@@ -37,7 +37,7 @@ class DefinitionErrorExceptionPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testNoExceptionThrown()
+    public function testNoExceptionThrown(): void
     {
         $container = new ContainerBuilder();
         $def = new Definition();
@@ -51,7 +51,7 @@ class DefinitionErrorExceptionPassTest extends TestCase
         $this->assertSame($def, $container->getDefinition('foo_service_id')->getArgument(0));
     }
 
-    public function testSkipNestedErrors()
+    public function testSkipNestedErrors(): void
     {
         $container = new ContainerBuilder();
 
@@ -75,7 +75,7 @@ class DefinitionErrorExceptionPassTest extends TestCase
         $container->get('foo');
     }
 
-    public function testSkipErrorFromTag()
+    public function testSkipErrorFromTag(): void
     {
         $container = new ContainerBuilder();
         $def = new Definition();

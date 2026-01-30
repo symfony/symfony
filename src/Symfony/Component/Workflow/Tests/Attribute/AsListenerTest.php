@@ -19,7 +19,7 @@ use Symfony\Component\Workflow\Exception\LogicException;
 class AsListenerTest extends TestCase
 {
     #[DataProvider('provideOkTests')]
-    public function testOk(string $class, string $expectedEvent, ?string $workflow = null, ?string $node = null)
+    public function testOk(string $class, string $expectedEvent, ?string $workflow = null, ?string $node = null): void
     {
         $attribute = new $class($workflow, $node);
 
@@ -58,7 +58,7 @@ class AsListenerTest extends TestCase
     }
 
     #[DataProvider('provideTransitionThrowException')]
-    public function testTransitionThrowException(string $class)
+    public function testTransitionThrowException(string $class): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(\sprintf('The "transition" argument of "%s" cannot be used without a "workflow" argument.', $class));
@@ -75,7 +75,7 @@ class AsListenerTest extends TestCase
     }
 
     #[DataProvider('providePlaceThrowException')]
-    public function testPlaceThrowException(string $class)
+    public function testPlaceThrowException(string $class): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(\sprintf('The "place" argument of "%s" cannot be used without a "workflow" argument.', $class));

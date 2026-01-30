@@ -18,14 +18,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class RequestStackContextTest extends TestCase
 {
-    public function testGetBasePathEmpty()
+    public function testGetBasePathEmpty(): void
     {
         $requestStackContext = new RequestStackContext(new RequestStack());
 
         $this->assertSame('', $requestStackContext->getBasePath());
     }
 
-    public function testGetBasePathSet()
+    public function testGetBasePathSet(): void
     {
         $testBasePath = 'test-path';
 
@@ -40,14 +40,14 @@ class RequestStackContextTest extends TestCase
         $this->assertSame($testBasePath, $requestStackContext->getBasePath());
     }
 
-    public function testIsSecureFalse()
+    public function testIsSecureFalse(): void
     {
         $requestStackContext = new RequestStackContext(new RequestStack());
 
         $this->assertFalse($requestStackContext->isSecure());
     }
 
-    public function testIsSecureTrue()
+    public function testIsSecureTrue(): void
     {
         $request = $this->createStub(Request::class);
         $request->method('isSecure')
@@ -60,7 +60,7 @@ class RequestStackContextTest extends TestCase
         $this->assertTrue($requestStackContext->isSecure());
     }
 
-    public function testDefaultContext()
+    public function testDefaultContext(): void
     {
         $requestStackContext = new RequestStackContext(new RequestStack(), 'default-path', true);
 

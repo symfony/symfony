@@ -39,13 +39,13 @@ class StringTypeResolverTest extends TestCase
     }
 
     #[DataProvider('resolveDataProvider')]
-    public function testResolve(Type $expectedType, string $string, ?TypeContext $typeContext = null)
+    public function testResolve(Type $expectedType, string $string, ?TypeContext $typeContext = null): void
     {
         $this->assertEquals($expectedType, $this->resolver->resolve($string, $typeContext));
     }
 
     #[DataProvider('resolveDataProvider')]
-    public function testResolveStringable(Type $expectedType, string $string, ?TypeContext $typeContext = null)
+    public function testResolveStringable(Type $expectedType, string $string, ?TypeContext $typeContext = null): void
     {
         $this->assertEquals($expectedType, $this->resolver->resolve(new class($string) implements \Stringable {
             public function __construct(private string $value)
@@ -216,80 +216,80 @@ class StringTypeResolverTest extends TestCase
         yield [Type::template('T'), 'AliasWithTemplate', $typeContextFactory->createFromClassName(DummyWithTemplateTypeAlias::class)];
     }
 
-    public function testResolveWithExtraTypeAlias()
+    public function testResolveWithExtraTypeAlias(): void
     {
         $resolver = new StringTypeResolver(null, null, ['CustomAlias' => 'int']);
 
         $this->assertEquals(Type::int(), $resolver->resolve('CustomAlias'));
     }
 
-    public function testCannotResolveNonStringType()
+    public function testCannotResolveNonStringType(): void
     {
         $this->expectException(UnsupportedException::class);
         $this->resolver->resolve(123);
     }
 
-    public function testCannotResolveThisWithoutTypeContext()
+    public function testCannotResolveThisWithoutTypeContext(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->resolver->resolve('$this');
     }
 
-    public function testCannotResolveSelfWithoutTypeContext()
+    public function testCannotResolveSelfWithoutTypeContext(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->resolver->resolve('self');
     }
 
-    public function testCannotResolveStaticWithoutTypeContext()
+    public function testCannotResolveStaticWithoutTypeContext(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->resolver->resolve('static');
     }
 
-    public function testCannotResolveParentWithoutTypeContext()
+    public function testCannotResolveParentWithoutTypeContext(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->resolver->resolve('parent');
     }
 
-    public function testCannotResolveUnknownIdentifier()
+    public function testCannotResolveUnknownIdentifier(): void
     {
         $this->expectException(UnsupportedException::class);
         $this->resolver->resolve('unknown');
     }
 
-    public function testCannotResolveKeyOfInvalidType()
+    public function testCannotResolveKeyOfInvalidType(): void
     {
         $this->expectException(UnsupportedException::class);
         $this->resolver->resolve('key-of<int>');
     }
 
-    public function testCannotResolveValueOfInvalidType()
+    public function testCannotResolveValueOfInvalidType(): void
     {
         $this->expectException(UnsupportedException::class);
         $this->resolver->resolve('value-of<int>');
     }
 
-    public function testCannotResolveListWithKeyType()
+    public function testCannotResolveListWithKeyType(): void
     {
         $this->expectException(UnsupportedException::class);
         $this->resolver->resolve('list<int, string>');
     }
 
-    public function testCannotResolveInvalidNonEmptyListWithKeyType()
+    public function testCannotResolveInvalidNonEmptyListWithKeyType(): void
     {
         $this->expectException(UnsupportedException::class);
         $this->resolver->resolve('non-empty-list<int, string>');
     }
 
-    public function testCannotResolveInvalidArrayKeyType()
+    public function testCannotResolveInvalidArrayKeyType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->resolver->resolve('array<mixed, string>');
     }
 
-    public function testCannotResolveInvalidUnionArrayKeyType()
+    public function testCannotResolveInvalidUnionArrayKeyType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->resolver->resolve('array<int|mixed, string>');

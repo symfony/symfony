@@ -38,7 +38,7 @@ use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
 
 class InvokableCommandTest extends TestCase
 {
-    public function testCommandInputArgumentDefinition()
+    public function testCommandInputArgumentDefinition(): void
     {
         $command = new Command('foo');
         $command->setCode(function (
@@ -88,7 +88,7 @@ class InvokableCommandTest extends TestCase
         self::assertSame(['ROLE_ADMIN', 'ROLE_USER'], array_map(static fn (Suggestion $s) => $s->getValue(), $suggestions->getValueSuggestions()));
     }
 
-    public function testCommandInputOptionDefinition()
+    public function testCommandInputOptionDefinition(): void
     {
         $command = new Command('foo');
         $command->setCode(function (
@@ -152,7 +152,7 @@ class InvokableCommandTest extends TestCase
         self::assertFalse($optInputOption->getDefault());
     }
 
-    public function testEnumArgument()
+    public function testEnumArgument(): void
     {
         $command = new Command('foo');
         $command->setCode(static function (
@@ -193,7 +193,7 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput(['enum' => 'incorrect']), new NullOutput());
     }
 
-    public function testEnumOption()
+    public function testEnumOption(): void
     {
         $command = new Command('foo');
         $command->setCode(static function (
@@ -234,7 +234,7 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput(['--enum' => 'incorrect']), new NullOutput());
     }
 
-    public function testExecuteHasPriorityOverInvokeMethod()
+    public function testExecuteHasPriorityOverInvokeMethod(): void
     {
         $command = new class extends Command {
             public string $called;
@@ -258,7 +258,7 @@ class InvokableCommandTest extends TestCase
         $this->assertSame('execute', $command->called);
     }
 
-    public function testCallInvokeMethodWhenExtendingCommandClass()
+    public function testCallInvokeMethodWhenExtendingCommandClass(): void
     {
         $command = new class extends Command {
             public string $called;
@@ -275,11 +275,11 @@ class InvokableCommandTest extends TestCase
         $this->assertSame('__invoke', $command->called);
     }
 
-    public function testInvalidReturnType()
+    public function testInvalidReturnType(): void
     {
         $command = new Command('foo');
         $command->setCode(new class {
-            public function __invoke()
+            public function __invoke(): void
             {
             }
         });
@@ -290,7 +290,7 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput([]), new NullOutput());
     }
 
-    public function testGetCode()
+    public function testGetCode(): void
     {
         $invokableTestCommand = new InvokableTestCommand();
         $command = new Command(null, $invokableTestCommand);
@@ -299,7 +299,7 @@ class InvokableCommandTest extends TestCase
     }
 
     #[DataProvider('provideInputArguments')]
-    public function testInputArguments(array $parameters, array $expected)
+    public function testInputArguments(array $parameters, array $expected): void
     {
         $command = new Command('foo');
         $command->setCode(function (
@@ -327,7 +327,7 @@ class InvokableCommandTest extends TestCase
     }
 
     #[DataProvider('provideBinaryInputOptions')]
-    public function testBinaryInputOptions(array $parameters, array $expected)
+    public function testBinaryInputOptions(array $parameters, array $expected): void
     {
         $command = new Command('foo');
         $command->setCode(function (
@@ -353,7 +353,7 @@ class InvokableCommandTest extends TestCase
     }
 
     #[DataProvider('provideNonBinaryInputOptions')]
-    public function testNonBinaryInputOptions(array $parameters, array $expected)
+    public function testNonBinaryInputOptions(array $parameters, array $expected): void
     {
         $command = new Command('foo');
         $command->setCode(function (
@@ -406,7 +406,7 @@ class InvokableCommandTest extends TestCase
     }
 
     #[DataProvider('provideInvalidOptionDefinitions')]
-    public function testInvalidOptionDefinition(callable $code)
+    public function testInvalidOptionDefinition(callable $code): void
     {
         $command = new Command('foo');
         $command->setCode($code);
@@ -419,38 +419,38 @@ class InvokableCommandTest extends TestCase
     public static function provideInvalidOptionDefinitions(): \Generator
     {
         yield 'no-default' => [
-            static function (#[Option] string $a) {},
+            static function (#[Option] string $a): void {},
         ];
         yield 'nullable-bool-default-true' => [
-            static function (#[Option] ?bool $a = true) {},
+            static function (#[Option] ?bool $a = true): void {},
         ];
         yield 'nullable-bool-default-false' => [
-            static function (#[Option] ?bool $a = false) {},
+            static function (#[Option] ?bool $a = false): void {},
         ];
         yield 'invalid-union-type' => [
-            static function (#[Option] array|bool $a = false) {},
+            static function (#[Option] array|bool $a = false): void {},
         ];
         yield 'union-type-cannot-allow-null' => [
-            static function (#[Option] string|bool|null $a = null) {},
+            static function (#[Option] string|bool|null $a = null): void {},
         ];
         yield 'union-type-default-true' => [
-            static function (#[Option] string|bool $a = true) {},
+            static function (#[Option] string|bool $a = true): void {},
         ];
         yield 'union-type-default-string' => [
-            static function (#[Option] string|bool $a = 'foo') {},
+            static function (#[Option] string|bool $a = 'foo'): void {},
         ];
         yield 'nullable-string-not-null-default' => [
-            static function (#[Option] ?string $a = 'foo') {},
+            static function (#[Option] ?string $a = 'foo'): void {},
         ];
         yield 'nullable-array-not-null-default' => [
-            static function (#[Option] ?array $a = []) {},
+            static function (#[Option] ?array $a = []): void {},
         ];
     }
 
-    public function testInvalidRequiredValueOptionEvenWithDefault()
+    public function testInvalidRequiredValueOptionEvenWithDefault(): void
     {
         $command = new Command('foo');
-        $command->setCode(static function (#[Option] string $a = 'a') {});
+        $command->setCode(static function (#[Option] string $a = 'a'): void {});
 
         $this->expectException(InvalidOptionException::class);
         $this->expectExceptionMessage('The "--a" option requires a value.');
@@ -458,7 +458,7 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput(['--a' => null]), new NullOutput());
     }
 
-    public function testHelpersInjection()
+    public function testHelpersInjection(): void
     {
         $command = new Command('foo');
         $command->setApplication(new Application());
@@ -478,7 +478,7 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput([]), new NullOutput());
     }
 
-    public function testDefaultArgumentResolversWithoutApplication()
+    public function testDefaultArgumentResolversWithoutApplication(): void
     {
         $command = new Command('foo');
         $command->setCode(static function (
@@ -497,7 +497,7 @@ class InvokableCommandTest extends TestCase
         $tester->assertCommandIsSuccessful();
     }
 
-    public function testCustomArgumentResolverViaApplication()
+    public function testCustomArgumentResolverViaApplication(): void
     {
         $customArgumentResolver = new ArgumentResolver([
             new CustomTypeValueResolver(),
@@ -527,7 +527,7 @@ class InvokableCommandTest extends TestCase
         $tester->assertCommandIsSuccessful();
     }
 
-    public function testCommandInjection()
+    public function testCommandInjection(): void
     {
         $application = new Application();
 

@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class RedisSenderTest extends TestCase
 {
-    public function testSend()
+    public function testSend(): void
     {
         $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];

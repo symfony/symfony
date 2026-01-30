@@ -18,7 +18,7 @@ use Symfony\Component\Translation\TranslatorBag;
 
 class FilteringProviderTest extends TestCase
 {
-    public function testReadDelegatesWithFilteredLocales()
+    public function testReadDelegatesWithFilteredLocales(): void
     {
         $innerProvider = $this->createMock(ProviderInterface::class);
         $expectedBag = new TranslatorBag();

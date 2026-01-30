@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class IsbnTest extends TestCase
 {
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(IsbnDummy::class);
         $loader = new AttributeLoader();

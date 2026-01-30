@@ -18,7 +18,7 @@ use Symfony\Component\HttpClient\UriTemplateHttpClient;
 
 final class UriTemplateHttpClientTest extends TestCase
 {
-    public function testExpanderIsCalled()
+    public function testExpanderIsCalled(): void
     {
         $client = new UriTemplateHttpClient(
             new MockHttpClient(),
@@ -44,7 +44,7 @@ final class UriTemplateHttpClientTest extends TestCase
         ])->getInfo('url'));
     }
 
-    public function testWithOptionsAppendsVarsToDefaultVars()
+    public function testWithOptionsAppendsVarsToDefaultVars(): void
     {
         $client = new UriTemplateHttpClient(
             new MockHttpClient(),
@@ -67,7 +67,7 @@ final class UriTemplateHttpClientTest extends TestCase
         $this->assertSame('https://foo.tld/ccc', $client->request('GET', 'https://foo.tld/{bar}')->getInfo('url'));
     }
 
-    public function testExpanderIsNotCalledWithEmptyVars()
+    public function testExpanderIsNotCalledWithEmptyVars(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -77,7 +77,7 @@ final class UriTemplateHttpClientTest extends TestCase
         ]);
     }
 
-    public function testExpanderIsNotCalledWithNoVarsAtAll()
+    public function testExpanderIsNotCalledWithNoVarsAtAll(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -85,7 +85,7 @@ final class UriTemplateHttpClientTest extends TestCase
         $client->request('GET', 'https://foo.tld/bar');
     }
 
-    public function testRequestWithNonArrayVarsOption()
+    public function testRequestWithNonArrayVarsOption(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "vars" option must be an array.');
@@ -95,7 +95,7 @@ final class UriTemplateHttpClientTest extends TestCase
         ]);
     }
 
-    public function testWithOptionsWithNonArrayVarsOption()
+    public function testWithOptionsWithNonArrayVarsOption(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "vars" option must be an array.');
@@ -105,7 +105,7 @@ final class UriTemplateHttpClientTest extends TestCase
         ]);
     }
 
-    public function testVarsOptionIsNotPropagated()
+    public function testVarsOptionIsNotPropagated(): void
     {
         $client = new UriTemplateHttpClient(
             new MockHttpClient(function (string $method, string $url, array $options): MockResponse {

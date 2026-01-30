@@ -44,13 +44,13 @@ class SendmailTransportTest extends TestCase
         unset($this->argsPath);
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $t = new SendmailTransport();
         $this->assertEquals('smtp://sendmail', (string) $t);
     }
 
-    public function testToIsUsedWhenRecipientsAreNotSet()
+    public function testToIsUsedWhenRecipientsAreNotSet(): void
     {
         $this->skipOnWindows();
 
@@ -70,7 +70,7 @@ class SendmailTransportTest extends TestCase
         $this->assertStringEqualsFile($this->argsPath, __DIR__.'/Fixtures/fake-sendmail.php -ffrom@mail.com to@mail.com');
     }
 
-    public function testRecipientsAreUsedWhenSet()
+    public function testRecipientsAreUsedWhenSet(): void
     {
         $this->skipOnWindows();
 
@@ -82,7 +82,7 @@ class SendmailTransportTest extends TestCase
         $this->assertStringEqualsFile($this->argsPath, __DIR__.'/Fixtures/fake-sendmail.php -ffrom@mail.com recipient@mail.com');
     }
 
-    public function testThrowsTransportExceptionOnFailure()
+    public function testThrowsTransportExceptionOnFailure(): void
     {
         $this->skipOnWindows();
 
@@ -99,7 +99,7 @@ class SendmailTransportTest extends TestCase
         $this->assertNull($stream->stream);
     }
 
-    public function testStreamIsClearedOnFailure()
+    public function testStreamIsClearedOnFailure(): void
     {
         $this->skipOnWindows();
 
@@ -118,7 +118,7 @@ class SendmailTransportTest extends TestCase
         $this->assertNull($innerStreamProperty->getValue($stream));
     }
 
-    public function testDoesNotThrowWhenInteractive()
+    public function testDoesNotThrowWhenInteractive(): void
     {
         $this->skipOnWindows();
 
@@ -156,7 +156,7 @@ class SendmailTransportTest extends TestCase
         $this->assertStringEqualsFile($this->argsPath, __DIR__.'/Fixtures/fake-failing-sendmail.php -bs');
     }
 
-    private function skipOnWindows()
+    private function skipOnWindows(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Windows does not support shebangs nor non-blocking standard streams');

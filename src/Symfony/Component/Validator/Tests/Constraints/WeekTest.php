@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class WeekTest extends TestCase
 {
-    public function testWithoutArgument()
+    public function testWithoutArgument(): void
     {
         $week = new Week();
 
@@ -27,7 +27,7 @@ class WeekTest extends TestCase
         $this->assertNull($week->max);
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $week = new Week(min: '2010-W01', max: '2010-W02');
 
@@ -35,7 +35,7 @@ class WeekTest extends TestCase
         $this->assertSame('2010-W02', $week->max);
     }
 
-    public function testMinYearIsAfterMaxYear()
+    public function testMinYearIsAfterMaxYear(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\Week" constraint requires the min week to be less than or equal to the max week.');
@@ -43,7 +43,7 @@ class WeekTest extends TestCase
         new Week(min: '2011-W01', max: '2010-W02');
     }
 
-    public function testMinWeekIsAfterMaxWeek()
+    public function testMinWeekIsAfterMaxWeek(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\Week" constraint requires the min week to be less than or equal to the max week.');
@@ -51,7 +51,7 @@ class WeekTest extends TestCase
         new Week(min: '2010-W02', max: '2010-W01');
     }
 
-    public function testMinAndMaxWeeksAreTheSame()
+    public function testMinAndMaxWeeksAreTheSame(): void
     {
         $week = new Week(min: '2010-W01', max: '2010-W01');
 
@@ -59,7 +59,7 @@ class WeekTest extends TestCase
         $this->assertSame('2010-W01', $week->max);
     }
 
-    public function testMinIsBadlyFormatted()
+    public function testMinIsBadlyFormatted(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\Week" constraint requires the min week to be in the ISO 8601 format if set.');
@@ -67,7 +67,7 @@ class WeekTest extends TestCase
         new Week(min: '2010-01');
     }
 
-    public function testMaxIsBadlyFormatted()
+    public function testMaxIsBadlyFormatted(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\Week" constraint requires the max week to be in the ISO 8601 format if set.');
@@ -75,7 +75,7 @@ class WeekTest extends TestCase
         new Week(max: '2010-01');
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(WeekDummy::class);
         $loader = new AttributeLoader();

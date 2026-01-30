@@ -34,7 +34,7 @@ class QueryParameterValueResolverTest extends TestCase
         $this->resolver = new QueryParameterValueResolver();
     }
 
-    public function testSkipWhenNoAttribute()
+    public function testSkipWhenNoAttribute(): void
     {
         $metadata = new ArgumentMetadata('firstName', 'string', false, true, false);
 
@@ -42,13 +42,13 @@ class QueryParameterValueResolverTest extends TestCase
     }
 
     #[DataProvider('validDataProvider')]
-    public function testResolvingSuccessfully(Request $request, ArgumentMetadata $metadata, array $expected)
+    public function testResolvingSuccessfully(Request $request, ArgumentMetadata $metadata, array $expected): void
     {
         $this->assertEquals($expected, $this->resolver->resolve($request, $metadata));
     }
 
     #[DataProvider('invalidArgumentTypeProvider')]
-    public function testResolvingWithInvalidArgumentType(Request $request, ArgumentMetadata $metadata, string $exceptionMessage)
+    public function testResolvingWithInvalidArgumentType(Request $request, ArgumentMetadata $metadata, string $exceptionMessage): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage($exceptionMessage);
@@ -57,7 +57,7 @@ class QueryParameterValueResolverTest extends TestCase
     }
 
     #[DataProvider('invalidOrMissingArgumentProvider')]
-    public function testResolvingWithInvalidOrMissingArgument(Request $request, ArgumentMetadata $metadata, HttpException $expectedException)
+    public function testResolvingWithInvalidOrMissingArgument(Request $request, ArgumentMetadata $metadata, HttpException $expectedException): void
     {
         try {
             $this->resolver->resolve($request, $metadata);

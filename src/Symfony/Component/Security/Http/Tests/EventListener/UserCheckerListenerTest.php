@@ -37,28 +37,28 @@ class UserCheckerListenerTest extends TestCase
         $this->user = new InMemoryUser('test', null);
     }
 
-    public function testPreAuth()
+    public function testPreAuth(): void
     {
         $this->userChecker->expects($this->once())->method('checkPreAuth')->with($this->user);
 
         $this->listener->preCheckCredentials($this->createCheckPassportEvent());
     }
 
-    public function testPreAuthenticatedBadge()
+    public function testPreAuthenticatedBadge(): void
     {
         $this->userChecker->expects($this->never())->method('checkPreAuth');
 
         $this->listener->preCheckCredentials($this->createCheckPassportEvent(new SelfValidatingPassport(new UserBadge('test', fn () => $this->user), [new PreAuthenticatedUserBadge()])));
     }
 
-    public function testPostAuthValidCredentials()
+    public function testPostAuthValidCredentials(): void
     {
         $this->userChecker->expects($this->once())->method('checkPostAuth')->with($this->user);
 
         $this->listener->postCheckCredentials(new AuthenticationSuccessEvent(new PostAuthenticationToken($this->user, 'main', [])));
     }
 
-    public function testTokenIsPassedToPost()
+    public function testTokenIsPassedToPost(): void
     {
         $token = new PostAuthenticationToken($this->user, 'main', []);
         $this->userChecker->expects($this->once())->method('checkPostAuth')->with($this->user, $token);

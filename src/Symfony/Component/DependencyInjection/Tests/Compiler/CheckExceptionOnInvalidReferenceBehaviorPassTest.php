@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 
@@ -40,7 +40,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessThrowsExceptionOnInvalidReference()
+    public function testProcessThrowsExceptionOnInvalidReference(): void
     {
         $container = new ContainerBuilder();
 
@@ -54,7 +54,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcessThrowsExceptionOnInvalidReferenceFromInlinedDefinition()
+    public function testProcessThrowsExceptionOnInvalidReferenceFromInlinedDefinition(): void
     {
         $container = new ContainerBuilder();
 
@@ -71,7 +71,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcessDefinitionWithBindings()
+    public function testProcessDefinitionWithBindings(): void
     {
         $container = new ContainerBuilder();
 
@@ -87,7 +87,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testWithErroredServiceLocator(bool $inline)
+    public function testWithErroredServiceLocator(bool $inline): void
     {
         $container = new ContainerBuilder();
 
@@ -106,7 +106,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testWithErroredHiddenService(bool $inline)
+    public function testWithErroredHiddenService(bool $inline): void
     {
         $container = new ContainerBuilder();
 
@@ -123,7 +123,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcessThrowsExceptionOnInvalidReferenceWithAlternatives()
+    public function testProcessThrowsExceptionOnInvalidReferenceWithAlternatives(): void
     {
         $container = new ContainerBuilder();
 
@@ -140,7 +140,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testCurrentIdIsExcludedFromAlternatives()
+    public function testCurrentIdIsExcludedFromAlternatives(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -153,7 +153,7 @@ class CheckExceptionOnInvalidReferenceBehaviorPassTest extends TestCase
         $this->process($container);
     }
 
-    private function process(ContainerBuilder $container)
+    private function process(ContainerBuilder $container): void
     {
         $pass = new CheckExceptionOnInvalidReferenceBehaviorPass();
         $pass->process($container);

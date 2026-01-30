@@ -22,7 +22,7 @@ class Base64EncoderTest extends TestCase
     years.
     */
 
-    public function testInputOutputRatioIs3to4Bytes()
+    public function testInputOutputRatioIs3to4Bytes(): void
     {
         /*
         RFC 2045, 6.8
@@ -40,7 +40,7 @@ class Base64EncoderTest extends TestCase
         $this->assertEquals('MTIzNDU2Nzg5', $encoder->encodeString('123456789'), '%s: 9 bytes in input should yield 12 bytes of output');
     }
 
-    public function testPadLength()
+    public function testPadLength(): void
     {
         /*
         RFC 2045, 6.8
@@ -79,7 +79,7 @@ class Base64EncoderTest extends TestCase
         }
     }
 
-    public function testMaximumLineLengthIs76Characters()
+    public function testMaximumLineLengthIs76Characters(): void
     {
         /*
          The encoded output stream must be represented in lines of no more
@@ -108,7 +108,7 @@ class Base64EncoderTest extends TestCase
         $this->assertEquals($output, $encoder->encodeString($input), 'Lines should be no more than 76 characters');
     }
 
-    public function testMaximumLineLengthCanBeSpecified()
+    public function testMaximumLineLengthCanBeSpecified(): void
     {
         $input =
         'abcdefghijklmnopqrstuvwxyz'.
@@ -133,7 +133,7 @@ class Base64EncoderTest extends TestCase
         $this->assertEquals($output, $encoder->encodeString($input, 'utf-8', 0, 50), 'Lines should be no more than 100 characters');
     }
 
-    public function testFirstLineLengthCanBeDifferent()
+    public function testFirstLineLengthCanBeDifferent(): void
     {
         $input =
         'abcdefghijklmnopqrstuvwxyz'.

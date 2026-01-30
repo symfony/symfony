@@ -36,7 +36,7 @@ class FormFlowBuilderTest extends TestCase
         $this->stepAccessor = new PropertyPathStepAccessor(PropertyAccess::createPropertyAccessor(), new PropertyPath('[currentStep]'));
     }
 
-    public function testNoStepsConfigured()
+    public function testNoStepsConfigured(): void
     {
         $builder = new FormFlowBuilder('test', null, new EventDispatcher(), $this->factory);
         $builder->setData([]);
@@ -49,7 +49,7 @@ class FormFlowBuilderTest extends TestCase
         $builder->getForm();
     }
 
-    public function testRemoveAllStepsDynamically()
+    public function testRemoveAllStepsDynamically(): void
     {
         $builder = new FormFlowBuilder('test', null, new EventDispatcher(), $this->factory);
         $builder->setData([]);
@@ -66,7 +66,7 @@ class FormFlowBuilderTest extends TestCase
         $builder->getForm();
     }
 
-    public function testNestedFormFlowException()
+    public function testNestedFormFlowException(): void
     {
         // Create parent form flow builder
         $builder = new FormFlowBuilder('parent', null, new EventDispatcher(), $this->factory);

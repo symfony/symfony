@@ -37,7 +37,7 @@ class AutoExpireFlashBagTest extends TestCase
         unset($this->bag);
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $bag = new FlashBag();
         $array = ['new' => ['notice' => ['A previous flash message']]];
@@ -52,21 +52,21 @@ class AutoExpireFlashBagTest extends TestCase
         $this->assertEquals(['a'], $bag->peek('error'));
     }
 
-    public function testGetStorageKey()
+    public function testGetStorageKey(): void
     {
         $this->assertEquals('_symfony_flashes', $this->bag->getStorageKey());
         $attributeBag = new FlashBag('test');
         $this->assertEquals('test', $attributeBag->getStorageKey());
     }
 
-    public function testGetSetName()
+    public function testGetSetName(): void
     {
         $this->assertEquals('flashes', $this->bag->getName());
         $this->bag->setName('foo');
         $this->assertEquals('foo', $this->bag->getName());
     }
 
-    public function testPeek()
+    public function testPeek(): void
     {
         $this->assertEquals([], $this->bag->peek('non_existing'));
         $this->assertEquals(['default'], $this->bag->peek('non_existing', ['default']));
@@ -74,24 +74,24 @@ class AutoExpireFlashBagTest extends TestCase
         $this->assertEquals(['A previous flash message'], $this->bag->peek('notice'));
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $this->bag->set('notice', 'Foo');
         $this->assertEquals(['A previous flash message'], $this->bag->peek('notice'));
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $this->assertFalse($this->bag->has('nothing'));
         $this->assertTrue($this->bag->has('notice'));
     }
 
-    public function testKeys()
+    public function testKeys(): void
     {
         $this->assertEquals(['notice'], $this->bag->keys());
     }
 
-    public function testPeekAll()
+    public function testPeekAll(): void
     {
         $array = [
             'new' => [
@@ -114,7 +114,7 @@ class AutoExpireFlashBagTest extends TestCase
         );
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $this->assertEquals([], $this->bag->get('non_existing'));
         $this->assertEquals(['default'], $this->bag->get('non_existing', ['default']));
@@ -122,14 +122,14 @@ class AutoExpireFlashBagTest extends TestCase
         $this->assertEquals([], $this->bag->get('notice'));
     }
 
-    public function testSetAll()
+    public function testSetAll(): void
     {
         $this->bag->setAll(['a' => 'first', 'b' => 'second']);
         $this->assertFalse($this->bag->has('a'));
         $this->assertFalse($this->bag->has('b'));
     }
 
-    public function testAll()
+    public function testAll(): void
     {
         $this->bag->set('notice', 'Foo');
         $this->bag->set('error', 'Bar');
@@ -141,12 +141,12 @@ class AutoExpireFlashBagTest extends TestCase
         $this->assertEquals([], $this->bag->all());
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->assertEquals(['notice' => ['A previous flash message']], $this->bag->clear());
     }
 
-    public function testDoNotRemoveTheNewFlashesWhenDisplayingTheExistingOnes()
+    public function testDoNotRemoveTheNewFlashesWhenDisplayingTheExistingOnes(): void
     {
         $this->bag->add('success', 'Something');
         $this->bag->all();

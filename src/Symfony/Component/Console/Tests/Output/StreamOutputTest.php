@@ -30,27 +30,27 @@ class StreamOutputTest extends TestCase
         unset($this->stream);
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $output = new StreamOutput($this->stream, Output::VERBOSITY_QUIET, true);
         $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
         $this->assertTrue($output->isDecorated(), '__construct() takes the decorated flag as its second argument');
     }
 
-    public function testStreamIsRequired()
+    public function testStreamIsRequired(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The StreamOutput class needs a stream as its first argument.');
         new StreamOutput('foo');
     }
 
-    public function testGetStream()
+    public function testGetStream(): void
     {
         $output = new StreamOutput($this->stream);
         $this->assertEquals($this->stream, $output->getStream(), '->getStream() returns the current stream');
     }
 
-    public function testDoWrite()
+    public function testDoWrite(): void
     {
         $output = new StreamOutput($this->stream);
         $output->writeln('foo');
@@ -58,7 +58,7 @@ class StreamOutputTest extends TestCase
         $this->assertEquals('foo'.\PHP_EOL, stream_get_contents($output->getStream()), '->doWrite() writes to the stream');
     }
 
-    public function testDoWriteOnFailure()
+    public function testDoWriteOnFailure(): void
     {
         $resource = fopen(__DIR__.'/../Fixtures/stream_output_file.txt', 'r', false);
         $output = new StreamOutput($resource);

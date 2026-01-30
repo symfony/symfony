@@ -15,7 +15,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class MissingUserProviderTest extends AbstractWebTestCase
 {
-    public function testUserProviderIsNeeded()
+    public function testUserProviderIsNeeded(): void
     {
         $client = $this->createClient(['test_case' => 'MissingUserProvider', 'root_config' => 'config.yml']);
 

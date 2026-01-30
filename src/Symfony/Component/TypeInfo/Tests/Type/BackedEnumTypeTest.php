@@ -19,18 +19,18 @@ use Symfony\Component\TypeInfo\Type\BackedEnumType;
 
 class BackedEnumTypeTest extends TestCase
 {
-    public function testCannotCreateInvalidBackingBuiltinType()
+    public function testCannotCreateInvalidBackingBuiltinType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new BackedEnumType(DummyBackedEnum::class, Type::bool());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertSame(DummyBackedEnum::class, (string) new BackedEnumType(DummyBackedEnum::class, Type::int()));
     }
 
-    public function testAccepts()
+    public function testAccepts(): void
     {
         $type = new BackedEnumType(DummyBackedEnum::class, Type::int());
 

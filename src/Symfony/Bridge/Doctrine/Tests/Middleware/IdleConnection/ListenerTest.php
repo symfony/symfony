@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ListenerTest extends TestCase
 {
-    public function testOnKernelRequest()
+    public function testOnKernelRequest(): void
     {
         $connectionExpiries = new \ArrayObject(['connectionone' => time() - 30, 'connectiontwo' => time() + 40]);
 
@@ -38,7 +38,7 @@ class ListenerTest extends TestCase
         $this->assertArrayHasKey('connectiontwo', (array) $connectionExpiries);
     }
 
-    public function testOnKernelRequestShouldSkipSubrequests()
+    public function testOnKernelRequestShouldSkipSubrequests(): void
     {
         self::expectNotToPerformAssertions();
         $arrayObj = $this->createStub(\ArrayObject::class);

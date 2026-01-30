@@ -23,7 +23,7 @@ use Symfony\Component\Mime\Part\TextPart;
 #[RequiresPhpExtension('openssl')]
 class SMimeSignerTest extends SMimeTestCase
 {
-    public function testSignedMessage()
+    public function testSignedMessage(): void
     {
         $message = new Message(
             (new Headers())
@@ -38,7 +38,7 @@ class SMimeSignerTest extends SMimeTestCase
         $this->assertMessageSignatureIsValid($signedMessage, $message);
     }
 
-    public function testSignEncryptedMessage()
+    public function testSignEncryptedMessage(): void
     {
         $message = (new Email())
             ->date(new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
@@ -58,7 +58,7 @@ class SMimeSignerTest extends SMimeTestCase
         $this->assertMessageSignatureIsValid($signedMessage, $message);
     }
 
-    public function testSignedMessageWithPassphrase()
+    public function testSignedMessageWithPassphrase(): void
     {
         $message = new Message(
             (new Headers())
@@ -73,7 +73,7 @@ class SMimeSignerTest extends SMimeTestCase
         $this->assertMessageSignatureIsValid($signedMessage, $message);
     }
 
-    public function testProperSerialiable()
+    public function testProperSerialiable(): void
     {
         $message = (new Email())
             ->date(new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
@@ -95,7 +95,7 @@ class SMimeSignerTest extends SMimeTestCase
         $this->assertMessageSignatureIsValid($restoredMessage, $message);
     }
 
-    public function testSignedMessageWithBcc()
+    public function testSignedMessageWithBcc(): void
     {
         $message = (new Email())
             ->date(new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
@@ -111,7 +111,7 @@ class SMimeSignerTest extends SMimeTestCase
         $this->assertMessageSignatureIsValid($signedMessage, $message);
     }
 
-    public function testSignedMessageWithAttachments()
+    public function testSignedMessageWithAttachments(): void
     {
         $message = new Email((new Headers())
             ->addDateHeader('Date', new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
@@ -129,7 +129,7 @@ class SMimeSignerTest extends SMimeTestCase
         $this->assertMessageSignatureIsValid($signedMessage, $message);
     }
 
-    public function testSignedMessageExtraCerts()
+    public function testSignedMessageExtraCerts(): void
     {
         $message = new Message(
             (new Headers())

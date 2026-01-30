@@ -32,7 +32,7 @@ use Symfony\Component\Security\Http\Firewall\AccessListener;
 
 class AccessListenerTest extends TestCase
 {
-    public function testHandleWhenTheAccessDecisionManagerDecidesToRefuseAccess()
+    public function testHandleWhenTheAccessDecisionManagerDecidesToRefuseAccess(): void
     {
         $request = new Request();
 
@@ -69,7 +69,7 @@ class AccessListenerTest extends TestCase
         $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
-    public function testHandleWhenThereIsNoAccessMapEntryMatchingTheRequest()
+    public function testHandleWhenThereIsNoAccessMapEntryMatchingTheRequest(): void
     {
         $request = new Request();
 
@@ -97,7 +97,7 @@ class AccessListenerTest extends TestCase
         $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
-    public function testHandleWhenAccessMapReturnsEmptyAttributes()
+    public function testHandleWhenAccessMapReturnsEmptyAttributes(): void
     {
         $request = new Request();
 
@@ -127,7 +127,7 @@ class AccessListenerTest extends TestCase
         $listener->authenticate(new LazyResponseEvent($event));
     }
 
-    public function testHandleWhenTheSecurityTokenStorageHasNoToken()
+    public function testHandleWhenTheSecurityTokenStorageHasNoToken(): void
     {
         $tokenStorage = new TokenStorage();
         $request = new Request();
@@ -158,7 +158,7 @@ class AccessListenerTest extends TestCase
         $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
-    public function testHandleWhenPublicAccessIsAllowed()
+    public function testHandleWhenPublicAccessIsAllowed(): void
     {
         $tokenStorage = new TokenStorage();
         $request = new Request();
@@ -187,7 +187,7 @@ class AccessListenerTest extends TestCase
         $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
-    public function testHandleWhenPublicAccessWhileAuthenticated()
+    public function testHandleWhenPublicAccessWhileAuthenticated(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('Wouter', null, ['ROLE_USER']), 'main', ['ROLE_USER']);
         $tokenStorage = new TokenStorage();
@@ -218,7 +218,7 @@ class AccessListenerTest extends TestCase
         $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
-    public function testHandleWithMultipleAttributesShouldBeHandledAsAnd()
+    public function testHandleWithMultipleAttributesShouldBeHandledAsAnd(): void
     {
         $request = new Request();
 
@@ -253,7 +253,7 @@ class AccessListenerTest extends TestCase
         $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
     }
 
-    public function testLazyPublicPagesShouldNotAccessTokenStorage()
+    public function testLazyPublicPagesShouldNotAccessTokenStorage(): void
     {
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->expects($this->never())->method('getToken');
@@ -272,7 +272,7 @@ class AccessListenerTest extends TestCase
         $listener->authenticate(new LazyResponseEvent(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST)));
     }
 
-    public function testConstructWithTrueExceptionOnNoToken()
+    public function testConstructWithTrueExceptionOnNoToken(): void
     {
         $tokenStorage = $this->createMock(TokenStorageInterface::class);
         $tokenStorage->expects($this->never())->method(self::anything());

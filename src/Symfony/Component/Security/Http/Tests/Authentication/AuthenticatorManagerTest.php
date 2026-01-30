@@ -59,7 +59,7 @@ class AuthenticatorManagerTest extends TestCase
     }
 
     #[DataProvider('provideSupportsData')]
-    public function testSupports($authenticators, $result)
+    public function testSupports($authenticators, $result): void
     {
         $manager = $this->createManager($authenticators, exposeSecurityErrors: ExposeSecurityLevel::None);
 
@@ -78,7 +78,7 @@ class AuthenticatorManagerTest extends TestCase
         yield [[], false];
     }
 
-    public function testSupportsInvalidAuthenticator()
+    public function testSupportsInvalidAuthenticator(): void
     {
         $manager = $this->createManager([new \stdClass()], exposeSecurityErrors: ExposeSecurityLevel::None);
 
@@ -89,7 +89,7 @@ class AuthenticatorManagerTest extends TestCase
         $manager->supports($this->request);
     }
 
-    public function testSupportCheckedUponRequestAuthentication()
+    public function testSupportCheckedUponRequestAuthentication(): void
     {
         // the attribute stores the supported authenticators, returning false now
         // means support changed between calling supports() and authenticateRequest()
@@ -105,7 +105,7 @@ class AuthenticatorManagerTest extends TestCase
     }
 
     #[DataProvider('provideMatchingAuthenticatorIndex')]
-    public function testAuthenticateRequest($matchingAuthenticatorIndex)
+    public function testAuthenticateRequest($matchingAuthenticatorIndex): void
     {
         $matchingAuthenticator = $this->createStub(TestInteractiveAuthenticator::class);
         $matchingAuthenticator->method('supports')->willReturn(true);
@@ -129,7 +129,7 @@ class AuthenticatorManagerTest extends TestCase
         $matchingAuthenticator->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', fn () => $this->user)));
 
         $listenerCalled = false;
-        $this->eventDispatcher->addListener(CheckPassportEvent::class, function (CheckPassportEvent $event) use (&$listenerCalled, $matchingAuthenticator) {
+        $this->eventDispatcher->addListener(CheckPassportEvent::class, function (CheckPassportEvent $event) use (&$listenerCalled, $matchingAuthenticator): void {
             if ($event->getAuthenticator() === $matchingAuthenticator && $event->getPassport()->getUser() === $this->user) {
                 $listenerCalled = true;
             }
@@ -148,7 +148,7 @@ class AuthenticatorManagerTest extends TestCase
         yield [1];
     }
 
-    public function testNoCredentialsValidated()
+    public function testNoCredentialsValidated(): void
     {
         $authenticator = $this->createMock(TestInteractiveAuthenticator::class);
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
@@ -163,7 +163,7 @@ class AuthenticatorManagerTest extends TestCase
         $manager->authenticateRequest($this->request);
     }
 
-    public function testRequiredBadgeMissing()
+    public function testRequiredBadgeMissing(): void
     {
         $authenticator = $this->createMock(TestInteractiveAuthenticator::class);
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
@@ -176,7 +176,7 @@ class AuthenticatorManagerTest extends TestCase
         $manager->authenticateRequest($this->request);
     }
 
-    public function testAllRequiredBadgesPresent()
+    public function testAllRequiredBadgesPresent(): void
     {
         $authenticator = $this->createMock(TestInteractiveAuthenticator::class);
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
@@ -192,7 +192,7 @@ class AuthenticatorManagerTest extends TestCase
         $manager->authenticateRequest($this->request);
     }
 
-    public function testAuthenticateRequestCanModifyTokenFromEvent()
+    public function testAuthenticateRequestCanModifyTokenFromEvent(): void
     {
         $authenticator = $this->createStub(TestInteractiveAuthenticator::class);
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
@@ -203,7 +203,7 @@ class AuthenticatorManagerTest extends TestCase
 
         $modifiedToken = new UsernamePasswordToken($this->user, 'main');
         $listenerCalled = false;
-        $this->eventDispatcher->addListener(AuthenticationTokenCreatedEvent::class, static function (AuthenticationTokenCreatedEvent $event) use (&$listenerCalled, $modifiedToken) {
+        $this->eventDispatcher->addListener(AuthenticationTokenCreatedEvent::class, static function (AuthenticationTokenCreatedEvent $event) use (&$listenerCalled, $modifiedToken): void {
             $event->setAuthenticatedToken($modifiedToken);
             $listenerCalled = true;
         });
@@ -214,7 +214,7 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertSame($modifiedToken, $this->tokenStorage->getToken());
     }
 
-    public function testAuthenticateUser()
+    public function testAuthenticateUser(): void
     {
         $authenticator = $this->createStub(TestInteractiveAuthenticator::class);
         $authenticator->method('onAuthenticationSuccess')->willReturn($this->response);
@@ -236,7 +236,7 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertSame($this->token, $this->tokenStorage->getToken());
     }
 
-    public function testAuthenticateUserCanModifyTokenFromEvent()
+    public function testAuthenticateUserCanModifyTokenFromEvent(): void
     {
         $authenticator = $this->createStub(TestInteractiveAuthenticator::class);
         $authenticator->method('createToken')->willReturn($this->token);
@@ -244,7 +244,7 @@ class AuthenticatorManagerTest extends TestCase
 
         $modifiedToken = new UsernamePasswordToken($this->user, 'main');
         $listenerCalled = false;
-        $this->eventDispatcher->addListener(AuthenticationTokenCreatedEvent::class, static function (AuthenticationTokenCreatedEvent $event) use (&$listenerCalled, $modifiedToken) {
+        $this->eventDispatcher->addListener(AuthenticationTokenCreatedEvent::class, static function (AuthenticationTokenCreatedEvent $event) use (&$listenerCalled, $modifiedToken): void {
             $event->setAuthenticatedToken($modifiedToken);
             $listenerCalled = true;
         });
@@ -255,7 +255,7 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertSame($modifiedToken, $this->tokenStorage->getToken());
     }
 
-    public function testInteractiveAuthenticator()
+    public function testInteractiveAuthenticator(): void
     {
         $authenticator = $this->createStub(TestInteractiveAuthenticator::class);
         $authenticator->method('isInteractive')->willReturn(true);
@@ -275,7 +275,7 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertSame($this->token, $this->tokenStorage->getToken());
     }
 
-    public function testLegacyInteractiveAuthenticator()
+    public function testLegacyInteractiveAuthenticator(): void
     {
         $authenticator = $this->createStub(InteractiveAuthenticatorInterface::class);
         $authenticator->method('isInteractive')->willReturn(true);
@@ -295,7 +295,7 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertSame($this->token, $this->tokenStorage->getToken());
     }
 
-    public function testAuthenticateRequestHidesInvalidUserExceptions()
+    public function testAuthenticateRequestHidesInvalidUserExceptions(): void
     {
         $invalidUserException = new UserNotFoundException();
         $authenticator = $this->createStub(TestInteractiveAuthenticator::class);
@@ -313,7 +313,7 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertSame($this->response, $response);
     }
 
-    public function testAuthenticateRequestShowsAccountStatusException()
+    public function testAuthenticateRequestShowsAccountStatusException(): void
     {
         $invalidUserException = new LockedException();
         $authenticator = $this->createStub(TestInteractiveAuthenticator::class);
@@ -331,7 +331,7 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertSame($this->response, $response);
     }
 
-    public function testAuthenticateRequestHidesInvalidAccountStatusException()
+    public function testAuthenticateRequestHidesInvalidAccountStatusException(): void
     {
         $invalidUserException = new LockedException();
         $authenticator = $this->createStub(TestInteractiveAuthenticator::class);
@@ -349,7 +349,7 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertSame($this->response, $response);
     }
 
-    public function testLogsUseTheDecoratedAuthenticatorWhenItIsTraceable()
+    public function testLogsUseTheDecoratedAuthenticatorWhenItIsTraceable(): void
     {
         $authenticator = $this->createStub(TestInteractiveAuthenticator::class);
         $authenticator->method('isInteractive')->willReturn(true);

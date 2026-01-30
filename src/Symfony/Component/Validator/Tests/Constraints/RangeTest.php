@@ -18,48 +18,48 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 class RangeTest extends TestCase
 {
-    public function testThrowsConstraintExceptionIfBothMinLimitAndPropertyPathNamed()
+    public function testThrowsConstraintExceptionIfBothMinLimitAndPropertyPathNamed(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "min" or "minPropertyPath" options to be set, not both.');
         new Range(min: 'min', minPropertyPath: 'minPropertyPath');
     }
 
-    public function testThrowsConstraintExceptionIfBothMaxLimitAndPropertyPathNamed()
+    public function testThrowsConstraintExceptionIfBothMaxLimitAndPropertyPathNamed(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('requires only one of the "max" or "maxPropertyPath" options to be set, not both.');
         new Range(max: 'max', maxPropertyPath: 'maxPropertyPath');
     }
 
-    public function testThrowsConstraintExceptionIfNoLimitNorPropertyPath()
+    public function testThrowsConstraintExceptionIfNoLimitNorPropertyPath(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage('Either option "min", "minPropertyPath", "max" or "maxPropertyPath" must be given');
         new Range();
     }
 
-    public function testThrowsNoDefaultOptionConfiguredException()
+    public function testThrowsNoDefaultOptionConfiguredException(): void
     {
         $this->expectException(\TypeError::class);
         new Range('value');
     }
 
-    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessageAndMaxMessage()
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessageAndMaxMessage(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
         new Range(min: 'min', max: 'max', minMessage: 'minMessage', maxMessage: 'maxMessage');
     }
 
-    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessage()
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMinMessage(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');
         new Range(min: 'min', max: 'max', minMessage: 'minMessage');
     }
 
-    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMaxMessage()
+    public function testThrowsConstraintDefinitionExceptionIfBothMinAndMaxAndMaxMessage(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('can not use "minMessage" and "maxMessage" when the "min" and "max" options are both set. Use "notInRangeMessage" instead.');

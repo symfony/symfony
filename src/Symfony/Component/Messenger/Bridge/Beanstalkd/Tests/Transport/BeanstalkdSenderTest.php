@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 final class BeanstalkdSenderTest extends TestCase
 {
-    public function testSend()
+    public function testSend(): void
     {
         $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
@@ -46,7 +46,7 @@ final class BeanstalkdSenderTest extends TestCase
         $this->assertSame('1', $transportMessageIdStamp->getId());
     }
 
-    public function testSendWithDelay()
+    public function testSendWithDelay(): void
     {
         $envelope = (new Envelope(new DummyMessage('Oy')))->with(new DelayStamp(500));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
@@ -61,7 +61,7 @@ final class BeanstalkdSenderTest extends TestCase
         $sender->send($envelope);
     }
 
-    public function testSendWithPriority()
+    public function testSendWithPriority(): void
     {
         $envelope = (new Envelope(new DummyMessage('Oy')))->with(new BeanstalkdPriorityStamp(2));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];

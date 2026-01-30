@@ -26,7 +26,7 @@ use Symfony\Component\Semaphore\Semaphore;
  */
 class SemaphoreTest extends TestCase
 {
-    public function testAcquireReturnsTrue()
+    public function testAcquireReturnsTrue(): void
     {
         $key = new Key('key', 1);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -42,7 +42,7 @@ class SemaphoreTest extends TestCase
         $this->assertGreaterThanOrEqual(299.0, $key->getRemainingLifetime());
     }
 
-    public function testAcquireReturnsFalse()
+    public function testAcquireReturnsFalse(): void
     {
         $key = new Key('key', 1);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -59,7 +59,7 @@ class SemaphoreTest extends TestCase
         $this->assertNull($key->getRemainingLifetime());
     }
 
-    public function testAcquireThrowException()
+    public function testAcquireThrowException(): void
     {
         $key = new Key('key', 1);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -78,7 +78,7 @@ class SemaphoreTest extends TestCase
         $semaphore->acquire();
     }
 
-    public function testRefresh()
+    public function testRefresh(): void
     {
         $key = new Key('key', 1);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -94,7 +94,7 @@ class SemaphoreTest extends TestCase
         $this->assertGreaterThanOrEqual(9.0, $key->getRemainingLifetime());
     }
 
-    public function testRefreshWithCustomTtl()
+    public function testRefreshWithCustomTtl(): void
     {
         $key = new Key('key', 1);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -110,7 +110,7 @@ class SemaphoreTest extends TestCase
         $this->assertGreaterThanOrEqual(39.0, $key->getRemainingLifetime());
     }
 
-    public function testRefreshWhenItFails()
+    public function testRefreshWhenItFails(): void
     {
         $key = new Key('key', 1);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -129,7 +129,7 @@ class SemaphoreTest extends TestCase
         $semaphore->refresh();
     }
 
-    public function testRefreshWhenItFailsHard()
+    public function testRefreshWhenItFailsHard(): void
     {
         $key = new Key('key', 1);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -148,7 +148,7 @@ class SemaphoreTest extends TestCase
         $semaphore->refresh();
     }
 
-    public function testRelease()
+    public function testRelease(): void
     {
         $key = new Key('key', 1);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -163,7 +163,7 @@ class SemaphoreTest extends TestCase
         $semaphore->release();
     }
 
-    public function testReleaseWhenItFails()
+    public function testReleaseWhenItFails(): void
     {
         $key = new Key('key', 1);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -182,7 +182,7 @@ class SemaphoreTest extends TestCase
         $semaphore->release();
     }
 
-    public function testReleaseWhenItFailsHard()
+    public function testReleaseWhenItFailsHard(): void
     {
         $key = new Key('key', 1);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -201,7 +201,7 @@ class SemaphoreTest extends TestCase
         $semaphore->release();
     }
 
-    public function testReleaseOnDestruction()
+    public function testReleaseOnDestruction(): void
     {
         $key = new Key('key', 1);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -220,7 +220,7 @@ class SemaphoreTest extends TestCase
         unset($semaphore);
     }
 
-    public function testNoAutoReleaseWhenNotConfigured()
+    public function testNoAutoReleaseWhenNotConfigured(): void
     {
         $key = new Key('key', 1);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -239,7 +239,7 @@ class SemaphoreTest extends TestCase
         unset($semaphore);
     }
 
-    public function testExpiration()
+    public function testExpiration(): void
     {
         $store = $this->createStub(PersistingStoreInterface::class);
 
@@ -254,7 +254,7 @@ class SemaphoreTest extends TestCase
     }
 
     #[Group('time-sensitive')]
-    public function testExpirationResetAfter()
+    public function testExpirationResetAfter(): void
     {
         $store = $this->createStub(PersistingStoreInterface::class);
 

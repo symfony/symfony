@@ -29,28 +29,28 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         return new TimezoneValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Timezone());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Timezone());
 
         $this->assertNoViolation();
     }
 
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Timezone());
     }
 
     #[DataProvider('getValidTimezones')]
-    public function testValidTimezones(string $timezone)
+    public function testValidTimezones(string $timezone): void
     {
         $this->validator->validate($timezone, new Timezone());
 
@@ -88,7 +88,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidGroupedTimezones')]
-    public function testValidGroupedTimezones(string $timezone, int $zone)
+    public function testValidGroupedTimezones(string $timezone, int $zone): void
     {
         $constraint = new Timezone(zone: $zone);
 
@@ -117,7 +117,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidTimezones')]
-    public function testInvalidTimezoneWithoutZone(string $timezone)
+    public function testInvalidTimezoneWithoutZone(string $timezone): void
     {
         $constraint = new Timezone(message: 'myMessage');
 
@@ -138,7 +138,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidGroupedTimezones')]
-    public function testInvalidGroupedTimezones(string $timezone, int $zone)
+    public function testInvalidGroupedTimezones(string $timezone, int $zone): void
     {
         $constraint = new Timezone(
             zone: $zone,
@@ -166,7 +166,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         yield ['Etc/UTC', \DateTimeZone::EUROPE];
     }
 
-    public function testInvalidGroupedTimezoneNamed()
+    public function testInvalidGroupedTimezoneNamed(): void
     {
         $constraint = new Timezone(zone: \DateTimeZone::AMERICA, message: 'myMessage');
 
@@ -179,7 +179,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidGroupedTimezonesByCountry')]
-    public function testValidGroupedTimezonesByCountry(string $timezone, string $country)
+    public function testValidGroupedTimezonesByCountry(string $timezone, string $country): void
     {
         $constraint = new Timezone(
             zone: \DateTimeZone::PER_COUNTRY,
@@ -214,7 +214,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidGroupedTimezonesByCountry')]
-    public function testInvalidGroupedTimezonesByCountry(string $timezone, string $countryCode)
+    public function testInvalidGroupedTimezonesByCountry(string $timezone, string $countryCode): void
     {
         $constraint = new Timezone(
             message: 'myMessage',
@@ -239,7 +239,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
         yield ['Europe/Amsterdam', 'AC']; // "AC" has no timezones, but is a valid country code
     }
 
-    public function testGroupedTimezonesWithInvalidCountry()
+    public function testGroupedTimezonesWithInvalidCountry(): void
     {
         $constraint = new Timezone(
             message: 'myMessage',
@@ -256,7 +256,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getDeprecatedTimezones')]
-    public function testDeprecatedTimezonesAreValidWithBC(string $timezone)
+    public function testDeprecatedTimezonesAreValidWithBC(string $timezone): void
     {
         // Skip test if the timezone is not available in the current timezone database
         if (!\in_array($timezone, \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC), true)) {
@@ -271,7 +271,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getDeprecatedTimezones')]
-    public function testDeprecatedTimezonesAreInvalidWithoutBC(string $timezone)
+    public function testDeprecatedTimezonesAreInvalidWithoutBC(string $timezone): void
     {
         $constraint = new Timezone(message: 'myMessage');
 
@@ -302,7 +302,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testIntlCompatibility()
+    public function testIntlCompatibility(): void
     {
         $reflector = new \ReflectionExtension('intl');
         ob_start();

@@ -18,7 +18,7 @@ use Symfony\Component\Config\Tests\Fixtures\TestEnum;
 
 class EnumNodeDefinitionTest extends TestCase
 {
-    public function testWithOneValue()
+    public function testWithOneValue(): void
     {
         $def = new EnumNodeDefinition('foo');
         $def->values(['foo']);
@@ -27,7 +27,7 @@ class EnumNodeDefinitionTest extends TestCase
         $this->assertEquals(['foo'], $node->getValues());
     }
 
-    public function testWithUnitEnumFqcn()
+    public function testWithUnitEnumFqcn(): void
     {
         $def = new EnumNodeDefinition('foo');
         $def->enumFqcn(TestEnum::class);
@@ -36,7 +36,7 @@ class EnumNodeDefinitionTest extends TestCase
         $this->assertEquals(TestEnum::class, $node->getEnumFqcn());
     }
 
-    public function testNoValuesPassed()
+    public function testNoValuesPassed(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('You must call either ->values() or ->enumFqcn() on enum nodes.');
@@ -44,7 +44,7 @@ class EnumNodeDefinitionTest extends TestCase
         $def->getNode();
     }
 
-    public function testBothValuesAndEnumFqcnPassed()
+    public function testBothValuesAndEnumFqcnPassed(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('You must call either ->values() or ->enumFqcn() on enum nodes but not both.');
@@ -55,7 +55,7 @@ class EnumNodeDefinitionTest extends TestCase
         $def->getNode();
     }
 
-    public function testWithNoValues()
+    public function testWithNoValues(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('->values() must be called with at least one value.');
@@ -63,7 +63,7 @@ class EnumNodeDefinitionTest extends TestCase
         $def->values([]);
     }
 
-    public function testGetNode()
+    public function testGetNode(): void
     {
         $def = new EnumNodeDefinition('foo');
         $def->values(['foo', 'bar']);
@@ -72,7 +72,7 @@ class EnumNodeDefinitionTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $node->getValues());
     }
 
-    public function testSetDeprecated()
+    public function testSetDeprecated(): void
     {
         $def = new EnumNodeDefinition('foo');
         $def->values(['foo', 'bar']);
@@ -88,7 +88,7 @@ class EnumNodeDefinitionTest extends TestCase
         $this->assertSame('Since vendor/package 1.1: The "foo" node is deprecated.', $node->getDeprecationMessage());
     }
 
-    public function testSameStringCoercedValuesAreDifferent()
+    public function testSameStringCoercedValuesAreDifferent(): void
     {
         $def = new EnumNodeDefinition('ccc');
         $def->values(['', false, null]);

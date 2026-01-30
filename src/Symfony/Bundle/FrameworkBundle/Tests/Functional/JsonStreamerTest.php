@@ -28,7 +28,7 @@ class JsonStreamerTest extends AbstractWebTestCase
         static::bootKernel(['test_case' => 'JsonStreamer']);
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         /** @var StreamWriterInterface $writer */
         $writer = static::getContainer()->get('json_streamer.stream_writer.alias');
@@ -36,7 +36,7 @@ class JsonStreamerTest extends AbstractWebTestCase
         $this->assertSame('{"@name":"DUMMY","range":"10..20"}', (string) $writer->write(new Dummy(), Type::object(Dummy::class)));
     }
 
-    public function testRead()
+    public function testRead(): void
     {
         /** @var StreamReaderInterface $reader */
         $reader = static::getContainer()->get('json_streamer.stream_reader.alias');
@@ -48,7 +48,7 @@ class JsonStreamerTest extends AbstractWebTestCase
         $this->assertEquals($expected, $reader->read('{"@name": "DUMMY", "range": "0..1"}', Type::object(Dummy::class)));
     }
 
-    public function testWarmupStreamableClasses()
+    public function testWarmupStreamableClasses(): void
     {
         /** @var Filesystem $fs */
         $fs = static::getContainer()->get('filesystem');

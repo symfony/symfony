@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 
 class PersistentTokenTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $lastUsed = new \DateTimeImmutable();
         $token = new PersistentToken('fooname', 'fooseries', 'footokenvalue', $lastUsed);
@@ -27,7 +27,7 @@ class PersistentTokenTest extends TestCase
         $this->assertEquals($lastUsed, $token->getLastUsed());
     }
 
-    public function testDateTime()
+    public function testDateTime(): void
     {
         $lastUsed = new \DateTime();
         $token = new PersistentToken('fooname', 'fooseries', 'footokenvalue', $lastUsed);

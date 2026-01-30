@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class TwigTest extends TestCase
 {
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(TwigDummy::class);
         $loader = new AttributeLoader();

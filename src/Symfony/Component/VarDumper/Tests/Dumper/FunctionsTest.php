@@ -18,7 +18,7 @@ use Symfony\Component\VarDumper\VarDumper;
 
 class FunctionsTest extends TestCase
 {
-    public function testDumpWithoutArg()
+    public function testDumpWithoutArg(): void
     {
         $this->setupVarDumper();
 
@@ -29,7 +29,7 @@ class FunctionsTest extends TestCase
         $this->assertNull($return);
     }
 
-    public function testDumpReturnsFirstArg()
+    public function testDumpReturnsFirstArg(): void
     {
         $this->setupVarDumper();
 
@@ -42,7 +42,7 @@ class FunctionsTest extends TestCase
         $this->assertSame($var1, $return);
     }
 
-    public function testDumpReturnsFirstNamedArgWithoutSectionName()
+    public function testDumpReturnsFirstNamedArgWithoutSectionName(): void
     {
         $this->setupVarDumper();
 
@@ -55,7 +55,7 @@ class FunctionsTest extends TestCase
         $this->assertSame($var1, $return);
     }
 
-    public function testDumpReturnsAllArgsInArray()
+    public function testDumpReturnsAllArgsInArray(): void
     {
         $this->setupVarDumper();
 
@@ -70,7 +70,7 @@ class FunctionsTest extends TestCase
         $this->assertSame([$var1, $var2, $var3], $return);
     }
 
-    public function testDumpReturnsAllNamedArgsInArray()
+    public function testDumpReturnsAllNamedArgsInArray(): void
     {
         $this->setupVarDumper();
 
@@ -85,11 +85,11 @@ class FunctionsTest extends TestCase
         $this->assertSame([$var1, 'second' => $var2, 'third' => $var3], $return);
     }
 
-    protected function setupVarDumper()
+    protected function setupVarDumper(): void
     {
         $cloner = new VarCloner();
         $dumper = new CliDumper('php://output');
-        VarDumper::setHandler(static function ($var) use ($cloner, $dumper) {
+        VarDumper::setHandler(static function ($var) use ($cloner, $dumper): void {
             $dumper->dump($cloner->cloneVar($var));
         });
     }

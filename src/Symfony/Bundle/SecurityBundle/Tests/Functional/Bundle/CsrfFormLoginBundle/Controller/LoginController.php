@@ -47,7 +47,7 @@ class LoginController implements ServiceSubscriberInterface
         return new Response('', 400);
     }
 
-    public function secureAction()
+    public function secureAction(): void
     {
         throw new \Exception('Wrapper', 0, new \Exception('Another Wrapper', 0, new AccessDeniedException()));
     }

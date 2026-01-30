@@ -18,7 +18,7 @@ use Symfony\Component\Clock\MockClock;
 
 class ClockAwareTraitTest extends TestCase
 {
-    public function testTrait()
+    public function testTrait(): void
     {
         $sut = new ClockAwareTestImplem();
 

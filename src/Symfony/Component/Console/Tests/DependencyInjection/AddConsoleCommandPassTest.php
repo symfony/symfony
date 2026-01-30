@@ -32,7 +32,7 @@ use Symfony\Component\DependencyInjection\TypedReference;
 class AddConsoleCommandPassTest extends TestCase
 {
     #[DataProvider('visibilityProvider')]
-    public function testProcess($public)
+    public function testProcess($public): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -61,7 +61,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame([$public ? $id : $alias], $container->getParameter('console.command.ids'));
     }
 
-    public function testProcessRegistersLazyCommands()
+    public function testProcessRegistersLazyCommands(): void
     {
         $container = new ContainerBuilder();
         $command = $container
@@ -82,7 +82,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame([['setName', ['my:command']], ['setAliases', [['my:alias']]]], $command->getMethodCalls());
     }
 
-    public function testProcessFallsBackToDefaultName()
+    public function testProcessFallsBackToDefaultName(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -120,7 +120,7 @@ class AddConsoleCommandPassTest extends TestCase
         ];
     }
 
-    public function testProcessFallsBackToDefaultDescription()
+    public function testProcessFallsBackToDefaultDescription(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -153,7 +153,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame(1 + $initCounter, DescribedCommand::$initCounter);
     }
 
-    public function testEscapesDefaultFromPhp()
+    public function testEscapesDefaultFromPhp(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -181,7 +181,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame('The %command.name% help content.', $command->getHelp());
     }
 
-    public function testProcessThrowAnExceptionIfTheServiceIsAbstract()
+    public function testProcessThrowAnExceptionIfTheServiceIsAbstract(): void
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -198,7 +198,7 @@ class AddConsoleCommandPassTest extends TestCase
         $container->compile();
     }
 
-    public function testProcessThrowAnExceptionIfTheServiceIsNotASubclassOfCommand()
+    public function testProcessThrowAnExceptionIfTheServiceIsNotASubclassOfCommand(): void
     {
         $container = new ContainerBuilder();
         $container->setResourceTracking(false);
@@ -214,7 +214,7 @@ class AddConsoleCommandPassTest extends TestCase
         $container->compile();
     }
 
-    public function testProcessPrivateServicesWithSameCommand()
+    public function testProcessPrivateServicesWithSameCommand(): void
     {
         $container = new ContainerBuilder();
         $className = 'Symfony\Component\Console\Tests\DependencyInjection\MyCommand';
@@ -235,7 +235,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertTrue($container->hasAlias($aliasPrefix.'my-command2'));
     }
 
-    public function testProcessMultiCommandSameClass()
+    public function testProcessMultiCommandSameClass(): void
     {
         $container = new ContainerBuilder();
 
@@ -267,7 +267,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertSame('cmd2', $commandTester->getDisplay());
     }
 
-    public function testProcessOnChildDefinitionWithClass()
+    public function testProcessOnChildDefinitionWithClass(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -292,7 +292,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertInstanceOf($className, $command);
     }
 
-    public function testProcessOnChildDefinitionWithParentClass()
+    public function testProcessOnChildDefinitionWithParentClass(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -316,7 +316,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertInstanceOf($className, $command);
     }
 
-    public function testProcessOnChildDefinitionWithoutClass()
+    public function testProcessOnChildDefinitionWithoutClass(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -339,7 +339,7 @@ class AddConsoleCommandPassTest extends TestCase
         $container->compile();
     }
 
-    public function testProcessInvokableCommand()
+    public function testProcessInvokableCommand(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
@@ -363,7 +363,7 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertStringContainsString('usage1', $command->getUsages()[0]);
     }
 
-    public function testProcessCommandWithDescriptionWithpercentageSigns()
+    public function testProcessCommandWithDescriptionWithpercentageSigns(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -382,7 +382,7 @@ class AddConsoleCommandPassTest extends TestCase
         self::assertSame('Just testing %percentage-signs%', $command->getDescription());
     }
 
-    public function testProcessInvokableSignalableCommand()
+    public function testProcessInvokableSignalableCommand(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddConsoleCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);

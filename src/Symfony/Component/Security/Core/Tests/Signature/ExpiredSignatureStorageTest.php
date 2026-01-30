@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Signature\ExpiredSignatureStorage;
 
 class ExpiredSignatureStorageTest extends TestCase
 {
-    public function testUsage()
+    public function testUsage(): void
     {
         $cache = new ArrayAdapter();
         $storage = new ExpiredSignatureStorage($cache, 600);

@@ -40,7 +40,7 @@ class DotenvDumpCommandTest extends TestCase
         @unlink(__DIR__.'/composer.json');
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $command = $this->createCommand();
         $command->execute([
@@ -56,7 +56,7 @@ class DotenvDumpCommandTest extends TestCase
         ], $vars);
     }
 
-    public function testExecuteEmpty()
+    public function testExecuteEmpty(): void
     {
         $command = $this->createCommand();
         $command->execute([
@@ -70,7 +70,7 @@ class DotenvDumpCommandTest extends TestCase
         $this->assertSame(['APP_ENV' => 'test'], $vars);
     }
 
-    public function testExecuteTestEnvs()
+    public function testExecuteTestEnvs(): void
     {
         file_put_contents(__DIR__.'/composer.json', <<<EOF
             {"extra":{"runtime":{"test_envs":[]}}}

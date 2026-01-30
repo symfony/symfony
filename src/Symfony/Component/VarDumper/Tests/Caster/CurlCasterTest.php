@@ -20,7 +20,7 @@ class CurlCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testCastCurl()
+    public function testCastCurl(): void
     {
         $ch = curl_init('http://example.com');
         curl_setopt($ch, \CURLOPT_RETURNTRANSFER, true);

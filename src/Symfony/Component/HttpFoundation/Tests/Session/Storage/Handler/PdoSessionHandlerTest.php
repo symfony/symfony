@@ -50,7 +50,7 @@ class PdoSessionHandlerTest extends TestCase
         return $pdo;
     }
 
-    public function testWrongPdoErrMode()
+    public function testWrongPdoErrMode(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $pdo = $this->getMemorySqlitePdo();
@@ -59,7 +59,7 @@ class PdoSessionHandlerTest extends TestCase
         new PdoSessionHandler($pdo);
     }
 
-    public function testInexistentTable()
+    public function testInexistentTable(): void
     {
         $this->expectException(\RuntimeException::class);
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo(), ['db_table' => 'inexistent_table']);
@@ -69,14 +69,14 @@ class PdoSessionHandlerTest extends TestCase
         $storage->close();
     }
 
-    public function testCreateTableTwice()
+    public function testCreateTableTwice(): void
     {
         $this->expectException(\RuntimeException::class);
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
         $storage->createTable();
     }
 
-    public function testWithLazyDsnConnection()
+    public function testWithLazyDsnConnection(): void
     {
         $dsn = $this->getPersistentSqliteDsn();
 
@@ -94,7 +94,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame('data', $data, 'Written value can be read back correctly');
     }
 
-    public function testWithLazySavePathConnection()
+    public function testWithLazySavePathConnection(): void
     {
         $dsn = $this->getPersistentSqliteDsn();
 
@@ -113,7 +113,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame('data', $data, 'Written value can be read back correctly');
     }
 
-    public function testReadWriteReadWithNullByte()
+    public function testReadWriteReadWithNullByte(): void
     {
         $sessionData = 'da'."\0".'ta';
 
@@ -130,7 +130,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame($sessionData, $readData, 'Written value can be read back correctly');
     }
 
-    public function testReadConvertsStreamToString()
+    public function testReadConvertsStreamToString(): void
     {
         $pdo = new MockPdo('pgsql');
         $pdo->prepareResult = $this->createMock(\PDOStatement::class);
@@ -147,7 +147,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame($content, $result);
     }
 
-    public function testReadLockedConvertsStreamToString()
+    public function testReadLockedConvertsStreamToString(): void
     {
         if (filter_var(\ini_get('session.use_strict_mode'), \FILTER_VALIDATE_BOOL)) {
             $this->markTestSkipped('Strict mode needs no locking for new sessions.');
@@ -169,7 +169,7 @@ class PdoSessionHandlerTest extends TestCase
             });
 
         $insertStmt->expects($this->once())->method('execute')
-            ->willReturnCallback(static function () use (&$exception) {
+            ->willReturnCallback(static function () use (&$exception): void {
                 throw $exception = new \PDOException('', '23');
             });
 
@@ -179,7 +179,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame($content, $result);
     }
 
-    public function testReadingRequiresExactlySameId()
+    public function testReadingRequiresExactlySameId(): void
     {
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
         $storage->open('', 'sid');
@@ -204,7 +204,7 @@ class PdoSessionHandlerTest extends TestCase
     /**
      * Simulates session_regenerate_id(true) which will require an INSERT or UPDATE (replace).
      */
-    public function testWriteDifferentSessionIdThanRead()
+    public function testWriteDifferentSessionIdThanRead(): void
     {
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
         $storage->open('', 'sid');
@@ -220,7 +220,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame('data_of_new_session_id', $data, 'Data of regenerated session id is available');
     }
 
-    public function testWrongUsageStillWorks()
+    public function testWrongUsageStillWorks(): void
     {
         // wrong method sequence that should no happen, but still works
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
@@ -237,7 +237,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertSame('other_data', $otherData);
     }
 
-    public function testSessionDestroy()
+    public function testSessionDestroy(): void
     {
         $pdo = $this->getMemorySqlitePdo();
         $storage = new PdoSessionHandler($pdo);
@@ -261,7 +261,7 @@ class PdoSessionHandlerTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testSessionGC()
+    public function testSessionGC(): void
     {
         $previousLifeTime = ini_set('session.gc_maxlifetime', 1000);
         $pdo = $this->getMemorySqlitePdo();
@@ -290,7 +290,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertEquals(1, $pdo->query('SELECT COUNT(*) FROM sessions')->fetchColumn(), 'Expired session is pruned');
     }
 
-    public function testGetConnection()
+    public function testGetConnection(): void
     {
         $storage = new PdoSessionHandler($this->getMemorySqlitePdo());
 
@@ -299,7 +299,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertInstanceOf(\PDO::class, $method->invoke($storage));
     }
 
-    public function testGetConnectionConnectsIfNeeded()
+    public function testGetConnectionConnectsIfNeeded(): void
     {
         $storage = new PdoSessionHandler('sqlite::memory:');
 
@@ -309,7 +309,7 @@ class PdoSessionHandlerTest extends TestCase
     }
 
     #[DataProvider('provideUrlDsnPairs')]
-    public function testUrlDsn($url, $expectedDsn, $expectedUser = null, $expectedPassword = null)
+    public function testUrlDsn($url, $expectedDsn, $expectedUser = null, $expectedPassword = null): void
     {
         $storage = new PdoSessionHandler($url);
         $reflection = new \ReflectionClass(PdoSessionHandler::class);
@@ -323,7 +323,7 @@ class PdoSessionHandlerTest extends TestCase
         }
     }
 
-    public function testConfigureSchemaDifferentDatabase()
+    public function testConfigureSchemaDifferentDatabase(): void
     {
         $schema = new Schema();
 
@@ -332,7 +332,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertFalse($schema->hasTable('sessions'));
     }
 
-    public function testConfigureSchemaSameDatabase()
+    public function testConfigureSchemaSameDatabase(): void
     {
         $schema = new Schema();
 
@@ -341,7 +341,7 @@ class PdoSessionHandlerTest extends TestCase
         $this->assertTrue($schema->hasTable('sessions'));
     }
 
-    public function testConfigureSchemaTableExistsPdo()
+    public function testConfigureSchemaTableExistsPdo(): void
     {
         $schema = new Schema();
         $schema->createTable('sessions');
@@ -371,7 +371,7 @@ class PdoSessionHandlerTest extends TestCase
         yield ['mssql://localhost:56/test', 'sqlsrv:server=localhost,56;Database=test'];
     }
 
-    public function testTtl()
+    public function testTtl(): void
     {
         foreach ([60, static fn () => 60] as $ttl) {
             $pdo = $this->getMemorySqlitePdo();
@@ -386,7 +386,7 @@ class PdoSessionHandlerTest extends TestCase
         }
     }
 
-    public function testSqlsrvDataBindingUsesStream()
+    public function testSqlsrvDataBindingUsesStream(): void
     {
         $pdo = new MockPdo('sqlsrv', null, '10');
         $boundData = [];

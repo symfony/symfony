@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Exception\InvalidArgumentException;
  */
 class ChannelPolicyTest extends TestCase
 {
-    public function testCannotRetrieveChannelsUsingUnavailableImportance()
+    public function testCannotRetrieveChannelsUsingUnavailableImportance(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -30,7 +30,7 @@ class ChannelPolicyTest extends TestCase
     }
 
     #[DataProvider('provideValidPolicies')]
-    public function testCanRetrieveChannels(array $policy, string $importance, array $expectedChannels)
+    public function testCanRetrieveChannels(array $policy, string $importance, array $expectedChannels): void
     {
         $channelPolicy = new ChannelPolicy($policy);
         $channels = $channelPolicy->getChannels($importance);

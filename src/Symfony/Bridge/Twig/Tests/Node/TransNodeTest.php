@@ -24,7 +24,7 @@ use Twig\Node\TextNode;
  */
 class TransNodeTest extends TestCase
 {
-    public function testCompileStrict()
+    public function testCompileStrict(): void
     {
         $body = new TextNode('trans %var%', 0);
         $vars = new ContextVariable('foo', 0);

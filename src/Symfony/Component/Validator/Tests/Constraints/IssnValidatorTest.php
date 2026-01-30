@@ -90,7 +90,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $constraint = new Issn();
 
@@ -99,7 +99,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $constraint = new Issn();
 
@@ -108,7 +108,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $constraint = new Issn();
@@ -116,7 +116,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidLowerCasedIssn')]
-    public function testCaseSensitiveIssns($issn)
+    public function testCaseSensitiveIssns($issn): void
     {
         $constraint = new Issn(
             caseSensitive: true,
@@ -132,7 +132,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidNonHyphenatedIssn')]
-    public function testRequireHyphenIssns($issn)
+    public function testRequireHyphenIssns($issn): void
     {
         $constraint = new Issn(
             requireHyphen: true,
@@ -148,7 +148,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidIssn')]
-    public function testValidIssn($issn)
+    public function testValidIssn($issn): void
     {
         $constraint = new Issn();
 
@@ -158,7 +158,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidIssn')]
-    public function testInvalidIssn($issn, $code)
+    public function testInvalidIssn($issn, $code): void
     {
         $constraint = new Issn(message: 'myMessage');
 
@@ -170,7 +170,7 @@ class IssnValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testNamedArguments()
+    public function testNamedArguments(): void
     {
         $this->validator->validate(
             '2162321x',

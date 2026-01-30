@@ -22,13 +22,13 @@ use Symfony\Component\Validator\Tests\Fixtures\DummyConstraintValidator;
 
 class ContainerConstraintValidatorFactoryTest extends TestCase
 {
-    public function testGetInstanceCreatesValidator()
+    public function testGetInstanceCreatesValidator(): void
     {
         $factory = new ContainerConstraintValidatorFactory(new Container());
         $this->assertInstanceOf(DummyConstraintValidator::class, $factory->getInstance(new DummyConstraint()));
     }
 
-    public function testGetInstanceReturnsExistingValidator()
+    public function testGetInstanceReturnsExistingValidator(): void
     {
         $factory = new ContainerConstraintValidatorFactory(new Container());
         $v1 = $factory->getInstance(new BlankConstraint());
@@ -36,7 +36,7 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
         $this->assertSame($v1, $v2);
     }
 
-    public function testGetInstanceReturnsService()
+    public function testGetInstanceReturnsService(): void
     {
         $validator = new DummyConstraintValidator();
         $container = new Container();
@@ -47,7 +47,7 @@ class ContainerConstraintValidatorFactoryTest extends TestCase
         $this->assertSame($validator, $factory->getInstance(new DummyConstraint()));
     }
 
-    public function testGetInstanceInvalidValidatorClass()
+    public function testGetInstanceInvalidValidatorClass(): void
     {
         $constraint = $this->createMock(Constraint::class);
         $constraint

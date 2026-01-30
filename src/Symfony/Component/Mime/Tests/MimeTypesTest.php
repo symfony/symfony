@@ -24,7 +24,7 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTestCase
         return new MimeTypes();
     }
 
-    public function testUnsupportedGuesser()
+    public function testUnsupportedGuesser(): void
     {
         $guesser = $this->getGuesser();
         $guesser->registerGuesser(new class implements MimeTypeGuesserInterface {
@@ -41,7 +41,7 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTestCase
         $this->assertEquals('image/gif', $guesser->guessMimeType(__DIR__.'/Fixtures/mimetypes/test'));
     }
 
-    public function testGetExtensions()
+    public function testGetExtensions(): void
     {
         $mt = new MimeTypes();
         $this->assertSame(['mbox'], $mt->getExtensions('application/mbox'));
@@ -51,7 +51,7 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTestCase
         $this->assertSame([], $mt->getExtensions('application/whatever-symfony'));
     }
 
-    public function testGetMimeTypes()
+    public function testGetMimeTypes(): void
     {
         $mt = new MimeTypes();
         $this->assertSame(['application/mbox'], $mt->getMimeTypes('mbox'));
@@ -62,7 +62,7 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTestCase
         $this->assertSame([], $mt->getMimeTypes('symfony'));
     }
 
-    public function testCustomMimeTypes()
+    public function testCustomMimeTypes(): void
     {
         $mt = new MimeTypes([
             'text/bar' => ['foo'],
@@ -73,7 +73,7 @@ class MimeTypesTest extends AbstractMimeTypeGuesserTestCase
         $this->assertSame(['foo', 'moof'], $mt->getExtensions('text/baz'));
     }
 
-    public function testCsvExtension()
+    public function testCsvExtension(): void
     {
         $mt = new MimeTypes();
 

@@ -17,7 +17,7 @@ use Symfony\Component\JsonStreamer\ValueTransformer\DateTimeToStringValueTransfo
 
 class DateTimeToStringValueTransformerTest extends TestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $valueTransformer = new DateTimeToStringValueTransformer();
 
@@ -32,7 +32,7 @@ class DateTimeToStringValueTransformerTest extends TestCase
         );
     }
 
-    public function testTransformThrowWhenInvalidNativeValue()
+    public function testTransformThrowWhenInvalidNativeValue(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The native value must implement the "\DateTimeInterface".');

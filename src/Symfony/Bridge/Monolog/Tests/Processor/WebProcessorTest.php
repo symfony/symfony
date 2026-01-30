@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class WebProcessorTest extends TestCase
 {
-    public function testUsesRequestServerData()
+    public function testUsesRequestServerData(): void
     {
         [$event, $server] = $this->createRequestEvent();
 
@@ -38,7 +38,7 @@ class WebProcessorTest extends TestCase
         $this->assertEquals($server['HTTP_REFERER'], $record['extra']['referrer']);
     }
 
-    public function testUseRequestClientIp()
+    public function testUseRequestClientIp(): void
     {
         Request::setTrustedProxies(['192.168.0.1'], Request::HEADER_X_FORWARDED_FOR);
         [$event, $server] = $this->createRequestEvent(['X_FORWARDED_FOR' => '192.168.0.2']);
@@ -57,7 +57,7 @@ class WebProcessorTest extends TestCase
         Request::setTrustedProxies([], -1);
     }
 
-    public function testCanBeConstructedWithExtraFields()
+    public function testCanBeConstructedWithExtraFields(): void
     {
         if (!$this->isExtraFieldsSupported()) {
             $this->markTestSkipped('WebProcessor of the installed Monolog version does not support $extraFields parameter');

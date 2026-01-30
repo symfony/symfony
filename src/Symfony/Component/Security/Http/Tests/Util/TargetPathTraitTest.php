@@ -17,7 +17,7 @@ use Symfony\Component\Security\Http\Util\TargetPathTrait;
 
 class TargetPathTraitTest extends TestCase
 {
-    public function testSetTargetPath()
+    public function testSetTargetPath(): void
     {
         $obj = new TestClassWithTargetPathTrait();
 
@@ -29,7 +29,7 @@ class TargetPathTraitTest extends TestCase
         $obj->doSetTargetPath($session, 'firewall_name', '/foo');
     }
 
-    public function testGetTargetPath()
+    public function testGetTargetPath(): void
     {
         $obj = new TestClassWithTargetPathTrait();
 
@@ -46,7 +46,7 @@ class TargetPathTraitTest extends TestCase
         );
     }
 
-    public function testRemoveTargetPath()
+    public function testRemoveTargetPath(): void
     {
         $obj = new TestClassWithTargetPathTrait();
 
@@ -63,7 +63,7 @@ class TestClassWithTargetPathTrait
 {
     use TargetPathTrait;
 
-    public function doSetTargetPath(SessionInterface $session, $firewallName, $uri)
+    public function doSetTargetPath(SessionInterface $session, $firewallName, $uri): void
     {
         $this->saveTargetPath($session, $firewallName, $uri);
     }
@@ -73,7 +73,7 @@ class TestClassWithTargetPathTrait
         return $this->getTargetPath($session, $firewallName);
     }
 
-    public function doRemoveTargetPath(SessionInterface $session, $firewallName)
+    public function doRemoveTargetPath(SessionInterface $session, $firewallName): void
     {
         $this->removeTargetPath($session, $firewallName);
     }

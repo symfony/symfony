@@ -21,7 +21,7 @@ use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 
 class DoctrineDbalCacheAdapterSchemaListenerTest extends TestCase
 {
-    public function testPostGenerateSchema()
+    public function testPostGenerateSchema(): void
     {
         $schema = new Schema();
         $dbalConnection = $this->createStub(Connection::class);

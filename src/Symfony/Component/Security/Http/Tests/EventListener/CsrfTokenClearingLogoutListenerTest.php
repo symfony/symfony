@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\EventListener\CsrfTokenClearingLogoutListene
 
 class CsrfTokenClearingLogoutListenerTest extends TestCase
 {
-    public function testSkipsClearingSessionTokenStorageOnStatelessRequest()
+    public function testSkipsClearingSessionTokenStorageOnStatelessRequest(): void
     {
         try {
             (new CsrfTokenClearingLogoutListener(

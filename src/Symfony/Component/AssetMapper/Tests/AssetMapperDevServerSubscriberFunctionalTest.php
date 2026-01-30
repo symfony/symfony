@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
 {
-    public function testGettingAssetWorks()
+    public function testGettingAssetWorks(): void
     {
         $client = static::createClient();
 
@@ -37,7 +37,7 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         $this->assertTrue($response->headers->has('X-Assets-Dev'));
     }
 
-    public function testGettingAssetWithNonAsciiFilenameWorks()
+    public function testGettingAssetWithNonAsciiFilenameWorks(): void
     {
         $client = static::createClient();
 
@@ -53,7 +53,7 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         );
     }
 
-    public function test404OnUnknownAsset()
+    public function test404OnUnknownAsset(): void
     {
         $client = static::createClient();
 
@@ -63,7 +63,7 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         $this->assertFalse($response->headers->has('X-Assets-Dev'));
     }
 
-    public function test404OnInvalidDigest()
+    public function test404OnInvalidDigest(): void
     {
         $client = static::createClient();
 
@@ -72,7 +72,7 @@ class AssetMapperDevServerSubscriberFunctionalTest extends WebTestCase
         $this->assertSame(404, $response->getStatusCode());
     }
 
-    public function testPreDigestedAssetIsReturned()
+    public function testPreDigestedAssetIsReturned(): void
     {
         $client = static::createClient();
 

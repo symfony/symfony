@@ -20,17 +20,17 @@ class TestPluralAdderRemoverAndSetterSameSingularAndPlural
         return $this->aircraft;
     }
 
-    public function setAircraft(array $aircraft)
+    public function setAircraft(array $aircraft): void
     {
         $this->aircraft = ['plane'];
     }
 
-    public function addAircraft($aircraft)
+    public function addAircraft($aircraft): void
     {
         $this->aircraft[] = $aircraft;
     }
 
-    public function removeAircraft($aircraft)
+    public function removeAircraft($aircraft): void
     {
         $this->aircraft = array_diff($this->aircraft, [$aircraft]);
     }

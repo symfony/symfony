@@ -19,7 +19,7 @@ use Symfony\Component\Config\Definition\NodeInterface;
 class BaseNodeTest extends TestCase
 {
     #[DataProvider('providePath')]
-    public function testGetPathForChildNode(string $expected, array $params)
+    public function testGetPathForChildNode(string $expected, array $params): void
     {
         $constructorArgs = [];
         $constructorArgs[] = $params[0];

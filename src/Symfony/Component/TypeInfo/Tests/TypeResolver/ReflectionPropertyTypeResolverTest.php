@@ -30,13 +30,13 @@ class ReflectionPropertyTypeResolverTest extends TestCase
         $this->resolver = new ReflectionPropertyTypeResolver(new ReflectionTypeResolver(), new TypeContextFactory());
     }
 
-    public function testCannotResolveNonReflectionProperty()
+    public function testCannotResolveNonReflectionProperty(): void
     {
         $this->expectException(UnsupportedException::class);
         $this->resolver->resolve(123);
     }
 
-    public function testCannotResolveReflectionPropertyWithoutType()
+    public function testCannotResolveReflectionPropertyWithoutType(): void
     {
         $this->expectException(UnsupportedException::class);
 
@@ -46,7 +46,7 @@ class ReflectionPropertyTypeResolverTest extends TestCase
         $this->resolver->resolve($reflectionProperty);
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableDummy::class);
         $reflectionProperty = $reflectionClass->getProperty('builtin');
@@ -54,7 +54,7 @@ class ReflectionPropertyTypeResolverTest extends TestCase
         $this->assertEquals(Type::int(), $this->resolver->resolve($reflectionProperty));
     }
 
-    public function testResolveSelfFromClassWithoutContext()
+    public function testResolveSelfFromClassWithoutContext(): void
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableDummy::class);
         $reflectionProperty = $reflectionClass->getProperty('self');
@@ -62,7 +62,7 @@ class ReflectionPropertyTypeResolverTest extends TestCase
         $this->assertEquals(Type::object(ReflectionExtractableDummy::class), $this->resolver->resolve($reflectionProperty));
     }
 
-    public function testResolveSelfFromTraitWithoutContext()
+    public function testResolveSelfFromTraitWithoutContext(): void
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableTrait::class);
         $reflectionProperty = $reflectionClass->getProperty('self');
@@ -70,7 +70,7 @@ class ReflectionPropertyTypeResolverTest extends TestCase
         $this->assertEquals(Type::object(ReflectionExtractableTrait::class), $this->resolver->resolve($reflectionProperty));
     }
 
-    public function testResolveSelfFromTraitWithClassContext()
+    public function testResolveSelfFromTraitWithClassContext(): void
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableTrait::class);
         $reflectionProperty = $reflectionClass->getProperty('self');

@@ -22,7 +22,7 @@ use Symfony\Component\HttpClient\ScopingHttpClient;
 
 class ScopingHttpClientTest extends TestCase
 {
-    public function testRelativeUrl()
+    public function testRelativeUrl(): void
     {
         $mockClient = new MockHttpClient();
         $client = new ScopingHttpClient($mockClient, []);
@@ -31,7 +31,7 @@ class ScopingHttpClientTest extends TestCase
         $client->request('GET', '/foo');
     }
 
-    public function testRelativeUrlWithDefaultRegexp()
+    public function testRelativeUrlWithDefaultRegexp(): void
     {
         $mockClient = new MockHttpClient();
         $client = new ScopingHttpClient($mockClient, ['.*' => ['base_uri' => 'http://example.com', 'query' => ['a' => 'b']]], '.*');
@@ -40,7 +40,7 @@ class ScopingHttpClientTest extends TestCase
     }
 
     #[DataProvider('provideMatchingUrls')]
-    public function testMatchingUrls(string $regexp, string $url, array $options)
+    public function testMatchingUrls(string $regexp, string $url, array $options): void
     {
         $mockClient = new MockHttpClient();
         $client = new ScopingHttpClient($mockClient, $options);
@@ -63,7 +63,7 @@ class ScopingHttpClientTest extends TestCase
         yield ['regexp' => '.*', 'url' => 'http://example.com/foobar', 'options' => $defaultOptions];
     }
 
-    public function testMatchingUrlsAndOptions()
+    public function testMatchingUrlsAndOptions(): void
     {
         $defaultOptions = [
             '.*/foo-bar' => ['headers' => ['X-FooBar' => 'unit-test-foo-bar']],
@@ -91,7 +91,7 @@ class ScopingHttpClientTest extends TestCase
         $this->assertSame('Content-Type: text/html', $requestOptions['headers'][1]);
     }
 
-    public function testForBaseUri()
+    public function testForBaseUri(): void
     {
         $client = ScopingHttpClient::forBaseUri(new MockHttpClient(null, null), 'http://example.com/foo');
 
@@ -102,7 +102,7 @@ class ScopingHttpClientTest extends TestCase
         $this->assertSame('http://foo.bar/', $response->getInfo('url'));
     }
 
-    public function testRetryableHttpClientIntegration()
+    public function testRetryableHttpClientIntegration(): void
     {
         $responses = [
             new MockResponse(info: ['http_code' => 503]),

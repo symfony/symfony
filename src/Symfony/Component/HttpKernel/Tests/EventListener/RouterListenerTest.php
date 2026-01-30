@@ -39,7 +39,7 @@ use Symfony\Component\Routing\RequestContext;
 class RouterListenerTest extends TestCase
 {
     #[DataProvider('getPortData')]
-    public function testPort($defaultHttpPort, $defaultHttpsPort, $uri, $expectedHttpPort, $expectedHttpsPort)
+    public function testPort($defaultHttpPort, $defaultHttpsPort, $uri, $expectedHttpPort, $expectedHttpsPort): void
     {
         $urlMatcher = $this->createStub(UrlMatcherInterface::class);
 
@@ -78,7 +78,7 @@ class RouterListenerTest extends TestCase
         return new RequestEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST);
     }
 
-    public function testRequestMatcher()
+    public function testRequestMatcher(): void
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
         $request = Request::create('http://localhost/');
@@ -94,7 +94,7 @@ class RouterListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    public function testSubRequestWithDifferentMethod()
+    public function testSubRequestWithDifferentMethod(): void
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
         $request = Request::create('http://localhost/', 'post');
@@ -122,7 +122,7 @@ class RouterListenerTest extends TestCase
     }
 
     #[DataProvider('getLoggingParameterData')]
-    public function testLoggingParameter($parameter, $log, $parameters)
+    public function testLoggingParameter($parameter, $log, $parameters): void
     {
         $requestMatcher = $this->createMock(RequestMatcherInterface::class);
         $requestMatcher->expects($this->once())
@@ -149,7 +149,7 @@ class RouterListenerTest extends TestCase
         ];
     }
 
-    public function testWithBadRequest()
+    public function testWithBadRequest(): void
     {
         $requestStack = new RequestStack();
 
@@ -169,7 +169,7 @@ class RouterListenerTest extends TestCase
         $this->assertSame(400, $response->getStatusCode());
     }
 
-    public function testNoRoutingConfigurationResponse()
+    public function testNoRoutingConfigurationResponse(): void
     {
         $requestStack = new RequestStack();
 
@@ -196,7 +196,7 @@ class RouterListenerTest extends TestCase
         $this->assertStringContainsString('Welcome', $response->getContent());
     }
 
-    public function testRequestWithBadHost()
+    public function testRequestWithBadHost(): void
     {
         $this->expectException(BadRequestHttpException::class);
         $kernel = $this->createStub(HttpKernelInterface::class);
@@ -210,7 +210,7 @@ class RouterListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    public function testResourceNotFoundException()
+    public function testResourceNotFoundException(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('No route found for "GET https://www.symfony.com/path" (from "https://www.google.com")');
@@ -237,7 +237,7 @@ class RouterListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    public function testMethodNotAllowedException()
+    public function testMethodNotAllowedException(): void
     {
         $this->expectException(MethodNotAllowedHttpException::class);
         $this->expectExceptionMessage('No route found for "GET https://www.symfony.com/path": Method Not Allowed (Allow: POST)');
@@ -264,7 +264,7 @@ class RouterListenerTest extends TestCase
     }
 
     #[DataProvider('provideRouteMapping')]
-    public function testRouteMapping(array $expected, array $parameters)
+    public function testRouteMapping(array $expected, array $parameters): void
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
         $request = Request::create('http://localhost/');

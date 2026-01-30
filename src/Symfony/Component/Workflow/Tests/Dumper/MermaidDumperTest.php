@@ -25,7 +25,7 @@ class MermaidDumperTest extends TestCase
     use WorkflowBuilderTrait;
 
     #[DataProvider('provideWorkflowDefinitionWithoutMarking')]
-    public function testDumpWithoutMarking(Definition $definition, string $expected)
+    public function testDumpWithoutMarking(Definition $definition, string $expected): void
     {
         $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_WORKFLOW);
 
@@ -35,7 +35,7 @@ class MermaidDumperTest extends TestCase
     }
 
     #[DataProvider('provideWorkflowWithReservedWords')]
-    public function testDumpWithReservedWordsAsPlacenames(Definition $definition, string $expected)
+    public function testDumpWithReservedWordsAsPlacenames(Definition $definition, string $expected): void
     {
         $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_WORKFLOW);
 
@@ -45,7 +45,7 @@ class MermaidDumperTest extends TestCase
     }
 
     #[DataProvider('provideStateMachine')]
-    public function testDumpAsStateMachine(Definition $definition, string $expected)
+    public function testDumpAsStateMachine(Definition $definition, string $expected): void
     {
         $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_STATEMACHINE);
 
@@ -55,7 +55,7 @@ class MermaidDumperTest extends TestCase
     }
 
     #[DataProvider('provideWorkflowWithMarking')]
-    public function testDumpWorkflowWithMarking(Definition $definition, Marking $marking, string $expected)
+    public function testDumpWorkflowWithMarking(Definition $definition, Marking $marking, string $expected): void
     {
         $dumper = new MermaidDumper(MermaidDumper::TRANSITION_TYPE_WORKFLOW);
 

@@ -34,7 +34,7 @@ class CurlHttpClientTest extends HttpClientTestCase
         return new CurlHttpClient(['verify_peer' => false, 'verify_host' => false, 'extra' => ['use_persistent_connections' => $usePersistentConnections]], 6, 50);
     }
 
-    public function testTimeoutIsNotAFatalError()
+    public function testTimeoutIsNotAFatalError(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Too transient on Windows');
@@ -43,7 +43,7 @@ class CurlHttpClientTest extends HttpClientTestCase
         parent::testTimeoutIsNotAFatalError();
     }
 
-    public function testHandleIsReinitOnReset()
+    public function testHandleIsReinitOnReset(): void
     {
         $httpClient = $this->getHttpClient(__FUNCTION__);
 
@@ -54,7 +54,7 @@ class CurlHttpClientTest extends HttpClientTestCase
         self::assertNotSame($initialShareId, $clientState->share);
     }
 
-    public function testCurlClientStateIsSharedBetweenClones()
+    public function testCurlClientStateIsSharedBetweenClones(): void
     {
         $client = $this->getHttpClient(__FUNCTION__);
         $cloneA = $client->withOptions(['headers' => ['Foo: bar']]);
@@ -67,7 +67,7 @@ class CurlHttpClientTest extends HttpClientTestCase
         self::assertSame($state, $r->getValue($cloneB));
     }
 
-    public function testCurlClientStateInitializesHandlesLazily()
+    public function testCurlClientStateInitializesHandlesLazily(): void
     {
         $client = $this->getHttpClient(__FUNCTION__);
 
@@ -83,7 +83,7 @@ class CurlHttpClientTest extends HttpClientTestCase
         self::assertInstanceOf(\CurlShareHandle::class, $state->share);
     }
 
-    public function testCurlClientPersistentStateInitializesHandlesLazily()
+    public function testCurlClientPersistentStateInitializesHandlesLazily(): void
     {
         $client = $this->getHttpClient(__FUNCTION__);
 
@@ -101,7 +101,7 @@ class CurlHttpClientTest extends HttpClientTestCase
         self::assertInstanceOf(\PHP_VERSION_ID >= 80500 ? \CurlSharePersistentHandle::class : \CurlShareHandle::class, $state->persistentShare);
     }
 
-    public function testProcessAfterReset()
+    public function testProcessAfterReset(): void
     {
         $client = $this->getHttpClient(__FUNCTION__);
 
@@ -112,7 +112,7 @@ class CurlHttpClientTest extends HttpClientTestCase
         $this->assertSame(['application/json'], $response->getHeaders()['content-type']);
     }
 
-    public function testOverridingRefererUsingCurlOptions()
+    public function testOverridingRefererUsingCurlOptions(): void
     {
         $httpClient = $this->getHttpClient(__FUNCTION__);
         $this->expectException(InvalidArgumentException::class);
@@ -127,7 +127,7 @@ class CurlHttpClientTest extends HttpClientTestCase
         ]);
     }
 
-    public function testOverridingHttpMethodUsingCurlOptions()
+    public function testOverridingHttpMethodUsingCurlOptions(): void
     {
         $httpClient = $this->getHttpClient(__FUNCTION__);
         $this->expectException(InvalidArgumentException::class);
@@ -142,7 +142,7 @@ class CurlHttpClientTest extends HttpClientTestCase
         ]);
     }
 
-    public function testOverridingInternalAttributesUsingCurlOptions()
+    public function testOverridingInternalAttributesUsingCurlOptions(): void
     {
         $httpClient = $this->getHttpClient(__FUNCTION__);
         $this->expectException(InvalidArgumentException::class);
@@ -157,7 +157,7 @@ class CurlHttpClientTest extends HttpClientTestCase
         ]);
     }
 
-    public function testOverridingMaxConnectDurationUsingCurlOptions()
+    public function testOverridingMaxConnectDurationUsingCurlOptions(): void
     {
         $httpClient = $this->getHttpClient(__FUNCTION__);
         $this->expectException(InvalidArgumentException::class);
@@ -172,7 +172,7 @@ class CurlHttpClientTest extends HttpClientTestCase
         ]);
     }
 
-    public function testKeepAuthorizationHeaderOnRedirectToSameHostWithConfiguredHostToIpAddressMapping()
+    public function testKeepAuthorizationHeaderOnRedirectToSameHostWithConfiguredHostToIpAddressMapping(): void
     {
         $httpClient = $this->getHttpClient(__FUNCTION__);
         $response = $httpClient->request('POST', 'http://127.0.0.1:8057/301', [
@@ -189,7 +189,7 @@ class CurlHttpClientTest extends HttpClientTestCase
     }
 
     #[Group('integration')]
-    public function testMaxConnections()
+    public function testMaxConnections(): void
     {
         foreach ($ports = [80, 8681, 8682, 8683, 8684] as $port) {
             if (!($fp = @fsockopen('localhost', $port, $errorCode, $errorMessage, 2))) {

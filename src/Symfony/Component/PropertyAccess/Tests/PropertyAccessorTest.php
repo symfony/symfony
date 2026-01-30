@@ -53,7 +53,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor = new PropertyAccessor();
     }
 
-    public function testPrefersPropertyOverMethodWithSameNameAndRequiredArgs()
+    public function testPrefersPropertyOverMethodWithSameNameAndRequiredArgs(): void
     {
         $obj = new class {
             public bool $loaded = true;
@@ -100,20 +100,20 @@ class PropertyAccessorTest extends TestCase
     }
 
     #[DataProvider('getValidReadPropertyPaths')]
-    public function testGetValue(array|object $objectOrArray, string $path, ?string $value)
+    public function testGetValue(array|object $objectOrArray, string $path, ?string $value): void
     {
         $this->assertSame($value, $this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
     #[DataProvider('getPathsWithMissingProperty')]
-    public function testGetValueThrowsExceptionIfPropertyNotFound(array|object $objectOrArray, string $path)
+    public function testGetValueThrowsExceptionIfPropertyNotFound(array|object $objectOrArray, string $path): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
     #[DataProvider('getPathsWithMissingProperty')]
-    public function testGetValueReturnsNullIfPropertyNotFoundAndExceptionIsDisabled(array|object $objectOrArray, string $path)
+    public function testGetValueReturnsNullIfPropertyNotFoundAndExceptionIsDisabled(array|object $objectOrArray, string $path): void
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET, PropertyAccessor::DO_NOT_THROW);
 
@@ -121,13 +121,13 @@ class PropertyAccessorTest extends TestCase
     }
 
     #[DataProvider('getPathsWithMissingIndex')]
-    public function testGetValueThrowsNoExceptionIfIndexNotFound(array|object $objectOrArray, string $path)
+    public function testGetValueThrowsNoExceptionIfIndexNotFound(array|object $objectOrArray, string $path): void
     {
         $this->assertNull($this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
     #[DataProvider('getPathsWithMissingIndex')]
-    public function testGetValueThrowsExceptionIfIndexNotFoundAndIndexExceptionsEnabled(array|object $objectOrArray, string $path)
+    public function testGetValueThrowsExceptionIfIndexNotFoundAndIndexExceptionsEnabled(array|object $objectOrArray, string $path): void
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
 
@@ -136,7 +136,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
-    public function testGetValueThrowsExceptionIfUninitializedProperty()
+    public function testGetValueThrowsExceptionIfUninitializedProperty(): void
     {
         $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty::$uninitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.');
@@ -144,7 +144,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue(new UninitializedProperty(), 'uninitialized');
     }
 
-    public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetter()
+    public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetter(): void
     {
         $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The method "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty::getUninitialized()" returned "null", but expected type "array". Did you forget to initialize a property or to make the return type nullable using "?array"?');
@@ -152,7 +152,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue(new UninitializedPrivateProperty(), 'uninitialized');
     }
 
-    public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousClass()
+    public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousClass(): void
     {
         $object = new class {
             private $uninitialized;
@@ -169,7 +169,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue($object, 'uninitialized');
     }
 
-    public function testGetValueThrowsExceptionIfUninitializedNotNullablePropertyWithGetterOfAnonymousClass()
+    public function testGetValueThrowsExceptionIfUninitializedNotNullablePropertyWithGetterOfAnonymousClass(): void
     {
         $object = new class {
             private string $uninitialized;
@@ -186,7 +186,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue($object, 'uninitialized');
     }
 
-    public function testGetValueThrowsExceptionIfUninitializedPropertyOfAnonymousClass()
+    public function testGetValueThrowsExceptionIfUninitializedPropertyOfAnonymousClass(): void
     {
         $object = new class {
             public string $uninitialized;
@@ -198,7 +198,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue($object, 'uninitialized');
     }
 
-    public function testGetValueThrowsExceptionIfUninitializedNotNullableOfParentClass()
+    public function testGetValueThrowsExceptionIfUninitializedNotNullableOfParentClass(): void
     {
         $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty::$uninitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.');
@@ -206,7 +206,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue(new ExtendedUninitializedProperty(), 'uninitialized');
     }
 
-    public function testGetValueThrowsExceptionIfUninitializedNotNullablePropertyWithGetterOfParentClass()
+    public function testGetValueThrowsExceptionIfUninitializedNotNullablePropertyWithGetterOfParentClass(): void
     {
         $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty::$privateUninitialized" is not readable because it is typed "string". You should initialize it or declare a default value instead.');
@@ -214,7 +214,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue(new ExtendedUninitializedProperty(), 'privateUninitialized');
     }
 
-    public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousStdClass()
+    public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousStdClass(): void
     {
         $object = new class extends \stdClass {
             private $uninitialized;
@@ -231,7 +231,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue($object, 'uninitialized');
     }
 
-    public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousChildClass()
+    public function testGetValueThrowsExceptionIfUninitializedPropertyWithGetterOfAnonymousChildClass(): void
     {
         $object = new class extends UninitializedPrivateProperty {
         };
@@ -242,18 +242,18 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue($object, 'uninitialized');
     }
 
-    public function testGetValueThrowsExceptionIfNotArrayAccess()
+    public function testGetValueThrowsExceptionIfNotArrayAccess(): void
     {
         $this->expectException(NoSuchIndexException::class);
         $this->propertyAccessor->getValue(new \stdClass(), '[index]');
     }
 
-    public function testGetValueReadsMagicGet()
+    public function testGetValueReadsMagicGet(): void
     {
         $this->assertSame('Bernhard', $this->propertyAccessor->getValue(new TestClassMagicGet('Bernhard'), 'magicProperty'));
     }
 
-    public function testGetValueIgnoresMagicGet()
+    public function testGetValueIgnoresMagicGet(): void
     {
         $this->expectException(NoSuchPropertyException::class);
 
@@ -262,7 +262,7 @@ class PropertyAccessorTest extends TestCase
         $propertyAccessor->getValue(new TestClassMagicGet('Bernhard'), 'magicProperty');
     }
 
-    public function testGetValueReadsArrayWithMissingIndexForCustomPropertyPath()
+    public function testGetValueReadsArrayWithMissingIndexForCustomPropertyPath(): void
     {
         $object = new \ArrayObject();
         $array = ['child' => ['index' => $object]];
@@ -272,12 +272,12 @@ class PropertyAccessorTest extends TestCase
     }
 
     // https://github.com/symfony/symfony/pull/4450
-    public function testGetValueReadsMagicGetThatReturnsConstant()
+    public function testGetValueReadsMagicGetThatReturnsConstant(): void
     {
         $this->assertSame('constant value', $this->propertyAccessor->getValue(new TestClassMagicGet('Bernhard'), 'constantMagicProperty'));
     }
 
-    public function testGetValueNotModifyObject()
+    public function testGetValueNotModifyObject(): void
     {
         $object = new \stdClass();
         $object->firstName = ['Bernhard'];
@@ -286,7 +286,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame(['Bernhard'], $object->firstName);
     }
 
-    public function testGetValueNotModifyObjectException()
+    public function testGetValueNotModifyObjectException(): void
     {
         $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
         $object = new \stdClass();
@@ -300,13 +300,13 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame(['Bernhard'], $object->firstName);
     }
 
-    public function testGetValueDoesNotReadMagicCallByDefault()
+    public function testGetValueDoesNotReadMagicCallByDefault(): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->getValue(new TestClassMagicCall('Bernhard'), 'magicCallProperty');
     }
 
-    public function testGetValueReadsMagicCallIfEnabled()
+    public function testGetValueReadsMagicCallIfEnabled(): void
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_GET | PropertyAccessor::MAGIC_SET | PropertyAccessor::MAGIC_CALL);
 
@@ -314,7 +314,7 @@ class PropertyAccessorTest extends TestCase
     }
 
     // https://github.com/symfony/symfony/pull/4450
-    public function testGetValueReadsMagicCallThatReturnsConstant()
+    public function testGetValueReadsMagicCallThatReturnsConstant(): void
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_CALL);
 
@@ -322,7 +322,7 @@ class PropertyAccessorTest extends TestCase
     }
 
     #[DataProvider('getValidWritePropertyPaths')]
-    public function testSetValue(array|object $objectOrArray, string $path, ?string $value)
+    public function testSetValue(array|object $objectOrArray, string $path, ?string $value): void
     {
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
 
@@ -330,14 +330,14 @@ class PropertyAccessorTest extends TestCase
     }
 
     #[DataProvider('getPathsWithMissingProperty')]
-    public function testSetValueThrowsExceptionIfPropertyNotFound(array|object $objectOrArray, string $path)
+    public function testSetValueThrowsExceptionIfPropertyNotFound(array|object $objectOrArray, string $path): void
     {
         $this->expectException(NoSuchPropertyException::class);
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
     }
 
     #[DataProvider('getPathsWithMissingIndex')]
-    public function testSetValueThrowsNoExceptionIfIndexNotFound(array|object $objectOrArray, string $path)
+    public function testSetValueThrowsNoExceptionIfIndexNotFound(array|object $objectOrArray, string $path): void
     {
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
 
@@ -345,7 +345,7 @@ class PropertyAccessorTest extends TestCase
     }
 
     #[DataProvider('getPathsWithMissingIndex')]
-    public function testSetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsEnabled(array|object $objectOrArray, string $path)
+    public function testSetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsEnabled(array|object $objectOrArray, string $path): void
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
@@ -353,7 +353,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame('Updated', $this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
-    public function testSetValueThrowsExceptionIfNotArrayAccess()
+    public function testSetValueThrowsExceptionIfNotArrayAccess(): void
     {
         $object = new \stdClass();
 
@@ -362,7 +362,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, '[index]', 'Updated');
     }
 
-    public function testSetValueUpdatesMagicSet()
+    public function testSetValueUpdatesMagicSet(): void
     {
         $author = new TestClassMagicGet('Bernhard');
 
@@ -371,7 +371,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertEquals('Updated', $author->__get('magicProperty'));
     }
 
-    public function testSetValueIgnoresMagicSet()
+    public function testSetValueIgnoresMagicSet(): void
     {
         $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS);
 
@@ -382,7 +382,7 @@ class PropertyAccessorTest extends TestCase
         $propertyAccessor->setValue($author, 'magicProperty', 'Updated');
     }
 
-    public function testSetValueThrowsExceptionIfThereAreMissingParameters()
+    public function testSetValueThrowsExceptionIfThereAreMissingParameters(): void
     {
         $object = new TestClass('Bernhard');
 
@@ -391,7 +391,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'publicAccessorWithMoreRequiredParameters', 'Updated');
     }
 
-    public function testSetValueDoesNotUpdateMagicCallByDefault()
+    public function testSetValueDoesNotUpdateMagicCallByDefault(): void
     {
         $author = new TestClassMagicCall('Bernhard');
 
@@ -400,7 +400,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($author, 'magicCallProperty', 'Updated');
     }
 
-    public function testSetValueUpdatesMagicCallIfEnabled()
+    public function testSetValueUpdatesMagicCallIfEnabled(): void
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_CALL);
 
@@ -411,33 +411,33 @@ class PropertyAccessorTest extends TestCase
         $this->assertEquals('Updated', $author->__call('getMagicCallProperty', []));
     }
 
-    public function testGetValueWhenArrayValueIsNull()
+    public function testGetValueWhenArrayValueIsNull(): void
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
         $this->assertNull($this->propertyAccessor->getValue(['index' => ['nullable' => null]], '[index][nullable]'));
     }
 
     #[DataProvider('getValidReadPropertyPaths')]
-    public function testIsReadable(array|object $objectOrArray, string $path, ?string $value)
+    public function testIsReadable(array|object $objectOrArray, string $path, ?string $value): void
     {
         $this->assertTrue($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
 
     #[DataProvider('getPathsWithMissingProperty')]
-    public function testIsReadableReturnsFalseIfPropertyNotFound(array|object $objectOrArray, string $path)
+    public function testIsReadableReturnsFalseIfPropertyNotFound(array|object $objectOrArray, string $path): void
     {
         $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
 
     #[DataProvider('getPathsWithMissingIndex')]
-    public function testIsReadableReturnsTrueIfIndexNotFound(array|object $objectOrArray, string $path)
+    public function testIsReadableReturnsTrueIfIndexNotFound(array|object $objectOrArray, string $path): void
     {
         // Non-existing indices can be read. In this case, null is returned
         $this->assertTrue($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
 
     #[DataProvider('getPathsWithMissingIndex')]
-    public function testIsReadableReturnsFalseIfIndexNotFoundAndIndexExceptionsEnabled(array|object $objectOrArray, string $path)
+    public function testIsReadableReturnsFalseIfIndexNotFoundAndIndexExceptionsEnabled(array|object $objectOrArray, string $path): void
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
 
@@ -445,17 +445,17 @@ class PropertyAccessorTest extends TestCase
         $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
     }
 
-    public function testIsReadableRecognizesMagicGet()
+    public function testIsReadableRecognizesMagicGet(): void
     {
         $this->assertTrue($this->propertyAccessor->isReadable(new TestClassMagicGet('Bernhard'), 'magicProperty'));
     }
 
-    public function testIsReadableDoesNotRecognizeMagicCallByDefault()
+    public function testIsReadableDoesNotRecognizeMagicCallByDefault(): void
     {
         $this->assertFalse($this->propertyAccessor->isReadable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
     }
 
-    public function testIsReadableRecognizesMagicCallIfEnabled()
+    public function testIsReadableRecognizesMagicCallIfEnabled(): void
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_CALL);
 
@@ -463,26 +463,26 @@ class PropertyAccessorTest extends TestCase
     }
 
     #[DataProvider('getValidWritePropertyPaths')]
-    public function testIsWritable(array|object $objectOrArray, string $path, ?string $value)
+    public function testIsWritable(array|object $objectOrArray, string $path, ?string $value): void
     {
         $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
     #[DataProvider('getPathsWithMissingProperty')]
-    public function testIsWritableReturnsFalseIfPropertyNotFound(array|object $objectOrArray, string $path)
+    public function testIsWritableReturnsFalseIfPropertyNotFound(array|object $objectOrArray, string $path): void
     {
         $this->assertFalse($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
     #[DataProvider('getPathsWithMissingIndex')]
-    public function testIsWritableReturnsTrueIfIndexNotFound(array|object $objectOrArray, string $path)
+    public function testIsWritableReturnsTrueIfIndexNotFound(array|object $objectOrArray, string $path): void
     {
         // Non-existing indices can be written. Arrays are created on-demand.
         $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
     #[DataProvider('getPathsWithMissingIndex')]
-    public function testIsWritableReturnsTrueIfIndexNotFoundAndIndexExceptionsEnabled(array|object $objectOrArray, string $path)
+    public function testIsWritableReturnsTrueIfIndexNotFoundAndIndexExceptionsEnabled(array|object $objectOrArray, string $path): void
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
 
@@ -490,17 +490,17 @@ class PropertyAccessorTest extends TestCase
         $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
-    public function testIsWritableRecognizesMagicSet()
+    public function testIsWritableRecognizesMagicSet(): void
     {
         $this->assertTrue($this->propertyAccessor->isWritable(new TestClassMagicGet('Bernhard'), 'magicProperty'));
     }
 
-    public function testIsWritableDoesNotRecognizeMagicCallByDefault()
+    public function testIsWritableDoesNotRecognizeMagicCallByDefault(): void
     {
         $this->assertFalse($this->propertyAccessor->isWritable(new TestClassMagicCall('Bernhard'), 'magicCallProperty'));
     }
 
-    public function testIsWritableRecognizesMagicCallIfEnabled()
+    public function testIsWritableRecognizesMagicCallIfEnabled(): void
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::MAGIC_CALL);
 
@@ -579,14 +579,14 @@ class PropertyAccessorTest extends TestCase
     }
 
     #[DataProvider('getNullSafeIndexPaths')]
-    public function testNullSafeIndexWithThrowOnInvalidIndex(array|object $objectOrArray, string $path, ?string $value)
+    public function testNullSafeIndexWithThrowOnInvalidIndex(array|object $objectOrArray, string $path, ?string $value): void
     {
         $this->propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS, PropertyAccessor::THROW_ON_INVALID_INDEX | PropertyAccessor::THROW_ON_INVALID_PROPERTY_PATH);
 
         $this->assertSame($value, $this->propertyAccessor->getValue($objectOrArray, $path));
     }
 
-    public function testTicket5755()
+    public function testTicket5755(): void
     {
         $object = new Ticket5775Object();
 
@@ -595,7 +595,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertEquals('foobar', $object->getProperty());
     }
 
-    public function testSetValueDeepWithMagicGetter()
+    public function testSetValueDeepWithMagicGetter(): void
     {
         $obj = new TestClassMagicGet('foo');
         $obj->publicProperty = ['foo' => ['bar' => 'some_value']];
@@ -615,7 +615,7 @@ class PropertyAccessorTest extends TestCase
     }
 
     #[DataProvider('getReferenceChainObjectsForSetValue')]
-    public function testSetValueForReferenceChainIssue($object, $path, $value)
+    public function testSetValueForReferenceChainIssue($object, $path, $value): void
     {
         $this->propertyAccessor->setValue($object, $path, $value);
 
@@ -632,12 +632,12 @@ class PropertyAccessorTest extends TestCase
     }
 
     #[DataProvider('getReferenceChainObjectsForIsWritable')]
-    public function testIsWritableForReferenceChainIssue($object, $path, $value)
+    public function testIsWritableForReferenceChainIssue($object, $path, $value): void
     {
         $this->assertEquals($value, $this->propertyAccessor->isWritable($object, $path));
     }
 
-    public function testThrowTypeError()
+    public function testThrowTypeError(): void
     {
         $object = new TypeHinted();
 
@@ -647,7 +647,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'date', 'This is a string, \DateTimeImmutable expected.');
     }
 
-    public function testThrowTypeErrorWithNullArgument()
+    public function testThrowTypeErrorWithNullArgument(): void
     {
         $object = new TypeHinted();
 
@@ -657,7 +657,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'date', null);
     }
 
-    public function testSetTypeHint()
+    public function testSetTypeHint(): void
     {
         $date = new \DateTimeImmutable();
         $object = new TypeHinted();
@@ -666,7 +666,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame($date, $object->getDate());
     }
 
-    public function testArrayNotBeeingOverwritten()
+    public function testArrayNotBeeingOverwritten(): void
     {
         $value = ['value1' => 'foo', 'value2' => 'bar'];
         $object = new TestClass($value);
@@ -676,7 +676,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame(['value1' => 'foo', 'value2' => 'baz'], $object->getPublicAccessor());
     }
 
-    public function testCacheReadAccess()
+    public function testCacheReadAccess(): void
     {
         $obj = new TestClass('foo');
 
@@ -687,7 +687,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertEquals('baz', $propertyAccessor->getValue($obj, 'publicGetSetter'));
     }
 
-    public function testAttributeWithSpecialChars()
+    public function testAttributeWithSpecialChars(): void
     {
         $obj = new \stdClass();
         $obj->{'@foo'} = 'bar';
@@ -700,7 +700,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame('2', $propertyAccessor->getValue($obj, 'a%2Fb'));
     }
 
-    public function testThrowTypeErrorWithInterface()
+    public function testThrowTypeErrorWithInterface(): void
     {
         $object = new TypeHinted();
 
@@ -710,7 +710,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'countable', 'This is a string, \Countable expected.');
     }
 
-    public function testAnonymousClassRead()
+    public function testAnonymousClassRead(): void
     {
         $value = 'bar';
 
@@ -721,7 +721,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertEquals($value, $propertyAccessor->getValue($obj, 'foo'));
     }
 
-    public function testAnonymousClassReadThrowExceptionOnInvalidPropertyPath()
+    public function testAnonymousClassReadThrowExceptionOnInvalidPropertyPath(): void
     {
         $obj = $this->generateAnonymousClass('bar');
 
@@ -730,7 +730,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue($obj, 'invalid_property');
     }
 
-    public function testAnonymousClassReadReturnsNullOnInvalidPropertyWithDisabledException()
+    public function testAnonymousClassReadReturnsNullOnInvalidPropertyWithDisabledException(): void
     {
         $obj = $this->generateAnonymousClass('bar');
 
@@ -739,7 +739,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertNull($this->propertyAccessor->getValue($obj, 'invalid_property'));
     }
 
-    public function testAnonymousClassWrite()
+    public function testAnonymousClassWrite(): void
     {
         $value = 'bar';
 
@@ -766,14 +766,14 @@ class PropertyAccessorTest extends TestCase
                 return $this->foo;
             }
 
-            public function setFoo($foo)
+            public function setFoo($foo): void
             {
                 $this->foo = $foo;
             }
         };
     }
 
-    public function testThrowTypeErrorInsideSetterCall()
+    public function testThrowTypeErrorInsideSetterCall(): void
     {
         $object = new TestClassTypeErrorInsideCall();
 
@@ -782,7 +782,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'property', 'foo');
     }
 
-    public function testDoNotDiscardReturnTypeError()
+    public function testDoNotDiscardReturnTypeError(): void
     {
         $object = new ReturnTyped();
 
@@ -791,7 +791,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'foos', [new \DateTimeImmutable()]);
     }
 
-    public function testDoNotDiscardReturnTypeErrorWhenWriterMethodIsMisconfigured()
+    public function testDoNotDiscardReturnTypeErrorWhenWriterMethodIsMisconfigured(): void
     {
         $object = new ReturnTyped();
 
@@ -800,7 +800,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'name', 'foo');
     }
 
-    public function testWriteToSingularPropertyWhilePluralOneExists()
+    public function testWriteToSingularPropertyWhilePluralOneExists(): void
     {
         $object = new TestSingularAndPluralProps();
 
@@ -811,7 +811,7 @@ class PropertyAccessorTest extends TestCase
         self::assertSame([], $object->getEmails());
     }
 
-    public function testWriteToPluralPropertyWhileSingularOneExists()
+    public function testWriteToPluralPropertyWhileSingularOneExists(): void
     {
         $object = new TestSingularAndPluralProps();
 
@@ -822,7 +822,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertNull($object->getEmail());
     }
 
-    public function testAdderAndRemoverArePreferredOverSetter()
+    public function testAdderAndRemoverArePreferredOverSetter(): void
     {
         $object = new TestPluralAdderRemoverAndSetter();
 
@@ -832,7 +832,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertEquals(['test@email.com'], $object->getEmails());
     }
 
-    public function testAdderAndRemoverArePreferredOverSetterForSameSingularAndPlural()
+    public function testAdderAndRemoverArePreferredOverSetterForSameSingularAndPlural(): void
     {
         $object = new TestPluralAdderRemoverAndSetterSameSingularAndPlural();
 
@@ -842,7 +842,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertEquals(['aeroplane'], $object->getAircraft());
     }
 
-    public function testAdderWithoutRemover()
+    public function testAdderWithoutRemover(): void
     {
         $object = new TestAdderRemoverInvalidMethods();
 
@@ -852,7 +852,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'foos', [1, 2]);
     }
 
-    public function testRemoverWithoutAdder()
+    public function testRemoverWithoutAdder(): void
     {
         $object = new TestAdderRemoverInvalidMethods();
 
@@ -862,7 +862,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'bars', [1, 2]);
     }
 
-    public function testAdderAndRemoveNeedsTheExactParametersDefined()
+    public function testAdderAndRemoveNeedsTheExactParametersDefined(): void
     {
         $object = new TestAdderRemoverInvalidArgumentLength();
 
@@ -872,7 +872,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'foo', [1, 2]);
     }
 
-    public function testSetterNeedsTheExactParametersDefined()
+    public function testSetterNeedsTheExactParametersDefined(): void
     {
         $object = new TestAdderRemoverInvalidArgumentLength();
 
@@ -882,7 +882,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'bar', [1, 2]);
     }
 
-    public function testSetterNeedsPublicAccess()
+    public function testSetterNeedsPublicAccess(): void
     {
         $object = new TestClassSetValue(0);
 
@@ -892,7 +892,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'foo', 1);
     }
 
-    public function testGetPublicProperty()
+    public function testGetPublicProperty(): void
     {
         $value = 'A';
         $path = 'a';
@@ -901,7 +901,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame($value, $this->propertyAccessor->getValue($object, $path));
     }
 
-    public function testGetPrivateProperty()
+    public function testGetPrivateProperty(): void
     {
         $object = new TestPublicPropertyGetterOnObject();
 
@@ -910,7 +910,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue($object, 'b');
     }
 
-    public function testGetDynamicPublicProperty()
+    public function testGetDynamicPublicProperty(): void
     {
         $value = 'Bar';
         $path = 'foo';
@@ -919,7 +919,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame($value, $this->propertyAccessor->getValue($object, $path));
     }
 
-    public function testGetDynamicPublicPropertyWithMagicGetterDisallow()
+    public function testGetDynamicPublicPropertyWithMagicGetterDisallow(): void
     {
         $object = new TestPublicPropertyGetterOnObjectMagicGet();
         $propertyAccessor = new PropertyAccessor(PropertyAccessor::DISALLOW_MAGIC_METHODS);
@@ -928,7 +928,7 @@ class PropertyAccessorTest extends TestCase
         $propertyAccessor->getValue($object, 'c');
     }
 
-    public function testGetDynamicPublicPropertyWithMagicGetterAllow()
+    public function testGetDynamicPublicPropertyWithMagicGetterAllow(): void
     {
         $value = 'B';
         $path = 'b';
@@ -936,7 +936,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertSame($value, $this->propertyAccessor->getValue($object, $path));
     }
 
-    public function testSetValueWrongTypeShouldThrowWrappedException()
+    public function testSetValueWrongTypeShouldThrowWrappedException(): void
     {
         $object = new TestClassTypedProperty();
 
@@ -945,7 +945,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->setValue($object, 'publicProperty', 'string');
     }
 
-    public function testCastDateTime()
+    public function testCastDateTime(): void
     {
         $object = new TypeHinted();
 
@@ -954,7 +954,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertInstanceOf(\DateTimeImmutable::class, $object->getDate());
     }
 
-    public function testCastDateTimeImmutable()
+    public function testCastDateTimeImmutable(): void
     {
         $object = new TypeHinted();
 
@@ -963,7 +963,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertInstanceOf(\DateTime::class, $object->getDate());
     }
 
-    public function testGetValuePropertyThrowsExceptionIfUninitializedWithoutLazyGhost()
+    public function testGetValuePropertyThrowsExceptionIfUninitializedWithoutLazyGhost(): void
     {
         $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty::$uninitialized" is not readable because it is typed "DateTimeInterface". You should initialize it or declare a default value instead.');
@@ -971,7 +971,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue(new UninitializedObjectProperty(), 'uninitialized');
     }
 
-    public function testGetValueGetterThrowsExceptionIfUninitializedWithoutLazyGhost()
+    public function testGetValueGetterThrowsExceptionIfUninitializedWithoutLazyGhost(): void
     {
         $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty::$privateUninitialized" is not readable because it is typed "DateTimeInterface". You should initialize it or declare a default value instead.');
@@ -980,7 +980,7 @@ class PropertyAccessorTest extends TestCase
     }
 
     #[DataProvider('voidAccessorProvider')]
-    public function testIgnoreVoidAccessor(string $property, mixed $value)
+    public function testIgnoreVoidAccessor(string $property, mixed $value): void
     {
         $object = new TestIgnoreVoidAccessor();
         if (null === $value) {
@@ -1004,7 +1004,7 @@ class PropertyAccessorTest extends TestCase
         ];
     }
 
-    public function testGetValuePropertyThrowsExceptionIfUninitializedWithLazyGhost()
+    public function testGetValuePropertyThrowsExceptionIfUninitializedWithLazyGhost(): void
     {
         $this->expectException(UninitializedPropertyException::class);
         $this->expectExceptionMessage('The property "Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty::$uninitialized" is not readable because it is typed "DateTimeInterface". You should initialize it or declare a default value instead.');
@@ -1014,7 +1014,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue($lazyGhost, 'uninitialized');
     }
 
-    public function testGetValueGetterThrowsExceptionIfUninitializedWithLazyGhost()
+    public function testGetValueGetterThrowsExceptionIfUninitializedWithLazyGhost(): void
     {
         $lazyGhost = $this->createUninitializedObjectPropertyGhost();
 
@@ -1024,7 +1024,7 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue($lazyGhost, 'privateUninitialized');
     }
 
-    public function testIsReadableWithMissingPropertyAndLazyGhost()
+    public function testIsReadableWithMissingPropertyAndLazyGhost(): void
     {
         $lazyGhost = $this->createUninitializedObjectPropertyGhost();
 
@@ -1036,7 +1036,7 @@ class PropertyAccessorTest extends TestCase
         return new \ReflectionClass(UninitializedObjectProperty::class)->newLazyGhost(static fn () => null);
     }
 
-    public function testIsWritableWithAsymmetricVisibility()
+    public function testIsWritableWithAsymmetricVisibility(): void
     {
         $object = new AsymmetricVisibility();
 
@@ -1047,7 +1047,7 @@ class PropertyAccessorTest extends TestCase
         $this->assertFalse($this->propertyAccessor->isWritable($object, 'virtualNoSetHook'));
     }
 
-    public function testIsReadableWithAsymmetricVisibility()
+    public function testIsReadableWithAsymmetricVisibility(): void
     {
         $object = new AsymmetricVisibility();
 
@@ -1059,7 +1059,7 @@ class PropertyAccessorTest extends TestCase
     }
 
     #[DataProvider('setValueWithAsymmetricVisibilityDataProvider')]
-    public function testSetValueWithAsymmetricVisibility(string $propertyPath, ?string $expectedException)
+    public function testSetValueWithAsymmetricVisibility(string $propertyPath, ?string $expectedException): void
     {
         $object = new AsymmetricVisibility();
 

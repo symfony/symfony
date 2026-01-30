@@ -22,7 +22,7 @@ use Symfony\Component\Semaphore\Store\StoreFactory;
 class StoreFactoryTest extends TestCase
 {
     #[DataProvider('validConnections')]
-    public function testCreateStore($connection, string $expectedStoreClass)
+    public function testCreateStore($connection, string $expectedStoreClass): void
     {
         $store = StoreFactory::createStore($connection);
 

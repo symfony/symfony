@@ -18,21 +18,21 @@ use Symfony\Component\Stopwatch\StopwatchPeriod;
 class StopwatchPeriodTest extends TestCase
 {
     #[DataProvider('provideTimeValues')]
-    public function testGetStartTime($start, $useMorePrecision, $expected)
+    public function testGetStartTime($start, $useMorePrecision, $expected): void
     {
         $period = new StopwatchPeriod($start, $start, $useMorePrecision);
         $this->assertSame($expected, $period->getStartTime());
     }
 
     #[DataProvider('provideTimeValues')]
-    public function testGetEndTime($end, $useMorePrecision, $expected)
+    public function testGetEndTime($end, $useMorePrecision, $expected): void
     {
         $period = new StopwatchPeriod($end, $end, $useMorePrecision);
         $this->assertSame($expected, $period->getEndTime());
     }
 
     #[DataProvider('provideDurationValues')]
-    public function testGetDuration($start, $end, $useMorePrecision, $duration)
+    public function testGetDuration($start, $end, $useMorePrecision, $duration): void
     {
         $period = new StopwatchPeriod($start, $end, $useMorePrecision);
         $this->assertEqualsWithDelta($duration, $period->getDuration(), \PHP_FLOAT_EPSILON);

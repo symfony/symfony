@@ -22,7 +22,7 @@ use Symfony\Component\CssSelector\Parser\Shortcut\ClassParser;
 class ClassParserTest extends TestCase
 {
     #[DataProvider('getParseTestData')]
-    public function testParse($source, $representation)
+    public function testParse($source, $representation): void
     {
         $parser = new ClassParser();
         $selectors = $parser->parse($source);

@@ -51,7 +51,7 @@ class ImportMapManagerTest extends TestCase
     }
 
     #[DataProvider('getRequirePackageTests')]
-    public function testRequire(array $packages, int $expectedProviderPackageArgumentCount, array $resolvedPackages, array $expectedImportMap)
+    public function testRequire(array $packages, int $expectedProviderPackageArgumentCount, array $resolvedPackages, array $expectedImportMap): void
     {
         $this->packageResolver = $this->createMock(PackageResolverInterface::class);
         $manager = $this->createImportMapManager();
@@ -207,7 +207,7 @@ class ImportMapManagerTest extends TestCase
         ];
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $manager = $this->createImportMapManager();
         $this->mockImportMap([
@@ -233,7 +233,7 @@ class ImportMapManagerTest extends TestCase
         $manager->remove(['cowsay', 'app']);
     }
 
-    public function testUpdateAll()
+    public function testUpdateAll(): void
     {
         $this->packageResolver = $this->createMock(PackageResolverInterface::class);
         $manager = $this->createImportMapManager();
@@ -279,7 +279,7 @@ class ImportMapManagerTest extends TestCase
         $manager->update();
     }
 
-    public function testUpdateWithSpecificPackages()
+    public function testUpdateWithSpecificPackages(): void
     {
         $this->packageResolver = $this->createMock(PackageResolverInterface::class);
         $this->remotePackageDownloader = $this->createMock(RemotePackageDownloader::class);
@@ -316,7 +316,7 @@ class ImportMapManagerTest extends TestCase
     }
 
     #[DataProvider('getPackageNameTests')]
-    public function testParsePackageName(string $packageName, array $expectedReturn)
+    public function testParsePackageName(string $packageName, array $expectedReturn): void
     {
         $parsed = ImportMapManager::parsePackageName($packageName);
         $this->assertIsArray($parsed);
@@ -365,7 +365,7 @@ class ImportMapManagerTest extends TestCase
         ];
     }
 
-    public function testUpdatePreservesEntrypointStatus()
+    public function testUpdatePreservesEntrypointStatus(): void
     {
         $this->packageResolver = $this->createMock(PackageResolverInterface::class);
         $manager = $this->createImportMapManager();

@@ -45,7 +45,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         }
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
@@ -55,14 +55,14 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals('200', $transformer->transform(2));
     }
 
-    public function testTransformEmpty()
+    public function testTransformEmpty(): void
     {
         $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
         $this->assertEquals('', $transformer->transform(null));
     }
 
-    public function testTransformWithInteger()
+    public function testTransformWithInteger(): void
     {
         $transformer = new PercentToLocalizedStringTransformer(null, 'integer', \NumberFormatter::ROUND_HALFUP);
 
@@ -72,7 +72,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals('16', $transformer->transform(15.9));
     }
 
-    public function testTransformWithScale()
+    public function testTransformWithScale(): void
     {
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
@@ -84,14 +84,14 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals('12,34', $transformer->transform(0.1234));
     }
 
-    public function testReverseTransformWithScaleAndImplicitRounding()
+    public function testReverseTransformWithScaleAndImplicitRounding(): void
     {
         $transformer = new PercentToLocalizedStringTransformer(2, PercentToLocalizedStringTransformer::FRACTIONAL);
 
         $this->assertEquals(0.0123, $transformer->reverseTransform('1.23456'));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
@@ -195,21 +195,21 @@ class PercentToLocalizedStringTransformerTest extends TestCase
     }
 
     #[DataProvider('reverseTransformWithRoundingProvider')]
-    public function testReverseTransformWithRounding($type, $scale, $input, $output, $roundingMode)
+    public function testReverseTransformWithRounding($type, $scale, $input, $output, $roundingMode): void
     {
         $transformer = new PercentToLocalizedStringTransformer($scale, $type, $roundingMode);
 
         $this->assertSame($output, $transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformEmpty()
+    public function testReverseTransformEmpty(): void
     {
         $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
         $this->assertNull($transformer->reverseTransform(''));
     }
 
-    public function testReverseTransformWithInteger()
+    public function testReverseTransformWithInteger(): void
     {
         $transformer = new PercentToLocalizedStringTransformer(null, 'integer', \NumberFormatter::ROUND_HALFUP);
 
@@ -219,7 +219,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(200, $transformer->reverseTransform('200'));
     }
 
-    public function testReverseTransformWithScale()
+    public function testReverseTransformWithScale(): void
     {
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
@@ -231,7 +231,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(0.1234, $transformer->reverseTransform('12,34'));
     }
 
-    public function testTransformExpectsNumeric()
+    public function testTransformExpectsNumeric(): void
     {
         $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
@@ -240,7 +240,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $transformer->transform('foo');
     }
 
-    public function testReverseTransformExpectsString()
+    public function testReverseTransformExpectsString(): void
     {
         $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
 
@@ -249,7 +249,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform(1);
     }
 
-    public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsNotDot()
+    public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsNotDot(): void
     {
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
 
@@ -265,7 +265,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
     }
 
-    public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot()
+    public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDot(): void
     {
         $this->expectException(TransformationFailedException::class);
         // Since we test against "de_DE", we need the full implementation
@@ -278,7 +278,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform('1.234.5');
     }
 
-    public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDotWithNoGroupSep()
+    public function testDecimalSeparatorMayNotBeDotIfGroupingSeparatorIsDotWithNoGroupSep(): void
     {
         $this->expectException(TransformationFailedException::class);
         // Since we test against "de_DE", we need the full implementation
@@ -291,7 +291,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform('1234.5');
     }
 
-    public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsDotButNoGroupingUsed()
+    public function testDecimalSeparatorMayBeDotIfGroupingSeparatorIsDotButNoGroupingUsed(): void
     {
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this);
@@ -303,7 +303,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
     }
 
-    public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsNotComma()
+    public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsNotComma(): void
     {
         // Since we test against other locales, we need the full implementation
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
@@ -320,7 +320,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234,5'));
     }
 
-    public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma()
+    public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsComma(): void
     {
         $this->expectException(TransformationFailedException::class);
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
@@ -330,7 +330,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform('1,234,5');
     }
 
-    public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsCommaWithNoGroupSep()
+    public function testDecimalSeparatorMayNotBeCommaIfGroupingSeparatorIsCommaWithNoGroupSep(): void
     {
         $this->expectException(TransformationFailedException::class);
         IntlTestHelper::requireFullIntl($this, '4.8.1.1');
@@ -340,7 +340,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform('1234,5');
     }
 
-    public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsCommaButNoGroupingUsed()
+    public function testDecimalSeparatorMayBeCommaIfGroupingSeparatorIsCommaButNoGroupingUsed(): void
     {
         $transformer = new PercentToLocalizedStringTransformerWithoutGrouping(1, 'integer', \NumberFormatter::ROUND_HALFUP);
 
@@ -348,7 +348,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(1234.5, $transformer->reverseTransform('1234.5'));
     }
 
-    public function testReverseTransformDisallowsLeadingExtraCharacters()
+    public function testReverseTransformDisallowsLeadingExtraCharacters(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP);
@@ -356,7 +356,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform('foo123');
     }
 
-    public function testReverseTransformDisallowsCenteredExtraCharacters()
+    public function testReverseTransformDisallowsCenteredExtraCharacters(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('The number contains unrecognized characters: "foo3"');
@@ -366,7 +366,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
     }
 
     #[RequiresPhpExtension('mbstring')]
-    public function testReverseTransformDisallowsCenteredExtraCharactersMultibyte()
+    public function testReverseTransformDisallowsCenteredExtraCharactersMultibyte(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('The number contains unrecognized characters: "foo8"');
@@ -380,7 +380,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform("12\xc2\xa0345,67foo8");
     }
 
-    public function testReverseTransformDisallowsTrailingExtraCharacters()
+    public function testReverseTransformDisallowsTrailingExtraCharacters(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('The number contains unrecognized characters: "foo"');
@@ -390,7 +390,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
     }
 
     #[RequiresPhpExtension('mbstring')]
-    public function testReverseTransformDisallowsTrailingExtraCharactersMultibyte()
+    public function testReverseTransformDisallowsTrailingExtraCharactersMultibyte(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('The number contains unrecognized characters: "foo"');
@@ -404,7 +404,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform("12\xc2\xa0345,678foo");
     }
 
-    public function testTransformForHtml5Format()
+    public function testTransformForHtml5Format(): void
     {
         $transformer = new PercentToLocalizedStringTransformer(null, null, \NumberFormatter::ROUND_HALFUP, true);
 
@@ -418,7 +418,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals('200000', $transformer->transform(2000));
     }
 
-    public function testTransformForHtml5FormatWithInteger()
+    public function testTransformForHtml5FormatWithInteger(): void
     {
         $transformer = new PercentToLocalizedStringTransformer(null, 'integer', \NumberFormatter::ROUND_HALFUP, true);
 
@@ -431,7 +431,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals('1234', $transformer->transform(1234));
     }
 
-    public function testTransformForHtml5FormatWithScale()
+    public function testTransformForHtml5FormatWithScale(): void
     {
         // Since we test against "de_CH", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
@@ -443,7 +443,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals('12.34', $transformer->transform(0.1234));
     }
 
-    public function testReverseTransformForHtml5Format()
+    public function testReverseTransformForHtml5Format(): void
     {
         // Since we test against "de_CH", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
@@ -457,7 +457,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(2000, $transformer->reverseTransform('200000'));
     }
 
-    public function testReverseTransformForHtml5FormatWithInteger()
+    public function testReverseTransformForHtml5FormatWithInteger(): void
     {
         // Since we test against "de_CH", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
@@ -472,7 +472,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(200, $transformer->reverseTransform('200'));
     }
 
-    public function testReverseTransformForHtml5FormatWithScale()
+    public function testReverseTransformForHtml5FormatWithScale(): void
     {
         // Since we test against "de_CH", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
@@ -486,7 +486,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     #[RequiresPhpExtension('intl')]
     #[RequiresPhp('< 8.5')]
-    public function testReverseTransformWrapsIntlErrorsWithErrorLevel()
+    public function testReverseTransformWrapsIntlErrorsWithErrorLevel(): void
     {
         $errorLevel = ini_set('intl.error_level', \E_WARNING);
 
@@ -500,7 +500,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testReverseTransformWrapsIntlErrorsWithExceptions()
+    public function testReverseTransformWrapsIntlErrorsWithExceptions(): void
     {
         $initialUseExceptions = ini_set('intl.use_exceptions', 1);
 
@@ -515,7 +515,7 @@ class PercentToLocalizedStringTransformerTest extends TestCase
 
     #[RequiresPhpExtension('intl')]
     #[RequiresPhp('< 8.5')]
-    public function testReverseTransformWrapsIntlErrorsWithExceptionsAndErrorLevel()
+    public function testReverseTransformWrapsIntlErrorsWithExceptionsAndErrorLevel(): void
     {
         $initialUseExceptions = ini_set('intl.use_exceptions', 1);
         $initialErrorLevel = ini_set('intl.error_level', \E_WARNING);

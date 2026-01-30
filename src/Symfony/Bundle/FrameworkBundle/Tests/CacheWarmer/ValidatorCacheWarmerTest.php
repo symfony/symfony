@@ -37,7 +37,7 @@ class ValidatorCacheWarmerTest extends TestCase
         return $this->arrayPool = new PhpArrayAdapter($file, new NullAdapter());
     }
 
-    public function testWarmUp()
+    public function testWarmUp(): void
     {
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addXmlMapping(__DIR__.'/../Fixtures/Validation/Resources/person.xml');
@@ -59,7 +59,7 @@ class ValidatorCacheWarmerTest extends TestCase
         $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
     }
 
-    public function testWarmUpAbsoluteFilePath()
+    public function testWarmUpAbsoluteFilePath(): void
     {
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addXmlMapping(__DIR__.'/../Fixtures/Validation/Resources/person.xml');
@@ -84,7 +84,7 @@ class ValidatorCacheWarmerTest extends TestCase
         $this->assertTrue($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
     }
 
-    public function testWarmUpWithoutBuilDir()
+    public function testWarmUpWithoutBuilDir(): void
     {
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addXmlMapping(__DIR__.'/../Fixtures/Validation/Resources/person.xml');
@@ -106,7 +106,7 @@ class ValidatorCacheWarmerTest extends TestCase
         $this->assertFalse($arrayPool->getItem('Symfony.Bundle.FrameworkBundle.Tests.Fixtures.Validation.Author')->isHit());
     }
 
-    public function testWarmUpWithAnnotations()
+    public function testWarmUpWithAnnotations(): void
     {
         $validatorBuilder = new ValidatorBuilder();
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/categories.yml');
@@ -128,7 +128,7 @@ class ValidatorCacheWarmerTest extends TestCase
         $this->assertInstanceOf(ClassMetadata::class, $item->get());
     }
 
-    public function testWarmUpWithoutLoader()
+    public function testWarmUpWithoutLoader(): void
     {
         $validatorBuilder = new ValidatorBuilder();
 
@@ -145,7 +145,7 @@ class ValidatorCacheWarmerTest extends TestCase
      * Test that the cache warming process is not broken if a class loader
      * throws an exception (on class / file not found for example).
      */
-    public function testClassAutoloadException()
+    public function testClassAutoloadException(): void
     {
         $this->assertFalse(class_exists($mappedClass = 'AClassThatDoesNotExist_FWB_CacheWarmer_ValidatorCacheWarmerTest', false));
 
@@ -156,7 +156,7 @@ class ValidatorCacheWarmerTest extends TestCase
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/does_not_exist.yaml');
         $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
 
-        spl_autoload_register($classloader = static function ($class) use ($mappedClass) {
+        spl_autoload_register($classloader = static function ($class) use ($mappedClass): void {
             if ($class === $mappedClass) {
                 throw new \DomainException('This exception should be caught by the warmer.');
             }
@@ -173,7 +173,7 @@ class ValidatorCacheWarmerTest extends TestCase
      * Test that the cache warming process is broken if a class loader throws an
      * exception but that is unrelated to the class load.
      */
-    public function testClassAutoloadExceptionWithUnrelatedException()
+    public function testClassAutoloadExceptionWithUnrelatedException(): void
     {
         $file = tempnam(sys_get_temp_dir(), __FUNCTION__);
         @unlink($file);
@@ -184,7 +184,7 @@ class ValidatorCacheWarmerTest extends TestCase
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/does_not_exist.yaml');
         $warmer = new ValidatorCacheWarmer($validatorBuilder, basename($file));
 
-        spl_autoload_register($classLoader = function ($class) use ($mappedClass) {
+        spl_autoload_register($classLoader = function ($class) use ($mappedClass): void {
             if ($class === $mappedClass) {
                 eval('class '.$mappedClass.'{}');
                 throw new \DomainException('This exception should not be caught by the warmer.');

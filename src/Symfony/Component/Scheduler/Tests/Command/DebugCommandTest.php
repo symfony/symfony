@@ -25,7 +25,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  */
 class DebugCommandTest extends TestCase
 {
-    public function testExecuteWithoutSchedules()
+    public function testExecuteWithoutSchedules(): void
     {
         $schedules = $this->createMock(ServiceProviderInterface::class);
         $schedules
@@ -43,7 +43,7 @@ class DebugCommandTest extends TestCase
         $this->assertSame("\nScheduler\n=========\n\n [ERROR] No schedules found.{$filler}\n\n", $tester->getDisplay(true));
     }
 
-    public function testExecuteWithScheduleWithoutTriggerDoesNotDisplayMessage()
+    public function testExecuteWithScheduleWithoutTriggerDoesNotDisplayMessage(): void
     {
         $schedule = new Schedule();
         $schedule->add(RecurringMessage::trigger(new CallbackTrigger(static fn () => null, 'test'), new \stdClass()));
@@ -78,7 +78,7 @@ class DebugCommandTest extends TestCase
             "\n", $tester->getDisplay(true));
     }
 
-    public function testExecuteWithScheduleWithoutTriggerShowingNoNextRunWithAllOption()
+    public function testExecuteWithScheduleWithoutTriggerShowingNoNextRunWithAllOption(): void
     {
         $schedule = new Schedule();
         $schedule->add(RecurringMessage::trigger(new CallbackTrigger(static fn () => null, 'test'), new \stdClass()));
@@ -115,7 +115,7 @@ class DebugCommandTest extends TestCase
             "\n", $tester->getDisplay(true));
     }
 
-    public function testExecuteWithSchedule()
+    public function testExecuteWithSchedule(): void
     {
         $schedule = new Schedule();
         $schedule->add(RecurringMessage::every('first day of next month', new \stdClass()));
@@ -153,7 +153,7 @@ class DebugCommandTest extends TestCase
     }
 
     #[DataProvider('provideSorting')]
-    public function testExecuteWithScheduleAndSortOption(bool $sorted, string $expected)
+    public function testExecuteWithScheduleAndSortOption(bool $sorted, string $expected): void
     {
         $schedule = new Schedule();
         $schedule

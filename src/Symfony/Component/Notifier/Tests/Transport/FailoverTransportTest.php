@@ -23,14 +23,14 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 #[Group('time-sensitive')]
 class FailoverTransportTest extends TestCase
 {
-    public function testSendNoTransports()
+    public function testSendNoTransports(): void
     {
         $this->expectException(LogicException::class);
 
         new FailoverTransport([]);
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->once())->method('__toString')->willReturn('t1://local');
@@ -43,7 +43,7 @@ class FailoverTransportTest extends TestCase
         $this->assertEquals('t1://local || t2://local', (string) $t);
     }
 
-    public function testSendMessageNotSupportedByAnyTransport()
+    public function testSendMessageNotSupportedByAnyTransport(): void
     {
         $t1 = $this->createStub(TransportInterface::class);
         $t2 = $this->createStub(TransportInterface::class);
@@ -55,7 +55,7 @@ class FailoverTransportTest extends TestCase
         $t->send(new DummyMessage());
     }
 
-    public function testSendFirstWork()
+    public function testSendFirstWork(): void
     {
         $message = new DummyMessage();
 
@@ -73,7 +73,7 @@ class FailoverTransportTest extends TestCase
         $t->send($message);
     }
 
-    public function testSendAllDead()
+    public function testSendAllDead(): void
     {
         $message = new DummyMessage();
 
@@ -93,7 +93,7 @@ class FailoverTransportTest extends TestCase
         $t->send($message);
     }
 
-    public function testSendOneDead()
+    public function testSendOneDead(): void
     {
         $message = new DummyMessage();
 
@@ -110,7 +110,7 @@ class FailoverTransportTest extends TestCase
         $t->send($message);
     }
 
-    public function testSendAllDeadWithinRetryPeriod()
+    public function testSendAllDeadWithinRetryPeriod(): void
     {
         $message = new DummyMessage();
 
@@ -144,7 +144,7 @@ class FailoverTransportTest extends TestCase
         $t->send($message);
     }
 
-    public function testSendOneDeadButRecover()
+    public function testSendOneDeadButRecover(): void
     {
         $message = new DummyMessage();
 

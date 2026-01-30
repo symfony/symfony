@@ -27,24 +27,24 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class FailedMessageEventTest extends TestCase
 {
     #[DataProvider('messagesProvider')]
-    public function testConstruct(MessageInterface $message, \Throwable $error, FailedMessageEvent $event)
+    public function testConstruct(MessageInterface $message, \Throwable $error, FailedMessageEvent $event): void
     {
         $this->assertEquals($event, new FailedMessageEvent($message, $error));
     }
 
     #[DataProvider('messagesProvider')]
-    public function testGetMessage(MessageInterface $message, \Throwable $error, FailedMessageEvent $event)
+    public function testGetMessage(MessageInterface $message, \Throwable $error, FailedMessageEvent $event): void
     {
         $this->assertSame($message, $event->getMessage());
     }
 
     #[DataProvider('messagesProvider')]
-    public function testGetError(MessageInterface $message, \Throwable $error, FailedMessageEvent $event)
+    public function testGetError(MessageInterface $message, \Throwable $error, FailedMessageEvent $event): void
     {
         $this->assertSame($error, $event->getError());
     }
 
-    public function testFailedMessageEventIsDisptachIfError()
+    public function testFailedMessageEventIsDisptachIfError(): void
     {
         $eventDispatcherMock = $this->createMock(EventDispatcherInterface::class);
         $clientMock = new MockHttpClient();

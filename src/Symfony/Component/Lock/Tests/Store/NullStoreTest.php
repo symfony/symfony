@@ -17,7 +17,7 @@ use Symfony\Component\Lock\Store\NullStore;
 
 class NullStoreTest extends TestCase
 {
-    public function testExistsAlwaysReturnsFalse()
+    public function testExistsAlwaysReturnsFalse(): void
     {
         $store = new NullStore();
         $key = new Key('foo');
@@ -25,7 +25,7 @@ class NullStoreTest extends TestCase
         $this->assertFalse($store->exists($key));
     }
 
-    public function testSaveDoesNothing()
+    public function testSaveDoesNothing(): void
     {
         $store = new NullStore();
         $key = new Key('foo');

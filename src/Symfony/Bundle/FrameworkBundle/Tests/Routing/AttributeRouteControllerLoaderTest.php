@@ -18,7 +18,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Routing\Fixtures\MethodActionController
 
 class AttributeRouteControllerLoaderTest extends TestCase
 {
-    public function testConfigureRouteSetsControllerForInvokable()
+    public function testConfigureRouteSetsControllerForInvokable(): void
     {
         $loader = new AttributeRouteControllerLoader();
         $collection = $loader->load(InvokableController::class);
@@ -27,7 +27,7 @@ class AttributeRouteControllerLoaderTest extends TestCase
         $this->assertSame(InvokableController::class, $route->getDefault('_controller'));
     }
 
-    public function testConfigureRouteSetsControllerForMethod()
+    public function testConfigureRouteSetsControllerForMethod(): void
     {
         $loader = new AttributeRouteControllerLoader();
         $collection = $loader->load(MethodActionControllers::class);

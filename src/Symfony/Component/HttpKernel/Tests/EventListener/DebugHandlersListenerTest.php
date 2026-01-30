@@ -32,7 +32,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class DebugHandlersListenerTest extends TestCase
 {
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $userHandler = static fn () => null;
         $listener = new DebugHandlersListener($userHandler);
@@ -56,7 +56,7 @@ class DebugHandlersListenerTest extends TestCase
         $this->assertSame($userHandler, $eHandler->setExceptionHandler('var_dump'));
     }
 
-    public function testConfigureForHttpKernelWithNoTerminateWithException()
+    public function testConfigureForHttpKernelWithNoTerminateWithException(): void
     {
         $listener = new DebugHandlersListener(null);
         $eHandler = new ErrorHandler();
@@ -81,7 +81,7 @@ class DebugHandlersListenerTest extends TestCase
         $this->assertNull($h);
     }
 
-    public function testConsoleEvent()
+    public function testConsoleEvent(): void
     {
         $dispatcher = new EventDispatcher();
         $listener = new DebugHandlersListener(null);
@@ -124,9 +124,9 @@ class DebugHandlersListenerTest extends TestCase
         $xHandler(new \Exception());
     }
 
-    public function testReplaceExistingExceptionHandler()
+    public function testReplaceExistingExceptionHandler(): void
     {
-        $userHandler = static function () {};
+        $userHandler = static function (): void {};
         $listener = new DebugHandlersListener($userHandler);
         $eHandler = new ErrorHandler();
         $eHandler->setExceptionHandler('var_dump');

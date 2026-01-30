@@ -18,7 +18,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class MergeTest extends TestCase
 {
-    public function testForbiddenOverwrite()
+    public function testForbiddenOverwrite(): void
     {
         $tb = new TreeBuilder('root', 'array');
         $tree = $tb
@@ -45,7 +45,7 @@ class MergeTest extends TestCase
         $tree->merge($a, $b);
     }
 
-    public function testUnsetKey()
+    public function testUnsetKey(): void
     {
         $tb = new TreeBuilder('root', 'array');
         $tree = $tb
@@ -93,7 +93,7 @@ class MergeTest extends TestCase
         ], $tree->merge($a, $b));
     }
 
-    public function testDoesNotAllowNewKeysInSubsequentConfigs()
+    public function testDoesNotAllowNewKeysInSubsequentConfigs(): void
     {
         $tb = new TreeBuilder('root', 'array');
         $tree = $tb
@@ -129,7 +129,7 @@ class MergeTest extends TestCase
         $tree->merge($a, $b);
     }
 
-    public function testPerformsNoDeepMerging()
+    public function testPerformsNoDeepMerging(): void
     {
         $tb = new TreeBuilder('root', 'array');
 
@@ -168,7 +168,7 @@ class MergeTest extends TestCase
         ], $tree->merge($a, $b));
     }
 
-    public function testPrototypeWithoutAKeyAttribute()
+    public function testPrototypeWithoutAKeyAttribute(): void
     {
         $tb = new TreeBuilder('root', 'array');
 

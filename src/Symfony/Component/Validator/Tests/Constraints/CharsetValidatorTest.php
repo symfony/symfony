@@ -26,7 +26,7 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideValidValues')]
-    public function testEncodingIsValid(string|\Stringable $value, array|string $encodings)
+    public function testEncodingIsValid(string|\Stringable $value, array|string $encodings): void
     {
         $this->validator->validate($value, new Charset(encodings: $encodings));
 
@@ -34,7 +34,7 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideInvalidValues')]
-    public function testInvalidValues(string $value, array|string $encodings)
+    public function testInvalidValues(string $value, array|string $encodings): void
     {
         $this->validator->validate($value, new Charset(encodings: $encodings));
 
@@ -46,7 +46,7 @@ class CharsetValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideInvalidTypes')]
-    public function testNonStringValues(mixed $value)
+    public function testNonStringValues(mixed $value): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessageMatches('/Expected argument of type "string", ".*" given/');

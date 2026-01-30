@@ -41,7 +41,7 @@ class SessionListenerTest extends TestCase
 {
     #[DataProvider('provideSessionOptions')]
     #[RunInSeparateProcess]
-    public function testSessionCookieOptions(array $phpSessionOptions, array $sessionOptions, array $expectedSessionOptions)
+    public function testSessionCookieOptions(array $phpSessionOptions, array $sessionOptions, array $expectedSessionOptions): void
     {
         $session = $this->createStub(Session::class);
         $session->method('getUsageIndex')->willReturn(0, 1);
@@ -139,7 +139,7 @@ class SessionListenerTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testPhpBridgeAlreadyStartedSession()
+    public function testPhpBridgeAlreadyStartedSession(): void
     {
         session_start();
         $sessionId = session_id();
@@ -156,7 +156,7 @@ class SessionListenerTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testSessionCookieWrittenNoCookieGiven()
+    public function testSessionCookieWrittenNoCookieGiven(): void
     {
         $request = new Request();
         $listener = $this->createListener($request, new NativeSessionStorageFactory());
@@ -180,7 +180,7 @@ class SessionListenerTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testSessionCookieNotWrittenCookieGiven()
+    public function testSessionCookieNotWrittenCookieGiven(): void
     {
         $sessionId = $this->createValidSessionId();
 
@@ -207,7 +207,7 @@ class SessionListenerTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testNewSessionIdIsNotOverwritten()
+    public function testNewSessionIdIsNotOverwritten(): void
     {
         $newSessionId = $this->createValidSessionId();
 
@@ -239,7 +239,7 @@ class SessionListenerTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testSessionCookieClearedWhenInvalidated()
+    public function testSessionCookieClearedWhenInvalidated(): void
     {
         $sessionId = $this->createValidSessionId();
         $request = new Request();
@@ -269,7 +269,7 @@ class SessionListenerTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testSessionCookieNotClearedWhenOtherVariablesSet()
+    public function testSessionCookieNotClearedWhenOtherVariablesSet(): void
     {
         $sessionId = $this->createValidSessionId();
         $request = new Request();
@@ -293,7 +293,7 @@ class SessionListenerTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testSessionCookieSetWhenOtherNativeVariablesSet()
+    public function testSessionCookieSetWhenOtherNativeVariablesSet(): void
     {
         $request = new Request();
         $listener = $this->createListener($request, new NativeSessionStorageFactory());
@@ -319,7 +319,7 @@ class SessionListenerTest extends TestCase
         $this->assertFalse($sessionCookie->isCleared());
     }
 
-    public function testOnlyTriggeredOnMainRequest()
+    public function testOnlyTriggeredOnMainRequest(): void
     {
         $listener = new class extends AbstractSessionListener {
             protected function getSession(): ?SessionInterface
@@ -336,7 +336,7 @@ class SessionListenerTest extends TestCase
         $listener->onKernelRequest($event);
     }
 
-    public function testSessionIsSet()
+    public function testSessionIsSet(): void
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
@@ -361,7 +361,7 @@ class SessionListenerTest extends TestCase
         $this->assertSame($session, $request->getSession());
     }
 
-    public function testSessionUsesFactory()
+    public function testSessionUsesFactory(): void
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
@@ -382,7 +382,7 @@ class SessionListenerTest extends TestCase
         $this->assertSame($session, $request->getSession());
     }
 
-    public function testUsesFactoryWhenNeeded()
+    public function testUsesFactoryWhenNeeded(): void
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->once())->method('getName')->willReturn('foo');
@@ -404,7 +404,7 @@ class SessionListenerTest extends TestCase
         $listener->onKernelResponse($event);
     }
 
-    public function testDontUsesFactoryWhenSessionIsNotUsed()
+    public function testDontUsesFactoryWhenSessionIsNotUsed(): void
     {
         $sessionFactory = $this->createMock(SessionFactory::class);
         $sessionFactory->expects($this->never())->method('createSession');
@@ -422,7 +422,7 @@ class SessionListenerTest extends TestCase
         $listener->onKernelResponse($event);
     }
 
-    public function testResponseIsPrivateIfSessionStarted()
+    public function testResponseIsPrivateIfSessionStarted(): void
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->once())->method('getUsageIndex')->willReturn(1);
@@ -452,7 +452,7 @@ class SessionListenerTest extends TestCase
         $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
-    public function testResponseIsStillPublicIfSessionStartedAndHeaderPresent()
+    public function testResponseIsStillPublicIfSessionStartedAndHeaderPresent(): void
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->once())->method('getUsageIndex')->willReturn(1);
@@ -480,7 +480,7 @@ class SessionListenerTest extends TestCase
         $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
-    public function testSessionSaveAndResponseHasSessionCookie()
+    public function testSessionSaveAndResponseHasSessionCookie(): void
     {
         $session = $this->getMockBuilder(Session::class)->disableOriginalConstructor()->getMock();
         $session->expects($this->exactly(1))->method('getUsageIndex')->willReturn(0);
@@ -507,7 +507,7 @@ class SessionListenerTest extends TestCase
         $this->assertSame('123456', $cookies[0]->getValue());
     }
 
-    public function testUninitializedSessionUsingSessionFromRequest()
+    public function testUninitializedSessionUsingSessionFromRequest(): void
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
         $response = new Response();
@@ -527,7 +527,7 @@ class SessionListenerTest extends TestCase
         $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
-    public function testUninitializedSessionWithoutInitializedSession()
+    public function testUninitializedSessionWithoutInitializedSession(): void
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
         $response = new Response();
@@ -545,7 +545,7 @@ class SessionListenerTest extends TestCase
         $this->assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
     }
 
-    public function testResponseHeadersMaxAgeAndExpiresNotBeOverriddenIfSessionStarted()
+    public function testResponseHeadersMaxAgeAndExpiresNotBeOverriddenIfSessionStarted(): void
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->once())->method('getUsageIndex')->willReturn(1);
@@ -580,7 +580,7 @@ class SessionListenerTest extends TestCase
         $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
-    public function testResponseHeadersMaxAgeAndExpiresDefaultValuesIfSessionStarted()
+    public function testResponseHeadersMaxAgeAndExpiresDefaultValuesIfSessionStarted(): void
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->once())->method('getUsageIndex')->willReturn(1);
@@ -608,7 +608,7 @@ class SessionListenerTest extends TestCase
         $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
-    public function testPrivateResponseMaxAgeIsRespectedIfSessionStarted()
+    public function testPrivateResponseMaxAgeIsRespectedIfSessionStarted(): void
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
 
@@ -632,7 +632,7 @@ class SessionListenerTest extends TestCase
         $this->assertFalse($response->headers->has(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER));
     }
 
-    public function testSurrogateMainRequestIsPublic()
+    public function testSurrogateMainRequestIsPublic(): void
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
@@ -672,7 +672,7 @@ class SessionListenerTest extends TestCase
         $this->assertLessThanOrEqual(new \DateTimeImmutable('now', new \DateTimeZone('UTC')), new \DateTimeImmutable($response->headers->get('Expires')));
     }
 
-    public function testGetSessionIsCalledOnce()
+    public function testGetSessionIsCalledOnce(): void
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->exactly(1))->method('getName')->willReturn('PHPSESSID');
@@ -702,7 +702,7 @@ class SessionListenerTest extends TestCase
         $subRequest->getSession();
     }
 
-    public function testGetSessionSetsSessionOnMainRequest()
+    public function testGetSessionSetsSessionOnMainRequest(): void
     {
         $mainRequest = new Request();
         $listener = $this->createListener($mainRequest, new NativeSessionStorageFactory());
@@ -723,7 +723,7 @@ class SessionListenerTest extends TestCase
         $this->assertSame($session, $mainRequest->getSession());
     }
 
-    public function testSessionUsageExceptionIfStatelessAndSessionUsed()
+    public function testSessionUsageExceptionIfStatelessAndSessionUsed(): void
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->once())->method('getUsageIndex')->willReturn(1);
@@ -746,7 +746,7 @@ class SessionListenerTest extends TestCase
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, new Response()));
     }
 
-    public function testSessionUsageLogIfStatelessAndSessionUsed()
+    public function testSessionUsageLogIfStatelessAndSessionUsed(): void
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->once())->method('getName')->willReturn('foo');
@@ -772,7 +772,7 @@ class SessionListenerTest extends TestCase
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, new Response()));
     }
 
-    public function testSessionIsSavedWhenUnexpectedSessionExceptionThrown()
+    public function testSessionIsSavedWhenUnexpectedSessionExceptionThrown(): void
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->exactly(1))->method('getId')->willReturn('123456');
@@ -800,7 +800,7 @@ class SessionListenerTest extends TestCase
         $listener->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $response));
     }
 
-    public function testSessionUsageCallbackWhenDebugAndStateless()
+    public function testSessionUsageCallbackWhenDebugAndStateless(): void
     {
         $session = $this->createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
@@ -827,7 +827,7 @@ class SessionListenerTest extends TestCase
         (new SessionListener($container, true))->onSessionUsage();
     }
 
-    public function testSessionUsageCallbackWhenNoDebug()
+    public function testSessionUsageCallbackWhenNoDebug(): void
     {
         $session = $this->createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
@@ -849,7 +849,7 @@ class SessionListenerTest extends TestCase
         (new SessionListener($container))->onSessionUsage();
     }
 
-    public function testSessionUsageCallbackWhenNoStateless()
+    public function testSessionUsageCallbackWhenNoStateless(): void
     {
         $session = $this->createMock(Session::class);
         $session->method('isStarted')->willReturn(true);
@@ -866,7 +866,7 @@ class SessionListenerTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testReset()
+    public function testReset(): void
     {
         session_start();
         $_SESSION['test'] = ['test'];
@@ -885,7 +885,7 @@ class SessionListenerTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testResetUnclosedSession()
+    public function testResetUnclosedSession(): void
     {
         session_start();
         $_SESSION['test'] = ['test'];

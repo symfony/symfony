@@ -31,7 +31,7 @@ class MailerHandlerTest extends TestCase
         $this->mailer = $this->createMock(MailerInterface::class);
     }
 
-    public function testHandle()
+    public function testHandle(): void
     {
         $handler = new MailerHandler($this->mailer, (new Email())->subject('Alert: %level_name% %message%'));
         $handler->setFormatter(new LineFormatter());
@@ -43,7 +43,7 @@ class MailerHandlerTest extends TestCase
         $handler->handle($this->getRecord(Level::Warning, 'message'));
     }
 
-    public function testHandleBatch()
+    public function testHandleBatch(): void
     {
         $handler = new MailerHandler($this->mailer, (new Email())->subject('Alert: %level_name% %message%'));
         $handler->setFormatter(new LineFormatter());
@@ -55,14 +55,14 @@ class MailerHandlerTest extends TestCase
         $handler->handleBatch($this->getMultipleRecords());
     }
 
-    public function testMessageCreationIsLazyWhenUsingCallback()
+    public function testMessageCreationIsLazyWhenUsingCallback(): void
     {
         $this->mailer
             ->expects($this->never())
             ->method('send')
         ;
 
-        $callback = static function () {
+        $callback = static function (): void {
             throw new \RuntimeException('Email creation callback should not have been called in this test');
         };
         $handler = new MailerHandler($this->mailer, $callback, Level::Alert);
@@ -74,7 +74,7 @@ class MailerHandlerTest extends TestCase
         $handler->handleBatch($records);
     }
 
-    public function testHtmlContent()
+    public function testHtmlContent(): void
     {
         $handler = new MailerHandler($this->mailer, (new Email())->subject('Alert: %level_name% %message%'));
         $handler->setFormatter(new HtmlFormatter());

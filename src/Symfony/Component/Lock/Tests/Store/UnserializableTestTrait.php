@@ -26,7 +26,7 @@ trait UnserializableTestTrait
      */
     abstract protected function getStore(): PersistingStoreInterface;
 
-    public function testUnserializableKey()
+    public function testUnserializableKey(): void
     {
         $store = $this->getStore();
 

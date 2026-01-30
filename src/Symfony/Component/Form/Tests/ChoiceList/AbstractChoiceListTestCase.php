@@ -64,86 +64,86 @@ abstract class AbstractChoiceListTestCase extends TestCase
         }
     }
 
-    public function testGetChoices()
+    public function testGetChoices(): void
     {
         $this->assertSame($this->choices, $this->list->getChoices());
     }
 
-    public function testGetValues()
+    public function testGetValues(): void
     {
         $this->assertSame($this->values, $this->list->getValues());
     }
 
-    public function testGetStructuredValues()
+    public function testGetStructuredValues(): void
     {
         $this->assertSame($this->values, $this->list->getStructuredValues());
     }
 
-    public function testGetOriginalKeys()
+    public function testGetOriginalKeys(): void
     {
         $this->assertSame($this->keys, $this->list->getOriginalKeys());
     }
 
-    public function testGetChoicesForValues()
+    public function testGetChoicesForValues(): void
     {
         $values = [$this->value1, $this->value2];
         $this->assertSame([$this->choice1, $this->choice2], $this->list->getChoicesForValues($values));
     }
 
-    public function testGetChoicesForValuesPreservesKeys()
+    public function testGetChoicesForValuesPreservesKeys(): void
     {
         $values = [5 => $this->value1, 8 => $this->value2];
         $this->assertSame([5 => $this->choice1, 8 => $this->choice2], $this->list->getChoicesForValues($values));
     }
 
-    public function testGetChoicesForValuesPreservesOrder()
+    public function testGetChoicesForValuesPreservesOrder(): void
     {
         $values = [$this->value2, $this->value1];
         $this->assertSame([$this->choice2, $this->choice1], $this->list->getChoicesForValues($values));
     }
 
-    public function testGetChoicesForValuesIgnoresNonExistingValues()
+    public function testGetChoicesForValuesIgnoresNonExistingValues(): void
     {
         $values = [$this->value1, $this->value2, 'foobar'];
         $this->assertSame([$this->choice1, $this->choice2], $this->list->getChoicesForValues($values));
     }
 
     // https://github.com/symfony/symfony/issues/3446
-    public function testGetChoicesForValuesEmpty()
+    public function testGetChoicesForValuesEmpty(): void
     {
         $this->assertSame([], $this->list->getChoicesForValues([]));
     }
 
-    public function testGetValuesForChoices()
+    public function testGetValuesForChoices(): void
     {
         $choices = [$this->choice1, $this->choice2];
         $this->assertSame([$this->value1, $this->value2], $this->list->getValuesForChoices($choices));
     }
 
-    public function testGetValuesForChoicesPreservesKeys()
+    public function testGetValuesForChoicesPreservesKeys(): void
     {
         $choices = [5 => $this->choice1, 8 => $this->choice2];
         $this->assertSame([5 => $this->value1, 8 => $this->value2], $this->list->getValuesForChoices($choices));
     }
 
-    public function testGetValuesForChoicesPreservesOrder()
+    public function testGetValuesForChoicesPreservesOrder(): void
     {
         $choices = [$this->choice2, $this->choice1];
         $this->assertSame([$this->value2, $this->value1], $this->list->getValuesForChoices($choices));
     }
 
-    public function testGetValuesForChoicesIgnoresNonExistingChoices()
+    public function testGetValuesForChoicesIgnoresNonExistingChoices(): void
     {
         $choices = [$this->choice1, $this->choice2, 'foobar'];
         $this->assertSame([$this->value1, $this->value2], $this->list->getValuesForChoices($choices));
     }
 
-    public function testGetValuesForChoicesEmpty()
+    public function testGetValuesForChoicesEmpty(): void
     {
         $this->assertSame([], $this->list->getValuesForChoices([]));
     }
 
-    public function testGetChoicesForValuesWithNull()
+    public function testGetChoicesForValuesWithNull(): void
     {
         $values = $this->list->getValuesForChoices([null]);
 

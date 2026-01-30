@@ -18,7 +18,7 @@ use Symfony\Component\Finder\Comparator\NumberComparator;
 class NumberComparatorTest extends TestCase
 {
     #[DataProvider('getConstructorTestData')]
-    public function testConstructor($successes, $failures)
+    public function testConstructor($successes, $failures): void
     {
         foreach ($successes as $s) {
             new NumberComparator($s);
@@ -35,7 +35,7 @@ class NumberComparatorTest extends TestCase
     }
 
     #[DataProvider('getTestData')]
-    public function testTest($test, $match, $noMatch)
+    public function testTest($test, $match, $noMatch): void
     {
         $c = new NumberComparator($test);
 

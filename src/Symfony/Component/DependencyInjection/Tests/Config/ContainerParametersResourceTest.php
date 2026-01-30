@@ -23,19 +23,19 @@ class ContainerParametersResourceTest extends TestCase
         $this->resource = new ContainerParametersResource(['locales' => ['fr', 'en'], 'default_locale' => 'fr']);
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertSame('container_parameters_f2f012423c221eddf6c9a6305f965327', (string) $this->resource);
     }
 
-    public function testSerializeUnserialize()
+    public function testSerializeUnserialize(): void
     {
         $unserialized = unserialize(serialize($this->resource));
 
         $this->assertEquals($this->resource, $unserialized);
     }
 
-    public function testGetParameters()
+    public function testGetParameters(): void
     {
         $this->assertSame(['locales' => ['fr', 'en'], 'default_locale' => 'fr'], $this->resource->getParameters());
     }

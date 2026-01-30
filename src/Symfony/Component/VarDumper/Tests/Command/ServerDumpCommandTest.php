@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Server\DumpServer;
 class ServerDumpCommandTest extends TestCase
 {
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $tester = new CommandCompletionTester($this->createCommand());
 

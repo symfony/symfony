@@ -30,14 +30,14 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
 
     abstract protected static function createCollection(array $content);
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Count(6));
 
         $this->assertNoViolation();
     }
 
-    public function testExpectsCountableType()
+    public function testExpectsCountableType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Count(5));
@@ -71,7 +71,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getThreeOrLessElements')]
-    public function testValidValuesMaxNamed($value)
+    public function testValidValuesMaxNamed($value): void
     {
         $constraint = new Count(max: 3);
         $this->validator->validate($value, $constraint);
@@ -80,7 +80,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getFiveOrMoreElements')]
-    public function testValidValuesMinNamed($value)
+    public function testValidValuesMinNamed($value): void
     {
         $constraint = new Count(min: 5);
         $this->validator->validate($value, $constraint);
@@ -89,7 +89,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getFourElements')]
-    public function testValidValuesExactNamed($value)
+    public function testValidValuesExactNamed($value): void
     {
         $constraint = new Count(exactly: 4);
         $this->validator->validate($value, $constraint);
@@ -98,7 +98,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getFiveOrMoreElements')]
-    public function testTooManyValuesNamed($value)
+    public function testTooManyValuesNamed($value): void
     {
         $constraint = new Count(max: 4, maxMessage: 'myMessage');
 
@@ -114,7 +114,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getThreeOrLessElements')]
-    public function testTooFewValuesNamed($value)
+    public function testTooFewValuesNamed($value): void
     {
         $constraint = new Count(min: 4, minMessage: 'myMessage');
 
@@ -130,7 +130,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getFiveOrMoreElements')]
-    public function testTooManyValuesExactNamed($value)
+    public function testTooManyValuesExactNamed($value): void
     {
         $constraint = new Count(exactly: 4, exactMessage: 'myMessage');
 
@@ -146,7 +146,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getThreeOrLessElements')]
-    public function testTooFewValuesExact($value)
+    public function testTooFewValuesExact($value): void
     {
         $constraint = new Count(
             min: 4,
@@ -165,7 +165,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testDefaultOption()
+    public function testDefaultOption(): void
     {
         $constraint = new Count(5);
 
@@ -173,7 +173,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
         $this->assertEquals(5, $constraint->max);
     }
 
-    public function testConstraintAttributeDefaultOption()
+    public function testConstraintAttributeDefaultOption(): void
     {
         $constraint = new Count(exactly: 5, exactMessage: 'message');
 
@@ -184,7 +184,7 @@ abstract class CountValidatorTestCase extends ConstraintValidatorTestCase
 
     // Since the contextual validator is mocked, this test only asserts that it
     // is called with the right DivisibleBy constraint.
-    public function testDivisibleBy()
+    public function testDivisibleBy(): void
     {
         $constraint = new Count(
             divisibleBy: 123,

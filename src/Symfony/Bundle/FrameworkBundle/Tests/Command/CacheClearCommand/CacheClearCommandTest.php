@@ -43,7 +43,7 @@ class CacheClearCommandTest extends TestCase
         }
     }
 
-    public function testCacheIsFreshAfterCacheClearedWithWarmup()
+    public function testCacheIsFreshAfterCacheClearedWithWarmup(): void
     {
         $input = new ArrayInput(['cache:clear']);
         $application = new Application($this->kernel);
@@ -61,7 +61,7 @@ class CacheClearCommandTest extends TestCase
         foreach ($metaFiles as $file) {
             $configCacheFactory->cache(
                 substr($file, 0, -5),
-                function () use ($file) {
+                function () use ($file): void {
                     $this->fail(\sprintf('Meta file "%s" is not fresh', (string) $file));
                 }
             );
@@ -98,7 +98,7 @@ class CacheClearCommandTest extends TestCase
         );
     }
 
-    public function testCacheIsWarmedWhenCalledTwice()
+    public function testCacheIsWarmedWhenCalledTwice(): void
     {
         $input = new ArrayInput(['cache:clear']);
         $application = new Application(clone $this->kernel);
@@ -113,7 +113,7 @@ class CacheClearCommandTest extends TestCase
         $this->assertTrue(is_file($this->kernel->getCacheDir().'/dummy.txt'));
     }
 
-    public function testCacheIsWarmedWithOldContainer()
+    public function testCacheIsWarmedWithOldContainer(): void
     {
         $kernel = clone $this->kernel;
 
@@ -121,7 +121,7 @@ class CacheClearCommandTest extends TestCase
         // BUT without "kernel.build_dir" parameter (like an old dumped container)
         $kernel->boot();
         $container = $kernel->getContainer();
-        \Closure::bind(static function (Container $class) {
+        \Closure::bind(static function (Container $class): void {
             unset($class->loadedDynamicParameters['kernel.build_dir']);
             unset($class->parameters['kernel.build_dir']);
         }, null, $container::class)($container);

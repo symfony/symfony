@@ -30,7 +30,7 @@ use Twig\RuntimeLoader\ContainerRuntimeLoader;
 
 class HttpKernelExtensionTest extends TestCase
 {
-    public function testFragmentWithError()
+    public function testFragmentWithError(): void
     {
         $renderer = $this->getFragmentHandler(new \Exception('foo'));
 
@@ -39,7 +39,7 @@ class HttpKernelExtensionTest extends TestCase
         $this->renderTemplate($renderer);
     }
 
-    public function testRenderFragment()
+    public function testRenderFragment(): void
     {
         $renderer = $this->getFragmentHandler(new Response('html'));
 
@@ -48,7 +48,7 @@ class HttpKernelExtensionTest extends TestCase
         $this->assertEquals('html', $response);
     }
 
-    public function testUnknownFragmentRenderer()
+    public function testUnknownFragmentRenderer(): void
     {
         $renderer = new FragmentHandler(new RequestStack());
 
@@ -58,7 +58,7 @@ class HttpKernelExtensionTest extends TestCase
         $renderer->render('/foo');
     }
 
-    public function testGenerateFragmentUri()
+    public function testGenerateFragmentUri(): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(Request::create('/'));

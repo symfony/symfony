@@ -20,7 +20,7 @@ use Symfony\Component\Form\FormEvent;
 
 class TrimListenerTest extends TestCase
 {
-    public function testTrim()
+    public function testTrim(): void
     {
         $data = ' Foo! ';
         $form = new Form(new FormConfigBuilder('name', null, new EventDispatcher()));
@@ -32,7 +32,7 @@ class TrimListenerTest extends TestCase
         $this->assertEquals('Foo!', $event->getData());
     }
 
-    public function testTrimSkipNonStrings()
+    public function testTrimSkipNonStrings(): void
     {
         $data = 1234;
         $form = new Form(new FormConfigBuilder('name', null, new EventDispatcher()));

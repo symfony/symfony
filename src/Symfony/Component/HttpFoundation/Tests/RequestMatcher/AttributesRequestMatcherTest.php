@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 class AttributesRequestMatcherTest extends TestCase
 {
     #[DataProvider('getData')]
-    public function test(string $key, string $regexp, bool $expected)
+    public function test(string $key, string $regexp, bool $expected): void
     {
         $matcher = new AttributesRequestMatcher([$key => $regexp]);
         $request = Request::create('/admin/foo');

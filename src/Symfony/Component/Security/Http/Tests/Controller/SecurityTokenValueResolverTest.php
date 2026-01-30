@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Controller\SecurityTokenValueResolver;
 
 class SecurityTokenValueResolverTest extends TestCase
 {
-    public function testResolveSucceedsWithTokenInterface()
+    public function testResolveSucceedsWithTokenInterface(): void
     {
         $user = new InMemoryUser('username', 'password');
         $token = new UsernamePasswordToken($user, 'provider');
@@ -38,7 +38,7 @@ class SecurityTokenValueResolverTest extends TestCase
         $this->assertSame([$token], $resolver->resolve(Request::create('/'), $metadata));
     }
 
-    public function testResolveSucceedsWithSubclassType()
+    public function testResolveSucceedsWithSubclassType(): void
     {
         $user = new InMemoryUser('username', 'password');
         $token = new UsernamePasswordToken($user, 'provider');
@@ -51,7 +51,7 @@ class SecurityTokenValueResolverTest extends TestCase
         $this->assertSame([$token], $resolver->resolve(Request::create('/'), $metadata));
     }
 
-    public function testResolveSucceedsWithNullableParamAndNoToken()
+    public function testResolveSucceedsWithNullableParamAndNoToken(): void
     {
         $tokenStorage = new TokenStorage();
         $resolver = new SecurityTokenValueResolver($tokenStorage);
@@ -60,7 +60,7 @@ class SecurityTokenValueResolverTest extends TestCase
         $this->assertSame([], $resolver->resolve(Request::create('/'), $metadata));
     }
 
-    public function testResolveThrowsUnauthenticatedWithNoToken()
+    public function testResolveThrowsUnauthenticatedWithNoToken(): void
     {
         $tokenStorage = new TokenStorage();
         $resolver = new SecurityTokenValueResolver($tokenStorage);
@@ -72,7 +72,7 @@ class SecurityTokenValueResolverTest extends TestCase
         $resolver->resolve(Request::create('/'), $metadata);
     }
 
-    public function testIntegration()
+    public function testIntegration(): void
     {
         $user = new InMemoryUser('username', 'password');
         $token = new UsernamePasswordToken($user, 'provider');
@@ -80,18 +80,18 @@ class SecurityTokenValueResolverTest extends TestCase
         $tokenStorage->setToken($token);
 
         $argumentResolver = new ArgumentResolver(null, [new SecurityTokenValueResolver($tokenStorage)]);
-        $this->assertSame([$token], $argumentResolver->getArguments(Request::create('/'), static function (TokenInterface $token) {}));
+        $this->assertSame([$token], $argumentResolver->getArguments(Request::create('/'), static function (TokenInterface $token): void {}));
     }
 
-    public function testIntegrationNoToken()
+    public function testIntegrationNoToken(): void
     {
         $tokenStorage = new TokenStorage();
 
         $argumentResolver = new ArgumentResolver(null, [new SecurityTokenValueResolver($tokenStorage), new DefaultValueResolver()]);
-        $this->assertSame([null], $argumentResolver->getArguments(Request::create('/'), static function (?TokenInterface $token) {}));
+        $this->assertSame([null], $argumentResolver->getArguments(Request::create('/'), static function (?TokenInterface $token): void {}));
     }
 
-    public function testIntegrationNonNullablwWithNoToken()
+    public function testIntegrationNonNullablwWithNoToken(): void
     {
         $tokenStorage = new TokenStorage();
 
@@ -100,6 +100,6 @@ class SecurityTokenValueResolverTest extends TestCase
         $this->expectException(HttpException::class);
         $this->expectExceptionMessage('A security token is required but the token storage is empty.');
 
-        $argumentResolver->getArguments(Request::create('/'), static function (TokenInterface $token) {});
+        $argumentResolver->getArguments(Request::create('/'), static function (TokenInterface $token): void {});
     }
 }

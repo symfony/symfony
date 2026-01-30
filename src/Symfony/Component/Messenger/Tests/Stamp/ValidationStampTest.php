@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
  */
 class ValidationStampTest extends TestCase
 {
-    public function testStamp()
+    public function testStamp(): void
     {
         $stamp = new ValidationStamp($groups = ['Default', 'Extra']);
         $this->assertSame($groups, $stamp->getGroups());
@@ -29,7 +29,7 @@ class ValidationStampTest extends TestCase
         $this->assertSame($groups, $stamp->getGroups());
     }
 
-    public function testSerializable()
+    public function testSerializable(): void
     {
         $this->assertEquals($stamp = new ValidationStamp(['Default', 'Extra']), unserialize(serialize($stamp)));
         $this->assertEquals($stamp = new ValidationStamp(new GroupSequence(['Default', 'Then'])), unserialize(serialize($stamp)));

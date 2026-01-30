@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ValidationMiddlewareTest extends MiddlewareTestCase
 {
-    public function testValidateAndNextMiddleware()
+    public function testValidateAndNextMiddleware(): void
     {
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
@@ -39,7 +39,7 @@ class ValidationMiddlewareTest extends MiddlewareTestCase
         (new ValidationMiddleware($validator))->handle($envelope, $this->getStackMock());
     }
 
-    public function testValidateWithStampAndNextMiddleware()
+    public function testValidateWithStampAndNextMiddleware(): void
     {
         $message = new DummyMessage('Hey');
         $envelope = (new Envelope($message))->with(new ValidationStamp($groups = ['Default', 'Extra']));
@@ -54,7 +54,7 @@ class ValidationMiddlewareTest extends MiddlewareTestCase
         (new ValidationMiddleware($validator))->handle($envelope, $this->getStackMock());
     }
 
-    public function testValidationFailedException()
+    public function testValidationFailedException(): void
     {
         $this->expectException(ValidationFailedException::class);
         $this->expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" failed validation.');

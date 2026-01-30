@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Mercure\MercureOptions;
 
 final class MercureOptionsTest extends TestCase
 {
-    public function testConstructWithDefaults()
+    public function testConstructWithDefaults(): void
     {
         $this->assertSame([
             'topics' => null,
@@ -28,7 +28,7 @@ final class MercureOptionsTest extends TestCase
         ], (new MercureOptions())->toArray());
     }
 
-    public function testConstructWithParameters()
+    public function testConstructWithParameters(): void
     {
         $options = (new MercureOptions('/topic/1', true, 'id', 'type', 1, ['tag' => '1234', 'body' => 'TEST']));
 
@@ -42,7 +42,7 @@ final class MercureOptionsTest extends TestCase
         ], $options->toArray());
     }
 
-    public function testConstructWithWrongTopicsThrows()
+    public function testConstructWithWrongTopicsThrows(): void
     {
         $this->expectException(\TypeError::class);
         new MercureOptions(new \stdClass());

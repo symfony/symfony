@@ -29,17 +29,17 @@ class ConstructorExtractorTest extends TestCase
         $this->extractor = new ConstructorExtractor([new DummyExtractor()]);
     }
 
-    public function testInstanceOf()
+    public function testInstanceOf(): void
     {
         $this->assertInstanceOf(PropertyTypeExtractorInterface::class, $this->extractor);
     }
 
-    public function testGetType()
+    public function testGetType(): void
     {
         $this->assertEquals(Type::string(), $this->extractor->getType('Foo', 'bar', []));
     }
 
-    public function testGetTypeIfNoExtractors()
+    public function testGetTypeIfNoExtractors(): void
     {
         $extractor = new ConstructorExtractor([]);
         $this->assertNull($extractor->getType('Foo', 'bar', []));

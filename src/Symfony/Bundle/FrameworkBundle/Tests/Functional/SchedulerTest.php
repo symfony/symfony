@@ -25,7 +25,7 @@ use Symfony\Component\Scheduler\RecurringMessage;
 
 class SchedulerTest extends AbstractWebTestCase
 {
-    public function testScheduler()
+    public function testScheduler(): void
     {
         $scheduledMessages = [
             RecurringMessage::every('5 minutes', $foo = new FooMessage(), new \DateTimeImmutable('2020-01-01T00:00:00Z')),
@@ -58,7 +58,7 @@ class SchedulerTest extends AbstractWebTestCase
         $this->assertSame([$foo, $bar, $foo, $bar], $fetchMessages(600.0));
     }
 
-    public function testAutoconfiguredScheduler()
+    public function testAutoconfiguredScheduler(): void
     {
         $container = self::getContainer();
         $container->set('clock', $clock = new MockClock('2023-10-26T08:59:59Z'));
@@ -89,7 +89,7 @@ class SchedulerTest extends AbstractWebTestCase
         $this->assertSame([['5', 6], ['7', 8]], $calls['attributesOnMethod']);
     }
 
-    public function testAutoconfiguredSchedulerCommand()
+    public function testAutoconfiguredSchedulerCommand(): void
     {
         $container = self::getContainer();
         $container->set('clock', $clock = new MockClock('2023-10-26T08:59:59Z'));
@@ -112,7 +112,7 @@ class SchedulerTest extends AbstractWebTestCase
         $this->assertSame(['execute' => [0 => null, 1 => 'test']], $getCalls(1));
     }
 
-    public function testSchedulerWithCustomTransport()
+    public function testSchedulerWithCustomTransport(): void
     {
         $container = self::getContainer();
         $container->set('clock', new MockClock('2023-10-26T08:59:59Z'));

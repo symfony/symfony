@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Bridge\Discord\Embeds\DiscordMediaEmbedObject;
 
 final class DiscordOptionsTest extends TestCase
 {
-    public function testDiscordOptions()
+    public function testDiscordOptions(): void
     {
         $discordOptions = (new DiscordOptions())
             ->username('name of the bot')
@@ -35,7 +35,7 @@ final class DiscordOptionsTest extends TestCase
         ], $discordOptions->toArray());
     }
 
-    public function testDiscordEmbedFields()
+    public function testDiscordEmbedFields(): void
     {
         $discordOptions = (new DiscordOptions())
             ->addEmbed((new DiscordEmbed())
@@ -144,7 +144,7 @@ final class DiscordOptionsTest extends TestCase
         ], $discordOptions->toArray());
     }
 
-    public function testDiscordFooterEmbedFields()
+    public function testDiscordFooterEmbedFields(): void
     {
         $footer = (new DiscordFooterEmbedObject())
             ->text('text')
@@ -159,7 +159,7 @@ final class DiscordOptionsTest extends TestCase
         ], $footer->toArray());
     }
 
-    public function testDiscordMediaEmbedFields()
+    public function testDiscordMediaEmbedFields(): void
     {
         $media = (new DiscordMediaEmbedObject())
             ->url('https://ur.l/')
@@ -176,7 +176,7 @@ final class DiscordOptionsTest extends TestCase
         ], $media->toArray());
     }
 
-    public function testDiscordAuthorEmbedFields()
+    public function testDiscordAuthorEmbedFields(): void
     {
         $author = (new DiscordAuthorEmbedObject())
             ->name('name field')
@@ -194,7 +194,7 @@ final class DiscordOptionsTest extends TestCase
     }
 
     #[DataProvider('getRecipientIdProvider')]
-    public function testGetRecipientId(?string $expected, DiscordOptions $options)
+    public function testGetRecipientId(?string $expected, DiscordOptions $options): void
     {
         $this->assertSame($expected, $options->getRecipientId());
     }
@@ -205,7 +205,7 @@ final class DiscordOptionsTest extends TestCase
         yield ['foo', (new DiscordOptions())->recipient('foo')];
     }
 
-    public function testToArrayUnsetsRecipientId()
+    public function testToArrayUnsetsRecipientId(): void
     {
         $options = (new DiscordOptions())->recipient('foo');
 

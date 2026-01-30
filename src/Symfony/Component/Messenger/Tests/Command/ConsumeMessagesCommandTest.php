@@ -35,7 +35,7 @@ use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
 class ConsumeMessagesCommandTest extends TestCase
 {
-    public function testConfigurationWithDefaultReceiver()
+    public function testConfigurationWithDefaultReceiver(): void
     {
         $command = new ConsumeMessagesCommand(new RoutableMessageBus(new Container()), new ServiceLocator([]), new EventDispatcher(), null, ['amqp']);
         $inputArgument = $command->getDefinition()->getArgument('receivers');
@@ -43,7 +43,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertSame(['amqp'], $inputArgument->getDefault());
     }
 
-    public function testBasicRun()
+    public function testBasicRun(): void
     {
         $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
 
@@ -73,7 +73,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
-    public function testRunWithBusOption()
+    public function testRunWithBusOption(): void
     {
         $envelope = new Envelope(new \stdClass());
 
@@ -111,7 +111,7 @@ class ConsumeMessagesCommandTest extends TestCase
     }
 
     #[DataProvider('provideRunWithResetServicesOption')]
-    public function testRunWithResetServicesOption(bool $shouldReset)
+    public function testRunWithResetServicesOption(bool $shouldReset): void
     {
         $envelope = new Envelope(new \stdClass());
 
@@ -147,7 +147,7 @@ class ConsumeMessagesCommandTest extends TestCase
     }
 
     #[DataProvider('getInvalidOptions')]
-    public function testRunWithInvalidOption(string $option, string $value, string $expectedMessage)
+    public function testRunWithInvalidOption(string $option, string $value, string $expectedMessage): void
     {
         $receiverLocator = new Container();
         $receiverLocator->set('dummy-receiver', new \stdClass());
@@ -175,7 +175,7 @@ class ConsumeMessagesCommandTest extends TestCase
         yield 'Non-numeric time limit' => ['--time-limit', 'whatever', 'Option "time-limit" must be a positive integer, "whatever" passed.'];
     }
 
-    public function testRunWithTimeLimit()
+    public function testRunWithTimeLimit(): void
     {
         $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
 
@@ -202,7 +202,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
-    public function testRunWithMemoryLimit()
+    public function testRunWithMemoryLimit(): void
     {
         $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
 
@@ -244,7 +244,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertSame(1572864, $logger->logs[1][2]['limit']);
     }
 
-    public function testRunWithAllOption()
+    public function testRunWithAllOption(): void
     {
         $envelope1 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
         $envelope2 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
@@ -283,7 +283,7 @@ class ConsumeMessagesCommandTest extends TestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $command = new ConsumeMessagesCommand(new RoutableMessageBus(new Container()), new Container(), new EventDispatcher(), null, ['async', 'async_high', 'failed'], null, ['messenger.bus.default']);
         $tester = new CommandCompletionTester($command);
@@ -299,7 +299,7 @@ class ConsumeMessagesCommandTest extends TestCase
         yield 'option --bus' => [['--bus', ''], ['messenger.bus.default']];
     }
 
-    public function testSuccessMessageGoesToStdout()
+    public function testSuccessMessageGoesToStdout(): void
     {
         $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
 
@@ -336,7 +336,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringNotContainsString('Consuming messages from transport', $stderr);
     }
 
-    public function testCommentsGoToStderr()
+    public function testCommentsGoToStderr(): void
     {
         $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
 
@@ -373,7 +373,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('Quit the worker with CONTROL-C', $stderr);
     }
 
-    public function testRunWithExcludeReceiversOption()
+    public function testRunWithExcludeReceiversOption(): void
     {
         $envelope1 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
         $envelope2 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
@@ -421,7 +421,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver1, dummy-receiver3"', $tester->getDisplay());
     }
 
-    public function testRunWithExcludeReceiversMultipleQueues()
+    public function testRunWithExcludeReceiversMultipleQueues(): void
     {
         $envelope1 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
         $envelope2 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
@@ -473,7 +473,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver1, dummy-receiver4"', $tester->getDisplay());
     }
 
-    public function testExcludeReceiverssWithoutAllOptionThrowsException()
+    public function testExcludeReceiverssWithoutAllOptionThrowsException(): void
     {
         $receiverLocator = new Container();
         $receiverLocator->set('dummy-receiver', new \stdClass());
@@ -496,7 +496,7 @@ class ConsumeMessagesCommandTest extends TestCase
         ]);
     }
 
-    public function testExcludeReceiversWithAllQueuesExcludedThrowsException()
+    public function testExcludeReceiversWithAllQueuesExcludedThrowsException(): void
     {
         $receiverLocator = new Container();
         $receiverLocator->set('dummy-receiver1', new \stdClass());

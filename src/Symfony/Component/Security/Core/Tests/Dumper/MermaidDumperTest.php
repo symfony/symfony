@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
 
 class MermaidDumperTest extends TestCase
 {
-    public function testDumpSimpleHierarchy()
+    public function testDumpSimpleHierarchy(): void
     {
         $hierarchy = [
             'ROLE_ADMIN' => ['ROLE_USER'],
@@ -38,7 +38,7 @@ class MermaidDumperTest extends TestCase
         $this->assertStringContainsString('ROLE_SUPER_ADMIN --> ROLE_ALLOWED_TO_SWITCH', $output);
     }
 
-    public function testDumpWithDirection()
+    public function testDumpWithDirection(): void
     {
         $hierarchy = [
             'ROLE_ADMIN' => ['ROLE_USER'],
@@ -51,7 +51,7 @@ class MermaidDumperTest extends TestCase
         $this->assertStringContainsString('graph LR', $output);
     }
 
-    public function testDumpEmptyHierarchy()
+    public function testDumpEmptyHierarchy(): void
     {
         $roleHierarchy = new RoleHierarchy([]);
         $dumper = new MermaidDumper();
@@ -61,7 +61,7 @@ class MermaidDumperTest extends TestCase
         $this->assertStringContainsString('classDef default fill:#e1f5fe;', $output);
     }
 
-    public function testDumpComplexHierarchy()
+    public function testDumpComplexHierarchy(): void
     {
         $hierarchy = [
             'ROLE_SUPER_ADMIN' => ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'],
@@ -88,7 +88,7 @@ class MermaidDumperTest extends TestCase
         $this->assertStringContainsString('ROLE_EDITOR --> ROLE_USER', $output);
     }
 
-    public function testInvalidDirection()
+    public function testInvalidDirection(): void
     {
         $this->expectException(\TypeError::class);
 
@@ -97,7 +97,7 @@ class MermaidDumperTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\DataProvider('dataProviderValidDirection')]
-    public function testValidDirections(MermaidDirection $direction)
+    public function testValidDirections(MermaidDirection $direction): void
     {
         $this->expectNotToPerformAssertions();
         $dumper = new MermaidDumper();
@@ -115,7 +115,7 @@ class MermaidDumperTest extends TestCase
         ];
     }
 
-    public function testRoleNameEscaping()
+    public function testRoleNameEscaping(): void
     {
         $hierarchy = [
             'ROLE_ADMIN-TEST' => ['ROLE_USER.SPECIAL'],

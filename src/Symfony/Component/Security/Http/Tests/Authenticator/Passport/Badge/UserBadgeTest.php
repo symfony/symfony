@@ -23,21 +23,21 @@ use function Symfony\Component\String\u;
 
 class UserBadgeTest extends TestCase
 {
-    public function testUserNotFound()
+    public function testUserNotFound(): void
     {
         $badge = new UserBadge('dummy', static fn () => null);
         $this->expectException(UserNotFoundException::class);
         $badge->getUser();
     }
 
-    public function testEmptyUserIdentifier()
+    public function testEmptyUserIdentifier(): void
     {
         $this->expectException(BadCredentialsException::class);
         new UserBadge('', static fn () => null);
     }
 
     #[DataProvider('provideUserIdentifierNormalizationData')]
-    public function testUserIdentifierNormalization(string $identifier, string $expectedNormalizedIdentifier, callable $normalizer)
+    public function testUserIdentifierNormalization(string $identifier, string $expectedNormalizedIdentifier, callable $normalizer): void
     {
         $badge = new UserBadge($identifier, static fn () => null, identifierNormalizer: $normalizer);
 
@@ -63,7 +63,7 @@ class UserBadgeTest extends TestCase
         yield 'Katakana to ASCII' => ['たなかそういち', 'TANAKASOUICHI', $upperAndAscii];
     }
 
-    public function testUserIdentifierNormalizationEnforcesMaxLength()
+    public function testUserIdentifierNormalizationEnforcesMaxLength(): void
     {
         $badge = new UserBadge('valid_input', null, null, static fn () => str_repeat('a', UserBadge::MAX_USERNAME_LENGTH + 1));
 

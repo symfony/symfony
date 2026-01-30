@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgume
 
 class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
@@ -61,7 +61,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEqualsCanonicalizing($expectedLog, $container->getCompiler()->getLog());
     }
 
-    public function testInvoke()
+    public function testInvoke(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
@@ -82,25 +82,25 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
 
 class RemoveTestController1
 {
-    public function fooAction(\stdClass $bar, ?ClassNotInContainer $baz = null)
+    public function fooAction(\stdClass $bar, ?ClassNotInContainer $baz = null): void
     {
     }
 }
 
 class RemoveTestController2
 {
-    public function setTestCase(TestCase $test)
+    public function setTestCase(TestCase $test): void
     {
     }
 
-    public function fooAction(?ClassNotInContainer $bar = null)
+    public function fooAction(?ClassNotInContainer $bar = null): void
     {
     }
 }
 
 class InvokableRegisterTestController
 {
-    public function __invoke(\stdClass $bar)
+    public function __invoke(\stdClass $bar): void
     {
     }
 }

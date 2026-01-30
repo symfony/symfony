@@ -16,7 +16,7 @@ use Symfony\Component\Workflow\Marking;
 
 class MarkingTest extends TestCase
 {
-    public function testMarking()
+    public function testMarking(): void
     {
         $marking = new Marking(['a' => 1]);
 
@@ -55,7 +55,7 @@ class MarkingTest extends TestCase
         $this->assertPlaces([], $marking);
     }
 
-    public function testGuardNotMarked()
+    public function testGuardNotMarked(): void
     {
         $marking = new Marking([]);
 
@@ -64,7 +64,7 @@ class MarkingTest extends TestCase
         $marking->unmark('a');
     }
 
-    public function testUnmarkGuardResultTokenCountIsNotNegative()
+    public function testUnmarkGuardResultTokenCountIsNotNegative(): void
     {
         $marking = new Marking(['a' => 1]);
 
@@ -73,7 +73,7 @@ class MarkingTest extends TestCase
         $marking->unmark('a', 2);
     }
 
-    public function testUnmarkGuardNbTokenIsGreaterThanZero()
+    public function testUnmarkGuardNbTokenIsGreaterThanZero(): void
     {
         $marking = new Marking(['a' => 1]);
 
@@ -82,7 +82,7 @@ class MarkingTest extends TestCase
         $marking->unmark('a', 0);
     }
 
-    private function assertPlaces(array $expected, Marking $marking)
+    private function assertPlaces(array $expected, Marking $marking): void
     {
         $places = $marking->getPlaces();
         ksort($places);

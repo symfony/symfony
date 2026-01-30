@@ -23,14 +23,14 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 #[RequiresPhpExtension('amqp')]
 class AmqpTransportTest extends TestCase
 {
-    public function testItIsATransport()
+    public function testItIsATransport(): void
     {
         $transport = $this->getTransport();
 
         $this->assertInstanceOf(TransportInterface::class, $transport);
     }
 
-    public function testReceivesMessages()
+    public function testReceivesMessages(): void
     {
         $transport = $this->getTransport(
             $serializer = $this->createStub(SerializerInterface::class),

@@ -23,13 +23,13 @@ use Symfony\Component\HttpFoundation\FileBag;
  */
 class FileBagTest extends TestCase
 {
-    public function testFileMustBeAnArrayOrUploadedFile()
+    public function testFileMustBeAnArrayOrUploadedFile(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new FileBag(['file' => 'foo']);
     }
 
-    public function testShouldConvertsUploadedFiles()
+    public function testShouldConvertsUploadedFiles(): void
     {
         $tmpFile = $this->createTempFile();
         $name = basename($tmpFile);
@@ -47,7 +47,7 @@ class FileBagTest extends TestCase
         $this->assertEquals($file, $bag->get('file'));
     }
 
-    public function testShouldSetEmptyUploadedFilesToNull()
+    public function testShouldSetEmptyUploadedFilesToNull(): void
     {
         $bag = new FileBag(['file' => [
             'name' => '',
@@ -60,7 +60,7 @@ class FileBagTest extends TestCase
         $this->assertNull($bag->get('file'));
     }
 
-    public function testShouldRemoveEmptyUploadedFilesForMultiUpload()
+    public function testShouldRemoveEmptyUploadedFilesForMultiUpload(): void
     {
         $bag = new FileBag(['files' => [
             'name' => [''],
@@ -73,7 +73,7 @@ class FileBagTest extends TestCase
         $this->assertSame([], $bag->get('files'));
     }
 
-    public function testShouldNotRemoveEmptyUploadedFilesForAssociativeArray()
+    public function testShouldNotRemoveEmptyUploadedFilesForAssociativeArray(): void
     {
         $bag = new FileBag(['files' => [
             'name' => ['file1' => ''],
@@ -86,7 +86,7 @@ class FileBagTest extends TestCase
         $this->assertSame(['file1' => null], $bag->get('files'));
     }
 
-    public function testShouldConvertUploadedFilesWithPhpBug()
+    public function testShouldConvertUploadedFilesWithPhpBug(): void
     {
         $tmpFile = $this->createTempFile();
         $name = basename($tmpFile);
@@ -116,7 +116,7 @@ class FileBagTest extends TestCase
         $this->assertEquals($file, $files['child']['file']);
     }
 
-    public function testShouldConvertNestedUploadedFilesWithPhpBug()
+    public function testShouldConvertNestedUploadedFilesWithPhpBug(): void
     {
         $tmpFile = $this->createTempFile();
         $name = basename($tmpFile);
@@ -146,7 +146,7 @@ class FileBagTest extends TestCase
         $this->assertEquals($file, $files['child']['sub']['file']);
     }
 
-    public function testShouldNotConvertNestedUploadedFiles()
+    public function testShouldNotConvertNestedUploadedFiles(): void
     {
         $tmpFile = $this->createTempFile();
         $name = basename($tmpFile);
@@ -157,7 +157,7 @@ class FileBagTest extends TestCase
         $this->assertEquals($file, $files['image']['file']);
     }
 
-    public function testWebkitDirectoryUpload()
+    public function testWebkitDirectoryUpload(): void
     {
         $file1 = __DIR__.'/File/Fixtures/webkitdirectory/test.txt';
         $file2 = __DIR__.'/File/Fixtures/webkitdirectory/nested/test.txt';

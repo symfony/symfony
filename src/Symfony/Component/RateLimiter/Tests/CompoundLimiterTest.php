@@ -31,7 +31,7 @@ class CompoundLimiterTest extends TestCase
         ClockMock::register(InMemoryStorage::class);
     }
 
-    public function testConsume()
+    public function testConsume(): void
     {
         $limiter1 = $this->createLimiter(4, new \DateInterval('PT1S'));
         $limiter2 = $this->createLimiter(8, new \DateInterval('PT10S'));
@@ -81,7 +81,7 @@ class CompoundLimiterTest extends TestCase
         $this->assertTrue($limiter->consume()->isAccepted());
     }
 
-    public function testReserve()
+    public function testReserve(): void
     {
         $this->expectException(ReserveNotSupportedException::class);
 

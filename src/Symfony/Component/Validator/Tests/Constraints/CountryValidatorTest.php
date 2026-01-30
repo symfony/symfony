@@ -41,28 +41,28 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         return new CountryValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Country());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Country());
 
         $this->assertNoViolation();
     }
 
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Country());
     }
 
     #[DataProvider('getValidCountries')]
-    public function testValidCountries($country)
+    public function testValidCountries($country): void
     {
         $this->validator->validate($country, new Country());
 
@@ -79,7 +79,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidCountries')]
-    public function testInvalidCountries($country)
+    public function testInvalidCountries($country): void
     {
         $constraint = new Country(message: 'myMessage');
 
@@ -100,7 +100,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidAlpha3Countries')]
-    public function testValidAlpha3Countries($country)
+    public function testValidAlpha3Countries($country): void
     {
         $this->validator->validate($country, new Country(alpha3: true));
 
@@ -117,7 +117,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidAlpha3Countries')]
-    public function testInvalidAlpha3Countries($country)
+    public function testInvalidAlpha3Countries($country): void
     {
         $constraint = new Country(
             alpha3: true,
@@ -142,7 +142,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testInvalidAlpha3CountryNamed()
+    public function testInvalidAlpha3CountryNamed(): void
     {
         $this->validator->validate(
             'DE',
@@ -155,7 +155,7 @@ class CountryValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testValidateUsingCountrySpecificLocale()
+    public function testValidateUsingCountrySpecificLocale(): void
     {
         // in order to test with "en_GB"
         IntlTestHelper::requireFullIntl($this);

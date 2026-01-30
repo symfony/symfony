@@ -43,7 +43,7 @@ final class NativeTransportFactoryTest extends TestCase
         eval($eval);
     }
 
-    public function testCreateWithNotSupportedScheme()
+    public function testCreateWithNotSupportedScheme(): void
     {
         $this->expectException(UnsupportedSchemeException::class);
         $this->expectExceptionMessage('The "sendmail" scheme is not supported');
@@ -52,7 +52,7 @@ final class NativeTransportFactoryTest extends TestCase
         $sut->create(Dsn::fromString('sendmail://default'));
     }
 
-    public function testCreateSendmailWithNoSendmailPath()
+    public function testCreateSendmailWithNoSendmailPath(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test cannot run on Windows.');
@@ -73,7 +73,7 @@ final class NativeTransportFactoryTest extends TestCase
     }
 
     #[DataProvider('provideCreateSendmailWithNoHostOrNoPort')]
-    public function testCreateSendmailWithNoHostOrNoPort(string $dsn, string $sendmaiPath, string $smtp, string $smtpPort)
+    public function testCreateSendmailWithNoHostOrNoPort(string $dsn, string $sendmaiPath, string $smtp, string $smtpPort): void
     {
         if ('\\' !== \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test only run on Windows.');
@@ -111,7 +111,7 @@ final class NativeTransportFactoryTest extends TestCase
     }
 
     #[DataProvider('provideCreate')]
-    public function testCreate(string $dsn, string $sendmailPath, string $smtp, string $smtpPort, TransportInterface $expectedTransport)
+    public function testCreate(string $dsn, string $sendmailPath, string $smtp, string $smtpPort, TransportInterface $expectedTransport): void
     {
         self::$fakeConfiguration = [
             'sendmail_path' => $sendmailPath,

@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
 class RoleHierarchyVoterTest extends RoleVoterTest
 {
     #[DataProvider('getVoteTests')]
-    public function testVoteUsingTokenThatReturnsRoleNames($roles, $attributes, $expected)
+    public function testVoteUsingTokenThatReturnsRoleNames($roles, $attributes, $expected): void
     {
         $voter = new RoleHierarchyVoter(new RoleHierarchy(['ROLE_FOO' => ['ROLE_FOOBAR']]));
 
@@ -34,7 +34,7 @@ class RoleHierarchyVoterTest extends RoleVoterTest
     }
 
     #[DataProvider('getVoteWithEmptyHierarchyTests')]
-    public function testVoteWithEmptyHierarchyUsingTokenThatReturnsRoleNames($roles, $attributes, $expected)
+    public function testVoteWithEmptyHierarchyUsingTokenThatReturnsRoleNames($roles, $attributes, $expected): void
     {
         $voter = new RoleHierarchyVoter(new RoleHierarchy([]));
 

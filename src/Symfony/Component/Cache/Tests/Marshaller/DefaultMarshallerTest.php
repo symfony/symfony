@@ -17,12 +17,12 @@ use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 
 class DefaultMarshallerTest extends TestCase
 {
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $marshaller = new DefaultMarshaller();
         $values = [
             'a' => 123,
-            'b' => static function () {},
+            'b' => static function (): void {},
         ];
 
         $expected = ['a' => serialize(123)];
@@ -31,7 +31,7 @@ class DefaultMarshallerTest extends TestCase
     }
 
     #[RequiresPhpExtension('igbinary')]
-    public function testIgbinarySerialize()
+    public function testIgbinarySerialize(): void
     {
         if (version_compare('3.1.6', phpversion('igbinary'), '>')) {
             $this->markTestSkipped('igbinary needs to be v3.1.6 or higher.');
@@ -40,7 +40,7 @@ class DefaultMarshallerTest extends TestCase
         $marshaller = new DefaultMarshaller(true);
         $values = [
             'a' => 123,
-            'b' => static function () {},
+            'b' => static function (): void {},
         ];
 
         $expected = ['a' => igbinary_serialize(123)];
@@ -48,7 +48,7 @@ class DefaultMarshallerTest extends TestCase
         $this->assertSame(['b'], $failed);
     }
 
-    public function testNativeUnserialize()
+    public function testNativeUnserialize(): void
     {
         $marshaller = new DefaultMarshaller();
         $this->assertNull($marshaller->unmarshall(serialize(null)));
@@ -58,7 +58,7 @@ class DefaultMarshallerTest extends TestCase
     }
 
     #[RequiresPhpExtension('igbinary')]
-    public function testIgbinaryUnserialize()
+    public function testIgbinaryUnserialize(): void
     {
         if (version_compare('3.1.6', phpversion('igbinary'), '>')) {
             $this->markTestSkipped('igbinary needs to be v3.1.6 or higher.');
@@ -71,7 +71,7 @@ class DefaultMarshallerTest extends TestCase
         $this->assertSame(0, $marshaller->unmarshall(igbinary_serialize(0)));
     }
 
-    public function testNativeUnserializeNotFoundClass()
+    public function testNativeUnserializeNotFoundClass(): void
     {
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('Class not found: NotExistingClass');
@@ -79,7 +79,7 @@ class DefaultMarshallerTest extends TestCase
     }
 
     #[RequiresPhpExtension('igbinary')]
-    public function testIgbinaryUnserializeNotFoundClass()
+    public function testIgbinaryUnserializeNotFoundClass(): void
     {
         if (version_compare('3.1.6', phpversion('igbinary'), '>')) {
             $this->markTestSkipped('igbinary needs to be v3.1.6 or higher.');
@@ -91,7 +91,7 @@ class DefaultMarshallerTest extends TestCase
         $marshaller->unmarshall(rawurldecode('%00%00%00%02%17%10NotExistingClass%14%00'));
     }
 
-    public function testNativeUnserializeInvalid()
+    public function testNativeUnserializeInvalid(): void
     {
         $this->expectException(\DomainException::class);
         $this->expectExceptionMessage('unserialize(): Error at offset 0 of 3 bytes');
@@ -105,7 +105,7 @@ class DefaultMarshallerTest extends TestCase
     }
 
     #[RequiresPhpExtension('igbinary')]
-    public function testIgbinaryUnserializeInvalid()
+    public function testIgbinaryUnserializeInvalid(): void
     {
         if (version_compare('3.1.6', phpversion('igbinary'), '>')) {
             $this->markTestSkipped('igbinary needs to be v3.1.6 or higher.');
@@ -122,11 +122,11 @@ class DefaultMarshallerTest extends TestCase
         }
     }
 
-    public function testSerializeDebug()
+    public function testSerializeDebug(): void
     {
         $marshaller = new DefaultMarshaller(false, true);
         $values = [
-            'a' => static function () {},
+            'a' => static function (): void {},
         ];
 
         $this->expectException(\ValueError::class);

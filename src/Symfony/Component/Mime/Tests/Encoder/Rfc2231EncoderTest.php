@@ -27,7 +27,7 @@ class Rfc2231EncoderTest extends TestCase
     which matches RFC 2045's definition of "token".
     */
 
-    public function testEncodingAsciiCharactersProducesValidToken()
+    public function testEncodingAsciiCharactersProducesValidToken(): void
     {
         $string = '';
         foreach (range(0x00, 0x7F) as $octet) {
@@ -42,7 +42,7 @@ class Rfc2231EncoderTest extends TestCase
         }
     }
 
-    public function testEncodingNonAsciiCharactersProducesValidToken()
+    public function testEncodingNonAsciiCharactersProducesValidToken(): void
     {
         $string = '';
         foreach (range(0x80, 0xFF) as $octet) {
@@ -57,7 +57,7 @@ class Rfc2231EncoderTest extends TestCase
         }
     }
 
-    public function testMaximumLineLengthCanBeSet()
+    public function testMaximumLineLengthCanBeSet(): void
     {
         $string = '';
         for ($x = 0; $x < 200; ++$x) {
@@ -77,7 +77,7 @@ class Rfc2231EncoderTest extends TestCase
         );
     }
 
-    public function testFirstLineCanHaveShorterLength()
+    public function testFirstLineCanHaveShorterLength(): void
     {
         $string = '';
         for ($x = 0; $x < 200; ++$x) {
@@ -97,7 +97,7 @@ class Rfc2231EncoderTest extends TestCase
         );
     }
 
-    public function testEncodingAndDecodingSamples()
+    public function testEncodingAndDecodingSamples(): void
     {
         $dir = realpath(__DIR__.'/../Fixtures/samples/charsets');
         $sampleFp = opendir($dir);

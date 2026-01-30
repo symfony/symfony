@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class TwigEnvironmentPassTest extends TestCase
 {
-    public function testPassWithTwoExtensionsWithPriority()
+    public function testPassWithTwoExtensionsWithPriority(): void
     {
         $twigDefinition = new Definition('twig');
         $twigDefinition->setPublic(true);
@@ -45,7 +45,7 @@ class TwigEnvironmentPassTest extends TestCase
         $this->assertEquals('test_extension_1', (string) $calls[1][1][0]);
     }
 
-    public function testTwigBridgeExtensionsAreRegisteredFirst()
+    public function testTwigBridgeExtensionsAreRegisteredFirst(): void
     {
         $container = new ContainerBuilder();
         $twigDefinition = $container->register('twig');

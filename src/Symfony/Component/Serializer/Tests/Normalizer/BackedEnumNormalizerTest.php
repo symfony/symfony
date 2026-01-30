@@ -32,7 +32,7 @@ class BackedEnumNormalizerTest extends TestCase
         $this->normalizer = new BackedEnumNormalizer();
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsNormalization(StringBackedEnumDummy::GET));
         $this->assertTrue($this->normalizer->supportsNormalization(IntegerBackedEnumDummy::SUCCESS));
@@ -40,19 +40,19 @@ class BackedEnumNormalizerTest extends TestCase
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $this->assertSame('GET', $this->normalizer->normalize(StringBackedEnumDummy::GET));
         $this->assertSame(200, $this->normalizer->normalize(IntegerBackedEnumDummy::SUCCESS));
     }
 
-    public function testNormalizeBadObjectTypeThrowsException()
+    public function testNormalizeBadObjectTypeThrowsException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->normalizer->normalize(new \stdClass());
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsDenormalization(null, StringBackedEnumDummy::class));
         $this->assertTrue($this->normalizer->supportsDenormalization(null, IntegerBackedEnumDummy::class));
@@ -63,12 +63,12 @@ class BackedEnumNormalizerTest extends TestCase
     #[TestWith([StringBackedEnumDummy::GET, 'GET', StringBackedEnumDummy::class], 'string backed enum')]
     #[TestWith([IntegerBackedEnumDummy::SUCCESS, 200, IntegerBackedEnumDummy::class], 'int backed enum')]
     #[TestWith([IntegerBackedEnumDummy::SUCCESS, '200', IntegerBackedEnumDummy::class], 'int backed enum with string value')]
-    public function testDenormalize(mixed $expected, mixed $data, string $type)
+    public function testDenormalize(mixed $expected, mixed $data, string $type): void
     {
         $this->assertSame($expected, $this->normalizer->denormalize($data, $type));
     }
 
-    public function testDenormalizeNullValueThrowsException()
+    public function testDenormalizeNullValueThrowsException(): void
     {
         $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('The data is neither an integer nor a string, you should pass an integer or a string');
@@ -76,7 +76,7 @@ class BackedEnumNormalizerTest extends TestCase
         $this->normalizer->denormalize(null, StringBackedEnumDummy::class);
     }
 
-    public function testDenormalizeBooleanValueThrowsException()
+    public function testDenormalizeBooleanValueThrowsException(): void
     {
         $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('The data is neither an integer nor a string, you should pass an integer or a string');
@@ -84,7 +84,7 @@ class BackedEnumNormalizerTest extends TestCase
         $this->normalizer->denormalize(true, StringBackedEnumDummy::class);
     }
 
-    public function testDenormalizeObjectThrowsException()
+    public function testDenormalizeObjectThrowsException(): void
     {
         $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('The data is neither an integer nor a string, you should pass an integer or a string');
@@ -92,7 +92,7 @@ class BackedEnumNormalizerTest extends TestCase
         $this->normalizer->denormalize(new \stdClass(), StringBackedEnumDummy::class);
     }
 
-    public function testDenormalizeInvalidBackedTypeThrowsException()
+    public function testDenormalizeInvalidBackedTypeThrowsException(): void
     {
         $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('The data must be of type string');
@@ -100,7 +100,7 @@ class BackedEnumNormalizerTest extends TestCase
         $this->normalizer->denormalize(8, StringBackedEnumDummy::class);
     }
 
-    public function testDenormalizeInvalidIntegerBackedValueThrowsException()
+    public function testDenormalizeInvalidIntegerBackedValueThrowsException(): void
     {
         $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('The data must be one of the following values: 200, 404');
@@ -108,7 +108,7 @@ class BackedEnumNormalizerTest extends TestCase
         $this->normalizer->denormalize(300, IntegerBackedEnumDummy::class);
     }
 
-    public function testDenormalizeInvalidStringBackedValueThrowsException()
+    public function testDenormalizeInvalidStringBackedValueThrowsException(): void
     {
         $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage("The data must be one of the following values: 'GET', 'OPTIONS'");
@@ -116,7 +116,7 @@ class BackedEnumNormalizerTest extends TestCase
         $this->normalizer->denormalize('POST', StringBackedEnumDummy::class);
     }
 
-    public function testDenormalizeInvalidBackedValueWithAllowInvalidAndCollectErrorsThrows()
+    public function testDenormalizeInvalidBackedValueWithAllowInvalidAndCollectErrorsThrows(): void
     {
         $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage("The data must be one of the following values: 'GET', 'OPTIONS'");
@@ -129,7 +129,7 @@ class BackedEnumNormalizerTest extends TestCase
         $this->normalizer->denormalize('invalid-value', StringBackedEnumDummy::class, null, $context);
     }
 
-    public function testDenormalizeNullWithAllowInvalidAndCollectErrorsThrows()
+    public function testDenormalizeNullWithAllowInvalidAndCollectErrorsThrows(): void
     {
         $this->expectException(NotNormalizableValueException::class);
         $this->expectExceptionMessage('The data is neither an integer nor a string');
@@ -142,7 +142,7 @@ class BackedEnumNormalizerTest extends TestCase
         $this->normalizer->denormalize(null, StringBackedEnumDummy::class, null, $context);
     }
 
-    public function testNormalizeShouldThrowExceptionForNonEnumObjects()
+    public function testNormalizeShouldThrowExceptionForNonEnumObjects(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The data must belong to a backed enumeration.');
@@ -150,7 +150,7 @@ class BackedEnumNormalizerTest extends TestCase
         $this->normalizer->normalize(\stdClass::class);
     }
 
-    public function testDenormalizeShouldThrowExceptionForNonEnumObjects()
+    public function testDenormalizeShouldThrowExceptionForNonEnumObjects(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The data must belong to a backed enumeration.');
@@ -158,12 +158,12 @@ class BackedEnumNormalizerTest extends TestCase
         $this->normalizer->denormalize('GET', \stdClass::class);
     }
 
-    public function testSupportsNormalizationShouldFailOnAnyPHPVersionForNonEnumObjects()
+    public function testSupportsNormalizationShouldFailOnAnyPHPVersionForNonEnumObjects(): void
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
-    public function testItUsesTryFromIfContextIsPassed()
+    public function testItUsesTryFromIfContextIsPassed(): void
     {
         $this->assertNull($this->normalizer->denormalize(1, IntegerBackedEnumDummy::class, null, [BackedEnumNormalizer::ALLOW_INVALID_VALUES => true]));
         $this->assertNull($this->normalizer->denormalize('', IntegerBackedEnumDummy::class, null, [BackedEnumNormalizer::ALLOW_INVALID_VALUES => true]));

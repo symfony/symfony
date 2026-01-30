@@ -23,7 +23,7 @@ class UidTest extends AbstractWebTestCase
         self::deleteTmpDir();
     }
 
-    public function testArgumentValueResolverDisabled()
+    public function testArgumentValueResolverDisabled(): void
     {
         $client = $this->createClient(['test_case' => 'Uid', 'root_config' => 'config_disabled.yml']);
         $client->catchExceptions(false);
@@ -34,7 +34,7 @@ class UidTest extends AbstractWebTestCase
         $client->request('GET', '/1/uuid-v1/'.new UuidV1());
     }
 
-    public function testArgumentValueResolverEnabled()
+    public function testArgumentValueResolverEnabled(): void
     {
         $client = $this->createClient(['test_case' => 'Uid', 'root_config' => 'config_enabled.yml']);
 

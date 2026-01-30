@@ -23,21 +23,21 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 class CamelCaseToSnakeCaseNameConverterTest extends TestCase
 {
-    public function testInterface()
+    public function testInterface(): void
     {
         $attributeMetadata = new CamelCaseToSnakeCaseNameConverter();
         $this->assertInstanceOf(NameConverterInterface::class, $attributeMetadata);
     }
 
     #[DataProvider('attributeProvider')]
-    public function testNormalize($underscored, $camelCased, $useLowerCamelCase)
+    public function testNormalize($underscored, $camelCased, $useLowerCamelCase): void
     {
         $nameConverter = new CamelCaseToSnakeCaseNameConverter(null, $useLowerCamelCase);
         $this->assertEquals($nameConverter->normalize($camelCased), $underscored);
     }
 
     #[DataProvider('attributeProvider')]
-    public function testDenormalize($underscored, $camelCased, $useLowerCamelCase)
+    public function testDenormalize($underscored, $camelCased, $useLowerCamelCase): void
     {
         $nameConverter = new CamelCaseToSnakeCaseNameConverter(null, $useLowerCamelCase);
         $this->assertEquals($nameConverter->denormalize($underscored), $camelCased);
@@ -55,7 +55,7 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
         ];
     }
 
-    public function testDenormalizeWithContext()
+    public function testDenormalizeWithContext(): void
     {
         $nameConverter = new CamelCaseToSnakeCaseNameConverter(null, true);
         $denormalizedValue = $nameConverter->denormalize('last_name', null, null, [CamelCaseToSnakeCaseNameConverter::REQUIRE_SNAKE_CASE_PROPERTIES => true]);
@@ -63,7 +63,7 @@ class CamelCaseToSnakeCaseNameConverterTest extends TestCase
         $this->assertSame('lastName', $denormalizedValue);
     }
 
-    public function testErrorDenormalizeWithContext()
+    public function testErrorDenormalizeWithContext(): void
     {
         $nameConverter = new CamelCaseToSnakeCaseNameConverter(null, true);
 

@@ -20,7 +20,7 @@ class PercentTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         return $this->factory->create(PercentType::class, null, $options + ['rounding_mode' => \NumberFormatter::ROUND_CEILING]);
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 

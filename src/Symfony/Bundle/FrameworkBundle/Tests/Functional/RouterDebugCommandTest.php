@@ -29,7 +29,7 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $this->application = new Application($kernel);
     }
 
-    public function testDumpAllRoutes()
+    public function testDumpAllRoutes(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute([]);
@@ -41,7 +41,7 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('/session', $display);
     }
 
-    public function testDumpOneRoute()
+    public function testDumpOneRoute(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['name' => 'routerdebug_session_welcome']);
@@ -51,7 +51,7 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('/session', $tester->getDisplay());
     }
 
-    public function testSearchMultipleRoutes()
+    public function testSearchMultipleRoutes(): void
     {
         $tester = $this->createCommandTester();
         $tester->setInputs([3]);
@@ -63,7 +63,7 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('/test', $tester->getDisplay());
     }
 
-    public function testSearchMultipleRoutesWithoutInteraction()
+    public function testSearchMultipleRoutesWithoutInteraction(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['name' => 'routerdebug'], ['interactive' => false]);
@@ -80,7 +80,7 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('/test', $tester->getDisplay());
     }
 
-    public function testSearchWithThrow()
+    public function testSearchWithThrow(): void
     {
         $tester = $this->createCommandTester();
 
@@ -91,7 +91,7 @@ class RouterDebugCommandTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $tester = new CommandCompletionTester($this->application->get('debug:router'));
         $this->assertSame($expectedSuggestions, $tester->complete($input));
@@ -101,7 +101,7 @@ class RouterDebugCommandTest extends AbstractWebTestCase
     #[TestWith(['xml'])]
     #[TestWith(['json'])]
     #[TestWith(['md'])]
-    public function testShowAliases(string $format)
+    public function testShowAliases(string $format): void
     {
         $tester = $this->createCommandTester();
 

@@ -28,7 +28,7 @@ class CurrencyTypeTest extends BaseTypeTestCase
         parent::setUp();
     }
 
-    public function testCurrenciesAreSelectable()
+    public function testCurrenciesAreSelectable(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE)
             ->createView()->vars['choices'];
@@ -38,7 +38,7 @@ class CurrencyTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testChoiceTranslationLocaleOption()
+    public function testChoiceTranslationLocaleOption(): void
     {
         $choices = $this->factory
             ->create(static::TESTED_TYPE, null, [
@@ -51,18 +51,18 @@ class CurrencyTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('USD', 'USD', 'долар США'), $choices);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'EUR', $expectedData = 'EUR')
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'EUR', $expectedData = 'EUR'): void
     {
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testAnActiveAndLegalTenderCurrencyIn2006()
+    public function testAnActiveAndLegalTenderCurrencyIn2006(): void
     {
         $choices = $this->factory
             ->create(static::TESTED_TYPE, null, [
@@ -76,7 +76,7 @@ class CurrencyTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testAnExpiredCurrencyIn2007()
+    public function testAnExpiredCurrencyIn2007(): void
     {
         $choices = $this->factory
             ->create(static::TESTED_TYPE, null, [
@@ -91,7 +91,7 @@ class CurrencyTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testRetrieveExpiredCurrenciesIn2007()
+    public function testRetrieveExpiredCurrenciesIn2007(): void
     {
         $choices = $this->factory
             ->create(static::TESTED_TYPE, null, [
@@ -106,7 +106,7 @@ class CurrencyTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('SIT', 'SIT', 'tolar slovène'), $choices);
     }
 
-    public function testAnExceptionShouldBeThrownWhenTheActiveAtAndNotActiveAtOptionsAreBothSet()
+    public function testAnExceptionShouldBeThrownWhenTheActiveAtAndNotActiveAtOptionsAreBothSet(): void
     {
         $this->expectException(InvalidOptionsException::class);
 

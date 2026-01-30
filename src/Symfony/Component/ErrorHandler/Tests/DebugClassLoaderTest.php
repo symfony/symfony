@@ -40,7 +40,7 @@ class DebugClassLoaderTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testIdempotence()
+    public function testIdempotence(): void
     {
         DebugClassLoader::enable();
         DebugClassLoader::enable();
@@ -60,7 +60,7 @@ class DebugClassLoaderTest extends TestCase
         $this->fail('DebugClassLoader did not register');
     }
 
-    public function testThrowingClass()
+    public function testThrowingClass(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('boo');
@@ -75,14 +75,14 @@ class DebugClassLoaderTest extends TestCase
         class_exists(Fixtures\Throwing::class);
     }
 
-    public function testNameCaseMismatch()
+    public function testNameCaseMismatch(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Case mismatch between loaded and declared class names');
         class_exists(TestingCaseMismatch::class, true);
     }
 
-    public function testFileCaseMismatch()
+    public function testFileCaseMismatch(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Case mismatch between class and real file names');
@@ -93,30 +93,30 @@ class DebugClassLoaderTest extends TestCase
         class_exists(Fixtures\CaseMismatch::class, true);
     }
 
-    public function testPsr4CaseMismatch()
+    public function testPsr4CaseMismatch(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Case mismatch between loaded and declared class names');
         class_exists(__NAMESPACE__.'\Fixtures\Psr4CaseMismatch', true);
     }
 
-    public function testNotPsr0()
+    public function testNotPsr0(): void
     {
         $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\NotPSR0', true));
     }
 
-    public function testNotPsr0Bis()
+    public function testNotPsr0Bis(): void
     {
         $this->assertTrue(class_exists(__NAMESPACE__.'\Fixtures\NotPSR0bis', true));
     }
 
-    public function testClassAlias()
+    public function testClassAlias(): void
     {
         $this->assertTrue(class_exists(Fixtures\ClassAlias::class, true));
     }
 
     #[DataProvider('provideDeprecatedSuper')]
-    public function testDeprecatedSuper(string $class, string $super, string $type)
+    public function testDeprecatedSuper(string $class, string $super, string $type): void
     {
         set_error_handler(static fn () => false);
         $e = error_reporting(0);
@@ -146,7 +146,7 @@ class DebugClassLoaderTest extends TestCase
         ];
     }
 
-    public function testInterfaceExtendsDeprecatedInterface()
+    public function testInterfaceExtendsDeprecatedInterface(): void
     {
         set_error_handler(static fn () => false);
         $e = error_reporting(0);
@@ -168,7 +168,7 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame($xError, $lastError);
     }
 
-    public function testDeprecatedSuperInSameNamespace()
+    public function testDeprecatedSuperInSameNamespace(): void
     {
         set_error_handler(static fn () => false);
         $e = error_reporting(0);
@@ -190,10 +190,10 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame($xError, $lastError);
     }
 
-    public function testExtendedFinalClass()
+    public function testExtendedFinalClass(): void
     {
         $deprecations = [];
-        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        set_error_handler(static function ($type, $msg) use (&$deprecations): void { $deprecations[] = $msg; });
         $e = error_reporting(\E_USER_DEPRECATED);
 
         require __DIR__.'/Fixtures/FinalClasses.php';
@@ -219,10 +219,10 @@ class DebugClassLoaderTest extends TestCase
         ], $deprecations);
     }
 
-    public function testExtendedFinalMethod()
+    public function testExtendedFinalMethod(): void
     {
         $deprecations = [];
-        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        set_error_handler(static function ($type, $msg) use (&$deprecations): void { $deprecations[] = $msg; });
         $e = error_reporting(\E_USER_DEPRECATED);
 
         class_exists(Fixtures\ExtendedFinalMethod::class, true);
@@ -238,7 +238,7 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame($xError, $deprecations);
     }
 
-    public function testExtendedDeprecatedMethodDoesntTriggerAnyNotice()
+    public function testExtendedDeprecatedMethodDoesntTriggerAnyNotice(): void
     {
         set_error_handler(static fn () => false);
         $e = error_reporting(0);
@@ -255,10 +255,10 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame(['type' => \E_USER_NOTICE, 'message' => ''], $lastError);
     }
 
-    public function testInternalsUse()
+    public function testInternalsUse(): void
     {
         $deprecations = [];
-        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        set_error_handler(static function ($type, $msg) use (&$deprecations): void { $deprecations[] = $msg; });
         $e = error_reporting(\E_USER_DEPRECATED);
 
         class_exists('Test\\'.ExtendsInternals::class, true);
@@ -274,10 +274,10 @@ class DebugClassLoaderTest extends TestCase
         ], $deprecations);
     }
 
-    public function testExtendedMethodDefinesNewParameters()
+    public function testExtendedMethodDefinesNewParameters(): void
     {
         $deprecations = [];
-        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        set_error_handler(static function ($type, $msg) use (&$deprecations): void { $deprecations[] = $msg; });
         $e = error_reporting(\E_USER_DEPRECATED);
 
         class_exists(Fixtures\SubClassWithAnnotatedParameters::class, true);
@@ -296,10 +296,10 @@ class DebugClassLoaderTest extends TestCase
         ], $deprecations);
     }
 
-    public function testUseTraitWithInternalMethod()
+    public function testUseTraitWithInternalMethod(): void
     {
         $deprecations = [];
-        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        set_error_handler(static function ($type, $msg) use (&$deprecations): void { $deprecations[] = $msg; });
         $e = error_reporting(\E_USER_DEPRECATED);
 
         class_exists('Test\\'.UseTraitWithInternalMethod::class, true);
@@ -310,10 +310,10 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame([], $deprecations);
     }
 
-    public function testVirtualUse()
+    public function testVirtualUse(): void
     {
         $deprecations = [];
-        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        set_error_handler(static function ($type, $msg) use (&$deprecations): void { $deprecations[] = $msg; });
         $e = error_reporting(\E_USER_DEPRECATED);
 
         class_exists('Test\\'.ExtendsVirtual::class, true);
@@ -340,10 +340,10 @@ class DebugClassLoaderTest extends TestCase
         ], $deprecations);
     }
 
-    public function testVirtualUseWithMagicCall()
+    public function testVirtualUseWithMagicCall(): void
     {
         $deprecations = [];
-        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        set_error_handler(static function ($type, $msg) use (&$deprecations): void { $deprecations[] = $msg; });
         $e = error_reporting(\E_USER_DEPRECATED);
 
         class_exists('Test\\'.ExtendsVirtualMagicCall::class, true);
@@ -354,15 +354,15 @@ class DebugClassLoaderTest extends TestCase
         $this->assertSame([], $deprecations);
     }
 
-    public function testEvaluatedCode()
+    public function testEvaluatedCode(): void
     {
         $this->assertTrue(class_exists(Fixtures\DefinitionInEvaluatedCode::class, true));
     }
 
-    public function testReturnType()
+    public function testReturnType(): void
     {
         $deprecations = [];
-        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        set_error_handler(static function ($type, $msg) use (&$deprecations): void { $deprecations[] = $msg; });
         $e = error_reporting(\E_USER_DEPRECATED);
 
         class_exists('Test\\'.ReturnType::class, true);
@@ -403,10 +403,10 @@ class DebugClassLoaderTest extends TestCase
         ], $deprecations);
     }
 
-    public function testReturnTypePhp83()
+    public function testReturnTypePhp83(): void
     {
         $deprecations = [];
-        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        set_error_handler(static function ($type, $msg) use (&$deprecations): void { $deprecations[] = $msg; });
         $e = error_reporting(\E_USER_DEPRECATED);
 
         class_exists('Test\\'.ReturnTypePhp83::class, true);
@@ -419,10 +419,10 @@ class DebugClassLoaderTest extends TestCase
         ], $deprecations);
     }
 
-    public function testOverrideFinalProperty()
+    public function testOverrideFinalProperty(): void
     {
         $deprecations = [];
-        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        set_error_handler(static function ($type, $msg) use (&$deprecations): void { $deprecations[] = $msg; });
         $e = error_reporting(\E_USER_DEPRECATED);
 
         class_exists(Fixtures\OverrideFinalProperty::class, true);
@@ -440,10 +440,10 @@ class DebugClassLoaderTest extends TestCase
         ], $deprecations);
     }
 
-    public function testOverrideFinalConstant()
+    public function testOverrideFinalConstant(): void
     {
         $deprecations = [];
-        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        set_error_handler(static function ($type, $msg) use (&$deprecations): void { $deprecations[] = $msg; });
         $e = error_reporting(\E_USER_DEPRECATED);
 
         class_exists(Fixtures\FinalConstant\OverrideFinalConstant::class, true);
@@ -457,10 +457,10 @@ class DebugClassLoaderTest extends TestCase
         ], $deprecations);
     }
 
-    public function testOverrideFinalConstant81()
+    public function testOverrideFinalConstant81(): void
     {
         $deprecations = [];
-        set_error_handler(static function ($type, $msg) use (&$deprecations) { $deprecations[] = $msg; });
+        set_error_handler(static function ($type, $msg) use (&$deprecations): void { $deprecations[] = $msg; });
         $e = error_reporting(\E_USER_DEPRECATED);
 
         class_exists(Fixtures\FinalConstant\OverrideFinalConstant81::class, true);
@@ -477,7 +477,7 @@ class DebugClassLoaderTest extends TestCase
 
 class ClassLoader
 {
-    public function loadClass($class)
+    public function loadClass($class): void
     {
     }
 

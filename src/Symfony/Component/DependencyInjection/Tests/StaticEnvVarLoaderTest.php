@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\StaticEnvVarLoader;
 
 class StaticEnvVarLoaderTest extends TestCase
 {
-    public function testLoadEnvVarsCachesInnerLoaderEnvVars()
+    public function testLoadEnvVarsCachesInnerLoaderEnvVars(): void
     {
         $innerLoader = new class(['FOO' => 'BAR']) implements EnvVarLoaderInterface {
             /** @param array<string, string> */

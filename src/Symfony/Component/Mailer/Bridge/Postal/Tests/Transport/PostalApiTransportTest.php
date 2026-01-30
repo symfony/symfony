@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class PostalApiTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(PostalApiTransport $transport, string $expected)
+    public function testToString(PostalApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -44,7 +44,7 @@ class PostalApiTransportTest extends TestCase
         ];
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -84,7 +84,7 @@ class PostalApiTransportTest extends TestCase
         $this->assertSame('foobar', $message->getMessageId());
     }
 
-    public function testSendThrowsForErrorResponse()
+    public function testSendThrowsForErrorResponse(): void
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['message' => 'i\'m a teapot'], [
             'http_code' => 418,

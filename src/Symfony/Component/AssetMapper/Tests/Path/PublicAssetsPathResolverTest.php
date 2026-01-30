@@ -16,7 +16,7 @@ use Symfony\Component\AssetMapper\Path\PublicAssetsPathResolver;
 
 class PublicAssetsPathResolverTest extends TestCase
 {
-    public function testResolvePublicPath()
+    public function testResolvePublicPath(): void
     {
         $resolver = new PublicAssetsPathResolver(
             '/assets-prefix/',

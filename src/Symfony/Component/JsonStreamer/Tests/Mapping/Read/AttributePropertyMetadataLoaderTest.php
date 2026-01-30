@@ -27,14 +27,14 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 
 class AttributePropertyMetadataLoaderTest extends TestCase
 {
-    public function testRetrieveStreamedName()
+    public function testRetrieveStreamedName(): void
     {
         $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), TypeResolver::create());
 
         $this->assertSame(['@id', 'name'], array_keys($loader->load(DummyWithNameAttributes::class)));
     }
 
-    public function testRetrieveValueTransformer()
+    public function testRetrieveValueTransformer(): void
     {
         $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer([
             DivideStringAndCastToIntValueTransformer::class => new DivideStringAndCastToIntValueTransformer(),
@@ -49,7 +49,7 @@ class AttributePropertyMetadataLoaderTest extends TestCase
         ], $loader->load(DummyWithValueTransformerAttributes::class));
     }
 
-    public function testThrowWhenCannotRetrieveValueTransformer()
+    public function testThrowWhenCannotRetrieveValueTransformer(): void
     {
         $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), TypeResolver::create());
 
@@ -59,7 +59,7 @@ class AttributePropertyMetadataLoaderTest extends TestCase
         $loader->load(DummyWithValueTransformerAttributes::class);
     }
 
-    public function testThrowWhenInvaliValueTransformer()
+    public function testThrowWhenInvaliValueTransformer(): void
     {
         $loader = new AttributePropertyMetadataLoader(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer([
             DivideStringAndCastToIntValueTransformer::class => true,

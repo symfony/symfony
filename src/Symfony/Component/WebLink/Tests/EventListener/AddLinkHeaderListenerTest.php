@@ -27,7 +27,7 @@ use Symfony\Component\WebLink\Link;
  */
 class AddLinkHeaderListenerTest extends TestCase
 {
-    public function testOnKernelResponse()
+    public function testOnKernelResponse(): void
     {
         $request = new Request([], [], ['_links' => new GenericLinkProvider([new Link('preload', '/foo')])]);
         $response = new Response('', 200, ['Link' => '<https://demo.api-platform.com/docs.jsonld>; rel="http://www.w3.org/ns/hydra/core#apiDocumentation"']);
@@ -48,7 +48,7 @@ class AddLinkHeaderListenerTest extends TestCase
         $this->assertEquals($expected, $response->headers->all()['link']);
     }
 
-    public function testSubscribedEvents()
+    public function testSubscribedEvents(): void
     {
         $this->assertEquals([KernelEvents::RESPONSE => 'onKernelResponse'], AddLinkHeaderListener::getSubscribedEvents());
     }

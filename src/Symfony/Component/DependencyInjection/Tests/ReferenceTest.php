@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ReferenceTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $ref = new Reference('foo');
         $this->assertEquals('foo', (string) $ref, '__construct() sets the id of the reference, which is used for the __toString() method');

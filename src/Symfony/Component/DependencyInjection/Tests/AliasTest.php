@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 class AliasTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $alias = new Alias('foo');
 
@@ -26,7 +26,7 @@ class AliasTest extends TestCase
         $this->assertFalse($alias->isPublic());
     }
 
-    public function testCanConstructANonPublicAlias()
+    public function testCanConstructANonPublicAlias(): void
     {
         $alias = new Alias('foo', false);
 
@@ -34,7 +34,7 @@ class AliasTest extends TestCase
         $this->assertFalse($alias->isPublic());
     }
 
-    public function testCanConstructAPrivateAlias()
+    public function testCanConstructAPrivateAlias(): void
     {
         $alias = new Alias('foo', false, false);
 
@@ -43,7 +43,7 @@ class AliasTest extends TestCase
         $this->assertTrue($alias->isPrivate());
     }
 
-    public function testCanSetPublic()
+    public function testCanSetPublic(): void
     {
         $alias = new Alias('foo', false);
         $alias->setPublic(true);
@@ -51,7 +51,7 @@ class AliasTest extends TestCase
         $this->assertTrue($alias->isPublic());
     }
 
-    public function testCanDeprecateAnAlias()
+    public function testCanDeprecateAnAlias(): void
     {
         $alias = new Alias('foo', false);
         $alias->setDeprecated('vendor/package', '1.1', 'The %alias_id% service is deprecated.');
@@ -59,7 +59,7 @@ class AliasTest extends TestCase
         $this->assertTrue($alias->isDeprecated());
     }
 
-    public function testReturnsCorrectDeprecation()
+    public function testReturnsCorrectDeprecation(): void
     {
         $alias = new Alias('foo', false);
         $alias->setDeprecated('vendor/package', '1.1', 'The "%alias_id%" is deprecated.');
@@ -71,7 +71,7 @@ class AliasTest extends TestCase
     }
 
     #[DataProvider('invalidDeprecationMessageProvider')]
-    public function testCannotDeprecateWithAnInvalidTemplate($message)
+    public function testCannotDeprecateWithAnInvalidTemplate($message): void
     {
         $def = new Alias('foo');
 

@@ -30,7 +30,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class AccessTokenFactoryTest extends TestCase
 {
-    public function testBasicServiceConfiguration()
+    public function testBasicServiceConfiguration(): void
     {
         $container = new ContainerBuilder();
         $config = [
@@ -48,7 +48,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.authenticator.access_token.firewall1'));
     }
 
-    public function testDefaultTokenHandlerConfiguration()
+    public function testDefaultTokenHandlerConfiguration(): void
     {
         $container = new ContainerBuilder();
         $config = [
@@ -64,7 +64,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
     }
 
-    public function testIdTokenHandlerConfiguration()
+    public function testIdTokenHandlerConfiguration(): void
     {
         $container = new ContainerBuilder();
         $config = [
@@ -80,7 +80,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
     }
 
-    public function testCasTokenHandlerConfiguration()
+    public function testCasTokenHandlerConfiguration(): void
     {
         $container = new ContainerBuilder();
         $config = [
@@ -101,7 +101,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertNull($arguments[3]);
     }
 
-    public function testInvalidOidcTokenHandlerConfigurationKeyMissing()
+    public function testInvalidOidcTokenHandlerConfigurationKeyMissing(): void
     {
         $config = [
             'token_handler' => [
@@ -121,7 +121,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->processConfig($config, $factory);
     }
 
-    public function testInvalidOidcTokenHandlerConfigurationMissingAlgorithmParameters()
+    public function testInvalidOidcTokenHandlerConfigurationMissingAlgorithmParameters(): void
     {
         $config = [
             'token_handler' => [
@@ -141,7 +141,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->processConfig($config, $factory);
     }
 
-    public function testOidcTokenHandlerConfigurationWithMultipleAlgorithms()
+    public function testOidcTokenHandlerConfigurationWithMultipleAlgorithms(): void
     {
         $container = new ContainerBuilder();
         $jwkset = '{"keys":[{"kty":"EC","crv":"P-256","x":"FtgMtrsKDboRO-Zo0XC7tDJTATHVmwuf9GK409kkars","y":"rWDE0ERU2SfwGYCo1DWWdgFEbZ0MiAXLRBBOzBgs_jY","d":"4G7bRIiKih0qrFxc0dtvkHUll19tTyctoCR3eIbOrO0"},{"kty":"EC","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220"}]}';
@@ -176,7 +176,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition('security.access_token_handler.firewall1')->getArguments());
     }
 
-    public function testOidcTokenHandlerConfigurationWithEncryption()
+    public function testOidcTokenHandlerConfigurationWithEncryption(): void
     {
         $container = new ContainerBuilder();
         $jwkset = '{"keys":[{"kty":"EC","crv":"P-256","x":"FtgMtrsKDboRO-Zo0XC7tDJTATHVmwuf9GK409kkars","y":"rWDE0ERU2SfwGYCo1DWWdgFEbZ0MiAXLRBBOzBgs_jY","d":"4G7bRIiKih0qrFxc0dtvkHUll19tTyctoCR3eIbOrO0"},{"kty":"EC","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220"}]}';
@@ -205,7 +205,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
     }
 
-    public function testInvalidOidcTokenHandlerConfigurationMissingEncryptionKeyset()
+    public function testInvalidOidcTokenHandlerConfigurationMissingEncryptionKeyset(): void
     {
         $jwkset = '{"keys":[{"kty":"EC","crv":"P-256","x":"FtgMtrsKDboRO-Zo0XC7tDJTATHVmwuf9GK409kkars","y":"rWDE0ERU2SfwGYCo1DWWdgFEbZ0MiAXLRBBOzBgs_jY","d":"4G7bRIiKih0qrFxc0dtvkHUll19tTyctoCR3eIbOrO0"},{"kty":"EC","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220"}]}';
         $config = [
@@ -231,7 +231,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->processConfig($config, $factory);
     }
 
-    public function testInvalidOidcTokenHandlerConfigurationMissingAlgorithm()
+    public function testInvalidOidcTokenHandlerConfigurationMissingAlgorithm(): void
     {
         $jwkset = '{"keys":[{"kty":"EC","crv":"P-256","x":"FtgMtrsKDboRO-Zo0XC7tDJTATHVmwuf9GK409kkars","y":"rWDE0ERU2SfwGYCo1DWWdgFEbZ0MiAXLRBBOzBgs_jY","d":"4G7bRIiKih0qrFxc0dtvkHUll19tTyctoCR3eIbOrO0"},{"kty":"EC","crv":"P-256","x":"0QEAsI1wGI-dmYatdUZoWSRWggLEpyzopuhwk-YUnA4","y":"KYl-qyZ26HobuYwlQh-r0iHX61thfP82qqEku7i0woo","d":"iA_TV2zvftni_9aFAQwFO_9aypfJFCSpcCyevDvz220"}]}';
         $config = [
@@ -258,7 +258,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->processConfig($config, $factory);
     }
 
-    public function testOidcTokenHandlerConfigurationWithDiscovery()
+    public function testOidcTokenHandlerConfigurationWithDiscovery(): void
     {
         $container = new ContainerBuilder();
         $config = [
@@ -310,7 +310,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertEquals($expectedCalls, $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls());
     }
 
-    public function testOidcTokenHandlerConfigurationWithMultipleDiscoveryBaseUri()
+    public function testOidcTokenHandlerConfigurationWithMultipleDiscoveryBaseUri(): void
     {
         $container = new ContainerBuilder();
         $config = [
@@ -367,7 +367,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertEquals($expectedCalls, $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls());
     }
 
-    public function testOidcUserInfoTokenHandlerConfigurationWithExistingClient()
+    public function testOidcUserInfoTokenHandlerConfigurationWithExistingClient(): void
     {
         $container = new ContainerBuilder();
         $config = [
@@ -397,7 +397,7 @@ class AccessTokenFactoryTest extends TestCase
     }
 
     #[DataProvider('getOidcUserInfoConfiguration')]
-    public function testOidcUserInfoTokenHandlerConfigurationWithBaseUri(array|string $configuration)
+    public function testOidcUserInfoTokenHandlerConfigurationWithBaseUri(array|string $configuration): void
     {
         $container = new ContainerBuilder();
         $config = [
@@ -432,7 +432,7 @@ class AccessTokenFactoryTest extends TestCase
         yield ['https://www.example.com/realms/demo/protocol/openid-connect/userinfo'];
     }
 
-    public function testOidcUserInfoTokenHandlerConfigurationWithDiscovery()
+    public function testOidcUserInfoTokenHandlerConfigurationWithDiscovery(): void
     {
         $container = new ContainerBuilder();
         $config = [
@@ -474,7 +474,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertEquals($expectedCalls, $container->getDefinition('security.access_token_handler.firewall1')->getMethodCalls());
     }
 
-    public function testMultipleTokenHandlersSet()
+    public function testMultipleTokenHandlersSet(): void
     {
         $config = [
             'token_handler' => [
@@ -491,7 +491,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->processConfig($config, $factory);
     }
 
-    public function testOAuth2TokenHandlerConfiguration()
+    public function testOAuth2TokenHandlerConfiguration(): void
     {
         $container = new ContainerBuilder();
         $config = [
@@ -507,7 +507,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.access_token_handler.firewall1'));
     }
 
-    public function testNoTokenHandlerSet()
+    public function testNoTokenHandlerSet(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('You must set a token handler.');
@@ -520,7 +520,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->processConfig($config, $factory);
     }
 
-    public function testNoExtractorsDefined()
+    public function testNoExtractorsDefined(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The path "access_token.token_extractors" should have at least 1 element(s) defined.');
@@ -535,7 +535,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->processConfig($config, $factory);
     }
 
-    public function testNoHandlerDefined()
+    public function testNoHandlerDefined(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The child config "token_handler" under "access_token" must be configured.');
@@ -570,7 +570,7 @@ class AccessTokenFactoryTest extends TestCase
         ];
     }
 
-    public function testOidcTokenGenerator()
+    public function testOidcTokenGenerator(): void
     {
         if (!class_exists(OidcTokenGenerator::class)) {
             $this->markTestSkipped('OidcTokenGenerator not available.');
@@ -598,7 +598,7 @@ class AccessTokenFactoryTest extends TestCase
         $this->assertTrue($container->getDefinition('security.access_token_handler.oidc.command.generate')->hasMethodCall('addGenerator'));
     }
 
-    public function testOidcTokenGeneratorCommandWithNoTokenHandler()
+    public function testOidcTokenGeneratorCommandWithNoTokenHandler(): void
     {
         $container = new ContainerBuilder();
         $config = [

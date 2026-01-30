@@ -23,7 +23,7 @@ use Symfony\Component\Uid\Ulid;
 final class GenerateUlidCommandTest extends TestCase
 {
     #[Group('time-sensitive')]
-    public function testDefaults()
+    public function testDefaults(): void
     {
         $time = microtime(false);
         $time = substr($time, 11).substr($time, 1, 4);
@@ -36,7 +36,7 @@ final class GenerateUlidCommandTest extends TestCase
         $this->assertEquals(\DateTimeImmutable::createFromFormat('U.u', $time), $ulid->getDateTime());
     }
 
-    public function testUnparsableTimestamp()
+    public function testUnparsableTimestamp(): void
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
@@ -44,7 +44,7 @@ final class GenerateUlidCommandTest extends TestCase
         $this->assertStringContainsString('Invalid timestamp "foo"', $commandTester->getDisplay());
     }
 
-    public function testTimestampBeforeUnixEpoch()
+    public function testTimestampBeforeUnixEpoch(): void
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
@@ -52,7 +52,7 @@ final class GenerateUlidCommandTest extends TestCase
         $this->assertStringContainsString('The timestamp must be positive', $commandTester->getDisplay());
     }
 
-    public function testTimestamp()
+    public function testTimestamp(): void
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
@@ -62,7 +62,7 @@ final class GenerateUlidCommandTest extends TestCase
         $this->assertEquals(new \DateTimeImmutable('2021-02-16 18:09:42.999'), $ulid->getDateTime());
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
@@ -75,7 +75,7 @@ final class GenerateUlidCommandTest extends TestCase
         }
     }
 
-    public function testInvalidFormat()
+    public function testInvalidFormat(): void
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
@@ -83,7 +83,7 @@ final class GenerateUlidCommandTest extends TestCase
         $this->assertStringContainsString('Invalid format "foo"', $commandTester->getDisplay());
     }
 
-    public function testFormat()
+    public function testFormat(): void
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
@@ -92,7 +92,7 @@ final class GenerateUlidCommandTest extends TestCase
         Ulid::fromRfc4122(trim($commandTester->getDisplay()));
     }
 
-    public function testUlidsAreDifferentWhenGeneratingSeveralNow()
+    public function testUlidsAreDifferentWhenGeneratingSeveralNow(): void
     {
         $commandTester = new CommandTester(new GenerateUlidCommand());
 
@@ -104,7 +104,7 @@ final class GenerateUlidCommandTest extends TestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $application = new Application();
         $application->addCommand(new GenerateUlidCommand());

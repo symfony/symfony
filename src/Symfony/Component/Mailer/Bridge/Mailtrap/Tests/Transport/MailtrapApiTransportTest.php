@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class MailtrapApiTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(MailtrapApiTransport $transport, string $expected)
+    public function testToString(MailtrapApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -67,7 +67,7 @@ class MailtrapApiTransportTest extends TestCase
         ];
     }
 
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
@@ -81,7 +81,7 @@ class MailtrapApiTransportTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $payload['headers']);
     }
 
-    public function testSendToLiveApi()
+    public function testSendToLiveApi(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -109,7 +109,7 @@ class MailtrapApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testSendToSandboxApi()
+    public function testSendToSandboxApi(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -137,7 +137,7 @@ class MailtrapApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testSendThrowsForErrorResponse()
+    public function testSendThrowsForErrorResponse(): void
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['errors' => ['i\'m a teapot']], [
             'http_code' => 418,
@@ -156,7 +156,7 @@ class MailtrapApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testTagAndMetadataHeaders()
+    public function testTagAndMetadataHeaders(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('password-reset'));
@@ -176,7 +176,7 @@ class MailtrapApiTransportTest extends TestCase
         $this->assertSame(['Color' => 'blue', 'Client-ID' => '12345'], $payload['custom_variables']);
     }
 
-    public function testMultipleTagsAreNotAllowed()
+    public function testMultipleTagsAreNotAllowed(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('tag1'));

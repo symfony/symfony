@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class RegisterEventListenersAndSubscribersPassTest extends TestCase
 {
-    public function testExceptionOnAbstractTaggedListener()
+    public function testExceptionOnAbstractTaggedListener(): void
     {
         $container = $this->createBuilder();
 
@@ -37,7 +37,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcessEventListenersWithPriorities()
+    public function testProcessEventListenersWithPriorities(): void
     {
         $container = $this->createBuilder();
 
@@ -96,7 +96,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         );
     }
 
-    public function testProcessEventListenersWithMultipleConnections()
+    public function testProcessEventListenersWithMultipleConnections(): void
     {
         $container = $this->createBuilder(true);
 
@@ -181,7 +181,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         );
     }
 
-    public function testSubscribersAreSkippedIfListenerDefinedForSameDefinition()
+    public function testSubscribersAreSkippedIfListenerDefinedForSameDefinition(): void
     {
         $container = $this->createBuilder();
 
@@ -217,7 +217,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         );
     }
 
-    public function testProcessNoTaggedServices()
+    public function testProcessNoTaggedServices(): void
     {
         $container = $this->createBuilder(true);
 
@@ -228,7 +228,7 @@ class RegisterEventListenersAndSubscribersPassTest extends TestCase
         $this->assertEquals([], $container->getDefinition('doctrine.dbal.second_connection.event_manager')->getMethodCalls());
     }
 
-    private function process(ContainerBuilder $container)
+    private function process(ContainerBuilder $container): void
     {
         $pass = new RegisterEventListenersAndSubscribersPass('doctrine.connections', 'doctrine.dbal.%s_connection.event_manager', 'doctrine');
         $pass->process($container);

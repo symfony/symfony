@@ -42,7 +42,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeRouteCollectionTestData')]
-    public function testDescribeRouteCollection(RouteCollection $routes, $expectedDescription, $file)
+    public function testDescribeRouteCollection(RouteCollection $routes, $expectedDescription, $file): void
     {
         $this->assertDescription($expectedDescription, $routes);
     }
@@ -53,7 +53,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeRouteCollectionWithHttpMethodFilterTestData')]
-    public function testDescribeRouteCollectionWithHttpMethodFilter(string $httpMethod, RouteCollection $routes, $expectedDescription, $file)
+    public function testDescribeRouteCollectionWithHttpMethodFilter(string $httpMethod, RouteCollection $routes, $expectedDescription, $file): void
     {
         $this->assertDescription($expectedDescription, $routes, ['method' => $httpMethod]);
     }
@@ -68,7 +68,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeRouteTestData')]
-    public function testDescribeRoute(Route $route, $expectedDescription, $file)
+    public function testDescribeRoute(Route $route, $expectedDescription, $file): void
     {
         $this->assertDescription($expectedDescription, $route);
     }
@@ -79,7 +79,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeContainerParametersTestData')]
-    public function testDescribeContainerParameters(ParameterBag $parameters, $expectedDescription, $file)
+    public function testDescribeContainerParameters(ParameterBag $parameters, $expectedDescription, $file): void
     {
         $this->assertDescription($expectedDescription, $parameters);
     }
@@ -90,7 +90,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeContainerBuilderTestData')]
-    public function testDescribeContainerBuilder(ContainerBuilder $builder, $expectedDescription, array $options, $file)
+    public function testDescribeContainerBuilder(ContainerBuilder $builder, $expectedDescription, array $options, $file): void
     {
         $this->assertDescription($expectedDescription, $builder, $options);
     }
@@ -101,7 +101,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeContainerExistingClassDefinitionTestData')]
-    public function testDescribeContainerExistingClassDefinition(Definition $definition, $expectedDescription, $file)
+    public function testDescribeContainerExistingClassDefinition(Definition $definition, $expectedDescription, $file): void
     {
         $this->assertDescription($expectedDescription, $definition);
     }
@@ -112,7 +112,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeContainerDefinitionTestData')]
-    public function testDescribeContainerDefinition(Definition $definition, $expectedDescription, $file)
+    public function testDescribeContainerDefinition(Definition $definition, $expectedDescription, $file): void
     {
         $this->assertDescription($expectedDescription, $definition);
     }
@@ -123,7 +123,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeContainerDefinitionWithArgumentsShownTestData')]
-    public function testDescribeContainerDefinitionWithArgumentsShown(Definition $definition, $expectedDescription, $file)
+    public function testDescribeContainerDefinitionWithArgumentsShown(Definition $definition, $expectedDescription, $file): void
     {
         $this->assertDescription($expectedDescription, $definition, []);
     }
@@ -143,7 +143,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeContainerAliasTestData')]
-    public function testDescribeContainerAlias(Alias $alias, $expectedDescription, $file)
+    public function testDescribeContainerAlias(Alias $alias, $expectedDescription, $file): void
     {
         $this->assertDescription($expectedDescription, $alias);
     }
@@ -154,7 +154,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeContainerDefinitionWhichIsAnAliasTestData')]
-    public function testDescribeContainerDefinitionWhichIsAnAlias(Alias $alias, $expectedDescription, ContainerBuilder $builder, $options = [], $file = null)
+    public function testDescribeContainerDefinitionWhichIsAnAlias(Alias $alias, $expectedDescription, ContainerBuilder $builder, $options = [], $file = null): void
     {
         $this->assertDescription($expectedDescription, $builder, $options);
     }
@@ -189,7 +189,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
      */
     #[IgnoreDeprecations]
     #[DataProvider('getDescribeContainerParameterTestData')]
-    public function testDescribeContainerParameter($parameter, $expectedDescription, array $options, $file)
+    public function testDescribeContainerParameter($parameter, $expectedDescription, array $options, $file): void
     {
         $this->assertDescription($expectedDescription, $parameter, $options);
     }
@@ -212,7 +212,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeEventDispatcherTestData')]
-    public function testDescribeEventDispatcher(EventDispatcher $eventDispatcher, $expectedDescription, array $options, $file)
+    public function testDescribeEventDispatcher(EventDispatcher $eventDispatcher, $expectedDescription, array $options, $file): void
     {
         $this->assertDescription($expectedDescription, $eventDispatcher, $options);
     }
@@ -223,7 +223,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeCallableTestData')]
-    public function testDescribeCallable($callable, $expectedDescription, $file)
+    public function testDescribeCallable($callable, $expectedDescription, $file): void
     {
         $this->assertDescription($expectedDescription, $callable);
     }
@@ -235,7 +235,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
 
     #[IgnoreDeprecations]
     #[DataProvider('getDescribeDeprecatedCallableTestData')]
-    public function testDescribeDeprecatedCallable($callable, $expectedDescription, $file)
+    public function testDescribeDeprecatedCallable($callable, $expectedDescription, $file): void
     {
         $this->assertDescription($expectedDescription, $callable);
     }
@@ -246,7 +246,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getClassDescriptionTestData')]
-    public function testGetClassDescription($object, $expectedDescription)
+    public function testGetClassDescription($object, $expectedDescription): void
     {
         $this->assertEquals($expectedDescription, $this->getDescriptor()->getClassDescription($object));
     }
@@ -262,7 +262,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDeprecationsTestData')]
-    public function testGetDeprecations(ContainerBuilder $builder, $expectedDescription, $file)
+    public function testGetDeprecations(ContainerBuilder $builder, $expectedDescription, $file): void
     {
         $this->assertDescription($expectedDescription, $builder, ['deprecations' => true]);
     }
@@ -276,7 +276,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
 
     abstract protected static function getFormat();
 
-    private function assertDescription($expectedDescription, $describedObject, array $options = [])
+    private function assertDescription($expectedDescription, $describedObject, array $options = []): void
     {
         $options['is_debug'] = false;
         $options['raw_output'] = true;
@@ -351,7 +351,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[DataProvider('getDescribeContainerBuilderWithPriorityTagsTestData')]
-    public function testDescribeContainerBuilderWithPriorityTags(ContainerBuilder $builder, $expectedDescription, array $options)
+    public function testDescribeContainerBuilderWithPriorityTags(ContainerBuilder $builder, $expectedDescription, array $options): void
     {
         $this->assertDescription($expectedDescription, $builder, $options);
     }

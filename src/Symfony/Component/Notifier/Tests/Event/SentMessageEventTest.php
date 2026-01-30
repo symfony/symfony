@@ -21,13 +21,13 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 final class SentMessageEventTest extends TestCase
 {
     #[DataProvider('messagesProvider')]
-    public function testConstruct(SentMessage $message, SentMessageEvent $event)
+    public function testConstruct(SentMessage $message, SentMessageEvent $event): void
     {
         $this->assertEquals($event, new SentMessageEvent($message));
     }
 
     #[DataProvider('messagesProvider')]
-    public function testGetMessage(SentMessage $message, SentMessageEvent $event)
+    public function testGetMessage(SentMessage $message, SentMessageEvent $event): void
     {
         $this->assertSame($message, $event->getMessage());
     }

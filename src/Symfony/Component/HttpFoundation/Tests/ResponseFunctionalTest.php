@@ -43,7 +43,7 @@ class ResponseFunctionalTest extends TestCase
     }
 
     #[DataProvider('provideCookie')]
-    public function testCookie($fixture)
+    public function testCookie($fixture): void
     {
         $result = file_get_contents(\sprintf('http://localhost:8054/%s.php', $fixture));
         $result = preg_replace_callback('/expires=[^;]++/', static fn ($m) => str_replace('-', ' ', $m[0]), $result);
@@ -60,7 +60,7 @@ class ResponseFunctionalTest extends TestCase
     }
 
     #[Group('integration')]
-    public function testInformationalResponse()
+    public function testInformationalResponse(): void
     {
         if (!(new ExecutableFinder())->find('curl')) {
             $this->markTestSkipped('curl is not installed');

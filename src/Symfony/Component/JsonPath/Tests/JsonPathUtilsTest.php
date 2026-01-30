@@ -20,7 +20,7 @@ use Symfony\Component\JsonPath\Tokenizer\TokenType;
 
 class JsonPathUtilsTest extends TestCase
 {
-    public function testReduceWithArrayAccess()
+    public function testReduceWithArrayAccess(): void
     {
         $path = new JsonPath('$.store.book[0].title');
         $resource = self::provideJsonResource();
@@ -36,7 +36,7 @@ class JsonPathUtilsTest extends TestCase
         $this->assertEquals([new JsonPathToken(TokenType::Name, 'title')], $reduced['tokens']);
     }
 
-    public function testReduceWithBasicProperty()
+    public function testReduceWithBasicProperty(): void
     {
         $path = new JsonPath('$.store.book');
         $resource = self::provideJsonResource();
@@ -59,7 +59,7 @@ class JsonPathUtilsTest extends TestCase
         $this->assertEquals([new JsonPathToken(TokenType::Name, 'book')], $reduced['tokens']);
     }
 
-    public function testReduceUntilFilter()
+    public function testReduceUntilFilter(): void
     {
         $path = new JsonPath('$.store[?(@.book.author == "Nigel Rees")]');
         $resource = self::provideJsonResource();
@@ -82,7 +82,7 @@ class JsonPathUtilsTest extends TestCase
         $this->assertEquals([new JsonPathToken(TokenType::Bracket, '?(@.book.author == "Nigel Rees")')], $reduced['tokens']);
     }
 
-    public function testDoesNotReduceOnRecursiveDescent()
+    public function testDoesNotReduceOnRecursiveDescent(): void
     {
         $path = new JsonPath('$..book');
         $resource = self::provideJsonResource();
@@ -103,7 +103,7 @@ class JsonPathUtilsTest extends TestCase
         ], $reduced['tokens']);
     }
 
-    public function testDoesNotReduceOnArraySlice()
+    public function testDoesNotReduceOnArraySlice(): void
     {
         $path = new JsonPath('$.store.book[1:2]');
         $resource = self::provideJsonResource();
@@ -129,7 +129,7 @@ class JsonPathUtilsTest extends TestCase
         ], $reduced['tokens']);
     }
 
-    public function testDoesNotReduceOnUnknownProperty()
+    public function testDoesNotReduceOnUnknownProperty(): void
     {
         $path = new JsonPath('$.unknown');
         $resource = self::provideJsonResource();
@@ -148,7 +148,7 @@ class JsonPathUtilsTest extends TestCase
         ], $reduced['tokens']);
     }
 
-    public function testDoesNotReduceOnUnknownIndex()
+    public function testDoesNotReduceOnUnknownIndex(): void
     {
         $path = new JsonPath('$.store.book[123].title');
         $resource = self::provideJsonResource();

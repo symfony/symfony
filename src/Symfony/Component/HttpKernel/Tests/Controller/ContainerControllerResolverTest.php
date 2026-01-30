@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Controller\ContainerControllerResolver;
 
 class ContainerControllerResolverTest extends ControllerResolverTest
 {
-    public function testGetControllerService()
+    public function testGetControllerService(): void
     {
         $service = new ControllerTestService('foo');
 
@@ -37,7 +37,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertSame('action', $controller[1]);
     }
 
-    public function testGetControllerInvokableService()
+    public function testGetControllerInvokableService(): void
     {
         $service = new InvokableControllerService('bar');
 
@@ -53,7 +53,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertSame($service, $controller);
     }
 
-    public function testGetControllerInvokableServiceWithClassNameAsName()
+    public function testGetControllerInvokableServiceWithClassNameAsName(): void
     {
         $service = new InvokableControllerService('bar');
 
@@ -70,7 +70,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
     }
 
     #[DataProvider('getControllers')]
-    public function testInstantiateControllerWhenControllerStartsWithABackslash($controller)
+    public function testInstantiateControllerWhenControllerStartsWithABackslash($controller): void
     {
         $service = new ControllerTestService('foo');
         $class = ControllerTestService::class;
@@ -95,7 +95,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         ];
     }
 
-    public function testExceptionWhenUsingRemovedControllerServiceWithClassNameAsName()
+    public function testExceptionWhenUsingRemovedControllerServiceWithClassNameAsName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Controller "Symfony\Component\HttpKernel\Tests\Controller\ControllerTestService" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?');
@@ -119,7 +119,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $resolver->getController($request);
     }
 
-    public function testExceptionWhenUsingRemovedControllerService()
+    public function testExceptionWhenUsingRemovedControllerService(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Controller "app.my_controller" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?');
@@ -183,7 +183,7 @@ class InvokableControllerService
     {
     }
 
-    public function __invoke()
+    public function __invoke(): void
     {
     }
 }
@@ -194,7 +194,7 @@ class ControllerTestService
     {
     }
 
-    public function action()
+    public function action(): void
     {
     }
 }

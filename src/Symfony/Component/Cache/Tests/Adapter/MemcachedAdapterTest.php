@@ -51,7 +51,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         return new MemcachedAdapter($client, $namespace ?? str_replace('\\', '.', __CLASS__), $defaultLifetime);
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $client = MemcachedAdapter::createConnection([], [
             'libketama_compatible' => false,
@@ -69,7 +69,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     }
 
     #[DataProvider('provideBadOptions')]
-    public function testBadOptions($name, $value)
+    public function testBadOptions($name, $value): void
     {
         $this->expectException(\Error::class);
         $this->expectExceptionMessage('Undefined constant Memcached::');
@@ -86,7 +86,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         ];
     }
 
-    public function testDefaultOptions()
+    public function testDefaultOptions(): void
     {
         $this->assertTrue(MemcachedAdapter::isSupported());
 
@@ -98,7 +98,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         $this->assertSame(1, $client->getOption(\Memcached::OPT_LIBKETAMA_COMPATIBLE));
     }
 
-    public function testOptionSerializer()
+    public function testOptionSerializer(): void
     {
         if (!\Memcached::HAVE_JSON) {
             $this->markTestSkipped('Memcached::HAVE_JSON required');
@@ -111,7 +111,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     }
 
     #[DataProvider('provideServersSetting')]
-    public function testServersSetting(string $dsn, string $host, int $port)
+    public function testServersSetting(string $dsn, string $host, int $port): void
     {
         $client1 = MemcachedAdapter::createConnection($dsn);
         $client2 = MemcachedAdapter::createConnection([$dsn]);
@@ -166,7 +166,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     }
 
     #[RequiresPhpExtension('memcached')]
-    public function testOptionsFromDsnWinOverAdditionallyPassedOptions()
+    public function testOptionsFromDsnWinOverAdditionallyPassedOptions(): void
     {
         $client = MemcachedAdapter::createConnection('memcached://localhost:11222?retry_timeout=10', [
             \Memcached::OPT_RETRY_TIMEOUT => 8,
@@ -176,7 +176,7 @@ class MemcachedAdapterTest extends AdapterTestCase
     }
 
     #[RequiresPhpExtension('memcached')]
-    public function testOptionsFromDsnAndAdditionallyPassedOptionsAreMerged()
+    public function testOptionsFromDsnAndAdditionallyPassedOptionsAreMerged(): void
     {
         $client = MemcachedAdapter::createConnection('memcached://localhost:11222?socket_recv_size=1&socket_send_size=2', [
             \Memcached::OPT_RETRY_TIMEOUT => 8,
@@ -187,12 +187,12 @@ class MemcachedAdapterTest extends AdapterTestCase
         $this->assertSame(8, $client->getOption(\Memcached::OPT_RETRY_TIMEOUT));
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->assertTrue($this->createCachePool()->clear());
     }
 
-    public function testMultiServerDsn()
+    public function testMultiServerDsn(): void
     {
         $dsn = 'memcached:?host[localhost]&host[localhost:12345]&host[/some/memcached.sock:]=3';
         $client = MemcachedAdapter::createConnection($dsn);
@@ -234,7 +234,7 @@ class MemcachedAdapterTest extends AdapterTestCase
         $this->assertSame($expected, $client->getServerList());
     }
 
-    public function testKeyEncoding()
+    public function testKeyEncoding(): void
     {
         $reservedMemcachedCharacters = " \n\r\t\v\f\0";
 

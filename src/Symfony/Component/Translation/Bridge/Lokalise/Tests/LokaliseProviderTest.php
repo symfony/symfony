@@ -65,7 +65,7 @@ class LokaliseProviderTest extends ProviderTestCase
         ];
     }
 
-    public function testCompleteWriteProcess()
+    public function testCompleteWriteProcess(): void
     {
         $getLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
             $this->assertSame('GET', $method);
@@ -253,7 +253,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $this->assertTrue($updateProcessed, 'Translations update was not called.');
     }
 
-    public function testUpdateProcessWhenLocalTranslationsMatchLokaliseTranslations()
+    public function testUpdateProcessWhenLocalTranslationsMatchLokaliseTranslations(): void
     {
         $getLanguagesResponse = function (string $method, string $url): ResponseInterface {
             $this->assertSame('GET', $method);
@@ -303,7 +303,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $this->assertSame(1, $mockHttpClient->getRequestsCount());
     }
 
-    public function testWriteGetLanguageServerError()
+    public function testWriteGetLanguageServerError(): void
     {
         $getLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
             $this->assertSame('GET', $method);
@@ -330,7 +330,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testWriteCreateLanguageServerError()
+    public function testWriteCreateLanguageServerError(): void
     {
         $getLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
             $this->assertSame('GET', $method);
@@ -372,7 +372,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testWriteGetKeysIdsServerError()
+    public function testWriteGetKeysIdsServerError(): void
     {
         $getLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
             $this->assertSame('GET', $method);
@@ -430,7 +430,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testWriteCreateKeysServerError()
+    public function testWriteCreateKeysServerError(): void
     {
         $getLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
             $this->assertSame('GET', $method);
@@ -511,7 +511,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testWriteUploadTranslationsServerError()
+    public function testWriteUploadTranslationsServerError(): void
     {
         $getLanguagesResponse = function (string $method, string $url, array $options = []): ResponseInterface {
             $this->assertSame('GET', $method);
@@ -605,7 +605,7 @@ class LokaliseProviderTest extends ProviderTestCase
     }
 
     #[DataProvider('getResponsesForOneLocaleAndOneDomain')]
-    public function testReadForOneLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag)
+    public function testReadForOneLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag): void
     {
         $response = function (string $method, string $url, array $options = []) use ($locale, $domain, $responseContent): ResponseInterface {
             $expectedBody = json_encode([
@@ -647,7 +647,7 @@ class LokaliseProviderTest extends ProviderTestCase
     }
 
     #[DataProvider('getResponsesForManyLocalesAndManyDomains')]
-    public function testReadForManyLocalesAndManyDomains(array $locales, array $domains, array $responseContents, TranslatorBag $expectedTranslatorBag)
+    public function testReadForManyLocalesAndManyDomains(array $locales, array $domains, array $responseContents, TranslatorBag $expectedTranslatorBag): void
     {
         $consecutiveLoadArguments = [];
         $consecutiveLoadReturns = [];
@@ -696,7 +696,7 @@ class LokaliseProviderTest extends ProviderTestCase
     }
 
     #[RequiresPhpExtension('zip')]
-    public function testReadWithExportAsync()
+    public function testReadWithExportAsync(): void
     {
         $zipLocation = __DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'Symfony-locale.zip';
         $firstResponse = static fn (): ResponseInterface => new JsonMockResponse(
@@ -751,7 +751,7 @@ class LokaliseProviderTest extends ProviderTestCase
     }
 
     #[RequiresPhpExtension('zip')]
-    public function testReadWithExportAsyncFailedProcess()
+    public function testReadWithExportAsyncFailedProcess(): void
     {
         $firstResponse = static fn (): ResponseInterface => new JsonMockResponse(
             ['error' => ['code' => 413, 'message' => 'test']],
@@ -773,7 +773,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $provider->read(['foo'], ['baz']);
     }
 
-    public function testDeleteProcess()
+    public function testDeleteProcess(): void
     {
         $getKeysIdsForMessagesDomainResponse = function (string $method, string $url, array $options = []): ResponseInterface {
             $expectedQuery = [
@@ -849,7 +849,7 @@ class LokaliseProviderTest extends ProviderTestCase
         $provider->delete($translatorBag);
     }
 
-    public function testDeleteProcessWhenLocalTranslationsMatchLokaliseTranslations()
+    public function testDeleteProcessWhenLocalTranslationsMatchLokaliseTranslations(): void
     {
         $failOnDeleteRequest = function (string $method, string $url, array $options = []): void {
             $this->assertSame('DELETE', $method);

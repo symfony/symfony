@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 
 final class LinkedInOptionsTest extends TestCase
 {
-    public function testLinkedInOptions()
+    public function testLinkedInOptions(): void
     {
         $options = new LinkedInOptions([
             'contentCertificationRecord' => 'test_record',
@@ -36,7 +36,7 @@ final class LinkedInOptionsTest extends TestCase
         $this->assertNull($options->getRecipientId());
     }
 
-    public function testLinkedInOptionsWithAllMethods()
+    public function testLinkedInOptionsWithAllMethods(): void
     {
         $author = new AuthorShare('123456');
         $lifecycleState = new LifecycleStateShare('PUBLISHED');
@@ -80,7 +80,7 @@ final class LinkedInOptionsTest extends TestCase
         $this->assertSame('urn:li:person:123456', $options->getAuthor());
     }
 
-    public function testFromNotification()
+    public function testFromNotification(): void
     {
         $notification = new Notification('Test Subject');
         $notification->content('Test Content');
@@ -106,7 +106,7 @@ final class LinkedInOptionsTest extends TestCase
         $this->assertSame($expected, $options->toArray());
     }
 
-    public function testFromNotificationWithoutContent()
+    public function testFromNotificationWithoutContent(): void
     {
         $notification = new Notification('Test Subject Only');
 
@@ -131,7 +131,7 @@ final class LinkedInOptionsTest extends TestCase
         $this->assertSame($expected, $options->toArray());
     }
 
-    public function testOptionsChaining()
+    public function testOptionsChaining(): void
     {
         $options = new LinkedInOptions();
 

@@ -20,7 +20,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RedirectableCompiledUrlMatcherTest extends TestCase
 {
-    public function testRedirectWhenNoSlash()
+    public function testRedirectWhenNoSlash(): void
     {
         $routes = new RouteCollection();
         $routes->add('foo', new Route('/foo/'));
@@ -41,7 +41,7 @@ class RedirectableCompiledUrlMatcherTest extends TestCase
         );
     }
 
-    public function testSchemeRedirect()
+    public function testSchemeRedirect(): void
     {
         $routes = new RouteCollection();
         $routes->add('foo', new Route('/foo', [], [], [], '', ['https']));

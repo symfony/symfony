@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class ContainerCommandLoaderTest extends TestCase
 {
-    public function testHas()
+    public function testHas(): void
     {
         $loader = new ContainerCommandLoader(new ServiceLocator([
             'foo-service' => static fn () => new Command('foo'),
@@ -31,7 +31,7 @@ class ContainerCommandLoaderTest extends TestCase
         $this->assertFalse($loader->has('baz'));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $loader = new ContainerCommandLoader(new ServiceLocator([
             'foo-service' => static fn () => new Command('foo'),
@@ -42,13 +42,13 @@ class ContainerCommandLoaderTest extends TestCase
         $this->assertInstanceOf(Command::class, $loader->get('bar'));
     }
 
-    public function testGetUnknownCommandThrows()
+    public function testGetUnknownCommandThrows(): void
     {
         $this->expectException(CommandNotFoundException::class);
         (new ContainerCommandLoader(new ServiceLocator([]), []))->get('unknown');
     }
 
-    public function testGetCommandNames()
+    public function testGetCommandNames(): void
     {
         $loader = new ContainerCommandLoader(new ServiceLocator([
             'foo-service' => static fn () => new Command('foo'),

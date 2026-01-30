@@ -16,25 +16,25 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class JsonResponseTest extends TestCase
 {
-    public function testConstructorEmptyCreatesJsonObject()
+    public function testConstructorEmptyCreatesJsonObject(): void
     {
         $response = new JsonResponse();
         $this->assertSame('{}', $response->getContent());
     }
 
-    public function testConstructorWithArrayCreatesJsonArray()
+    public function testConstructorWithArrayCreatesJsonArray(): void
     {
         $response = new JsonResponse([0, 1, 2, 3]);
         $this->assertSame('[0,1,2,3]', $response->getContent());
     }
 
-    public function testConstructorWithAssocArrayCreatesJsonObject()
+    public function testConstructorWithAssocArrayCreatesJsonObject(): void
     {
         $response = new JsonResponse(['foo' => 'bar']);
         $this->assertSame('{"foo":"bar"}', $response->getContent());
     }
 
-    public function testConstructorWithSimpleTypes()
+    public function testConstructorWithSimpleTypes(): void
     {
         $response = new JsonResponse('foo');
         $this->assertSame('"foo"', $response->getContent());
@@ -50,26 +50,26 @@ class JsonResponseTest extends TestCase
         $this->assertSame('true', $response->getContent());
     }
 
-    public function testConstructorWithCustomStatus()
+    public function testConstructorWithCustomStatus(): void
     {
         $response = new JsonResponse([], 202);
         $this->assertSame(202, $response->getStatusCode());
     }
 
-    public function testConstructorAddsContentTypeHeader()
+    public function testConstructorAddsContentTypeHeader(): void
     {
         $response = new JsonResponse();
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
     }
 
-    public function testConstructorWithCustomHeaders()
+    public function testConstructorWithCustomHeaders(): void
     {
         $response = new JsonResponse([], 200, ['ETag' => 'foo']);
         $this->assertSame('application/json', $response->headers->get('Content-Type'));
         $this->assertSame('foo', $response->headers->get('ETag'));
     }
 
-    public function testConstructorWithCustomContentType()
+    public function testConstructorWithCustomContentType(): void
     {
         $headers = ['Content-Type' => 'application/vnd.acme.blog-v1+json'];
 
@@ -77,7 +77,7 @@ class JsonResponseTest extends TestCase
         $this->assertSame('application/vnd.acme.blog-v1+json', $response->headers->get('Content-Type'));
     }
 
-    public function testSetJson()
+    public function testSetJson(): void
     {
         $response = new JsonResponse('1', 200, [], true);
         $this->assertEquals('1', $response->getContent());
@@ -90,7 +90,7 @@ class JsonResponseTest extends TestCase
         $this->assertEquals('true', $response->getContent());
     }
 
-    public function testSetCallback()
+    public function testSetCallback(): void
     {
         $response = (new JsonResponse(['foo' => 'bar']))->setCallback('callback');
 
@@ -98,21 +98,21 @@ class JsonResponseTest extends TestCase
         $this->assertEquals('text/javascript', $response->headers->get('Content-Type'));
     }
 
-    public function testJsonEncodeFlags()
+    public function testJsonEncodeFlags(): void
     {
         $response = new JsonResponse('<>\'&"');
 
         $this->assertEquals('"\u003C\u003E\u0027\u0026\u0022"', $response->getContent());
     }
 
-    public function testGetEncodingOptions()
+    public function testGetEncodingOptions(): void
     {
         $response = new JsonResponse();
 
         $this->assertEquals(\JSON_HEX_TAG | \JSON_HEX_APOS | \JSON_HEX_AMP | \JSON_HEX_QUOT, $response->getEncodingOptions());
     }
 
-    public function testSetEncodingOptions()
+    public function testSetEncodingOptions(): void
     {
         $response = new JsonResponse();
         $response->setData([[1, 2, 3]]);
@@ -124,26 +124,26 @@ class JsonResponseTest extends TestCase
         $this->assertEquals('{"0":{"0":1,"1":2,"2":3}}', $response->getContent());
     }
 
-    public function testItAcceptsJsonAsString()
+    public function testItAcceptsJsonAsString(): void
     {
         $response = JsonResponse::fromJsonString('{"foo":"bar"}');
         $this->assertSame('{"foo":"bar"}', $response->getContent());
     }
 
-    public function testSetCallbackInvalidIdentifier()
+    public function testSetCallbackInvalidIdentifier(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $response = new JsonResponse('foo');
         $response->setCallback('+invalid');
     }
 
-    public function testSetContent()
+    public function testSetContent(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new JsonResponse("\xB1\x31");
     }
 
-    public function testSetContentJsonSerializeError()
+    public function testSetContentJsonSerializeError(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('This error is expected');
@@ -153,7 +153,7 @@ class JsonResponseTest extends TestCase
         new JsonResponse($serializable);
     }
 
-    public function testSetComplexCallback()
+    public function testSetComplexCallback(): void
     {
         $response = new JsonResponse(['foo' => 'bar']);
         $response->setCallback('ಠ_ಠ["foo"].bar[0]');
@@ -161,7 +161,7 @@ class JsonResponseTest extends TestCase
         $this->assertEquals('/**/ಠ_ಠ["foo"].bar[0]({"foo":"bar"});', $response->getContent());
     }
 
-    public function testConstructorWithNullAsDataThrowsAnUnexpectedValueException()
+    public function testConstructorWithNullAsDataThrowsAnUnexpectedValueException(): void
     {
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('If $json is set to true, argument $data must be a string or object implementing __toString(), "null" given.');
@@ -169,7 +169,7 @@ class JsonResponseTest extends TestCase
         new JsonResponse(null, 200, [], true);
     }
 
-    public function testConstructorWithObjectWithToStringMethod()
+    public function testConstructorWithObjectWithToStringMethod(): void
     {
         $class = new class {
             public function __toString(): string
@@ -183,7 +183,7 @@ class JsonResponseTest extends TestCase
         $this->assertSame('{}', $response->getContent());
     }
 
-    public function testConstructorWithObjectWithoutToStringMethodThrowsAnException()
+    public function testConstructorWithObjectWithoutToStringMethodThrowsAnException(): void
     {
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('If $json is set to true, argument $data must be a string or object implementing __toString(), "stdClass" given.');
@@ -191,7 +191,7 @@ class JsonResponseTest extends TestCase
         new JsonResponse(new \stdClass(), 200, [], true);
     }
 
-    public function testSetDataWithNull()
+    public function testSetDataWithNull(): void
     {
         $response = new JsonResponse();
         $response->setData(null);

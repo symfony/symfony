@@ -21,19 +21,19 @@ use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
  */
 class AttributeMetadataTest extends TestCase
 {
-    public function testInterface()
+    public function testInterface(): void
     {
         $attributeMetadata = new AttributeMetadata('name');
         $this->assertInstanceOf(AttributeMetadataInterface::class, $attributeMetadata);
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $attributeMetadata = new AttributeMetadata('name');
         $this->assertEquals('name', $attributeMetadata->getName());
     }
 
-    public function testGroups()
+    public function testGroups(): void
     {
         $attributeMetadata = new AttributeMetadata('group');
         $attributeMetadata->addGroup('a');
@@ -43,7 +43,7 @@ class AttributeMetadataTest extends TestCase
         $this->assertEquals(['a', 'b'], $attributeMetadata->getGroups());
     }
 
-    public function testMaxDepth()
+    public function testMaxDepth(): void
     {
         $attributeMetadata = new AttributeMetadata('name');
         $attributeMetadata->setMaxDepth(69);
@@ -51,7 +51,7 @@ class AttributeMetadataTest extends TestCase
         $this->assertEquals(69, $attributeMetadata->getMaxDepth());
     }
 
-    public function testSerializedName()
+    public function testSerializedName(): void
     {
         $attributeMetadata = new AttributeMetadata('name');
         $attributeMetadata->setSerializedName('serialized_name');
@@ -59,7 +59,7 @@ class AttributeMetadataTest extends TestCase
         $this->assertEquals('serialized_name', $attributeMetadata->getSerializedName());
     }
 
-    public function testSerializedPath()
+    public function testSerializedPath(): void
     {
         $attributeMetadata = new AttributeMetadata('path');
         $serializedPath = new PropertyPath('[serialized][path]');
@@ -68,7 +68,7 @@ class AttributeMetadataTest extends TestCase
         $this->assertEquals($serializedPath, $attributeMetadata->getSerializedPath());
     }
 
-    public function testIgnore()
+    public function testIgnore(): void
     {
         $attributeMetadata = new AttributeMetadata('ignored');
         $this->assertFalse($attributeMetadata->isIgnored());
@@ -76,7 +76,7 @@ class AttributeMetadataTest extends TestCase
         $this->assertTrue($attributeMetadata->isIgnored());
     }
 
-    public function testSetContexts()
+    public function testSetContexts(): void
     {
         $metadata = new AttributeMetadata('a1');
         $metadata->setNormalizationContextForGroups(['foo' => 'default', 'bar' => 'default'], []);
@@ -102,7 +102,7 @@ class AttributeMetadataTest extends TestCase
         ], $metadata->getDenormalizationContexts());
     }
 
-    public function testGetContextsForGroups()
+    public function testGetContextsForGroups(): void
     {
         $metadata = new AttributeMetadata('a1');
 
@@ -127,7 +127,7 @@ class AttributeMetadataTest extends TestCase
         self::assertSame(['foo' => 'overridden', 'bar' => 'overridden'], $metadata->getDenormalizationContextForGroups(['b', 'c']));
     }
 
-    public function testMerge()
+    public function testMerge(): void
     {
         $serializedPath = new PropertyPath('[a4][a5]');
         $attributeMetadata1 = new AttributeMetadata('a1');
@@ -156,7 +156,7 @@ class AttributeMetadataTest extends TestCase
         $this->assertTrue($attributeMetadata1->isIgnored());
     }
 
-    public function testContextsNotMergedIfAlreadyDefined()
+    public function testContextsNotMergedIfAlreadyDefined(): void
     {
         $attributeMetadata1 = new AttributeMetadata('a1');
         $attributeMetadata1->setNormalizationContextForGroups(['foo' => 'not overridden'], ['a']);
@@ -172,7 +172,7 @@ class AttributeMetadataTest extends TestCase
         self::assertSame(['b' => ['baz' => 'not overridden']], $attributeMetadata1->getDenormalizationContexts());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $attributeMetadata = new AttributeMetadata('attribute');
         $attributeMetadata->addGroup('a');

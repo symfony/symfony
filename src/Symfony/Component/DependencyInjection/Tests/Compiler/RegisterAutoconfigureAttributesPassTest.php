@@ -35,7 +35,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\StaticConstructorAutoco
 
 class RegisterAutoconfigureAttributesPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', AutoconfigureAttributed::class)
@@ -61,7 +61,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $this->assertEquals([AutoconfigureAttributed::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 
-    public function testIgnoreAttribute()
+    public function testIgnoreAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', AutoconfigureAttributed::class)
@@ -73,7 +73,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $this->assertSame([], $container->getAutoconfiguredInstanceof());
     }
 
-    public function testAutoconfiguredTag()
+    public function testAutoconfiguredTag(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', AutoconfiguredInterface::class)
@@ -87,7 +87,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $this->assertEquals([AutoconfiguredInterface::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 
-    public function testAutoconfiguredRepeated()
+    public function testAutoconfiguredRepeated(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', AutoconfigureRepeated::class)
@@ -103,7 +103,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $this->assertEquals([AutoconfigureRepeated::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 
-    public function testAutoconfiguredRepeatedOverwrite()
+    public function testAutoconfiguredRepeatedOverwrite(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', AutoconfigureRepeatedOverwrite::class)
@@ -119,7 +119,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $this->assertEquals([AutoconfigureRepeatedOverwrite::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 
-    public function testAutoconfiguredRepeatedTag()
+    public function testAutoconfiguredRepeatedTag(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', AutoconfigureRepeatedTag::class)
@@ -134,7 +134,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $this->assertEquals([AutoconfigureRepeatedTag::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 
-    public function testAutoconfiguredRepeatedCalls()
+    public function testAutoconfiguredRepeatedCalls(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', AutoconfigureRepeatedCalls::class)
@@ -149,7 +149,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $this->assertEquals([AutoconfigureRepeatedCalls::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 
-    public function testAutoconfiguredRepeatedBindingsOverwrite()
+    public function testAutoconfiguredRepeatedBindingsOverwrite(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', AutoconfigureRepeatedBindings::class)
@@ -163,7 +163,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $this->assertEquals([AutoconfigureRepeatedBindings::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 
-    public function testAutoconfiguredRepeatedPropertiesOverwrite()
+    public function testAutoconfiguredRepeatedPropertiesOverwrite(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', AutoconfigureRepeatedProperties::class)
@@ -180,7 +180,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $this->assertEquals([AutoconfigureRepeatedProperties::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 
-    public function testMissingParent()
+    public function testMissingParent(): void
     {
         $container = new ContainerBuilder();
 
@@ -192,7 +192,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testStaticConstructor()
+    public function testStaticConstructor(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', StaticConstructorAutoconfigure::class)
@@ -209,7 +209,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $this->assertEquals([StaticConstructorAutoconfigure::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 
-    public function testLazyServiceAttribute()
+    public function testLazyServiceAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', LazyLoaded::class)
@@ -223,7 +223,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $this->assertEquals([LazyLoaded::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 
-    public function testLazyNotCompatibleWithAutoconfigureAttribute()
+    public function testLazyNotCompatibleWithAutoconfigureAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', LazyAutoconfigured::class)
@@ -236,7 +236,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         }
     }
 
-    public function testMultipleAutoconfigureAllowed()
+    public function testMultipleAutoconfigureAllowed(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', MultipleAutoconfigureAttributed::class)
@@ -251,7 +251,7 @@ class RegisterAutoconfigureAttributesPassTest extends TestCase
         $this->assertEquals([MultipleAutoconfigureAttributed::class => $expected], $container->getAutoconfiguredInstanceof());
     }
 
-    public function testAutoconfiguredResourceTags()
+    public function testAutoconfiguredResourceTags(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', AutoconfigureResourceTagsAttributed::class)

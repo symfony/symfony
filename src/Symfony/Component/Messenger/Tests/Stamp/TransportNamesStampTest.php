@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Serializer as SymfonySerializer;
 
 class TransportNamesStampTest extends TestCase
 {
-    public function testGetSenders()
+    public function testGetSenders(): void
     {
         $configuredSenders = ['first_transport', 'second_transport', 'other_transport'];
         $stamp = new TransportNamesStamp($configuredSenders);
@@ -34,7 +34,7 @@ class TransportNamesStampTest extends TestCase
         }
     }
 
-    public function testDeserialization()
+    public function testDeserialization(): void
     {
         $stamp = new TransportNamesStamp(['foo']);
         $serializer = new Serializer(
@@ -51,7 +51,7 @@ class TransportNamesStampTest extends TestCase
         $this->assertEquals($stamp, $deserializedStamp);
     }
 
-    public function testGetIndividualSender()
+    public function testGetIndividualSender(): void
     {
         $stamp = new TransportNamesStamp('first_transport');
         $stampSenders = $stamp->getTransportNames();

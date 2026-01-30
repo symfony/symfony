@@ -21,7 +21,7 @@ use Symfony\Component\Mime\Email;
 class SendgridSmtpTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(SendgridSmtpTransport $transport, string $expected)
+    public function testToString(SendgridSmtpTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -44,7 +44,7 @@ class SendgridSmtpTransportTest extends TestCase
         ];
     }
 
-    public function testSuppressionGroupHeader()
+    public function testSuppressionGroupHeader(): void
     {
         $email = (new Email())->subject('Hello!')
             ->to(new Address('kevin@symfony.com', 'Kevin'))

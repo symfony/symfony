@@ -36,7 +36,7 @@ class IntegerTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testArabicLocale()
+    public function testArabicLocale(): void
     {
         \Locale::setDefault('ar');
 
@@ -48,7 +48,7 @@ class IntegerTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testArabicLocaleNonHtml5()
+    public function testArabicLocaleNonHtml5(): void
     {
         \Locale::setDefault('ar');
 
@@ -59,7 +59,7 @@ class IntegerTypeTest extends BaseTypeTestCase
         $this->assertSame('١٢٣٬٤٥٦', $form->getViewData());
     }
 
-    public function testSubmitRejectsFloats()
+    public function testSubmitRejectsFloats(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
 
@@ -70,12 +70,12 @@ class IntegerTypeTest extends BaseTypeTestCase
         $this->assertFalse($form->isSynchronized());
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = '10', $expectedData = 10)
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = '10', $expectedData = 10): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => $emptyData,
@@ -87,7 +87,7 @@ class IntegerTypeTest extends BaseTypeTestCase
         $this->assertSame($expectedData, $form->getData());
     }
 
-    public function testSubmittedLargeIntegersAreNotCastToFloat()
+    public function testSubmittedLargeIntegersAreNotCastToFloat(): void
     {
         if (4 === \PHP_INT_SIZE) {
             $this->markTestSkipped('This test requires a 64bit PHP.');
@@ -100,7 +100,7 @@ class IntegerTypeTest extends BaseTypeTestCase
         $this->assertSame('201803221011791', $form->getViewData());
     }
 
-    public function testTooSmallIntegersAreNotValid()
+    public function testTooSmallIntegersAreNotValid(): void
     {
         if (4 === \PHP_INT_SIZE) {
             $min = '-2147483649';
@@ -114,7 +114,7 @@ class IntegerTypeTest extends BaseTypeTestCase
         $this->assertFalse($form->isSynchronized());
     }
 
-    public function testTooGreatIntegersAreNotValid()
+    public function testTooGreatIntegersAreNotValid(): void
     {
         if (4 === \PHP_INT_SIZE) {
             $max = '2147483648';

@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ReverseContainer;
 
 class RegisterReverseContainerPassTest extends TestCase
 {
-    public function testCompileRemovesUnusedServices()
+    public function testCompileRemovesUnusedServices(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass');
@@ -36,7 +36,7 @@ class RegisterReverseContainerPassTest extends TestCase
         $this->assertFalse($container->has('foo'));
     }
 
-    public function testPublicServices()
+    public function testPublicServices(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->setPublic(true);
@@ -55,7 +55,7 @@ class RegisterReverseContainerPassTest extends TestCase
         $this->assertSame($foo, $container->get('reverse_container')->getService('foo'));
     }
 
-    public function testReversibleServices()
+    public function testReversibleServices(): void
     {
         $container = new ContainerBuilder();
         $container->register('bar', 'stdClass')->setProperty('foo', new Reference('foo'))->setPublic(true);

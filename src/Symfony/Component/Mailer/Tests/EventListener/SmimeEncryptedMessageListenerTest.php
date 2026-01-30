@@ -28,7 +28,7 @@ use Symfony\Component\Mime\Part\TextPart;
 class SmimeEncryptedMessageListenerTest extends TestCase
 {
     #[RequiresPhpExtension('openssl')]
-    public function testSmimeMessageEncryptionProcess()
+    public function testSmimeMessageEncryptionProcess(): void
     {
         $repository = $this->createStub(SmimeCertificateRepositoryInterface::class);
         $repository->method('findCertificatePathFor')->willReturn(\dirname(__DIR__).'/Fixtures/sign.crt');
@@ -51,7 +51,7 @@ class SmimeEncryptedMessageListenerTest extends TestCase
     }
 
     #[RequiresPhpExtension('openssl')]
-    public function testMessageNotEncryptedWhenOneRecipientCertificateIsMissing()
+    public function testMessageNotEncryptedWhenOneRecipientCertificateIsMissing(): void
     {
         $repository = $this->createStub(SmimeCertificateRepositoryInterface::class);
         $repository->method('findCertificatePathFor')->willReturnOnConsecutiveCalls(\dirname(__DIR__).'/Fixtures/sign.crt', null);
@@ -76,7 +76,7 @@ class SmimeEncryptedMessageListenerTest extends TestCase
     }
 
     #[RequiresPhpExtension('openssl')]
-    public function testMessageNotExplicitlyAskedForNonEncryption()
+    public function testMessageNotExplicitlyAskedForNonEncryption(): void
     {
         $repository = $this->createStub(SmimeCertificateRepositoryInterface::class);
         $repository->method('findCertificatePathFor')->willReturn(\dirname(__DIR__).'/Fixtures/sign.crt');

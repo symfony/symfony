@@ -40,7 +40,7 @@ class ChainCompressorTest extends TestCase
         $this->filesystem->remove(self::WRITABLE_ROOT);
     }
 
-    public function testCompress()
+    public function testCompress(): void
     {
         $extensions = [];
         if (null === (new GzipCompressor())->getUnsupportedReason()) {

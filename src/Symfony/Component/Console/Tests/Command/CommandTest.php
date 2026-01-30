@@ -39,20 +39,20 @@ class CommandTest extends TestCase
         require_once self::$fixturesPath.'/TestCommand.php';
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $command = new Command('foo:bar');
         $this->assertEquals('foo:bar', $command->getName(), '__construct() takes the command name as its first argument');
     }
 
-    public function testCommandNameCannotBeEmpty()
+    public function testCommandNameCannotBeEmpty(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The command defined in "Symfony\Component\Console\Command\Command" cannot have an empty name.');
         (new Application())->addCommand(new Command());
     }
 
-    public function testSetApplication()
+    public function testSetApplication(): void
     {
         $application = new Application();
         $command = new \TestCommand();
@@ -61,14 +61,14 @@ class CommandTest extends TestCase
         $this->assertEquals($application->getHelperSet(), $command->getHelperSet());
     }
 
-    public function testSetApplicationNull()
+    public function testSetApplicationNull(): void
     {
         $command = new \TestCommand();
         $command->setApplication(null);
         $this->assertNull($command->getHelperSet());
     }
 
-    public function testSetGetDefinition()
+    public function testSetGetDefinition(): void
     {
         $command = new \TestCommand();
         $ret = $command->setDefinition($definition = new InputDefinition());
@@ -80,7 +80,7 @@ class CommandTest extends TestCase
         $command->setDefinition(new InputDefinition());
     }
 
-    public function testAddArgument()
+    public function testAddArgument(): void
     {
         $command = new \TestCommand();
         $ret = $command->addArgument('foo');
@@ -88,7 +88,7 @@ class CommandTest extends TestCase
         $this->assertTrue($command->getDefinition()->hasArgument('foo'), '->addArgument() adds an argument to the command');
     }
 
-    public function testAddArgumentFull()
+    public function testAddArgumentFull(): void
     {
         $command = new \TestCommand();
         $command->addArgument('foo', InputArgument::OPTIONAL, 'Description', 'default', ['a', 'b']);
@@ -98,7 +98,7 @@ class CommandTest extends TestCase
         $this->assertTrue($argument->hasCompletion());
     }
 
-    public function testAddOption()
+    public function testAddOption(): void
     {
         $command = new \TestCommand();
         $ret = $command->addOption('foo');
@@ -106,7 +106,7 @@ class CommandTest extends TestCase
         $this->assertTrue($command->getDefinition()->hasOption('foo'), '->addOption() adds an option to the command');
     }
 
-    public function testAddOptionFull()
+    public function testAddOptionFull(): void
     {
         $command = new \TestCommand();
         $command->addOption('foo', ['f'], InputOption::VALUE_OPTIONAL, 'Description', 'default', ['a', 'b']);
@@ -117,14 +117,14 @@ class CommandTest extends TestCase
         $this->assertTrue($option->hasCompletion());
     }
 
-    public function testSetHidden()
+    public function testSetHidden(): void
     {
         $command = new \TestCommand();
         $command->setHidden();
         $this->assertTrue($command->isHidden());
     }
 
-    public function testGetNamespaceGetNameSetName()
+    public function testGetNamespaceGetNameSetName(): void
     {
         $command = new \TestCommand();
         $this->assertEquals('namespace:name', $command->getName(), '->getName() returns the command name');
@@ -137,7 +137,7 @@ class CommandTest extends TestCase
     }
 
     #[DataProvider('provideInvalidCommandNames')]
-    public function testInvalidCommandNames($name)
+    public function testInvalidCommandNames($name): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('Command name "%s" is invalid.', $name));
@@ -153,7 +153,7 @@ class CommandTest extends TestCase
         ];
     }
 
-    public function testGetSetDescription()
+    public function testGetSetDescription(): void
     {
         $command = new \TestCommand();
         $this->assertEquals('description', $command->getDescription(), '->getDescription() returns the description');
@@ -162,7 +162,7 @@ class CommandTest extends TestCase
         $this->assertEquals('description1', $command->getDescription(), '->setDescription() sets the description');
     }
 
-    public function testGetSetHelp()
+    public function testGetSetHelp(): void
     {
         $command = new \TestCommand();
         $this->assertEquals('help', $command->getHelp(), '->getHelp() returns the help');
@@ -173,7 +173,7 @@ class CommandTest extends TestCase
         $this->assertEquals('', $command->getHelp(), '->getHelp() does not fall back to the description');
     }
 
-    public function testGetProcessedHelp()
+    public function testGetProcessedHelp(): void
     {
         $command = new \TestCommand();
         $command->setHelp('The %command.name% command does... Example: %command.full_name%.');
@@ -193,7 +193,7 @@ class CommandTest extends TestCase
         $this->assertStringNotContainsString('%command.full_name%', $command->getProcessedHelp(), '->getProcessedHelp() replaces %command.full_name% in single command applications');
     }
 
-    public function testGetSetAliases()
+    public function testGetSetAliases(): void
     {
         $command = new \TestCommand();
         $ret = $command->setAliases(['name1']);
@@ -201,7 +201,7 @@ class CommandTest extends TestCase
         $this->assertEquals(['name1'], $command->getAliases(), '->setAliases() sets the aliases');
     }
 
-    public function testAliasesSetBeforeParentConstructorArePreserved()
+    public function testAliasesSetBeforeParentConstructorArePreserved(): void
     {
         $command = new class extends Command {
             public function __construct()
@@ -217,7 +217,7 @@ class CommandTest extends TestCase
 
     #[TestWith(['name|alias1|alias2', 'name', ['alias1', 'alias2'], false])]
     #[TestWith(['|alias1|alias2', 'alias1', ['alias2'], true])]
-    public function testSetAliasesAndHiddenViaName(string $name, string $expectedName, array $expectedAliases, bool $expectedHidden)
+    public function testSetAliasesAndHiddenViaName(string $name, string $expectedName, array $expectedAliases, bool $expectedHidden): void
     {
         $command = new Command($name);
 
@@ -226,7 +226,7 @@ class CommandTest extends TestCase
         self::assertSame($expectedAliases, $command->getAliases());
     }
 
-    public function testGetSynopsis()
+    public function testGetSynopsis(): void
     {
         $command = new \TestCommand();
         $command->addOption('foo');
@@ -235,7 +235,7 @@ class CommandTest extends TestCase
         $this->assertEquals('namespace:name [--foo] [--] [<bar> [<info>]]', $command->getSynopsis(), '->getSynopsis() returns the synopsis');
     }
 
-    public function testAddGetUsages()
+    public function testAddGetUsages(): void
     {
         $command = new \TestCommand();
         $command->addUsage('foo1');
@@ -244,7 +244,7 @@ class CommandTest extends TestCase
         $this->assertContains('namespace:name foo2', $command->getUsages());
     }
 
-    public function testGetHelper()
+    public function testGetHelper(): void
     {
         $application = new Application();
         $command = new \TestCommand();
@@ -253,14 +253,14 @@ class CommandTest extends TestCase
         $this->assertEquals($formatterHelper->getName(), $command->getHelper('formatter')->getName(), '->getHelper() returns the correct helper');
     }
 
-    public function testGetHelperWithoutHelperSet()
+    public function testGetHelperWithoutHelperSet(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot retrieve helper "formatter" because there is no HelperSet defined.');
         (new \TestCommand())->getHelper('formatter');
     }
 
-    public function testMergeApplicationDefinition()
+    public function testMergeApplicationDefinition(): void
     {
         $application1 = new Application();
         $application1->getDefinition()->addArguments([new InputArgument('foo')]);
@@ -281,7 +281,7 @@ class CommandTest extends TestCase
         $this->assertEquals(3, $command->getDefinition()->getArgumentCount(), '->mergeApplicationDefinition() does not try to merge twice the application arguments and options');
     }
 
-    public function testMergeApplicationDefinitionWithoutArgsThenWithArgsAddsArgs()
+    public function testMergeApplicationDefinitionWithoutArgsThenWithArgsAddsArgs(): void
     {
         $application1 = new Application();
         $application1->getDefinition()->addArguments([new InputArgument('foo')]);
@@ -303,7 +303,7 @@ class CommandTest extends TestCase
         $this->assertEquals(2, $command->getDefinition()->getArgumentCount(), '->mergeApplicationDefinition() does not try to merge twice the application arguments');
     }
 
-    public function testRunInteractive()
+    public function testRunInteractive(): void
     {
         $tester = new CommandTester(new \TestCommand());
 
@@ -312,7 +312,7 @@ class CommandTest extends TestCase
         $this->assertEquals('interact called'.\PHP_EOL.'execute called'.\PHP_EOL, $tester->getDisplay(), '->run() calls the interact() method if the input is interactive');
     }
 
-    public function testInvokableCommand()
+    public function testInvokableCommand(): void
     {
         $invokable = new InvokableTestCommand();
         $command = new Command(null, $invokable);
@@ -327,7 +327,7 @@ class CommandTest extends TestCase
         $this->assertSame(Command::SUCCESS, $tester->execute([]));
     }
 
-    public function testRunNonInteractive()
+    public function testRunNonInteractive(): void
     {
         $tester = new CommandTester(new \TestCommand());
 
@@ -336,14 +336,14 @@ class CommandTest extends TestCase
         $this->assertEquals('execute called'.\PHP_EOL, $tester->getDisplay(), '->run() does not call the interact() method if the input is not interactive');
     }
 
-    public function testExecuteMethodNeedsToBeOverridden()
+    public function testExecuteMethodNeedsToBeOverridden(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('You must override the execute() method in the concrete command class.');
         (new Command('foo'))->run(new StringInput(''), new NullOutput());
     }
 
-    public function testRunWithInvalidOption()
+    public function testRunWithInvalidOption(): void
     {
         $command = new \TestCommand();
         $tester = new CommandTester($command);
@@ -354,7 +354,7 @@ class CommandTest extends TestCase
         $tester->execute(['--bar' => true]);
     }
 
-    public function testRunWithApplication()
+    public function testRunWithApplication(): void
     {
         $command = new \TestCommand();
         $command->setApplication(new Application());
@@ -363,14 +363,14 @@ class CommandTest extends TestCase
         $this->assertSame(0, $exitCode, '->run() returns an integer exit code');
     }
 
-    public function testRunReturnsAlwaysInteger()
+    public function testRunReturnsAlwaysInteger(): void
     {
         $command = new \TestCommand();
 
         $this->assertSame(0, $command->run(new StringInput(''), new NullOutput()));
     }
 
-    public function testRunWithProcessTitle()
+    public function testRunWithProcessTitle(): void
     {
         $command = new \TestCommand();
         $command->setApplication(new Application());
@@ -384,7 +384,7 @@ class CommandTest extends TestCase
         }
     }
 
-    public function testSetCode()
+    public function testSetCode(): void
     {
         $command = new \TestCommand();
         $ret = $command->setCode(static function (InputInterface $input, OutputInterface $output): int {
@@ -407,7 +407,7 @@ class CommandTest extends TestCase
     }
 
     #[DataProvider('getSetCodeBindToClosureTests')]
-    public function testSetCodeBindToClosure($previouslyBound, $expected)
+    public function testSetCodeBindToClosure($previouslyBound, $expected): void
     {
         $code = createClosure();
         if ($previouslyBound) {
@@ -421,7 +421,7 @@ class CommandTest extends TestCase
         $this->assertEquals('interact called'.\PHP_EOL.$expected.\PHP_EOL, $tester->getDisplay());
     }
 
-    public function testSetCodeWithStaticClosure()
+    public function testSetCodeWithStaticClosure(): void
     {
         $command = new \TestCommand();
         $command->setCode(self::createClosure());
@@ -440,7 +440,7 @@ class CommandTest extends TestCase
         };
     }
 
-    public function testSetCodeWithNonClosureCallable()
+    public function testSetCodeWithNonClosureCallable(): void
     {
         $command = new \TestCommand();
         $ret = $command->setCode($this->callableMethodCommand(...));
@@ -457,7 +457,7 @@ class CommandTest extends TestCase
         return 0;
     }
 
-    public function testSetCodeWithStaticAnonymousFunction()
+    public function testSetCodeWithStaticAnonymousFunction(): void
     {
         $command = new \TestCommand();
         $command->setCode(static function (InputInterface $input, OutputInterface $output): int {
@@ -471,7 +471,7 @@ class CommandTest extends TestCase
         $this->assertEquals('interact called'.\PHP_EOL.'not bound'.\PHP_EOL, $tester->getDisplay());
     }
 
-    public function testCommandAttribute()
+    public function testCommandAttribute(): void
     {
         $command = new Php8Command();
 
@@ -486,7 +486,7 @@ class CommandTest extends TestCase
         $this->assertNull($command->getCode());
     }
 
-    public function testDefaultCommand()
+    public function testDefaultCommand(): void
     {
         $apl = new Application();
         $apl->setDefaultCommand('foo');

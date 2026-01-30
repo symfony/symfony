@@ -42,7 +42,7 @@ class RouterTest extends TestCase
         }
     }
 
-    public function testSetOptionsWithSupportedOptions()
+    public function testSetOptionsWithSupportedOptions(): void
     {
         $router = $this->getRouter();
         $router->setOptions([
@@ -56,7 +56,7 @@ class RouterTest extends TestCase
         $this->assertSame('ResourceType', $router->getOption('resource_type'));
     }
 
-    public function testSetOptionsWithUnsupportedOptions()
+    public function testSetOptionsWithUnsupportedOptions(): void
     {
         $router = $this->getRouter();
         $this->expectException(\InvalidArgumentException::class);
@@ -69,7 +69,7 @@ class RouterTest extends TestCase
         ]);
     }
 
-    public function testSetOptionWithSupportedOption()
+    public function testSetOptionWithSupportedOption(): void
     {
         $router = $this->getRouter();
         $router->setOption('cache_dir', './cache');
@@ -77,7 +77,7 @@ class RouterTest extends TestCase
         $this->assertSame('./cache', $router->getOption('cache_dir'));
     }
 
-    public function testSetOptionWithUnsupportedOption()
+    public function testSetOptionWithUnsupportedOption(): void
     {
         $router = $this->getRouter();
         $this->expectException(\InvalidArgumentException::class);
@@ -85,7 +85,7 @@ class RouterTest extends TestCase
         $router->setOption('option_foo', true);
     }
 
-    public function testGetOptionWithUnsupportedOption()
+    public function testGetOptionWithUnsupportedOption(): void
     {
         $router = $this->getRouter();
         $this->expectException(\InvalidArgumentException::class);
@@ -93,7 +93,7 @@ class RouterTest extends TestCase
         $router->getOption('option_foo');
     }
 
-    public function testThatRouteCollectionIsLoaded()
+    public function testThatRouteCollectionIsLoaded(): void
     {
         $loader = $this->createMock(LoaderInterface::class);
         $router = $this->getRouter($loader);
@@ -108,7 +108,7 @@ class RouterTest extends TestCase
         $this->assertSame($routeCollection, $router->getRouteCollection());
     }
 
-    public function testMatcherIsCreatedIfCacheIsNotConfigured()
+    public function testMatcherIsCreatedIfCacheIsNotConfigured(): void
     {
         $loader = $this->createMock(LoaderInterface::class);
         $router = $this->getRouter($loader);
@@ -121,7 +121,7 @@ class RouterTest extends TestCase
         $this->assertInstanceOf(UrlMatcher::class, $router->getMatcher());
     }
 
-    public function testGeneratorIsCreatedIfCacheIsNotConfigured()
+    public function testGeneratorIsCreatedIfCacheIsNotConfigured(): void
     {
         $loader = $this->createMock(LoaderInterface::class);
         $router = $this->getRouter($loader);
@@ -134,7 +134,7 @@ class RouterTest extends TestCase
         $this->assertInstanceOf(CompiledUrlGenerator::class, $router->getGenerator());
     }
 
-    public function testGeneratorIsCreatedIfCacheIsNotConfiguredNotCompiled()
+    public function testGeneratorIsCreatedIfCacheIsNotConfiguredNotCompiled(): void
     {
         $loader = $this->createMock(LoaderInterface::class);
         $router = $this->getRouter($loader);
@@ -149,7 +149,7 @@ class RouterTest extends TestCase
         $this->assertNotInstanceOf(CompiledUrlGenerator::class, $router->getGenerator());
     }
 
-    public function testMatchRequestWithUrlMatcherInterface()
+    public function testMatchRequestWithUrlMatcherInterface(): void
     {
         $matcher = $this->createMock(UrlMatcherInterface::class);
         $matcher->expects($this->once())->method('match');
@@ -161,7 +161,7 @@ class RouterTest extends TestCase
         $router->matchRequest(Request::create('/'));
     }
 
-    public function testMatchRequestWithRequestMatcherInterface()
+    public function testMatchRequestWithRequestMatcherInterface(): void
     {
         $matcher = $this->createMock(RequestMatcherInterface::class);
         $matcher->expects($this->once())->method('matchRequest');
@@ -173,7 +173,7 @@ class RouterTest extends TestCase
         $router->matchRequest(Request::create('/'));
     }
 
-    public function testDefaultLocaleIsPassedToGeneratorClass()
+    public function testDefaultLocaleIsPassedToGeneratorClass(): void
     {
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->once())
@@ -193,7 +193,7 @@ class RouterTest extends TestCase
         $this->assertSame('hr', $p->getValue($generator));
     }
 
-    public function testDefaultLocaleIsPassedToCompiledGeneratorCacheClass()
+    public function testDefaultLocaleIsPassedToCompiledGeneratorCacheClass(): void
     {
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->once())

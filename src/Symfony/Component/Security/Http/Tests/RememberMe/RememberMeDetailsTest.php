@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\RememberMe\RememberMeDetails;
 
 class RememberMeDetailsTest extends TestCase
 {
-    public function testFromRawCookie()
+    public function testFromRawCookie(): void
     {
         $rememberMeDetails = RememberMeDetails::fromRawCookie(self::getRememberMeCookieValue());
 
@@ -28,7 +28,7 @@ class RememberMeDetailsTest extends TestCase
         $this->assertSame('series1:token_value', $rememberMeDetails->getValue());
     }
 
-    public function testFromRawCookieChildClassWithNewConstructorSignature()
+    public function testFromRawCookieChildClassWithNewConstructorSignature(): void
     {
         $rememberMeDetails = RememberMeDetailsChild::fromRawCookie(self::getRememberMeCookieValue());
 
@@ -38,7 +38,7 @@ class RememberMeDetailsTest extends TestCase
         $this->assertSame('series1:token_value', $rememberMeDetails->getValue());
     }
 
-    public function testFromRawCookieChildClassWithoutConstructor()
+    public function testFromRawCookieChildClassWithoutConstructor(): void
     {
         $rememberMeDetails = RememberMeDetailsChildWithoutConstructor::fromRawCookie(self::getRememberMeCookieValue());
 
@@ -48,7 +48,7 @@ class RememberMeDetailsTest extends TestCase
         $this->assertSame('series1:token_value', $rememberMeDetails->getValue());
     }
 
-    public function testFromLegacyRawCookie()
+    public function testFromLegacyRawCookie(): void
     {
         $rememberMeDetails = RememberMeDetails::fromRawCookie(self::getLegacyRememberMeCookieValue());
 
@@ -58,7 +58,7 @@ class RememberMeDetailsTest extends TestCase
         $this->assertSame('series1:token_value', $rememberMeDetails->getValue());
     }
 
-    public function testFromLegacyRawCookieChildClassWithNewConstructorSignature()
+    public function testFromLegacyRawCookieChildClassWithNewConstructorSignature(): void
     {
         $rememberMeDetails = RememberMeDetailsChild::fromRawCookie(self::getLegacyRememberMeCookieValue());
 
@@ -68,7 +68,7 @@ class RememberMeDetailsTest extends TestCase
         $this->assertSame('series1:token_value', $rememberMeDetails->getValue());
     }
 
-    public function testFromLegacyRawCookieChildClassWithoutConstructor()
+    public function testFromLegacyRawCookieChildClassWithoutConstructor(): void
     {
         $rememberMeDetails = RememberMeDetailsChildWithoutConstructor::fromRawCookie(self::getLegacyRememberMeCookieValue());
 
@@ -78,7 +78,7 @@ class RememberMeDetailsTest extends TestCase
         $this->assertSame('series1:token_value', $rememberMeDetails->getValue());
     }
 
-    public function testFromPersistentToken()
+    public function testFromPersistentToken(): void
     {
         if (method_exists(PersistentToken::class, 'getClass')) {
             $token = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'token_value', new \DateTimeImmutable(), false);
@@ -94,7 +94,7 @@ class RememberMeDetailsTest extends TestCase
         $this->assertSame('series1:token_value', $rememberMeDetails->getValue());
     }
 
-    public function testFromPersistentTokenChildClassWithNewConstructorSignature()
+    public function testFromPersistentTokenChildClassWithNewConstructorSignature(): void
     {
         if (method_exists(PersistentToken::class, 'getClass')) {
             $token = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'token_value', new \DateTimeImmutable(), false);
@@ -110,7 +110,7 @@ class RememberMeDetailsTest extends TestCase
         $this->assertSame('series1:token_value', $rememberMeDetails->getValue());
     }
 
-    public function testFromPersistentTokenChildClassWithoutConstructor()
+    public function testFromPersistentTokenChildClassWithoutConstructor(): void
     {
         if (method_exists(PersistentToken::class, 'getClass')) {
             $token = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'token_value', new \DateTimeImmutable(), false);

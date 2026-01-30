@@ -18,7 +18,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 class ChoiceQuestionTest extends TestCase
 {
     #[DataProvider('selectUseCases')]
-    public function testSelectUseCases($multiSelect, $answers, $expected, $message, $default = null)
+    public function testSelectUseCases($multiSelect, $answers, $expected, $message, $default = null): void
     {
         $question = new ChoiceQuestion('A question', [
             'First response',
@@ -87,7 +87,7 @@ class ChoiceQuestionTest extends TestCase
         ];
     }
 
-    public function testNonTrimmable()
+    public function testNonTrimmable(): void
     {
         $question = new ChoiceQuestion('A question', [
             'First response ',
@@ -104,7 +104,7 @@ class ChoiceQuestionTest extends TestCase
     }
 
     #[DataProvider('selectAssociativeChoicesProvider')]
-    public function testSelectAssociativeChoices($providedAnswer, $expectedValue)
+    public function testSelectAssociativeChoices($providedAnswer, $expectedValue): void
     {
         $question = new ChoiceQuestion('A question', [
             '0' => 'First choice',
@@ -130,7 +130,7 @@ class ChoiceQuestionTest extends TestCase
         ];
     }
 
-    public function testSelectWithNonStringChoices()
+    public function testSelectWithNonStringChoices(): void
     {
         $question = new ChoiceQuestion('A question', [
             $result1 = new StringChoice('foo'),

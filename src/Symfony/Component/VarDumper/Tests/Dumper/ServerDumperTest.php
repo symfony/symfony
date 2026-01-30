@@ -23,7 +23,7 @@ class ServerDumperTest extends TestCase
 {
     private const VAR_DUMPER_SERVER = 'tcp://127.0.0.1:9913';
 
-    public function testDumpForwardsToWrappedDumperWhenServerIsUnavailable()
+    public function testDumpForwardsToWrappedDumperWhenServerIsUnavailable(): void
     {
         $wrappedDumper = $this->createMock(DataDumperInterface::class);
 
@@ -37,7 +37,7 @@ class ServerDumperTest extends TestCase
         $dumper->dump($data);
     }
 
-    public function testDump()
+    public function testDump(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Skip transient test on Windows');
@@ -59,7 +59,7 @@ class ServerDumperTest extends TestCase
 
         $dumped = null;
         $process = $this->getServerProcess();
-        $process->start(function ($type, $buffer) use ($process, &$dumped, $dumper, $data) {
+        $process->start(function ($type, $buffer) use ($process, &$dumped, $dumper, $data): void {
             if (Process::ERR === $type) {
                 $process->stop();
                 $this->fail();

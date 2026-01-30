@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class AddExpressionLanguageProvidersPassTest extends TestCase
 {
-    public function testProcessForSecurity()
+    public function testProcessForSecurity(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
@@ -37,7 +37,7 @@ class AddExpressionLanguageProvidersPassTest extends TestCase
         $this->assertEquals(new Reference('some_security_provider'), $calls[0][1][0]);
     }
 
-    public function testProcessForSecurityAlias()
+    public function testProcessForSecurityAlias(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());

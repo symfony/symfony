@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class EnableAutoMappingTest extends TestCase
 {
-    public function testDisableAutoMappingAttribute()
+    public function testDisableAutoMappingAttribute(): void
     {
         $metadata = new ClassMetadata(EnableAutoMappingDummy::class);
         $loader = new AttributeLoader();

@@ -51,21 +51,21 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->notAnImage = __DIR__.'/Fixtures/ccc.txt';
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Image());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Image());
 
         $this->assertNoViolation();
     }
 
-    public function testValidImage()
+    public function testValidImage(): void
     {
         $this->validator->validate($this->image, new Image());
 
@@ -75,7 +75,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     /**
      * Checks that the logic from FileValidator still works.
      */
-    public function testFileNotFound()
+    public function testFileNotFound(): void
     {
         $this->validator->validate('foobar', new Image(notFoundMessage: 'myMessage'));
 
@@ -85,7 +85,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testValidSize()
+    public function testValidSize(): void
     {
         $constraint = new Image(
             minWidth: 1,
@@ -99,7 +99,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testWidthTooSmall()
+    public function testWidthTooSmall(): void
     {
         $this->validator->validate($this->image, new Image(minWidth: 3, minWidthMessage: 'myMessage'));
 
@@ -110,7 +110,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testWidthTooBig()
+    public function testWidthTooBig(): void
     {
         $this->validator->validate($this->image, new Image(maxWidth: 1, maxWidthMessage: 'myMessage'));
 
@@ -121,7 +121,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testHeightTooSmall()
+    public function testHeightTooSmall(): void
     {
         $this->validator->validate($this->image, new Image(minHeight: 3, minHeightMessage: 'myMessage'));
 
@@ -132,7 +132,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testHeightTooBig()
+    public function testHeightTooBig(): void
     {
         $this->validator->validate($this->image, new Image(maxHeight: 1, maxHeightMessage: 'myMessage'));
 
@@ -143,7 +143,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testPixelsTooFew()
+    public function testPixelsTooFew(): void
     {
         $this->validator->validate($this->image, new Image(minPixels: 5, minPixelsMessage: 'myMessage'));
 
@@ -156,7 +156,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testPixelsTooMany()
+    public function testPixelsTooMany(): void
     {
         $this->validator->validate($this->image, new Image(maxPixels: 3, maxPixelsMessage: 'myMessage'));
 
@@ -169,7 +169,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testRatioTooSmall()
+    public function testRatioTooSmall(): void
     {
         $this->validator->validate($this->image, new Image(minRatio: 2, minRatioMessage: 'myMessage'));
 
@@ -180,7 +180,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testRatioTooBig()
+    public function testRatioTooBig(): void
     {
         $this->validator->validate($this->image, new Image(maxRatio: 0.5, maxRatioMessage: 'myMessage'));
 
@@ -191,7 +191,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testMaxRatioUsesTwoDecimalsOnly()
+    public function testMaxRatioUsesTwoDecimalsOnly(): void
     {
         $constraint = new Image(maxRatio: 1.33);
 
@@ -200,7 +200,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testMinRatioUsesInputMoreDecimals()
+    public function testMinRatioUsesInputMoreDecimals(): void
     {
         $constraint = new Image(minRatio: 4 / 3);
 
@@ -209,7 +209,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testMaxRatioUsesInputMoreDecimals()
+    public function testMaxRatioUsesInputMoreDecimals(): void
     {
         $constraint = new Image(maxRatio: 16 / 9);
 
@@ -218,7 +218,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testSquareNotAllowed()
+    public function testSquareNotAllowed(): void
     {
         $this->validator->validate($this->image, new Image(allowSquare: false, allowSquareMessage: 'myMessage'));
 
@@ -229,7 +229,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testLandscapeNotAllowed()
+    public function testLandscapeNotAllowed(): void
     {
         $this->validator->validate($this->imageLandscape, new Image(allowLandscape: false, allowLandscapeMessage: 'myMessage'));
 
@@ -240,7 +240,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testPortraitNotAllowed()
+    public function testPortraitNotAllowed(): void
     {
         $this->validator->validate($this->imagePortrait, new Image(allowPortrait: false, allowPortraitMessage: 'myMessage'));
 
@@ -251,7 +251,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testCorrupted()
+    public function testCorrupted(): void
     {
         if (!\function_exists('imagecreatefromstring')) {
             $this->markTestSkipped('This test require GD extension');
@@ -270,7 +270,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidMimeType()
+    public function testInvalidMimeType(): void
     {
         $this->validator->validate($this->notAnImage, $constraint = new Image());
 
@@ -285,7 +285,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidMimeTypeWithNarrowedSet()
+    public function testInvalidMimeTypeWithNarrowedSet(): void
     {
         $this->validator->validate($this->image, new Image(mimeTypes: [
             'image/jpeg',
@@ -302,7 +302,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideSvgWithViolation')]
-    public function testSvgWithViolation(string $image, Image $constraint, string $violation, array $parameters = [])
+    public function testSvgWithViolation(string $image, Image $constraint, string $violation, array $parameters = []): void
     {
         $this->validator->validate($image, $constraint);
 
@@ -402,7 +402,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideSvgWithoutViolation')]
-    public function testSvgWithoutViolation(string $image, Image $constraint)
+    public function testSvgWithoutViolation(string $image, Image $constraint): void
     {
         $this->validator->validate($image, $constraint);
 
@@ -438,7 +438,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('providerValidExtension')]
-    public function testExtensionValid(string $name)
+    public function testExtensionValid(string $name): void
     {
         $constraint = new Image(mimeTypes: [], extensions: ['gif'], extensionsMessage: 'myMessage');
 
@@ -454,7 +454,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideInvalidExtension')]
-    public function testExtensionInvalid(string $name, string $extension)
+    public function testExtensionInvalid(string $name, string $extension): void
     {
         $path = __DIR__.'/Fixtures/'.$name;
         $constraint = new Image(extensions: ['png', 'svg'], extensionsMessage: 'myMessage');
@@ -478,7 +478,7 @@ class ImageValidatorTest extends ConstraintValidatorTestCase
         yield ['test.png.gif', 'gif'];
     }
 
-    public function testExtensionAutodetectMimeTypesInvalid()
+    public function testExtensionAutodetectMimeTypesInvalid(): void
     {
         $path = __DIR__.'/Fixtures/invalid-content.gif';
         $constraint = new Image(mimeTypesMessage: 'myMessage', extensions: ['gif']);

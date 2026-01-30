@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 class RegisterEnvVarProcessorsPassTest extends TestCase
 {
-    public function testSimpleProcessor()
+    public function testSimpleProcessor(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', SimpleProcessor::class)->addTag('container.env_var_processor');
@@ -57,7 +57,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
         $this->assertSame($expected, $container->getParameterBag()->getProvidedTypes());
     }
 
-    public function testNoProcessor()
+    public function testNoProcessor(): void
     {
         $container = new ContainerBuilder();
 
@@ -66,7 +66,7 @@ class RegisterEnvVarProcessorsPassTest extends TestCase
         $this->assertFalse($container->has('container.env_var_processors_locator'));
     }
 
-    public function testBadProcessor()
+    public function testBadProcessor(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid type "foo" returned by "Symfony\Component\DependencyInjection\Tests\Compiler\BadProcessor::getProvidedTypes()", expected one of "array", "bool", "float", "int", "string", "BackedEnum".');

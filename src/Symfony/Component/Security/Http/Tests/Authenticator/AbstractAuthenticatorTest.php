@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 
 class AbstractAuthenticatorTest extends TestCase
 {
-    public function testCreateToken()
+    public function testCreateToken(): void
     {
         $authenticator = new ConcreteAuthenticator();
         $this->assertInstanceOf(

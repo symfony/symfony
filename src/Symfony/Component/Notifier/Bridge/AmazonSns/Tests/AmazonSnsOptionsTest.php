@@ -16,13 +16,13 @@ use Symfony\Component\Notifier\Bridge\AmazonSns\AmazonSnsOptions;
 
 class AmazonSnsOptionsTest extends TestCase
 {
-    public function testGetRecipientId()
+    public function testGetRecipientId(): void
     {
         $options = new AmazonSnsOptions('my-topic');
         $this->assertSame('my-topic', $options->getRecipientId());
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $options = new AmazonSnsOptions('my-topic');
         $options->subject('value');

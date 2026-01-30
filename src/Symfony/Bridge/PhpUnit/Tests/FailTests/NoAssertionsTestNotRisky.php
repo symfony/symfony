@@ -27,7 +27,7 @@ final class NoAssertionsTestNotRisky extends TestCase
     /**
      * Do not remove this test in the next major version.
      */
-    public function testOne()
+    public function testOne(): void
     {
         $this->expectNotToPerformAssertions();
     }

@@ -42,7 +42,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
 
     abstract protected function getFileExtension();
 
-    public function testAuthenticatorManager()
+    public function testAuthenticatorManager(): void
     {
         $container = $this->getContainer('authenticator_manager');
 
@@ -80,7 +80,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertEquals('app.rate_limiter', (string) $listener->getArgument(1));
     }
 
-    public function testRolesHierarchy()
+    public function testRolesHierarchy(): void
     {
         $container = $this->getContainer('container1');
         $this->assertEquals([
@@ -90,7 +90,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         ], $container->getParameter('security.role_hierarchy.roles'));
     }
 
-    public function testUserProviders()
+    public function testUserProviders(): void
     {
         $container = $this->getContainer('container1');
 
@@ -114,7 +114,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         ])], $container->getDefinition('security.user.provider.concrete.chain')->getArguments());
     }
 
-    public function testFirewalls()
+    public function testFirewalls(): void
     {
         $container = $this->getContainer('container1');
         $arguments = $container->getDefinition('security.firewall.map')->getArguments();
@@ -246,7 +246,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertFalse($container->hasAlias(UserCheckerInterface::class), 'No user checker alias is registered when custom user checker services are registered');
     }
 
-    public function testFirewallRequestMatchers()
+    public function testFirewallRequestMatchers(): void
     {
         $container = $this->getContainer('container1');
 
@@ -279,7 +279,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertSame('foo\\.example\\.org', $def->getArgument(0));
     }
 
-    public function testUserCheckerAliasIsRegistered()
+    public function testUserCheckerAliasIsRegistered(): void
     {
         $container = $this->getContainer('no_custom_user_checker');
 
@@ -287,7 +287,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertFalse($container->getAlias(UserCheckerInterface::class)->isPublic());
     }
 
-    public function testAccess()
+    public function testAccess(): void
     {
         $container = $this->getContainer('container1');
 
@@ -341,7 +341,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertCount(4, $matcherIds);
     }
 
-    public function testMerge()
+    public function testMerge(): void
     {
         $container = $this->getContainer('merge');
 
@@ -351,7 +351,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         ], $container->getParameter('security.role_hierarchy.roles'));
     }
 
-    public function testHashers()
+    public function testHashers(): void
     {
         $container = $this->getContainer('container1');
 
@@ -408,7 +408,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
     }
 
-    public function testHashersWithLibsodium()
+    public function testHashersWithLibsodium(): void
     {
         if (!SodiumPasswordHasher::isSupported()) {
             $this->markTestSkipped('Libsodium is not available.');
@@ -461,7 +461,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
     }
 
-    public function testHashersWithArgon2i()
+    public function testHashersWithArgon2i(): void
     {
         if (!($sodium = SodiumPasswordHasher::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
             $this->markTestSkipped('Argon2i algorithm is not supported.');
@@ -514,7 +514,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
     }
 
-    public function testMigratingHasher()
+    public function testMigratingHasher(): void
     {
         if (!($sodium = SodiumPasswordHasher::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
             $this->markTestSkipped('Argon2i algorithm is not supported.');
@@ -575,7 +575,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
     }
 
-    public function testHashersWithBCrypt()
+    public function testHashersWithBCrypt(): void
     {
         $container = $this->getContainer('bcrypt_hasher');
 
@@ -624,48 +624,48 @@ abstract class CompleteConfigurationTestCase extends TestCase
         ]], $container->getDefinition('security.password_hasher_factory')->getArguments());
     }
 
-    public function testUserCheckerConfig()
+    public function testUserCheckerConfig(): void
     {
         $this->assertEquals('app.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.with_user_checker'));
     }
 
-    public function testUserCheckerConfigWithDefaultChecker()
+    public function testUserCheckerConfigWithDefaultChecker(): void
     {
         $this->assertEquals('security.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.host'));
     }
 
-    public function testUserCheckerConfigWithNoCheckers()
+    public function testUserCheckerConfigWithNoCheckers(): void
     {
         $this->assertEquals('security.user_checker', $this->getContainer('container1')->getAlias('security.user_checker.secure'));
     }
 
-    public function testUserPasswordHasherCommandIsRegistered()
+    public function testUserPasswordHasherCommandIsRegistered(): void
     {
         $this->assertTrue($this->getContainer('remember_me_options')->has('security.command.user_password_hash'));
     }
 
-    public function testDefaultAccessDecisionManagerStrategyIsAffirmative()
+    public function testDefaultAccessDecisionManagerStrategyIsAffirmative(): void
     {
         $container = $this->getContainer('access_decision_manager_default_strategy');
 
         $this->assertEquals(new Definition(AffirmativeStrategy::class, [false]), $container->getDefinition('security.access.decision_manager')->getArgument(1), 'Default vote strategy is affirmative');
     }
 
-    public function testCustomAccessDecisionManagerService()
+    public function testCustomAccessDecisionManagerService(): void
     {
         $container = $this->getContainer('access_decision_manager_service');
 
         $this->assertSame('app.access_decision_manager', (string) $container->getAlias('security.access.decision_manager'), 'The custom access decision manager service is aliased');
     }
 
-    public function testAccessDecisionManagerServiceAndStrategyCannotBeUsedAtTheSameTime()
+    public function testAccessDecisionManagerServiceAndStrategyCannotBeUsedAtTheSameTime(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid configuration for path "security.access_decision_manager": "strategy" and "service" cannot be used together.');
         $this->getContainer('access_decision_manager_service_and_strategy');
     }
 
-    public function testAccessDecisionManagerOptionsAreNotOverriddenByImplicitStrategy()
+    public function testAccessDecisionManagerOptionsAreNotOverriddenByImplicitStrategy(): void
     {
         $container = $this->getContainer('access_decision_manager_customized_config');
 
@@ -674,7 +674,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertEquals(new Definition(AffirmativeStrategy::class, [true]), $accessDecisionManagerDefinition->getArgument(1));
     }
 
-    public function testAccessDecisionManagerWithStrategyService()
+    public function testAccessDecisionManagerWithStrategyService(): void
     {
         $container = $this->getContainer('access_decision_manager_strategy_service');
 
@@ -684,40 +684,40 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertEquals(new Reference('app.custom_access_decision_strategy'), $accessDecisionManagerDefinition->getArgument(1));
     }
 
-    public function testFirewallUndefinedUserProvider()
+    public function testFirewallUndefinedUserProvider(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid firewall "main": user provider "undefined" not found.');
         $this->getContainer('firewall_undefined_provider');
     }
 
-    public function testFirewallListenerUndefinedProvider()
+    public function testFirewallListenerUndefinedProvider(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid firewall "main": user provider "undefined" not found.');
         $this->getContainer('listener_undefined_provider');
     }
 
-    public function testFirewallWithUserProvider()
+    public function testFirewallWithUserProvider(): void
     {
         $this->getContainer('firewall_provider');
         $this->addToAssertionCount(1);
     }
 
-    public function testFirewallListenerWithProvider()
+    public function testFirewallListenerWithProvider(): void
     {
         $this->getContainer('listener_provider');
         $this->addToAssertionCount(1);
     }
 
-    public function testFirewallLogoutClearSiteData()
+    public function testFirewallLogoutClearSiteData(): void
     {
         $container = $this->getContainer('logout_clear_site_data');
         $ClearSiteDataConfig = $container->getDefinition('security.firewall.map.config.main')->getArgument(12)['clear_site_data'];
         $this->assertSame(['cookies', 'executionContexts'], $ClearSiteDataConfig);
     }
 
-    public function testFirewallPatterns()
+    public function testFirewallPatterns(): void
     {
         $container = $this->getContainer('firewall_patterns');
         $chainRequestMatcherId = (string) $container->getDefinition('security.firewall.map')->getArgument(1)->getValues()['security.firewall.map.context.no_security'];
@@ -726,7 +726,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertSame('(?:^/register$|^/documentation$)', $container->getDefinition($requestMatcherId)->getArgument(0));
     }
 
-    public function testAccessTokenOidc()
+    public function testAccessTokenOidc(): void
     {
         $container = $this->getContainer('access_token_oidc');
 
@@ -739,7 +739,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertSame('sub', $def->getArgument(4));
     }
 
-    public function testAccessTokenOidcWithEncryption()
+    public function testAccessTokenOidcWithEncryption(): void
     {
         $container = $this->getContainer('access_token_oidc_encryption');
 
@@ -750,7 +750,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertSame(['RS256'], $def->getArgument(0)->getArgument(0));
     }
 
-    public function testAccessTokenOidcUserInfoWithDiscovery()
+    public function testAccessTokenOidcUserInfoWithDiscovery(): void
     {
         if ('xml' === $this->getFileExtension()) {
             $this->markTestSkipped('OIDC user info discovery is not supported by the XML schema.');

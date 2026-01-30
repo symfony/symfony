@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 class AddBusNameStampMiddlewareTest extends MiddlewareTestCase
 {
-    public function testItSendsTheMessageToAssignedSender()
+    public function testItSendsTheMessageToAssignedSender(): void
     {
         $middleware = new AddBusNameStampMiddleware('the_bus_name');
         $envelope = new Envelope(new DummyMessage('the message'));

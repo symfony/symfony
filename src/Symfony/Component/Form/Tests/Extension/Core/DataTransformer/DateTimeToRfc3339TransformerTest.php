@@ -59,7 +59,7 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
     }
 
     #[DataProvider('transformProvider')]
-    public function testTransform($fromTz, $toTz, $from, $to)
+    public function testTransform($fromTz, $toTz, $from, $to): void
     {
         $transformer = new DateTimeToRfc3339Transformer($fromTz, $toTz);
 
@@ -67,14 +67,14 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
     }
 
     #[DataProvider('transformProvider')]
-    public function testTransformDateTimeImmutable($fromTz, $toTz, $from, $to)
+    public function testTransformDateTimeImmutable($fromTz, $toTz, $from, $to): void
     {
         $transformer = new DateTimeToRfc3339Transformer($fromTz, $toTz);
 
         $this->assertSame($to, $transformer->transform(null !== $from ? new \DateTimeImmutable($from) : null));
     }
 
-    public function testTransformRequiresValidDateTime()
+    public function testTransformRequiresValidDateTime(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToRfc3339Transformer();
@@ -82,7 +82,7 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
     }
 
     #[DataProvider('reverseTransformProvider')]
-    public function testReverseTransform($toTz, $fromTz, $to, $from)
+    public function testReverseTransform($toTz, $fromTz, $to, $from): void
     {
         $transformer = new DateTimeToRfc3339Transformer($toTz, $fromTz);
 
@@ -93,14 +93,14 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
         }
     }
 
-    public function testReverseTransformRequiresString()
+    public function testReverseTransformRequiresString(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToRfc3339Transformer();
         $transformer->reverseTransform(12345);
     }
 
-    public function testReverseTransformWithNonExistingDate()
+    public function testReverseTransformWithNonExistingDate(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToRfc3339Transformer('UTC', 'UTC');
@@ -109,7 +109,7 @@ class DateTimeToRfc3339TransformerTest extends BaseDateTimeTransformerTestCase
     }
 
     #[DataProvider('invalidDateStringProvider')]
-    public function testReverseTransformExpectsValidDateString($date)
+    public function testReverseTransformExpectsValidDateString($date): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new DateTimeToRfc3339Transformer('UTC', 'UTC');

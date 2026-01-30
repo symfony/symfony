@@ -24,7 +24,7 @@ class ProfilerTest extends TestCase
     private string $tmp;
     private ?FileProfilerStorage $storage = null;
 
-    public function testCollect()
+    public function testCollect(): void
     {
         $request = new Request();
         $request->query->set('foo', 'bar');
@@ -42,7 +42,7 @@ class ProfilerTest extends TestCase
         $this->assertSame('bar', $profile->getCollector('request')->getRequestQuery()->all()['foo']->getValue());
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $collector = $this->getMockBuilder(DataCollectorInterface::class)
             ->onlyMethods(['collect', 'getName', 'reset'])
@@ -55,40 +55,40 @@ class ProfilerTest extends TestCase
         $profiler->reset();
     }
 
-    public function testFindWorksWithDates()
+    public function testFindWorksWithDates(): void
     {
         $profiler = new Profiler($this->storage);
 
         $this->assertCount(0, $profiler->find(null, null, null, null, '7th April 2014', '9th April 2014'));
     }
 
-    public function testFindWorksWithTimestamps()
+    public function testFindWorksWithTimestamps(): void
     {
         $profiler = new Profiler($this->storage);
 
         $this->assertCount(0, $profiler->find(null, null, null, null, '1396828800', '1397001600'));
     }
 
-    public function testFindWorksWithInvalidDates()
+    public function testFindWorksWithInvalidDates(): void
     {
         $profiler = new Profiler($this->storage);
 
         $this->assertCount(0, $profiler->find(null, null, null, null, 'some string', ''));
     }
 
-    public function testFindWorksWithStatusCode()
+    public function testFindWorksWithStatusCode(): void
     {
         $profiler = new Profiler($this->storage);
 
         $this->assertCount(0, $profiler->find(null, null, null, null, null, null, '204'));
     }
 
-    public function testIsInitiallyEnabled()
+    public function testIsInitiallyEnabled(): void
     {
         self::assertTrue((new Profiler($this->storage))->isEnabled());
     }
 
-    public function testDisable()
+    public function testDisable(): void
     {
         $profiler = new Profiler($this->storage);
         $profiler->disable();
@@ -96,7 +96,7 @@ class ProfilerTest extends TestCase
         self::assertFalse($profiler->isEnabled());
     }
 
-    public function testEnable()
+    public function testEnable(): void
     {
         $profiler = new Profiler($this->storage);
         $profiler->disable();

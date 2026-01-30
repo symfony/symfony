@@ -24,7 +24,7 @@ use Symfony\Component\Config\Definition\PrototypedArrayNode;
 
 class ArrayNodeDefinitionTest extends TestCase
 {
-    public function testAppendingSomeNode()
+    public function testAppendingSomeNode(): void
     {
         $parent = new ArrayNodeDefinition('root');
         $child = new ScalarNodeDefinition('child');
@@ -41,7 +41,7 @@ class ArrayNodeDefinitionTest extends TestCase
     }
 
     #[DataProvider('providePrototypeNodeSpecificCalls')]
-    public function testPrototypeNodeSpecificOption(string $method, array $args)
+    public function testPrototypeNodeSpecificOption(string $method, array $args): void
     {
         $this->expectException(InvalidDefinitionException::class);
         $node = new ArrayNodeDefinition('root');
@@ -62,7 +62,7 @@ class ArrayNodeDefinitionTest extends TestCase
         ];
     }
 
-    public function testConcreteNodeSpecificOption()
+    public function testConcreteNodeSpecificOption(): void
     {
         $this->expectException(InvalidDefinitionException::class);
         $node = new ArrayNodeDefinition('root');
@@ -73,7 +73,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $node->getNode();
     }
 
-    public function testPrototypeNodesCantHaveADefaultValueWhenUsingDefaultChildren()
+    public function testPrototypeNodesCantHaveADefaultValueWhenUsingDefaultChildren(): void
     {
         $this->expectException(InvalidDefinitionException::class);
         $node = new ArrayNodeDefinition('root');
@@ -85,7 +85,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $node->getNode();
     }
 
-    public function testPrototypedArrayNodeDefaultWhenUsingDefaultChildren()
+    public function testPrototypedArrayNodeDefaultWhenUsingDefaultChildren(): void
     {
         $node = new ArrayNodeDefinition('root');
         $node
@@ -97,7 +97,7 @@ class ArrayNodeDefinitionTest extends TestCase
     }
 
     #[DataProvider('providePrototypedArrayNodeDefaults')]
-    public function testPrototypedArrayNodeDefault(int|array|string|null $args, bool $shouldThrowWhenUsingAttrAsKey, bool $shouldThrowWhenNotUsingAttrAsKey, array $defaults)
+    public function testPrototypedArrayNodeDefault(int|array|string|null $args, bool $shouldThrowWhenUsingAttrAsKey, bool $shouldThrowWhenNotUsingAttrAsKey, array $defaults): void
     {
         $node = new ArrayNodeDefinition('root');
         $node
@@ -141,7 +141,7 @@ class ArrayNodeDefinitionTest extends TestCase
         ];
     }
 
-    public function testNestedPrototypedArrayNodes()
+    public function testNestedPrototypedArrayNodes(): void
     {
         $nodeDefinition = new ArrayNodeDefinition('root');
         $nodeDefinition
@@ -155,7 +155,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertInstanceOf(PrototypedArrayNode::class, $node->getPrototype());
     }
 
-    public function testEnabledNodeDefaults()
+    public function testEnabledNodeDefaults(): void
     {
         $node = new ArrayNodeDefinition('root');
         $node
@@ -168,7 +168,7 @@ class ArrayNodeDefinitionTest extends TestCase
     }
 
     #[DataProvider('getEnableableNodeFixtures')]
-    public function testTrueEnableEnabledNode(array $expected, array $config, string $message)
+    public function testTrueEnableEnabledNode(array $expected, array $config, string $message): void
     {
         $processor = new Processor();
         $node = new ArrayNodeDefinition('root');
@@ -185,7 +185,7 @@ class ArrayNodeDefinitionTest extends TestCase
         );
     }
 
-    public function testCanBeEnabledWithInfo()
+    public function testCanBeEnabledWithInfo(): void
     {
         $node = new ArrayNodeDefinition('root');
         $node->canBeEnabled('Some info about disabling this node');
@@ -195,7 +195,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertEquals('Some info about disabling this node', $this->getField($child, 'attributes')['info']);
     }
 
-    public function testCanBeDisabled()
+    public function testCanBeDisabled(): void
     {
         $node = new ArrayNodeDefinition('root');
         $node->canBeDisabled();
@@ -213,7 +213,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertTrue($this->getField($enabledNode, 'defaultValue'));
     }
 
-    public function testCanBeDisabledWithInfo()
+    public function testCanBeDisabledWithInfo(): void
     {
         $node = new ArrayNodeDefinition('root');
         $node->canBeDisabled('Some info about disabling this node');
@@ -223,7 +223,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertEquals('Some info about disabling this node', $this->getField($child, 'attributes')['info']);
     }
 
-    public function testIgnoreExtraKeys()
+    public function testIgnoreExtraKeys(): void
     {
         $node = new ArrayNodeDefinition('root');
 
@@ -235,7 +235,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertTrue($this->getField($node, 'ignoreExtraKeys'));
     }
 
-    public function testNormalizeKeys()
+    public function testNormalizeKeys(): void
     {
         $node = new ArrayNodeDefinition('root');
 
@@ -247,7 +247,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertFalse($this->getField($node, 'normalizeKeys'));
     }
 
-    public function testUnsetChild()
+    public function testUnsetChild(): void
     {
         $node = new ArrayNodeDefinition('root');
         $node
@@ -264,49 +264,49 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertSame([], $node->getNode()->normalize(['value' => null]));
     }
 
-    public function testPrototypeVariable()
+    public function testPrototypeVariable(): void
     {
         $node = new ArrayNodeDefinition('root');
         $this->assertEquals($node->prototype('variable'), $node->variablePrototype());
     }
 
-    public function testPrototypeScalar()
+    public function testPrototypeScalar(): void
     {
         $node = new ArrayNodeDefinition('root');
         $this->assertEquals($node->prototype('scalar'), $node->scalarPrototype());
     }
 
-    public function testPrototypeBoolean()
+    public function testPrototypeBoolean(): void
     {
         $node = new ArrayNodeDefinition('root');
         $this->assertEquals($node->prototype('boolean'), $node->booleanPrototype());
     }
 
-    public function testPrototypeString()
+    public function testPrototypeString(): void
     {
         $node = new ArrayNodeDefinition('root');
         $this->assertEquals($node->prototype('string'), $node->stringPrototype());
     }
 
-    public function testPrototypeInteger()
+    public function testPrototypeInteger(): void
     {
         $node = new ArrayNodeDefinition('root');
         $this->assertEquals($node->prototype('integer'), $node->integerPrototype());
     }
 
-    public function testPrototypeFloat()
+    public function testPrototypeFloat(): void
     {
         $node = new ArrayNodeDefinition('root');
         $this->assertEquals($node->prototype('float'), $node->floatPrototype());
     }
 
-    public function testPrototypeArray()
+    public function testPrototypeArray(): void
     {
         $node = new ArrayNodeDefinition('root');
         $this->assertEquals($node->prototype('array'), $node->arrayPrototype());
     }
 
-    public function testPrototypedArrayAllowsNullDefault()
+    public function testPrototypedArrayAllowsNullDefault(): void
     {
         $node = new ArrayNodeDefinition('root');
         $node
@@ -318,7 +318,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertNull($tree->getDefaultValue());
     }
 
-    public function testPrototypedArrayRejectsNonArrayDefaultValue()
+    public function testPrototypedArrayRejectsNonArrayDefaultValue(): void
     {
         $node = new ArrayNodeDefinition('root');
         $node
@@ -331,7 +331,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $node->getNode();
     }
 
-    public function testPrototypeEnum()
+    public function testPrototypeEnum(): void
     {
         $node = new ArrayNodeDefinition('root');
         $this->assertEquals($node->prototype('enum'), $node->enumPrototype());
@@ -350,7 +350,7 @@ class ArrayNodeDefinitionTest extends TestCase
     }
 
     #[DataProvider('provideEnabledStateAfterMerging')]
-    public function testEnabledStateIsPreservedAcrossMergedConfigs(array $firstConfig, array $expected, callable $nodeFactory)
+    public function testEnabledStateIsPreservedAcrossMergedConfigs(array $firstConfig, array $expected, callable $nodeFactory): void
     {
         $processor = new Processor();
         $node = $nodeFactory();
@@ -396,7 +396,7 @@ class ArrayNodeDefinitionTest extends TestCase
         ];
     }
 
-    public function testRequiresAtLeastOneElement()
+    public function testRequiresAtLeastOneElement(): void
     {
         $node = new ArrayNodeDefinition('root');
         $node
@@ -408,7 +408,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testCannotBeEmpty()
+    public function testCannotBeEmpty(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The path "root" should have at least 1 element(s) defined.');
@@ -420,7 +420,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $node->getNode()->finalize([]);
     }
 
-    public function testSetDeprecated()
+    public function testSetDeprecated(): void
     {
         $node = new ArrayNodeDefinition('root');
         $node
@@ -437,7 +437,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertSame('1.1', $deprecation['version']);
     }
 
-    public function testCannotBeEmptyOnConcreteNode()
+    public function testCannotBeEmptyOnConcreteNode(): void
     {
         $this->expectException(InvalidDefinitionException::class);
         $this->expectExceptionMessage('->cannotBeEmpty() is not applicable to concrete nodes at path "root"');
@@ -447,7 +447,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $node->getNode()->finalize([]);
     }
 
-    public function testFindShouldThrowExceptionIfNodeDoesNotExistInRootNode()
+    public function testFindShouldThrowExceptionIfNodeDoesNotExistInRootNode(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Node with name "child" does not exist in the current node "root".');
@@ -462,7 +462,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $rootNode->find('child');
     }
 
-    public function testFindShouldHandleComplexConfigurationProperly()
+    public function testFindShouldHandleComplexConfigurationProperly(): void
     {
         $rootNode = new ArrayNodeDefinition('root');
         $rootNode
@@ -501,7 +501,7 @@ class ArrayNodeDefinitionTest extends TestCase
         $this->assertNode('transports', ArrayNodeDefinition::class, $mailerNode->find('transports'));
     }
 
-    public function testFindShouldWorkProperlyForNonDefaultPathSeparator()
+    public function testFindShouldWorkProperlyForNonDefaultPathSeparator(): void
     {
         $rootNode = new ArrayNodeDefinition('root');
         $rootNode

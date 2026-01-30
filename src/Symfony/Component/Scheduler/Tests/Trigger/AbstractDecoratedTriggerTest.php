@@ -18,7 +18,7 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 class AbstractDecoratedTriggerTest extends TestCase
 {
-    public function testCanGetInnerTrigger()
+    public function testCanGetInnerTrigger(): void
     {
         $trigger = new JitterTrigger($inner = $this->createStub(TriggerInterface::class));
 
@@ -26,7 +26,7 @@ class AbstractDecoratedTriggerTest extends TestCase
         $this->assertSame([$trigger], iterator_to_array($trigger->decorators()));
     }
 
-    public function testCanGetNestedInnerTrigger()
+    public function testCanGetNestedInnerTrigger(): void
     {
         $trigger = new ExcludeTimeTrigger(
             $jitter = new JitterTrigger($inner = $this->createStub(TriggerInterface::class)),

@@ -24,7 +24,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 class ErrorControllerTest extends TestCase
 {
     #[DataProvider('getInvokeControllerDataProvider')]
-    public function testInvokeController(Request $request, \Exception $exception, int $statusCode, string $content)
+    public function testInvokeController(Request $request, \Exception $exception, int $statusCode, string $content): void
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
         $errorRenderer = new HtmlErrorRenderer();
@@ -61,7 +61,7 @@ class ErrorControllerTest extends TestCase
         ];
     }
 
-    public function testPreviewController()
+    public function testPreviewController(): void
     {
         $_controller = 'error_controller';
         $code = 404;

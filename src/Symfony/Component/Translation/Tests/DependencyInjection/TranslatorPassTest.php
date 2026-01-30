@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Constraints\TimeValidator;
 
 class TranslatorPassTest extends TestCase
 {
-    public function testValidCollector()
+    public function testValidCollector(): void
     {
         $loader = (new Definition())
             ->addTag('translation.loader', ['alias' => 'xliff', 'legacy-alias' => 'xlf']);
@@ -60,7 +60,7 @@ class TranslatorPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $translator->getArgument(0))->getArgument(0));
     }
 
-    public function testValidCommandsViewPathsArgument()
+    public function testValidCommandsViewPathsArgument(): void
     {
         $container = new ContainerBuilder();
         $container->register('translator.default')
@@ -88,7 +88,7 @@ class TranslatorPassTest extends TestCase
         $this->assertSame($expectedViewPaths, $updateCommand->getArgument(7));
     }
 
-    public function testCommandsViewPathsArgumentsAreIgnoredWithOldServiceDefinitions()
+    public function testCommandsViewPathsArgumentsAreIgnoredWithOldServiceDefinitions(): void
     {
         $container = new ContainerBuilder();
         $container->register('translator.default')
@@ -125,7 +125,7 @@ class TranslatorPassTest extends TestCase
         $this->assertSame('templates', $updateCommand->getArgument(5));
     }
 
-    public function testValidPhpAstExtractorConstraintVisitorArguments()
+    public function testValidPhpAstExtractorConstraintVisitorArguments(): void
     {
         $container = new ContainerBuilder();
         $container->register('translator.default')

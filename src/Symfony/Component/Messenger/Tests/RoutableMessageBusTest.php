@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Stamp\DelayStamp;
 
 class RoutableMessageBusTest extends TestCase
 {
-    public function testItRoutesToTheCorrectBus()
+    public function testItRoutesToTheCorrectBus(): void
     {
         $envelope = new Envelope(new \stdClass(), [new BusNameStamp('foo_bus')]);
 
@@ -40,7 +40,7 @@ class RoutableMessageBusTest extends TestCase
         $this->assertSame($envelope, $routableBus->dispatch($envelope, [$stamp]));
     }
 
-    public function testItRoutesToDefaultBus()
+    public function testItRoutesToDefaultBus(): void
     {
         $envelope = new Envelope(new \stdClass());
         $stamp = new DelayStamp(5);
@@ -53,7 +53,7 @@ class RoutableMessageBusTest extends TestCase
         $this->assertSame($envelope, $routableBus->dispatch($envelope, [$stamp]));
     }
 
-    public function testItExceptionOnBusNotFound()
+    public function testItExceptionOnBusNotFound(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Bus named "my_cool_bus" does not exist.');
@@ -66,7 +66,7 @@ class RoutableMessageBusTest extends TestCase
         $routableBus->dispatch($envelope);
     }
 
-    public function testItExceptionOnDefaultBusNotFound()
+    public function testItExceptionOnDefaultBusNotFound(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Envelope is missing a BusNameStamp and no fallback message bus is configured on RoutableMessageBus.');

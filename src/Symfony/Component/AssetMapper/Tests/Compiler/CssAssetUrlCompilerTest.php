@@ -22,7 +22,7 @@ use Symfony\Component\AssetMapper\MappedAsset;
 class CssAssetUrlCompilerTest extends TestCase
 {
     #[DataProvider('provideCompileTests')]
-    public function testCompile(string $input, string $expectedOutput, array $expectedDependencies)
+    public function testCompile(string $input, string $expectedOutput, array $expectedDependencies): void
     {
         $assetMapper = $this->createStub(AssetMapperInterface::class);
         $assetMapper
@@ -217,7 +217,7 @@ class CssAssetUrlCompilerTest extends TestCase
         ];
     }
 
-    public function testCompileFindsRelativeFilesViaSourcePath()
+    public function testCompileFindsRelativeFilesViaSourcePath(): void
     {
         $assetMapper = $this->createStub(AssetMapperInterface::class);
         $assetMapper
@@ -254,7 +254,7 @@ class CssAssetUrlCompilerTest extends TestCase
     }
 
     #[DataProvider('provideStrictModeTests')]
-    public function testStrictMode(string $sourceLogicalName, string $input, ?string $expectedExceptionMessage)
+    public function testStrictMode(string $sourceLogicalName, string $input, ?string $expectedExceptionMessage): void
     {
         if (null !== $expectedExceptionMessage) {
             $this->expectException(\RuntimeException::class);

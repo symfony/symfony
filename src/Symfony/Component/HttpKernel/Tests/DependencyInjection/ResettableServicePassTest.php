@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService;
 
 class ResettableServicePassTest extends TestCase
 {
-    public function testCompilerPass()
+    public function testCompilerPass(): void
     {
         $container = new ContainerBuilder();
         $container->register('one', ResettableService::class)
@@ -65,7 +65,7 @@ class ResettableServicePassTest extends TestCase
         );
     }
 
-    public function testMissingMethod()
+    public function testMissingMethod(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Tag "kernel.reset" requires the "method" attribute to be set on service "Symfony\Component\HttpKernel\Tests\Fixtures\ResettableService".');
@@ -79,7 +79,7 @@ class ResettableServicePassTest extends TestCase
         $container->compile();
     }
 
-    public function testIgnoreInvalidMethod()
+    public function testIgnoreInvalidMethod(): void
     {
         $container = new ContainerBuilder();
         $container->register(ResettableService::class)
@@ -99,7 +99,7 @@ class ResettableServicePassTest extends TestCase
         $resetter->reset();
     }
 
-    public function testCompilerPassWithoutResetters()
+    public function testCompilerPassWithoutResetters(): void
     {
         $container = new ContainerBuilder();
         $container->register('services_resetter', ServicesResetter::class)

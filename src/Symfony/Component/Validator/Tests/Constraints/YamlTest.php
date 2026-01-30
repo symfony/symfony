@@ -22,7 +22,7 @@ use Symfony\Component\Yaml\Yaml as YamlParser;
  */
 class YamlTest extends TestCase
 {
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(YamlDummy::class);
         $loader = new AttributeLoader();

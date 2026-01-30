@@ -41,7 +41,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->event = $this->createEventMock($this->request, $this->response);
     }
 
-    public function testWontReassignResponseWhenResponseIsUnsuccessful()
+    public function testWontReassignResponseWhenResponseIsUnsuccessful(): void
     {
         $response = $this->event->getResponse();
 
@@ -52,7 +52,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame($response, $this->event->getResponse());
     }
 
-    public function testWontReassignResponseWhenNoConfigurationIsPresent()
+    public function testWontReassignResponseWhenNoConfigurationIsPresent(): void
     {
         $response = $this->event->getResponse();
 
@@ -63,7 +63,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame($response, $this->event->getResponse());
     }
 
-    public function testResponseIsPublicIfSharedMaxAgeSetAndPublicNotOverridden()
+    public function testResponseIsPublicIfSharedMaxAgeSetAndPublicNotOverridden(): void
     {
         $request = $this->createRequest(new Cache(smaxage: 1));
 
@@ -73,7 +73,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertFalse($this->response->headers->hasCacheControlDirective('private'));
     }
 
-    public function testResponseIsPublicIfConfigurationIsPublicTrue()
+    public function testResponseIsPublicIfConfigurationIsPublicTrue(): void
     {
         $request = $this->createRequest(new Cache(public: true));
 
@@ -83,7 +83,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertFalse($this->response->headers->hasCacheControlDirective('private'));
     }
 
-    public function testResponseIsPrivateIfConfigurationIsPublicFalse()
+    public function testResponseIsPrivateIfConfigurationIsPublicFalse(): void
     {
         $request = $this->createRequest(new Cache(public: false));
 
@@ -93,7 +93,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
     }
 
-    public function testResponseIsPublicIfConfigurationIsPublicTrueNoStoreFalse()
+    public function testResponseIsPublicIfConfigurationIsPublicTrueNoStoreFalse(): void
     {
         $request = $this->createRequest(new Cache(public: true, noStore: false));
 
@@ -104,7 +104,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertFalse($this->response->headers->hasCacheControlDirective('no-store'));
     }
 
-    public function testResponseKeepPublicIfConfigurationIsPublicTrueNoStoreTrue()
+    public function testResponseKeepPublicIfConfigurationIsPublicTrueNoStoreTrue(): void
     {
         $request = $this->createRequest(new Cache(public: true, noStore: true));
 
@@ -115,7 +115,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-store'));
     }
 
-    public function testResponseKeepPrivateNoStoreIfConfigurationIsNoStoreTrue()
+    public function testResponseKeepPrivateNoStoreIfConfigurationIsNoStoreTrue(): void
     {
         $request = $this->createRequest(new Cache(noStore: true));
 
@@ -126,7 +126,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-store'));
     }
 
-    public function testResponseIsPublicIfSharedMaxAgeSetAndNoStoreIsTrue()
+    public function testResponseIsPublicIfSharedMaxAgeSetAndNoStoreIsTrue(): void
     {
         $request = $this->createRequest(new Cache(smaxage: 1, noStore: true));
 
@@ -137,7 +137,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-store'));
     }
 
-    public function testResponseVary()
+    public function testResponseVary(): void
     {
         $vary = ['foobar'];
         $request = $this->createRequest(new Cache(vary: $vary));
@@ -148,7 +148,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame($vary, $result);
     }
 
-    public function testResponseVaryWhenVaryNotSet()
+    public function testResponseVaryWhenVaryNotSet(): void
     {
         $request = $this->createRequest(new Cache());
         $vary = ['foobar'];
@@ -161,7 +161,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame($vary, $result, 'Vary header should not be changed');
     }
 
-    public function testResponseIsPrivateIfConfigurationIsPublicNotSet()
+    public function testResponseIsPrivateIfConfigurationIsPublicNotSet(): void
     {
         $request = $this->createRequest(new Cache());
 
@@ -170,7 +170,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertFalse($this->response->headers->hasCacheControlDirective('public'));
     }
 
-    public function testAttributeConfigurationsAreSetOnResponse()
+    public function testAttributeConfigurationsAreSetOnResponse(): void
     {
         $this->assertNull($this->response->getMaxAge());
         $this->assertNull($this->response->getExpires());
@@ -201,7 +201,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertInstanceOf(\DateTimeInterface::class, $this->response->getExpires());
     }
 
-    public function testCacheMaxAgeSupportsStrtotimeFormat()
+    public function testCacheMaxAgeSupportsStrtotimeFormat(): void
     {
         $this->request->attributes->set('_cache', [new Cache(
             maxage: '1 day',
@@ -223,7 +223,7 @@ class CacheAttributeListenerTest extends TestCase
     #[TestWith(['date'])]
     #[TestWith(['args["test"].getDate()'])]
     #[TestWith(['request.attributes.get("date")'])]
-    public function testLastModifiedNotModifiedResponse(string $expression)
+    public function testLastModifiedNotModifiedResponse(string $expression): void
     {
         $entity = new TestEntity();
 
@@ -244,7 +244,7 @@ class CacheAttributeListenerTest extends TestCase
     #[TestWith(['date'])]
     #[TestWith(['args["test"].getDate()'])]
     #[TestWith(['request.attributes.get("date")'])]
-    public function testLastModifiedHeader(string $expression)
+    public function testLastModifiedHeader(string $expression): void
     {
         $entity = new TestEntity();
 
@@ -270,7 +270,7 @@ class CacheAttributeListenerTest extends TestCase
     #[TestWith(['id'])]
     #[TestWith(['args["test"].getId()'])]
     #[TestWith(['request.attributes.get("id")'])]
-    public function testEtagNotModifiedResponse(string $expression)
+    public function testEtagNotModifiedResponse(string $expression): void
     {
         $entity = new TestEntity();
 
@@ -291,7 +291,7 @@ class CacheAttributeListenerTest extends TestCase
     #[TestWith(['id'])]
     #[TestWith(['args["test"].getId()'])]
     #[TestWith(['request.attributes.get("id")'])]
-    public function testEtagHeader(string $expression)
+    public function testEtagHeader(string $expression): void
     {
         $entity = new TestEntity();
 
@@ -314,7 +314,7 @@ class CacheAttributeListenerTest extends TestCase
     }
 
     #[DataProvider('provideLastModifiedHeaderAndEtagClosureCases')]
-    public function testLastModifiedHeaderAndEtagHeadersClosures(\Closure $lastModifiedClosure, \Closure $etagClosure)
+    public function testLastModifiedHeaderAndEtagHeadersClosures(\Closure $lastModifiedClosure, \Closure $etagClosure): void
     {
         $entity = new TestEntity();
 
@@ -352,7 +352,7 @@ class CacheAttributeListenerTest extends TestCase
         ];
     }
 
-    public function testConfigurationDoesNotOverrideAlreadySetResponseHeaders()
+    public function testConfigurationDoesNotOverrideAlreadySetResponseHeaders(): void
     {
         $request = $this->createRequest(new Cache(
             expires: 'Fri, 24 Aug 2013 00:00:00 GMT',
@@ -383,7 +383,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame(['foobaz'], $response->getVary());
     }
 
-    public function testAttribute()
+    public function testAttribute(): void
     {
         $request = new Request();
         $event = new ControllerArgumentsEvent($this->getKernel(), [new CacheAttributeController(), 'foo'], [], $request, null);
@@ -407,7 +407,7 @@ class CacheAttributeListenerTest extends TestCase
     }
 
     #[DataProvider('provideVaryHeaderScenarios')]
-    public function testHasRelevantVaryHeaderBehavior(array $responseVary, array $cacheVary, bool $varyByLanguage, array $expectedVary)
+    public function testHasRelevantVaryHeaderBehavior(array $responseVary, array $cacheVary, bool $varyByLanguage, array $expectedVary): void
     {
         $request = $this->createRequest(new Cache(vary: $cacheVary));
         $request->attributes->set('_vary_by_language', $varyByLanguage);
@@ -422,7 +422,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame($expectedVary, $response->getVary());
     }
 
-    public function testAttributeRespectsExplicitPrivateFromController()
+    public function testAttributeRespectsExplicitPrivateFromController(): void
     {
         $request = $this->createRequest(new Cache(public: true));
         $response = new Response();
@@ -434,7 +434,7 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertFalse($response->headers->hasCacheControlDirective('public'));
     }
 
-    public function testAttributeRespectsExplicitPublicFromController()
+    public function testAttributeRespectsExplicitPublicFromController(): void
     {
         $request = $this->createRequest(new Cache(public: false));
         $response = new Response();
@@ -493,7 +493,7 @@ class CacheAttributeListenerTest extends TestCase
     }
 
     #[DataProvider('provideCacheIfCases')]
-    public function testCacheAppliedOnlyWhenIfEvaluatesToTrue(string|\Closure $if1, string|\Closure $if2, bool $sMaxAge, bool $public, bool $maxAge, bool $private)
+    public function testCacheAppliedOnlyWhenIfEvaluatesToTrue(string|\Closure $if1, string|\Closure $if2, bool $sMaxAge, bool $public, bool $maxAge, bool $private): void
     {
         $entity = new TestEntity();
 
@@ -541,7 +541,7 @@ class CacheAttributeListenerTest extends TestCase
         ];
     }
 
-    public function testErrorIsThrownWhenIfEvaluatesToNonBool()
+    public function testErrorIsThrownWhenIfEvaluatesToNonBool(): void
     {
         $entity = new TestEntity();
 

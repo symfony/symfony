@@ -37,7 +37,7 @@ use Symfony\Component\Validator\Validation;
  */
 class PropertyInfoLoaderTest extends TestCase
 {
-    public function testLoadClassMetadata()
+    public function testLoadClassMetadata(): void
     {
         $propertyListExtractor = $this->createStub(PropertyListExtractorInterface::class);
         $propertyListExtractor
@@ -226,7 +226,7 @@ class PropertyInfoLoaderTest extends TestCase
     }
 
     #[DataProvider('regexpProvider')]
-    public function testClassValidator(bool $expected, ?string $classValidatorRegexp = null)
+    public function testClassValidator(bool $expected, ?string $classValidatorRegexp = null): void
     {
         $propertyListExtractor = $this->createStub(PropertyListExtractorInterface::class);
         $propertyListExtractor
@@ -264,7 +264,7 @@ class PropertyInfoLoaderTest extends TestCase
         ];
     }
 
-    public function testClassNoAutoMapping(?PropertyTypeExtractorInterface $propertyListExtractor = null)
+    public function testClassNoAutoMapping(?PropertyTypeExtractorInterface $propertyListExtractor = null): void
     {
         if (null === $propertyListExtractor) {
             $propertyListExtractor = $this->createStub(PropertyListExtractorInterface::class);

@@ -42,7 +42,7 @@ class LogoutListenerTest extends TestCase
         $this->eventDispatcher = new EventDispatcher();
     }
 
-    public function testHandleUnmatchedPath()
+    public function testHandleUnmatchedPath(): void
     {
         $listener = $this->getListener();
         $request = new Request();
@@ -50,7 +50,7 @@ class LogoutListenerTest extends TestCase
         $this->assertFalse($listener->supports($request));
     }
 
-    public function testHandleMatchedPathWithCsrfValidation()
+    public function testHandleMatchedPathWithCsrfValidation(): void
     {
         $this->csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
         $listener = $this->getListener();
@@ -61,7 +61,7 @@ class LogoutListenerTest extends TestCase
             ->willReturn(true);
 
         $response = new Response();
-        $this->eventDispatcher->addListener(LogoutEvent::class, static function (LogoutEvent $event) use ($response) {
+        $this->eventDispatcher->addListener(LogoutEvent::class, static function (LogoutEvent $event) use ($response): void {
             $event->setResponse($response);
         });
 
@@ -74,7 +74,7 @@ class LogoutListenerTest extends TestCase
         $this->assertNull($this->tokenStorage->getToken());
     }
 
-    public function testHandleMatchedPathWithCsrfInQueryParamAndBody()
+    public function testHandleMatchedPathWithCsrfInQueryParamAndBody(): void
     {
         $this->csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
         $listener = $this->getListener();
@@ -86,7 +86,7 @@ class LogoutListenerTest extends TestCase
             ->willReturn(true);
 
         $response = new Response();
-        $this->eventDispatcher->addListener(LogoutEvent::class, static function (LogoutEvent $event) use ($response) {
+        $this->eventDispatcher->addListener(LogoutEvent::class, static function (LogoutEvent $event) use ($response): void {
             $event->setResponse($response);
         });
 
@@ -99,7 +99,7 @@ class LogoutListenerTest extends TestCase
         $this->assertNull($this->tokenStorage->getToken());
     }
 
-    public function testHandleMatchedPathWithoutCsrfValidation()
+    public function testHandleMatchedPathWithoutCsrfValidation(): void
     {
         $listener = new LogoutListener($this->tokenStorage, new HttpUtils(), $this->eventDispatcher, [
             'csrf_parameter' => '_csrf_token',
@@ -111,7 +111,7 @@ class LogoutListenerTest extends TestCase
         $request = Request::create('/logout');
 
         $response = new Response();
-        $this->eventDispatcher->addListener(LogoutEvent::class, static function (LogoutEvent $event) use ($response) {
+        $this->eventDispatcher->addListener(LogoutEvent::class, static function (LogoutEvent $event) use ($response): void {
             $event->setResponse($response);
         });
 
@@ -124,7 +124,7 @@ class LogoutListenerTest extends TestCase
         $this->assertNull($this->tokenStorage->getToken());
     }
 
-    public function testNoResponseSet()
+    public function testNoResponseSet(): void
     {
         $listener = $this->getListener();
         $request = Request::create('/logout');
@@ -136,7 +136,7 @@ class LogoutListenerTest extends TestCase
     }
 
     #[DataProvider('provideInvalidCsrfTokens')]
-    public function testCsrfValidationFails($invalidToken)
+    public function testCsrfValidationFails($invalidToken): void
     {
         $this->csrfTokenManager = $this->createStub(CsrfTokenManagerInterface::class);
         $listener = $this->getListener();

@@ -28,7 +28,7 @@ class FormTest extends TestCase
         class_exists(Form::class);
     }
 
-    public function testConstructorThrowsExceptionIfTheNodeHasNoFormAncestor()
+    public function testConstructorThrowsExceptionIfTheNodeHasNoFormAncestor(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('
@@ -71,7 +71,7 @@ class FormTest extends TestCase
      * __construct() should throw a \LogicException if the form attribute is invalid.
      */
     #[DataProvider('constructorThrowsExceptionIfNoRelatedFormProvider')]
-    public function testConstructorThrowsExceptionIfNoRelatedForm(\DOMElement $node)
+    public function testConstructorThrowsExceptionIfNoRelatedForm(\DOMElement $node): void
     {
         $this->expectException(\LogicException::class);
 
@@ -99,7 +99,7 @@ class FormTest extends TestCase
         ];
     }
 
-    public function testConstructorLoadsOnlyFieldsOfTheRightForm()
+    public function testConstructorLoadsOnlyFieldsOfTheRightForm(): void
     {
         $dom = $this->createTestMultipleForm();
 
@@ -113,7 +113,7 @@ class FormTest extends TestCase
         $this->assertCount(5, $form->all());
     }
 
-    public function testConstructorHandlesFormAttribute()
+    public function testConstructorHandlesFormAttribute(): void
     {
         $dom = $this->createTestHtml5Form();
 
@@ -131,7 +131,7 @@ class FormTest extends TestCase
         $this->assertSame($dom->getElementsByTagName('form')->item(1), $form2->getFormNode(), 'HTML5-compliant form attribute handled incorrectly');
     }
 
-    public function testConstructorHandlesFormValues()
+    public function testConstructorHandlesFormValues(): void
     {
         $dom = $this->createTestHtml5Form();
 
@@ -159,7 +159,7 @@ class FormTest extends TestCase
         $this->assertEquals($values2, $form2->getPhpValues(), 'HTML5-compliant form attribute handled incorrectly');
     }
 
-    public function testMultiValuedFields()
+    public function testMultiValuedFields(): void
     {
         $form = $this->createForm('<form>
             <input type="text" name="foo[4]" value="foo" disabled="disabled" />
@@ -198,7 +198,7 @@ class FormTest extends TestCase
     }
 
     #[DataProvider('provideInitializeValues')]
-    public function testConstructor($message, $form, $values)
+    public function testConstructor($message, $form, $values): void
     {
         $form = $this->createForm('<form>'.$form.'</form>');
         $this->assertEquals(
@@ -297,7 +297,7 @@ class FormTest extends TestCase
         ];
     }
 
-    public function testGetFormNode()
+    public function testGetFormNode(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><form><input type="submit" /></form></html>');
@@ -307,7 +307,7 @@ class FormTest extends TestCase
         $this->assertSame($dom->getElementsByTagName('form')->item(0), $form->getFormNode(), '->getFormNode() returns the form node associated with this form');
     }
 
-    public function testGetFormNodeFromNamedForm()
+    public function testGetFormNodeFromNamedForm(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><form name="my_form"><input type="submit" /></form></html>');
@@ -317,7 +317,7 @@ class FormTest extends TestCase
         $this->assertSame($dom->getElementsByTagName('form')->item(0), $form->getFormNode(), '->getFormNode() returns the form node associated with this form');
     }
 
-    public function testGetMethod()
+    public function testGetMethod(): void
     {
         $form = $this->createForm('<form><input type="submit" /></form>');
         $this->assertEquals('GET', $form->getMethod(), '->getMethod() returns get if no method is defined');
@@ -335,25 +335,25 @@ class FormTest extends TestCase
         $this->assertEquals('PATCH', $form->getMethod(), '->getMethod() returns the method defined in the constructor if provided');
     }
 
-    public function testGetMethodWithOverride()
+    public function testGetMethodWithOverride(): void
     {
         $form = $this->createForm('<form method="get"><input type="submit" formmethod="post" /></form>');
         $this->assertEquals('POST', $form->getMethod(), '->getMethod() returns the method attribute value of the form');
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $form = $this->createForm('<form name="foo"><input type="submit" /></form>');
         $this->assertSame('foo', $form->getName());
     }
 
-    public function testGetNameOnFormWithoutName()
+    public function testGetNameOnFormWithoutName(): void
     {
         $form = $this->createForm('<form><input type="submit" /></form>');
         $this->assertSame('', $form->getName());
     }
 
-    public function testGetSetValue()
+    public function testGetSetValue(): void
     {
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
 
@@ -378,7 +378,7 @@ class FormTest extends TestCase
         }
     }
 
-    public function testDisableValidation()
+    public function testDisableValidation(): void
     {
         $form = $this->createForm('<form>
             <select name="foo[bar]">
@@ -398,14 +398,14 @@ class FormTest extends TestCase
         $this->assertEquals('bar', $form['foo[baz]']->getValue(), '->disableValidation() disables validation of all ChoiceFormField.');
     }
 
-    public function testOffsetUnset()
+    public function testOffsetUnset(): void
     {
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
         unset($form['foo']);
         $this->assertArrayNotHasKey('foo', $form, '->offsetUnset() removes a field');
     }
 
-    public function testOffsetExists()
+    public function testOffsetExists(): void
     {
         $form = $this->createForm('<form><input type="text" name="foo" value="foo" /><input type="submit" /></form>');
 
@@ -413,7 +413,7 @@ class FormTest extends TestCase
         $this->assertArrayNotHasKey('bar', $form, '->offsetExists() return false if the field does not exist');
     }
 
-    public function testGetValues()
+    public function testGetValues(): void
     {
         $form = $this->createForm('<form><input type="text" name="foo[bar]" value="foo" /><input type="text" name="bar" value="bar" /><select multiple="multiple" name="baz[]"></select><input type="submit" /></form>');
         $this->assertEquals(['foo[bar]' => 'foo', 'bar' => 'bar', 'baz' => []], $form->getValues(), '->getValues() returns all form field values');
@@ -435,21 +435,21 @@ class FormTest extends TestCase
         $this->assertEquals(['foo[bar]' => 'foo', 'bar' => 'bar', 'baz' => []], $form->getValues(), '->getValues() returns all form field values from template field inside a turbo-stream');
     }
 
-    public function testSetValues()
+    public function testSetValues(): void
     {
         $form = $this->createForm('<form><input type="checkbox" name="foo" value="foo" checked="checked" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $form->setValues(['foo' => false, 'bar' => 'foo']);
         $this->assertEquals(['bar' => 'foo'], $form->getValues(), '->setValues() sets the values of fields');
     }
 
-    public function testMultiselectSetValues()
+    public function testMultiselectSetValues(): void
     {
         $form = $this->createForm('<form><select multiple="multiple" name="multi"><option value="foo">foo</option><option value="bar">bar</option></select><input type="submit" /></form>');
         $form->setValues(['multi' => ['foo', 'bar']]);
         $this->assertEquals(['multi' => ['foo', 'bar']], $form->getValues(), '->setValue() sets the values of select');
     }
 
-    public function testGetPhpValues()
+    public function testGetPhpValues(): void
     {
         $form = $this->createForm('<form><input type="text" name="foo[bar]" value="foo" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $this->assertEquals(['foo' => ['bar' => 'foo'], 'bar' => 'bar'], $form->getPhpValues(), '->getPhpValues() converts keys with [] to arrays');
@@ -464,7 +464,7 @@ class FormTest extends TestCase
         $this->assertEquals(['foo' => ['bar' => 'foo'], 'bar' => 'bar'], $form->getPhpValues(), "->getPhpValues() doesn't return empty values");
     }
 
-    public function testGetFiles()
+    public function testGetFiles(): void
     {
         $form = $this->createForm('<form><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $this->assertEquals([], $form->getFiles(), '->getFiles() returns an empty array if method is get');
@@ -492,7 +492,7 @@ class FormTest extends TestCase
         $this->assertEquals(['foo[bar]' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]], $form->getFiles(), '->getFiles() return files fields from template inside turbo-stream');
     }
 
-    public function testGetPhpFiles()
+    public function testGetPhpFiles(): void
     {
         $form = $this->createForm('<form method="post"><input type="file" name="foo[bar]" /><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $this->assertEquals(['foo' => ['bar' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]]], $form->getPhpFiles(), '->getPhpFiles() converts keys with [] to arrays');
@@ -514,7 +514,7 @@ class FormTest extends TestCase
     }
 
     #[DataProvider('provideGetUriValues')]
-    public function testGetUri($message, $form, $values, $uri, $method = null)
+    public function testGetUri($message, $form, $values, $uri, $method = null): void
     {
         $form = $this->createForm($form, $method);
         $form->setValues($values);
@@ -522,7 +522,7 @@ class FormTest extends TestCase
         $this->assertEquals('http://example.com'.$uri, $form->getUri(), '->getUri() '.$message);
     }
 
-    public function testGetBaseUri()
+    public function testGetBaseUri(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<form method="post" action="foo.php"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
@@ -532,14 +532,14 @@ class FormTest extends TestCase
         $this->assertEquals('http://www.foo.com/foo.php', $form->getUri());
     }
 
-    public function testGetUriWithAnchor()
+    public function testGetUriWithAnchor(): void
     {
         $form = $this->createForm('<form action="#foo"><input type="submit" /></form>', null, 'http://example.com/id/123');
 
         $this->assertEquals('http://example.com/id/123#foo', $form->getUri());
     }
 
-    public function testGetUriActionAbsolute()
+    public function testGetUriActionAbsolute(): void
     {
         $formHtml = '<form id="login_form" action="https://login.foo.com/login.php?login_attempt=1" method="POST"><input type="text" name="foo" value="foo" /><input type="submit" /></form>';
 
@@ -560,7 +560,7 @@ class FormTest extends TestCase
         $this->assertEquals('https://login.foo.com/login.php?login_attempt=1', $form->getUri(), '->getUri() returns absolute URIs set in the action form');
     }
 
-    public function testGetUriAbsolute()
+    public function testGetUriAbsolute(): void
     {
         $form = $this->createForm('<form action="foo"><input type="submit" /></form>', null, 'http://localhost/foo/');
         $this->assertEquals('http://localhost/foo/foo', $form->getUri(), '->getUri() returns absolute URIs');
@@ -569,19 +569,19 @@ class FormTest extends TestCase
         $this->assertEquals('http://localhost/foo', $form->getUri(), '->getUri() returns absolute URIs');
     }
 
-    public function testGetUriWithOnlyQueryString()
+    public function testGetUriWithOnlyQueryString(): void
     {
         $form = $this->createForm('<form action="?get=param"><input type="submit" /></form>', null, 'http://localhost/foo/bar');
         $this->assertEquals('http://localhost/foo/bar?get=param', $form->getUri(), '->getUri() returns absolute URIs only if the host has been defined in the constructor');
     }
 
-    public function testGetUriWithoutAction()
+    public function testGetUriWithoutAction(): void
     {
         $form = $this->createForm('<form><input type="submit" /></form>', null, 'http://localhost/foo/bar');
         $this->assertEquals('http://localhost/foo/bar', $form->getUri(), '->getUri() returns path if no action defined');
     }
 
-    public function testGetUriWithActionOverride()
+    public function testGetUriWithActionOverride(): void
     {
         $form = $this->createForm('<form action="/foo"><button type="submit" formaction="/bar" /></form>', null, 'http://localhost/foo/');
         $this->assertEquals('http://localhost/bar', $form->getUri(), '->getUri() returns absolute URIs');
@@ -668,7 +668,7 @@ class FormTest extends TestCase
         ];
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
 
@@ -676,14 +676,14 @@ class FormTest extends TestCase
         $this->assertTrue($form->has('bar'), '->has() returns true if a field is in the form');
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
         $form->remove('bar');
         $this->assertFalse($form->has('bar'), '->remove() removes a field');
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
 
@@ -697,7 +697,7 @@ class FormTest extends TestCase
         }
     }
 
-    public function testAll()
+    public function testAll(): void
     {
         $form = $this->createForm('<form method="post"><input type="text" name="bar" value="bar" /><input type="submit" /></form>');
 
@@ -706,7 +706,7 @@ class FormTest extends TestCase
         $this->assertInstanceOf(InputFormField::class, $fields['bar'], '->all() return an array of form field objects');
     }
 
-    public function testSubmitWithoutAFormButton()
+    public function testSubmitWithoutAFormButton(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('
@@ -722,14 +722,14 @@ class FormTest extends TestCase
         $this->assertSame($nodes->item(0), $form->getFormNode(), '->getFormNode() returns the form node associated with this form');
     }
 
-    public function testTypeAttributeIsCaseInsensitive()
+    public function testTypeAttributeIsCaseInsensitive(): void
     {
         $form = $this->createForm('<form method="post"><input type="IMAGE" name="example" /></form>');
         $this->assertTrue($form->has('example.x'), '->has() returns true if the image input was correctly turned into an x and a y fields');
         $this->assertTrue($form->has('example.y'), '->has() returns true if the image input was correctly turned into an x and a y fields');
     }
 
-    public function testFormFieldRegistryAcceptAnyNames()
+    public function testFormFieldRegistryAcceptAnyNames(): void
     {
         $field = $this->getFormFieldMock('[t:dbt%3adate;]data_daterange_enddate_value');
 
@@ -744,21 +744,21 @@ class FormTest extends TestCase
         $registry->remove('[t:dbt%3adate;]data_daterange_enddate_value');
     }
 
-    public function testFormFieldRegistryGetThrowAnExceptionWhenTheFieldDoesNotExist()
+    public function testFormFieldRegistryGetThrowAnExceptionWhenTheFieldDoesNotExist(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $registry = new FormFieldRegistry();
         $registry->get('foo');
     }
 
-    public function testFormFieldRegistrySetThrowAnExceptionWhenTheFieldDoesNotExist()
+    public function testFormFieldRegistrySetThrowAnExceptionWhenTheFieldDoesNotExist(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $registry = new FormFieldRegistry();
         $registry->set('foo', null);
     }
 
-    public function testFormFieldRegistryHasReturnsTrueWhenTheFQNExists()
+    public function testFormFieldRegistryHasReturnsTrueWhenTheFQNExists(): void
     {
         $registry = new FormFieldRegistry();
         $registry->add($this->getFormFieldMock('foo[bar]'));
@@ -769,7 +769,7 @@ class FormTest extends TestCase
         $this->assertFalse($registry->has('foo[foo]'));
     }
 
-    public function testFormRegistryFieldsCanBeRemoved()
+    public function testFormRegistryFieldsCanBeRemoved(): void
     {
         $registry = new FormFieldRegistry();
         $registry->add($this->getFormFieldMock('foo'));
@@ -777,7 +777,7 @@ class FormTest extends TestCase
         $this->assertFalse($registry->has('foo'));
     }
 
-    public function testFormRegistrySupportsMultivaluedFields()
+    public function testFormRegistrySupportsMultivaluedFields(): void
     {
         $registry = new FormFieldRegistry();
         $registry->add($this->getFormFieldMock('foo[]'));
@@ -792,7 +792,7 @@ class FormTest extends TestCase
         );
     }
 
-    public function testFormRegistrySetValues()
+    public function testFormRegistrySetValues(): void
     {
         $registry = new FormFieldRegistry();
         $registry->add($f2 = $this->getFormFieldMock('foo[2]'));
@@ -830,7 +830,7 @@ class FormTest extends TestCase
         ]);
     }
 
-    public function testFormRegistrySetValueOnCompoundField()
+    public function testFormRegistrySetValueOnCompoundField(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot set value on a compound field "foo[bar]".');
@@ -840,7 +840,7 @@ class FormTest extends TestCase
         $registry->set('foo[bar]', 'fbb');
     }
 
-    public function testFormRegistrySetArrayOnNotCompoundField()
+    public function testFormRegistrySetArrayOnNotCompoundField(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unreachable field "0"');
@@ -850,7 +850,7 @@ class FormTest extends TestCase
         $registry->set('bar', ['baz']);
     }
 
-    public function testDifferentFieldTypesWithSameName()
+    public function testDifferentFieldTypesWithSameName(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('
@@ -972,7 +972,7 @@ class FormTest extends TestCase
         return $dom;
     }
 
-    public function testGetPhpValuesWithEmptyTextarea()
+    public function testGetPhpValuesWithEmptyTextarea(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('
@@ -988,7 +988,7 @@ class FormTest extends TestCase
         $this->assertEquals(['example' => ''], $form->getPhpValues());
     }
 
-    public function testGetReturnTypes()
+    public function testGetReturnTypes(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('

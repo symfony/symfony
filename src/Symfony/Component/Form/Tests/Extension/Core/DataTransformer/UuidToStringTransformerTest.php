@@ -19,21 +19,21 @@ use Symfony\Component\Uid\UuidV1;
 
 class UuidToStringTransformerTest extends TestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $transformer = new UuidToStringTransformer();
 
         $this->assertEquals('123e4567-e89b-12d3-a456-426655440000', $transformer->transform(new UuidV1('123e4567-e89b-12d3-a456-426655440000')));
     }
 
-    public function testTransformEmpty()
+    public function testTransformEmpty(): void
     {
         $transformer = new UuidToStringTransformer();
 
         $this->assertNull($transformer->transform(null));
     }
 
-    public function testTransformExpectsUuid()
+    public function testTransformExpectsUuid(): void
     {
         $transformer = new UuidToStringTransformer();
 
@@ -42,21 +42,21 @@ class UuidToStringTransformerTest extends TestCase
         $transformer->transform('1234');
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $transformer = new UuidToStringTransformer();
 
         $this->assertEquals(new UuidV1('123e4567-e89b-12d3-a456-426655440000'), $transformer->reverseTransform('123e4567-e89b-12d3-a456-426655440000'));
     }
 
-    public function testReverseTransformEmpty()
+    public function testReverseTransformEmpty(): void
     {
         $reverseTransformer = new UuidToStringTransformer();
 
         $this->assertNull($reverseTransformer->reverseTransform(''));
     }
 
-    public function testReverseTransformExpectsString()
+    public function testReverseTransformExpectsString(): void
     {
         $reverseTransformer = new UuidToStringTransformer();
 
@@ -65,7 +65,7 @@ class UuidToStringTransformerTest extends TestCase
         $reverseTransformer->reverseTransform(Uuid::fromString('123e4567-e89b-12d3-a456-426655440000')->toBase32());
     }
 
-    public function testReverseTransformExpectsValidUuidString()
+    public function testReverseTransformExpectsValidUuidString(): void
     {
         $reverseTransformer = new UuidToStringTransformer();
 

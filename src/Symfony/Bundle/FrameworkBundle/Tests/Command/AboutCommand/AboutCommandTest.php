@@ -28,7 +28,7 @@ class AboutCommandTest extends TestCase
         $this->fs = new Filesystem();
     }
 
-    public function testAboutWithReadableFiles()
+    public function testAboutWithReadableFiles(): void
     {
         $kernel = new TestAppKernel('test', true);
         $this->fs->mkdir($kernel->getProjectDir());
@@ -51,7 +51,7 @@ class AboutCommandTest extends TestCase
         }
     }
 
-    public function testAboutWithUnreadableFiles()
+    public function testAboutWithUnreadableFiles(): void
     {
         $kernel = new TestAppKernel('test', true);
         $this->fs->mkdir($kernel->getProjectDir());

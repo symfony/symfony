@@ -23,7 +23,7 @@ use Symfony\Component\Mime\Part\TextPart;
 
 class TextPartTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $p = new TextPart('content');
         $this->assertEquals('content', $p->getBody());
@@ -38,7 +38,7 @@ class TextPartTest extends TestCase
         $this->assertEquals('html', $p->getMediaSubType());
     }
 
-    public function testConstructorWithResource()
+    public function testConstructorWithResource(): void
     {
         $f = fopen('php://memory', 'r+', false);
         fwrite($f, 'content');
@@ -50,7 +50,7 @@ class TextPartTest extends TestCase
         fclose($f);
     }
 
-    public function testConstructorWithFile()
+    public function testConstructorWithFile(): void
     {
         $p = new TextPart(new File(\dirname(__DIR__).'/Fixtures/content.txt'));
         $this->assertSame('content', $p->getBody());
@@ -58,7 +58,7 @@ class TextPartTest extends TestCase
         $this->assertSame('content', implode('', iterator_to_array($p->bodyToIterable())));
     }
 
-    public function testConstructorWithUnknownFile()
+    public function testConstructorWithUnknownFile(): void
     {
         $p = new TextPart(new File(\dirname(__DIR__).'/Fixtures/unknown.txt'));
 
@@ -68,13 +68,13 @@ class TextPartTest extends TestCase
         $p->getBody();
     }
 
-    public function testConstructorWithNonStringOrResource()
+    public function testConstructorWithNonStringOrResource(): void
     {
         $this->expectException(\TypeError::class);
         new TextPart(new \stdClass());
     }
 
-    public function testHeaders()
+    public function testHeaders(): void
     {
         $p = new TextPart('content');
         $this->assertEquals(new Headers(
@@ -89,7 +89,7 @@ class TextPartTest extends TestCase
         ), $p->getPreparedHeaders());
     }
 
-    public function testEncoding()
+    public function testEncoding(): void
     {
         $p = new TextPart('content', 'utf-8', 'plain', 'base64');
         $this->assertEquals(base64_encode('content'), $p->bodyToString());
@@ -100,7 +100,7 @@ class TextPartTest extends TestCase
         ), $p->getPreparedHeaders());
     }
 
-    public function testCustomEncoderNeedsToRegisterFirst()
+    public function testCustomEncoderNeedsToRegisterFirst(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The encoding must be one of "quoted-printable", "base64", "8bit", "upper_encoder" ("this_encoding_does_not_exist" given).');
@@ -112,7 +112,7 @@ class TextPartTest extends TestCase
         new TextPart('content', 'utf-8', 'plain', 'this_encoding_does_not_exist');
     }
 
-    public function testOverwriteDefaultEncoder()
+    public function testOverwriteDefaultEncoder(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('You are not allowed to change the default encoders ("quoted-printable", "base64", and "8bit").');
@@ -123,7 +123,7 @@ class TextPartTest extends TestCase
         TextPart::addEncoder($base64Encoder);
     }
 
-    public function testCustomEncoding()
+    public function testCustomEncoding(): void
     {
         TextPart::addEncoder(new class implements ContentEncoderInterface {
             public function encodeByteStream($stream, int $maxLineLength = 0): iterable
@@ -159,7 +159,7 @@ class TextPartTest extends TestCase
         ), $p->getPreparedHeaders());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $r = fopen('php://memory', 'r+', false);
         fwrite($r, 'Text content');

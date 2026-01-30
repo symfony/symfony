@@ -56,7 +56,7 @@ class PhpConfigReferenceDumpPassTest extends TestCase
         }
     }
 
-    public function testProcessWithConfigDir()
+    public function testProcessWithConfigDir(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('.container.known_envs', ['test', 'dev']);
@@ -76,7 +76,7 @@ class PhpConfigReferenceDumpPassTest extends TestCase
         $this->assertEquals([new FileResource(realpath($this->tempDir).'/reference.php')], $container->getResources());
     }
 
-    public function testProcessIgnoresFileWriteErrors()
+    public function testProcessIgnoresFileWriteErrors(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('.container.known_envs', ['dev', 'prod', 'test']);
@@ -90,7 +90,7 @@ class PhpConfigReferenceDumpPassTest extends TestCase
         $this->assertEmpty($container->getResources());
     }
 
-    public function testProcessGeneratesExpectedReferenceFile()
+    public function testProcessGeneratesExpectedReferenceFile(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('.container.known_envs', ['dev', 'prod', 'test']);
@@ -117,7 +117,7 @@ class PhpConfigReferenceDumpPassTest extends TestCase
 
     #[TestWith([self::class])]
     #[TestWith(['Symfony\\NotARealClass'])]
-    public function testProcessWithInvalidBundleClass(string $invalidClass)
+    public function testProcessWithInvalidBundleClass(string $invalidClass): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('.container.known_envs', ['test', 'dev']);

@@ -26,7 +26,7 @@ use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 class RateLimiterFactoryTest extends TestCase
 {
     #[DataProvider('validConfigProvider')]
-    public function testValidConfig(string $expectedClass, array $config)
+    public function testValidConfig(string $expectedClass, array $config): void
     {
         $factory = new RateLimiterFactory($config, new InMemoryStorage());
         $rateLimiter = $factory->create('key');
@@ -62,7 +62,7 @@ class RateLimiterFactoryTest extends TestCase
     }
 
     #[DataProvider('invalidConfigProvider')]
-    public function testInvalidConfig(string $exceptionClass, array $config)
+    public function testInvalidConfig(string $exceptionClass, array $config): void
     {
         $this->expectException($exceptionClass);
 
@@ -77,7 +77,7 @@ class RateLimiterFactoryTest extends TestCase
     }
 
     #[Group('time-sensitive')]
-    public function testExpirationTimeCalculationWhenUsingDefaultTimezoneRomeWithIntervalAfterCETChange()
+    public function testExpirationTimeCalculationWhenUsingDefaultTimezoneRomeWithIntervalAfterCETChange(): void
     {
         $originalTimezone = date_default_timezone_get();
         try {

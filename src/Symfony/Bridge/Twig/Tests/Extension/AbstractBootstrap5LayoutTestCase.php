@@ -38,7 +38,7 @@ use Symfony\Component\Form\FormError;
  */
 abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4LayoutTestCase
 {
-    public function testRow()
+    public function testRow(): void
     {
         $form = $this->factory->createNamed('')->add('name', TextType::class);
         $form->get('name')->addError(new FormError('[trans]Error![/trans]'));
@@ -59,7 +59,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testRowWithCustomClass()
+    public function testRowWithCustomClass(): void
     {
         $form = $this->factory->createNamed('')->add('name', TextType::class);
         $form->get('name')->addError(new FormError('[trans]Error![/trans]'));
@@ -84,7 +84,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testLabelDoesNotRenderFieldAttributes()
+    public function testLabelDoesNotRenderFieldAttributes(): void
     {
         $form = $this->factory->createNamed('name', TextType::class);
         $html = $this->renderLabel($form->createView(), null, [
@@ -101,7 +101,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testLabelWithCustomAttributesPassedDirectly()
+    public function testLabelWithCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', TextType::class);
         $html = $this->renderLabel($form->createView(), null, [
@@ -118,7 +118,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testLabelWithCustomTextAndCustomAttributesPassedDirectly()
+    public function testLabelWithCustomTextAndCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', TextType::class);
         $html = $this->renderLabel($form->createView(), 'Custom label', [
@@ -136,7 +136,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
+    public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
             'label' => 'Custom label',
@@ -156,7 +156,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testLabelHtmlDefaultIsFalse()
+    public function testLabelHtmlDefaultIsFalse(): void
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
             'label' => '<b>Bolded label</b>',
@@ -172,7 +172,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class form-label required"]/b[.="Bolded label"]', 0);
     }
 
-    public function testLabelHtmlIsTrue()
+    public function testLabelHtmlIsTrue(): void
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
             'label' => '<b>Bolded label</b>',
@@ -189,7 +189,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class form-label required"]/b[.="Bolded label"]');
     }
 
-    public function testHelp()
+    public function testHelp(): void
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
             'help' => 'Help text test!',
@@ -206,7 +206,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testHelpAttr()
+    public function testHelpAttr(): void
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
             'help' => 'Help text test!',
@@ -226,7 +226,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testHelpHtmlDefaultIsFalse()
+    public function testHelpHtmlDefaultIsFalse(): void
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
             'help' => 'Help <b>text</b> test!',
@@ -253,7 +253,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testHelpHtmlIsFalse()
+    public function testHelpHtmlIsFalse(): void
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
             'help' => 'Help <b>text</b> test!',
@@ -281,7 +281,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testHelpHtmlIsTrue()
+    public function testHelpHtmlIsTrue(): void
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
             'help' => 'Help <b>text</b> test!',
@@ -307,12 +307,12 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testErrors()
+    public function testErrors(): void
     {
         self::markTestSkipped('This method has been split into testRootErrors() and testRowErrors().');
     }
 
-    public function testRootErrors()
+    public function testRootErrors(): void
     {
         $form = $this->factory->createNamed('');
         $form->addError(new FormError('[trans]Error 1[/trans]'));
@@ -330,7 +330,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testRowErrors()
+    public function testRowErrors(): void
     {
         $form = $this->factory->createNamed('')->add('name', TextType::class);
         $form->get('name')->addError(new FormError('[trans]Error 1[/trans]'));
@@ -348,12 +348,12 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testErrorWithNoLabel()
+    public function testErrorWithNoLabel(): void
     {
         self::markTestSkipped('Errors are no longer rendered inside label with Bootstrap 5.');
     }
 
-    public function testSingleChoiceAttributesWithMainAttributes()
+    public function testSingleChoiceAttributesWithMainAttributes(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -376,7 +376,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testCheckboxRowWithHelp()
+    public function testCheckboxRowWithHelp(): void
     {
         $form = $this->factory->createNamed('name', CheckboxType::class);
         $html = $this->renderRow($form->createView(), ['label' => 'foo', 'help' => 'really helpful text']);
@@ -408,7 +408,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testCheckboxSwitchWithValue()
+    public function testCheckboxSwitchWithValue(): void
     {
         $form = $this->factory->createNamed('name', CheckboxType::class, false, [
             'value' => 'foo&bar',
@@ -427,7 +427,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testCheckboxToggleWithValue()
+    public function testCheckboxToggleWithValue(): void
     {
         $form = $this->factory->createNamed('name', CheckboxType::class, false, [
             'value' => 'foo&bar',
@@ -442,7 +442,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testMultipleChoiceSkipsPlaceholder()
+    public function testMultipleChoiceSkipsPlaceholder(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -465,7 +465,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoice()
+    public function testSingleChoice(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -487,7 +487,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoiceWithoutTranslation()
+    public function testSingleChoiceWithoutTranslation(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -510,7 +510,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoiceWithPlaceholderWithoutTranslation()
+    public function testSingleChoiceWithPlaceholderWithoutTranslation(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -536,7 +536,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoiceAttributes()
+    public function testSingleChoiceAttributes(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -559,7 +559,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoiceWithPreferred()
+    public function testSingleChoiceWithPreferred(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -584,7 +584,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoiceWithPreferredIsNotDuplicated()
+    public function testSingleChoiceWithPreferredIsNotDuplicated(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -609,7 +609,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoiceWithSelectedPreferred()
+    public function testSingleChoiceWithSelectedPreferred(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -634,7 +634,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoiceWithPreferredAndNoSeparator()
+    public function testSingleChoiceWithPreferredAndNoSeparator(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -658,7 +658,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoiceWithPreferredAndBlankSeparator()
+    public function testSingleChoiceWithPreferredAndBlankSeparator(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -683,7 +683,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testChoiceWithOnlyPreferred()
+    public function testChoiceWithOnlyPreferred(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -700,7 +700,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoiceNonRequired()
+    public function testSingleChoiceNonRequired(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -724,7 +724,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoiceNonRequiredNoneSelected()
+    public function testSingleChoiceNonRequiredNoneSelected(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, null, [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -748,7 +748,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoiceNonRequiredWithPlaceholder()
+    public function testSingleChoiceNonRequiredWithPlaceholder(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -773,7 +773,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoiceRequiredWithPlaceholder()
+    public function testSingleChoiceRequiredWithPlaceholder(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -798,7 +798,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoiceRequiredWithPlaceholderViaView()
+    public function testSingleChoiceRequiredWithPlaceholderViaView(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -822,7 +822,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testSingleChoiceGrouped()
+    public function testSingleChoiceGrouped(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => [
@@ -853,7 +853,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testMultipleChoice()
+    public function testMultipleChoice(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -877,7 +877,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testMultipleChoiceAttributes()
+    public function testMultipleChoiceAttributes(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -902,7 +902,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testMultipleChoiceNonRequired()
+    public function testMultipleChoiceNonRequired(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -925,7 +925,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testRadioRowWithHelp()
+    public function testRadioRowWithHelp(): void
     {
         $form = $this->factory->createNamed('name', RadioType::class, false);
         $html = $this->renderRow($form->createView(), ['label' => 'foo', 'help' => 'really helpful text']);
@@ -942,7 +942,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testFile()
+    public function testFile(): void
     {
         $form = $this->factory->createNamed('name', FileType::class);
 
@@ -955,12 +955,12 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testFileLabelIdNotDuplicated()
+    public function testFileLabelIdNotDuplicated(): void
     {
         $this->markTestSkipped('The Bootstrap 5 form theme does not use the file widget shipped with the Bootstrap 4 theme.');
     }
 
-    public function testFileWithGroup()
+    public function testFileWithGroup(): void
     {
         $form = $this->factory->createNamed('name', FileType::class);
         $html = $this->renderRow($form->createView(), [
@@ -989,12 +989,12 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testFileWithPlaceholder()
+    public function testFileWithPlaceholder(): void
     {
         self::markTestSkipped('Placeholder does not apply on input file.');
     }
 
-    public function testCountry()
+    public function testCountry(): void
     {
         $form = $this->factory->createNamed('name', CountryType::class, 'AT');
 
@@ -1008,7 +1008,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testCountryWithPlaceholder()
+    public function testCountryWithPlaceholder(): void
     {
         $form = $this->factory->createNamed('name', CountryType::class, 'AT', [
             'placeholder' => 'Select&Country',
@@ -1026,7 +1026,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testDateTime()
+    public function testDateTime(): void
     {
         $form = $this->factory->createNamed('name', DateTimeType::class, date('Y').'-02-03 04:05:06', [
             'input' => 'string',
@@ -1079,7 +1079,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testDateTimeWithPlaceholderGlobal()
+    public function testDateTimeWithPlaceholderGlobal(): void
     {
         $form = $this->factory->createNamed('name', DateTimeType::class, null, [
             'input' => 'string',
@@ -1132,7 +1132,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testDateTimeWithHourAndMinute()
+    public function testDateTimeWithHourAndMinute(): void
     {
         $data = ['year' => date('Y'), 'month' => '2', 'day' => '3', 'hour' => '4', 'minute' => '5'];
 
@@ -1186,7 +1186,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testDateTimeWithSeconds()
+    public function testDateTimeWithSeconds(): void
     {
         $form = $this->factory->createNamed('name', DateTimeType::class, date('Y').'-02-03 04:05:06', [
             'input' => 'string',
@@ -1244,7 +1244,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testDateTimeSingleText()
+    public function testDateTimeSingleText(): void
     {
         $form = $this->factory->createNamed('name', DateTimeType::class, '2011-02-03 04:05:06', [
             'input' => 'string',
@@ -1273,7 +1273,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testDateChoice()
+    public function testDateChoice(): void
     {
         $form = $this->factory->createNamed('name', DateType::class, date('Y').'-02-03', [
             'input' => 'string',
@@ -1306,7 +1306,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testDateChoiceWithPlaceholderGlobal()
+    public function testDateChoiceWithPlaceholderGlobal(): void
     {
         $form = $this->factory->createNamed('name', DateType::class, null, [
             'input' => 'string',
@@ -1341,7 +1341,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testDateChoiceWithPlaceholderOnYear()
+    public function testDateChoiceWithPlaceholderOnYear(): void
     {
         $form = $this->factory->createNamed('name', DateType::class, null, [
             'input' => 'string',
@@ -1376,7 +1376,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testDateText()
+    public function testDateText(): void
     {
         $form = $this->factory->createNamed('name', DateType::class, '2011-02-03', [
             'input' => 'string',
@@ -1412,7 +1412,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testBirthDay()
+    public function testBirthDay(): void
     {
         $form = $this->factory->createNamed('name', BirthdayType::class, '2000-02-03', [
             'input' => 'string',
@@ -1445,7 +1445,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testBirthDayWithPlaceholder()
+    public function testBirthDayWithPlaceholder(): void
     {
         $form = $this->factory->createNamed('name', BirthdayType::class, '1950-01-01', [
             'input' => 'string',
@@ -1483,7 +1483,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testLanguage()
+    public function testLanguage(): void
     {
         $form = $this->factory->createNamed('name', LanguageType::class, 'de');
 
@@ -1497,7 +1497,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testLocale()
+    public function testLocale(): void
     {
         $form = $this->factory->createNamed('name', LocaleType::class, 'de_AT');
 
@@ -1511,7 +1511,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testMoney()
+    public function testMoney(): void
     {
         $form = $this->factory->createNamed('name', MoneyType::class, 1234.56, [
             'currency' => 'EUR',
@@ -1535,7 +1535,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testPercent()
+    public function testPercent(): void
     {
         $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['rounding_mode' => \NumberFormatter::ROUND_CEILING]);
 
@@ -1557,7 +1557,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testPercentCustomSymbol()
+    public function testPercentCustomSymbol(): void
     {
         $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱', 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), ['id' => 'my&id', 'attr' => ['class' => 'my&class']],
@@ -1578,7 +1578,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testRange()
+    public function testRange(): void
     {
         $form = $this->factory->createNamed('name', RangeType::class, 42, ['attr' => ['min' => 5]]);
 
@@ -1593,7 +1593,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testRangeWithMinMaxValues()
+    public function testRangeWithMinMaxValues(): void
     {
         $form = $this->factory->createNamed('name', RangeType::class, 42, ['attr' => ['min' => 5, 'max' => 57]]);
 
@@ -1609,7 +1609,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testColor()
+    public function testColor(): void
     {
         $color = '#0000ff';
         $form = $this->factory->createNamed('name', ColorType::class, $color);
@@ -1624,7 +1624,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testTime()
+    public function testTime(): void
     {
         $form = $this->factory->createNamed('name', TimeType::class, '04:05:06', [
             'input' => 'string',
@@ -1658,7 +1658,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testTimeWithSeconds()
+    public function testTimeWithSeconds(): void
     {
         $form = $this->factory->createNamed('name', TimeType::class, '04:05:06', [
             'input' => 'string',
@@ -1702,7 +1702,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testTimeText()
+    public function testTimeText(): void
     {
         $form = $this->factory->createNamed('name', TimeType::class, '04:05:06', [
             'input' => 'string',
@@ -1741,7 +1741,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testTimeWithPlaceholderGlobal()
+    public function testTimeWithPlaceholderGlobal(): void
     {
         $form = $this->factory->createNamed('name', TimeType::class, null, [
             'input' => 'string',
@@ -1775,7 +1775,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testTimeWithPlaceholderOnYear()
+    public function testTimeWithPlaceholderOnYear(): void
     {
         $form = $this->factory->createNamed('name', TimeType::class, null, [
             'input' => 'string',
@@ -1809,7 +1809,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testTimezone()
+    public function testTimezone(): void
     {
         $form = $this->factory->createNamed('name', TimezoneType::class, 'Europe/Vienna');
 
@@ -1824,7 +1824,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testTimezoneWithPlaceholder()
+    public function testTimezoneWithPlaceholder(): void
     {
         $form = $this->factory->createNamed('name', TimezoneType::class, null, [
             'placeholder' => 'Select&Timezone',
@@ -1840,7 +1840,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testWeekChoices()
+    public function testWeekChoices(): void
     {
         $data = ['year' => (int) date('Y'), 'week' => 1];
 
@@ -1866,7 +1866,7 @@ abstract class AbstractBootstrap5LayoutTestCase extends AbstractBootstrap4Layout
         );
     }
 
-    public function testFloatingLabel()
+    public function testFloatingLabel(): void
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
             'attr' => [

@@ -32,7 +32,7 @@ class YamlEncoderContextBuilderTest extends TestCase
      * @param array<string, mixed> $values
      */
     #[DataProvider('withersDataProvider')]
-    public function testWithers(array $values)
+    public function testWithers(array $values): void
     {
         $context = $this->contextBuilder
             ->withIndentLevel($values[YamlEncoder::YAML_INDENT])

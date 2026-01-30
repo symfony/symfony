@@ -19,7 +19,7 @@ class SessionTest extends AbstractWebTestCase
      * Tests session attributes persist.
      */
     #[DataProvider('getConfigs')]
-    public function testWelcome($config, $insulate)
+    public function testWelcome($config, $insulate): void
     {
         $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {
@@ -65,7 +65,7 @@ class SessionTest extends AbstractWebTestCase
      * Tests flash messages work in practice.
      */
     #[DataProvider('getConfigs')]
-    public function testFlash($config, $insulate)
+    public function testFlash($config, $insulate): void
     {
         $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {
@@ -88,7 +88,7 @@ class SessionTest extends AbstractWebTestCase
      * polluting each other's session data.
      */
     #[DataProvider('getConfigs')]
-    public function testTwoClients($config, $insulate)
+    public function testTwoClients($config, $insulate): void
     {
         // start first client
         $client1 = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
@@ -142,7 +142,7 @@ class SessionTest extends AbstractWebTestCase
     }
 
     #[DataProvider('getConfigs')]
-    public function testCorrectCacheControlHeadersForCacheableAction($config, $insulate)
+    public function testCorrectCacheControlHeadersForCacheableAction($config, $insulate): void
     {
         $client = $this->createClient(['test_case' => 'Session', 'root_config' => $config]);
         if ($insulate) {

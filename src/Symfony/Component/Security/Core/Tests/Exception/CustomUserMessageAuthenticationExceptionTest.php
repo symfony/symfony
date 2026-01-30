@@ -35,7 +35,7 @@ class ChildCustomUserMessageAuthenticationException extends CustomUserMessageAut
 
 class CustomUserMessageAuthenticationExceptionTest extends TestCase
 {
-    public function testConstructWithSAfeMessage()
+    public function testConstructWithSAfeMessage(): void
     {
         $e = new CustomUserMessageAuthenticationException('SAFE MESSAGE', ['foo' => true]);
 
@@ -44,7 +44,7 @@ class CustomUserMessageAuthenticationExceptionTest extends TestCase
         $this->assertEquals('SAFE MESSAGE', $e->getMessage());
     }
 
-    public function testSharedSerializedData()
+    public function testSharedSerializedData(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('foo', 'bar', ['ROLE_USER']), 'main', ['ROLE_USER']);
 
@@ -59,7 +59,7 @@ class CustomUserMessageAuthenticationExceptionTest extends TestCase
         $this->assertSame($processed->getToken(), $processed->getMessageData()['token']);
     }
 
-    public function testSharedSerializedDataFromChild()
+    public function testSharedSerializedDataFromChild(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('foo', 'bar', ['ROLE_USER']), 'main', ['ROLE_USER']);
 

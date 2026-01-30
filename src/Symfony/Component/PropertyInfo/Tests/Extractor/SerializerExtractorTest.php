@@ -32,7 +32,7 @@ class SerializerExtractorTest extends TestCase
         $this->extractor = new SerializerExtractor($classMetadataFactory);
     }
 
-    public function testGetProperties()
+    public function testGetProperties(): void
     {
         $this->assertEquals(
             ['collection'],
@@ -40,17 +40,17 @@ class SerializerExtractorTest extends TestCase
         );
     }
 
-    public function testGetPropertiesWithIgnoredProperties()
+    public function testGetPropertiesWithIgnoredProperties(): void
     {
         $this->assertSame(['visibleProperty'], $this->extractor->getProperties(IgnorePropertyDummy::class, ['serializer_groups' => ['a']]));
     }
 
-    public function testGetPropertiesWithAnyGroup()
+    public function testGetPropertiesWithAnyGroup(): void
     {
         $this->assertSame(['analyses', 'feet'], $this->extractor->getProperties(AdderRemoverDummy::class, ['serializer_groups' => null]));
     }
 
-    public function testGetPropertiesWithNonExistentClassReturnsNull()
+    public function testGetPropertiesWithNonExistentClassReturnsNull(): void
     {
         $this->assertNull($this->extractor->getProperties('NonExistent'));
     }

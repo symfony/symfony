@@ -22,7 +22,7 @@ use Symfony\Component\TypeInfo\TypeResolver\StringTypeResolver;
 
 class GenericTypePropertyMetadataLoaderTest extends TestCase
 {
-    public function testReplaceGenerics()
+    public function testReplaceGenerics(): void
     {
         $loader = new GenericTypePropertyMetadataLoader(self::propertyMetadataLoader([
             'foo' => new PropertyMetadata('foo', Type::template('T')),

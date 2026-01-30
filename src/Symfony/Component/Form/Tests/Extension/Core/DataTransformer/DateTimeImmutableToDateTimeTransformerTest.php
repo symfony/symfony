@@ -19,7 +19,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDat
 class DateTimeImmutableToDateTimeTransformerTest extends TestCase
 {
     #[DataProvider('provider')]
-    public function testTransform(\DateTime $expectedOutput, \DateTimeImmutable $input)
+    public function testTransform(\DateTime $expectedOutput, \DateTimeImmutable $input): void
     {
         $transformer = new DateTimeImmutableToDateTimeTransformer();
 
@@ -45,14 +45,14 @@ class DateTimeImmutableToDateTimeTransformerTest extends TestCase
         ];
     }
 
-    public function testTransformEmpty()
+    public function testTransformEmpty(): void
     {
         $transformer = new DateTimeImmutableToDateTimeTransformer();
 
         $this->assertNull($transformer->transform(null));
     }
 
-    public function testTransformFail()
+    public function testTransformFail(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected a \DateTimeImmutable.');
@@ -61,7 +61,7 @@ class DateTimeImmutableToDateTimeTransformerTest extends TestCase
     }
 
     #[DataProvider('provider')]
-    public function testReverseTransform(\DateTime $input, \DateTimeImmutable $expectedOutput)
+    public function testReverseTransform(\DateTime $input, \DateTimeImmutable $expectedOutput): void
     {
         $transformer = new DateTimeImmutableToDateTimeTransformer();
 
@@ -71,14 +71,14 @@ class DateTimeImmutableToDateTimeTransformerTest extends TestCase
         $this->assertEquals($expectedOutput->getTimezone(), $actualOutput->getTimezone());
     }
 
-    public function testReverseTransformEmpty()
+    public function testReverseTransformEmpty(): void
     {
         $transformer = new DateTimeImmutableToDateTimeTransformer();
 
         $this->assertNull($transformer->reverseTransform(null));
     }
 
-    public function testReverseTransformFail()
+    public function testReverseTransformFail(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected a \DateTime.');

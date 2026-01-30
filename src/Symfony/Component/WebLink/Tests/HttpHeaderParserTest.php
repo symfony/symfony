@@ -17,7 +17,7 @@ use Symfony\Component\WebLink\HttpHeaderParser;
 
 class HttpHeaderParserTest extends TestCase
 {
-    public function testParse()
+    public function testParse(): void
     {
         $parser = new HttpHeaderParser();
 
@@ -51,7 +51,7 @@ class HttpHeaderParserTest extends TestCase
         self::assertSame(['hreflang' => ['fr', 'de'], 'title' => 'Hello'], $links[4]->getAttributes());
     }
 
-    public function testParseEmpty()
+    public function testParseEmpty(): void
     {
         $parser = new HttpHeaderParser();
         $provider = $parser->parse('');
@@ -59,7 +59,7 @@ class HttpHeaderParserTest extends TestCase
     }
 
     #[DataProvider('provideHeaderParsingCases')]
-    public function testParseVariousAttributes(string $header, array $expectedRels, array $expectedAttributes)
+    public function testParseVariousAttributes(string $header, array $expectedRels, array $expectedAttributes): void
     {
         $parser = new HttpHeaderParser();
         $links = $parser->parse($header)->getLinks();

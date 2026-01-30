@@ -86,7 +86,7 @@ class ViolationPathTest extends TestCase
     }
 
     #[DataProvider('providePaths')]
-    public function testCreatePath($string, $entries, $slicedPath = null)
+    public function testCreatePath($string, $entries, $slicedPath = null): void
     {
         $slicedPath ??= $string;
 
@@ -120,7 +120,7 @@ class ViolationPathTest extends TestCase
     }
 
     #[DataProvider('provideParents')]
-    public function testGetParent($violationPath, $parentPath)
+    public function testGetParent($violationPath, $parentPath): void
     {
         $path = new ViolationPath($violationPath);
         $parent = null === $parentPath ? null : new ViolationPath($parentPath);
@@ -128,14 +128,14 @@ class ViolationPathTest extends TestCase
         $this->assertEquals($parent, $path->getParent());
     }
 
-    public function testGetElement()
+    public function testGetElement(): void
     {
         $path = new ViolationPath('children[address].data[street].name');
 
         $this->assertEquals('street', $path->getElement(1));
     }
 
-    public function testGetElementDoesNotAcceptInvalidIndices()
+    public function testGetElementDoesNotAcceptInvalidIndices(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $path = new ViolationPath('children[address].data[street].name');
@@ -143,7 +143,7 @@ class ViolationPathTest extends TestCase
         $path->getElement(3);
     }
 
-    public function testGetElementDoesNotAcceptNegativeIndices()
+    public function testGetElementDoesNotAcceptNegativeIndices(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $path = new ViolationPath('children[address].data[street].name');
@@ -151,7 +151,7 @@ class ViolationPathTest extends TestCase
         $path->getElement(-1);
     }
 
-    public function testIsProperty()
+    public function testIsProperty(): void
     {
         $path = new ViolationPath('children[address].data[street].name');
 
@@ -159,7 +159,7 @@ class ViolationPathTest extends TestCase
         $this->assertTrue($path->isProperty(2));
     }
 
-    public function testIsPropertyDoesNotAcceptInvalidIndices()
+    public function testIsPropertyDoesNotAcceptInvalidIndices(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $path = new ViolationPath('children[address].data[street].name');
@@ -167,7 +167,7 @@ class ViolationPathTest extends TestCase
         $path->isProperty(3);
     }
 
-    public function testIsPropertyDoesNotAcceptNegativeIndices()
+    public function testIsPropertyDoesNotAcceptNegativeIndices(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $path = new ViolationPath('children[address].data[street].name');
@@ -175,7 +175,7 @@ class ViolationPathTest extends TestCase
         $path->isProperty(-1);
     }
 
-    public function testIsIndex()
+    public function testIsIndex(): void
     {
         $path = new ViolationPath('children[address].data[street].name');
 
@@ -183,7 +183,7 @@ class ViolationPathTest extends TestCase
         $this->assertFalse($path->isIndex(2));
     }
 
-    public function testIsIndexDoesNotAcceptInvalidIndices()
+    public function testIsIndexDoesNotAcceptInvalidIndices(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $path = new ViolationPath('children[address].data[street].name');
@@ -191,7 +191,7 @@ class ViolationPathTest extends TestCase
         $path->isIndex(3);
     }
 
-    public function testIsIndexDoesNotAcceptNegativeIndices()
+    public function testIsIndexDoesNotAcceptNegativeIndices(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $path = new ViolationPath('children[address].data[street].name');
@@ -199,7 +199,7 @@ class ViolationPathTest extends TestCase
         $path->isIndex(-1);
     }
 
-    public function testMapsForm()
+    public function testMapsForm(): void
     {
         $path = new ViolationPath('children[address].data[street].name');
 
@@ -208,7 +208,7 @@ class ViolationPathTest extends TestCase
         $this->assertFalse($path->mapsForm(2));
     }
 
-    public function testMapsFormDoesNotAcceptInvalidIndices()
+    public function testMapsFormDoesNotAcceptInvalidIndices(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $path = new ViolationPath('children[address].data[street].name');
@@ -216,7 +216,7 @@ class ViolationPathTest extends TestCase
         $path->mapsForm(3);
     }
 
-    public function testMapsFormDoesNotAcceptNegativeIndices()
+    public function testMapsFormDoesNotAcceptNegativeIndices(): void
     {
         $this->expectException(\OutOfBoundsException::class);
         $path = new ViolationPath('children[address].data[street].name');

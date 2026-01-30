@@ -20,7 +20,7 @@ class HiddenTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         return $this->factory->create(HiddenType::class, null, $options);
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 

@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 
 class ContainerConfiguratorTest extends TestCase
 {
-    public function testImportForwardsExcludeAndIgnoreErrors()
+    public function testImportForwardsExcludeAndIgnoreErrors(): void
     {
         $container = new ContainerBuilder();
 

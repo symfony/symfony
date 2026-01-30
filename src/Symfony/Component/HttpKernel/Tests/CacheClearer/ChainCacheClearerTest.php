@@ -29,7 +29,7 @@ class ChainCacheClearerTest extends TestCase
         @unlink(self::$cacheDir);
     }
 
-    public function testInjectClearersInConstructor()
+    public function testInjectClearersInConstructor(): void
     {
         $clearer = $this->createMock(CacheClearerInterface::class);
         $clearer

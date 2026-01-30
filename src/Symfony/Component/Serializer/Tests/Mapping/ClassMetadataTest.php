@@ -21,13 +21,13 @@ use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
  */
 class ClassMetadataTest extends TestCase
 {
-    public function testInterface()
+    public function testInterface(): void
     {
         $classMetadata = new ClassMetadata('name');
         $this->assertInstanceOf(ClassMetadataInterface::class, $classMetadata);
     }
 
-    public function testAttributeMetadata()
+    public function testAttributeMetadata(): void
     {
         $classMetadata = new ClassMetadata('c');
 
@@ -40,7 +40,7 @@ class ClassMetadataTest extends TestCase
         $this->assertEquals(['a1' => $a1, 'a2' => $a2], $classMetadata->getAttributesMetadata());
     }
 
-    public function testMerge()
+    public function testMerge(): void
     {
         $classMetadata1 = new ClassMetadata('c1');
         $classMetadata2 = new ClassMetadata('c2');
@@ -61,7 +61,7 @@ class ClassMetadataTest extends TestCase
         $this->assertEquals(['a1' => $ac1], $classMetadata1->getAttributesMetadata());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $classMetadata = new ClassMetadata('a');
 

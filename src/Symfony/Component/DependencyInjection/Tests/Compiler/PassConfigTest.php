@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Compiler\PassConfig;
  */
 class PassConfigTest extends TestCase
 {
-    public function testPassOrdering()
+    public function testPassOrdering(): void
     {
         $config = new PassConfig();
         $config->setBeforeOptimizationPasses([]);
@@ -36,7 +36,7 @@ class PassConfigTest extends TestCase
         $this->assertSame($pass1, $passes[1]);
     }
 
-    public function testPassOrderingWithoutPasses()
+    public function testPassOrderingWithoutPasses(): void
     {
         $config = new PassConfig();
         $config->setBeforeOptimizationPasses([]);

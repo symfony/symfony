@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
  */
 class SwitchUserTokenProcessorTest extends TestCase
 {
-    public function testProcessor()
+    public function testProcessor(): void
     {
         $originalToken = new UsernamePasswordToken(new InMemoryUser('original_user', 'password', ['ROLE_SUPER_ADMIN']), 'provider', ['ROLE_SUPER_ADMIN']);
         $switchUserToken = new SwitchUserToken(new InMemoryUser('user', 'passsword', ['ROLE_USER']), 'provider', ['ROLE_USER'], $originalToken);

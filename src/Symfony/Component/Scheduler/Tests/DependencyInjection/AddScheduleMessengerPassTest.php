@@ -21,7 +21,7 @@ use Symfony\Component\Scheduler\DependencyInjection\AddScheduleMessengerPass;
 class AddScheduleMessengerPassTest extends TestCase
 {
     #[DataProvider('processSchedulerTaskCommandProvider')]
-    public function testProcessSchedulerTaskCommand(array $arguments, string $expectedCommand)
+    public function testProcessSchedulerTaskCommand(array $arguments, string $expectedCommand): void
     {
         $container = new ContainerBuilder();
 

@@ -45,7 +45,7 @@ class SecretsDecryptToLocalCommandTest extends TestCase
         (new Filesystem())->remove([$this->mainDir, $this->localDir]);
     }
 
-    public function testSecretsAreDecryptedAndStoredInLocalVault()
+    public function testSecretsAreDecryptedAndStoredInLocalVault(): void
     {
         $mainVault = new SodiumVault($this->mainDir);
         $localVault = new SodiumVault($this->localDir);
@@ -59,7 +59,7 @@ class SecretsDecryptToLocalCommandTest extends TestCase
         $this->assertSame('super_secret_value', $localVault->reveal('FOO_SECRET'));
     }
 
-    public function testExistingLocalSecretsAreSkippedWithoutForce()
+    public function testExistingLocalSecretsAreSkippedWithoutForce(): void
     {
         $mainVault = new SodiumVault($this->mainDir);
         $localVault = new SodiumVault($this->localDir);
@@ -71,7 +71,7 @@ class SecretsDecryptToLocalCommandTest extends TestCase
         $this->assertSame('old_value', $localVault->reveal('FOO_SECRET'));
     }
 
-    public function testForceOptionOverridesLocalSecrets()
+    public function testForceOptionOverridesLocalSecrets(): void
     {
         $mainVault = new SodiumVault($this->mainDir);
         $localVault = new SodiumVault($this->localDir);
@@ -83,7 +83,7 @@ class SecretsDecryptToLocalCommandTest extends TestCase
         $this->assertSame('super_secret_value', $localVault->reveal('FOO_SECRET'));
     }
 
-    public function testFailsGracefullyWhenLocalVaultIsDisabled()
+    public function testFailsGracefullyWhenLocalVaultIsDisabled(): void
     {
         $mainVault = new SodiumVault($this->mainDir);
         $tester = new CommandTester(new SecretsDecryptToLocalCommand($mainVault, null));

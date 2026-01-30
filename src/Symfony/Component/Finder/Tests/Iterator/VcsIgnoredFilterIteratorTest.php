@@ -34,7 +34,7 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
      * @param array<string, string> $gitIgnoreFiles
      */
     #[DataProvider('getAcceptData')]
-    public function testAccept(array $gitIgnoreFiles, array $otherFileNames, array $expectedResult, string $baseDir = '')
+    public function testAccept(array $gitIgnoreFiles, array $otherFileNames, array $expectedResult, string $baseDir = ''): void
     {
         $otherFileNames = $this->toAbsolute($otherFileNames);
         foreach ($otherFileNames as $path) {
@@ -363,7 +363,7 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
         ];
     }
 
-    public function testAcceptAtRootDirectory()
+    public function testAcceptAtRootDirectory(): void
     {
         $inner = new InnerNameIterator([__FILE__]);
 

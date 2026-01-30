@@ -23,7 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class BuiltinTypeValueResolverTest extends TestCase
 {
-    public function testResolveStringArgument()
+    public function testResolveStringArgument(): void
     {
         $resolver = new BuiltinTypeValueResolver();
 
@@ -35,7 +35,7 @@ class BuiltinTypeValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 string $username,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -47,7 +47,7 @@ class BuiltinTypeValueResolverTest extends TestCase
         $this->assertSame(['john'], $result);
     }
 
-    public function testResolveStringOption()
+    public function testResolveStringOption(): void
     {
         $resolver = new BuiltinTypeValueResolver();
 
@@ -59,7 +59,7 @@ class BuiltinTypeValueResolverTest extends TestCase
             public function __invoke(
                 #[Option]
                 string $name = '',
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -71,7 +71,7 @@ class BuiltinTypeValueResolverTest extends TestCase
         $this->assertSame(['john'], $result);
     }
 
-    public function testDelegatesToBackedEnumValueResolverForEnumArgument()
+    public function testDelegatesToBackedEnumValueResolverForEnumArgument(): void
     {
         $resolver = new BuiltinTypeValueResolver();
 
@@ -83,7 +83,7 @@ class BuiltinTypeValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 DummyBackedEnum $status,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -96,7 +96,7 @@ class BuiltinTypeValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testDelegatesToBackedEnumValueResolverForEnumOption()
+    public function testDelegatesToBackedEnumValueResolverForEnumOption(): void
     {
         $resolver = new BuiltinTypeValueResolver();
 
@@ -108,7 +108,7 @@ class BuiltinTypeValueResolverTest extends TestCase
             public function __invoke(
                 #[Option]
                 DummyBackedEnum $status = DummyBackedEnum::Pending,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -121,7 +121,7 @@ class BuiltinTypeValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testResolveBoolOption()
+    public function testResolveBoolOption(): void
     {
         $resolver = new BuiltinTypeValueResolver();
 
@@ -133,7 +133,7 @@ class BuiltinTypeValueResolverTest extends TestCase
             public function __invoke(
                 #[Option]
                 bool $force = false,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -145,7 +145,7 @@ class BuiltinTypeValueResolverTest extends TestCase
         $this->assertSame([true], $result);
     }
 
-    public function testResolveNullableBoolOptionWithNullValue()
+    public function testResolveNullableBoolOptionWithNullValue(): void
     {
         $resolver = new BuiltinTypeValueResolver();
 
@@ -157,7 +157,7 @@ class BuiltinTypeValueResolverTest extends TestCase
             public function __invoke(
                 #[Option]
                 ?bool $force = null,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -169,7 +169,7 @@ class BuiltinTypeValueResolverTest extends TestCase
         $this->assertSame([false], $result);
     }
 
-    public function testResolveArrayOption()
+    public function testResolveArrayOption(): void
     {
         $resolver = new BuiltinTypeValueResolver();
 
@@ -181,7 +181,7 @@ class BuiltinTypeValueResolverTest extends TestCase
             public function __invoke(
                 #[Option]
                 array $tags = [],
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -193,7 +193,7 @@ class BuiltinTypeValueResolverTest extends TestCase
         $this->assertSame([['foo', 'bar']], $result);
     }
 
-    public function testResolveNullableArrayOptionWithEmptyValue()
+    public function testResolveNullableArrayOptionWithEmptyValue(): void
     {
         $resolver = new BuiltinTypeValueResolver();
 
@@ -205,7 +205,7 @@ class BuiltinTypeValueResolverTest extends TestCase
             public function __invoke(
                 #[Option]
                 ?array $tags = null,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -217,7 +217,7 @@ class BuiltinTypeValueResolverTest extends TestCase
         $this->assertSame([null], $result);
     }
 
-    public function testDoesNotResolveWithoutAttribute()
+    public function testDoesNotResolveWithoutAttribute(): void
     {
         $resolver = new BuiltinTypeValueResolver();
 
@@ -235,7 +235,7 @@ class BuiltinTypeValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testResolveIntegerArgument()
+    public function testResolveIntegerArgument(): void
     {
         $resolver = new BuiltinTypeValueResolver();
 
@@ -247,7 +247,7 @@ class BuiltinTypeValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 int $count,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');

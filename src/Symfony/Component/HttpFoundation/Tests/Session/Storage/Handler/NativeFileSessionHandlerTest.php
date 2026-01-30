@@ -27,7 +27,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 #[RunTestsInSeparateProcesses]
 class NativeFileSessionHandlerTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         new NativeSessionStorage(['name' => 'TESTING'], new NativeFileSessionHandler(sys_get_temp_dir()));
 
@@ -38,7 +38,7 @@ class NativeFileSessionHandlerTest extends TestCase
     }
 
     #[DataProvider('savePathDataProvider')]
-    public function testConstructSavePath($savePath, $expectedSavePath, $path)
+    public function testConstructSavePath($savePath, $expectedSavePath, $path): void
     {
         new NativeFileSessionHandler($savePath);
         $this->assertEquals($expectedSavePath, \ini_get('session.save_path'));
@@ -58,13 +58,13 @@ class NativeFileSessionHandlerTest extends TestCase
         ];
     }
 
-    public function testConstructException()
+    public function testConstructException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new NativeFileSessionHandler('something;invalid;with;too-many-args');
     }
 
-    public function testConstructDefault()
+    public function testConstructDefault(): void
     {
         $path = \ini_get('session.save_path');
         new NativeSessionStorage(['name' => 'TESTING'], new NativeFileSessionHandler());

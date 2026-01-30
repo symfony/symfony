@@ -17,7 +17,7 @@ use Symfony\Component\Finder\Glob;
 
 class AssetMapperRepositoryTest extends TestCase
 {
-    public function testFindWithAbsolutePaths()
+    public function testFindWithAbsolutePaths(): void
     {
         $repository = new AssetMapperRepository([
             __DIR__.'/Fixtures/dir1' => '',
@@ -30,7 +30,7 @@ class AssetMapperRepositoryTest extends TestCase
         $this->assertNull($repository->find('file5.css'));
     }
 
-    public function testFindWithRelativePaths()
+    public function testFindWithRelativePaths(): void
     {
         $repository = new AssetMapperRepository([
             'dir1' => '',
@@ -43,7 +43,7 @@ class AssetMapperRepositoryTest extends TestCase
         $this->assertNull($repository->find('file5.css'));
     }
 
-    public function testFindWithMovingPaths()
+    public function testFindWithMovingPaths(): void
     {
         $repository = new AssetMapperRepository([
             __DIR__.'/../Tests/Fixtures/dir2' => '',
@@ -53,7 +53,7 @@ class AssetMapperRepositoryTest extends TestCase
         $this->assertSame(realpath(__DIR__.'/Fixtures/dir2/file4.js'), $repository->find('subdir/../file4.js'));
     }
 
-    public function testFindWithNamespaces()
+    public function testFindWithNamespaces(): void
     {
         $repository = new AssetMapperRepository([
             'dir1' => 'dir1_namespace',
@@ -67,7 +67,7 @@ class AssetMapperRepositoryTest extends TestCase
         $this->assertNull($repository->find('file4.js'));
     }
 
-    public function testFindLogicalPath()
+    public function testFindLogicalPath(): void
     {
         $repository = new AssetMapperRepository([
             'dir' => '',
@@ -79,7 +79,7 @@ class AssetMapperRepositoryTest extends TestCase
         $this->assertSame('some_namespace/file2.js', $repository->findLogicalPath(__DIR__.'/../Tests/Fixtures/dir1/file2.js'));
     }
 
-    public function testAll()
+    public function testAll(): void
     {
         $repository = new AssetMapperRepository([
             'dir1' => '',
@@ -104,7 +104,7 @@ class AssetMapperRepositoryTest extends TestCase
         $this->assertEquals($expectedAllAssets, array_map('realpath', $actualAllAssets));
     }
 
-    public function testAllWithNamespaces()
+    public function testAllWithNamespaces(): void
     {
         $repository = new AssetMapperRepository([
             'dir1' => 'dir1_namespace',
@@ -131,7 +131,7 @@ class AssetMapperRepositoryTest extends TestCase
         $this->assertEquals($normalizedExpectedAllAssets, $normalizedActualAssets);
     }
 
-    public function testExcludedPaths()
+    public function testExcludedPaths(): void
     {
         $excludedPatterns = [
             '*/subdir/*',
@@ -163,7 +163,7 @@ class AssetMapperRepositoryTest extends TestCase
         $this->assertNull($repository->findLogicalPath(__DIR__.'/Fixtures/dir2/file3.css'));
     }
 
-    public function testDotFilesExcluded()
+    public function testDotFilesExcluded(): void
     {
         $repository = new AssetMapperRepository([
             'dot_file' => '',
@@ -173,7 +173,7 @@ class AssetMapperRepositoryTest extends TestCase
         $this->assertEquals([], $actualAssets);
     }
 
-    public function testDotFilesNotExcluded()
+    public function testDotFilesNotExcluded(): void
     {
         $repository = new AssetMapperRepository([
             'dot_file' => '',

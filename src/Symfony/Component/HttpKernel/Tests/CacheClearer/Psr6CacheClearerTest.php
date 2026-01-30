@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
 
 class Psr6CacheClearerTest extends TestCase
 {
-    public function testClearPoolsInjectedInConstructor()
+    public function testClearPoolsInjectedInConstructor(): void
     {
         $pool = $this->createMock(CacheItemPoolInterface::class);
         $pool
@@ -27,7 +27,7 @@ class Psr6CacheClearerTest extends TestCase
         (new Psr6CacheClearer(['pool' => $pool]))->clear('');
     }
 
-    public function testClearPool()
+    public function testClearPool(): void
     {
         $pool = $this->createMock(CacheItemPoolInterface::class);
         $pool
@@ -39,7 +39,7 @@ class Psr6CacheClearerTest extends TestCase
         $this->assertTrue((new Psr6CacheClearer(['pool' => $pool]))->clearPool('pool'));
     }
 
-    public function testClearPoolThrowsExceptionOnUnreferencedPool()
+    public function testClearPoolThrowsExceptionOnUnreferencedPool(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cache pool not found: "unknown"');

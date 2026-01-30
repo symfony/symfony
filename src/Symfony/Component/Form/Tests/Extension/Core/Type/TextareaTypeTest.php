@@ -18,12 +18,12 @@ class TextareaTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = TextareaType::class;
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    public function testSubmitNormalizeCrlf()
+    public function testSubmitNormalizeCrlf(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->submit("Line 1\r\nLine 2\r\nLine 3");
@@ -31,7 +31,7 @@ class TextareaTypeTest extends BaseTypeTestCase
         $this->assertSame("Line 1\nLine 2\nLine 3", $form->getData());
     }
 
-    public function testSubmitNormalizeCr()
+    public function testSubmitNormalizeCr(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->submit("Line 1\rLine 2\rLine 3");
@@ -39,7 +39,7 @@ class TextareaTypeTest extends BaseTypeTestCase
         $this->assertSame("Line 1\nLine 2\nLine 3", $form->getData());
     }
 
-    public function testSubmitNormalizeMixedNewlines()
+    public function testSubmitNormalizeMixedNewlines(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->submit("Line 1\r\nLine 2\rLine 3\nLine 4");
@@ -47,7 +47,7 @@ class TextareaTypeTest extends BaseTypeTestCase
         $this->assertSame("Line 1\nLine 2\nLine 3\nLine 4", $form->getData());
     }
 
-    public function testSubmitPreserveLf()
+    public function testSubmitPreserveLf(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->submit("Line 1\nLine 2\nLine 3");
@@ -55,7 +55,7 @@ class TextareaTypeTest extends BaseTypeTestCase
         $this->assertSame("Line 1\nLine 2\nLine 3", $form->getData());
     }
 
-    public function testSubmitSingleLine()
+    public function testSubmitSingleLine(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
         $form->submit('Single line text');
@@ -63,7 +63,7 @@ class TextareaTypeTest extends BaseTypeTestCase
         $this->assertSame('Single line text', $form->getData());
     }
 
-    public function testBuildViewDoesNotHavePattern()
+    public function testBuildViewDoesNotHavePattern(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
         $view = $form->createView();
@@ -72,7 +72,7 @@ class TextareaTypeTest extends BaseTypeTestCase
         $this->assertArrayNotHasKey('pattern', $view->vars['attr']);
     }
 
-    public function testWithTrimDisabled()
+    public function testWithTrimDisabled(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['trim' => false]);
         $form->submit("  Line 1\r\nLine 2  ");
@@ -80,7 +80,7 @@ class TextareaTypeTest extends BaseTypeTestCase
         $this->assertSame("  Line 1\nLine 2  ", $form->getData());
     }
 
-    public function testWithTrimEnabled()
+    public function testWithTrimEnabled(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['trim' => true]);
         $form->submit("  Line 1\r\nLine 2  ");
@@ -88,7 +88,7 @@ class TextareaTypeTest extends BaseTypeTestCase
         $this->assertSame("Line 1\nLine 2", $form->getData());
     }
 
-    public function testCustomViewTransformerTakesPrecedence()
+    public function testCustomViewTransformerTakesPrecedence(): void
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE)
             ->addViewTransformer(new CallbackTransformer(

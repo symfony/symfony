@@ -56,7 +56,7 @@ class VarExporterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testPhpIncompleteClassesAreForbidden()
+    public function testPhpIncompleteClassesAreForbidden(): void
     {
         $this->expectException(ClassNotFoundException::class);
         $this->expectExceptionMessage('Class "SomeNotExistingClass" not found.');
@@ -69,7 +69,7 @@ class VarExporterTest extends TestCase
     }
 
     #[DataProvider('provideFailingSerialization')]
-    public function testFailingSerialization($value)
+    public function testFailingSerialization($value): void
     {
         $this->expectException(NotInstantiableTypeException::class);
         $this->expectExceptionMessageMatches('/Type ".*" is not instantiable\./');
@@ -87,7 +87,7 @@ class VarExporterTest extends TestCase
         yield [new \ReflectionClass(\stdClass::class)];
         yield [(new \ReflectionFunction(static function (): int {}))->getReturnType()];
         yield [new \ReflectionGenerator((static function () { yield 123; })())];
-        yield [static function () {}];
+        yield [static function (): void {}];
         yield [static function () { yield 123; }];
         yield [new \SplFileInfo(__FILE__)];
         yield [$h = fopen(__FILE__, 'r')];
@@ -105,7 +105,7 @@ class VarExporterTest extends TestCase
     }
 
     #[DataProvider('provideExport')]
-    public function testExport(string $testName, $value, bool $staticValueExpected = false)
+    public function testExport(string $testName, $value, bool $staticValueExpected = false): void
     {
         $dumpedValue = $this->getDump($value);
         $isStaticValue = null;
@@ -259,7 +259,7 @@ class VarExporterTest extends TestCase
         yield ['private-fcc', (new \ReflectionClass(PrivateFCC::class))->getAttributes(PrivateFCC::class)[0]->getArguments()[0], true];
     }
 
-    public function testUnicodeDirectionality()
+    public function testUnicodeDirectionality(): void
     {
         $this->assertSame('"\0\r\u{202A}\u{202B}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{202C}\u{2069}\n"', VarExporter::export("\0\r\u{202A}\u{202B}\u{202D}\u{202E}\u{2066}\u{2067}\u{2068}\u{202C}\u{2069}\n"));
     }
@@ -380,7 +380,7 @@ abstract class AbstractClass
     protected $foo;
     private $bar;
 
-    protected function setBar($bar)
+    protected function setBar($bar): void
     {
         $this->bar = $bar;
     }

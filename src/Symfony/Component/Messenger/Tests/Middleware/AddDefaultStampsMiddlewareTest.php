@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DefaultStampsProviderDummyMessage
 
 final class AddDefaultStampsMiddlewareTest extends MiddlewareTestCase
 {
-    public function testSelfStampableStampsMiddleware()
+    public function testSelfStampableStampsMiddleware(): void
     {
         $message = new DefaultStampsProviderDummyMessage('');
         $envelope = new Envelope($message);
@@ -33,7 +33,7 @@ final class AddDefaultStampsMiddlewareTest extends MiddlewareTestCase
         $this->assertSame(1, $delayStamp->getDelay());
     }
 
-    public function testSelfStampableStampsMiddlewareIfStampExists()
+    public function testSelfStampableStampsMiddlewareIfStampExists(): void
     {
         $message = new DefaultStampsProviderDummyMessage('');
         $envelope = new Envelope($message, [new DelayStamp(5)]);

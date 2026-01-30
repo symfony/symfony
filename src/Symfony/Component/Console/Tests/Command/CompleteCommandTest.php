@@ -43,19 +43,19 @@ class CompleteCommandTest extends TestCase
         $this->tester = new CommandTester($this->command);
     }
 
-    public function testRequiredShellOption()
+    public function testRequiredShellOption(): void
     {
         $this->expectExceptionMessage('The "--shell" option must be set.');
         $this->execute([]);
     }
 
-    public function testUnsupportedShellOption()
+    public function testUnsupportedShellOption(): void
     {
         $this->expectExceptionMessage('Shell completion is not supported for your shell: "unsupported" (supported: "bash", "fish", "zsh").');
         $this->execute(['--shell' => 'unsupported']);
     }
 
-    public function testAdditionalShellSupport()
+    public function testAdditionalShellSupport(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -70,7 +70,7 @@ class CompleteCommandTest extends TestCase
     }
 
     #[DataProvider('provideInputAndCurrentOptionValues')]
-    public function testInputAndCurrentOptionValidation(array $input, ?string $exceptionMessage)
+    public function testInputAndCurrentOptionValidation(array $input, ?string $exceptionMessage): void
     {
         if ($exceptionMessage) {
             $this->expectExceptionMessage($exceptionMessage);
@@ -94,7 +94,7 @@ class CompleteCommandTest extends TestCase
     }
 
     #[DataProvider('provideCompleteCommandNameInputs')]
-    public function testCompleteCommandName(array $input, array $suggestions)
+    public function testCompleteCommandName(array $input, array $suggestions): void
     {
         $this->execute(['--current' => '1', '--input' => $input]);
         $this->assertEquals(implode("\n", $suggestions).\PHP_EOL, $this->tester->getDisplay());
@@ -109,7 +109,7 @@ class CompleteCommandTest extends TestCase
     }
 
     #[DataProvider('provideCompleteCommandInputDefinitionInputs')]
-    public function testCompleteCommandInputDefinition(array $input, array $suggestions)
+    public function testCompleteCommandInputDefinition(array $input, array $suggestions): void
     {
         $this->execute(['--current' => '2', '--input' => $input]);
         $this->assertEquals(implode("\n", $suggestions).\PHP_EOL, $this->tester->getDisplay());
@@ -125,7 +125,7 @@ class CompleteCommandTest extends TestCase
         yield 'global-option-with-command-values' => [['bin/console', 'ahoy', '--global-option'], ['foo', 'bar', 'baz']];
     }
 
-    private function execute(array $input)
+    private function execute(array $input): void
     {
         // run in verbose mode to assert exceptions
         $this->tester->execute($input ? ($input + ['--shell' => 'bash', '--api-version' => CompleteCommand::COMPLETION_API_VERSION]) : $input, ['verbosity' => OutputInterface::VERBOSITY_DEBUG]);

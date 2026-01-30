@@ -27,7 +27,7 @@ class StubCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testArgsStubWithDefaults($foo = 234, $bar = 456)
+    public function testArgsStubWithDefaults($foo = 234, $bar = 456): void
     {
         $args = [new ArgsStub([123], __FUNCTION__, __CLASS__)];
 
@@ -42,7 +42,7 @@ class StubCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $args);
     }
 
-    public function testArgsStubWithExtraArgs($foo = 234)
+    public function testArgsStubWithExtraArgs($foo = 234): void
     {
         $args = [new ArgsStub([123, 456], __FUNCTION__, __CLASS__)];
 
@@ -60,7 +60,7 @@ class StubCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $args);
     }
 
-    public function testArgsStubNoParamWithExtraArgs()
+    public function testArgsStubNoParamWithExtraArgs(): void
     {
         $args = [new ArgsStub([123], __FUNCTION__, __CLASS__)];
 
@@ -75,7 +75,7 @@ class StubCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $args);
     }
 
-    public function testArgsStubWithClosure()
+    public function testArgsStubWithClosure(): void
     {
         $args = [new ArgsStub([123], '{closure}', null)];
 
@@ -90,7 +90,7 @@ class StubCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $args);
     }
 
-    public function testEmptyStub()
+    public function testEmptyStub(): void
     {
         $args = [new ScalarStub('🐛')];
 
@@ -103,7 +103,7 @@ class StubCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $args);
     }
 
-    public function testVirtualPropertyStub()
+    public function testVirtualPropertyStub(): void
     {
         $class = new \ReflectionClass(VirtualProperty::class);
         $args = [new VirtualStub($class->getProperty('fullName'))];
@@ -117,7 +117,7 @@ class StubCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $args);
     }
 
-    public function testVirtualPropertyWithoutTypeStub()
+    public function testVirtualPropertyWithoutTypeStub(): void
     {
         $class = new \ReflectionClass(VirtualProperty::class);
         $args = [new VirtualStub($class->getProperty('noType'))];
@@ -131,7 +131,7 @@ class StubCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $args);
     }
 
-    public function testLinkStub()
+    public function testLinkStub(): void
     {
         $var = [new LinkStub(__CLASS__, 0, __FILE__)];
 
@@ -152,7 +152,7 @@ class StubCasterTest extends TestCase
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
-    public function testLinkStubWithNoFileLink()
+    public function testLinkStubWithNoFileLink(): void
     {
         $var = [new LinkStub('example.com', 0, 'http://example.com')];
 
@@ -173,7 +173,7 @@ class StubCasterTest extends TestCase
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
-    public function testClassStub()
+    public function testClassStub(): void
     {
         $var = [new ClassStub('hello', [FooInterface::class, 'foo'])];
 
@@ -193,7 +193,7 @@ class StubCasterTest extends TestCase
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
-    public function testClassStubWithNotExistingClass()
+    public function testClassStubWithNotExistingClass(): void
     {
         $var = [new ClassStub(NotExisting::class)];
 
@@ -214,7 +214,7 @@ class StubCasterTest extends TestCase
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
-    public function testClassStubWithNotExistingMethod()
+    public function testClassStubWithNotExistingMethod(): void
     {
         $var = [new ClassStub('hello', [FooInterface::class, 'missing'])];
 
@@ -234,7 +234,7 @@ class StubCasterTest extends TestCase
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
-    public function testClassStubWithAnonymousClass()
+    public function testClassStubWithAnonymousClass(): void
     {
         $var = [new ClassStub((new class extends \Exception {
         })::class)];

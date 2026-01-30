@@ -27,7 +27,7 @@ use Symfony\Component\Mime\Part\TextPart;
 class SmimeSignedMessageListenerTest extends TestCase
 {
     #[RequiresPhpExtension('openssl')]
-    public function testSmimeMessageSigningProcess()
+    public function testSmimeMessageSigningProcess(): void
     {
         $signer = new SMimeSigner(\dirname(__DIR__).'/Fixtures/sign.crt', \dirname(__DIR__).'/Fixtures/sign.key');
         $listener = new SmimeSignedMessageListener($signer);

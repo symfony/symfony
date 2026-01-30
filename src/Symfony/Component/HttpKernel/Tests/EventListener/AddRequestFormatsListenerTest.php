@@ -31,12 +31,12 @@ class AddRequestFormatsListenerTest extends TestCase
         $this->listener = new AddRequestFormatsListener(['csv' => ['text/csv', 'text/plain']]);
     }
 
-    public function testIsAnEventSubscriber()
+    public function testIsAnEventSubscriber(): void
     {
         $this->assertInstanceOf(EventSubscriberInterface::class, $this->listener);
     }
 
-    public function testRegisteredEvent()
+    public function testRegisteredEvent(): void
     {
         $this->assertSame(
             [KernelEvents::REQUEST => ['onKernelRequest', 100]],
@@ -44,7 +44,7 @@ class AddRequestFormatsListenerTest extends TestCase
         );
     }
 
-    public function testSetAdditionalFormats()
+    public function testSetAdditionalFormats(): void
     {
         $request = $this->createMock(Request::class);
         $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);

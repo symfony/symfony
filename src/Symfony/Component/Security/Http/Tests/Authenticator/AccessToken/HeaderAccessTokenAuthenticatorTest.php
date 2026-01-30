@@ -36,7 +36,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideSupportData')]
-    public function testSupport($request)
+    public function testSupport($request): void
     {
         $this->setUpAuthenticator();
 
@@ -50,7 +50,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideSupportsWithCustomTokenTypeData')]
-    public function testSupportsWithCustomTokenType($request, $result)
+    public function testSupportsWithCustomTokenType($request, $result): void
     {
         $this->setUpAuthenticator('Authorization', 'JWT');
 
@@ -66,7 +66,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideSupportsWithCustomHeaderParameter')]
-    public function testSupportsWithCustomHeaderParameter($request, $result)
+    public function testSupportsWithCustomHeaderParameter($request, $result): void
     {
         $this->setUpAuthenticator('X-FOO');
 
@@ -81,7 +81,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
         yield [new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer INVALID_ACCESS_TOKEN']), false];
     }
 
-    public function testAuthenticate()
+    public function testAuthenticate(): void
     {
         $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', new UserBadge('foo'));
         $this->setUpAuthenticator();
@@ -91,7 +91,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
         $this->assertInstanceOf(SelfValidatingPassport::class, $passport);
     }
 
-    public function testAuthenticateWithCustomTokenType()
+    public function testAuthenticateWithCustomTokenType(): void
     {
         $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', new UserBadge('foo'));
         $this->setUpAuthenticator('Authorization', 'JWT');
@@ -102,7 +102,7 @@ class HeaderAccessTokenAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideInvalidAuthenticateData')]
-    public function testAuthenticateInvalid(Request $request, string $errorMessage, string $exceptionType)
+    public function testAuthenticateInvalid(Request $request, string $errorMessage, string $exceptionType): void
     {
         $this->setUpAuthenticator();
 

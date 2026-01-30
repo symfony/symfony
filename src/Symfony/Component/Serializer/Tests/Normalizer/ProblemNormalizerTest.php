@@ -33,14 +33,14 @@ class ProblemNormalizerTest extends TestCase
         $this->normalizer = new ProblemNormalizer(false);
     }
 
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsNormalization(FlattenException::createFromThrowable(new \Exception())));
         $this->assertFalse($this->normalizer->supportsNormalization(new \Exception()));
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $expected = [
             'type' => 'https://tools.ietf.org/html/rfc2616#section-10',
@@ -52,7 +52,7 @@ class ProblemNormalizerTest extends TestCase
         $this->assertSame($expected, $this->normalizer->normalize(FlattenException::createFromThrowable(new \RuntimeException('Error'))));
     }
 
-    public function testNormalizePartialDenormalizationException()
+    public function testNormalizePartialDenormalizationException(): void
     {
         $this->normalizer->setSerializer(new Serializer());
 
@@ -80,7 +80,7 @@ class ProblemNormalizerTest extends TestCase
         $this->assertSame($expected, $this->normalizer->normalize(FlattenException::createFromThrowable($exception), null, ['exception' => $exception]));
     }
 
-    public function testNormalizeValidationFailedException()
+    public function testNormalizeValidationFailedException(): void
     {
         $this->normalizer->setSerializer(new Serializer([new ConstraintViolationListNormalizer()]));
 
@@ -104,7 +104,7 @@ class ProblemNormalizerTest extends TestCase
         $this->assertSame($expected, $this->normalizer->normalize(FlattenException::createFromThrowable($exception), null, ['exception' => $exception]));
     }
 
-    public function testNormalizeMessageValidationFailedException()
+    public function testNormalizeMessageValidationFailedException(): void
     {
         $this->normalizer->setSerializer(new Serializer([new ConstraintViolationListNormalizer()]));
 

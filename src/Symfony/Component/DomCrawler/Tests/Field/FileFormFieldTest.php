@@ -16,7 +16,7 @@ use Symfony\Component\DomCrawler\Field\FileFormField;
 
 class FileFormFieldTest extends FormFieldTestCase
 {
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $node = $this->createNode('input', '', ['type' => 'file']);
         $field = new FileFormField($node);
@@ -41,7 +41,7 @@ class FileFormFieldTest extends FormFieldTestCase
     }
 
     #[DataProvider('getSetValueMethods')]
-    public function testSetValue($method)
+    public function testSetValue($method): void
     {
         $node = $this->createNode('input', '', ['type' => 'file']);
         $field = new FileFormField($node);
@@ -92,7 +92,7 @@ class FileFormFieldTest extends FormFieldTestCase
         ];
     }
 
-    public function testSetErrorCode()
+    public function testSetErrorCode(): void
     {
         $node = $this->createNode('input', '', ['type' => 'file']);
         $field = new FileFormField($node);
@@ -109,7 +109,7 @@ class FileFormFieldTest extends FormFieldTestCase
         }
     }
 
-    public function testSetRawFilePath()
+    public function testSetRawFilePath(): void
     {
         $node = $this->createNode('input', '', ['type' => 'file']);
         $field = new FileFormField($node);

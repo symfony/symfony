@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  */
 class SerializedPathTest extends TestCase
 {
-    public function testEmptyStringSerializedPathParameter()
+    public function testEmptyStringSerializedPathParameter(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Parameter given to "Symfony\Component\Serializer\Attribute\SerializedPath" must be a valid property path.');
@@ -29,7 +29,7 @@ class SerializedPathTest extends TestCase
         new SerializedPath('');
     }
 
-    public function testSerializedPath()
+    public function testSerializedPath(): void
     {
         $path = '[one][two]';
         $serializedPath = new SerializedPath($path);

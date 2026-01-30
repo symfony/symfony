@@ -17,7 +17,7 @@ use Symfony\Component\Translation\TranslatorBag;
 
 class TranslatorBagTest extends TestCase
 {
-    public function testAll()
+    public function testAll(): void
     {
         $catalogue = new MessageCatalogue('en', $messages = ['domain1' => ['foo' => 'foo'], 'domain2' => ['bar' => 'bar']]);
 
@@ -44,7 +44,7 @@ class TranslatorBagTest extends TestCase
         ], $this->getAllMessagesFromTranslatorBag($bag));
     }
 
-    public function testDiff()
+    public function testDiff(): void
     {
         $catalogueA = new MessageCatalogue('en', ['domain1' => ['foo' => 'foo', 'bar' => 'bar'], 'domain2' => ['baz' => 'baz', 'qux' => 'qux']]);
 
@@ -66,7 +66,7 @@ class TranslatorBagTest extends TestCase
         ], $this->getAllMessagesFromTranslatorBag($bagResult));
     }
 
-    public function testDiffWithIntlDomain()
+    public function testDiffWithIntlDomain(): void
     {
         $catalogueA = new MessageCatalogue('en', [
             'domain1+intl-icu' => ['foo' => 'foo', 'bar' => 'bar'],
@@ -94,7 +94,7 @@ class TranslatorBagTest extends TestCase
         ], $this->getAllMessagesFromTranslatorBag($bagResult));
     }
 
-    public function testIntersect()
+    public function testIntersect(): void
     {
         $catalogueA = new MessageCatalogue('en', ['domain1' => ['foo' => 'foo', 'bar' => 'bar'], 'domain2' => ['baz' => 'baz', 'qux' => 'qux']]);
 

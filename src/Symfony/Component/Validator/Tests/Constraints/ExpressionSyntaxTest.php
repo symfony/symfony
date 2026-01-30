@@ -20,7 +20,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class ExpressionSyntaxTest extends TestCase
 {
-    public function testValidatedByStandardValidator()
+    public function testValidatedByStandardValidator(): void
     {
         $constraint = new ExpressionSyntax();
 
@@ -28,7 +28,7 @@ class ExpressionSyntaxTest extends TestCase
     }
 
     #[DataProvider('provideServiceValidatedConstraints')]
-    public function testValidatedByService(ExpressionSyntax $constraint)
+    public function testValidatedByService(ExpressionSyntax $constraint): void
     {
         self::assertSame('my_service', $constraint->validatedBy());
     }
@@ -43,7 +43,7 @@ class ExpressionSyntaxTest extends TestCase
         yield 'attribute' => [$metadata->getPropertyMetadata('b')[0]->getConstraints()[0]];
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(ExpressionSyntaxDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));

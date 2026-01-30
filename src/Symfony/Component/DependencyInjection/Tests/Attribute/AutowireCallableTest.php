@@ -18,35 +18,35 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class AutowireCallableTest extends TestCase
 {
-    public function testNoArguments()
+    public function testNoArguments(): void
     {
         $this->expectException(LogicException::class);
 
         new AutowireCallable();
     }
 
-    public function testCallableAndService()
+    public function testCallableAndService(): void
     {
         $this->expectException(LogicException::class);
 
         new AutowireCallable(callable: 'my_callable', service: 'my_service', method: 'my_method');
     }
 
-    public function testMethodOnly()
+    public function testMethodOnly(): void
     {
         $this->expectException(LogicException::class);
 
         new AutowireCallable(method: 'my_method');
     }
 
-    public function testCallableAndMethod()
+    public function testCallableAndMethod(): void
     {
         $this->expectException(LogicException::class);
 
         new AutowireCallable(callable: 'my_callable', method: 'my_method');
     }
 
-    public function testStringCallable()
+    public function testStringCallable(): void
     {
         $attribute = new AutowireCallable(callable: 'my_callable');
 
@@ -54,7 +54,7 @@ class AutowireCallableTest extends TestCase
         self::assertFalse($attribute->lazy);
     }
 
-    public function testArrayCallable()
+    public function testArrayCallable(): void
     {
         $attribute = new AutowireCallable(callable: ['My\StaticClass', 'my_callable']);
 
@@ -62,7 +62,7 @@ class AutowireCallableTest extends TestCase
         self::assertFalse($attribute->lazy);
     }
 
-    public function testArrayCallableWithReferenceAndMethod()
+    public function testArrayCallableWithReferenceAndMethod(): void
     {
         $attribute = new AutowireCallable(callable: [new Reference('my_service'), 'my_callable']);
 
@@ -70,7 +70,7 @@ class AutowireCallableTest extends TestCase
         self::assertFalse($attribute->lazy);
     }
 
-    public function testArrayCallableWithReferenceOnly()
+    public function testArrayCallableWithReferenceOnly(): void
     {
         $attribute = new AutowireCallable(callable: [new Reference('my_service')]);
 
@@ -78,7 +78,7 @@ class AutowireCallableTest extends TestCase
         self::assertFalse($attribute->lazy);
     }
 
-    public function testArrayCallableWithServiceAndMethod()
+    public function testArrayCallableWithServiceAndMethod(): void
     {
         $attribute = new AutowireCallable(service: 'my_service', method: 'my_callable');
 
@@ -86,7 +86,7 @@ class AutowireCallableTest extends TestCase
         self::assertFalse($attribute->lazy);
     }
 
-    public function testArrayCallableWithServiceOnly()
+    public function testArrayCallableWithServiceOnly(): void
     {
         $attribute = new AutowireCallable(service: 'my_service');
 
@@ -94,7 +94,7 @@ class AutowireCallableTest extends TestCase
         self::assertFalse($attribute->lazy);
     }
 
-    public function testLazyAsArrayInDefinition()
+    public function testLazyAsArrayInDefinition(): void
     {
         $attribute = new AutowireCallable(callable: [Foo::class, 'myMethod'], lazy: 'my_lazy_class');
 
@@ -106,7 +106,7 @@ class AutowireCallableTest extends TestCase
         self::assertTrue($definition->isLazy());
     }
 
-    public function testLazyIsFalseInDefinition()
+    public function testLazyIsFalseInDefinition(): void
     {
         $attribute = new AutowireCallable(callable: [Foo::class, 'myMethod'], lazy: false);
 
@@ -121,7 +121,7 @@ class AutowireCallableTest extends TestCase
 
 class Foo
 {
-    public function myMethod(callable $myParameter)
+    public function myMethod(callable $myParameter): void
     {
     }
 }

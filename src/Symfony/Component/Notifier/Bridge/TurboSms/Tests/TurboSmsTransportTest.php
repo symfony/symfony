@@ -47,7 +47,7 @@ final class TurboSmsTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSuccessfulSend()
+    public function testSuccessfulSend(): void
     {
         $response = new JsonMockResponse(body: [
             'response_code' => 0,
@@ -84,7 +84,7 @@ final class TurboSmsTransportTest extends TransportTestCase
         self::assertSame('f83f8868-5e46-c6cf-e4fb-615e5a293754', $sentMessage->getMessageId());
     }
 
-    public function testFailedSendWithPartialAccepted()
+    public function testFailedSendWithPartialAccepted(): void
     {
         $response = new JsonMockResponse(body: [
             'response_code' => 0,
@@ -111,7 +111,7 @@ final class TurboSmsTransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testFailedSend()
+    public function testFailedSend(): void
     {
         $response = new JsonMockResponse(body: [
             'response_code' => 103,
@@ -131,7 +131,7 @@ final class TurboSmsTransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testInvalidFrom()
+    public function testInvalidFrom(): void
     {
         $this->expectException(LengthException::class);
         $this->expectExceptionMessage('The sender length of a TurboSMS message must not exceed 20 characters.');
@@ -139,7 +139,7 @@ final class TurboSmsTransportTest extends TransportTestCase
         new TurboSmsTransport('authToken', 'abcdefghijklmnopqrstu', new MockHttpClient());
     }
 
-    public function testInvalidSubjectWithLatinSymbols()
+    public function testInvalidSubjectWithLatinSymbols(): void
     {
         $message = new SmsMessage('380931234567', str_repeat('z', 1522));
         $transport = new TurboSmsTransport('authToken', 'sender', new MockHttpClient());
@@ -150,7 +150,7 @@ final class TurboSmsTransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testInvalidSubjectWithCyrillicSymbols()
+    public function testInvalidSubjectWithCyrillicSymbols(): void
     {
         $message = new SmsMessage('380931234567', str_repeat('z', 661).'Й');
         $transport = new TurboSmsTransport('authToken', 'sender', new MockHttpClient());
@@ -161,7 +161,7 @@ final class TurboSmsTransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testSmsMessageWithInvalidFrom()
+    public function testSmsMessageWithInvalidFrom(): void
     {
         $transport = $this->createTransport();
 

@@ -30,7 +30,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\StrictSessionHandle
 class SessionHandlerFactoryTest extends TestCase
 {
     #[DataProvider('provideConnectionDSN')]
-    public function testCreateFileHandler(string $connectionDSN, string $expectedPath, string $expectedHandlerType)
+    public function testCreateFileHandler(string $connectionDSN, string $expectedPath, string $expectedHandlerType): void
     {
         $handler = SessionHandlerFactory::createHandler($connectionDSN);
 
@@ -49,14 +49,14 @@ class SessionHandlerFactoryTest extends TestCase
     }
 
     #[RequiresPhpExtension('redis')]
-    public function testCreateRedisHandlerFromConnectionObject()
+    public function testCreateRedisHandlerFromConnectionObject(): void
     {
         $handler = SessionHandlerFactory::createHandler($this->createStub(\Redis::class));
         $this->assertInstanceOf(RedisSessionHandler::class, $handler);
     }
 
     #[RequiresPhpExtension('redis')]
-    public function testCreateRedisHandlerFromDsn()
+    public function testCreateRedisHandlerFromDsn(): void
     {
         $handler = SessionHandlerFactory::createHandler('redis://localhost?prefix=foo&ttl=3600&ignored=bar');
         $this->assertInstanceOf(RedisSessionHandler::class, $handler);

@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\IsJsonRequestMatcher;
 class IsJsonRequestMatcherTest extends TestCase
 {
     #[DataProvider('getData')]
-    public function test($json, bool $isValid)
+    public function test($json, bool $isValid): void
     {
         $matcher = new IsJsonRequestMatcher();
         $request = Request::create('', 'GET', [], [], [], [], $json);

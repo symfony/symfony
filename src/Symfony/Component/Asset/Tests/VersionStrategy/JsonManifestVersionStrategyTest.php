@@ -22,25 +22,25 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 class JsonManifestVersionStrategyTest extends TestCase
 {
     #[DataProvider('provideValidStrategies')]
-    public function testGetVersion(JsonManifestVersionStrategy $strategy)
+    public function testGetVersion(JsonManifestVersionStrategy $strategy): void
     {
         $this->assertSame('main.123abc.js', $strategy->getVersion('main.js'));
     }
 
     #[DataProvider('provideValidStrategies')]
-    public function testApplyVersion(JsonManifestVersionStrategy $strategy)
+    public function testApplyVersion(JsonManifestVersionStrategy $strategy): void
     {
         $this->assertSame('css/styles.555def.css', $strategy->applyVersion('css/styles.css'));
     }
 
     #[DataProvider('provideValidStrategies')]
-    public function testApplyVersionWhenKeyDoesNotExistInManifest(JsonManifestVersionStrategy $strategy)
+    public function testApplyVersionWhenKeyDoesNotExistInManifest(JsonManifestVersionStrategy $strategy): void
     {
         $this->assertSame('css/other.css', $strategy->applyVersion('css/other.css'));
     }
 
     #[DataProvider('provideStrictStrategies')]
-    public function testStrictExceptionWhenKeyDoesNotExistInManifest(JsonManifestVersionStrategy $strategy, $path, $message)
+    public function testStrictExceptionWhenKeyDoesNotExistInManifest(JsonManifestVersionStrategy $strategy, $path, $message): void
     {
         $this->expectException(AssetNotFoundException::class);
         $this->expectExceptionMessageMatches($message);
@@ -49,21 +49,21 @@ class JsonManifestVersionStrategyTest extends TestCase
     }
 
     #[DataProvider('provideMissingStrategies')]
-    public function testMissingManifestFileThrowsException(JsonManifestVersionStrategy $strategy)
+    public function testMissingManifestFileThrowsException(JsonManifestVersionStrategy $strategy): void
     {
         $this->expectException(RuntimeException::class);
         $strategy->getVersion('main.js');
     }
 
     #[DataProvider('provideInvalidStrategies')]
-    public function testManifestFileWithBadJSONThrowsException(JsonManifestVersionStrategy $strategy)
+    public function testManifestFileWithBadJSONThrowsException(JsonManifestVersionStrategy $strategy): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Error parsing JSON');
         $strategy->getVersion('main.js');
     }
 
-    public function testRemoteManifestFileWithoutHttpClient()
+    public function testRemoteManifestFileWithoutHttpClient(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(\sprintf('The "%s" class needs an HTTP client to use a remote manifest. Try running "composer require symfony/http-client".', JsonManifestVersionStrategy::class));

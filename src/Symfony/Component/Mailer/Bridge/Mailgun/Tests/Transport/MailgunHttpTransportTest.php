@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class MailgunHttpTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(MailgunHttpTransport $transport, string $expected)
+    public function testToString(MailgunHttpTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -53,7 +53,7 @@ class MailgunHttpTransportTest extends TestCase
         ];
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -88,7 +88,7 @@ class MailgunHttpTransportTest extends TestCase
         $this->assertSame('foobar', $message->getMessageId());
     }
 
-    public function testSendThrowsForErrorResponse()
+    public function testSendThrowsForErrorResponse(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -113,7 +113,7 @@ class MailgunHttpTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testTagAndMetadataHeaders()
+    public function testTagAndMetadataHeaders(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');

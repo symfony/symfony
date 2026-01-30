@@ -31,7 +31,7 @@ use Symfony\Component\Security\Http\Firewall\ExceptionListener;
 
 class RegisterEntryPointsPassTest extends TestCase
 {
-    public function testProcessResolvesChildDefinitionsClass()
+    public function testProcessResolvesChildDefinitionsClass(): void
     {
         $container = new ContainerBuilder();
 

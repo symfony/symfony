@@ -31,12 +31,12 @@ class DataCollectorTypeExtensionTest extends TestCase
         $this->extension = new DataCollectorTypeExtension(new FormDataCollector(new FormDataExtractor()));
     }
 
-    public function testGetExtendedType()
+    public function testGetExtendedType(): void
     {
         $this->assertEquals(['Symfony\Component\Form\Extension\Core\Type\FormType'], $this->extension::getExtendedTypes());
     }
 
-    public function testBuildForm()
+    public function testBuildForm(): void
     {
         $eventDispatcher = new EventDispatcher();
         $this->assertFalse($eventDispatcher->hasListeners(FormEvents::PRE_SET_DATA));

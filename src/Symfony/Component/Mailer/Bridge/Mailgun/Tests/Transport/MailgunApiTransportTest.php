@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class MailgunApiTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(MailgunApiTransport $transport, string $expected)
+    public function testToString(MailgunApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -55,7 +55,7 @@ class MailgunApiTransportTest extends TestCase
         ];
     }
 
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $json = json_encode(['foo' => 'bar']);
         $deliveryTime = (new \DateTimeImmutable('2020-03-20 13:01:00'))->format(\DateTimeInterface::RFC2822);
@@ -97,7 +97,7 @@ class MailgunApiTransportTest extends TestCase
         $this->assertEquals('amp-html-value', $payload['amp-html']);
     }
 
-    public function testPrefixHeaderWithH()
+    public function testPrefixHeaderWithH(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('h:bar', 'bar-value');
@@ -112,7 +112,7 @@ class MailgunApiTransportTest extends TestCase
         $this->assertEquals('bar-value', $payload['h:bar']);
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -147,7 +147,7 @@ class MailgunApiTransportTest extends TestCase
         $this->assertSame('foobar', $message->getMessageId());
     }
 
-    public function testSendWithMultipleTagHeaders()
+    public function testSendWithMultipleTagHeaders(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $content = '';
@@ -179,7 +179,7 @@ class MailgunApiTransportTest extends TestCase
         $this->assertSame('foobar2', $message->getMessageId());
     }
 
-    public function testSendThrowsForErrorResponse()
+    public function testSendThrowsForErrorResponse(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -204,7 +204,7 @@ class MailgunApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testSendThrowsForErrorResponseWithContentTypeTextHtml()
+    public function testSendThrowsForErrorResponseWithContentTypeTextHtml(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -233,7 +233,7 @@ class MailgunApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testTagAndMetadataHeaders()
+    public function testTagAndMetadataHeaders(): void
     {
         $json = json_encode(['foo' => 'bar']);
         $email = new Email();
@@ -262,7 +262,7 @@ class MailgunApiTransportTest extends TestCase
         $this->assertSame('12345', $payload['v:Client-ID']);
     }
 
-    public function testEnvelopeSenderHeaderIsCorrectlyEncoded()
+    public function testEnvelopeSenderHeaderIsCorrectlyEncoded(): void
     {
         $email = new Email();
         $envelope = new Envelope(new Address('alice@system.com', 'Žluťoučký Kůň'), [new Address('bob@system.com')]);

@@ -22,7 +22,7 @@ class EmojiExtensionTest extends TestCase
     #[TestWith(['🅰️', ':a:'])]
     #[TestWith(['🅰️', ':a:', 'slack'])]
     #[TestWith(['🅰', ':a:', 'github'])]
-    public function testEmojify(string $expected, string $string, ?string $catalog = null)
+    public function testEmojify(string $expected, string $string, ?string $catalog = null): void
     {
         $extension = new EmojiExtension();
         $this->assertSame($expected, $extension->emojify($string, $catalog));

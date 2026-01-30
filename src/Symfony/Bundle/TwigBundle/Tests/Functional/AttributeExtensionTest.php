@@ -31,12 +31,12 @@ use Twig\Extension\AttributeExtension;
 
 class AttributeExtensionTest extends TestCase
 {
-    public function testExtensionWithAttributes()
+    public function testExtensionWithAttributes(): void
     {
         $kernel = new class extends AttributeExtensionKernel {
             public function registerContainerConfiguration(LoaderInterface $loader): void
             {
-                $loader->load(static function (ContainerBuilder $container) {
+                $loader->load(static function (ContainerBuilder $container): void {
                     $container->setParameter('kernel.secret', 'secret');
                     $container->register(StaticExtensionWithAttributes::class, StaticExtensionWithAttributes::class)
                         ->setAutoconfigured(true);
@@ -62,12 +62,12 @@ class AttributeExtensionTest extends TestCase
         $twig->getRuntime(StaticExtensionWithAttributes::class);
     }
 
-    public function testInvalidExtensionClass()
+    public function testInvalidExtensionClass(): void
     {
         $kernel = new class extends AttributeExtensionKernel {
             public function registerContainerConfiguration(LoaderInterface $loader): void
             {
-                $loader->load(static function (ContainerBuilder $container) {
+                $loader->load(static function (ContainerBuilder $container): void {
                     $container->register(InvalidExtensionWithAttributes::class, InvalidExtensionWithAttributes::class)
                         ->setAutoconfigured(true);
                 });
@@ -81,7 +81,7 @@ class AttributeExtensionTest extends TestCase
     }
 
     #[Before, After]
-    protected function deleteTempDir()
+    protected function deleteTempDir(): void
     {
         if (file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/AttributeExtension')) {
             (new Filesystem())->remove($dir);

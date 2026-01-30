@@ -19,12 +19,12 @@ use Symfony\Component\Security\Http\Firewall\LogoutListener;
 
 class FirewallContextTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $config = new FirewallConfig('main', 'user_checker', 'request_matcher');
         $exceptionListener = $this->getExceptionListenerMock();
         $logoutListener = $this->getLogoutListenerMock();
-        $listeners = [static function () {}];
+        $listeners = [static function (): void {}];
 
         $context = new FirewallContext($listeners, $exceptionListener, $logoutListener, $config);
 

@@ -86,7 +86,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
         return new PhpArrayAdapterWrapper(self::$file, new NullAdapter());
     }
 
-    public function testStore()
+    public function testStore(): void
     {
         $arrayWithRefs = [];
         $arrayWithRefs[0] = 123;
@@ -113,7 +113,7 @@ class PhpArrayAdapterTest extends AdapterTestCase
         }
     }
 
-    public function testStoredFile()
+    public function testStoredFile(): void
     {
         $data = [
             'integer' => 42,
@@ -154,7 +154,7 @@ class PhpArrayAdapterWrapper extends PhpArrayAdapter
 
     public function save(CacheItemInterface $item): bool
     {
-        (\Closure::bind(function () use ($item) {
+        (\Closure::bind(function () use ($item): void {
             $key = $item->getKey();
             $this->keys[$key] = $id = \count($this->values);
             $this->data[$key] = $this->values[$id] = $item->get();

@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 
 class AmazonSqsTransportFactoryTest extends TestCase
 {
-    public function testSupportsOnlySqsTransports()
+    public function testSupportsOnlySqsTransports(): void
     {
         $factory = new AmazonSqsTransportFactory();
 
@@ -29,7 +29,7 @@ class AmazonSqsTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports('invalid-dsn', []));
     }
 
-    public function testCustomHttpClient()
+    public function testCustomHttpClient(): void
     {
         $httpClient = new MockHttpClient();
         $factory = new AmazonSqsTransportFactory(null, $httpClient);

@@ -27,7 +27,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Preload\UnionDummy;
 
 class PreloaderTest extends TestCase
 {
-    public function testPreload()
+    public function testPreload(): void
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');
 
@@ -41,7 +41,7 @@ class PreloaderTest extends TestCase
         self::assertTrue(class_exists(C::class, false));
     }
 
-    public function testPreloadSkipsNonExistingInterface()
+    public function testPreloadSkipsNonExistingInterface(): void
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');
 
@@ -51,7 +51,7 @@ class PreloaderTest extends TestCase
         self::assertFalse(class_exists(DummyWithInterface::class, false));
     }
 
-    public function testPreloadUnion()
+    public function testPreloadUnion(): void
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');
 
@@ -64,7 +64,7 @@ class PreloaderTest extends TestCase
         self::assertTrue(class_exists(E::class, false));
     }
 
-    public function testPreloadIntersection()
+    public function testPreloadIntersection(): void
     {
         $r = new \ReflectionMethod(Preloader::class, 'doPreload');
 

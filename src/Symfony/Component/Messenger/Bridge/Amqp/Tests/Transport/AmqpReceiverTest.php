@@ -31,7 +31,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 #[RequiresPhpExtension('amqp')]
 class AmqpReceiverTest extends TestCase
 {
-    public function testItReturnsTheDecodedMessageToTheHandler()
+    public function testItReturnsTheDecodedMessageToTheHandler(): void
     {
         $serializer = new Serializer(
             new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
@@ -48,7 +48,7 @@ class AmqpReceiverTest extends TestCase
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
     }
 
-    public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
+    public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage(): void
     {
         $this->expectException(TransportException::class);
         $serializer = $this->createStub(SerializerInterface::class);
@@ -62,7 +62,7 @@ class AmqpReceiverTest extends TestCase
         $receiver->ack(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope, 'queueName')]));
     }
 
-    public function testItThrowsATransportExceptionIfItCannotRejectMessage()
+    public function testItThrowsATransportExceptionIfItCannotRejectMessage(): void
     {
         $this->expectException(TransportException::class);
         $serializer = $this->createStub(SerializerInterface::class);
@@ -76,7 +76,7 @@ class AmqpReceiverTest extends TestCase
         $receiver->reject(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope, 'queueName')]));
     }
 
-    public function testTransportMessageIdStampIsCreatedWhenMessageIdIsSet()
+    public function testTransportMessageIdStampIsCreatedWhenMessageIdIsSet(): void
     {
         $serializer = new Serializer(
             new SerializerComponent\Serializer([new DateTimeNormalizer(), new ArrayDenormalizer(), new ObjectNormalizer()], ['json' => new JsonEncoder()])
@@ -110,7 +110,7 @@ class AmqpReceiverTest extends TestCase
         $this->assertSame($id, $transportMessageIdStamp->getId());
     }
 
-    public function testTransportMessageIdStampIsNotCreatedWhenMessageIdIsNotSet()
+    public function testTransportMessageIdStampIsNotCreatedWhenMessageIdIsNotSet(): void
     {
         $serializer = new Serializer(
             new SerializerComponent\Serializer([new DateTimeNormalizer(), new ArrayDenormalizer(), new ObjectNormalizer()], ['json' => new JsonEncoder()])

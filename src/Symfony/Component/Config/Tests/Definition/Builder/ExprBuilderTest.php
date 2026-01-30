@@ -20,7 +20,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 class ExprBuilderTest extends TestCase
 {
-    public function testAlwaysExpression()
+    public function testAlwaysExpression(): void
     {
         $test = $this->getTestBuilder()
             ->always($this->returnClosure('new_value'))
@@ -29,7 +29,7 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs('new_value', $test);
     }
 
-    public function testIfTrueExpression()
+    public function testIfTrueExpression(): void
     {
         $test = $this->getTestBuilder()
             ->ifTrue()
@@ -62,7 +62,7 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs('value', $test);
     }
 
-    public function testIfFalseExpression()
+    public function testIfFalseExpression(): void
     {
         $test = $this->getTestBuilder()
             ->ifFalse()
@@ -95,7 +95,7 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs('new_value', $test);
     }
 
-    public function testIfStringExpression()
+    public function testIfStringExpression(): void
     {
         $test = $this->getTestBuilder()
             ->ifString()
@@ -110,7 +110,7 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs(45, $test, ['key' => 45]);
     }
 
-    public function testIfNullExpression()
+    public function testIfNullExpression(): void
     {
         $test = $this->getTestBuilder()
             ->ifNull()
@@ -125,7 +125,7 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs('value', $test);
     }
 
-    public function testIfEmptyExpression()
+    public function testIfEmptyExpression(): void
     {
         $test = $this->getTestBuilder()
             ->ifEmpty()
@@ -140,7 +140,7 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs('value', $test);
     }
 
-    public function testIfArrayExpression()
+    public function testIfArrayExpression(): void
     {
         $test = $this->getTestBuilder()
             ->ifArray()
@@ -155,7 +155,7 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs('value', $test);
     }
 
-    public function testIfInArrayExpression()
+    public function testIfInArrayExpression(): void
     {
         $test = $this->getTestBuilder()
             ->ifInArray(['foo', 'bar', 'value'])
@@ -170,7 +170,7 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs('value', $test);
     }
 
-    public function testIfNotInArrayExpression()
+    public function testIfNotInArrayExpression(): void
     {
         $test = $this->getTestBuilder()
             ->ifNotInArray(['foo', 'bar'])
@@ -185,7 +185,7 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs('new_value', $test);
     }
 
-    public function testThenEmptyArrayExpression()
+    public function testThenEmptyArrayExpression(): void
     {
         $test = $this->getTestBuilder()
             ->ifString()
@@ -195,7 +195,7 @@ class ExprBuilderTest extends TestCase
     }
 
     #[DataProvider('castToArrayValues')]
-    public function testCastToArrayExpression($configValue, array $expectedValue)
+    public function testCastToArrayExpression($configValue, array $expectedValue): void
     {
         $test = $this->getTestBuilder()
             ->castToArray()
@@ -211,7 +211,7 @@ class ExprBuilderTest extends TestCase
         yield [['value'], ['value']];
     }
 
-    public function testThenInvalid()
+    public function testThenInvalid(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $test = $this->getTestBuilder()
@@ -221,7 +221,7 @@ class ExprBuilderTest extends TestCase
         $this->finalizeTestBuilder($test);
     }
 
-    public function testThenUnsetExpression()
+    public function testThenUnsetExpression(): void
     {
         $test = $this->getTestBuilder()
             ->ifString()
@@ -230,14 +230,14 @@ class ExprBuilderTest extends TestCase
         $this->assertEquals([], $this->finalizeTestBuilder($test));
     }
 
-    public function testEndIfPartNotSpecified()
+    public function testEndIfPartNotSpecified(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('You must specify an if part.');
         $this->getTestBuilder()->end();
     }
 
-    public function testEndThenPartNotSpecified()
+    public function testEndThenPartNotSpecified(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('You must specify a then part.');

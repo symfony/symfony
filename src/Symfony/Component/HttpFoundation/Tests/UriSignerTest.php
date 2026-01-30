@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\UriSigner;
 #[Group('time-sensitive')]
 class UriSignerTest extends TestCase
 {
-    public function testSign()
+    public function testSign(): void
     {
         $signer = new UriSigner('foobar');
 
@@ -39,7 +39,7 @@ class UriSignerTest extends TestCase
         $this->assertStringContainsString('&foo=', $signer->sign('http://example.com/foo?foo=bar', 1));
     }
 
-    public function testCheck()
+    public function testCheck(): void
     {
         $signer = new UriSigner('foobar');
 
@@ -65,7 +65,7 @@ class UriSignerTest extends TestCase
         $this->assertSame($signer->sign('http://example.com/foo?foo=bar&bar=foo', 1), $signer->sign('http://example.com/foo?bar=foo&foo=bar', 1));
     }
 
-    public function testCheckWithDifferentArgSeparator()
+    public function testCheckWithDifferentArgSeparator(): void
     {
         $oldArgSeparatorOutputValue = ini_set('arg_separator.output', '&amp;');
 
@@ -88,7 +88,7 @@ class UriSignerTest extends TestCase
         }
     }
 
-    public function testCheckWithRequest()
+    public function testCheckWithRequest(): void
     {
         $signer = new UriSigner('foobar');
 
@@ -101,7 +101,7 @@ class UriSignerTest extends TestCase
         $this->assertTrue($signer->checkRequest(Request::create($signer->sign('http://example.com/foo?foo=bar&0=integer', new \DateTimeImmutable('2099-01-01 00:00:00')))));
     }
 
-    public function testCheckWithDifferentParameter()
+    public function testCheckWithDifferentParameter(): void
     {
         $signer = new UriSigner('foobar', 'qux', 'abc');
 
@@ -118,7 +118,7 @@ class UriSignerTest extends TestCase
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?foo=bar&baz=bay', new \DateTimeImmutable('2099-01-01 00:00:00'))));
     }
 
-    public function testSignerWorksWithFragments()
+    public function testSignerWorksWithFragments(): void
     {
         $signer = new UriSigner('foobar');
 
@@ -137,14 +137,14 @@ class UriSignerTest extends TestCase
         $this->assertTrue($signer->check($signer->sign('http://example.com/foo?bar=foo&foo=bar#foobar', new \DateTimeImmutable('2099-01-01 00:00:00'))));
     }
 
-    public function testSignWithUriExpiration()
+    public function testSignWithUriExpiration(): void
     {
         $signer = new UriSigner('foobar');
 
         $this->assertSame($signer->sign('http://example.com/foo?foo=bar&bar=foo', new \DateTimeImmutable('2038-01-01 00:00:00', new \DateTimeZone('UTC'))), $signer->sign('http://example.com/foo?bar=foo&foo=bar', 2145916800));
     }
 
-    public function testSignWithoutExpirationAndWithReservedHashParameter()
+    public function testSignWithoutExpirationAndWithReservedHashParameter(): void
     {
         $signer = new UriSigner('foobar');
 
@@ -153,7 +153,7 @@ class UriSignerTest extends TestCase
         $signer->sign('http://example.com/foo?_hash=bar');
     }
 
-    public function testSignWithoutExpirationAndWithReservedParameter()
+    public function testSignWithoutExpirationAndWithReservedParameter(): void
     {
         $signer = new UriSigner('foobar');
 
@@ -162,7 +162,7 @@ class UriSignerTest extends TestCase
         $signer->sign('http://example.com/foo?_expiration=4070908800');
     }
 
-    public function testSignWithExpirationAndWithReservedHashParameter()
+    public function testSignWithExpirationAndWithReservedHashParameter(): void
     {
         $signer = new UriSigner('foobar');
 
@@ -171,7 +171,7 @@ class UriSignerTest extends TestCase
         $signer->sign('http://example.com/foo?_hash=bar', new \DateTimeImmutable('2099-01-01 00:00:00'));
     }
 
-    public function testSignWithExpirationAndWithReservedParameter()
+    public function testSignWithExpirationAndWithReservedParameter(): void
     {
         $signer = new UriSigner('foobar');
 
@@ -180,7 +180,7 @@ class UriSignerTest extends TestCase
         $signer->sign('http://example.com/foo?_expiration=4070908800', new \DateTimeImmutable('2099-01-01 00:00:00'));
     }
 
-    public function testCheckWithUriExpiration()
+    public function testCheckWithUriExpiration(): void
     {
         $signer = new UriSigner('foobar');
 
@@ -202,7 +202,7 @@ class UriSignerTest extends TestCase
         $this->assertFalse($signer->check($relativeUriFromNow3));
     }
 
-    public function testCheckWithUriExpirationWithClock()
+    public function testCheckWithUriExpirationWithClock(): void
     {
         $clock = new MockClock();
         $signer = new UriSigner('foobar', clock: $clock);
@@ -225,13 +225,13 @@ class UriSignerTest extends TestCase
         $this->assertFalse($signer->check($relativeUriFromNow3));
     }
 
-    public function testNonUrlSafeBase64()
+    public function testNonUrlSafeBase64(): void
     {
         $signer = new UriSigner('foobar');
         $this->assertTrue($signer->check('http://example.com/foo?_hash=rIOcC%2FF3DoEGo%2FvnESjSp7uU9zA9S%2F%2BOLhxgMexoPUM%3D&baz=bay&foo=bar'));
     }
 
-    public function testVerifyUnSignedUri()
+    public function testVerifyUnSignedUri(): void
     {
         $signer = new UriSigner('foobar');
         $uri = 'http://example.com/foo';
@@ -241,7 +241,7 @@ class UriSignerTest extends TestCase
         $signer->verify($uri);
     }
 
-    public function testVerifyUnverifiedUri()
+    public function testVerifyUnverifiedUri(): void
     {
         $signer = new UriSigner('foobar');
         $uri = 'http://example.com/foo?_hash=invalid';
@@ -251,7 +251,7 @@ class UriSignerTest extends TestCase
         $signer->verify($uri);
     }
 
-    public function testVerifyExpiredUri()
+    public function testVerifyExpiredUri(): void
     {
         $signer = new UriSigner('foobar');
         $uri = $signer->sign('http://example.com/foo', 123456);

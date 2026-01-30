@@ -32,7 +32,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 #[Group('time-sensitive')]
 class SmtpTransportTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $t = new SmtpTransport();
         $this->assertEquals('smtps://localhost', (string) $t);
@@ -41,7 +41,7 @@ class SmtpTransportTest extends TestCase
         $this->assertEquals('smtp://127.0.0.1:2525', (string) $t);
     }
 
-    public function testSendDoesNotPingBelowThreshold()
+    public function testSendDoesNotPingBelowThreshold(): void
     {
         $stream = new DummyStream();
         $envelope = new Envelope(new Address('sender@example.org'), [new Address('recipient@example.org')]);
@@ -54,7 +54,7 @@ class SmtpTransportTest extends TestCase
         $this->assertNotContains("NOOP\r\n", $stream->getCommands());
     }
 
-    public function testSendPingAfterTransportException()
+    public function testSendPingAfterTransportException(): void
     {
         $stream = new DummyStream();
         $envelope = new Envelope(new Address('sender@example.org'), [new Address('recipient@example.org')]);
@@ -77,7 +77,7 @@ class SmtpTransportTest extends TestCase
         $this->assertFalse($stream->isClosed());
     }
 
-    public function testSendDoesPingAboveThreshold()
+    public function testSendDoesPingAboveThreshold(): void
     {
         $stream = new DummyStream();
         $envelope = new Envelope(new Address('sender@example.org'), [new Address('recipient@example.org')]);
@@ -97,7 +97,7 @@ class SmtpTransportTest extends TestCase
         $this->assertContains("NOOP\r\n", $stream->getCommands());
     }
 
-    public function testSendInvalidMessage()
+    public function testSendInvalidMessage(): void
     {
         $stream = new DummyStream();
 
@@ -120,7 +120,7 @@ class SmtpTransportTest extends TestCase
         $this->assertTrue($stream->isClosed());
     }
 
-    public function testWriteEncodedRecipientAndSenderAddresses()
+    public function testWriteEncodedRecipientAndSenderAddresses(): void
     {
         $stream = new DummyStream();
 
@@ -139,7 +139,7 @@ class SmtpTransportTest extends TestCase
         $this->assertContains("RCPT TO:<recipient2@example.org>\r\n", $stream->getCommands());
     }
 
-    public function testMessageIdFromServerIsEmbeddedInSentMessageEvent()
+    public function testMessageIdFromServerIsEmbeddedInSentMessageEvent(): void
     {
         $calls = 0;
         $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
@@ -170,20 +170,20 @@ class SmtpTransportTest extends TestCase
         $this->assertSame(2, $calls);
     }
 
-    public function testAssertResponseCodeNoCodes()
+    public function testAssertResponseCodeNoCodes(): void
     {
         $this->expectException(LogicException::class);
         $this->invokeAssertResponseCode('response', []);
     }
 
-    public function testAssertResponseCodeWithEmptyResponse()
+    public function testAssertResponseCodeWithEmptyResponse(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Expected response code "220" but got empty code.');
         $this->invokeAssertResponseCode('', [220]);
     }
 
-    public function testAssertResponseCodeWithNotValidCode()
+    public function testAssertResponseCodeWithNotValidCode(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Expected response code "220" but got code "550", with message "550 Access Denied".');
@@ -198,7 +198,7 @@ class SmtpTransportTest extends TestCase
         $m->invoke($transport, $response, $codes);
     }
 
-    public function testStop()
+    public function testStop(): void
     {
         $stream = new DummyStream();
         $envelope = new Envelope(new Address('sender@example.org'), [new Address('recipient@example.org')]);

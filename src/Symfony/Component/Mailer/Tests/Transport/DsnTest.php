@@ -19,12 +19,12 @@ use Symfony\Component\Mailer\Transport\Dsn;
 class DsnTest extends TestCase
 {
     #[DataProvider('fromStringProvider')]
-    public function testFromString(string $string, Dsn $dsn)
+    public function testFromString(string $string, Dsn $dsn): void
     {
         $this->assertEquals($dsn, Dsn::fromString($string));
     }
 
-    public function testGetOption()
+    public function testGetOption(): void
     {
         $options = ['with_value' => 'some value', 'nullable' => null];
         $dsn = new Dsn('smtp', 'example.com', null, null, null, $options);
@@ -35,7 +35,7 @@ class DsnTest extends TestCase
     }
 
     #[DataProvider('invalidDsnProvider')]
-    public function testInvalidDsn(string $dsn, string $exceptionMessage)
+    public function testInvalidDsn(string $dsn, string $exceptionMessage): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($exceptionMessage);
@@ -104,7 +104,7 @@ class DsnTest extends TestCase
     }
 
     #[DataProvider('getBooleanOptionProvider')]
-    public function testGetBooleanOption(bool $expected, string $dsnString, string $option, bool $default)
+    public function testGetBooleanOption(bool $expected, string $dsnString, string $option, bool $default): void
     {
         $dsn = Dsn::fromString($dsnString);
 

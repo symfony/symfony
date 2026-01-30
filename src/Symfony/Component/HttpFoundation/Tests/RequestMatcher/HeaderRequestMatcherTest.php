@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\HeaderRequestMatcher;
 class HeaderRequestMatcherTest extends TestCase
 {
     #[DataProvider('getDataForArray')]
-    public function testArray(array $headers, bool $matches)
+    public function testArray(array $headers, bool $matches): void
     {
         $matcher = new HeaderRequestMatcher(['x-foo', 'bar']);
 
@@ -32,7 +32,7 @@ class HeaderRequestMatcherTest extends TestCase
     }
 
     #[DataProvider('getDataForArray')]
-    public function testCommaSeparatedString(array $headers, bool $matches)
+    public function testCommaSeparatedString(array $headers, bool $matches): void
     {
         $matcher = new HeaderRequestMatcher('x-foo, bar');
 
@@ -45,7 +45,7 @@ class HeaderRequestMatcherTest extends TestCase
     }
 
     #[DataProvider('getDataForSingleString')]
-    public function testSingleString(array $headers, bool $matches)
+    public function testSingleString(array $headers, bool $matches): void
     {
         $matcher = new HeaderRequestMatcher('x-foo');
 

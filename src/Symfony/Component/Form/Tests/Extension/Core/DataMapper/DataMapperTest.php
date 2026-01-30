@@ -37,7 +37,7 @@ class DataMapperTest extends TestCase
         $this->dispatcher = new EventDispatcher();
     }
 
-    public function testMapDataToFormsPassesObjectRefIfByReference()
+    public function testMapDataToFormsPassesObjectRefIfByReference(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -54,7 +54,7 @@ class DataMapperTest extends TestCase
         self::assertSame($engine, $form->getData());
     }
 
-    public function testMapDataToFormsPassesObjectCloneIfNotByReference()
+    public function testMapDataToFormsPassesObjectCloneIfNotByReference(): void
     {
         $car = new \stdClass();
         $engine = new \stdClass();
@@ -73,7 +73,7 @@ class DataMapperTest extends TestCase
         self::assertEquals($engine, $form->getData());
     }
 
-    public function testMapDataToFormsIgnoresEmptyPropertyPath()
+    public function testMapDataToFormsIgnoresEmptyPropertyPath(): void
     {
         $car = new \stdClass();
 
@@ -88,7 +88,7 @@ class DataMapperTest extends TestCase
         self::assertNull($form->getData());
     }
 
-    public function testMapDataToFormsIgnoresUnmapped()
+    public function testMapDataToFormsIgnoresUnmapped(): void
     {
         $car = new \stdClass();
         $car->engine = new \stdClass();
@@ -105,7 +105,7 @@ class DataMapperTest extends TestCase
         self::assertNull($form->getData());
     }
 
-    public function testMapDataToFormsIgnoresUninitializedProperties()
+    public function testMapDataToFormsIgnoresUninitializedProperties(): void
     {
         $engineForm = new Form(new FormConfigBuilder('engine', null, $this->dispatcher));
         $colorForm = new Form(new FormConfigBuilder('color', null, $this->dispatcher));
@@ -119,7 +119,7 @@ class DataMapperTest extends TestCase
         self::assertNull($colorForm->getData());
     }
 
-    public function testMapDataToFormsSetsDefaultDataIfPassedDataIsNull()
+    public function testMapDataToFormsSetsDefaultDataIfPassedDataIsNull(): void
     {
         $default = new \stdClass();
         $propertyPath = new PropertyPath('engine');
@@ -136,7 +136,7 @@ class DataMapperTest extends TestCase
         self::assertSame($default, $form->getData());
     }
 
-    public function testMapDataToFormsSetsDefaultDataIfPassedDataIsEmptyArray()
+    public function testMapDataToFormsSetsDefaultDataIfPassedDataIsEmptyArray(): void
     {
         $default = new \stdClass();
         $propertyPath = new PropertyPath('engine');
@@ -153,7 +153,7 @@ class DataMapperTest extends TestCase
         self::assertSame($default, $form->getData());
     }
 
-    public function testMapFormsToDataWritesBackIfNotByReference()
+    public function testMapFormsToDataWritesBackIfNotByReference(): void
     {
         $car = new \stdClass();
         $car->engine = new \stdClass();
@@ -173,7 +173,7 @@ class DataMapperTest extends TestCase
         self::assertNotSame($engine, $car->engine);
     }
 
-    public function testMapFormsToDataWritesBackIfByReferenceButNoReference()
+    public function testMapFormsToDataWritesBackIfByReferenceButNoReference(): void
     {
         $car = new \stdClass();
         $car->engine = new \stdClass();
@@ -191,7 +191,7 @@ class DataMapperTest extends TestCase
         self::assertSame($engine, $car->engine);
     }
 
-    public function testMapFormsToDataWritesBackIfByReferenceAndReference()
+    public function testMapFormsToDataWritesBackIfByReferenceAndReference(): void
     {
         $car = new \stdClass();
         $car->engine = 'BMW';
@@ -210,7 +210,7 @@ class DataMapperTest extends TestCase
         self::assertSame('Rolls-Royce', $car->engine);
     }
 
-    public function testMapFormsToDataIgnoresUnmapped()
+    public function testMapFormsToDataIgnoresUnmapped(): void
     {
         $initialEngine = new \stdClass();
         $car = new \stdClass();
@@ -230,7 +230,7 @@ class DataMapperTest extends TestCase
         self::assertSame($initialEngine, $car->engine);
     }
 
-    public function testMapFormsToDataIgnoresUnsubmittedForms()
+    public function testMapFormsToDataIgnoresUnsubmittedForms(): void
     {
         $initialEngine = new \stdClass();
         $car = new \stdClass();
@@ -249,7 +249,7 @@ class DataMapperTest extends TestCase
         self::assertSame($initialEngine, $car->engine);
     }
 
-    public function testMapFormsToDataIgnoresEmptyData()
+    public function testMapFormsToDataIgnoresEmptyData(): void
     {
         $initialEngine = new \stdClass();
         $car = new \stdClass();
@@ -267,7 +267,7 @@ class DataMapperTest extends TestCase
         self::assertSame($initialEngine, $car->engine);
     }
 
-    public function testMapFormsToDataIgnoresUnsynchronized()
+    public function testMapFormsToDataIgnoresUnsynchronized(): void
     {
         $initialEngine = new \stdClass();
         $car = new \stdClass();
@@ -286,7 +286,7 @@ class DataMapperTest extends TestCase
         self::assertSame($initialEngine, $car->engine);
     }
 
-    public function testMapFormsToDataIgnoresDisabled()
+    public function testMapFormsToDataIgnoresDisabled(): void
     {
         $initialEngine = new \stdClass();
         $car = new \stdClass();
@@ -306,7 +306,7 @@ class DataMapperTest extends TestCase
         self::assertSame($initialEngine, $car->engine);
     }
 
-    public function testMapFormsToUninitializedProperties()
+    public function testMapFormsToUninitializedProperties(): void
     {
         $car = new TypehintedPropertiesCar();
         $config = new FormConfigBuilder('engine', null, $this->dispatcher);
@@ -319,7 +319,7 @@ class DataMapperTest extends TestCase
     }
 
     #[DataProvider('provideDate')]
-    public function testMapFormsToDataDoesNotChangeEqualDateTimeInstance($date)
+    public function testMapFormsToDataDoesNotChangeEqualDateTimeInstance($date): void
     {
         $article = [];
         $publishedAt = $date;
@@ -346,7 +346,7 @@ class DataMapperTest extends TestCase
         ];
     }
 
-    public function testMapDataToFormsUsingGetCallbackOption()
+    public function testMapDataToFormsUsingGetCallbackOption(): void
     {
         $initialName = 'John Doe';
         $person = new DummyPerson($initialName);
@@ -361,12 +361,12 @@ class DataMapperTest extends TestCase
         self::assertSame($initialName, $form->getData());
     }
 
-    public function testMapFormsToDataUsingSetCallbackOption()
+    public function testMapFormsToDataUsingSetCallbackOption(): void
     {
         $person = new DummyPerson('John Doe');
 
         $config = new FormConfigBuilder('name', null, $this->dispatcher, [
-            'setter' => static function (DummyPerson $person, $name) {
+            'setter' => static function (DummyPerson $person, $name): void {
                 $person->rename($name);
             },
         ]);
@@ -378,7 +378,7 @@ class DataMapperTest extends TestCase
         self::assertSame('Jane Doe', $person->myName());
     }
 
-    public function testMapFormsToDataMapsDateTimeInstanceToArrayIfNotSetBefore()
+    public function testMapFormsToDataMapsDateTimeInstanceToArrayIfNotSetBefore(): void
     {
         $propertyAccessor = PropertyAccess::createPropertyAccessorBuilder()
             ->enableExceptionOnInvalidIndex()
@@ -405,7 +405,7 @@ class DataMapperTest extends TestCase
         $this->assertEquals(['date' => new \DateTime('2022-08-04', new \DateTimeZone('UTC'))], $form->getData());
     }
 
-    public function testMapFormToDataWithOnlyGetterConfigured()
+    public function testMapFormToDataWithOnlyGetterConfigured(): void
     {
         $person = new DummyPerson('foo');
         $form = (new FormFactoryBuilder())

@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class MandrillApiTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(MandrillApiTransport $transport, string $expected)
+    public function testToString(MandrillApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -50,7 +50,7 @@ class MandrillApiTransportTest extends TestCase
         ];
     }
 
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
@@ -66,7 +66,7 @@ class MandrillApiTransportTest extends TestCase
         $this->assertEquals('bar', $payload['message']['headers']['foo']);
     }
 
-    public function testSubaccountHeaderIsAddedToPayload()
+    public function testSubaccountHeaderIsAddedToPayload(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('X-MC-Subaccount', 'foo-bar');
@@ -81,7 +81,7 @@ class MandrillApiTransportTest extends TestCase
         $this->assertArrayNotHasKey('headers', $payload['message']);
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -115,7 +115,7 @@ class MandrillApiTransportTest extends TestCase
         $this->assertSame('foobar', $message->getMessageId());
     }
 
-    public function testSendThrowsForErrorResponse()
+    public function testSendThrowsForErrorResponse(): void
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['status' => 'error', 'message' => 'i\'m a teapot', 'code' => 418], [
             'http_code' => 418,
@@ -134,7 +134,7 @@ class MandrillApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testTagAndMetadataHeaders()
+    public function testTagAndMetadataHeaders(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('password-reset'));
@@ -154,7 +154,7 @@ class MandrillApiTransportTest extends TestCase
         $this->assertSame(['Color' => 'blue', 'Client-ID' => '12345'], $payload['message']['metadata']);
     }
 
-    public function testCanHaveMultipleTags()
+    public function testCanHaveMultipleTags(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('password-reset,user'));

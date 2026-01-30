@@ -24,14 +24,14 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
         return new IsinValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Isin());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Isin());
 
@@ -39,7 +39,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidIsin')]
-    public function testValidIsin($isin)
+    public function testValidIsin($isin): void
     {
         $this->validator->validate($isin, new Isin());
         $this->expectViolationsAt(0, $isin, new Luhn());
@@ -63,7 +63,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getIsinWithInvalidLenghFormat')]
-    public function testIsinWithInvalidFormat($isin)
+    public function testIsinWithInvalidFormat($isin): void
     {
         $this->assertViolationRaised($isin, Isin::INVALID_LENGTH_ERROR);
     }
@@ -86,7 +86,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getIsinWithInvalidPattern')]
-    public function testIsinWithInvalidPattern($isin)
+    public function testIsinWithInvalidPattern($isin): void
     {
         $this->assertViolationRaised($isin, Isin::INVALID_PATTERN_ERROR);
     }
@@ -102,7 +102,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getIsinWithValidFormatButIncorrectChecksum')]
-    public function testIsinWithValidFormatButIncorrectChecksum($isin)
+    public function testIsinWithValidFormatButIncorrectChecksum($isin): void
     {
         $this->expectViolationsAt(0, $isin, new Luhn());
         $this->assertViolationRaised($isin, Isin::INVALID_CHECKSUM_ERROR);
@@ -121,7 +121,7 @@ class IsinValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    private function assertViolationRaised($isin, $code)
+    private function assertViolationRaised($isin, $code): void
     {
         $constraint = new Isin(message: 'myMessage');
 

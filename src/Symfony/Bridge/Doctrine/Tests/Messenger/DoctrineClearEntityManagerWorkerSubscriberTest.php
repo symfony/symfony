@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class DoctrineClearEntityManagerWorkerSubscriberTest extends MiddlewareTestCase
 {
-    public function testMiddlewareClearEntityManager()
+    public function testMiddlewareClearEntityManager(): void
     {
         $entityManager1 = $this->createMock(EntityManagerInterface::class);
         $entityManager1->expects($this->once())

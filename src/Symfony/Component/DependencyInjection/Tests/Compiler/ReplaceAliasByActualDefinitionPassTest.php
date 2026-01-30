@@ -21,7 +21,7 @@ require_once __DIR__.'/../Fixtures/includes/foo.php';
 
 class ReplaceAliasByActualDefinitionPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 
@@ -54,7 +54,7 @@ class ReplaceAliasByActualDefinitionPassTest extends TestCase
         $this->assertSame('b_alias', (string) $resolvedFactory[0]);
     }
 
-    public function testProcessWithInvalidAlias()
+    public function testProcessWithInvalidAlias(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $container = new ContainerBuilder();
@@ -62,7 +62,7 @@ class ReplaceAliasByActualDefinitionPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcessDoesNotInvertAliasChainWithDeprecatedAlias()
+    public function testProcessDoesNotInvertAliasChainWithDeprecatedAlias(): void
     {
         $container = new ContainerBuilder();
 
@@ -106,7 +106,7 @@ class ReplaceAliasByActualDefinitionPassTest extends TestCase
         $this->assertTrue($container->getAlias('MyServiceInterface')->isDeprecated());
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new ReplaceAliasByActualDefinitionPass();
         $pass->process($container);

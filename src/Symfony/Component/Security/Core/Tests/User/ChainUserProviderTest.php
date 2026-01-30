@@ -24,7 +24,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class ChainUserProviderTest extends TestCase
 {
-    public function testLoadUserByIdentifier()
+    public function testLoadUserByIdentifier(): void
     {
         $provider1 = $this->createMock(InMemoryUserProvider::class);
         $provider1
@@ -46,7 +46,7 @@ class ChainUserProviderTest extends TestCase
         $this->assertSame($account, $provider->loadUserByIdentifier('foo'));
     }
 
-    public function testLoadUserByIdentifierWithAttributes()
+    public function testLoadUserByIdentifierWithAttributes(): void
     {
         $provider0 = $this->createMock(ChainUserProvider::class);
         $provider0
@@ -76,7 +76,7 @@ class ChainUserProviderTest extends TestCase
         $this->assertSame($account, $provider->loadUserByIdentifier('foo', ['attr' => 5]));
     }
 
-    public function testLoadUserByIdentifierThrowsUserNotFoundException()
+    public function testLoadUserByIdentifierThrowsUserNotFoundException(): void
     {
         $provider1 = $this->createMock(InMemoryUserProvider::class);
         $provider1
@@ -101,7 +101,7 @@ class ChainUserProviderTest extends TestCase
         $provider->loadUserByIdentifier('foo');
     }
 
-    public function testRefreshUser()
+    public function testRefreshUser(): void
     {
         $provider1 = $this->createMock(InMemoryUserProvider::class);
         $provider1
@@ -140,7 +140,7 @@ class ChainUserProviderTest extends TestCase
         $this->assertSame($account, $provider->refreshUser(new InMemoryUser('John', 'password')));
     }
 
-    public function testRefreshUserAgain()
+    public function testRefreshUserAgain(): void
     {
         $provider1 = $this->createMock(InMemoryUserProvider::class);
         $provider1
@@ -172,7 +172,7 @@ class ChainUserProviderTest extends TestCase
         $this->assertSame($account, $provider->refreshUser(new InMemoryUser('John', 'password')));
     }
 
-    public function testRefreshUserThrowsUnsupportedUserException()
+    public function testRefreshUserThrowsUnsupportedUserException(): void
     {
         $provider1 = $this->createMock(InMemoryUserProvider::class);
         $provider1
@@ -207,7 +207,7 @@ class ChainUserProviderTest extends TestCase
         $provider->refreshUser(new InMemoryUser('John', 'password'));
     }
 
-    public function testSupportsClass()
+    public function testSupportsClass(): void
     {
         $provider1 = $this->createMock(InMemoryUserProvider::class);
         $provider1
@@ -229,7 +229,7 @@ class ChainUserProviderTest extends TestCase
         $this->assertTrue($provider->supportsClass('foo'));
     }
 
-    public function testSupportsClassWhenNotSupported()
+    public function testSupportsClassWhenNotSupported(): void
     {
         $provider1 = $this->createMock(InMemoryUserProvider::class);
         $provider1
@@ -251,7 +251,7 @@ class ChainUserProviderTest extends TestCase
         $this->assertFalse($provider->supportsClass('foo'));
     }
 
-    public function testAcceptsTraversable()
+    public function testAcceptsTraversable(): void
     {
         $provider1 = $this->createMock(InMemoryUserProvider::class);
         $provider1
@@ -283,7 +283,7 @@ class ChainUserProviderTest extends TestCase
         $this->assertSame($account, $provider->refreshUser(new InMemoryUser('John', 'password')));
     }
 
-    public function testPasswordUpgrades()
+    public function testPasswordUpgrades(): void
     {
         $user = new InMemoryUser('user', 'pwd');
 

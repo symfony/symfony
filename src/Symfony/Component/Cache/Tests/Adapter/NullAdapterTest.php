@@ -24,7 +24,7 @@ class NullAdapterTest extends TestCase
         return new NullAdapter();
     }
 
-    public function testGetItem()
+    public function testGetItem(): void
     {
         $adapter = $this->createCachePool();
 
@@ -33,12 +33,12 @@ class NullAdapterTest extends TestCase
         $this->assertNull($item->get(), "Item's value must be null when isHit is false.");
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $adapter = $this->createCachePool();
 
         $fetched = [];
-        $adapter->get('myKey', static function ($item) use (&$fetched) { $fetched[] = $item; });
+        $adapter->get('myKey', static function ($item) use (&$fetched): void { $fetched[] = $item; });
         $this->assertCount(1, $fetched);
         $item = $fetched[0];
         $this->assertFalse($item->isHit());
@@ -46,12 +46,12 @@ class NullAdapterTest extends TestCase
         $this->assertSame('myKey', $item->getKey());
     }
 
-    public function testHasItem()
+    public function testHasItem(): void
     {
         $this->assertFalse($this->createCachePool()->hasItem('key'));
     }
 
-    public function testGetItems()
+    public function testGetItems(): void
     {
         $adapter = $this->createCachePool();
 
@@ -81,7 +81,7 @@ class NullAdapterTest extends TestCase
         $this->assertSame(4, $count);
     }
 
-    public function testIsHit()
+    public function testIsHit(): void
     {
         $adapter = $this->createCachePool();
 
@@ -89,22 +89,22 @@ class NullAdapterTest extends TestCase
         $this->assertFalse($item->isHit());
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->assertTrue($this->createCachePool()->clear());
     }
 
-    public function testDeleteItem()
+    public function testDeleteItem(): void
     {
         $this->assertTrue($this->createCachePool()->deleteItem('key'));
     }
 
-    public function testDeleteItems()
+    public function testDeleteItems(): void
     {
         $this->assertTrue($this->createCachePool()->deleteItems(['key', 'foo', 'bar']));
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $adapter = $this->createCachePool();
 
@@ -115,7 +115,7 @@ class NullAdapterTest extends TestCase
         $this->assertTrue($adapter->save($item));
     }
 
-    public function testDeferredSave()
+    public function testDeferredSave(): void
     {
         $adapter = $this->createCachePool();
 
@@ -126,7 +126,7 @@ class NullAdapterTest extends TestCase
         $this->assertTrue($adapter->saveDeferred($item));
     }
 
-    public function testCommit()
+    public function testCommit(): void
     {
         $adapter = $this->createCachePool();
 
@@ -138,7 +138,7 @@ class NullAdapterTest extends TestCase
         $this->assertTrue($this->createCachePool()->commit());
     }
 
-    public function testTaggable()
+    public function testTaggable(): void
     {
         $this->expectNotToPerformAssertions();
         $adapter = $this->createCachePool();
@@ -147,7 +147,7 @@ class NullAdapterTest extends TestCase
         $item->tag(['tag1']);
     }
 
-    public function testInvalidateTags()
+    public function testInvalidateTags(): void
     {
         $adapter = $this->createCachePool();
 

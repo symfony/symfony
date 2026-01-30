@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class TemplateIteratorTest extends TestCase
 {
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $iterator = new TemplateIterator($this->createKernelMock(), [__DIR__.'/Fixtures/templates/Foo' => 'Foo'], __DIR__.'/DependencyInjection/Fixtures/templates');
 
@@ -36,7 +36,7 @@ class TemplateIteratorTest extends TestCase
         );
     }
 
-    public function testGetIteratorWithFileNameFilter()
+    public function testGetIteratorWithFileNameFilter(): void
     {
         $iterator = new TemplateIterator($this->createKernelMock(), [__DIR__.'/Fixtures/templates/Foo' => 'Foo'], __DIR__.'/DependencyInjection/Fixtures/templates', ['*.twig']);
 

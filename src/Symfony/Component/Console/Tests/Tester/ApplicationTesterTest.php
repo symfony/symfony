@@ -42,30 +42,30 @@ class ApplicationTesterTest extends TestCase
         $this->tester->run(['command' => 'foo', 'foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]);
     }
 
-    public function testRun()
+    public function testRun(): void
     {
         $this->assertFalse($this->tester->getInput()->isInteractive(), '->execute() takes an interactive option');
         $this->assertFalse($this->tester->getOutput()->isDecorated(), '->execute() takes a decorated option');
         $this->assertEquals(Output::VERBOSITY_VERBOSE, $this->tester->getOutput()->getVerbosity(), '->execute() takes a verbosity option');
     }
 
-    public function testGetInput()
+    public function testGetInput(): void
     {
         $this->assertEquals('bar', $this->tester->getInput()->getArgument('foo'), '->getInput() returns the current input instance');
     }
 
-    public function testGetOutput()
+    public function testGetOutput(): void
     {
         rewind($this->tester->getOutput()->getStream());
         $this->assertEquals('foo'.\PHP_EOL, stream_get_contents($this->tester->getOutput()->getStream()), '->getOutput() returns the current output instance');
     }
 
-    public function testGetDisplay()
+    public function testGetDisplay(): void
     {
         $this->assertEquals('foo'.\PHP_EOL, $this->tester->getDisplay(), '->getDisplay() returns the display of the last execution');
     }
 
-    public function testSetInputs()
+    public function testSetInputs(): void
     {
         $application = new Application();
         $application->setAutoExit(false);
@@ -86,12 +86,12 @@ class ApplicationTesterTest extends TestCase
         $this->assertEquals('Q1Q2Q3', $tester->getDisplay(true));
     }
 
-    public function testGetStatusCode()
+    public function testGetStatusCode(): void
     {
         $this->tester->assertCommandIsSuccessful('->getStatusCode() returns the status code');
     }
 
-    public function testErrorOutput()
+    public function testErrorOutput(): void
     {
         $application = new Application();
         $application->setAutoExit(false);

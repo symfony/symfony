@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ContentSecurityPolicyHandlerTest extends TestCase
 {
     #[DataProvider('provideRequestAndResponses')]
-    public function testGetNonces($nonce, $expectedNonce, Request $request, Response $response)
+    public function testGetNonces($nonce, $expectedNonce, Request $request, Response $response): void
     {
         $cspHandler = new ContentSecurityPolicyHandler($this->mockNonceGenerator($nonce));
 
@@ -29,7 +29,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
     }
 
     #[DataProvider('provideRequestAndResponsesForOnKernelResponse')]
-    public function testOnKernelResponse($nonce, $expectedNonce, Request $request, Response $response, array $expectedCsp)
+    public function testOnKernelResponse($nonce, $expectedNonce, Request $request, Response $response, array $expectedCsp): void
     {
         $cspHandler = new ContentSecurityPolicyHandler($this->mockNonceGenerator($nonce));
 

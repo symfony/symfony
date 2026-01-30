@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Definition;
 
 class RegisterMappingsPassTest extends TestCase
 {
-    public function testNoDriverParmeterException()
+    public function testNoDriverParmeterException(): void
     {
         $container = $this->createBuilder();
 
@@ -31,7 +31,7 @@ class RegisterMappingsPassTest extends TestCase
         ]);
     }
 
-    private function process(ContainerBuilder $container, array $managerParamNames)
+    private function process(ContainerBuilder $container, array $managerParamNames): void
     {
         $pass = new ConcreteMappingsPass(
             new Definition('\stdClass'),

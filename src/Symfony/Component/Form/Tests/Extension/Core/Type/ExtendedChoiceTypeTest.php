@@ -20,7 +20,7 @@ use Symfony\Component\Form\Tests\Fixtures\LazyChoiceTypeExtension;
 class ExtendedChoiceTypeTest extends TestCase
 {
     #[DataProvider('provideTestedTypes')]
-    public function testChoicesAreOverridden($type)
+    public function testChoicesAreOverridden($type): void
     {
         ChoiceTypeExtension::$extendedType = $type;
         $factory = Forms::createFormFactoryBuilder()
@@ -38,7 +38,7 @@ class ExtendedChoiceTypeTest extends TestCase
     }
 
     #[DataProvider('provideTestedTypes')]
-    public function testChoiceLoaderIsOverridden($type)
+    public function testChoiceLoaderIsOverridden($type): void
     {
         LazyChoiceTypeExtension::$extendedType = $type;
         $factory = Forms::createFormFactoryBuilder()

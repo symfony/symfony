@@ -31,7 +31,7 @@ class ReflectionCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testReflectionCaster()
+    public function testReflectionCaster(): void
     {
         $var = new \ReflectionClass(\ReflectionClass::class);
 
@@ -83,10 +83,10 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testClosureCaster()
+    public function testClosureCaster(): void
     {
         $a = $b = 123;
-        $var = static function ($x) use ($a, &$b) { var_dump($a, $b); };
+        $var = static function ($x) use ($a, &$b): void { var_dump($a, $b); };
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'
@@ -103,7 +103,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testFromCallableClosureCaster()
+    public function testFromCallableClosureCaster(): void
     {
         $var = [
             (new \ReflectionMethod($this, __FUNCTION__))->getClosure($this),
@@ -129,16 +129,16 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testClosureCasterExcludingVerbosity()
+    public function testClosureCasterExcludingVerbosity(): void
     {
-        $var = function &($a = 123) {
+        $var = function &($a = 123): void {
             \assert(null !== $this);
         };
 
         $this->assertDumpEquals('Closure&($a = 123) { …5}', $var, Caster::EXCLUDE_VERBOSE);
     }
 
-    public function testReflectionParameter()
+    public function testReflectionParameter(): void
     {
         $var = new \ReflectionParameter(reflectionParameterFixture::class, 0);
 
@@ -155,9 +155,9 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionParameterScalar()
+    public function testReflectionParameterScalar(): void
     {
-        $f = static function (int $a) {};
+        $f = static function (int $a): void {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -172,9 +172,9 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionParameterMixed()
+    public function testReflectionParameterMixed(): void
     {
-        $f = static function (mixed $a) {};
+        $f = static function (mixed $a): void {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -190,9 +190,9 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionParameterUnion()
+    public function testReflectionParameterUnion(): void
     {
-        $f = static function (int|float $a) {};
+        $f = static function (int|float $a): void {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -207,9 +207,9 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionParameterNullableUnion()
+    public function testReflectionParameterNullableUnion(): void
     {
-        $f = static function (int|float|null $a) {};
+        $f = static function (int|float|null $a): void {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -225,9 +225,9 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionParameterIntersection()
+    public function testReflectionParameterIntersection(): void
     {
-        $f = static function (\Traversable&\Countable $a) {};
+        $f = static function (\Traversable&\Countable $a): void {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -242,7 +242,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionPropertyScalar()
+    public function testReflectionPropertyScalar(): void
     {
         $var = new \ReflectionProperty(ReflectionNamedTypeFixture::class, 'a');
         $this->assertDumpMatchesFormat(
@@ -257,7 +257,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionNamedType()
+    public function testReflectionNamedType(): void
     {
         $var = (new \ReflectionProperty(ReflectionNamedTypeFixture::class, 'a'))->getType();
         $this->assertDumpMatchesFormat(
@@ -272,7 +272,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionUnionType()
+    public function testReflectionUnionType(): void
     {
         $var = (new \ReflectionProperty(ReflectionUnionTypeFixture::class, 'a'))->getType();
         $this->assertDumpMatchesFormat(
@@ -297,7 +297,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionIntersectionType()
+    public function testReflectionIntersectionType(): void
     {
         $var = (new \ReflectionProperty(ReflectionIntersectionTypeFixture::class, 'a'))->getType();
         $this->assertDumpMatchesFormat(
@@ -322,7 +322,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionUnionTypeWithIntersection()
+    public function testReflectionUnionTypeWithIntersection(): void
     {
         $var = (new \ReflectionProperty(ReflectionUnionTypeWithIntersectionFixture::class, 'a'))->getType();
         $this->assertDumpMatchesFormat(
@@ -357,7 +357,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testExtendsReflectionType()
+    public function testExtendsReflectionType(): void
     {
         $var = new ExtendsReflectionTypeFixture();
         $this->assertDumpMatchesFormat(
@@ -370,7 +370,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReturnType()
+    public function testReturnType(): void
     {
         $f = function (): int {
             \assert(null !== $this);
@@ -390,7 +390,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testMixedReturnType()
+    public function testMixedReturnType(): void
     {
         $f = function (): mixed {
             \assert(null !== $this);
@@ -410,7 +410,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testNullReturnType()
+    public function testNullReturnType(): void
     {
         $className = Php82NullStandaloneReturnType::class;
 
@@ -427,7 +427,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testUnionReturnType()
+    public function testUnionReturnType(): void
     {
         $f = function (): int|float {
             \assert(null !== $this);
@@ -447,7 +447,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testNullableUnionReturnType()
+    public function testNullableUnionReturnType(): void
     {
         $f = function (): int|float|null {
             \assert(null !== $this);
@@ -467,7 +467,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testGenerator()
+    public function testGenerator(): void
     {
         if (\extension_loaded('xdebug')) {
             $this->markTestSkipped('xdebug is active');
@@ -545,9 +545,9 @@ class ReflectionCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $generator);
     }
 
-    public function testNewInInitializer()
+    public function testNewInInitializer(): void
     {
-        $f = function ($a = new \stdClass()) {
+        $f = function ($a = new \stdClass()): void {
             \assert(null !== $this);
         };
 
@@ -564,7 +564,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionClassWithAttribute()
+    public function testReflectionClassWithAttribute(): void
     {
         $var = new \ReflectionClass(LotsOfAttributes::class);
 
@@ -584,7 +584,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionMethodWithAttribute()
+    public function testReflectionMethodWithAttribute(): void
     {
         $var = new \ReflectionMethod(LotsOfAttributes::class, 'someMethod');
 
@@ -607,7 +607,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionPropertyWithAttribute()
+    public function testReflectionPropertyWithAttribute(): void
     {
         $var = new \ReflectionProperty(LotsOfAttributes::class, 'someProperty');
 
@@ -630,7 +630,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionClassConstantWithAttribute()
+    public function testReflectionClassConstantWithAttribute(): void
     {
         $var = new \ReflectionClassConstant(LotsOfAttributes::class, 'SOME_CONSTANT');
 
@@ -660,7 +660,7 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    public function testReflectionParameterWithAttribute()
+    public function testReflectionParameterWithAttribute(): void
     {
         $var = new \ReflectionParameter([LotsOfAttributes::class, 'someMethod'], 'someParameter');
 
@@ -688,6 +688,6 @@ class ReflectionCasterTest extends TestCase
     }
 }
 
-function reflectionParameterFixture(?NotLoadableClass $arg1, $arg2)
+function reflectionParameterFixture(?NotLoadableClass $arg1, $arg2): void
 {
 }

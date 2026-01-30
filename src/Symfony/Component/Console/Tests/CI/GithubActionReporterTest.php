@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class GithubActionReporterTest extends TestCase
 {
-    public function testIsGithubActionEnvironment()
+    public function testIsGithubActionEnvironment(): void
     {
         $prev = getenv('GITHUB_ACTIONS');
         putenv('GITHUB_ACTIONS');
@@ -33,7 +33,7 @@ class GithubActionReporterTest extends TestCase
     }
 
     #[DataProvider('annotationsFormatProvider')]
-    public function testAnnotationsFormat(string $type, string $message, ?string $file, ?int $line, ?int $col, string $expected)
+    public function testAnnotationsFormat(string $type, string $message, ?string $file, ?int $line, ?int $col, string $expected): void
     {
         $reporter = new GithubActionReporter($buffer = new BufferedOutput());
 

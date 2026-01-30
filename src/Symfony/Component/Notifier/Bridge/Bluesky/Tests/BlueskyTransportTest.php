@@ -60,7 +60,7 @@ final class BlueskyTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testExceptionIsThrownWhenNoMessageIsSent()
+    public function testExceptionIsThrownWhenNoMessageIsSent(): void
     {
         $transport = self::createTransport();
 
@@ -73,7 +73,7 @@ final class BlueskyTransportTest extends TransportTestCase
      * - https://atproto.com/blog/create-post
      * - https://github.com/bluesky-social/atproto-website/blob/main/examples/create_bsky_post.py.
      */
-    public function testParseFacets()
+    public function testParseFacets(): void
     {
         $input = '✨ example mentioning @atproto.com the URL 👨‍❤️‍👨 https://en.wikipedia.org/wiki/CBOR.';
         $expected =
@@ -98,7 +98,7 @@ final class BlueskyTransportTest extends TransportTestCase
     /**
      * Example from https://github.com/bluesky-social/atproto-website/blob/main/examples/create_bsky_post.py.
      */
-    public function testParseFacetsMultipleHandles()
+    public function testParseFacetsMultipleHandles(): void
     {
         $input = 'prefix @handle.example.com @handle.com suffix';
         $expected = [
@@ -122,7 +122,7 @@ final class BlueskyTransportTest extends TransportTestCase
     /**
      * Example from https://github.com/bluesky-social/atproto-website/blob/main/examples/create_bsky_post.py.
      */
-    public function testParseFacetsNoHandles()
+    public function testParseFacetsNoHandles(): void
     {
         $input = 'handle.example.com';
         $expected = [];
@@ -133,7 +133,7 @@ final class BlueskyTransportTest extends TransportTestCase
     /**
      * Example from https://github.com/bluesky-social/atproto-website/blob/main/examples/create_bsky_post.py.
      */
-    public function testParseFacetsInvalidHandle()
+    public function testParseFacetsInvalidHandle(): void
     {
         $input = '@bare';
         $expected = [];
@@ -149,7 +149,7 @@ final class BlueskyTransportTest extends TransportTestCase
     /**
      * Example from https://github.com/bluesky-social/atproto-website/blob/main/examples/create_bsky_post.py.
      */
-    public function testParseFacetsMentionWithEmoji()
+    public function testParseFacetsMentionWithEmoji(): void
     {
         $input = '💩💩💩 @handle.example.com';
         $expected = [
@@ -167,7 +167,7 @@ final class BlueskyTransportTest extends TransportTestCase
     /**
      * Example from https://github.com/bluesky-social/atproto-website/blob/main/examples/create_bsky_post.py.
      */
-    public function testParseFacetsWithEmail()
+    public function testParseFacetsWithEmail(): void
     {
         $input = 'cc:@example.com';
         $expected = [
@@ -185,7 +185,7 @@ final class BlueskyTransportTest extends TransportTestCase
     /**
      * Example from https://github.com/bluesky-social/atproto-website/blob/main/examples/create_bsky_post.py.
      */
-    public function testParseFacetsUrl()
+    public function testParseFacetsUrl(): void
     {
         $input = 'prefix https://example.com/index.html http://bsky.app suffix';
         $expected = [
@@ -209,7 +209,7 @@ final class BlueskyTransportTest extends TransportTestCase
     /**
      * Example from https://github.com/bluesky-social/atproto-website/blob/main/examples/create_bsky_post.py.
      */
-    public function testParseFacetsNoUrls()
+    public function testParseFacetsNoUrls(): void
     {
         $input = 'example.com';
         $expected = [];
@@ -225,7 +225,7 @@ final class BlueskyTransportTest extends TransportTestCase
     /**
      * Example from https://github.com/bluesky-social/atproto-website/blob/main/examples/create_bsky_post.py.
      */
-    public function testParseFacetsUrlWithEmoji()
+    public function testParseFacetsUrlWithEmoji(): void
     {
         $input = '💩💩💩 http://bsky.app';
         $expected = [
@@ -242,7 +242,7 @@ final class BlueskyTransportTest extends TransportTestCase
     /**
      * Example from https://github.com/bluesky-social/atproto-website/blob/main/examples/create_bsky_post.py.
      */
-    public function testParseFacetsUrlWithTrickyRegex()
+    public function testParseFacetsUrlWithTrickyRegex(): void
     {
         $input = 'ref [https://bsky.app]';
         $expected = [
@@ -276,7 +276,7 @@ final class BlueskyTransportTest extends TransportTestCase
     }
 
     #[DataProvider('sendMessageWithEmbedDataProvider')]
-    public function testWithEmbed(BlueskyOptions $blueskyOptions, string $expectedJsonResponse)
+    public function testWithEmbed(BlueskyOptions $blueskyOptions, string $expectedJsonResponse): void
     {
         // realistic sample values taken from https://docs.bsky.app/docs/advanced-guides/posts#post-record-structure
         $recordUri = 'at://did:plc:u5cwb2mwiv2bfq53cjufe6yn/app.bsky.feed.post/3k4duaz5vfs2b';
@@ -320,7 +320,7 @@ final class BlueskyTransportTest extends TransportTestCase
         $this->assertSame($recordUri, $result->getMessageId());
     }
 
-    public function testReturnedMessageId()
+    public function testReturnedMessageId(): void
     {
         // realistic sample values taken from https://docs.bsky.app/docs/advanced-guides/posts#post-record-structure
         $recordUri = 'at://did:plc:u5cwb2mwiv2bfq53cjufe6yn/app.bsky.feed.post/3k4duaz5vfs2b';

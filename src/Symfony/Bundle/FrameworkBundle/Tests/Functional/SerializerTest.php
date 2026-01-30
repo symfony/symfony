@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  */
 class SerializerTest extends AbstractWebTestCase
 {
-    public function testDeserializeArrayOfObject()
+    public function testDeserializeArrayOfObject(): void
     {
         static::bootKernel(['test_case' => 'Serializer']);
 
@@ -38,7 +38,7 @@ class SerializerTest extends AbstractWebTestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testNormalizersAndEncodersUseDefaultContextConfigOption()
+    public function testNormalizersAndEncodersUseDefaultContextConfigOption(): void
     {
         /** @var SerializerKernel $kernel */
         $kernel = static::bootKernel(['test_case' => 'Serializer', 'root_config' => 'default_context.yaml']);
@@ -92,7 +92,7 @@ class SerializerKernel extends AppKernel implements CompilerPassInterface
         }
     }
 
-    public function testSerializeTranslatableBackedEnum()
+    public function testSerializeTranslatableBackedEnum(): void
     {
         static::bootKernel(['test_case' => 'Serializer']);
 

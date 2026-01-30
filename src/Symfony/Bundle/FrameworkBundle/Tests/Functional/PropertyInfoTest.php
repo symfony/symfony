@@ -15,7 +15,7 @@ use Symfony\Component\TypeInfo\Type;
 
 class PropertyInfoTest extends AbstractWebTestCase
 {
-    public function testPhpDocPriority()
+    public function testPhpDocPriority(): void
     {
         static::bootKernel(['test_case' => 'Serializer']);
 
@@ -30,7 +30,7 @@ class Dummy
     /**
      * @param int[] $codes
      */
-    public function setCodes(array $codes)
+    public function setCodes(array $codes): void
     {
     }
 }

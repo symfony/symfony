@@ -50,7 +50,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class FailureIntegrationTest extends TestCase
 {
-    public function testRequeueMechanism()
+    public function testRequeueMechanism(): void
     {
         $transport1 = new DummyFailureTestSenderAndReceiver();
         $transport2 = new DummyFailureTestSenderAndReceiver();
@@ -115,7 +115,7 @@ class FailureIntegrationTest extends TestCase
 
         $runWorker = static function (string $transportName) use ($transports, $bus, $dispatcher): ?\Throwable {
             $throwable = null;
-            $failedListener = static function (WorkerMessageFailedEvent $event) use (&$throwable) {
+            $failedListener = static function (WorkerMessageFailedEvent $event) use (&$throwable): void {
                 $throwable = $event->getThrowable();
             };
             $dispatcher->addListener(WorkerMessageFailedEvent::class, $failedListener);
@@ -228,7 +228,7 @@ class FailureIntegrationTest extends TestCase
         $this->assertSame([], $failureTransport->getMessagesWaitingToBeReceived());
     }
 
-    public function testMultipleFailedTransportsWithoutGlobalFailureTransport()
+    public function testMultipleFailedTransportsWithoutGlobalFailureTransport(): void
     {
         $transport1 = new DummyFailureTestSenderAndReceiver();
         $transport2 = new DummyFailureTestSenderAndReceiver();
@@ -288,7 +288,7 @@ class FailureIntegrationTest extends TestCase
 
         $runWorker = static function (string $transportName) use ($transports, $bus, $dispatcher): ?\Throwable {
             $throwable = null;
-            $failedListener = static function (WorkerMessageFailedEvent $event) use (&$throwable) {
+            $failedListener = static function (WorkerMessageFailedEvent $event) use (&$throwable): void {
                 $throwable = $event->getThrowable();
             };
             $dispatcher->addListener(WorkerMessageFailedEvent::class, $failedListener);
@@ -350,7 +350,7 @@ class FailureIntegrationTest extends TestCase
         $this->assertCount(0, $failureTransport2->getMessagesWaitingToBeReceived());
     }
 
-    public function testStampsAddedByMiddlewaresDontDisappearWhenDelayedMessageFails()
+    public function testStampsAddedByMiddlewaresDontDisappearWhenDelayedMessageFails(): void
     {
         $transport1 = new DummyFailureTestSenderAndReceiver();
 
@@ -395,7 +395,7 @@ class FailureIntegrationTest extends TestCase
 
         $runWorker = static function (string $transportName) use ($transports, $bus, $dispatcher): ?\Throwable {
             $throwable = null;
-            $failedListener = static function (WorkerMessageFailedEvent $event) use (&$throwable) {
+            $failedListener = static function (WorkerMessageFailedEvent $event) use (&$throwable): void {
                 $throwable = $event->getThrowable();
             };
             $dispatcher->addListener(WorkerMessageFailedEvent::class, $failedListener);
@@ -425,7 +425,7 @@ class FailureIntegrationTest extends TestCase
         $this->assertSame('some.bus', $messagesWaiting[0]->last(BusNameStamp::class)?->getBusName());
     }
 
-    public function testStampsAddedByMiddlewaresDontDisappearWhenValidationFails()
+    public function testStampsAddedByMiddlewaresDontDisappearWhenValidationFails(): void
     {
         $transport1 = new DummyFailureTestSenderAndReceiver();
 
@@ -468,7 +468,7 @@ class FailureIntegrationTest extends TestCase
 
         $runWorker = static function (string $transportName) use ($transports, $bus, $dispatcher): ?\Throwable {
             $throwable = null;
-            $failedListener = static function (WorkerMessageFailedEvent $event) use (&$throwable) {
+            $failedListener = static function (WorkerMessageFailedEvent $event) use (&$throwable): void {
                 $throwable = $event->getThrowable();
             };
             $dispatcher->addListener(WorkerMessageFailedEvent::class, $failedListener);
@@ -546,7 +546,7 @@ class DummyTestHandler
     ) {
     }
 
-    public function __invoke()
+    public function __invoke(): void
     {
         ++$this->timesCalled;
 
@@ -560,7 +560,7 @@ class DummyTestHandler
         return $this->timesCalled;
     }
 
-    public function setShouldThrow(bool $shouldThrow)
+    public function setShouldThrow(bool $shouldThrow): void
     {
         $this->shouldThrow = $shouldThrow;
     }

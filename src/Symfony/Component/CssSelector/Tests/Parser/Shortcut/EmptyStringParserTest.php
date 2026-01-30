@@ -20,7 +20,7 @@ use Symfony\Component\CssSelector\Parser\Shortcut\EmptyStringParser;
  */
 class EmptyStringParserTest extends TestCase
 {
-    public function testParse()
+    public function testParse(): void
     {
         $parser = new EmptyStringParser();
         $selectors = $parser->parse('');

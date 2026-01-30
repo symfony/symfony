@@ -19,7 +19,7 @@ use Symfony\Component\Mime\Exception\RfcComplianceException;
 
 class AddressTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $a = new Address('fabien@symfonï.com');
         $this->assertEquals('fabien@symfonï.com', $a->getAddress());
@@ -33,20 +33,20 @@ class AddressTest extends TestCase
         $this->assertEquals('fabien@xn--symfon-nwa.com', $a->getEncodedAddress());
     }
 
-    public function testConstructorWithInvalidAddress()
+    public function testConstructorWithInvalidAddress(): void
     {
         $this->expectException(RfcComplianceException::class);
         new Address('fab   pot@symfony.com');
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $this->assertSame($a = new Address('fabien@symfony.com'), Address::create($a));
         $this->assertSame($b = new Address('helene@symfony.com', 'Helene'), Address::create($b));
         $this->assertEquals($a, Address::create('fabien@symfony.com'));
     }
 
-    public function testCreateWithInvalidFormat()
+    public function testCreateWithInvalidFormat(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Could not parse "<fabien@symfony" to a "Symfony\Component\Mime\Address" instance.');
@@ -55,7 +55,7 @@ class AddressTest extends TestCase
     }
 
     #[DataProvider('fromStringProvider')]
-    public function testCreateWithString($string, $displayName, $addrSpec)
+    public function testCreateWithString($string, $displayName, $addrSpec): void
     {
         $address = Address::create($string);
         $this->assertEquals($displayName, $address->getName());
@@ -65,13 +65,13 @@ class AddressTest extends TestCase
         $this->assertEquals($addrSpec, $fromToStringAddress->getAddress());
     }
 
-    public function testCreateWrongArg()
+    public function testCreateWrongArg(): void
     {
         $this->expectException(\TypeError::class);
         Address::create(new \stdClass());
     }
 
-    public function testCreateArray()
+    public function testCreateArray(): void
     {
         $fabien = new Address('fabien@symfony.com');
         $helene = new Address('helene@symfony.com', 'Helene');
@@ -80,21 +80,21 @@ class AddressTest extends TestCase
         $this->assertEquals([$fabien], Address::createArray(['fabien@symfony.com']));
     }
 
-    public function testUnicodeLocalpart()
+    public function testUnicodeLocalpart(): void
     {
         /* dømi means example and is reserved by the .fo registry */
         $this->assertFalse((new Address('info@dømi.fo'))->hasUnicodeLocalpart());
         $this->assertTrue((new Address('dømi@dømi.fo'))->hasUnicodeLocalpart());
     }
 
-    public function testCreateArrayWrongArg()
+    public function testCreateArrayWrongArg(): void
     {
         $this->expectException(\TypeError::class);
         Address::createArray([new \stdClass()]);
     }
 
     #[DataProvider('nameEmptyDataProvider')]
-    public function testNameEmpty(string $name)
+    public function testNameEmpty(string $name): void
     {
         $mail = 'mail@example.org';
         $this->assertSame($mail, (new Address($mail, $name))->toString());
@@ -161,7 +161,7 @@ class AddressTest extends TestCase
         ];
     }
 
-    public function testEncodeNameIfNameContainsCommas()
+    public function testEncodeNameIfNameContainsCommas(): void
     {
         $address = new Address('fabien@symfony.com', 'Fabien, "Potencier');
         $this->assertSame('"Fabien, \"Potencier" <fabien@symfony.com>', $address->toString());

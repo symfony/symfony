@@ -38,7 +38,7 @@ class ZookeeperStoreTest extends AbstractStoreTestCase
     }
 
     #[DataProvider('provideValidConnectionString')]
-    public function testCreateConnection(string $connectionString)
+    public function testCreateConnection(string $connectionString): void
     {
         $this->assertInstanceOf(\Zookeeper::class, ZookeeperStore::createConnection($connectionString));
     }
@@ -50,7 +50,7 @@ class ZookeeperStoreTest extends AbstractStoreTestCase
         yield 'with extra attributes' => ['zookeeper://localhost:2181/path?option=value'];
     }
 
-    public function testSaveSucceedsWhenPathContainsMoreThanOneNode()
+    public function testSaveSucceedsWhenPathContainsMoreThanOneNode(): void
     {
         $store = $this->getStore();
         $resource = '/baseNode/lockNode';
@@ -63,7 +63,7 @@ class ZookeeperStoreTest extends AbstractStoreTestCase
         $this->assertFalse($store->exists($key));
     }
 
-    public function testSaveSucceedsWhenPathContainsOneNode()
+    public function testSaveSucceedsWhenPathContainsOneNode(): void
     {
         $store = $this->getStore();
         $resource = '/baseNode';
@@ -76,7 +76,7 @@ class ZookeeperStoreTest extends AbstractStoreTestCase
         $this->assertFalse($store->exists($key));
     }
 
-    public function testSaveSucceedsWhenPathsContainSameFirstNode()
+    public function testSaveSucceedsWhenPathsContainSameFirstNode(): void
     {
         $store = $this->getStore();
         $resource = 'foo/bar';
@@ -99,7 +99,7 @@ class ZookeeperStoreTest extends AbstractStoreTestCase
         $this->assertFalse($store->exists($key));
     }
 
-    public function testRootPathIsLockable()
+    public function testRootPathIsLockable(): void
     {
         $store = $this->getStore();
         $resource = '/';
@@ -112,7 +112,7 @@ class ZookeeperStoreTest extends AbstractStoreTestCase
         $this->assertFalse($store->exists($key));
     }
 
-    public function testEmptyStringIsLockable()
+    public function testEmptyStringIsLockable(): void
     {
         $store = $this->getStore();
         $resource = '';

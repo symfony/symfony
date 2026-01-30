@@ -25,7 +25,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
  */
 class TokenProcessorTest extends TestCase
 {
-    public function testProcessor()
+    public function testProcessor(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('user', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
         $tokenStorage = new TokenStorage();

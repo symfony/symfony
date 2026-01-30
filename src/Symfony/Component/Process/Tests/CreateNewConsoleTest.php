@@ -19,7 +19,7 @@ use Symfony\Component\Process\Process;
  */
 class CreateNewConsoleTest extends TestCase
 {
-    public function testOptionCreateNewConsole()
+    public function testOptionCreateNewConsole(): void
     {
         $this->expectNotToPerformAssertions();
         try {
@@ -32,7 +32,7 @@ class CreateNewConsoleTest extends TestCase
         }
     }
 
-    public function testItReturnsFastAfterStart()
+    public function testItReturnsFastAfterStart(): void
     {
         // The started process must run in background after the main has finished but that can't be tested with PHPUnit
         $startTime = microtime(true);

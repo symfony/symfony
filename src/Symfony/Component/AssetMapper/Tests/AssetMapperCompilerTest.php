@@ -19,7 +19,7 @@ use Symfony\Component\AssetMapper\MappedAsset;
 
 class AssetMapperCompilerTest extends TestCase
 {
-    public function testCompile()
+    public function testCompile(): void
     {
         $compiler1 = new class implements AssetCompilerInterface {
             public function supports(MappedAsset $asset): bool

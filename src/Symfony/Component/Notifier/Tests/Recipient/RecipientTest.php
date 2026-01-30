@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Recipient\Recipient;
  */
 class RecipientTest extends TestCase
 {
-    public function testCannotBeConstructedWithoutEmailAndWithoutPhone()
+    public function testCannotBeConstructedWithoutEmailAndWithoutPhone(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -29,7 +29,7 @@ class RecipientTest extends TestCase
     }
 
     #[DataProvider('provideValidEmailAndPhone')]
-    public function testCanBeConstructed(string $email, string $phone)
+    public function testCanBeConstructed(string $email, string $phone): void
     {
         $recipient = new Recipient($email, $phone);
 
@@ -44,7 +44,7 @@ class RecipientTest extends TestCase
         yield ['', '+0815'];
     }
 
-    public function testEmailAndPhoneAreNotImmutable()
+    public function testEmailAndPhoneAreNotImmutable(): void
     {
         $recipient = new Recipient('test@test.de', '+0815');
 

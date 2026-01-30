@@ -18,7 +18,7 @@ class UrlTypeTest extends TextTypeTest
 {
     public const TESTED_TYPE = UrlType::class;
 
-    public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded()
+    public function testSubmitAddsNoDefaultProtocolIfAlreadyIncluded(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'default_protocol' => 'http',
@@ -30,7 +30,7 @@ class UrlTypeTest extends TextTypeTest
         $this->assertSame('ftp://www.domain.com', $form->getViewData());
     }
 
-    public function testSubmitAddsNoDefaultProtocolIfEmpty()
+    public function testSubmitAddsNoDefaultProtocolIfEmpty(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'default_protocol' => 'http',
@@ -42,7 +42,7 @@ class UrlTypeTest extends TextTypeTest
         $this->assertSame('', $form->getViewData());
     }
 
-    public function testSubmitAddsNoDefaultProtocolIfNull()
+    public function testSubmitAddsNoDefaultProtocolIfNull(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'default_protocol' => 'http',
@@ -54,7 +54,7 @@ class UrlTypeTest extends TextTypeTest
         $this->assertSame('', $form->getViewData());
     }
 
-    public function testSubmitAddsNoDefaultProtocolIfSetToNull()
+    public function testSubmitAddsNoDefaultProtocolIfSetToNull(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'default_protocol' => null,
@@ -66,7 +66,7 @@ class UrlTypeTest extends TextTypeTest
         $this->assertSame('www.domain.com', $form->getViewData());
     }
 
-    public function testThrowExceptionIfDefaultProtocolIsInvalid()
+    public function testThrowExceptionIfDefaultProtocolIsInvalid(): void
     {
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [
@@ -74,7 +74,7 @@ class UrlTypeTest extends TextTypeTest
         ]);
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = 'http://empty')
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = 'http://empty'): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'default_protocol' => 'http',

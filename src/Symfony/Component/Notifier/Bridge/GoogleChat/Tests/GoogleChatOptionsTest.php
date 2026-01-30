@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\GoogleChat\GoogleChatOptions;
 
 final class GoogleChatOptionsTest extends TestCase
 {
-    public function testToArrayWithCardV2()
+    public function testToArrayWithCardV2(): void
     {
         $options = new GoogleChatOptions();
 
@@ -57,7 +57,7 @@ final class GoogleChatOptionsTest extends TestCase
         $this->assertSame($expected, $options->toArray());
     }
 
-    public function testOptionsWithThread()
+    public function testOptionsWithThread(): void
     {
         $thread = 'fgh.ijk';
         $options = new GoogleChatOptions();

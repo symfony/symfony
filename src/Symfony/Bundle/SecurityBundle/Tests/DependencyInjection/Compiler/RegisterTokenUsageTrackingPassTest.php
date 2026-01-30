@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Firewall\ContextListener;
 
 class RegisterTokenUsageTrackingPassTest extends TestCase
 {
-    public function testTokenStorageIsUntrackedIfSessionIsMissing()
+    public function testTokenStorageIsUntrackedIfSessionIsMissing(): void
     {
         $container = new ContainerBuilder();
         $container->register('security.untracked_token_storage', TokenStorage::class);
@@ -36,7 +36,7 @@ class RegisterTokenUsageTrackingPassTest extends TestCase
         $this->assertEquals(new Alias('security.untracked_token_storage', true), $container->getAlias('security.token_storage'));
     }
 
-    public function testContextListenerIsNotModifiedIfTokenStorageDoesNotSupportUsageTracking()
+    public function testContextListenerIsNotModifiedIfTokenStorageDoesNotSupportUsageTracking(): void
     {
         $container = new ContainerBuilder();
 
@@ -59,7 +59,7 @@ class RegisterTokenUsageTrackingPassTest extends TestCase
         $this->assertCount(6, $container->getDefinition('security.context_listener')->getArguments());
     }
 
-    public function testContextListenerEnablesUsageTrackingIfSupportedByTokenStorage()
+    public function testContextListenerEnablesUsageTrackingIfSupportedByTokenStorage(): void
     {
         $container = new ContainerBuilder();
 

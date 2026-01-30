@@ -18,7 +18,7 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
 
 abstract class AbstractOperationTestCase extends TestCase
 {
-    public function testGetEmptyDomains()
+    public function testGetEmptyDomains(): void
     {
         $this->assertEquals(
             [],
@@ -29,7 +29,7 @@ abstract class AbstractOperationTestCase extends TestCase
         );
     }
 
-    public function testGetMergedDomains()
+    public function testGetMergedDomains(): void
     {
         $this->assertEquals(
             ['a', 'b', 'c'],
@@ -40,7 +40,7 @@ abstract class AbstractOperationTestCase extends TestCase
         );
     }
 
-    public function testGetMessagesFromUnknownDomain()
+    public function testGetMessagesFromUnknownDomain(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->createOperation(
@@ -49,7 +49,7 @@ abstract class AbstractOperationTestCase extends TestCase
         )->getMessages('domain');
     }
 
-    public function testGetEmptyMessages()
+    public function testGetEmptyMessages(): void
     {
         $this->assertEquals(
             [],
@@ -60,7 +60,7 @@ abstract class AbstractOperationTestCase extends TestCase
         );
     }
 
-    public function testGetEmptyResult()
+    public function testGetEmptyResult(): void
     {
         $this->assertEquals(
             new MessageCatalogue('en'),
@@ -71,7 +71,7 @@ abstract class AbstractOperationTestCase extends TestCase
         );
     }
 
-    public function testSourceAndTargetWithDifferentLocales()
+    public function testSourceAndTargetWithDifferentLocales(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Operated catalogues must belong to the same locale.');

@@ -59,21 +59,21 @@ class LocaleScannerTest extends TestCase
         $this->filesystem->remove($this->directory);
     }
 
-    public function testScanLocales()
+    public function testScanLocales(): void
     {
         $sortedLocales = ['de', 'de_alias', 'de_child', 'en', 'en_alias', 'en_child', 'fr', 'fr_alias', 'fr_child'];
 
         $this->assertSame($sortedLocales, $this->scanner->scanLocales($this->directory));
     }
 
-    public function testScanAliases()
+    public function testScanAliases(): void
     {
         $sortedAliases = ['de_alias' => 'de', 'en_alias' => 'en', 'fr_alias' => 'fr'];
 
         $this->assertSame($sortedAliases, $this->scanner->scanAliases($this->directory));
     }
 
-    public function testScanParents()
+    public function testScanParents(): void
     {
         $sortedParents = ['de_child' => 'de', 'en_child' => 'en', 'fr_child' => 'fr'];
 

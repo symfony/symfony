@@ -40,17 +40,17 @@ class RdKafkaCasterTest extends TestCase
         }
     }
 
-    public function testDumpConf()
+    public function testDumpConf(): void
     {
         $conf = new Conf();
-        $conf->setErrorCb(static function ($kafka, $err, $reason) {});
-        $conf->setDrMsgCb(static function () {});
-        $conf->setRebalanceCb(static function () {});
+        $conf->setErrorCb(static function ($kafka, $err, $reason): void {});
+        $conf->setDrMsgCb(static function (): void {});
+        $conf->setRebalanceCb(static function (): void {});
 
         // BC with earlier version of extension rdkafka
         foreach (['setLogCb', 'setOffsetCommitCb', 'setStatsCb', 'setConsumeCb'] as $method) {
             if (method_exists($conf, $method)) {
-                $conf->{$method}(static function () {});
+                $conf->{$method}(static function (): void {});
             }
         }
 
@@ -67,7 +67,7 @@ class RdKafkaCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $conf);
     }
 
-    public function testDumpProducer()
+    public function testDumpProducer(): void
     {
         if (!$this->hasBroker) {
             $this->markTestSkipped('Test requires an active broker');
@@ -106,7 +106,7 @@ class RdKafkaCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $producer);
     }
 
-    public function testDumpTopicConf()
+    public function testDumpTopicConf(): void
     {
         $topicConf = new TopicConf();
         $topicConf->set('auto.offset.reset', 'smallest');
@@ -130,7 +130,7 @@ class RdKafkaCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $topicConf);
     }
 
-    public function testDumpKafkaConsumer()
+    public function testDumpKafkaConsumer(): void
     {
         if (!$this->hasBroker) {
             $this->markTestSkipped('Test requires an active broker');
@@ -176,7 +176,7 @@ class RdKafkaCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $consumer);
     }
 
-    public function testDumpProducerTopic()
+    public function testDumpProducerTopic(): void
     {
         $producer = new Producer(new Conf());
         $producer->addBrokers($this->broker);
@@ -193,7 +193,7 @@ class RdKafkaCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $topic);
     }
 
-    public function testDumpMessage()
+    public function testDumpMessage(): void
     {
         $conf = new Conf();
         $conf->set('metadata.broker.list', $this->broker);

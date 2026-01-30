@@ -40,7 +40,7 @@ class TableTest extends TestCase
     }
 
     #[DataProvider('renderProvider')]
-    public function testRender($headers, $rows, $style, $expected, $decorated = false)
+    public function testRender($headers, $rows, $style, $expected, $decorated = false): void
     {
         $table = new Table($output = $this->getOutputStream($decorated));
         $table
@@ -54,7 +54,7 @@ class TableTest extends TestCase
     }
 
     #[DataProvider('renderProvider')]
-    public function testRenderAddRows($headers, $rows, $style, $expected, $decorated = false)
+    public function testRenderAddRows($headers, $rows, $style, $expected, $decorated = false): void
     {
         $table = new Table($output = $this->getOutputStream($decorated));
         $table
@@ -68,7 +68,7 @@ class TableTest extends TestCase
     }
 
     #[DataProvider('renderProvider')]
-    public function testRenderAddRowsOneByOne($headers, $rows, $style, $expected, $decorated = false)
+    public function testRenderAddRowsOneByOne($headers, $rows, $style, $expected, $decorated = false): void
     {
         $table = new Table($output = $this->getOutputStream($decorated));
         $table
@@ -840,7 +840,7 @@ class TableTest extends TestCase
         ];
     }
 
-    public function testRenderMultiByte()
+    public function testRenderMultiByte(): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -863,7 +863,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testTableCellWithNumericIntValue()
+    public function testTableCellWithNumericIntValue(): void
     {
         $table = new Table($output = $this->getOutputStream());
 
@@ -881,7 +881,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testTableCellWithNumericFloatValue()
+    public function testTableCellWithNumericFloatValue(): void
     {
         $table = new Table($output = $this->getOutputStream());
 
@@ -899,7 +899,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testStyle()
+    public function testStyle(): void
     {
         $style = new TableStyle();
         $style
@@ -929,7 +929,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testRowSeparator()
+    public function testRowSeparator(): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -962,7 +962,7 @@ class TableTest extends TestCase
         $this->assertEquals($table, $table->addRow(new TableSeparator()), 'fluent interface on addRow() with a single TableSeparator() works');
     }
 
-    public function testRenderMultiCalls()
+    public function testRenderMultiCalls(): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table->setRows([
@@ -989,7 +989,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testColumnStyle()
+    public function testColumnStyle(): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -1019,7 +1019,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testThrowsWhenTheCellInAnArray()
+    public function testThrowsWhenTheCellInAnArray(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('A cell must be a TableCell, a scalar or an object implementing "__toString()", "array" given.');
@@ -1033,7 +1033,7 @@ class TableTest extends TestCase
         $table->render();
     }
 
-    public function testColumnWidth()
+    public function testColumnWidth(): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -1065,7 +1065,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testColumnWidths()
+    public function testColumnWidths(): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -1096,7 +1096,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testSectionOutput()
+    public function testSectionOutput(): void
     {
         $sections = [];
         $stream = $this->getOutputStream(true);
@@ -1131,7 +1131,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testSectionOutputDoesntClearIfTableIsntRendered()
+    public function testSectionOutputDoesntClearIfTableIsntRendered(): void
     {
         $sections = [];
         $stream = $this->getOutputStream(true);
@@ -1159,7 +1159,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testSectionOutputWithoutDecoration()
+    public function testSectionOutputWithoutDecoration(): void
     {
         $sections = [];
         $stream = $this->getOutputStream();
@@ -1194,7 +1194,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testAppendRowWithoutSectionOutput()
+    public function testAppendRowWithoutSectionOutput(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Output should be an instance of "Symfony\Component\Console\Output\ConsoleSectionOutput" when calling "Symfony\Component\Console\Helper\Table::appendRow".');
@@ -1203,7 +1203,7 @@ class TableTest extends TestCase
         $table->appendRow(['9971-5-0210-0', 'A Tale of Two Cities', 'Charles Dickens', '139.25']);
     }
 
-    public function testSectionOutputHandlesZeroRowsAfterRender()
+    public function testSectionOutputHandlesZeroRowsAfterRender(): void
     {
         $sections = [];
         $stream = $this->getOutputStream(true);
@@ -1235,7 +1235,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testIsNotDefinedStyleException()
+    public function testIsNotDefinedStyleException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Style "absent" is not defined.');
@@ -1243,7 +1243,7 @@ class TableTest extends TestCase
         $table->setStyle('absent');
     }
 
-    public function testGetStyleDefinition()
+    public function testGetStyleDefinition(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Style "absent" is not defined.');
@@ -1251,7 +1251,7 @@ class TableTest extends TestCase
     }
 
     #[DataProvider('renderSetTitle')]
-    public function testSetTitle($headerTitle, $footerTitle, $style, $expected)
+    public function testSetTitle($headerTitle, $footerTitle, $style, $expected): void
     {
         (new Table($output = $this->getOutputStream()))
             ->setHeaderTitle($headerTitle)
@@ -1342,7 +1342,7 @@ class TableTest extends TestCase
         ];
     }
 
-    public function testSetTitleWithoutHeaders()
+    public function testSetTitleWithoutHeaders(): void
     {
         (new Table($output = $this->getOutputStream()))
             ->setHeaderTitle('Reproducer')
@@ -1363,7 +1363,7 @@ class TableTest extends TestCase
         $this->assertSame($expected, $this->getOutputContent($output));
     }
 
-    public function testColumnMaxWidths()
+    public function testColumnMaxWidths(): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -1392,7 +1392,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testColumnMaxWidthsHeaders()
+    public function testColumnMaxWidthsHeaders(): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -1427,7 +1427,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testColumnMaxWidthsWithTrailingBackslash()
+    public function testColumnMaxWidthsWithTrailingBackslash(): void
     {
         (new Table($output = $this->getOutputStream()))
             ->setColumnMaxWidth(0, 5)
@@ -1447,7 +1447,7 @@ class TableTest extends TestCase
         $this->assertEquals($expected, $this->getOutputContent($output));
     }
 
-    public function testBoxedStyleWithColspan()
+    public function testBoxedStyleWithColspan(): void
     {
         $boxed = new TableStyle();
         $boxed
@@ -1523,7 +1523,7 @@ class TableTest extends TestCase
     }
 
     #[DataProvider('provideRenderHorizontalTests')]
-    public function testRenderHorizontal(array $headers, array $rows, string $expected)
+    public function testRenderHorizontal(array $headers, array $rows, string $expected): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -1548,7 +1548,7 @@ class TableTest extends TestCase
         return str_replace(\PHP_EOL, "\n", stream_get_contents($output->getStream()));
     }
 
-    public function testWithColspanAndMaxWith()
+    public function testWithColspanAndMaxWith(): void
     {
         $table = new Table($output = $this->getOutputStream());
 
@@ -1953,7 +1953,7 @@ class TableTest extends TestCase
     }
 
     #[DataProvider('provideRenderVerticalTests')]
-    public function testVerticalRender(string $expectedOutput, array $headers, array $rows, string $style = 'default', string $headerTitle = '', string $footerTitle = '')
+    public function testVerticalRender(string $expectedOutput, array $headers, array $rows, string $style = 'default', string $headerTitle = '', string $footerTitle = ''): void
     {
         $table = new Table($output = $this->getOutputStream());
         $table
@@ -1974,7 +1974,7 @@ class TableTest extends TestCase
         $this->assertEquals($expectedOutput, $this->getOutputContent($output));
     }
 
-    public function testWithHyperlinkAndMaxWidth()
+    public function testWithHyperlinkAndMaxWidth(): void
     {
         $table = new Table($output = $this->getOutputStream(true));
         $table
@@ -2000,7 +2000,7 @@ class TableTest extends TestCase
         $this->assertSame($expected, $this->getOutputContent($output));
     }
 
-    public function testGithubIssue52101HorizontalTrue()
+    public function testGithubIssue52101HorizontalTrue(): void
     {
         $tableStyle = (new TableStyle())
             ->setHorizontalBorderChars('─')
@@ -2028,7 +2028,7 @@ class TableTest extends TestCase
         );
     }
 
-    public function testGithubIssue52101HorizontalFalse()
+    public function testGithubIssue52101HorizontalFalse(): void
     {
         $tableStyle = (new TableStyle())
             ->setHorizontalBorderChars('─')
@@ -2058,7 +2058,7 @@ class TableTest extends TestCase
         );
     }
 
-    public function testGithubIssue60038WidthOfCellWithEmoji()
+    public function testGithubIssue60038WidthOfCellWithEmoji(): void
     {
         $table = (new Table($output = $this->getOutputStream()))
             ->setHeaderTitle('Test Title')

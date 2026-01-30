@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Section\Field\Image;
 
 final class ImageTest extends TestCase
 {
-    public function testImage()
+    public function testImage(): void
     {
         $field = (new Image())
             ->image($value = 'https://symfony.com/logo.png');
@@ -24,7 +24,7 @@ final class ImageTest extends TestCase
         $this->assertSame($value, $field->toArray()['image']);
     }
 
-    public function testTitle()
+    public function testTitle(): void
     {
         $field = (new Image())
             ->title($value = 'Symfony is great!');

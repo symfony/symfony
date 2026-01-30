@@ -29,7 +29,7 @@ class JsonSerializableNormalizerTest extends TestCase
 {
     use CircularReferenceTestTrait;
 
-    public function testSupportNormalization()
+    public function testSupportNormalization(): void
     {
         $normalizer = new JsonSerializableNormalizer();
         $normalizer->setSerializer($this->createStub(JsonSerializerNormalizer::class));
@@ -38,7 +38,7 @@ class JsonSerializableNormalizerTest extends TestCase
         $this->assertFalse($normalizer->supportsNormalization(new \stdClass()));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $serializer = $this->createMock(JsonSerializerNormalizer::class);
         $serializer
@@ -56,7 +56,7 @@ class JsonSerializableNormalizerTest extends TestCase
         $this->assertEquals('string_object', $normalizer->normalize(new JsonSerializableDummy()));
     }
 
-    public function testCircularNormalize()
+    public function testCircularNormalize(): void
     {
         $normalizer = new JsonSerializableNormalizer(null, null, [JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
 
@@ -90,7 +90,7 @@ class JsonSerializableNormalizerTest extends TestCase
         return new JsonSerializableCircularReferenceDummy();
     }
 
-    public function testInvalidDataThrowException()
+    public function testInvalidDataThrowException(): void
     {
         $normalizer = new JsonSerializableNormalizer();
         $normalizer->setSerializer($this->createStub(JsonSerializerNormalizer::class));

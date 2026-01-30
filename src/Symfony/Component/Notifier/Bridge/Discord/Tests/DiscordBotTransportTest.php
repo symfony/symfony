@@ -46,7 +46,7 @@ final class DiscordBotTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendThrowsWithoutRecipientId()
+    public function testSendThrowsWithoutRecipientId(): void
     {
         $transport = self::createTransport();
 
@@ -56,7 +56,7 @@ final class DiscordBotTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithErrorResponseThrows()
+    public function testSendWithErrorResponseThrows(): void
     {
         $response = new JsonMockResponse(
             ['message' => 'testDescription', 'code' => 'testErrorCode'],

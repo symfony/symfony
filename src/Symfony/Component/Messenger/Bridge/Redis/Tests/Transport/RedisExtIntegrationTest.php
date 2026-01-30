@@ -47,7 +47,7 @@ class RedisExtIntegrationTest extends TestCase
         }
     }
 
-    public function testConnectionSendAndGet()
+    public function testConnectionSendAndGet(): void
     {
         $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class]);
         $message = $this->connection->get();
@@ -59,7 +59,7 @@ class RedisExtIntegrationTest extends TestCase
         ], $message['data']);
     }
 
-    public function testGetTheFirstAvailableMessage()
+    public function testGetTheFirstAvailableMessage(): void
     {
         $this->connection->add('{"message": "Hi1"}', ['type' => DummyMessage::class]);
         $this->connection->add('{"message": "Hi2"}', ['type' => DummyMessage::class]);
@@ -79,7 +79,7 @@ class RedisExtIntegrationTest extends TestCase
         ], $message['data']);
     }
 
-    public function testConnectionSendWithSameContent()
+    public function testConnectionSendWithSameContent(): void
     {
         $body = '{"message": "Hi"}';
         $headers = ['type' => DummyMessage::class];
@@ -104,7 +104,7 @@ class RedisExtIntegrationTest extends TestCase
         ], $message['data']);
     }
 
-    public function testConnectionSendAndGetDelayed()
+    public function testConnectionSendAndGetDelayed(): void
     {
         $this->connection->add('{"message": "Hi"}', ['type' => DummyMessage::class], 500);
         $message = $this->connection->get();
@@ -119,7 +119,7 @@ class RedisExtIntegrationTest extends TestCase
         ], $message['data']);
     }
 
-    public function testConnectionSendDelayedMessagesWithSameContent()
+    public function testConnectionSendDelayedMessagesWithSameContent(): void
     {
         $body = '{"message": "Hi"}';
         $headers = ['type' => DummyMessage::class];
@@ -144,7 +144,7 @@ class RedisExtIntegrationTest extends TestCase
         ], $message['data']);
     }
 
-    public function testConnectionBelowRedeliverTimeout()
+    public function testConnectionBelowRedeliverTimeout(): void
     {
         // lower redeliver timeout and claim interval
         $connection = Connection::fromDsn(getenv('MESSENGER_REDIS_DSN'), [], $this->redis);
@@ -170,7 +170,7 @@ class RedisExtIntegrationTest extends TestCase
         $this->assertNull($connection->get());
     }
 
-    public function testConnectionClaimAndRedeliver()
+    public function testConnectionClaimAndRedeliver(): void
     {
         // lower redeliver timeout and claim interval
         $connection = Connection::fromDsn(
@@ -221,7 +221,7 @@ class RedisExtIntegrationTest extends TestCase
     }
 
     #[DataProvider('sentinelOptionNames')]
-    public function testSentinel(string $sentinelOptionName)
+    public function testSentinel(string $sentinelOptionName): void
     {
         if (!$hosts = getenv('REDIS_SENTINEL_HOSTS')) {
             $this->markTestSkipped('REDIS_SENTINEL_HOSTS env var is not defined.');
@@ -257,7 +257,7 @@ class RedisExtIntegrationTest extends TestCase
         yield ['sentinel_master'];
     }
 
-    public function testLazySentinel()
+    public function testLazySentinel(): void
     {
         if (!$hosts = getenv('REDIS_SENTINEL_HOSTS')) {
             $this->markTestSkipped('REDIS_SENTINEL_HOSTS env var is not defined.');
@@ -287,7 +287,7 @@ class RedisExtIntegrationTest extends TestCase
         $connection->cleanup();
     }
 
-    public function testLazyCluster()
+    public function testLazyCluster(): void
     {
         $this->skipIfRedisClusterUnavailable();
 
@@ -305,7 +305,7 @@ class RedisExtIntegrationTest extends TestCase
         $connection->cleanup();
     }
 
-    public function testLazy()
+    public function testLazy(): void
     {
         $redis = $this->createRedisClient();
         $connection = Connection::fromDsn('redis://localhost/messenger-lazy?lazy=1', [], $redis);
@@ -326,7 +326,7 @@ class RedisExtIntegrationTest extends TestCase
         }
     }
 
-    public function testDbIndex()
+    public function testDbIndex(): void
     {
         $redis = $this->createRedisClient();
 
@@ -335,7 +335,7 @@ class RedisExtIntegrationTest extends TestCase
         $this->assertSame(2, $redis->getDbNum());
     }
 
-    public function testFromDsnWithMultipleHosts()
+    public function testFromDsnWithMultipleHosts(): void
     {
         $this->skipIfRedisClusterUnavailable();
 
@@ -347,7 +347,7 @@ class RedisExtIntegrationTest extends TestCase
         $this->assertInstanceOf(Connection::class, Connection::fromDsn($dsn, []));
     }
 
-    public function testJsonError()
+    public function testJsonError(): void
     {
         $redis = $this->createRedisClient();
         $connection = Connection::fromDsn('redis://localhost/messenger-json-error', [], $redis);
@@ -363,7 +363,7 @@ class RedisExtIntegrationTest extends TestCase
     }
 
     #[Group('transient-on-windows')]
-    public function testGetNonBlocking()
+    public function testGetNonBlocking(): void
     {
         $redis = $this->createRedisClient();
 
@@ -380,7 +380,7 @@ class RedisExtIntegrationTest extends TestCase
     }
 
     #[Group('transient-on-windows')]
-    public function testGetAfterReject()
+    public function testGetAfterReject(): void
     {
         $redis = $this->createRedisClient();
         $connection = Connection::fromDsn('redis://localhost/messenger-rejectthenget', ['sentinel' => null], $redis);
@@ -400,7 +400,7 @@ class RedisExtIntegrationTest extends TestCase
     }
 
     #[Group('transient-on-windows')]
-    public function testItProperlyHandlesEmptyMessages()
+    public function testItProperlyHandlesEmptyMessages(): void
     {
         $redisReceiver = new RedisReceiver($this->connection, new Serializer());
 
@@ -424,7 +424,7 @@ class RedisExtIntegrationTest extends TestCase
         $this->assertEquals('Hi2', $message->getMessage());
     }
 
-    public function testItCountMessages()
+    public function testItCountMessages(): void
     {
         $this->assertSame(0, $this->connection->getMessageCount());
 
@@ -459,7 +459,7 @@ class RedisExtIntegrationTest extends TestCase
         return $property->getValue($connection);
     }
 
-    private function skipIfRedisClusterUnavailable()
+    private function skipIfRedisClusterUnavailable(): void
     {
         try {
             new \RedisCluster(null, getenv('REDIS_CLUSTER_HOSTS') ? explode(' ', getenv('REDIS_CLUSTER_HOSTS')) : []);

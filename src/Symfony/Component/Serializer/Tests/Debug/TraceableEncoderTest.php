@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
 
 class TraceableEncoderTest extends TestCase
 {
-    public function testForwardsToEncoder()
+    public function testForwardsToEncoder(): void
     {
         $encoder = $this->createMock(EncoderInterface::class);
         $encoder
@@ -40,7 +40,7 @@ class TraceableEncoderTest extends TestCase
         $this->assertSame('decoded', (new TraceableEncoder($decoder, new SerializerDataCollector(), 'default'))->decode('data', 'format'));
     }
 
-    public function testCollectEncodingData()
+    public function testCollectEncodingData(): void
     {
         $serializerName = uniqid('name', true);
 
@@ -61,7 +61,7 @@ class TraceableEncoderTest extends TestCase
         (new TraceableEncoder($decoder, $dataCollector, $serializerName))->decode('data', 'format', [TraceableSerializer::DEBUG_TRACE_ID => 'debug']);
     }
 
-    public function testNotCollectEncodingDataIfNoDebugTraceId()
+    public function testNotCollectEncodingDataIfNoDebugTraceId(): void
     {
         $encoder = $this->createStub(EncoderInterface::class);
         $decoder = $this->createStub(DecoderInterface::class);
@@ -74,21 +74,21 @@ class TraceableEncoderTest extends TestCase
         (new TraceableEncoder($decoder, $dataCollector, 'default'))->decode('data', 'format');
     }
 
-    public function testCannotEncodeIfNotEncoder()
+    public function testCannotEncodeIfNotEncoder(): void
     {
         $this->expectException(\BadMethodCallException::class);
 
         (new TraceableEncoder($this->createStub(DecoderInterface::class), new SerializerDataCollector(), 'default'))->encode('data', 'format');
     }
 
-    public function testCannotDecodeIfNotDecoder()
+    public function testCannotDecodeIfNotDecoder(): void
     {
         $this->expectException(\BadMethodCallException::class);
 
         (new TraceableEncoder($this->createStub(EncoderInterface::class), new SerializerDataCollector(), 'default'))->decode('data', 'format');
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $encoder = $this->createStub(EncoderInterface::class);
         $encoder->method('supportsEncoding')->willReturn(true);

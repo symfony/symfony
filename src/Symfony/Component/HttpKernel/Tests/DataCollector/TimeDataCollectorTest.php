@@ -23,7 +23,7 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
 #[Group('time-sensitive')]
 class TimeDataCollectorTest extends TestCase
 {
-    public function testCollect()
+    public function testCollect(): void
     {
         $c = new TimeDataCollector();
 
@@ -56,7 +56,7 @@ class TimeDataCollectorTest extends TestCase
         $this->assertSame(class_exists(Stopwatch::class, false), $c->isStopwatchInstalled());
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $collector = new TimeDataCollector();
 
@@ -72,7 +72,7 @@ class TimeDataCollectorTest extends TestCase
         $this->assertFalse($collector->isStopwatchInstalled());
     }
 
-    public function testLateCollect()
+    public function testLateCollect(): void
     {
         $stopwatch = new Stopwatch();
         $stopwatch->start('test');
@@ -88,7 +88,7 @@ class TimeDataCollectorTest extends TestCase
         $this->assertEquals(['test'], array_keys($collector->getEvents()));
     }
 
-    public function testSetEvents()
+    public function testSetEvents(): void
     {
         $collector = new TimeDataCollector();
 
@@ -102,7 +102,7 @@ class TimeDataCollectorTest extends TestCase
         $this->assertCount(1, $collector->getEvents());
     }
 
-    public function testGetDurationHasEvents()
+    public function testGetDurationHasEvents(): void
     {
         $collector = new TimeDataCollector();
 
@@ -119,21 +119,21 @@ class TimeDataCollectorTest extends TestCase
         $this->assertEquals(1000 + 2000 - 1000, $collector->getDuration());
     }
 
-    public function testGetDurationNotEvents()
+    public function testGetDurationNotEvents(): void
     {
         $collector = new TimeDataCollector();
 
         $this->assertEquals(0, $collector->getDuration());
     }
 
-    public function testGetInitTimeNotEvents()
+    public function testGetInitTimeNotEvents(): void
     {
         $collector = new TimeDataCollector();
 
         $this->assertEquals(0, $collector->getInitTime());
     }
 
-    public function testGetInitTimeHasEvents()
+    public function testGetInitTimeHasEvents(): void
     {
         $collector = new TimeDataCollector();
 
@@ -149,7 +149,7 @@ class TimeDataCollectorTest extends TestCase
         $this->assertEquals(2000 - 1000, $collector->getInitTime());
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $collector = new TimeDataCollector();
 

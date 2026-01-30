@@ -25,32 +25,32 @@ class NativeHttpClientTest extends HttpClientTestCase
         return new NativeHttpClient();
     }
 
-    public function testInformationalResponseStream()
+    public function testInformationalResponseStream(): void
     {
         $this->markTestSkipped('NativeHttpClient doesn\'t support informational status codes.');
     }
 
-    public function testTimeoutOnInitialize()
+    public function testTimeoutOnInitialize(): void
     {
         $this->markTestSkipped('NativeHttpClient doesn\'t support opening concurrent requests.');
     }
 
-    public function testTimeoutOnDestruct()
+    public function testTimeoutOnDestruct(): void
     {
         $this->markTestSkipped('NativeHttpClient doesn\'t support opening concurrent requests.');
     }
 
-    public function testHttp2PushVulcain()
+    public function testHttp2PushVulcain(): void
     {
         $this->markTestSkipped('NativeHttpClient doesn\'t support HTTP/2.');
     }
 
-    public function testHttp2PushVulcainWithUnusedResponse()
+    public function testHttp2PushVulcainWithUnusedResponse(): void
     {
         $this->markTestSkipped('NativeHttpClient doesn\'t support HTTP/2.');
     }
 
-    public function testIPv6Resolve()
+    public function testIPv6Resolve(): void
     {
         TestHttpServer::start(-8087);
 
@@ -71,7 +71,7 @@ class NativeHttpClientTest extends HttpClientTestCase
         DnsMock::withMockedHosts([]);
     }
 
-    public function testUnixSocket()
+    public function testUnixSocket(): void
     {
         $this->markTestSkipped('NativeHttpClient doesn\'t support binding to unix sockets.');
     }

@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class LoginLinkFactoryTest extends TestCase
 {
-    public function testBasicServiceConfiguration()
+    public function testBasicServiceConfiguration(): void
     {
         $container = new ContainerBuilder();
 

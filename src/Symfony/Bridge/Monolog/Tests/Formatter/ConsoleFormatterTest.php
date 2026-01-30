@@ -17,7 +17,7 @@ use Symfony\Bridge\Monolog\Tests\RecordFactory;
 
 class ConsoleFormatterTest extends TestCase
 {
-    public function testFormat()
+    public function testFormat(): void
     {
         $record = RecordFactory::create(datetime: new \DateTimeImmutable('2013-01-13 12:34:56 Europe/Berlin'));
         $formatter = new ConsoleFormatter();

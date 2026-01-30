@@ -28,13 +28,13 @@ class LexerTest extends TestCase
     }
 
     #[DataProvider('getTokenizeData')]
-    public function testTokenize($tokens, $expression)
+    public function testTokenize($tokens, $expression): void
     {
         $tokens[] = new Token('end of expression', null, \strlen($expression) + 1);
         $this->assertEquals(new TokenStream($tokens, $expression), $this->lexer->tokenize($expression));
     }
 
-    public function testTokenizeMultilineComment()
+    public function testTokenizeMultilineComment(): void
     {
         $expression = <<<EXPRESSION
             /**
@@ -60,7 +60,7 @@ class LexerTest extends TestCase
         $this->assertEquals(new TokenStream($tokens, str_replace("\n", ' ', $expression)), $this->lexer->tokenize($expression));
     }
 
-    public function testTokenizeThrowsErrorWithMessage()
+    public function testTokenizeThrowsErrorWithMessage(): void
     {
         $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage('Unexpected character "\'" around position 33 for expression `service(faulty.expression.example\').dummyMethod()`.');
@@ -68,7 +68,7 @@ class LexerTest extends TestCase
         $this->lexer->tokenize($expression);
     }
 
-    public function testTokenizeThrowsErrorOnUnclosedBrace()
+    public function testTokenizeThrowsErrorOnUnclosedBrace(): void
     {
         $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage('Unclosed "(" around position 7 for expression `service(unclosed.expression.dummyMethod()`.');
@@ -76,7 +76,7 @@ class LexerTest extends TestCase
         $this->lexer->tokenize($expression);
     }
 
-    public function testTokenizeOnNotOpenedBracket()
+    public function testTokenizeOnNotOpenedBracket(): void
     {
         $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage('Unexpected ")" around position 7 for expression `service)not.opened.expression.dummyMethod()`.');
@@ -232,7 +232,7 @@ class LexerTest extends TestCase
         ];
     }
 
-    public function testOperatorRegexWasGeneratedWithScript()
+    public function testOperatorRegexWasGeneratedWithScript(): void
     {
         ob_start();
         try {

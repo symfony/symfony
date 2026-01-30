@@ -20,7 +20,7 @@ use Symfony\Component\AssetMapper\MappedAsset;
 class SourceMappingUrlsCompilerTest extends TestCase
 {
     #[DataProvider('provideCompileTests')]
-    public function testCompile(string $sourceLogicalName, string $input, string $expectedOutput, $expectedDependencies)
+    public function testCompile(string $sourceLogicalName, string $input, string $expectedOutput, $expectedDependencies): void
     {
         $assetMapper = $this->createStub(AssetMapperInterface::class);
         $assetMapper

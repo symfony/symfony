@@ -37,19 +37,19 @@ class DirectoryLoaderTest extends TestCase
         $this->loader->setResolver($resolver);
     }
 
-    public function testLoadDirectory()
+    public function testLoadDirectory(): void
     {
         $collection = $this->loader->load(__DIR__.'/../Fixtures/directory', 'directory');
         $this->verifyCollection($collection);
     }
 
-    public function testImportDirectory()
+    public function testImportDirectory(): void
     {
         $collection = $this->loader->load(__DIR__.'/../Fixtures/directory_import', 'directory');
         $this->verifyCollection($collection);
     }
 
-    private function verifyCollection(RouteCollection $collection)
+    private function verifyCollection(RouteCollection $collection): void
     {
         $routes = $collection->all();
 
@@ -61,7 +61,7 @@ class DirectoryLoaderTest extends TestCase
         }
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $fixturesDir = __DIR__.'/../Fixtures';
 

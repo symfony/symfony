@@ -25,7 +25,7 @@ use Symfony\Component\Mime\Message;
 class MessageListenerTest extends TestCase
 {
     #[DataProvider('provideHeaders')]
-    public function testHeaders(Headers $initialHeaders, Headers $defaultHeaders, Headers $expectedHeaders, array $rules = MessageListener::DEFAULT_RULES)
+    public function testHeaders(Headers $initialHeaders, Headers $defaultHeaders, Headers $expectedHeaders, array $rules = MessageListener::DEFAULT_RULES): void
     {
         $message = new Message($initialHeaders);
         $listener = new MessageListener($defaultHeaders, null, $rules);

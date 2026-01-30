@@ -30,21 +30,21 @@ class StringToFloatTransformerTest extends TestCase
     }
 
     #[DataProvider('provideTransformations')]
-    public function testTransform($from, $to)
+    public function testTransform($from, $to): void
     {
         $transformer = new StringToFloatTransformer();
 
         $this->assertSame($to, $transformer->transform($from));
     }
 
-    public function testFailIfTransformingANonString()
+    public function testFailIfTransformingANonString(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new StringToFloatTransformer();
         $transformer->transform(1.0);
     }
 
-    public function testFailIfTransformingANonNumericString()
+    public function testFailIfTransformingANonNumericString(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new StringToFloatTransformer();
@@ -68,14 +68,14 @@ class StringToFloatTransformerTest extends TestCase
     }
 
     #[DataProvider('provideReverseTransformations')]
-    public function testReverseTransform($from, $to, ?int $scale = null)
+    public function testReverseTransform($from, $to, ?int $scale = null): void
     {
         $transformer = new StringToFloatTransformer($scale);
 
         $this->assertSame($to, $transformer->reverseTransform($from));
     }
 
-    public function testFailIfReverseTransformingANonNumeric()
+    public function testFailIfReverseTransformingANonNumeric(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new StringToFloatTransformer();

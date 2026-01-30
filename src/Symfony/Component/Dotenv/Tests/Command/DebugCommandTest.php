@@ -24,7 +24,7 @@ use Symfony\Component\Dotenv\Dotenv;
 class DebugCommandTest extends TestCase
 {
     #[RunInSeparateProcess]
-    public function testErrorOnUninitializedDotenv()
+    public function testErrorOnUninitializedDotenv(): void
     {
         unset($_SERVER['SYMFONY_DOTENV_VARS']);
 
@@ -38,7 +38,7 @@ class DebugCommandTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testEmptyDotEnvVarsList()
+    public function testEmptyDotEnvVarsList(): void
     {
         $_SERVER['SYMFONY_DOTENV_VARS'] = '';
 
@@ -62,7 +62,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringMatchesFormat($expectedFormat, $tester->getDisplay());
     }
 
-    public function testScenario1InDevEnv()
+    public function testScenario1InDevEnv(): void
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'dev');
 
@@ -84,7 +84,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('TEST123    true    n/a          true', $output);
     }
 
-    public function testScenario1InTestEnv()
+    public function testScenario1InTestEnv(): void
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'test');
 
@@ -105,7 +105,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('TEST123    false   false       true', $output);
     }
 
-    public function testScenario1InProdEnv()
+    public function testScenario1InProdEnv(): void
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'prod');
 
@@ -128,7 +128,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('TEST123    true    n/a               n/a          true', $output);
     }
 
-    public function testScenario2InProdEnv()
+    public function testScenario2InProdEnv(): void
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario2', 'prod');
 
@@ -150,7 +150,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('TEST       1234    1234             1234        0000', $output);
     }
 
-    public function testScenario2WithCustomPath()
+    public function testScenario2WithCustomPath(): void
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures', 'prod', [], __DIR__.'/Fixtures/Scenario2/.env');
 
@@ -172,7 +172,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('TEST       1234    1234                       1234                  0000', $output);
     }
 
-    public function testWarningOnEnvAndEnvDistFile()
+    public function testWarningOnEnvAndEnvDistFile(): void
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario3', 'dev');
 
@@ -180,7 +180,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('[WARNING] The file .env.dist gets skipped', $output);
     }
 
-    public function testWarningOnEnvAndEnvDistFileWithCustomPath()
+    public function testWarningOnEnvAndEnvDistFileWithCustomPath(): void
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures', 'dev', dotenvPath: __DIR__.'/Fixtures/Scenario3/.env');
 
@@ -188,7 +188,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('[WARNING] The file Scenario3/.env.dist gets skipped', $output);
     }
 
-    public function testWarningOnPhpEnvFile()
+    public function testWarningOnPhpEnvFile(): void
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario2', 'prod');
 
@@ -196,7 +196,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('[WARNING] Due to existing dump file (.env.local.php)', $output);
     }
 
-    public function testWarningOnPhpEnvFileWithCustomPath()
+    public function testWarningOnPhpEnvFileWithCustomPath(): void
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures', 'prod', dotenvPath: __DIR__.'/Fixtures/Scenario2/.env');
 
@@ -204,7 +204,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('[WARNING] Due to existing dump file (Scenario2/.env.local.php)', $output);
     }
 
-    public function testScenario1InDevEnvWithNameFilter()
+    public function testScenario1InDevEnvWithNameFilter(): void
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'dev', ['filter' => 'FoO']);
 
@@ -226,7 +226,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringNotContainsString('TEST123    true    n/a          true', $output);
     }
 
-    public function testScenario1InProdEnvWithMissingNameFilter()
+    public function testScenario1InProdEnvWithMissingNameFilter(): void
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario1', 'prod', ['filter' => 'unknown']);
 
@@ -250,7 +250,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringNotContainsString('TEST123    true    n/a               n/a          true', $output);
     }
 
-    public function testScenario2InProdEnvWithNameFilterPrefix()
+    public function testScenario2InProdEnvWithNameFilterPrefix(): void
     {
         $output = $this->executeCommand(__DIR__.'/Fixtures/Scenario2', 'prod', ['filter' => 'tes']);
 
@@ -273,7 +273,7 @@ class DebugCommandTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testCompletion()
+    public function testCompletion(): void
     {
         $env = 'prod';
         $projectDirectory = __DIR__.'/Fixtures/Scenario2';

@@ -16,7 +16,7 @@ use Symfony\Component\Workflow\Arc;
 
 class ArcTest extends TestCase
 {
-    public function testConstructorWithInvalidPlaceName()
+    public function testConstructorWithInvalidPlaceName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The place name cannot be empty.');
@@ -24,7 +24,7 @@ class ArcTest extends TestCase
         new Arc('', 1);
     }
 
-    public function testConstructorWithInvalidWeight()
+    public function testConstructorWithInvalidWeight(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The weight must be greater than 0, 0 given.');
@@ -32,7 +32,7 @@ class ArcTest extends TestCase
         new Arc('not empty', 0);
     }
 
-    public function testConstructorWithZeroPlaceName()
+    public function testConstructorWithZeroPlaceName(): void
     {
         $arc = new Arc('0', 1);
         $this->assertEquals('0', $arc->place);

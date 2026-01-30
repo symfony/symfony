@@ -17,7 +17,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 
 class LoaderResolverTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $resolver = new LoaderResolver([
             $loader = $this->createStub(LoaderInterface::class),
@@ -26,7 +26,7 @@ class LoaderResolverTest extends TestCase
         $this->assertEquals([$loader], $resolver->getLoaders(), '__construct() takes an array of loaders as its first argument');
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $loader = $this->createStub(LoaderInterface::class);
         $resolver = new LoaderResolver([$loader]);
@@ -35,10 +35,10 @@ class LoaderResolverTest extends TestCase
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->once())->method('supports')->willReturn(true);
         $resolver = new LoaderResolver([$loader]);
-        $this->assertEquals($loader, $resolver->resolve(static function () {}), '->resolve() returns the loader for the given resource');
+        $this->assertEquals($loader, $resolver->resolve(static function (): void {}), '->resolve() returns the loader for the given resource');
     }
 
-    public function testLoaders()
+    public function testLoaders(): void
     {
         $resolver = new LoaderResolver();
         $resolver->addLoader($loader = $this->createStub(LoaderInterface::class));

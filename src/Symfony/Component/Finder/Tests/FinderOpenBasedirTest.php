@@ -17,7 +17,7 @@ use Symfony\Component\Finder\Finder;
 class FinderOpenBasedirTest extends Iterator\RealIteratorTestCase
 {
     #[RunInSeparateProcess]
-    public function testIgnoreVCSIgnoredWithOpenBasedir()
+    public function testIgnoreVCSIgnoredWithOpenBasedir(): void
     {
         $this->markTestIncomplete('Test case needs to be refactored so that PHPUnit can run it');
 

@@ -24,7 +24,7 @@ use Twig\Loader\FilesystemLoader;
  */
 class WrappedTemplatedEmailTest extends TestCase
 {
-    public function testEmailImage()
+    public function testEmailImage(): void
     {
         $email = $this->buildEmail('email/image.html.twig');
         $body = $email->toString();
@@ -59,7 +59,7 @@ class WrappedTemplatedEmailTest extends TestCase
         self::assertStringContainsString($part2, $body);
     }
 
-    public function testEmailAttach()
+    public function testEmailAttach(): void
     {
         $email = $this->buildEmail('email/attach.html.twig');
         $body = $email->toString();
@@ -102,7 +102,7 @@ class WrappedTemplatedEmailTest extends TestCase
         return $email;
     }
 
-    public function testGetReturnPathWhenNull()
+    public function testGetReturnPathWhenNull(): void
     {
         $message = new TemplatedEmail();
         $email = new WrappedTemplatedEmail(new Environment(new ArrayLoader()), $message);
@@ -110,7 +110,7 @@ class WrappedTemplatedEmailTest extends TestCase
         $this->assertSame('', $email->getReturnPath());
     }
 
-    public function testGetReturnPathWhenSet()
+    public function testGetReturnPathWhenSet(): void
     {
         $message = (new TemplatedEmail())->returnPath('test@example.com');
         $email = new WrappedTemplatedEmail(new Environment(new ArrayLoader()), $message);

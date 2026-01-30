@@ -47,7 +47,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendWithErrorResponseThrows()
+    public function testSendWithErrorResponseThrows(): void
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options = []): ResponseInterface => new MockResponse('testErrorMessage', ['response_headers' => ['request-id' => ['testRequestId']], 'http_code' => 400]));
 
@@ -59,7 +59,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithErrorRequestIdThrows()
+    public function testSendWithErrorRequestIdThrows(): void
     {
         $client = new MockHttpClient(new MockResponse());
 
@@ -71,7 +71,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $message = 'testMessage';
 
@@ -90,7 +90,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
         $transport->send(new ChatMessage($message));
     }
 
-    public function testSendWithOptionsAndTextOverwritesChatMessage()
+    public function testSendWithOptionsAndTextOverwritesChatMessage(): void
     {
         $message = 'testMessage';
         $options = new MicrosoftTeamsOptions([
@@ -112,7 +112,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
         $transport->send(new ChatMessage($message, $options));
     }
 
-    public function testSendWithOptionsAsMessageCard()
+    public function testSendWithOptionsAsMessageCard(): void
     {
         $title = 'title';
         $message = 'testMessage';
@@ -139,7 +139,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
         $transport->send(new ChatMessage($message, $options));
     }
 
-    public function testSendFromNotification()
+    public function testSendFromNotification(): void
     {
         $notification = new Notification($message = 'testMessage');
         $chatMessage = ChatMessage::fromNotification($notification);

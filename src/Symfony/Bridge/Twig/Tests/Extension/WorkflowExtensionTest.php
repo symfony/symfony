@@ -51,7 +51,7 @@ class WorkflowExtensionTest extends TestCase
         $this->extension = new WorkflowExtension($registry);
     }
 
-    public function testCanTransition()
+    public function testCanTransition(): void
     {
         $subject = new Subject();
 
@@ -59,7 +59,7 @@ class WorkflowExtensionTest extends TestCase
         $this->assertFalse($this->extension->canTransition($subject, 't2'));
     }
 
-    public function testGetEnabledTransitions()
+    public function testGetEnabledTransitions(): void
     {
         $subject = new Subject();
 
@@ -70,7 +70,7 @@ class WorkflowExtensionTest extends TestCase
         $this->assertSame('t1', $transitions[0]->getName());
     }
 
-    public function testGetEnabledTransition()
+    public function testGetEnabledTransition(): void
     {
         $subject = new Subject();
 
@@ -80,7 +80,7 @@ class WorkflowExtensionTest extends TestCase
         $this->assertSame('t1', $transition->getName());
     }
 
-    public function testHasMarkedPlace()
+    public function testHasMarkedPlace(): void
     {
         $subject = new Subject(['ordered' => 1, 'waiting_for_payment' => 1]);
 
@@ -89,7 +89,7 @@ class WorkflowExtensionTest extends TestCase
         $this->assertFalse($this->extension->hasMarkedPlace($subject, 'processed'));
     }
 
-    public function testGetMarkedPlaces()
+    public function testGetMarkedPlaces(): void
     {
         $subject = new Subject(['ordered' => 1, 'waiting_for_payment' => 1]);
 
@@ -97,7 +97,7 @@ class WorkflowExtensionTest extends TestCase
         $this->assertSame($subject->getMarking(), $this->extension->getMarkedPlaces($subject, false));
     }
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         $subject = new Subject();
 
@@ -108,7 +108,7 @@ class WorkflowExtensionTest extends TestCase
         $this->assertNull($this->extension->getMetadata($subject, 'not found', $this->t1));
     }
 
-    public function testbuildTransitionBlockerList()
+    public function testbuildTransitionBlockerList(): void
     {
         $subject = new Subject();
 

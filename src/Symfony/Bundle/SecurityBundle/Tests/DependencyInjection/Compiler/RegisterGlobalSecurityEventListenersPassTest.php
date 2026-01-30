@@ -52,7 +52,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
     }
 
     #[DataProvider('providePropagatedEvents')]
-    public function testEventIsPropagated(string $configuredEvent, string $registeredEvent)
+    public function testEventIsPropagated(string $configuredEvent, string $registeredEvent): void
     {
         $this->container->loadFromExtension('security', [
             'firewalls' => ['main' => ['pattern' => '/', 'http_basic' => true]],
@@ -85,7 +85,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
         ];
     }
 
-    public function testRegisterCustomListener()
+    public function testRegisterCustomListener(): void
     {
         $this->container->loadFromExtension('security', [
             'firewalls' => ['main' => ['pattern' => '/', 'http_basic' => true]],
@@ -105,7 +105,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
         ]);
     }
 
-    public function testRegisterCustomSubscriber()
+    public function testRegisterCustomSubscriber(): void
     {
         $this->container->loadFromExtension('security', [
             'firewalls' => ['main' => ['pattern' => '/', 'http_basic' => true]],
@@ -124,7 +124,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
         ]);
     }
 
-    public function testMultipleFirewalls()
+    public function testMultipleFirewalls(): void
     {
         $this->container->loadFromExtension('security', [
             'firewalls' => ['main' => ['pattern' => '/', 'http_basic' => true], 'api' => ['pattern' => '/api', 'http_basic' => true]],
@@ -153,7 +153,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
         ], 'security.event_dispatcher.api');
     }
 
-    public function testListenerAlreadySpecific()
+    public function testListenerAlreadySpecific(): void
     {
         $this->container->loadFromExtension('security', [
             'firewalls' => ['main' => ['pattern' => '/', 'http_basic' => true]],
@@ -177,7 +177,7 @@ class RegisterGlobalSecurityEventListenersPassTest extends TestCase
         ], 'security.event_dispatcher.main');
     }
 
-    private function assertListeners(array $expectedListeners, string $dispatcherId = 'security.event_dispatcher.main')
+    private function assertListeners(array $expectedListeners, string $dispatcherId = 'security.event_dispatcher.main'): void
     {
         $actualListeners = [];
         foreach ($this->container->findDefinition($dispatcherId)->getMethodCalls() as $methodCall) {

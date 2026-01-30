@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\ServerEvent;
 
 class EventStreamResponseTest extends TestCase
 {
-    public function testInitializationWithDefaultValues()
+    public function testInitializationWithDefaultValues(): void
     {
         $response = new EventStreamResponse();
 
@@ -29,7 +29,7 @@ class EventStreamResponseTest extends TestCase
         $this->assertNull($response->getRetry());
     }
 
-    public function testPresentOfExpiresHeader()
+    public function testPresentOfExpiresHeader(): void
     {
         $response = new EventStreamResponse();
 
@@ -37,7 +37,7 @@ class EventStreamResponseTest extends TestCase
         $this->assertSame('0', $response->headers->get('Expires'));
     }
 
-    public function testStreamSingleEvent()
+    public function testStreamSingleEvent(): void
     {
         $response = new EventStreamResponse(static function () {
             yield new ServerEvent(
@@ -62,7 +62,7 @@ class EventStreamResponseTest extends TestCase
         $this->assertSameResponseContent($expected, $response);
     }
 
-    public function testStreamEventsAndData()
+    public function testStreamEventsAndData(): void
     {
         $data = static function (): iterable {
             yield 'first line';
@@ -92,7 +92,7 @@ class EventStreamResponseTest extends TestCase
         $this->assertSameResponseContent($expected, $response);
     }
 
-    public function testStreamEventsWithRetryFallback()
+    public function testStreamEventsWithRetryFallback(): void
     {
         $response = new EventStreamResponse(static function () {
             yield new ServerEvent('foo');
@@ -115,16 +115,16 @@ class EventStreamResponseTest extends TestCase
         $this->assertSameResponseContent($expected, $response);
     }
 
-    public function testStreamEventWithSendMethod()
+    public function testStreamEventWithSendMethod(): void
     {
-        $response = new EventStreamResponse(static function (EventStreamResponse $response) {
+        $response = new EventStreamResponse(static function (EventStreamResponse $response): void {
             $response->sendEvent(new ServerEvent('foo'));
         });
 
         $this->assertSameResponseContent("data: foo\n\n", $response);
     }
 
-    public function testStreamEventWith0Data()
+    public function testStreamEventWith0Data(): void
     {
         $response = new EventStreamResponse(static function () {
             yield new ServerEvent(
@@ -135,7 +135,7 @@ class EventStreamResponseTest extends TestCase
         $this->assertSameResponseContent("data: 0\n\n", $response);
     }
 
-    public function testStreamEventEmptyStringIgnored()
+    public function testStreamEventEmptyStringIgnored(): void
     {
         $response = new EventStreamResponse(static function () {
             yield new ServerEvent(

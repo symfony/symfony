@@ -18,20 +18,20 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 
 class YamlFrameworkExtensionTest extends FrameworkExtensionTestCase
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
+    protected function loadFromFile(ContainerBuilder $container, $file): void
     {
         $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/Fixtures/yml'));
         $loader->load($file.'.yml');
     }
 
-    public function testWorkflowWithSimplisticPlaceFollowedByComplexPlaceWithAlternativeSyntax()
+    public function testWorkflowWithSimplisticPlaceFollowedByComplexPlaceWithAlternativeSyntax(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Unrecognized option "wait_for_journalist" under "framework.workflows.workflows.article.places.1". Available options are "metadata", "name".');
         $this->createContainerFromFile('workflow_with_simplistic_place_follow_by_complex_place_config_with_alternative_syntax');
     }
 
-    public function testWorkflowWithComplexPlaceFollowedBySimplisticPlaceWithAlternativeSyntax()
+    public function testWorkflowWithComplexPlaceFollowedBySimplisticPlaceWithAlternativeSyntax(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Unrecognized option "draft" under "framework.workflows.workflows.article.places.0". Available options are "metadata", "name".');

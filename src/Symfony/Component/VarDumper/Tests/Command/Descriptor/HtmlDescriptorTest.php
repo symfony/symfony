@@ -33,7 +33,7 @@ class HtmlDescriptorTest extends TestCase
         date_default_timezone_set(self::$timezone);
     }
 
-    public function testItOutputsStylesAndScriptsOnFirstDescribeCall()
+    public function testItOutputsStylesAndScriptsOnFirstDescribeCall(): void
     {
         $output = new BufferedOutput();
         $dumper = $this->createStub(HtmlDumper::class);
@@ -50,7 +50,7 @@ class HtmlDescriptorTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
-    public function testDescribe(array $context, string $expectedOutput)
+    public function testDescribe(array $context, string $expectedOutput): void
     {
         $output = new BufferedOutput();
         $dumper = $this->createStub(HtmlDumper::class);

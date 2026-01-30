@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class SignatureHasherTest extends TestCase
 {
-    public function testComputeSignatureHash()
+    public function testComputeSignatureHash(): void
     {
         $user = new TestSignatureUser('john', 'my-password');
         $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), ['password'], 'secret');
@@ -32,7 +32,7 @@ class SignatureHasherTest extends TestCase
         $this->assertNotEmpty($hash);
     }
 
-    public function testVerifySignatureHashValid()
+    public function testVerifySignatureHashValid(): void
     {
         $user = new TestSignatureUser('john', 'my-password');
         $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), ['password'], 'secret');
@@ -45,7 +45,7 @@ class SignatureHasherTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testVerifySignatureHashExpired()
+    public function testVerifySignatureHashExpired(): void
     {
         $user = new TestSignatureUser('john', 'my-password');
         $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), ['password'], 'secret');
@@ -57,7 +57,7 @@ class SignatureHasherTest extends TestCase
         $hasher->verifySignatureHash($user, $expires, $hash);
     }
 
-    public function testVerifySignatureHashInvalid()
+    public function testVerifySignatureHashInvalid(): void
     {
         $user = new TestSignatureUser('john', 'my-password');
         $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), ['password'], 'secret');
@@ -68,7 +68,7 @@ class SignatureHasherTest extends TestCase
         $hasher->verifySignatureHash($user, $expires, 'invalid-hash');
     }
 
-    public function testVerifySignatureHashChangedPropertyInvalidates()
+    public function testVerifySignatureHashChangedPropertyInvalidates(): void
     {
         $user = new TestSignatureUser('john', 'my-password');
         $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), ['password'], 'secret');
@@ -82,7 +82,7 @@ class SignatureHasherTest extends TestCase
         $hasher->verifySignatureHash($userWithNewPassword, $expires, $hash);
     }
 
-    public function testComputeSignatureHashWithDateTimeProperty()
+    public function testComputeSignatureHashWithDateTimeProperty(): void
     {
         $date = new \DateTimeImmutable('2024-01-15 10:30:00');
         $user = new TestSignatureUserWithDate('john', $date);
@@ -96,7 +96,7 @@ class SignatureHasherTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testComputeSignatureHashWithEnumProperty()
+    public function testComputeSignatureHashWithEnumProperty(): void
     {
         $user = new TestSignatureUserWithEnum('john', TestUserStatus::Active);
         $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), ['status'], 'secret');
@@ -109,7 +109,7 @@ class SignatureHasherTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testComputeSignatureHashWithBackedEnumProperty()
+    public function testComputeSignatureHashWithBackedEnumProperty(): void
     {
         $user = new TestSignatureUserWithBackedEnum('john', TestUserRole::Admin);
         $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), ['role'], 'secret');
@@ -122,7 +122,7 @@ class SignatureHasherTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testEnumPropertyChangeInvalidatesSignature()
+    public function testEnumPropertyChangeInvalidatesSignature(): void
     {
         $user = new TestSignatureUserWithEnum('john', TestUserStatus::Active);
         $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), ['status'], 'secret');
@@ -136,7 +136,7 @@ class SignatureHasherTest extends TestCase
         $hasher->verifySignatureHash($userWithNewStatus, $expires, $hash);
     }
 
-    public function testBackedEnumPropertyChangeInvalidatesSignature()
+    public function testBackedEnumPropertyChangeInvalidatesSignature(): void
     {
         $user = new TestSignatureUserWithBackedEnum('john', TestUserRole::Admin);
         $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), ['role'], 'secret');
@@ -150,7 +150,7 @@ class SignatureHasherTest extends TestCase
         $hasher->verifySignatureHash($userWithNewRole, $expires, $hash);
     }
 
-    public function testComputeSignatureHashWithStringableProperty()
+    public function testComputeSignatureHashWithStringableProperty(): void
     {
         $stringable = new class implements \Stringable {
             public function __toString(): string
@@ -169,7 +169,7 @@ class SignatureHasherTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testComputeSignatureHashWithNullProperty()
+    public function testComputeSignatureHashWithNullProperty(): void
     {
         $user = new TestSignatureUserWithNullable('john', null);
         $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), ['optionalValue'], 'secret');
@@ -182,7 +182,7 @@ class SignatureHasherTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testComputeSignatureHashWithInvalidPropertyThrows()
+    public function testComputeSignatureHashWithInvalidPropertyThrows(): void
     {
         $user = new TestSignatureUserWithArray('john', ['invalid']);
         $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), ['data'], 'secret');
@@ -194,7 +194,7 @@ class SignatureHasherTest extends TestCase
         $hasher->computeSignatureHash($user, $expires);
     }
 
-    public function testAcceptSignatureHashValid()
+    public function testAcceptSignatureHashValid(): void
     {
         $user = new TestSignatureUser('john', 'my-password');
         $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), ['password'], 'secret');
@@ -207,7 +207,7 @@ class SignatureHasherTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testAcceptSignatureHashExpired()
+    public function testAcceptSignatureHashExpired(): void
     {
         $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), [], 'secret');
 
@@ -218,7 +218,7 @@ class SignatureHasherTest extends TestCase
         $hasher->acceptSignatureHash('john', $expires, 'any-hash');
     }
 
-    public function testAcceptSignatureHashInvalid()
+    public function testAcceptSignatureHashInvalid(): void
     {
         $hasher = new SignatureHasher(PropertyAccess::createPropertyAccessor(), [], 'secret');
 
@@ -228,7 +228,7 @@ class SignatureHasherTest extends TestCase
         $hasher->acceptSignatureHash('john', $expires, 'invalid-hash');
     }
 
-    public function testConstructorThrowsOnEmptySecret()
+    public function testConstructorThrowsOnEmptySecret(): void
     {
         $this->expectException(\Symfony\Component\Security\Core\Exception\InvalidArgumentException::class);
         $this->expectExceptionMessage('A non-empty secret is required.');

@@ -16,7 +16,7 @@ use Symfony\Component\Mime\Part\Multipart\MixedPart;
 
 class MixedPartTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $a = new MixedPart();
         $this->assertEquals('multipart', $a->getMediaType());

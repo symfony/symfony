@@ -23,7 +23,7 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 #[RequiresPhpExtension('pdo_sqlite')]
 class DoctrineTokenProviderTest extends TestCase
 {
-    public function testCreateNewToken()
+    public function testCreateNewToken(): void
     {
         $provider = $this->bootstrapProvider();
 
@@ -37,7 +37,7 @@ class DoctrineTokenProviderTest extends TestCase
         $this->assertEquals($provider->loadTokenBySeries('someSeries'), $token);
     }
 
-    public function testLoadTokenBySeriesThrowsNotFoundException()
+    public function testLoadTokenBySeriesThrowsNotFoundException(): void
     {
         $provider = $this->bootstrapProvider();
 
@@ -45,7 +45,7 @@ class DoctrineTokenProviderTest extends TestCase
         $provider->loadTokenBySeries('someSeries');
     }
 
-    public function testUpdateToken()
+    public function testUpdateToken(): void
     {
         $provider = $this->bootstrapProvider();
 
@@ -63,7 +63,7 @@ class DoctrineTokenProviderTest extends TestCase
         $this->assertEquals($token->getLastUsed(), $lastUsed);
     }
 
-    public function testDeleteToken()
+    public function testDeleteToken(): void
     {
         $provider = $this->bootstrapProvider();
         if (method_exists(PersistentToken::class, 'getClass')) {
@@ -79,7 +79,7 @@ class DoctrineTokenProviderTest extends TestCase
         $provider->loadTokenBySeries('someSeries');
     }
 
-    public function testVerifyOutdatedTokenAfterParallelRequest()
+    public function testVerifyOutdatedTokenAfterParallelRequest(): void
     {
         $provider = $this->bootstrapProvider();
         $series = base64_encode(random_bytes(64));
@@ -108,7 +108,7 @@ class DoctrineTokenProviderTest extends TestCase
         $this->assertTrue($provider->verifyToken($token, $oldValue));
     }
 
-    public function testVerifyOutdatedTokenAfterParallelRequestFailsAfter60Seconds()
+    public function testVerifyOutdatedTokenAfterParallelRequestFailsAfter60Seconds(): void
     {
         $provider = $this->bootstrapProvider();
         $series = base64_encode(random_bytes(64));

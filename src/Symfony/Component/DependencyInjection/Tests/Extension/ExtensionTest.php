@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\Extension\ValidConfig\V
 class ExtensionTest extends TestCase
 {
     #[DataProvider('getResolvedEnabledFixtures')]
-    public function testIsConfigEnabledReturnsTheResolvedValue($enabled)
+    public function testIsConfigEnabledReturnsTheResolvedValue($enabled): void
     {
         $extension = new EnableableExtension();
         $this->assertSame($enabled, $extension->isConfigEnabled(new ContainerBuilder(), ['enabled' => $enabled]));
@@ -39,7 +39,7 @@ class ExtensionTest extends TestCase
         ];
     }
 
-    public function testIsConfigEnabledOnNonEnableableConfig()
+    public function testIsConfigEnabledOnNonEnableableConfig(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The config array has no \'enabled\' key.');
@@ -48,28 +48,28 @@ class ExtensionTest extends TestCase
         $extension->isConfigEnabled(new ContainerBuilder(), []);
     }
 
-    public function testNoConfiguration()
+    public function testNoConfiguration(): void
     {
         $extension = new EnableableExtension();
 
         $this->assertNull($extension->getConfiguration([], new ContainerBuilder()));
     }
 
-    public function testValidConfiguration()
+    public function testValidConfiguration(): void
     {
         $extension = new ValidConfigExtension();
 
         $this->assertInstanceOf(Configuration::class, $extension->getConfiguration([], new ContainerBuilder()));
     }
 
-    public function testSemiValidConfiguration()
+    public function testSemiValidConfiguration(): void
     {
         $extension = new SemiValidConfigExtension();
 
         $this->assertNull($extension->getConfiguration([], new ContainerBuilder()));
     }
 
-    public function testInvalidConfiguration()
+    public function testInvalidConfiguration(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The extension configuration class "Symfony\\Component\\DependencyInjection\\Tests\\Fixtures\\Extension\\InvalidConfig\\Configuration" must implement "Symfony\\Component\\Config\\Definition\\ConfigurationInterface".');

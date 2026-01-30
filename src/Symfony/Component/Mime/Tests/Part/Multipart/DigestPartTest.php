@@ -18,7 +18,7 @@ use Symfony\Component\Mime\Part\Multipart\DigestPart;
 
 class DigestPartTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $r = new DigestPart($a = new MessagePart(new Message()), $b = new MessagePart(new Message()));
         $this->assertEquals('multipart', $r->getMediaType());

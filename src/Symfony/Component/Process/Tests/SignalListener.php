@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-pcntl_signal(\SIGUSR1, static function () {
+pcntl_signal(\SIGUSR1, static function (): void {
     echo 'SIGUSR1';
     exit;
 });

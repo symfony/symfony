@@ -33,7 +33,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class ApplicationTest extends TestCase
 {
-    public function testBundleInterfaceImplementation()
+    public function testBundleInterfaceImplementation(): void
     {
         $bundle = $this->createStub(BundleInterface::class);
 
@@ -43,7 +43,7 @@ class ApplicationTest extends TestCase
         $application->doRun(new ArrayInput(['list']), new NullOutput());
     }
 
-    public function testBundleCommandsAreRegistered()
+    public function testBundleCommandsAreRegistered(): void
     {
         $bundle = $this->createBundleMock([]);
 
@@ -56,7 +56,7 @@ class ApplicationTest extends TestCase
         $application->doRun(new ArrayInput(['list']), new NullOutput());
     }
 
-    public function testBundleCommandsAreRetrievable()
+    public function testBundleCommandsAreRetrievable(): void
     {
         $bundle = $this->createBundleMock([]);
 
@@ -69,7 +69,7 @@ class ApplicationTest extends TestCase
         $application->all();
     }
 
-    public function testBundleSingleCommandIsRetrievable()
+    public function testBundleSingleCommandIsRetrievable(): void
     {
         $command = new Command('example');
 
@@ -82,7 +82,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($command, $application->get('example'));
     }
 
-    public function testBundleCommandCanBeFound()
+    public function testBundleCommandCanBeFound(): void
     {
         $command = new Command('example');
 
@@ -95,7 +95,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($command, $application->find('example'));
     }
 
-    public function testBundleCommandCanBeFoundByAlias()
+    public function testBundleCommandCanBeFoundByAlias(): void
     {
         $command = new Command('example');
         $command->setAliases(['alias']);
@@ -109,7 +109,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($command, $application->find('alias'));
     }
 
-    public function testBundleCommandCanOverriddeAPreExistingCommandWithTheSameName()
+    public function testBundleCommandCanOverriddeAPreExistingCommandWithTheSameName(): void
     {
         $command = new Command('example');
 
@@ -124,7 +124,7 @@ class ApplicationTest extends TestCase
         $this->assertSame($newCommand, $application->get('example'));
     }
 
-    public function testRunOnlyWarnsOnUnregistrableCommand()
+    public function testRunOnlyWarnsOnUnregistrableCommand(): void
     {
         $container = new ContainerBuilder();
         $container->register('event_dispatcher', EventDispatcher::class);
@@ -158,7 +158,7 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('fine', $output);
     }
 
-    public function testRegistrationErrorsAreDisplayedOnCommandNotFound()
+    public function testRegistrationErrorsAreDisplayedOnCommandNotFound(): void
     {
         $container = new ContainerBuilder();
         $container->register('event_dispatcher', EventDispatcher::class);
@@ -189,7 +189,7 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('Command "fine" is not defined.', $output);
     }
 
-    public function testRunOnlyWarnsOnUnregistrableCommandAtTheEnd()
+    public function testRunOnlyWarnsOnUnregistrableCommandAtTheEnd(): void
     {
         $container = new ContainerBuilder();
         $container->register('event_dispatcher', EventDispatcher::class);
@@ -223,19 +223,19 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString(trim('[WARNING] Some commands could not be registered:'), trim($display[1]));
     }
 
-    public function testSuggestingPackagesWithExactMatch()
+    public function testSuggestingPackagesWithExactMatch(): void
     {
         $result = $this->createEventForSuggestingPackages('doctrine:fixtures', []);
         $this->assertMatchesRegularExpression('/You may be looking for a command provided by/', $result);
     }
 
-    public function testSuggestingPackagesWithPartialMatchAndNoAlternatives()
+    public function testSuggestingPackagesWithPartialMatchAndNoAlternatives(): void
     {
         $result = $this->createEventForSuggestingPackages('server', []);
         $this->assertMatchesRegularExpression('/You may be looking for a command provided by/', $result);
     }
 
-    public function testSuggestingPackagesWithPartialMatchAndAlternatives()
+    public function testSuggestingPackagesWithPartialMatchAndAlternatives(): void
     {
         $result = $this->createEventForSuggestingPackages('server', ['server:run']);
         $this->assertDoesNotMatchRegularExpression('/You may be looking for a command provided by/', $result);
@@ -290,7 +290,7 @@ class ApplicationTest extends TestCase
         $bundle
             ->expects($this->once())
             ->method('registerCommands')
-            ->willReturnCallback(static function (Application $application) use ($commands) {
+            ->willReturnCallback(static function (Application $application) use ($commands): void {
                 $application->addCommands($commands);
             })
         ;

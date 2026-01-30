@@ -21,7 +21,7 @@ use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 class RegisterLocaleAwareServicesPassTest extends TestCase
 {
-    public function testCompilerPass()
+    public function testCompilerPass(): void
     {
         $container = new ContainerBuilder();
 
@@ -52,7 +52,7 @@ class RegisterLocaleAwareServicesPassTest extends TestCase
         );
     }
 
-    public function testListenerUnregisteredWhenNoLocaleAwareServices()
+    public function testListenerUnregisteredWhenNoLocaleAwareServices(): void
     {
         $container = new ContainerBuilder();
 

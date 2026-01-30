@@ -45,7 +45,7 @@ final class FakeSmsLoggerTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendWithDefaultTransport()
+    public function testSendWithDefaultTransport(): void
     {
         $message = new SmsMessage($phone = '0611223344', 'Hello!');
 

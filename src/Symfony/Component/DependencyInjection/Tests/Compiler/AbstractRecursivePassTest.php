@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryDummy;
 
 class AbstractRecursivePassTest extends TestCase
 {
-    public function testGetConstructorResolvesFactoryChildDefinitionsClass()
+    public function testGetConstructorResolvesFactoryChildDefinitionsClass(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('factory_dummy_class', FactoryDummy::class);
@@ -53,7 +53,7 @@ class AbstractRecursivePassTest extends TestCase
         $this->assertSame(FactoryDummy::class, $pass->actual->class);
     }
 
-    public function testGetConstructorResolvesChildDefinitionsClass()
+    public function testGetConstructorResolvesChildDefinitionsClass(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -79,7 +79,7 @@ class AbstractRecursivePassTest extends TestCase
         $this->assertSame(Bar::class, $pass->actual->class);
     }
 
-    public function testGetReflectionMethodResolvesChildDefinitionsClass()
+    public function testGetReflectionMethodResolvesChildDefinitionsClass(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -105,7 +105,7 @@ class AbstractRecursivePassTest extends TestCase
         $this->assertSame(Bar::class, $pass->actual->class);
     }
 
-    public function testGetConstructorDefinitionNoClass()
+    public function testGetConstructorDefinitionNoClass(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo');

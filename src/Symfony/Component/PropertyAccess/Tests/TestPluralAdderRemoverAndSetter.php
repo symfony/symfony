@@ -20,17 +20,17 @@ class TestPluralAdderRemoverAndSetter
         return $this->emails;
     }
 
-    public function setEmails(array $emails)
+    public function setEmails(array $emails): void
     {
         $this->emails = ['foo@email.com'];
     }
 
-    public function addEmail($email)
+    public function addEmail($email): void
     {
         $this->emails[] = $email;
     }
 
-    public function removeEmail($email)
+    public function removeEmail($email): void
     {
         $this->emails = array_diff($this->emails, [$email]);
     }

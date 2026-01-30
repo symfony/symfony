@@ -33,7 +33,7 @@ use Symfony\Component\Validator\Validation;
 
 class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
-    public function testSubmitValidatesData()
+    public function testSubmitValidatesData(): void
     {
         $builder = $this->factory->createBuilder(
             FormTypeTest::TESTED_TYPE,
@@ -55,27 +55,27 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         $this->assertFalse($form->get('firstName')->isValid());
     }
 
-    public function testValidConstraint()
+    public function testValidConstraint(): void
     {
         $form = $this->createForm(['constraints' => $valid = new Valid()]);
 
         $this->assertSame([$valid], $form->getConfig()->getOption('constraints'));
     }
 
-    public function testValidConstraintsArray()
+    public function testValidConstraintsArray(): void
     {
         $form = $this->createForm(['constraints' => [$valid = new Valid()]]);
 
         $this->assertSame([$valid], $form->getConfig()->getOption('constraints'));
     }
 
-    public function testInvalidConstraint()
+    public function testInvalidConstraint(): void
     {
         $this->expectException(InvalidOptionsException::class);
         $this->createForm(['constraints' => ['foo' => 'bar']]);
     }
 
-    public function testGroupSequenceWithConstraintsOption()
+    public function testGroupSequenceWithConstraintsOption(): void
     {
         $form = Forms::createFormFactoryBuilder()
             ->addExtension(new ValidatorExtension(Validation::createValidator(), false))
@@ -97,7 +97,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         $this->assertInstanceOf(Length::class, $errors[0]->getCause()->getConstraint());
     }
 
-    public function testManyFieldsGroupSequenceWithConstraintsOption()
+    public function testManyFieldsGroupSequenceWithConstraintsOption(): void
     {
         $formMetadata = new ClassMetadata(Form::class);
         $authorMetadata = (new ClassMetadata(Author::class))
@@ -149,7 +149,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         $this->assertSame('children[lastName].data', $errors[0]->getCause()->getPropertyPath());
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 
@@ -161,7 +161,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         return $this->factory->create(FormTypeTest::TESTED_TYPE, null, $options);
     }
 
-    public function testCollectionTypeKeepAsListOptionFalse()
+    public function testCollectionTypeKeepAsListOptionFalse(): void
     {
         $formMetadata = new ClassMetadata(Form::class);
         $authorMetadata = (new ClassMetadata(Author::class))
@@ -252,7 +252,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         $this->assertCount(1, $form->getErrors(false));
     }
 
-    public function testCollectionTypeKeepAsListOptionTrue()
+    public function testCollectionTypeKeepAsListOptionTrue(): void
     {
         $formMetadata = new ClassMetadata(Form::class);
         $authorMetadata = (new ClassMetadata(Author::class))

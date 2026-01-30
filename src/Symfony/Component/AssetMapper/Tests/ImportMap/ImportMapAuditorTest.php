@@ -39,7 +39,7 @@ class ImportMapAuditorTest extends TestCase
         $this->importMapAuditor = new ImportMapAuditor($this->importMapConfigReader, $this->httpClient);
     }
 
-    public function testAudit()
+    public function testAudit(): void
     {
         $this->httpClient->setResponseFactory(new JsonMockResponse([
             [
@@ -91,7 +91,7 @@ class ImportMapAuditorTest extends TestCase
     }
 
     #[DataProvider('provideAuditWithVersionRange')]
-    public function testAuditWithVersionRange(bool $expectMatch, string $version, ?string $versionRange)
+    public function testAuditWithVersionRange(bool $expectMatch, string $version, ?string $versionRange): void
     {
         $this->httpClient->setResponseFactory(new JsonMockResponse([
             [
@@ -131,7 +131,7 @@ class ImportMapAuditorTest extends TestCase
         yield [false, '1.2.0', '> 1.0.0, < 1.2.0'];
     }
 
-    public function testAuditError()
+    public function testAuditError(): void
     {
         $this->httpClient->setResponseFactory(new MockResponse('Server error', ['http_code' => 500]));
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([

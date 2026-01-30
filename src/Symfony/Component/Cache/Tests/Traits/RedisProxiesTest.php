@@ -26,7 +26,7 @@ class RedisProxiesTest extends TestCase
     #[RequiresPhpExtension('redis')]
     #[TestWith([\Redis::class])]
     #[TestWith([\RedisCluster::class])]
-    public function testRedisProxy($class)
+    public function testRedisProxy($class): void
     {
         $proxy = file_get_contents(\dirname(__DIR__, 2)."/Traits/{$class}Proxy.php");
         $proxy = substr($proxy, 0, 2 + strpos($proxy, '[];'));
@@ -75,7 +75,7 @@ class RedisProxiesTest extends TestCase
     }
 
     #[RequiresPhpExtension('relay')]
-    public function testRelayProxy()
+    public function testRelayProxy(): void
     {
         $proxy = file_get_contents(\dirname(__DIR__, 2).'/Traits/RelayProxy.php');
         $proxy = substr($proxy, 0, 2 + strpos($proxy, '}'));
@@ -120,7 +120,7 @@ class RedisProxiesTest extends TestCase
     }
 
     #[RequiresPhpExtension('relay')]
-    public function testRelayClusterProxy()
+    public function testRelayClusterProxy(): void
     {
         $proxy = file_get_contents(\dirname(__DIR__, 2).'/Traits/RelayClusterProxy.php');
         $proxy = substr($proxy, 0, 2 + strpos($proxy, '}'));

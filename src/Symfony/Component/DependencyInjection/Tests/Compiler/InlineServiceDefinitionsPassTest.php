@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class InlineServiceDefinitionsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $inlineable = $container
@@ -43,7 +43,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertFalse($container->has('inlinable.service'));
     }
 
-    public function testProcessDoesNotInlinesWhenAliasedServiceIsShared()
+    public function testProcessDoesNotInlinesWhenAliasedServiceIsShared(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo');
@@ -62,7 +62,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($ref, $arguments[0]);
     }
 
-    public function testProcessDoesInlineNonSharedService()
+    public function testProcessDoesInlineNonSharedService(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -92,7 +92,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertFalse($container->has('bar'));
     }
 
-    public function testProcessDoesNotInlineMixedServicesLoop()
+    public function testProcessDoesNotInlineMixedServicesLoop(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -112,7 +112,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertEquals(new Reference('bar'), $container->getDefinition('foo')->getArgument(0));
     }
 
-    public function testProcessThrowsOnNonSharedLoops()
+    public function testProcessThrowsOnNonSharedLoops(): void
     {
         $this->expectException(ServiceCircularReferenceException::class);
         $this->expectExceptionMessage('Circular reference detected for service "bar", path: "bar -> foo -> bar".');
@@ -131,7 +131,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcessNestedNonSharedServices()
+    public function testProcessNestedNonSharedServices(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -165,7 +165,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertNotSame($baz1, $baz2);
     }
 
-    public function testProcessInlinesIfMultipleReferencesButAllFromTheSameDefinition()
+    public function testProcessInlinesIfMultipleReferencesButAllFromTheSameDefinition(): void
     {
         $container = new ContainerBuilder();
 
@@ -185,7 +185,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($a, $inlinedArguments[0]);
     }
 
-    public function testProcessInlinesPrivateFactoryReference()
+    public function testProcessInlinesPrivateFactoryReference(): void
     {
         $container = new ContainerBuilder();
 
@@ -208,7 +208,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($b, $inlinedArguments[0]);
     }
 
-    public function testProcessDoesNotInlinePrivateFactoryIfReferencedMultipleTimesWithinTheSameDefinition()
+    public function testProcessDoesNotInlinePrivateFactoryIfReferencedMultipleTimesWithinTheSameDefinition(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -234,7 +234,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($ref2, $args[1]);
     }
 
-    public function testProcessDoesNotInlineReferenceWhenUsedByInlineFactory()
+    public function testProcessDoesNotInlineReferenceWhenUsedByInlineFactory(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -262,7 +262,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($ref, $args[0]);
     }
 
-    public function testProcessDoesNotInlineWhenServiceIsPrivateButLazy()
+    public function testProcessDoesNotInlineWhenServiceIsPrivateButLazy(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -282,7 +282,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($ref, $arguments[0]);
     }
 
-    public function testProcessDoesNotInlineWhenServiceReferencesItself()
+    public function testProcessDoesNotInlineWhenServiceReferencesItself(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -296,7 +296,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame($ref, $calls[0][1][0]);
     }
 
-    public function testProcessDoesNotSetLazyArgumentValuesAfterInlining()
+    public function testProcessDoesNotSetLazyArgumentValuesAfterInlining(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -323,7 +323,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame('inline', (string) $values[0]);
     }
 
-    public function testDoNotInline()
+    public function testDoNotInline(): void
     {
         $container = new ContainerBuilder();
         $container->register('decorated1', 'decorated1')->addTag('container.do_not_inline');
@@ -351,7 +351,7 @@ class InlineServiceDefinitionsPassTest extends TestCase
         $this->assertSame('decorated1', $container->getDefinition('s1.inner')->getClass());
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         (new InlineServiceDefinitionsPass(new AnalyzeServiceReferencesPass()))->process($container);
     }

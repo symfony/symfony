@@ -39,7 +39,7 @@ require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
 class ResolveBindingsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 
@@ -70,7 +70,7 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertEquals([['setSensitiveClass', [new Reference('foo')]]], $definition->getMethodCalls());
     }
 
-    public function testProcessEnum()
+    public function testProcessEnum(): void
     {
         $container = new ContainerBuilder();
 
@@ -88,7 +88,7 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertEquals($expected, $definition->getArguments());
     }
 
-    public function testUnusedBinding()
+    public function testUnusedBinding(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('A binding is configured for an argument named "$quz" for service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy", but no corresponding argument has been found. It may be unused and should be removed, or it may have a typo.');
@@ -101,7 +101,7 @@ class ResolveBindingsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testMissingParent()
+    public function testMissingParent(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('A binding is configured for an argument named "$quz" for service "Symfony\Component\DependencyInjection\Tests\Fixtures\ParentNotExists", but no corresponding argument has been found. It may be unused and should be removed, or it may have a typo.');
@@ -115,7 +115,7 @@ class ResolveBindingsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testTypedReferenceSupport()
+    public function testTypedReferenceSupport(): void
     {
         $container = new ContainerBuilder();
 
@@ -145,7 +145,7 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertEquals([new Reference('bar')], $container->getDefinition('def3')->getArguments());
     }
 
-    public function testScalarSetterAttribute()
+    public function testScalarSetterAttribute(): void
     {
         $container = new ContainerBuilder();
 
@@ -158,7 +158,7 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertEquals([['setDefaultLocale', ['fr']]], $definition->getMethodCalls());
     }
 
-    public function testWithNonExistingSetterAndBinding()
+    public function testWithNonExistingSetterAndBinding(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy": method "setLogger()" does not exist.');
@@ -176,7 +176,7 @@ class ResolveBindingsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testSyntheticServiceWithBind()
+    public function testSyntheticServiceWithBind(): void
     {
         $container = new ContainerBuilder();
         $argument = new BoundArgument('bar');
@@ -197,7 +197,7 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertSame([1 => 'bar'], $container->getDefinition(NamedArgumentsDummy::class)->getArguments());
     }
 
-    public function testEmptyBindingTypehint()
+    public function testEmptyBindingTypehint(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Did you forget to add the type "string" to argument "$apiKey" of method "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy::__construct()"?');
@@ -212,9 +212,9 @@ class ResolveBindingsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testIterableBindingTypehint()
+    public function testIterableBindingTypehint(): void
     {
-        $autoloader = static function ($class) {
+        $autoloader = static function ($class): void {
             if ('iterable' === $class) {
                 throw new \RuntimeException('We should not search pseudo-type iterable as class');
             }
@@ -234,7 +234,7 @@ class ResolveBindingsPassTest extends TestCase
         spl_autoload_unregister($autoloader);
     }
 
-    public function testBindWithTarget()
+    public function testBindWithTarget(): void
     {
         $container = new ContainerBuilder();
 
@@ -246,7 +246,7 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertSame('bar', (string) $container->getDefinition('with_target')->getArgument(0));
     }
 
-    public function testBindWithNamedArgs()
+    public function testBindWithNamedArgs(): void
     {
         $container = new ContainerBuilder();
 
@@ -264,7 +264,7 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertEquals(['C', 'K', 'H'], $definition->getArguments());
     }
 
-    public function testAbstractArg()
+    public function testAbstractArg(): void
     {
         $container = new ContainerBuilder();
 
@@ -278,7 +278,7 @@ class ResolveBindingsPassTest extends TestCase
         $this->assertEquals(['C', 'K'], $definition->getArguments());
     }
 
-    public function testBindingsOnTargetedArguments()
+    public function testBindingsOnTargetedArguments(): void
     {
         $container = new ContainerBuilder();
         $container->register('service', TargetedBindingsService::class)

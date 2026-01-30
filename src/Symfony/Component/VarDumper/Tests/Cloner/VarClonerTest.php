@@ -25,7 +25,7 @@ use Symfony\Component\VarDumper\Tests\Fixtures\Php81Enums;
  */
 class VarClonerTest extends TestCase
 {
-    public function testAddCaster()
+    public function testAddCaster(): void
     {
         $o1 = new class {
             public string $p1 = 'p1';
@@ -83,7 +83,7 @@ class VarClonerTest extends TestCase
         );
     }
 
-    public function testMaxIntBoundary()
+    public function testMaxIntBoundary(): void
     {
         $data = [\PHP_INT_MAX => 123];
 
@@ -126,7 +126,7 @@ class VarClonerTest extends TestCase
         $this->assertSame(\sprintf($expected, \PHP_INT_MAX), print_r($clone, true));
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $json = json_decode('{"1":{"var":"val"},"2":{"var":"val"}}');
 
@@ -218,7 +218,7 @@ class VarClonerTest extends TestCase
         $this->assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
-    public function testLimits()
+    public function testLimits(): void
     {
         // Level 0:
         $data = [
@@ -390,7 +390,7 @@ class VarClonerTest extends TestCase
         $this->assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
-    public function testJsonCast()
+    public function testJsonCast(): void
     {
         if (2 == \ini_get('xdebug.overload_var_dump')) {
             $this->markTestSkipped('xdebug is active');
@@ -458,7 +458,7 @@ class VarClonerTest extends TestCase
         $this->assertStringMatchesFormat(str_replace('"1"', '1', $expected), ob_get_clean());
     }
 
-    public function testCaster()
+    public function testCaster(): void
     {
         $cloner = new VarCloner([
             '*' => static fn ($obj, $array) => ['foo' => 123],
@@ -518,7 +518,7 @@ class VarClonerTest extends TestCase
         $this->assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
-    public function testPhp74()
+    public function testPhp74(): void
     {
         $data = new Php74();
 
@@ -631,7 +631,7 @@ class VarClonerTest extends TestCase
         $this->assertStringMatchesFormat($expected, print_r($clone, true));
     }
 
-    public function testPhp81Enums()
+    public function testPhp81Enums(): void
     {
         $data = new Php81Enums();
 

@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 final class BeanstalkdTransportFactoryTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $factory = new BeanstalkdTransportFactory();
 
@@ -27,7 +27,7 @@ final class BeanstalkdTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports('doctrine://127.0.0.1', []));
     }
 
-    public function testCreateTransport()
+    public function testCreateTransport(): void
     {
         $factory = new BeanstalkdTransportFactory();
         $serializer = $this->createStub(SerializerInterface::class);

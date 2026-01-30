@@ -51,7 +51,7 @@ final class SlackTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testInstatiatingWithAnInvalidSlackTokenThrowsInvalidArgumentException()
+    public function testInstatiatingWithAnInvalidSlackTokenThrowsInvalidArgumentException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('A valid Slack token needs to start with "xoxb-", "xoxp-" or "xoxa-2". See https://api.slack.com/authentication/token-types for further information.');
@@ -59,7 +59,7 @@ final class SlackTransportTest extends TransportTestCase
         new SlackTransport('token', 'testChannel', new MockHttpClient());
     }
 
-    public function testSendWithEmptyArrayResponseThrowsTransportException()
+    public function testSendWithEmptyArrayResponseThrowsTransportException(): void
     {
         $this->expectException(TransportException::class);
 
@@ -70,7 +70,7 @@ final class SlackTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithErrorResponseThrowsTransportException()
+    public function testSendWithErrorResponseThrowsTransportException(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/testErrorCode/');
@@ -82,7 +82,7 @@ final class SlackTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithOptions()
+    public function testSendWithOptions(): void
     {
         $channel = 'testChannel';
         $message = 'testMessage';
@@ -104,7 +104,7 @@ final class SlackTransportTest extends TransportTestCase
         $this->assertSame('C123456', $sentMessage->getChannelId());
     }
 
-    public function testSendWithNotification()
+    public function testSendWithNotification(): void
     {
         $channel = 'testChannel';
         $message = 'testMessage';
@@ -134,7 +134,7 @@ final class SlackTransportTest extends TransportTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testSendWithBooleanOptionValue(bool $value)
+    public function testSendWithBooleanOptionValue(bool $value): void
     {
         $channel = 'testChannel';
         $message = 'testMessage';
@@ -170,7 +170,7 @@ final class SlackTransportTest extends TransportTestCase
         $transport->send($chatMessage);
     }
 
-    public function testSendWith200ResponseButNotOk()
+    public function testSendWith200ResponseButNotOk(): void
     {
         $channel = 'testChannel';
         $message = 'testMessage';
@@ -190,7 +190,7 @@ final class SlackTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendIncludesContentTypeWithCharset()
+    public function testSendIncludesContentTypeWithCharset(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
             $this->assertContains('Content-Type: application/json; charset=utf-8', $options['headers']);
@@ -203,7 +203,7 @@ final class SlackTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithErrorsIncluded()
+    public function testSendWithErrorsIncluded(): void
     {
         $client = new MockHttpClient(new MockResponse(json_encode([
             'ok' => false,
@@ -219,7 +219,7 @@ final class SlackTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testUpdateMessage()
+    public function testUpdateMessage(): void
     {
         $sentMessage = new SlackSentMessage(new ChatMessage('Hello'), 'slack', 'C123456', '1503435956.000247');
         $chatMessage = $sentMessage->getUpdateMessage('Hello World');

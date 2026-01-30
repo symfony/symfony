@@ -24,35 +24,35 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         return new UrlValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Url(requireTld: true));
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Url(requireTld: true));
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringFromObjectIsValid()
+    public function testEmptyStringFromObjectIsValid(): void
     {
         $this->validator->validate(new EmailProvider(), new Url(requireTld: true));
 
         $this->assertNoViolation();
     }
 
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Url(requireTld: true));
     }
 
     #[DataProvider('getValidUrls')]
-    public function testValidUrls($url)
+    public function testValidUrls($url): void
     {
         $this->validator->validate($url, new Url(requireTld: false));
 
@@ -60,7 +60,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidUrls')]
-    public function testValidUrlsWithNewLine($url)
+    public function testValidUrlsWithNewLine($url): void
     {
         $this->validator->validate($url."\n", new Url(requireTld: false));
 
@@ -71,7 +71,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidUrlsWithWhitespaces')]
-    public function testValidUrlsWithWhitespaces($url)
+    public function testValidUrlsWithWhitespaces($url): void
     {
         $this->validator->validate($url, new Url(
             normalizer: 'trim',
@@ -83,7 +83,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
 
     #[DataProvider('getValidRelativeUrls')]
     #[DataProvider('getValidUrls')]
-    public function testValidRelativeUrl($url)
+    public function testValidRelativeUrl($url): void
     {
         $constraint = new Url(
             relativeProtocol: true,
@@ -97,7 +97,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
 
     #[DataProvider('getValidRelativeUrls')]
     #[DataProvider('getValidUrls')]
-    public function testValidRelativeUrlWithNewLine(string $url)
+    public function testValidRelativeUrlWithNewLine(string $url): void
     {
         $constraint = new Url(relativeProtocol: true, requireTld: false);
 
@@ -109,7 +109,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testProtocolsWildcardAllowsAnyProtocol()
+    public function testProtocolsWildcardAllowsAnyProtocol(): void
     {
         $constraint = new Url(protocols: ['*'], requireTld: false);
 
@@ -131,7 +131,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         }
     }
 
-    public function testProtocolsWildcardRejectsInvalidSchemes()
+    public function testProtocolsWildcardRejectsInvalidSchemes(): void
     {
         $constraint = new Url(protocols: ['*'], requireTld: true);
 
@@ -155,7 +155,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         }
     }
 
-    public function testProtocolsWildcardWithRelativeProtocol()
+    public function testProtocolsWildcardWithRelativeProtocol(): void
     {
         $constraint = new Url(protocols: ['*'], relativeProtocol: true, requireTld: true);
 
@@ -166,7 +166,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testProtocolsWildcardWithRequireTld()
+    public function testProtocolsWildcardWithRequireTld(): void
     {
         $constraint = new Url(protocols: ['*'], requireTld: true);
 
@@ -180,7 +180,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testProtocolsSupportsRegexPatterns()
+    public function testProtocolsSupportsRegexPatterns(): void
     {
         $constraint = new Url(protocols: ['https?', 'custom.*'], requireTld: true);
 
@@ -314,7 +314,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidUrls')]
-    public function testInvalidUrls($url)
+    public function testInvalidUrls($url): void
     {
         $constraint = new Url(
             message: 'myMessage',
@@ -331,7 +331,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
 
     #[DataProvider('getInvalidRelativeUrls')]
     #[DataProvider('getInvalidUrls')]
-    public function testInvalidRelativeUrl($url)
+    public function testInvalidRelativeUrl($url): void
     {
         $constraint = new Url(
             message: 'myMessage',
@@ -412,7 +412,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidCustomUrls')]
-    public function testCustomProtocolIsValid($url, $requireTld)
+    public function testCustomProtocolIsValid($url, $requireTld): void
     {
         $constraint = new Url(
             protocols: ['ftp', 'file', 'git'],
@@ -434,7 +434,7 @@ class UrlValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getUrlsForRequiredTld')]
-    public function testRequiredTld(string $url, bool $requireTld, bool $isValid)
+    public function testRequiredTld(string $url, bool $requireTld, bool $isValid): void
     {
         $constraint = new Url(requireTld: $requireTld);
 

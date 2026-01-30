@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class FragmentTest extends AbstractWebTestCase
 {
     #[DataProvider('getConfigs')]
-    public function testFragment($insulate)
+    public function testFragment($insulate): void
     {
         $client = $this->createClient(['test_case' => 'Fragment', 'root_config' => 'config.yml', 'debug' => true]);
         if ($insulate) {
@@ -46,7 +46,7 @@ class FragmentTest extends AbstractWebTestCase
         ];
     }
 
-    public function testGenerateFragmentUri()
+    public function testGenerateFragmentUri(): void
     {
         $client = self::createClient(['test_case' => 'Fragment', 'root_config' => 'config.yml', 'debug' => true]);
         $client->request('GET', '/fragment_uri');

@@ -24,7 +24,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class DoctrineTransportFactoryTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $factory = new DoctrineTransportFactory(
             $this->createStub(ConnectionRegistry::class)
@@ -34,7 +34,7 @@ class DoctrineTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports('amqp://localhost', []));
     }
 
-    public function testCreateTransport()
+    public function testCreateTransport(): void
     {
         $driverConnection = $this->createStub(\Doctrine\DBAL\Connection::class);
         $platform = $this->createStub(AbstractPlatform::class);
@@ -54,7 +54,7 @@ class DoctrineTransportFactoryTest extends TestCase
         );
     }
 
-    public function testCreateTransportNotifyWithPostgreSQLPlatform()
+    public function testCreateTransportNotifyWithPostgreSQLPlatform(): void
     {
         $driverConnection = $this->createStub(\Doctrine\DBAL\Connection::class);
         $platform = $this->createStub(PostgreSQLPlatform::class);
@@ -75,14 +75,14 @@ class DoctrineTransportFactoryTest extends TestCase
         );
     }
 
-    public function testCreateTransportMustThrowAnExceptionIfManagerIsNotFound()
+    public function testCreateTransportMustThrowAnExceptionIfManagerIsNotFound(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Could not find Doctrine connection from Messenger DSN.');
         $registry = $this->createMock(ConnectionRegistry::class);
         $registry->expects($this->once())
             ->method('getConnection')
-            ->willReturnCallback(static function () {
+            ->willReturnCallback(static function (): void {
                 throw new \InvalidArgumentException();
             });
 

@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Tests\Constraints\Fixtures\WhenTestWithClosure;
 
 final class WhenTest extends TestCase
 {
-    public function testMissingConstraints()
+    public function testMissingConstraints(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage('The options "constraints" must be set for constraint "Symfony\Component\Validator\Constraints\When".');
@@ -35,14 +35,14 @@ final class WhenTest extends TestCase
         new When('true');
     }
 
-    public function testNonConstraintsAreRejected()
+    public function testNonConstraintsAreRejected(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The value "foo" is not an instance of Constraint in constraint "Symfony\Component\Validator\Constraints\When"');
         new When('true', ['foo']);
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $loader = new AttributeLoader();
         $metadata = new ClassMetadata(WhenTestWithAttributes::class);
@@ -112,7 +112,7 @@ final class WhenTest extends TestCase
     }
 
     #[RequiresPhp('>=8.5')]
-    public function testAttributesWithClosure()
+    public function testAttributesWithClosure(): void
     {
         $loader = new AttributeLoader();
         $metadata = new ClassMetadata(WhenTestWithClosure::class);

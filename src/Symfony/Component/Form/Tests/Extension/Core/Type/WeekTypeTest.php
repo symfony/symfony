@@ -19,7 +19,7 @@ class WeekTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = WeekType::class;
 
-    public function testSubmitArray()
+    public function testSubmitArray(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'choice',
@@ -34,7 +34,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame(['year' => 2019, 'week' => 1], $form->getData());
     }
 
-    public function testSubmitString()
+    public function testSubmitString(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'years' => [2019],
@@ -50,7 +50,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertEquals('2019-W01', $form->getData());
     }
 
-    public function testSubmitStringSingleText()
+    public function testSubmitStringSingleText(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'years' => [2019],
@@ -63,7 +63,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertEquals('2019-W01', $form->getData());
     }
 
-    public function testPassDefaultPlaceholderToViewIfNotRequired()
+    public function testPassDefaultPlaceholderToViewIfNotRequired(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => false,
@@ -75,7 +75,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame('', $view['week']->vars['placeholder']);
     }
 
-    public function testPassNoPlaceholderToViewIfRequired()
+    public function testPassNoPlaceholderToViewIfRequired(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => true,
@@ -87,7 +87,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertNull($view['week']->vars['placeholder']);
     }
 
-    public function testPassPlaceholderAsString()
+    public function testPassPlaceholderAsString(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'placeholder' => 'Empty',
@@ -99,7 +99,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame('Empty', $view['week']->vars['placeholder']);
     }
 
-    public function testPassPlaceholderAsArray()
+    public function testPassPlaceholderAsArray(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'placeholder' => [
@@ -114,7 +114,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame('Empty week', $view['week']->vars['placeholder']);
     }
 
-    public function testPassPlaceholderAsPartialArrayAddEmptyIfNotRequired()
+    public function testPassPlaceholderAsPartialArrayAddEmptyIfNotRequired(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => false,
@@ -129,7 +129,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame('', $view['week']->vars['placeholder']);
     }
 
-    public function testPassPlaceholderAsPartialArrayAddNullIfRequired()
+    public function testPassPlaceholderAsPartialArrayAddNullIfRequired(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'required' => true,
@@ -144,7 +144,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertNull($view['week']->vars['placeholder']);
     }
 
-    public function testPassHtml5TypeIfSingleTextAndHtml5Format()
+    public function testPassHtml5TypeIfSingleTextAndHtml5Format(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'single_text',
@@ -154,7 +154,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame('week', $view->vars['type']);
     }
 
-    public function testDontPassHtml5TypeIfHtml5NotAllowed()
+    public function testDontPassHtml5TypeIfHtml5NotAllowed(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'single_text',
@@ -165,7 +165,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertArrayNotHasKey('type', $view->vars);
     }
 
-    public function testDontPassHtml5TypeIfNotSingleText()
+    public function testDontPassHtml5TypeIfNotSingleText(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'text',
@@ -175,7 +175,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertArrayNotHasKey('type', $view->vars);
     }
 
-    public function testYearTypeChoiceErrorsBubbleUp()
+    public function testYearTypeChoiceErrorsBubbleUp(): void
     {
         $error = new FormError('Invalid!');
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -188,7 +188,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame([$error], iterator_to_array($form->getErrors()));
     }
 
-    public function testWeekTypeChoiceErrorsBubbleUp()
+    public function testWeekTypeChoiceErrorsBubbleUp(): void
     {
         $error = new FormError('Invalid!');
         $form = $this->factory->create(static::TESTED_TYPE, null, [
@@ -201,7 +201,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame([$error], iterator_to_array($form->getErrors()));
     }
 
-    public function testPassDefaultChoiceTranslationDomain()
+    public function testPassDefaultChoiceTranslationDomain(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'choice',
@@ -213,7 +213,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertFalse($view['week']->vars['choice_translation_domain']);
     }
 
-    public function testPassChoiceTranslationDomainAsString()
+    public function testPassChoiceTranslationDomainAsString(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'choice_translation_domain' => 'messages',
@@ -225,7 +225,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame('messages', $view['week']->vars['choice_translation_domain']);
     }
 
-    public function testPassChoiceTranslationDomainAsArray()
+    public function testPassChoiceTranslationDomainAsArray(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'choice_translation_domain' => [
@@ -240,7 +240,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame('test', $view['week']->vars['choice_translation_domain']);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         $form = $this->factory->create($this->getTestedType(), null, [
             'widget' => 'choice',
@@ -252,7 +252,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame(['year' => null, 'week' => null], $form->getViewData());
     }
 
-    public function testSubmitFromChoiceEmpty()
+    public function testSubmitFromChoiceEmpty(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'choice',
@@ -267,7 +267,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame(['year' => null, 'week' => null], $form->getData());
     }
 
-    public function testSubmitNullWithText()
+    public function testSubmitNullWithText(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'text',
@@ -277,7 +277,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame(['year' => null, 'week' => null], $form->getViewData());
     }
 
-    public function testSubmitNullWithSingleText()
+    public function testSubmitNullWithSingleText(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => 'single_text',
@@ -290,7 +290,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame('', $form->getViewData());
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = [], $expectedData = null)
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = [], $expectedData = null): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => $emptyData,
@@ -302,7 +302,7 @@ class WeekTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('provideEmptyData')]
-    public function testSubmitNullUsesDateEmptyDataString($widget, $emptyData, $expectedData)
+    public function testSubmitNullUsesDateEmptyDataString($widget, $emptyData, $expectedData): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'widget' => $widget,

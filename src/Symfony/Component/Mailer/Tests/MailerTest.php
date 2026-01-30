@@ -31,7 +31,7 @@ use Symfony\Component\Mime\RawMessage;
 
 class MailerTest extends TestCase
 {
-    public function testSendingRawMessages()
+    public function testSendingRawMessages(): void
     {
         $this->expectException(LogicException::class);
 
@@ -39,7 +39,7 @@ class MailerTest extends TestCase
         $transport->send(new RawMessage('Some raw email message'));
     }
 
-    public function testSendMessageToBus()
+    public function testSendMessageToBus(): void
     {
         $bus = new class implements MessageBusInterface {
             public array $messages = [];
@@ -84,7 +84,7 @@ class MailerTest extends TestCase
         self::assertSame([$stamp], $bus->stamps);
     }
 
-    public function testRejectMessage()
+    public function testRejectMessage(): void
     {
         $this->expectNotToPerformAssertions();
 

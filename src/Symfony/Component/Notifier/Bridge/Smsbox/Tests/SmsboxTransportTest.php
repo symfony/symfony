@@ -53,7 +53,7 @@ final class SmsboxTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testBasicQuerySucceded()
+    public function testBasicQuerySucceded(): void
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
 
@@ -71,7 +71,7 @@ final class SmsboxTransportTest extends TransportTestCase
         $this->assertSame('12345678', $sentMessage->getMessageId());
     }
 
-    public function testBasicQueryFailed()
+    public function testBasicQueryFailed(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Unable to send the SMS: "ERROR 02" (400).');
@@ -90,7 +90,7 @@ final class SmsboxTransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testQuerySuccededWithOptions()
+    public function testQuerySuccededWithOptions(): void
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
 
@@ -115,7 +115,7 @@ final class SmsboxTransportTest extends TransportTestCase
         $this->assertSame('12345678', $sentMessage->getMessageId());
     }
 
-    public function testQueryDateTime()
+    public function testQueryDateTime(): void
     {
         self::mockTime('2023-12-26');
 
@@ -142,7 +142,7 @@ final class SmsboxTransportTest extends TransportTestCase
         $this->assertSame('12345678', $sentMessage->getMessageId());
     }
 
-    public function testQueryVariable()
+    public function testQueryVariable(): void
     {
         $message = new SmsMessage('0612345678', 'Hello %1% %2%');
 
@@ -165,7 +165,7 @@ final class SmsboxTransportTest extends TransportTestCase
         $this->assertSame('12345678', $sentMessage->getMessageId());
     }
 
-    public function testSmsboxOptionsInvalidDateTimeAndDate()
+    public function testSmsboxOptionsInvalidDateTimeAndDate(): void
     {
         $client = new MockHttpClient(static fn (): ResponseInterface => new MockResponse());
 
@@ -188,7 +188,7 @@ final class SmsboxTransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testSmsboxInvalidPhoneNumber()
+    public function testSmsboxInvalidPhoneNumber(): void
     {
         $client = new MockHttpClient(static fn (): ResponseInterface => new MockResponse());
 

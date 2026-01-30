@@ -26,7 +26,7 @@ class ExecutableFinderTest extends TestCase
         putenv('PATH='.($_SERVER['PATH'] ?? $_SERVER['Path']));
     }
 
-    public function testFind()
+    public function testFind(): void
     {
         if (\ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
@@ -40,7 +40,7 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath(\PHP_BINARY, $result);
     }
 
-    public function testFindWithDefault()
+    public function testFindWithDefault(): void
     {
         if (\ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
@@ -56,7 +56,7 @@ class ExecutableFinderTest extends TestCase
         $this->assertEquals($expected, $result);
     }
 
-    public function testFindWithNullAsDefault()
+    public function testFindWithNullAsDefault(): void
     {
         if (\ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
@@ -71,7 +71,7 @@ class ExecutableFinderTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testFindWithExtraDirs()
+    public function testFindWithExtraDirs(): void
     {
         if (\ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
@@ -87,7 +87,7 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath(\PHP_BINARY, $result);
     }
 
-    public function testFindWithoutSuffix()
+    public function testFindWithoutSuffix(): void
     {
         $fixturesDir = __DIR__.\DIRECTORY_SEPARATOR.'Fixtures';
         $name = 'executable_without_suffix';
@@ -98,7 +98,7 @@ class ExecutableFinderTest extends TestCase
         $this->assertSamePath($fixturesDir.\DIRECTORY_SEPARATOR.$name, $result);
     }
 
-    public function testFindWithAddedSuffixes()
+    public function testFindWithAddedSuffixes(): void
     {
         $fixturesDir = __DIR__.\DIRECTORY_SEPARATOR.'Fixtures';
         $name = 'executable_with_added_suffix';
@@ -113,7 +113,7 @@ class ExecutableFinderTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testFindWithOpenBaseDir()
+    public function testFindWithOpenBaseDir(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Cannot run test on windows');
@@ -131,7 +131,7 @@ class ExecutableFinderTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testFindBatchExecutableOnWindows()
+    public function testFindBatchExecutableOnWindows(): void
     {
         if (\ini_get('open_basedir')) {
             $this->markTestSkipped('Cannot test when open_basedir is set');
@@ -162,7 +162,7 @@ class ExecutableFinderTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testEmptyDirInPath()
+    public function testEmptyDirInPath(): void
     {
         putenv(\sprintf('PATH=%s%s', \dirname(\PHP_BINARY), \PATH_SEPARATOR));
 
@@ -179,7 +179,7 @@ class ExecutableFinderTest extends TestCase
         }
     }
 
-    public function testFindBuiltInCommandOnWindows()
+    public function testFindBuiltInCommandOnWindows(): void
     {
         if ('\\' !== \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Can be only tested on windows');
@@ -191,7 +191,7 @@ class ExecutableFinderTest extends TestCase
         $this->assertSame('move', strtolower($finder->find('MoVe')));
     }
 
-    private function assertSamePath($expected, $tested)
+    private function assertSamePath($expected, $tested): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->assertEquals(strtolower($expected), strtolower($tested));

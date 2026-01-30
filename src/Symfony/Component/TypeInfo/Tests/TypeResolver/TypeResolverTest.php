@@ -20,7 +20,7 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 
 class TypeResolverTest extends TestCase
 {
-    public function testResolve()
+    public function testResolve(): void
     {
         $resolver = TypeResolver::create();
 
@@ -32,7 +32,7 @@ class TypeResolverTest extends TestCase
         $this->assertEquals(Type::string(), $resolver->resolve(new \ReflectionFunction(strtoupper(...))));
     }
 
-    public function testCannotFindResolver()
+    public function testCannotFindResolver(): void
     {
         $this->expectException(UnsupportedException::class);
         $this->expectExceptionMessage('Cannot find any resolver for "int" type.');
@@ -41,7 +41,7 @@ class TypeResolverTest extends TestCase
         $resolver->resolve(1);
     }
 
-    public function testUseProperResolver()
+    public function testUseProperResolver(): void
     {
         $stringResolver = $this->createStub(TypeResolverInterface::class);
         $stringResolver->method('resolve')->willReturn(Type::template('STRING'));

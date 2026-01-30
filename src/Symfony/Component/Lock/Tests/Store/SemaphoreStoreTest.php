@@ -31,7 +31,7 @@ class SemaphoreStoreTest extends AbstractStoreTestCase
         return new SemaphoreStore();
     }
 
-    public function testResourceRemoval()
+    public function testResourceRemoval(): void
     {
         $initialCount = $this->getOpenedSemaphores();
         $store = new SemaphoreStore();

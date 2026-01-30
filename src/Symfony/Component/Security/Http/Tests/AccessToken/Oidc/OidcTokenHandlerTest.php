@@ -36,7 +36,7 @@ class OidcTokenHandlerTest extends TestCase
     private const AUDIENCE = 'Symfony OIDC';
 
     #[DataProvider('getClaims')]
-    public function testGetsUserIdentifierFromSignedToken(string $claim, string $expected)
+    public function testGetsUserIdentifierFromSignedToken(string $claim, string $expected): void
     {
         $time = time();
         $claims = [
@@ -80,7 +80,7 @@ class OidcTokenHandlerTest extends TestCase
     }
 
     #[DataProvider('getInvalidTokens')]
-    public function testThrowsAnErrorIfTokenIsInvalid(string $token)
+    public function testThrowsAnErrorIfTokenIsInvalid(string $token): void
     {
         $loggerMock = $this->createMock(LoggerInterface::class);
         $loggerMock->expects($this->once())->method('error');
@@ -128,7 +128,7 @@ class OidcTokenHandlerTest extends TestCase
         ];
     }
 
-    public function testThrowsAnErrorIfUserPropertyIsMissing()
+    public function testThrowsAnErrorIfUserPropertyIsMissing(): void
     {
         $loggerMock = $this->createMock(LoggerInterface::class);
         $loggerMock->expects($this->once())->method('error');
@@ -205,7 +205,7 @@ class OidcTokenHandlerTest extends TestCase
         ]);
     }
 
-    public function testGetsUserIdentifierWithSingleDiscoveryEndpoint()
+    public function testGetsUserIdentifierWithSingleDiscoveryEndpoint(): void
     {
         $time = time();
         $claims = [
@@ -239,7 +239,7 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertSame('e21bf182-1538-406e-8ccb-e25a17aba39f', $userBadge->getUserIdentifier());
     }
 
-    public function testGetsUserIdentifierWithMultipleDiscoveryEndpoints()
+    public function testGetsUserIdentifierWithMultipleDiscoveryEndpoints(): void
     {
         $time = time();
 
@@ -313,7 +313,7 @@ class OidcTokenHandlerTest extends TestCase
         );
     }
 
-    public function testDiscoveryCachesJwksAccordingToCacheControl()
+    public function testDiscoveryCachesJwksAccordingToCacheControl(): void
     {
         $time = time();
         $claims = [
@@ -353,7 +353,7 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertSame(2, $requestCount);
     }
 
-    public function testDiscoveryCachesJwksAccordingToExpires()
+    public function testDiscoveryCachesJwksAccordingToExpires(): void
     {
         $time = time();
         $claims = [
@@ -394,7 +394,7 @@ class OidcTokenHandlerTest extends TestCase
         $this->assertSame(2, $requestCount);
     }
 
-    public function testComputeDiscoveryKeysReturnsEmptyWhenNoClients()
+    public function testComputeDiscoveryKeysReturnsEmptyWhenNoClients(): void
     {
         $cache = new ArrayAdapter();
         $handler = new OidcTokenHandler(
@@ -414,7 +414,7 @@ class OidcTokenHandlerTest extends TestCase
         $handler->computeDiscoveryKeys($item);
     }
 
-    public function testDiscoveryThrowsWhenJwksUriIsMissing()
+    public function testDiscoveryThrowsWhenJwksUriIsMissing(): void
     {
         $time = time();
         $claims = [
@@ -444,7 +444,7 @@ class OidcTokenHandlerTest extends TestCase
         $handler->getUserBadgeFrom($token);
     }
 
-    public function testDiscoveryIgnoresNonSignatureKeys()
+    public function testDiscoveryIgnoresNonSignatureKeys(): void
     {
         $httpClient = new MockHttpClient([
             new JsonMockResponse(['jwks_uri' => 'https://www.example.com/jwks.json']),

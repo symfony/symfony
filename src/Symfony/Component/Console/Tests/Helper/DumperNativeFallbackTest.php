@@ -34,7 +34,7 @@ class DumperNativeFallbackTest extends TestCase
     }
 
     #[DataProvider('provideVariables')]
-    public function testInvoke($variable, $primitiveString)
+    public function testInvoke($variable, $primitiveString): void
     {
         $dumper = new Dumper(new NullOutput());
 

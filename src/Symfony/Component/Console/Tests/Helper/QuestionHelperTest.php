@@ -35,7 +35,7 @@ use Symfony\Component\Process\Process;
 #[Group('tty')]
 class QuestionHelperTest extends AbstractQuestionHelperTestCase
 {
-    public function testAskChoice()
+    public function testAskChoice(): void
     {
         $questionHelper = new QuestionHelper();
 
@@ -99,7 +99,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertEquals('Superman', $questionHelper->ask($this->createStreamableInputInterfaceMock($inputStream, true), $this->createOutputInterface(), $question));
     }
 
-    public function testAskChoiceNonInteractive()
+    public function testAskChoiceNonInteractive(): void
     {
         $questionHelper = new QuestionHelper();
 
@@ -159,7 +159,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         }
     }
 
-    public function testAsk()
+    public function testAsk(): void
     {
         $dialog = new QuestionHelper();
 
@@ -175,7 +175,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertEquals('What time is it?', stream_get_contents($output->getStream()));
     }
 
-    public function testAskNonTrimmed()
+    public function testAskNonTrimmed(): void
     {
         $dialog = new QuestionHelper();
 
@@ -189,7 +189,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertEquals('What time is it?', stream_get_contents($output->getStream()));
     }
 
-    public function testAskTimeout()
+    public function testAskTimeout(): void
     {
         $dialog = new QuestionHelper();
 
@@ -208,7 +208,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         }
     }
 
-    public function testAskTimeoutWithIncompatibleStream()
+    public function testAskTimeoutWithIncompatibleStream(): void
     {
         $dialog = new QuestionHelper();
         $inputStream = $this->getInputStream('');
@@ -228,7 +228,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         }
     }
 
-    public function testAskWithAutocomplete()
+    public function testAskWithAutocomplete(): void
     {
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -263,7 +263,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertEquals('F⭐Y', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function testAskWithAutocompleteTrimmable()
+    public function testAskWithAutocompleteTrimmable(): void
     {
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -297,7 +297,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertEquals('FooBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function testAskWithAutocompleteCallback()
+    public function testAskWithAutocompleteCallback(): void
     {
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -338,7 +338,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertSame('Potato Creme Pie', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function testAskWithAutocompleteWithNonSequentialKeys()
+    public function testAskWithAutocompleteWithNonSequentialKeys(): void
     {
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -357,7 +357,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertEquals('AsseticBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function testAskWithAutocompleteWithExactMatch()
+    public function testAskWithAutocompleteWithExactMatch(): void
     {
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -391,7 +391,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
     }
 
     #[DataProvider('getInputs')]
-    public function testAskWithAutocompleteWithMultiByteCharacter($character)
+    public function testAskWithAutocompleteWithMultiByteCharacter($character): void
     {
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -415,7 +415,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertSame($character, $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function testAutocompleteWithSpaceAfterPartialMatch()
+    public function testAutocompleteWithSpaceAfterPartialMatch(): void
     {
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -433,7 +433,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertSame('a test', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function testAutocompleteWithTrailingBackslash()
+    public function testAutocompleteWithTrailingBackslash(): void
     {
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -472,7 +472,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertEquals($expectedCompletion, $importantActualOutput);
     }
 
-    public function testAskHiddenResponse()
+    public function testAskHiddenResponse(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test is not supported on Windows');
@@ -486,7 +486,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertEquals('8AM', $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream("8AM\n")), $this->createOutputInterface(), $question));
     }
 
-    public function testAskHiddenResponseNotTrimmed()
+    public function testAskHiddenResponseNotTrimmed(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test is not supported on Windows');
@@ -501,7 +501,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertEquals(' 8AM'.\PHP_EOL, $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream(' 8AM'.\PHP_EOL)), $this->createOutputInterface(), $question));
     }
 
-    public function testAskMultilineResponseWithEOF()
+    public function testAskMultilineResponseWithEOF(): void
     {
         $essay = <<<'EOD'
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque pretium lectus quis suscipit porttitor. Sed pretium bibendum vestibulum.
@@ -523,7 +523,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertSame($essay, $dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
     }
 
-    public function testAskMultilineResponseWithSingleNewline()
+    public function testAskMultilineResponseWithSingleNewline(): void
     {
         $response = $this->getInputStream(\PHP_EOL);
 
@@ -535,7 +535,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertNull($dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
     }
 
-    public function testAskMultilineResponseWithDataAfterNewline()
+    public function testAskMultilineResponseWithDataAfterNewline(): void
     {
         $response = $this->getInputStream(\PHP_EOL.'this is text');
 
@@ -547,7 +547,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertNull($dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
     }
 
-    public function testAskMultilineResponseWithMultipleNewlinesAtEnd()
+    public function testAskMultilineResponseWithMultipleNewlinesAtEnd(): void
     {
         $typedText = 'This is a body'.\PHP_EOL.\PHP_EOL;
         $response = $this->getInputStream($typedText);
@@ -560,7 +560,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertSame('This is a body', $dialog->ask($this->createStreamableInputInterfaceMock($response), $this->createOutputInterface(), $question));
     }
 
-    public function testAskMultilineResponseWithWithCursorInMiddleOfSeekableInputStream()
+    public function testAskMultilineResponseWithWithCursorInMiddleOfSeekableInputStream(): void
     {
         $input = <<<EOD
             This
@@ -581,7 +581,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
     }
 
     #[DataProvider('getAskConfirmationData')]
-    public function testAskConfirmation($question, $expected, $default = true)
+    public function testAskConfirmation($question, $expected, $default = true): void
     {
         $dialog = new QuestionHelper();
 
@@ -602,7 +602,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         ];
     }
 
-    public function testAskConfirmationWithCustomTrueAnswer()
+    public function testAskConfirmationWithCustomTrueAnswer(): void
     {
         $dialog = new QuestionHelper();
 
@@ -613,7 +613,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertTrue($dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function testAskAndValidate()
+    public function testAskAndValidate(): void
     {
         $dialog = new QuestionHelper();
         $helperSet = new HelperSet([new FormatterHelper()]);
@@ -645,7 +645,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
     }
 
     #[DataProvider('simpleAnswerProvider')]
-    public function testSelectChoiceFromSimpleChoices($providedAnswer, $expectedValue)
+    public function testSelectChoiceFromSimpleChoices($providedAnswer, $expectedValue): void
     {
         $possibleChoices = [
             'My environment 1',
@@ -677,7 +677,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
     }
 
     #[DataProvider('specialCharacterInMultipleChoice')]
-    public function testSpecialCharacterChoiceFromMultipleChoiceList($providedAnswer, $expectedValue)
+    public function testSpecialCharacterChoiceFromMultipleChoiceList($providedAnswer, $expectedValue): void
     {
         $possibleChoices = [
             '.',
@@ -706,7 +706,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
     }
 
     #[DataProvider('answerProvider')]
-    public function testSelectChoiceFromChoiceList($providedAnswer, $expectedValue)
+    public function testSelectChoiceFromChoiceList($providedAnswer, $expectedValue): void
     {
         $possibleChoices = [
             'env_1' => 'My environment 1',
@@ -725,7 +725,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertSame($expectedValue, $answer);
     }
 
-    public function testAmbiguousChoiceFromChoicelist()
+    public function testAmbiguousChoiceFromChoicelist(): void
     {
         $possibleChoices = [
             'env_1' => 'My first environment',
@@ -756,14 +756,14 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         ];
     }
 
-    public function testNoInteraction()
+    public function testNoInteraction(): void
     {
         $dialog = new QuestionHelper();
         $question = new Question('Do you have a job?', 'not yet');
         $this->assertEquals('not yet', $dialog->ask($this->createStreamableInputInterfaceMock(null, false), $this->createOutputInterface(), $question));
     }
 
-    public function testChoiceOutputFormattingQuestionForUtf8Keys()
+    public function testChoiceOutputFormattingQuestionForUtf8Keys(): void
     {
         $question = 'Lorem ipsum?';
         $possibleChoices = [
@@ -790,26 +790,26 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream("\n")), $output, $question);
     }
 
-    public function testAskThrowsExceptionOnMissingInput()
+    public function testAskThrowsExceptionOnMissingInput(): void
     {
         $this->expectException(MissingInputException::class);
         $this->expectExceptionMessage('Aborted.');
         (new QuestionHelper())->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new Question('What\'s your name?'));
     }
 
-    public function testAskThrowsExceptionOnMissingInputForChoiceQuestion()
+    public function testAskThrowsExceptionOnMissingInputForChoiceQuestion(): void
     {
         $this->expectException(MissingInputException::class);
         $this->expectExceptionMessage('Aborted while asking: Choice');
         (new QuestionHelper())->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), new ChoiceQuestion('Choice', ['a', 'b']));
     }
 
-    public function testAskThrowsExceptionOnMissingInputWithValidator()
+    public function testAskThrowsExceptionOnMissingInputWithValidator(): void
     {
         $dialog = new QuestionHelper();
 
         $question = new Question('What\'s your name?');
-        $question->setValidator(static function ($value) {
+        $question->setValidator(static function ($value): void {
             if (!$value) {
                 throw new \Exception('A value is required.');
             }
@@ -821,7 +821,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), $question);
     }
 
-    public function testQuestionValidatorRepeatsThePrompt()
+    public function testQuestionValidatorRepeatsThePrompt(): void
     {
         $tries = 0;
         $application = new Application();
@@ -853,14 +853,14 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertSame($statusCode, 0);
     }
 
-    public function testEmptyChoices()
+    public function testEmptyChoices(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Choice question must have at least 1 choice available.');
         new ChoiceQuestion('Question', [], 'irrelevant');
     }
 
-    public function testTraversableAutocomplete()
+    public function testTraversableAutocomplete(): void
     {
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -893,7 +893,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertEquals('FooBundle', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function testDisableStty()
+    public function testDisableStty(): void
     {
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -921,7 +921,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         }
     }
 
-    public function testTraversableMultiselectAutocomplete()
+    public function testTraversableMultiselectAutocomplete(): void
     {
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -956,7 +956,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertEquals(['AcmeDemoBundle', 'AsseticBundle'], $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
-    public function testAutocompleteMoveCursorBackwards()
+    public function testAutocompleteMoveCursorBackwards(): void
     {
         if (!Terminal::hasSttyAvailable()) {
             $this->markTestSkipped('`stty` is required to test autocomplete functionality');
@@ -981,7 +981,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
 
     #[TestWith(['single'])]
     #[TestWith(['multi'])]
-    public function testExitCommandOnInputSIGINT(string $mode)
+    public function testExitCommandOnInputSIGINT(string $mode): void
     {
         if (!\function_exists('pcntl_signal')) {
             $this->markTestSkipped('pcntl signals not available');

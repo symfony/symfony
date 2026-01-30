@@ -45,7 +45,7 @@ class ChatworkTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testWithErrorResponseThrows()
+    public function testWithErrorResponseThrows(): void
     {
         $client = new MockHttpClient(new MockResponse(json_encode(['errors' => ['first error', 'second error']]), ['http_code' => 400]));
 

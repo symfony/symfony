@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class ServiceValueResolverTest extends TestCase
 {
-    public function testDoNotSupportWhenCommandDoesNotExist()
+    public function testDoNotSupportWhenCommandDoesNotExist(): void
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([]));
         $input = new ArrayInput(['app:test'], new InputDefinition([
@@ -37,7 +37,7 @@ class ServiceValueResolverTest extends TestCase
         $this->assertSame([], $resolver->resolve('dummy', $input, $member));
     }
 
-    public function testExistingCommand()
+    public function testExistingCommand(): void
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([
             'app:test' => static fn () => new ServiceLocator([
@@ -59,7 +59,7 @@ class ServiceValueResolverTest extends TestCase
         $this->assertEquals([new DummyService()], $result);
     }
 
-    public function testServiceLocatorPatternTakesPriorityOverTypeResolution()
+    public function testServiceLocatorPatternTakesPriorityOverTypeResolution(): void
     {
         $serviceA = new DummyService();
         $serviceB = new DummyService();
@@ -85,7 +85,7 @@ class ServiceValueResolverTest extends TestCase
         $this->assertSame([$serviceA], $result);
     }
 
-    public function testFallbackToTypeBasedResolution()
+    public function testFallbackToTypeBasedResolution(): void
     {
         $service = new DummyService();
 
@@ -107,7 +107,7 @@ class ServiceValueResolverTest extends TestCase
         $this->assertSame([$service], $result);
     }
 
-    public function testTypeResolutionReturnsEmptyForBuiltinTypes()
+    public function testTypeResolutionReturnsEmptyForBuiltinTypes(): void
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([]));
 
@@ -125,7 +125,7 @@ class ServiceValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testTypeResolutionReturnsEmptyWhenServiceDoesNotExist()
+    public function testTypeResolutionReturnsEmptyWhenServiceDoesNotExist(): void
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([]));
 
@@ -143,7 +143,7 @@ class ServiceValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testThrowsNearMissExceptionWhenServiceExistsButWrongType()
+    public function testThrowsNearMissExceptionWhenServiceExistsButWrongType(): void
     {
         $this->expectException(NearMissValueResolverException::class);
         $this->expectExceptionMessage('Service "Symfony\Component\Console\Tests\ArgumentResolver\ValueResolver\DummyService" exists in the container but is not an instance of "Symfony\Component\Console\Tests\ArgumentResolver\ValueResolver\DummyService".');
@@ -164,7 +164,7 @@ class ServiceValueResolverTest extends TestCase
         iterator_to_array($resolver->resolve('dummy', $input, $member));
     }
 
-    public function testThrowsNearMissExceptionOnServiceLocatorError()
+    public function testThrowsNearMissExceptionOnServiceLocatorError(): void
     {
         $this->expectException(NearMissValueResolverException::class);
 
@@ -186,7 +186,7 @@ class ServiceValueResolverTest extends TestCase
         iterator_to_array($resolver->resolve('dummy', $input, $member));
     }
 
-    public function testDoesNotResolveWhenNoCommandArgument()
+    public function testDoesNotResolveWhenNoCommandArgument(): void
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([
             'app:test' => static fn () => new ServiceLocator([

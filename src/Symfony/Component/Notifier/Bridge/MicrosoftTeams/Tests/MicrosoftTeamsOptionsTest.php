@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 
 final class MicrosoftTeamsOptionsTest extends TestCase
 {
-    public function testFromNotification()
+    public function testFromNotification(): void
     {
         $notification = (new Notification($subject = 'Subject'))
             ->content($content = 'Content');
@@ -37,7 +37,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         );
     }
 
-    public function testGetRecipientIdReturnsRecipientWhenSetViaConstructor()
+    public function testGetRecipientIdReturnsRecipientWhenSetViaConstructor(): void
     {
         $options = new MicrosoftTeamsOptions([
             'recipient_id' => $recipient = '/webhookb2/foo',
@@ -46,7 +46,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame($recipient, $options->getRecipientId());
     }
 
-    public function testGetRecipientIdReturnsRecipientWhenSetSetter()
+    public function testGetRecipientIdReturnsRecipientWhenSetSetter(): void
     {
         $options = (new MicrosoftTeamsOptions())
             ->recipient($recipient = '/webhookb2/foo');
@@ -54,14 +54,14 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame($recipient, $options->getRecipientId());
     }
 
-    public function testGetRecipientIdReturnsNullIfNotSetViaConstructorAndSetter()
+    public function testGetRecipientIdReturnsNullIfNotSetViaConstructorAndSetter(): void
     {
         $options = new MicrosoftTeamsOptions();
 
         $this->assertNull($options->getRecipientId());
     }
 
-    public function testRecipientMethodThrowsIfValueDoesNotMatchRegex()
+    public function testRecipientMethodThrowsIfValueDoesNotMatchRegex(): void
     {
         $options = new MicrosoftTeamsOptions();
 
@@ -73,7 +73,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $options->recipient($recipient);
     }
 
-    public function testSummaryViaConstructor()
+    public function testSummaryViaConstructor(): void
     {
         $options = new MicrosoftTeamsOptions([
             'summary' => $summary = 'My summary',
@@ -82,7 +82,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame($summary, $options->toArray()['summary']);
     }
 
-    public function testSummaryViaSetter()
+    public function testSummaryViaSetter(): void
     {
         $options = (new MicrosoftTeamsOptions())
             ->summary($summary = 'My summary');
@@ -90,7 +90,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame($summary, $options->toArray()['summary']);
     }
 
-    public function testTitleViaConstructor()
+    public function testTitleViaConstructor(): void
     {
         $options = new MicrosoftTeamsOptions([
             'title' => $title = 'My title',
@@ -99,7 +99,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame($title, $options->toArray()['title']);
     }
 
-    public function testTitleViaSetter()
+    public function testTitleViaSetter(): void
     {
         $options = (new MicrosoftTeamsOptions())
             ->title($title = 'My title');
@@ -107,7 +107,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame($title, $options->toArray()['title']);
     }
 
-    public function testTextViaConstructor()
+    public function testTextViaConstructor(): void
     {
         $options = new MicrosoftTeamsOptions([
             'text' => $text = 'My text',
@@ -116,7 +116,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame($text, $options->toArray()['text']);
     }
 
-    public function testTextViaSetter()
+    public function testTextViaSetter(): void
     {
         $options = (new MicrosoftTeamsOptions())
             ->text($text = 'My text');
@@ -125,7 +125,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
     }
 
     #[DataProvider('validThemeColors')]
-    public function testThemeColorViaConstructor(string $themeColor)
+    public function testThemeColorViaConstructor(string $themeColor): void
     {
         $options = new MicrosoftTeamsOptions([
             'themeColor' => $themeColor,
@@ -135,7 +135,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
     }
 
     #[DataProvider('validThemeColors')]
-    public function testThemeColorViaSetter(string $themeColor)
+    public function testThemeColorViaSetter(string $themeColor): void
     {
         $options = (new MicrosoftTeamsOptions())
             ->themeColor($themeColor);
@@ -154,7 +154,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
     }
 
     #[DataProvider('invalidThemeColors')]
-    public function testThemeColorViaConstructorThrowsInvalidArgumentException(string $themeColor)
+    public function testThemeColorViaConstructorThrowsInvalidArgumentException(string $themeColor): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('MessageCard themeColor must have a valid hex color format.');
@@ -165,7 +165,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
     }
 
     #[DataProvider('invalidThemeColors')]
-    public function testThemeColorViaSetterThrowsInvalidArgumentException(string $themeColor)
+    public function testThemeColorViaSetterThrowsInvalidArgumentException(string $themeColor): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('MessageCard themeColor must have a valid hex color format.');
@@ -185,7 +185,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         yield ['#55555'];
     }
 
-    public function testSectionViaConstructor()
+    public function testSectionViaConstructor(): void
     {
         $options = new MicrosoftTeamsOptions([
             'sections' => $sections = [(new Section())->toArray()],
@@ -194,7 +194,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame($sections, $options->toArray()['sections']);
     }
 
-    public function testSectionViaSetter()
+    public function testSectionViaSetter(): void
     {
         $options = (new MicrosoftTeamsOptions())
             ->section($section = new Section());
@@ -202,7 +202,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame([$section->toArray()], $options->toArray()['sections']);
     }
 
-    public function testActionViaConstructor()
+    public function testActionViaConstructor(): void
     {
         $options = new MicrosoftTeamsOptions([
             'potentialAction' => $actions = [(new OpenUriAction())->toArray()],
@@ -211,7 +211,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame($actions, $options->toArray()['potentialAction']);
     }
 
-    public function testActionViaSetter()
+    public function testActionViaSetter(): void
     {
         $options = (new MicrosoftTeamsOptions())
             ->action($action = new OpenUriAction());
@@ -219,7 +219,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame([$action->toArray()], $options->toArray()['potentialAction']);
     }
 
-    public function testActionViaConstructorThrowsIfMaxNumberOfActionsIsReached()
+    public function testActionViaConstructorThrowsIfMaxNumberOfActionsIsReached(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('MessageCard maximum number of "potentialAction" has been reached (4).');
@@ -235,7 +235,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         ]);
     }
 
-    public function testActionViaSetterThrowsIfMaxNumberOfActionsIsReached()
+    public function testActionViaSetterThrowsIfMaxNumberOfActionsIsReached(): void
     {
         $options = (new MicrosoftTeamsOptions())
             ->action(new OpenUriAction())
@@ -249,7 +249,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $options->action(new OpenUriAction());
     }
 
-    public function testExpectedActorViaConstructor()
+    public function testExpectedActorViaConstructor(): void
     {
         $options = new MicrosoftTeamsOptions([
             'expectedActors' => $expectedActors = ['Oskar'],
@@ -258,7 +258,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame($expectedActors, $options->toArray()['expectedActors']);
     }
 
-    public function testExpectedActorViaSetter()
+    public function testExpectedActorViaSetter(): void
     {
         $options = (new MicrosoftTeamsOptions())
             ->expectedActor($expectedActor = 'Oskar');
@@ -266,7 +266,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame([$expectedActor], $options->toArray()['expectedActors']);
     }
 
-    public function testExpectedActorsViaConstructor()
+    public function testExpectedActorsViaConstructor(): void
     {
         $options = new MicrosoftTeamsOptions([
             'expectedActors' => $expectedActors = ['Oskar', 'Fabien'],
@@ -275,7 +275,7 @@ final class MicrosoftTeamsOptionsTest extends TestCase
         $this->assertSame($expectedActors, $options->toArray()['expectedActors']);
     }
 
-    public function testExpectedActorsViaSetter()
+    public function testExpectedActorsViaSetter(): void
     {
         $options = (new MicrosoftTeamsOptions())
             ->expectedActor($expectedActor1 = 'Oskar')

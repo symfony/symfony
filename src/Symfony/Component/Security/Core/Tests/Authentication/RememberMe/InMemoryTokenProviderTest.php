@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\Exception\TokenNotFoundException;
 
 class InMemoryTokenProviderTest extends TestCase
 {
-    public function testCreateNewToken()
+    public function testCreateNewToken(): void
     {
         $provider = new InMemoryTokenProvider();
 
@@ -28,13 +28,13 @@ class InMemoryTokenProviderTest extends TestCase
         $this->assertSame($provider->loadTokenBySeries('foo'), $token);
     }
 
-    public function testLoadTokenBySeriesThrowsNotFoundException()
+    public function testLoadTokenBySeriesThrowsNotFoundException(): void
     {
         $this->expectException(TokenNotFoundException::class);
         (new InMemoryTokenProvider())->loadTokenBySeries('foo');
     }
 
-    public function testUpdateToken()
+    public function testUpdateToken(): void
     {
         $provider = new InMemoryTokenProvider();
 
@@ -47,7 +47,7 @@ class InMemoryTokenProviderTest extends TestCase
         $this->assertEquals($token->getLastUsed(), $lastUsed);
     }
 
-    public function testDeleteToken()
+    public function testDeleteToken(): void
     {
         $provider = new InMemoryTokenProvider();
 

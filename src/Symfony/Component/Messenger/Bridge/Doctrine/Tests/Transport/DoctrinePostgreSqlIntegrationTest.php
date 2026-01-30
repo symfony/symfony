@@ -54,7 +54,7 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $this->driverConnection->close();
     }
 
-    public function testPostgreSqlConnectionSendAndGet()
+    public function testPostgreSqlConnectionSendAndGet(): void
     {
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
 
@@ -65,7 +65,7 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $this->assertNull($this->connection->get());
     }
 
-    public function testSkipLocked()
+    public function testSkipLocked(): void
     {
         $connection = new PostgreSqlConnection(['table_name' => 'queue_table', 'skip_locked' => true], $this->driverConnection);
 

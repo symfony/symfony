@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\Role\RoleHierarchy;
 
 class RoleHierarchyTest extends TestCase
 {
-    public function testGetReachableRoleNames()
+    public function testGetReachableRoleNames(): void
     {
         $role = new RoleHierarchy([
             'ROLE_ADMIN' => ['ROLE_USER'],

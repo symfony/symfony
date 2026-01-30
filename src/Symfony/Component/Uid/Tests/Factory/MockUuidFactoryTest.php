@@ -27,7 +27,7 @@ use Symfony\Component\Uid\UuidV8;
 class MockUuidFactoryTest extends TestCase
 {
     #[DataProvider('provideSequences')]
-    public function testCreate(iterable $sequence, array $expected)
+    public function testCreate(iterable $sequence, array $expected): void
     {
         $factory = new MockUuidFactory($sequence);
         foreach ($expected as $expectedUuid) {
@@ -83,7 +83,7 @@ class MockUuidFactoryTest extends TestCase
         ];
     }
 
-    public function testCreateThrowsExceptionOnInvalidUuidType()
+    public function testCreateThrowsExceptionOnInvalidUuidType(): void
     {
         $factory = new MockUuidFactory([123]);
 
@@ -93,7 +93,7 @@ class MockUuidFactoryTest extends TestCase
         $factory->create();
     }
 
-    public function testCreateThrowsExceptionWhenSequenceIsEmpty()
+    public function testCreateThrowsExceptionWhenSequenceIsEmpty(): void
     {
         $factory = new MockUuidFactory([
             UuidV1::fromString('6ba7b810-9dad-11d1-80b4-00c04fd430c8'),
@@ -109,7 +109,7 @@ class MockUuidFactoryTest extends TestCase
         $factory->create();
     }
 
-    public function testRandomBasedReturnsUuidV4FromSequence()
+    public function testRandomBasedReturnsUuidV4FromSequence(): void
     {
         $uuid1 = UuidV4::fromString('6ba7b810-9dad-41d1-80b4-00c04fd430c8');
         $uuid2 = UuidV4::fromString('9d235ae3-a819-41e3-9216-7858734f543d');
@@ -126,7 +126,7 @@ class MockUuidFactoryTest extends TestCase
         $this->assertEquals(UuidV4::fromString($uuid3), $randomFactory->create());
     }
 
-    public function testRandomBasedThrowsExceptionWhenSequenceIsEmpty()
+    public function testRandomBasedThrowsExceptionWhenSequenceIsEmpty(): void
     {
         $factory = new MockUuidFactory([
             UuidV4::fromString('6ba7b810-9dad-41d1-80b4-00c04fd430c8'),
@@ -143,7 +143,7 @@ class MockUuidFactoryTest extends TestCase
         $randomFactory->create();
     }
 
-    public function testRandomBasedThrowsExceptionOnInvalidType()
+    public function testRandomBasedThrowsExceptionOnInvalidType(): void
     {
         $factory = new MockUuidFactory([
             UuidV5::fromString('6ba7b810-9dad-51d1-80b4-00c04fd430c8'),
@@ -156,7 +156,7 @@ class MockUuidFactoryTest extends TestCase
         $randomFactory->create();
     }
 
-    public function testTimeBasedReturnsUuidFromSequence()
+    public function testTimeBasedReturnsUuidFromSequence(): void
     {
         $uuid1 = UuidV1::fromString('6ba7b810-9dad-11d1-80b4-00c04fd430c8');
         $uuid2 = UuidV6::fromString('9d235ae3-a819-61e3-9216-7858734f543d');
@@ -176,7 +176,7 @@ class MockUuidFactoryTest extends TestCase
         $this->assertEquals(UuidV1::fromString($uuid4), $timeFactory->create());
     }
 
-    public function testTimeBasedThrowsExceptionWhenSequenceIsEmpty()
+    public function testTimeBasedThrowsExceptionWhenSequenceIsEmpty(): void
     {
         $factory = new MockUuidFactory([
             UuidV1::fromString('6ba7b810-9dad-11d1-80b4-00c04fd430c8'),
@@ -193,7 +193,7 @@ class MockUuidFactoryTest extends TestCase
         $timeFactory->create();
     }
 
-    public function testTimeBasedThrowsExceptionOnInvalidType()
+    public function testTimeBasedThrowsExceptionOnInvalidType(): void
     {
         $factory = new MockUuidFactory([
             UuidV4::fromString('6ba7b810-9dad-41d1-80b4-00c04fd430c8'),
@@ -206,7 +206,7 @@ class MockUuidFactoryTest extends TestCase
         $timeFactory->create();
     }
 
-    public function testTimeBasedThrowsExceptionOnMismatchedTime()
+    public function testTimeBasedThrowsExceptionOnMismatchedTime(): void
     {
         $factory = new MockUuidFactory([
             UuidV1::fromString('6ba7b810-9dad-11d1-80b4-00c04fd430c8'),
@@ -221,7 +221,7 @@ class MockUuidFactoryTest extends TestCase
         $timeFactory->create($wrongTime);
     }
 
-    public function testNameBasedReturnsUuidFromSequence()
+    public function testNameBasedReturnsUuidFromSequence(): void
     {
         $namespace = 'dns';
         $uuid1 = UuidV5::fromString('4be0643f-1d98-573b-97cd-ca98a65347dd');
@@ -236,7 +236,7 @@ class MockUuidFactoryTest extends TestCase
         $this->assertSame($uuid2, $factory->nameBased($namespace)->create('test'));
     }
 
-    public function testNameBasedThrowsExceptionOnNullNamespace()
+    public function testNameBasedThrowsExceptionOnNullNamespace(): void
     {
         $uuid = UuidV5::fromString('4be0643f-1d98-573b-97cd-ca98a65347dd');
         $factory = new MockUuidFactory([
@@ -248,7 +248,7 @@ class MockUuidFactoryTest extends TestCase
         $factory->nameBased()->create('test');
     }
 
-    public function testNameBasedThrowsExceptionWhenSequenceIsEmpty()
+    public function testNameBasedThrowsExceptionWhenSequenceIsEmpty(): void
     {
         $namespace = 'dns';
         $uuid1 = UuidV5::fromString('4be0643f-1d98-573b-97cd-ca98a65347dd');
@@ -267,7 +267,7 @@ class MockUuidFactoryTest extends TestCase
         $factory->nameBased($namespace)->create('test');
     }
 
-    public function testNameBasedThrowsExceptionOnInvalidType()
+    public function testNameBasedThrowsExceptionOnInvalidType(): void
     {
         $uuid = UuidV7::fromString('4be0643f-1d98-773b-97cd-ca98a65347dd');
 
@@ -281,7 +281,7 @@ class MockUuidFactoryTest extends TestCase
         $factory->nameBased('dns')->create('test');
     }
 
-    public function testNameBasedThrowsExceptionOnMismatchedNamespace()
+    public function testNameBasedThrowsExceptionOnMismatchedNamespace(): void
     {
         $uuid = UuidV5::fromString('4be0643f-1d98-573b-97cd-ca98a65347dd');
 
@@ -295,7 +295,7 @@ class MockUuidFactoryTest extends TestCase
         $factory->nameBased('url')->create('test');
     }
 
-    public function testNameBasedThrowsExceptionOnMismatchedName()
+    public function testNameBasedThrowsExceptionOnMismatchedName(): void
     {
         $uuid = UuidV5::fromString('4be0643f-1d98-573b-97cd-ca98a65347dd');
 

@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class NullOutputTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $output = new NullOutput();
 
@@ -32,7 +32,7 @@ class NullOutputTest extends TestCase
         $this->assertFalse($output->isDecorated(), '->isDecorated() returns false');
     }
 
-    public function testVerbosity()
+    public function testVerbosity(): void
     {
         $output = new NullOutput();
         $this->assertSame(OutputInterface::VERBOSITY_SILENT, $output->getVerbosity(), '->getVerbosity() returns VERBOSITY_SILENT for NullOutput by default');
@@ -41,14 +41,14 @@ class NullOutputTest extends TestCase
         $this->assertSame(OutputInterface::VERBOSITY_SILENT, $output->getVerbosity(), '->getVerbosity() always returns VERBOSITY_QUIET for NullOutput');
     }
 
-    public function testGetFormatter()
+    public function testGetFormatter(): void
     {
         $output = new NullOutput();
         $this->assertInstanceof(NullOutputFormatter::class, $formatter = $output->getFormatter());
         $this->assertSame($formatter, $output->getFormatter());
     }
 
-    public function testSetFormatter()
+    public function testSetFormatter(): void
     {
         $output = new NullOutput();
         $outputFormatter = new OutputFormatter();
@@ -56,45 +56,45 @@ class NullOutputTest extends TestCase
         $this->assertNotSame($outputFormatter, $output->getFormatter());
     }
 
-    public function testSetVerbosity()
+    public function testSetVerbosity(): void
     {
         $output = new NullOutput();
         $output->setVerbosity(Output::VERBOSITY_NORMAL);
         $this->assertEquals(Output::VERBOSITY_SILENT, $output->getVerbosity());
     }
 
-    public function testSetDecorated()
+    public function testSetDecorated(): void
     {
         $output = new NullOutput();
         $output->setDecorated(true);
         $this->assertFalse($output->isDecorated());
     }
 
-    public function testIsSilent()
+    public function testIsSilent(): void
     {
         $output = new NullOutput();
         $this->assertTrue($output->isSilent());
     }
 
-    public function testIsQuiet()
+    public function testIsQuiet(): void
     {
         $output = new NullOutput();
         $this->assertFalse($output->isQuiet());
     }
 
-    public function testIsVerbose()
+    public function testIsVerbose(): void
     {
         $output = new NullOutput();
         $this->assertFalse($output->isVerbose());
     }
 
-    public function testIsVeryVerbose()
+    public function testIsVeryVerbose(): void
     {
         $output = new NullOutput();
         $this->assertFalse($output->isVeryVerbose());
     }
 
-    public function testIsDebug()
+    public function testIsDebug(): void
     {
         $output = new NullOutput();
         $this->assertFalse($output->isDebug());

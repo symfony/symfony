@@ -32,7 +32,7 @@ class TranslationDebugCommandTest extends TestCase
     private Filesystem $fs;
     private string $translationDir;
 
-    public function testDebugMissingMessages()
+    public function testDebugMissingMessages(): void
     {
         $tester = $this->createCommandTester(['foo' => 'foo']);
         $res = $tester->execute(['locale' => 'en', 'bundle' => 'foo']);
@@ -41,7 +41,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertSame(TranslationDebugCommand::EXIT_CODE_MISSING, $res);
     }
 
-    public function testDebugUnusedMessages()
+    public function testDebugUnusedMessages(): void
     {
         $tester = $this->createCommandTester([], ['foo' => 'foo']);
         $res = $tester->execute(['locale' => 'en', 'bundle' => 'foo']);
@@ -50,7 +50,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertSame(TranslationDebugCommand::EXIT_CODE_UNUSED, $res);
     }
 
-    public function testDebugFallbackMessages()
+    public function testDebugFallbackMessages(): void
     {
         $tester = $this->createCommandTester(['foo' => 'foo'], ['foo' => 'foo']);
         $res = $tester->execute(['locale' => 'fr', 'bundle' => 'foo']);
@@ -59,7 +59,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertSame(TranslationDebugCommand::EXIT_CODE_FALLBACK, $res);
     }
 
-    public function testNoDefinedMessages()
+    public function testNoDefinedMessages(): void
     {
         $tester = $this->createCommandTester();
         $res = $tester->execute(['locale' => 'fr', 'bundle' => 'test']);
@@ -68,7 +68,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertSame(TranslationDebugCommand::EXIT_CODE_GENERAL_ERROR, $res);
     }
 
-    public function testDebugDefaultDirectory()
+    public function testDebugDefaultDirectory(): void
     {
         $tester = $this->createCommandTester(['foo' => 'foo'], ['bar' => 'bar']);
         $res = $tester->execute(['locale' => 'en']);
@@ -79,7 +79,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertSame($expectedExitStatus, $res);
     }
 
-    public function testDebugDefaultRootDirectory()
+    public function testDebugDefaultRootDirectory(): void
     {
         $this->fs->remove($this->translationDir);
         $this->fs = new Filesystem();
@@ -98,7 +98,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertSame($expectedExitStatus, $res);
     }
 
-    public function testDebugCustomDirectory()
+    public function testDebugCustomDirectory(): void
     {
         $this->fs->mkdir($this->translationDir.'/customDir/translations');
         $this->fs->mkdir($this->translationDir.'/customDir/templates');
@@ -118,7 +118,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertSame($expectedExitStatus, $res);
     }
 
-    public function testDebugInvalidDirectory()
+    public function testDebugInvalidDirectory(): void
     {
         $kernel = $this->createMock(KernelInterface::class);
         $kernel->expects($this->once())
@@ -133,7 +133,7 @@ class TranslationDebugCommandTest extends TestCase
         $tester->execute(['locale' => 'en', 'bundle' => 'dir']);
     }
 
-    public function testNoErrorWithOnlyMissingOptionAndNoResults()
+    public function testNoErrorWithOnlyMissingOptionAndNoResults(): void
     {
         $tester = $this->createCommandTester([], ['foo' => 'foo']);
         $res = $tester->execute(['locale' => 'en', '--only-missing' => true]);
@@ -141,7 +141,7 @@ class TranslationDebugCommandTest extends TestCase
         $this->assertSame(Command::SUCCESS, $res);
     }
 
-    public function testNoErrorWithOnlyUnusedOptionAndNoResults()
+    public function testNoErrorWithOnlyUnusedOptionAndNoResults(): void
     {
         $tester = $this->createCommandTester(['foo' => 'foo']);
         $res = $tester->execute(['locale' => 'en', '--only-unused' => true]);
@@ -178,7 +178,7 @@ class TranslationDebugCommandTest extends TestCase
             $extractor
                 ->method('extract')
                 ->willReturnCallback(
-                    static function ($path, $catalogue) use ($extractedMessages) {
+                    static function ($path, $catalogue) use ($extractedMessages): void {
                         $catalogue->add($extractedMessages);
                     }
                 );
@@ -188,7 +188,7 @@ class TranslationDebugCommandTest extends TestCase
         $loader
             ->method('read')
             ->willReturnCallback(
-                static function ($path, $catalogue) use ($loadedMessages) {
+                static function ($path, $catalogue) use ($loadedMessages): void {
                     $catalogue->add($loadedMessages);
                 }
             );
@@ -233,7 +233,7 @@ class TranslationDebugCommandTest extends TestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $extractedMessagesWithDomains = [
             'messages' => [
@@ -250,7 +250,7 @@ class TranslationDebugCommandTest extends TestCase
         $extractor
             ->method('extract')
             ->willReturnCallback(
-                static function ($path, $catalogue) use ($extractedMessagesWithDomains) {
+                static function ($path, $catalogue) use ($extractedMessagesWithDomains): void {
                     foreach ($extractedMessagesWithDomains as $domain => $message) {
                         $catalogue->add($message, $domain);
                     }

@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\GatewayApi\GatewayApiOptions;
 
 class GatewayApiOptionsTest extends TestCase
 {
-    public function testGatewayApiOptions()
+    public function testGatewayApiOptions(): void
     {
         $gatewayApiOptions = (new GatewayApiOptions())
             ->class('test_class')

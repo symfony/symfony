@@ -20,7 +20,7 @@ class StateMachineGraphvizDumperTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
-    public function testDumpWithoutMarking()
+    public function testDumpWithoutMarking(): void
     {
         $definition = $this->createComplexStateMachineDefinition();
 
@@ -48,7 +48,7 @@ class StateMachineGraphvizDumperTest extends TestCase
         $this->assertEquals($expected, $dump);
     }
 
-    public function testDumpWithMarking()
+    public function testDumpWithMarking(): void
     {
         $definition = $this->createComplexStateMachineDefinition();
         $marking = new Marking(['b' => 1]);

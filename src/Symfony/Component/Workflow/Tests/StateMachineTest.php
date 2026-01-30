@@ -22,7 +22,7 @@ class StateMachineTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
-    public function testCan()
+    public function testCan(): void
     {
         $definition = $this->createComplexStateMachineDefinition();
 
@@ -39,7 +39,7 @@ class StateMachineTest extends TestCase
         $this->assertFalse($net->can($subject, 't1'));
     }
 
-    public function testCanWithMultipleTransition()
+    public function testCanWithMultipleTransition(): void
     {
         $definition = $this->createComplexStateMachineDefinition();
 
@@ -52,7 +52,7 @@ class StateMachineTest extends TestCase
         $this->assertTrue($net->can($subject, 't3'));
     }
 
-    public function testBuildTransitionBlockerList()
+    public function testBuildTransitionBlockerList(): void
     {
         $definition = $this->createComplexStateMachineDefinition();
 
@@ -68,7 +68,7 @@ class StateMachineTest extends TestCase
         $this->assertFalse($net->buildTransitionBlockerList($subject, 't1')->isEmpty());
     }
 
-    public function testBuildTransitionBlockerListWithMultipleTransitions()
+    public function testBuildTransitionBlockerListWithMultipleTransitions(): void
     {
         $definition = $this->createComplexStateMachineDefinition();
 
@@ -80,14 +80,14 @@ class StateMachineTest extends TestCase
         $this->assertTrue($net->buildTransitionBlockerList($subject, 't3')->isEmpty());
     }
 
-    public function testBuildTransitionBlockerListReturnsExpectedReasonOnBranchMerge()
+    public function testBuildTransitionBlockerListReturnsExpectedReasonOnBranchMerge(): void
     {
         $definition = $this->createComplexStateMachineDefinition();
 
         $dispatcher = new EventDispatcher();
         $net = new StateMachine($definition, null, $dispatcher);
 
-        $dispatcher->addListener('workflow.guard', static function (GuardEvent $event) {
+        $dispatcher->addListener('workflow.guard', static function (GuardEvent $event): void {
             $event->addTransitionBlocker(new TransitionBlocker(\sprintf('Transition blocker of place %s', $event->getTransition()->getFroms(true)[0]->place), 'blocker'));
         });
 
@@ -116,14 +116,14 @@ class StateMachineTest extends TestCase
         $this->assertSame('blocker', $blockers[0]->getCode());
     }
 
-    public function testApplyReturnsExpectedReasonOnBranchMerge()
+    public function testApplyReturnsExpectedReasonOnBranchMerge(): void
     {
         $definition = $this->createComplexStateMachineDefinition();
 
         $dispatcher = new EventDispatcher();
         $net = new StateMachine($definition, null, $dispatcher);
 
-        $dispatcher->addListener('workflow.guard', static function (GuardEvent $event) {
+        $dispatcher->addListener('workflow.guard', static function (GuardEvent $event): void {
             $event->addTransitionBlocker(new TransitionBlocker(\sprintf('Transition blocker of place %s', $event->getTransition()->getFroms(true)[0]->place), 'blocker'));
         });
 

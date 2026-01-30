@@ -31,7 +31,7 @@ class FlockStoreTest extends AbstractStoreTestCase
         return new FlockStore();
     }
 
-    public function testConstructWhenRepositoryCannotBeCreated()
+    public function testConstructWhenRepositoryCannotBeCreated(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The FlockStore directory "/a/b/c/d/e" does not exists and cannot be created.');
@@ -42,7 +42,7 @@ class FlockStoreTest extends AbstractStoreTestCase
         new FlockStore('/a/b/c/d/e');
     }
 
-    public function testConstructWhenRepositoryIsNotWriteable()
+    public function testConstructWhenRepositoryIsNotWriteable(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The FlockStore directory "/" is not writable.');
@@ -53,7 +53,7 @@ class FlockStoreTest extends AbstractStoreTestCase
         new FlockStore('/');
     }
 
-    public function testConstructWithSubdir()
+    public function testConstructWithSubdir(): void
     {
         new FlockStore($dir = (sys_get_temp_dir().'/sf-flock'));
         $this->assertDirectoryExists($dir);
@@ -61,7 +61,7 @@ class FlockStoreTest extends AbstractStoreTestCase
         @rmdir($dir);
     }
 
-    public function testSaveSanitizeName()
+    public function testSaveSanitizeName(): void
     {
         $store = $this->getStore();
 
@@ -82,7 +82,7 @@ class FlockStoreTest extends AbstractStoreTestCase
         $store->delete($key);
     }
 
-    public function testSaveSanitizeLongName()
+    public function testSaveSanitizeLongName(): void
     {
         $store = $this->getStore();
 

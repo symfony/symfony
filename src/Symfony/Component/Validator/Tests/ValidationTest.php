@@ -22,13 +22,13 @@ use Symfony\Component\Validator\Validation;
  */
 class ValidationTest extends TestCase
 {
-    public function testCreateCallableValid()
+    public function testCreateCallableValid(): void
     {
         $validator = Validation::createCallable(new NotBlank());
         $this->assertEquals('test@example.com', $validator('test@example.com'));
     }
 
-    public function testCreateCallableInvalid()
+    public function testCreateCallableInvalid(): void
     {
         $validator = Validation::createCallable(new Blank());
         try {
@@ -43,13 +43,13 @@ class ValidationTest extends TestCase
         }
     }
 
-    public function testCreateIsValidCallableValid()
+    public function testCreateIsValidCallableValid(): void
     {
         $validator = Validation::createIsValidCallable(new NotBlank());
         $this->assertTrue($validator('test@example.com'));
     }
 
-    public function testCreateIsValidCallableInvalid()
+    public function testCreateIsValidCallableInvalid(): void
     {
         $validator = Validation::createIsValidCallable(new Blank());
         $this->assertFalse($validator('test', $violations));

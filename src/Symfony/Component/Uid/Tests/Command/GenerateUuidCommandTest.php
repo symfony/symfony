@@ -27,7 +27,7 @@ use Symfony\Component\Uid\UuidV7;
 
 final class GenerateUuidCommandTest extends TestCase
 {
-    public function testDefaults()
+    public function testDefaults(): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
         $this->assertSame(0, $commandTester->execute([]));
@@ -38,7 +38,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertInstanceOf(UuidV4::class, Uuid::fromRfc4122(trim($commandTester->getDisplay())));
     }
 
-    public function testTimeBasedWithInvalidNode()
+    public function testTimeBasedWithInvalidNode(): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
 
@@ -46,7 +46,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertStringContainsString('Invalid node "foo"', $commandTester->getDisplay());
     }
 
-    public function testTimeBasedWithUnparsableTimestamp()
+    public function testTimeBasedWithUnparsableTimestamp(): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
 
@@ -54,7 +54,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertStringContainsString('Invalid timestamp "foo"', $commandTester->getDisplay());
     }
 
-    public function testTimeBasedWithTimestampBeforeUUIDEpoch()
+    public function testTimeBasedWithTimestampBeforeUUIDEpoch(): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
 
@@ -62,7 +62,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertStringContainsString('The timestamp must be positive.', $commandTester->getDisplay());
     }
 
-    public function testTimeBased()
+    public function testTimeBased(): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
         $this->assertSame(0, $commandTester->execute(['--time-based' => 'now']));
@@ -81,7 +81,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertStringMatchesFormat('1c31e868-c148-11d3-%s-691421b27a00', (string) $uuid);
     }
 
-    public function testNameBasedWithInvalidNamespace()
+    public function testNameBasedWithInvalidNamespace(): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
 
@@ -89,7 +89,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertStringContainsString('Invalid namespace "bar"', $commandTester->getDisplay());
     }
 
-    public function testNameBasedWithoutNamespace()
+    public function testNameBasedWithoutNamespace(): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
 
@@ -97,7 +97,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertStringContainsString('Missing namespace', $commandTester->getDisplay());
     }
 
-    public function testNameBased()
+    public function testNameBased(): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
         $this->assertSame(0, $commandTester->execute(['--name-based' => 'foo', '--namespace' => 'bcdf2a0e-e287-4d20-a92f-103eda39b100']));
@@ -115,7 +115,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertEquals(new UuidV3('54950ff1-375c-33e8-a992-2109e384091f'), Uuid::fromRfc4122(trim($commandTester->getDisplay())));
     }
 
-    public function testRandomBased()
+    public function testRandomBased(): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
         $this->assertSame(0, $commandTester->execute(['--random-based' => null]));
@@ -123,7 +123,7 @@ final class GenerateUuidCommandTest extends TestCase
     }
 
     #[DataProvider('provideInvalidCombinationOfBasedOptions')]
-    public function testInvalidCombinationOfBasedOptions(array $input)
+    public function testInvalidCombinationOfBasedOptions(array $input): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
 
@@ -142,7 +142,7 @@ final class GenerateUuidCommandTest extends TestCase
     }
 
     #[DataProvider('provideExtraNodeOption')]
-    public function testExtraNodeOption(array $input)
+    public function testExtraNodeOption(array $input): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
 
@@ -160,7 +160,7 @@ final class GenerateUuidCommandTest extends TestCase
     }
 
     #[DataProvider('provideExtraNamespaceOption')]
-    public function testExtraNamespaceOption(array $input)
+    public function testExtraNamespaceOption(array $input): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
 
@@ -177,7 +177,7 @@ final class GenerateUuidCommandTest extends TestCase
         ];
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
 
@@ -190,7 +190,7 @@ final class GenerateUuidCommandTest extends TestCase
         }
     }
 
-    public function testInvalidFormat()
+    public function testInvalidFormat(): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
 
@@ -198,7 +198,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertStringContainsString('Invalid format "foo"', $commandTester->getDisplay());
     }
 
-    public function testFormat()
+    public function testFormat(): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
 
@@ -207,7 +207,7 @@ final class GenerateUuidCommandTest extends TestCase
         Uuid::fromBase32(trim($commandTester->getDisplay()));
     }
 
-    public function testTimestampIncrementWhenGeneratingSeveralTimeBasedUuids()
+    public function testTimestampIncrementWhenGeneratingSeveralTimeBasedUuids(): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
 
@@ -218,7 +218,7 @@ final class GenerateUuidCommandTest extends TestCase
         $this->assertNotSame($uuids[0], $uuids[1]);
     }
 
-    public function testNamespacePredefinedKeyword()
+    public function testNamespacePredefinedKeyword(): void
     {
         $commandTester = new CommandTester(new GenerateUuidCommand());
 
@@ -228,7 +228,7 @@ final class GenerateUuidCommandTest extends TestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $application = new Application();
         $application->addCommand(new GenerateUuidCommand());

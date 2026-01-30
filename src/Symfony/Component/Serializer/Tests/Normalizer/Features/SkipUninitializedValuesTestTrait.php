@@ -23,7 +23,7 @@ trait SkipUninitializedValuesTestTrait
     abstract protected function getNormalizerForSkipUninitializedValues(): AbstractObjectNormalizer;
 
     #[DataProvider('skipUninitializedValuesFlagProvider')]
-    public function testSkipUninitializedValues(array $context)
+    public function testSkipUninitializedValues(array $context): void
     {
         $object = new TypedPropertiesObjectWithGetters();
 
@@ -47,7 +47,7 @@ trait SkipUninitializedValuesTestTrait
         yield 'using default context value' => [['groups' => ['foo']]];
     }
 
-    public function testWithoutSkipUninitializedValues()
+    public function testWithoutSkipUninitializedValues(): void
     {
         $object = new TypedPropertiesObjectWithGetters();
 

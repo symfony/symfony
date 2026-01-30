@@ -26,7 +26,7 @@ class TransitionTest extends TestCase
     }
 
     #[DataProvider('provideConstructorTests')]
-    public function testConstructor(mixed $froms, mixed $tos)
+    public function testConstructor(mixed $froms, mixed $tos): void
     {
         $transition = new Transition('name', $froms, $tos);
 
@@ -39,7 +39,7 @@ class TransitionTest extends TestCase
         $this->assertSame(1, $transition->getTos(true)[0]->weight);
     }
 
-    public function testConstructorWithInvalidData()
+    public function testConstructorWithInvalidData(): void
     {
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('The type of arc is invalid. Expected string or Arc, got "bool".');
@@ -47,7 +47,7 @@ class TransitionTest extends TestCase
         new Transition('name', [true], ['a']);
     }
 
-    public function testLegacyGetter()
+    public function testLegacyGetter(): void
     {
         $transition = new Transition('name', 'a', 'b');
 

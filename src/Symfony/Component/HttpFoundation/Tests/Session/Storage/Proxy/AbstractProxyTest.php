@@ -31,26 +31,26 @@ class AbstractProxyTest extends TestCase
         $this->proxy = new class extends AbstractProxy {};
     }
 
-    public function testGetSaveHandlerName()
+    public function testGetSaveHandlerName(): void
     {
         $this->assertNull($this->proxy->getSaveHandlerName());
     }
 
-    public function testIsSessionHandlerInterface()
+    public function testIsSessionHandlerInterface(): void
     {
         $this->assertFalse($this->proxy->isSessionHandlerInterface());
         $sh = new SessionHandlerProxy(new \SessionHandler());
         $this->assertTrue($sh->isSessionHandlerInterface());
     }
 
-    public function testIsWrapper()
+    public function testIsWrapper(): void
     {
         $this->assertFalse($this->proxy->isWrapper());
     }
 
     #[PreserveGlobalState(false)]
     #[RunInSeparateProcess]
-    public function testIsActive()
+    public function testIsActive(): void
     {
         $this->assertFalse($this->proxy->isActive());
         session_start();
@@ -59,7 +59,7 @@ class AbstractProxyTest extends TestCase
 
     #[PreserveGlobalState(false)]
     #[RunInSeparateProcess]
-    public function testName()
+    public function testName(): void
     {
         $this->assertEquals(session_name(), $this->proxy->getName());
         $this->proxy->setName('foo');
@@ -69,7 +69,7 @@ class AbstractProxyTest extends TestCase
 
     #[PreserveGlobalState(false)]
     #[RunInSeparateProcess]
-    public function testNameException()
+    public function testNameException(): void
     {
         $this->expectException(\LogicException::class);
         session_start();
@@ -78,7 +78,7 @@ class AbstractProxyTest extends TestCase
 
     #[PreserveGlobalState(false)]
     #[RunInSeparateProcess]
-    public function testId()
+    public function testId(): void
     {
         $this->assertEquals(session_id(), $this->proxy->getId());
         $this->proxy->setId('foo');
@@ -88,7 +88,7 @@ class AbstractProxyTest extends TestCase
 
     #[PreserveGlobalState(false)]
     #[RunInSeparateProcess]
-    public function testIdException()
+    public function testIdException(): void
     {
         $this->expectException(\LogicException::class);
         session_start();

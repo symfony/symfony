@@ -17,7 +17,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToTimestampTra
 
 class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $transformer = new DateTimeToTimestampTransformer('UTC', 'UTC');
 
@@ -27,14 +27,14 @@ class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
         $this->assertEquals($output, $transformer->transform($input));
     }
 
-    public function testTransformEmpty()
+    public function testTransformEmpty(): void
     {
         $transformer = new DateTimeToTimestampTransformer();
 
         $this->assertNull($transformer->transform(null));
     }
 
-    public function testTransformWithDifferentTimezones()
+    public function testTransformWithDifferentTimezones(): void
     {
         $transformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'America/New_York');
 
@@ -45,7 +45,7 @@ class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
         $this->assertEquals($output, $transformer->transform($input));
     }
 
-    public function testTransformFromDifferentTimezone()
+    public function testTransformFromDifferentTimezone(): void
     {
         $transformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'UTC');
 
@@ -58,7 +58,7 @@ class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
         $this->assertEquals($output, $transformer->transform($input));
     }
 
-    public function testTransformDateTimeImmutable()
+    public function testTransformDateTimeImmutable(): void
     {
         $transformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'America/New_York');
 
@@ -69,7 +69,7 @@ class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
         $this->assertEquals($output, $transformer->transform($input));
     }
 
-    public function testTransformExpectsDateTime()
+    public function testTransformExpectsDateTime(): void
     {
         $transformer = new DateTimeToTimestampTransformer();
 
@@ -78,7 +78,7 @@ class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
         $transformer->transform('1234');
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $reverseTransformer = new DateTimeToTimestampTransformer('UTC', 'UTC');
 
@@ -88,14 +88,14 @@ class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
         $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
-    public function testReverseTransformEmpty()
+    public function testReverseTransformEmpty(): void
     {
         $reverseTransformer = new DateTimeToTimestampTransformer();
 
         $this->assertNull($reverseTransformer->reverseTransform(null));
     }
 
-    public function testReverseTransformWithDifferentTimezones()
+    public function testReverseTransformWithDifferentTimezones(): void
     {
         $reverseTransformer = new DateTimeToTimestampTransformer('Asia/Hong_Kong', 'America/New_York');
 
@@ -106,7 +106,7 @@ class DateTimeToTimestampTransformerTest extends BaseDateTimeTransformerTestCase
         $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
-    public function testReverseTransformExpectsValidTimestamp()
+    public function testReverseTransformExpectsValidTimestamp(): void
     {
         $reverseTransformer = new DateTimeToTimestampTransformer();
 

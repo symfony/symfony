@@ -34,7 +34,7 @@ class DumperTest extends TestCase
     }
 
     #[DataProvider('provideVariables')]
-    public function testInvoke($variable)
+    public function testInvoke($variable): void
     {
         $dumper = new Dumper(new NullOutput());
 

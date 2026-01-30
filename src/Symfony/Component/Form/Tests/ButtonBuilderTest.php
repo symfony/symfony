@@ -33,12 +33,12 @@ class ButtonBuilderTest extends TestCase
     }
 
     #[DataProvider('getValidNames')]
-    public function testValidNames($name)
+    public function testValidNames($name): void
     {
         $this->assertInstanceOf(ButtonBuilder::class, new ButtonBuilder($name));
     }
 
-    public function testNameContainingIllegalCharacters()
+    public function testNameContainingIllegalCharacters(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The name "button[]" contains illegal characters. Names should start with a letter, digit or underscore and only contain letters, digits, numbers, underscores ("_"), hyphens ("-") and colons (":").');
@@ -55,7 +55,7 @@ class ButtonBuilderTest extends TestCase
     }
 
     #[DataProvider('getInvalidNames')]
-    public function testInvalidNames($name)
+    public function testInvalidNames($name): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Buttons cannot have empty names.');

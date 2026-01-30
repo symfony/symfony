@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 
 class MultiplierRetryStrategyTest extends TestCase
 {
-    public function testIsRetryable()
+    public function testIsRetryable(): void
     {
         $strategy = new MultiplierRetryStrategy(3);
         $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0)]);
@@ -27,7 +27,7 @@ class MultiplierRetryStrategyTest extends TestCase
         $this->assertTrue($strategy->isRetryable($envelope));
     }
 
-    public function testIsNotRetryable()
+    public function testIsNotRetryable(): void
     {
         $strategy = new MultiplierRetryStrategy(3);
         $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(3)]);
@@ -35,14 +35,14 @@ class MultiplierRetryStrategyTest extends TestCase
         $this->assertFalse($strategy->isRetryable($envelope));
     }
 
-    public function testIsNotRetryableWithZeroMax()
+    public function testIsNotRetryableWithZeroMax(): void
     {
         $strategy = new MultiplierRetryStrategy(0);
         $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(0)]);
         $this->assertFalse($strategy->isRetryable($envelope));
     }
 
-    public function testIsRetryableWithNoStamp()
+    public function testIsRetryableWithNoStamp(): void
     {
         $strategy = new MultiplierRetryStrategy(3);
         $envelope = new Envelope(new \stdClass());
@@ -51,7 +51,7 @@ class MultiplierRetryStrategyTest extends TestCase
     }
 
     #[DataProvider('getWaitTimeTests')]
-    public function testGetWaitTime(int $delay, float $multiplier, int $maxDelay, int $previousRetries, int $expectedDelay)
+    public function testGetWaitTime(int $delay, float $multiplier, int $maxDelay, int $previousRetries, int $expectedDelay): void
     {
         $strategy = new MultiplierRetryStrategy(10, $delay, $multiplier, $maxDelay, 0);
         $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp($previousRetries)]);
@@ -59,7 +59,7 @@ class MultiplierRetryStrategyTest extends TestCase
         $this->assertSame($expectedDelay, $strategy->getWaitingTime($envelope));
     }
 
-    public function testGetWaitTimeWithOverflowingDelay()
+    public function testGetWaitTimeWithOverflowingDelay(): void
     {
         $strategy = new MultiplierRetryStrategy(512, \PHP_INT_MAX, 2, 0, 1);
         $envelope = new Envelope(new \stdClass(), [new RedeliveryStamp(10)]);
@@ -98,7 +98,7 @@ class MultiplierRetryStrategyTest extends TestCase
     }
 
     #[DataProvider('getJitterTest')]
-    public function testJitter(float $jitter, int $maxMin, int $maxMax)
+    public function testJitter(float $jitter, int $maxMin, int $maxMax): void
     {
         $strategy = new MultiplierRetryStrategy(3, 1000, 1, 0, $jitter);
         $envelope = new Envelope(new \stdClass());

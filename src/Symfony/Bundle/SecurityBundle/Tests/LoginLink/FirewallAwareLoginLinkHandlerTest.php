@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 
 class FirewallAwareLoginLinkHandlerTest extends TestCase
 {
-    public function testSuccessfulDecoration()
+    public function testSuccessfulDecoration(): void
     {
         $user = new InMemoryUser('John', 'password');
         $linkDetails = new LoginLinkDetails('http://example.com', new \DateTimeImmutable());

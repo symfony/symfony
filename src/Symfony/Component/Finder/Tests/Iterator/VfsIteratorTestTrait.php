@@ -166,7 +166,7 @@ trait VfsIteratorTestTrait
         return str_replace(\DIRECTORY_SEPARATOR, '/', $urlArr['host'].($urlArr['path'] ?? ''));
     }
 
-    protected function assertSameVfsIterator(array $expected, \Traversable $iterator)
+    protected function assertSameVfsIterator(array $expected, \Traversable $iterator): void
     {
         $values = array_map(fn (\SplFileInfo $fileinfo) => $this->stripSchemeFromVfsPath($fileinfo->getPathname()), iterator_to_array($iterator));
 

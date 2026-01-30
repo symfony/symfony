@@ -25,14 +25,14 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         return new IbanValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Iban());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Iban());
 
@@ -40,7 +40,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidIbans')]
-    public function testValidIbans($iban)
+    public function testValidIbans($iban): void
     {
         $this->validator->validate($iban, new Iban());
 
@@ -48,7 +48,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidIbans')]
-    public function testValidIbansWithNewLine(string $iban)
+    public function testValidIbansWithNewLine(string $iban): void
     {
         $this->validator->validate($iban."\n", new Iban());
 
@@ -191,7 +191,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getIbansWithInvalidFormat')]
-    public function testIbansWithInvalidFormat($iban)
+    public function testIbansWithInvalidFormat($iban): void
     {
         $this->assertViolationRaised($iban, Iban::INVALID_FORMAT_ERROR);
     }
@@ -308,7 +308,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getIbansWithValidFormatButIncorrectChecksum')]
-    public function testIbansWithValidFormatButIncorrectChecksum($iban)
+    public function testIbansWithValidFormatButIncorrectChecksum($iban): void
     {
         $this->assertViolationRaised($iban, Iban::CHECKSUM_FAILED_ERROR);
     }
@@ -424,7 +424,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getUnsupportedCountryCodes')]
-    public function testIbansWithUnsupportedCountryCode($countryCode)
+    public function testIbansWithUnsupportedCountryCode($countryCode): void
     {
         $this->assertViolationRaised($countryCode.'260211000000230064016', Iban::NOT_SUPPORTED_COUNTRY_CODE_ERROR);
     }
@@ -440,18 +440,18 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testIbansWithInvalidCharacters()
+    public function testIbansWithInvalidCharacters(): void
     {
         $this->assertViolationRaised('CH930076201162385295]', Iban::INVALID_CHARACTERS_ERROR);
     }
 
     #[DataProvider('getIbansWithInvalidCountryCode')]
-    public function testIbansWithInvalidCountryCode($iban)
+    public function testIbansWithInvalidCountryCode($iban): void
     {
         $this->assertViolationRaised($iban, Iban::INVALID_COUNTRY_CODE_ERROR);
     }
 
-    public function testLoadFromAttribute()
+    public function testLoadFromAttribute(): void
     {
         $classMetadata = new ClassMetadata(IbanDummy::class);
         (new AttributeLoader())->loadClassMetadata($classMetadata);
@@ -475,7 +475,7 @@ class IbanValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    private function assertViolationRaised($iban, $code)
+    private function assertViolationRaised($iban, $code): void
     {
         $constraint = new Iban(message: 'myMessage');
 

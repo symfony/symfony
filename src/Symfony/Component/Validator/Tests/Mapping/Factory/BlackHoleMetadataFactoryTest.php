@@ -17,13 +17,13 @@ use Symfony\Component\Validator\Mapping\Factory\BlackHoleMetadataFactory;
 
 class BlackHoleMetadataFactoryTest extends TestCase
 {
-    public function testGetMetadataForThrowsALogicException()
+    public function testGetMetadataForThrowsALogicException(): void
     {
         $this->expectException(LogicException::class);
         (new BlackHoleMetadataFactory())->getMetadataFor('foo');
     }
 
-    public function testHasMetadataForReturnsFalse()
+    public function testHasMetadataForReturnsFalse(): void
     {
         $this->assertFalse((new BlackHoleMetadataFactory())->hasMetadataFor('foo'));
     }

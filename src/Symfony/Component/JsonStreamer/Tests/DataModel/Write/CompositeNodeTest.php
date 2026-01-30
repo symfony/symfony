@@ -21,7 +21,7 @@ use Symfony\Component\TypeInfo\Type;
 
 class CompositeNodeTest extends TestCase
 {
-    public function testCannotCreateWithOnlyOneType()
+    public function testCannotCreateWithOnlyOneType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('"%s" expects at least 2 nodes.', CompositeNode::class));
@@ -29,7 +29,7 @@ class CompositeNodeTest extends TestCase
         new CompositeNode('$data', [new ScalarNode('$data', Type::int())]);
     }
 
-    public function testCannotCreateWithCompositeNodeParts()
+    public function testCannotCreateWithCompositeNodeParts(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('Cannot set "%s" as a "%s" node.', CompositeNode::class, CompositeNode::class));
@@ -43,7 +43,7 @@ class CompositeNodeTest extends TestCase
         ]);
     }
 
-    public function testSortNodesOnCreation()
+    public function testSortNodesOnCreation(): void
     {
         $composite = new CompositeNode('$data', [
             $scalar = new ScalarNode('$data', Type::int()),
@@ -54,7 +54,7 @@ class CompositeNodeTest extends TestCase
         $this->assertSame([$collection, $object, $scalar], $composite->getNodes());
     }
 
-    public function testWithAccessor()
+    public function testWithAccessor(): void
     {
         $composite = new CompositeNode('$data', [
             new ScalarNode('$foo', Type::int()),

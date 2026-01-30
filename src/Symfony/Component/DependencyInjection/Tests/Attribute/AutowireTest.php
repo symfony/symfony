@@ -21,51 +21,51 @@ use Symfony\Component\ExpressionLanguage\Expression;
 class AutowireTest extends TestCase
 {
     #[DataProvider('provideMultipleParameters')]
-    public function testCanOnlySetOneParameter(array $parameters)
+    public function testCanOnlySetOneParameter(array $parameters): void
     {
         $this->expectException(LogicException::class);
 
         new Autowire(...$parameters);
     }
 
-    public function testMustSetOneParameter()
+    public function testMustSetOneParameter(): void
     {
         $this->expectException(LogicException::class);
 
         new Autowire();
     }
 
-    public function testCanUseZeroForValue()
+    public function testCanUseZeroForValue(): void
     {
         $this->assertSame('0', (new Autowire(value: '0'))->value);
     }
 
-    public function testCanUseArrayForValue()
+    public function testCanUseArrayForValue(): void
     {
         $this->assertSame(['FOO' => 'BAR'], (new Autowire(value: ['FOO' => 'BAR']))->value);
     }
 
-    public function testCanUseValueWithAtSign()
+    public function testCanUseValueWithAtSign(): void
     {
         $this->assertInstanceOf(Reference::class, (new Autowire(value: '@service'))->value);
     }
 
-    public function testCanUseValueWithDoubleAtSign()
+    public function testCanUseValueWithDoubleAtSign(): void
     {
         $this->assertSame('@service', (new Autowire(value: '@@service'))->value);
     }
 
-    public function testCanUseValueWithAtAndEqualSign()
+    public function testCanUseValueWithAtAndEqualSign(): void
     {
         $this->assertInstanceOf(Expression::class, (new Autowire(value: '@=service'))->value);
     }
 
-    public function testCanUseEnv()
+    public function testCanUseEnv(): void
     {
         $this->assertSame('%env(SOME_ENV_VAR)%', (new Autowire(env: 'SOME_ENV_VAR'))->value);
     }
 
-    public function testCanUseParam()
+    public function testCanUseParam(): void
     {
         $this->assertSame('%some.param%', (new Autowire(param: 'some.param'))->value);
     }
@@ -83,7 +83,7 @@ class AutowireTest extends TestCase
     }
 
     #[DataProvider('provideMutuallyExclusiveOptions')]
-    public function testConstructThrowsOnMutuallyExclusiveOptions(array $parameters)
+    public function testConstructThrowsOnMutuallyExclusiveOptions(array $parameters): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('#[Autowire] attribute must declare exactly one of $service, $expression, $env, $param or $value.');

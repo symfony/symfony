@@ -29,7 +29,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideNonSuspiciousStrings')]
-    public function testNonSuspiciousStrings(string $string, array $options = [])
+    public function testNonSuspiciousStrings(string $string, array $options = []): void
     {
         $this->validator->validate($string, new NoSuspiciousCharacters(...$options));
 
@@ -53,7 +53,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideSuspiciousStrings')]
-    public function testSuspiciousStrings(string $string, array $options, array $errors)
+    public function testSuspiciousStrings(string $string, array $options, array $errors): void
     {
         $this->validator->validate($string, new NoSuspiciousCharacters(...$options));
 
@@ -156,7 +156,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testConstants()
+    public function testConstants(): void
     {
         $this->assertSame(\Spoofchecker::INVISIBLE, NoSuspiciousCharacters::CHECK_INVISIBLE);
         $this->assertSame(\Spoofchecker::ASCII, NoSuspiciousCharacters::RESTRICTION_LEVEL_ASCII);
@@ -167,7 +167,7 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
         $this->assertSame(\Spoofchecker::UNRESTRICTIVE, NoSuspiciousCharacters::RESTRICTION_LEVEL_NONE);
     }
 
-    public function testValidatorFiltersEmptyDefaultLocales()
+    public function testValidatorFiltersEmptyDefaultLocales(): void
     {
         $validator = new NoSuspiciousCharactersValidator(['en', '', 'fr', null, 'de']);
         $validator->initialize($this->context);

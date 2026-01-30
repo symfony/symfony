@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Worker;
 class StopWorkerOnMemoryLimitListenerTest extends TestCase
 {
     #[DataProvider('memoryProvider')]
-    public function testWorkerStopsWhenMemoryLimitExceeded(int $memoryUsage, int $memoryLimit, bool $shouldStop)
+    public function testWorkerStopsWhenMemoryLimitExceeded(int $memoryUsage, int $memoryLimit, bool $shouldStop): void
     {
         $memoryResolver = static fn () => $memoryUsage;
 
@@ -41,7 +41,7 @@ class StopWorkerOnMemoryLimitListenerTest extends TestCase
         yield [1024, 2048, false];
     }
 
-    public function testWorkerLogsMemoryExceededWhenLoggerIsGiven()
+    public function testWorkerLogsMemoryExceededWhenLoggerIsGiven(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('info')

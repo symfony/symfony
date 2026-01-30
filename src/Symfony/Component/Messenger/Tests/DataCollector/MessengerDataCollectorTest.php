@@ -33,7 +33,7 @@ class MessengerDataCollectorTest extends TestCase
         $this->dumper->setColors(false);
     }
 
-    public function testHandle()
+    public function testHandle(): void
     {
         $message = new DummyMessage('dummy message');
         $envelope = new Envelope($message);
@@ -75,7 +75,7 @@ class MessengerDataCollectorTest extends TestCase
         $this->assertStringMatchesFormat($expected, $this->getDataAsString($messages[0]));
     }
 
-    public function testHandleWithException()
+    public function testHandleWithException(): void
     {
         $message = new DummyMessage('dummy message');
 
@@ -125,7 +125,7 @@ class MessengerDataCollectorTest extends TestCase
         );
     }
 
-    public function testKeepsOrderedDispatchCalls()
+    public function testKeepsOrderedDispatchCalls(): void
     {
         $firstBus = $this->createStub(MessageBusInterface::class);
         $firstBus->method('dispatch')->willReturn(new Envelope(new \stdClass()));

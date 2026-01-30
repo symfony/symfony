@@ -21,7 +21,7 @@ use Symfony\Component\Mime\MimeTypes;
 
 class AddMimeTypeGuesserPassTest extends TestCase
 {
-    public function testTags()
+    public function testTags(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new AddMimeTypeGuesserPass());

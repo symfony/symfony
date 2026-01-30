@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 final class AliasDeprecatedPublicServicesPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -44,7 +44,7 @@ final class AliasDeprecatedPublicServicesPassTest extends TestCase
     }
 
     #[DataProvider('processWithMissingAttributeProvider')]
-    public function testProcessWithMissingAttribute(string $attribute, array $attributes)
+    public function testProcessWithMissingAttribute(string $attribute, array $attributes): void
     {
         $container = new ContainerBuilder();
         $container
@@ -65,7 +65,7 @@ final class AliasDeprecatedPublicServicesPassTest extends TestCase
         ];
     }
 
-    public function testProcessWithNonPublicService()
+    public function testProcessWithNonPublicService(): void
     {
         $container = new ContainerBuilder();
         $container

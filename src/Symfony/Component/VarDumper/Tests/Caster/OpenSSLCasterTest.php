@@ -20,7 +20,7 @@ class OpenSSLCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testAsymmetricKey()
+    public function testAsymmetricKey(): void
     {
         $key = openssl_pkey_new([
             'private_key_bits' => 1024,
@@ -50,7 +50,7 @@ class OpenSSLCasterTest extends TestCase
         );
     }
 
-    public function testOpensslCsr()
+    public function testOpensslCsr(): void
     {
         $dn = [
             'countryName' => 'FR',

@@ -45,7 +45,7 @@ final class FakeChatLoggerTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendWithDefaultTransport()
+    public function testSendWithDefaultTransport(): void
     {
         $message1 = new ChatMessage($subject1 = 'Hello subject1!', new TestOptions(['recipient_id' => $recipient1 = 'Oskar']));
         $message2 = new ChatMessage($subject2 = 'Hello subject2!');

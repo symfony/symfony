@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler;
 class HandlerDescriptorTest extends TestCase
 {
     #[DataProvider('provideHandlers')]
-    public function testDescriptorNames(callable $handler, ?string $expectedHandlerString)
+    public function testDescriptorNames(callable $handler, ?string $expectedHandlerString): void
     {
         $descriptor = new HandlerDescriptor($handler);
 
@@ -28,27 +28,27 @@ class HandlerDescriptorTest extends TestCase
 
     public static function provideHandlers(): iterable
     {
-        yield [static function () {}, 'Closure'];
+        yield [static function (): void {}, 'Closure'];
         yield ['var_dump', 'var_dump'];
         yield [new DummyCommandHandler(), DummyCommandHandler::class.'::__invoke'];
         yield [
             [new DummyCommandHandlerWithSpecificMethod(), 'handle'],
             DummyCommandHandlerWithSpecificMethod::class.'::handle',
         ];
-        yield [\Closure::fromCallable(static function () {}), 'Closure'];
+        yield [\Closure::fromCallable(static function (): void {}), 'Closure'];
         yield [\Closure::fromCallable(new DummyCommandHandler()), DummyCommandHandler::class.'::__invoke'];
-        yield [\Closure::bind(\Closure::fromCallable(function () {}), new \stdClass()), 'Closure'];
+        yield [\Closure::bind(\Closure::fromCallable(function (): void {}), new \stdClass()), 'Closure'];
         yield [new class {
-            public function __invoke()
+            public function __invoke(): void
             {
             }
         }, 'class@anonymous%sHandlerDescriptorTest.php%s::__invoke'];
     }
 
-    public function testGetOptions()
+    public function testGetOptions(): void
     {
         $options = ['option1' => 'value1', 'option2' => 'value2'];
-        $descriptor = new HandlerDescriptor(static function () {}, $options);
+        $descriptor = new HandlerDescriptor(static function (): void {}, $options);
 
         $this->assertSame($options, $descriptor->getOptions());
     }

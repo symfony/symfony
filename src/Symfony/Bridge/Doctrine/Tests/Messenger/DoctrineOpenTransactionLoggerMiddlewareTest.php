@@ -49,7 +49,7 @@ class DoctrineOpenTransactionLoggerMiddlewareTest extends MiddlewareTestCase
         $this->middleware = new DoctrineOpenTransactionLoggerMiddleware($managerRegistry, null, $this->logger);
     }
 
-    public function testMiddlewareWrapsInTransactionAndFlushes()
+    public function testMiddlewareWrapsInTransactionAndFlushes(): void
     {
         $this->connection->expects($this->exactly(2))
             ->method('getTransactionNestingLevel')

@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class TypeTest extends TestCase
 {
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(TypeDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
@@ -38,7 +38,7 @@ class TypeTest extends TestCase
         self::assertSame('some attached data', $cConstraint->payload);
     }
 
-    public function testMissingType()
+    public function testMissingType(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage(\sprintf('The options "type" must be set for constraint "%s".', Type::class));

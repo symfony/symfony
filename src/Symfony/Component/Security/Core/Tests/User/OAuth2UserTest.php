@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\OAuth2User;
 
 class OAuth2UserTest extends TestCase
 {
-    public function testCannotCreateUserWithoutSubProperty()
+    public function testCannotCreateUserWithoutSubProperty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The claim "sub" or "username" must be provided.');
@@ -24,7 +24,7 @@ class OAuth2UserTest extends TestCase
         new OAuth2User();
     }
 
-    public function testCreateFullUserWithAdditionalClaimsUsingPositionalParameters()
+    public function testCreateFullUserWithAdditionalClaimsUsingPositionalParameters(): void
     {
         $this->assertEquals(new OAuth2User(
             scope: 'read write dolphin',

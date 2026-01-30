@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Tests\Fixtures\DummyAuthenticator;
 
 class CsrfProtectionListenerTest extends TestCase
 {
-    public function testNoCsrfTokenBadge()
+    public function testNoCsrfTokenBadge(): void
     {
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
         $csrfTokenManager->expects($this->never())->method('isTokenValid');
@@ -35,7 +35,7 @@ class CsrfProtectionListenerTest extends TestCase
         $listener->checkPassport($event);
     }
 
-    public function testValidCsrfToken()
+    public function testValidCsrfToken(): void
     {
         $csrfTokenManager = $this->createStub(CsrfTokenManagerInterface::class);
         $csrfTokenManager
@@ -51,7 +51,7 @@ class CsrfProtectionListenerTest extends TestCase
         $this->assertTrue($badge->isResolved());
     }
 
-    public function testInvalidCsrfToken()
+    public function testInvalidCsrfToken(): void
     {
         $csrfTokenManager = $this->createStub(CsrfTokenManagerInterface::class);
         $csrfTokenManager

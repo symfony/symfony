@@ -35,7 +35,7 @@ class FixedWindowLimiterTest extends TestCase
         ClockMock::register(RateLimit::class);
     }
 
-    public function testConsume()
+    public function testConsume(): void
     {
         $now = time();
         $limiter = $this->createLimiter();
@@ -58,7 +58,7 @@ class FixedWindowLimiterTest extends TestCase
     }
 
     #[DataProvider('provideConsumeOutsideInterval')]
-    public function testConsumeOutsideInterval(string $dateIntervalString)
+    public function testConsumeOutsideInterval(string $dateIntervalString): void
     {
         $limiter = $this->createLimiter($dateIntervalString);
 
@@ -74,7 +74,7 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertTrue($rateLimit->isAccepted());
     }
 
-    public function testWaitIntervalOnConsumeOverLimit()
+    public function testWaitIntervalOnConsumeOverLimit(): void
     {
         $limiter = $this->createLimiter();
 
@@ -88,7 +88,7 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertEqualsWithDelta($start + 60, microtime(true), 1);
     }
 
-    public function testWrongWindowFromCache()
+    public function testWrongWindowFromCache(): void
     {
         $this->storage->save(new DummyWindow());
         $limiter = $this->createLimiter();
@@ -97,7 +97,7 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertEquals(9, $rateLimit->getRemainingTokens());
     }
 
-    public function testWindowResilientToTimeShifting()
+    public function testWindowResilientToTimeShifting(): void
     {
         $serverOneClock = microtime(true) - 1;
         $serverTwoClock = microtime(true) + 1;
@@ -110,7 +110,7 @@ class FixedWindowLimiterTest extends TestCase
         $this->assertSame(100, $window->getAvailableTokens($serverOneClock));
     }
 
-    public function testPeekConsume()
+    public function testPeekConsume(): void
     {
         $limiter = $this->createLimiter();
 
@@ -138,7 +138,7 @@ class FixedWindowLimiterTest extends TestCase
         );
     }
 
-    public function testNegativeConsume()
+    public function testNegativeConsume(): void
     {
         $limiter = $this->createLimiter();
 

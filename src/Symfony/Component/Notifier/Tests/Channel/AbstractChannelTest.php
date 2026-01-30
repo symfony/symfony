@@ -22,7 +22,7 @@ use Symfony\Component\Notifier\Recipient\RecipientInterface;
  */
 class AbstractChannelTest extends TestCase
 {
-    public function testChannelCannotBeConstructedWithoutTransportAndBus()
+    public function testChannelCannotBeConstructedWithoutTransportAndBus(): void
     {
         $this->expectException(LogicException::class);
 

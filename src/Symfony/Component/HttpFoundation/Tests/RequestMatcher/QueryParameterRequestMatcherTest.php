@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\QueryParameterRequestMatcher
 class QueryParameterRequestMatcherTest extends TestCase
 {
     #[DataProvider('getDataForArray')]
-    public function testArray(string $uri, bool $matches)
+    public function testArray(string $uri, bool $matches): void
     {
         $matcher = new QueryParameterRequestMatcher(['foo', 'bar']);
         $request = Request::create($uri);
@@ -27,7 +27,7 @@ class QueryParameterRequestMatcherTest extends TestCase
     }
 
     #[DataProvider('getDataForArray')]
-    public function testCommaSeparatedString(string $uri, bool $matches)
+    public function testCommaSeparatedString(string $uri, bool $matches): void
     {
         $matcher = new QueryParameterRequestMatcher('foo, bar');
         $request = Request::create($uri);
@@ -35,7 +35,7 @@ class QueryParameterRequestMatcherTest extends TestCase
     }
 
     #[DataProvider('getDataForSingleString')]
-    public function testSingleString(string $uri, bool $matches)
+    public function testSingleString(string $uri, bool $matches): void
     {
         $matcher = new QueryParameterRequestMatcher('foo');
         $request = Request::create($uri);

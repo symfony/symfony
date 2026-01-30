@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 class SecurityTest extends AbstractWebTestCase
 {
     #[DataProvider('getUsers')]
-    public function testLoginUser(string $username, array $roles, ?string $firewallContext)
+    public function testLoginUser(string $username, array $roles, ?string $firewallContext): void
     {
         $user = new InMemoryUser($username, 'the-password', $roles);
         $client = $this->createClient(['test_case' => 'Security', 'root_config' => 'config.yml']);
@@ -43,7 +43,7 @@ class SecurityTest extends AbstractWebTestCase
         yield ['no-role-username', [], null];
     }
 
-    public function testLoginUserMultipleRequests()
+    public function testLoginUserMultipleRequests(): void
     {
         $user = new InMemoryUser('the-username', 'the-password', ['ROLE_FOO']);
         $client = $this->createClient(['test_case' => 'Security', 'root_config' => 'config.yml']);
@@ -56,7 +56,7 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertEquals('Welcome the-username!', $client->getResponse()->getContent());
     }
 
-    public function testLoginInBetweenRequests()
+    public function testLoginInBetweenRequests(): void
     {
         $user = new InMemoryUser('the-username', 'the-password', ['ROLE_FOO']);
         $client = $this->createClient(['test_case' => 'Security', 'root_config' => 'config.yml']);
@@ -70,7 +70,7 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertEquals('Welcome the-username!', $client->getResponse()->getContent());
     }
 
-    public function testLoginUserMultipleTimes()
+    public function testLoginUserMultipleTimes(): void
     {
         $userFoo = new InMemoryUser('the-username', 'the-password', ['ROLE_FOO']);
         $userBar = new InMemoryUser('no-role-username', 'the-password');

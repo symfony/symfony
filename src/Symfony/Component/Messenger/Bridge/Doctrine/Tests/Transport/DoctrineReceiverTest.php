@@ -32,7 +32,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class DoctrineReceiverTest extends TestCase
 {
-    public function testItReturnsTheDecodedMessageToTheHandler()
+    public function testItReturnsTheDecodedMessageToTheHandler(): void
     {
         $serializer = $this->createSerializer();
 
@@ -58,7 +58,7 @@ class DoctrineReceiverTest extends TestCase
         $this->assertSame(1, $transportMessageIdStamp->getId());
     }
 
-    public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException()
+    public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException(): void
     {
         $this->expectException(MessageDecodingFailedException::class);
         $serializer = $this->createStub(PhpSerializer::class);
@@ -73,7 +73,7 @@ class DoctrineReceiverTest extends TestCase
         $receiver->get();
     }
 
-    public function testOccursRetryableExceptionFromConnection()
+    public function testOccursRetryableExceptionFromConnection(): void
     {
         $serializer = $this->createSerializer();
         $connection = $this->createStub(Connection::class);
@@ -93,7 +93,7 @@ class DoctrineReceiverTest extends TestCase
         $receiver->get();
     }
 
-    public function testGetReplacesExistingTransportMessageIdStamps()
+    public function testGetReplacesExistingTransportMessageIdStamps(): void
     {
         $serializer = $this->createSerializer();
 
@@ -110,7 +110,7 @@ class DoctrineReceiverTest extends TestCase
         $this->assertCount(1, $messageIdStamps);
     }
 
-    public function testAll()
+    public function testAll(): void
     {
         $serializer = $this->createSerializer();
 
@@ -125,7 +125,7 @@ class DoctrineReceiverTest extends TestCase
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
     }
 
-    public function testAllReplacesExistingTransportMessageIdStamps()
+    public function testAllReplacesExistingTransportMessageIdStamps(): void
     {
         $serializer = $this->createSerializer();
 
@@ -143,7 +143,7 @@ class DoctrineReceiverTest extends TestCase
         }
     }
 
-    public function testFind()
+    public function testFind(): void
     {
         $serializer = $this->createSerializer();
 
@@ -156,7 +156,7 @@ class DoctrineReceiverTest extends TestCase
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelope->getMessage());
     }
 
-    public function testFindReplacesExistingTransportMessageIdStamps()
+    public function testFindReplacesExistingTransportMessageIdStamps(): void
     {
         $serializer = $this->createSerializer();
 
@@ -171,7 +171,7 @@ class DoctrineReceiverTest extends TestCase
         $this->assertCount(1, $messageIdStamps);
     }
 
-    public function testAck()
+    public function testAck(): void
     {
         $serializer = $this->createSerializer();
         $connection = $this->createMock(Connection::class);
@@ -188,7 +188,7 @@ class DoctrineReceiverTest extends TestCase
         $receiver->ack($envelope);
     }
 
-    public function testAckThrowsRetryableException()
+    public function testAckThrowsRetryableException(): void
     {
         $serializer = $this->createSerializer();
         $connection = $this->createMock(Connection::class);
@@ -211,7 +211,7 @@ class DoctrineReceiverTest extends TestCase
         $receiver->ack($envelope);
     }
 
-    public function testAckThrowsRetryableExceptionAndRetriesFail()
+    public function testAckThrowsRetryableExceptionAndRetriesFail(): void
     {
         $serializer = $this->createSerializer();
         $connection = $this->createMock(Connection::class);
@@ -232,7 +232,7 @@ class DoctrineReceiverTest extends TestCase
         $receiver->ack($envelope);
     }
 
-    public function testAckThrowsException()
+    public function testAckThrowsException(): void
     {
         $serializer = $this->createSerializer();
         $connection = $this->createMock(Connection::class);
@@ -252,7 +252,7 @@ class DoctrineReceiverTest extends TestCase
         $receiver->ack($envelope);
     }
 
-    public function testReject()
+    public function testReject(): void
     {
         $serializer = $this->createSerializer();
         $connection = $this->createMock(Connection::class);
@@ -269,7 +269,7 @@ class DoctrineReceiverTest extends TestCase
         $receiver->reject($envelope);
     }
 
-    public function testRejectThrowsRetryableException()
+    public function testRejectThrowsRetryableException(): void
     {
         $serializer = $this->createSerializer();
         $connection = $this->createMock(Connection::class);
@@ -292,7 +292,7 @@ class DoctrineReceiverTest extends TestCase
         $receiver->reject($envelope);
     }
 
-    public function testRejectThrowsRetryableExceptionAndRetriesFail()
+    public function testRejectThrowsRetryableExceptionAndRetriesFail(): void
     {
         $serializer = $this->createSerializer();
         $connection = $this->createMock(Connection::class);
@@ -313,7 +313,7 @@ class DoctrineReceiverTest extends TestCase
         $receiver->reject($envelope);
     }
 
-    public function testRejectThrowsException()
+    public function testRejectThrowsException(): void
     {
         $serializer = $this->createSerializer();
         $connection = $this->createMock(Connection::class);
@@ -333,7 +333,7 @@ class DoctrineReceiverTest extends TestCase
         $receiver->reject($envelope);
     }
 
-    public function testKeepalive()
+    public function testKeepalive(): void
     {
         $serializer = $this->createSerializer();
         $connection = $this->createMock(Connection::class);

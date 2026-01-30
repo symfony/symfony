@@ -17,14 +17,14 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class UsernamePasswordTokenTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('foo', 'bar', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
         $this->assertEquals('key', $token->getFirewallName());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('foo', '', ['A', 'B']), 'foo', ['A', 'B']);
         $this->assertEquals('UsernamePasswordToken(user="foo", roles="A, B")', (string) $token);

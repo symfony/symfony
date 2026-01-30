@@ -18,7 +18,7 @@ use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass
 
 class AddValidatorInitializersPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container

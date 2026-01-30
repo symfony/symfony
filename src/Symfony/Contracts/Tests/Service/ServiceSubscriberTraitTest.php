@@ -30,7 +30,7 @@ class ServiceSubscriberTraitTest extends TestCase
         class_exists(LegacyTestService::class);
     }
 
-    public function testMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices()
+    public function testMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices(): void
     {
         $expected = [
             LegacyTestService::class.'::aService' => Service2::class,
@@ -42,7 +42,7 @@ class ServiceSubscriberTraitTest extends TestCase
         $this->assertEquals($expected, LegacyChildTestService::getSubscribedServices());
     }
 
-    public function testSetContainerIsCalledOnParent()
+    public function testSetContainerIsCalledOnParent(): void
     {
         $container = new class([]) implements ContainerInterface {
             use ServiceLocatorTrait;
@@ -51,7 +51,7 @@ class ServiceSubscriberTraitTest extends TestCase
         $this->assertSame($container, (new LegacyTestService())->setContainer($container));
     }
 
-    public function testParentNotCalledIfHasMagicCall()
+    public function testParentNotCalledIfHasMagicCall(): void
     {
         $container = new class([]) implements ContainerInterface {
             use ServiceLocatorTrait;
@@ -66,7 +66,7 @@ class ServiceSubscriberTraitTest extends TestCase
         $this->assertSame([], $service::getSubscribedServices());
     }
 
-    public function testParentNotCalledIfNoParent()
+    public function testParentNotCalledIfNoParent(): void
     {
         $container = new class([]) implements ContainerInterface {
             use ServiceLocatorTrait;
@@ -81,7 +81,7 @@ class ServiceSubscriberTraitTest extends TestCase
         $this->assertSame([], $service::getSubscribedServices());
     }
 
-    public function testSetContainerCalledFirstOnParent()
+    public function testSetContainerCalledFirstOnParent(): void
     {
         $container1 = new class([]) implements ContainerInterface {
             use ServiceLocatorTrait;

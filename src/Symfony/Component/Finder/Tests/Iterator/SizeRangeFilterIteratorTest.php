@@ -18,7 +18,7 @@ use Symfony\Component\Finder\Iterator\SizeRangeFilterIterator;
 class SizeRangeFilterIteratorTest extends RealIteratorTestCase
 {
     #[DataProvider('getAcceptData')]
-    public function testAccept($size, $expected)
+    public function testAccept($size, $expected): void
     {
         $inner = new InnerSizeIterator(self::$files);
 

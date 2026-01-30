@@ -37,7 +37,7 @@ class CheckCredentialsListenerTest extends TestCase
     }
 
     #[DataProvider('providePasswords')]
-    public function testPasswordAuthenticated(string $password, bool $passwordValid, bool $result)
+    public function testPasswordAuthenticated(string $password, bool $passwordValid, bool $result): void
     {
         $hasher = $this->createStub(PasswordHasherInterface::class);
         $hasher->method('verify')->with('password-hash', $password)->willReturn($passwordValid);
@@ -65,7 +65,7 @@ class CheckCredentialsListenerTest extends TestCase
         yield ['Invalid', false, false];
     }
 
-    public function testEmptyPassword()
+    public function testEmptyPassword(): void
     {
         $hasherFactory = $this->createMock(PasswordHasherFactory::class);
         $hasherFactory->expects($this->never())->method('getPasswordHasher');
@@ -79,7 +79,7 @@ class CheckCredentialsListenerTest extends TestCase
     }
 
     #[DataProvider('provideCustomAuthenticatedResults')]
-    public function testCustomAuthenticated(bool $result)
+    public function testCustomAuthenticated(bool $result): void
     {
         $hasherFactory = $this->createMock(PasswordHasherFactory::class);
         $hasherFactory->expects($this->never())->method('getPasswordHasher');
@@ -102,7 +102,7 @@ class CheckCredentialsListenerTest extends TestCase
         yield [false];
     }
 
-    public function testNoCredentialsBadgeProvided()
+    public function testNoCredentialsBadgeProvided(): void
     {
         $hasherFactory = $this->createMock(PasswordHasherFactory::class);
         $hasherFactory->expects($this->never())->method('getPasswordHasher');
@@ -111,7 +111,7 @@ class CheckCredentialsListenerTest extends TestCase
         (new CheckCredentialsListener($hasherFactory))->checkPassport($event);
     }
 
-    public function testAddsPasswordUpgradeBadge()
+    public function testAddsPasswordUpgradeBadge(): void
     {
         $hasher = $this->createStub(PasswordHasherInterface::class);
         $hasher->method('verify')->with('password-hash', 'ThePa$$word')->willReturn(true);
@@ -127,7 +127,7 @@ class CheckCredentialsListenerTest extends TestCase
         $this->assertEquals('ThePa$$word', $passport->getBadge(PasswordUpgradeBadge::class)->getAndErasePlaintextPassword());
     }
 
-    public function testAddsNoPasswordUpgradeBadgeIfItAlreadyExists()
+    public function testAddsNoPasswordUpgradeBadgeIfItAlreadyExists(): void
     {
         $hasher = $this->createStub(PasswordHasherInterface::class);
         $hasher->method('verify')->with('password-hash', 'ThePa$$word')->willReturn(true);
@@ -146,7 +146,7 @@ class CheckCredentialsListenerTest extends TestCase
         (new CheckCredentialsListener($hasherFactory))->checkPassport($this->createEvent($passport));
     }
 
-    public function testAddsNoPasswordUpgradeBadgeIfPasswordIsInvalid()
+    public function testAddsNoPasswordUpgradeBadgeIfPasswordIsInvalid(): void
     {
         $hasher = $this->createStub(PasswordHasherInterface::class);
         $hasher->method('verify')->with('password-hash', 'ThePa$$word')->willReturn(false);

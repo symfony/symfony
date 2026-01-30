@@ -46,7 +46,7 @@ final class PushyTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendWithOptions()
+    public function testSendWithOptions(): void
     {
         $messageSubject = 'testMessageSubject';
         $messageContent = 'testMessageContent';
@@ -74,7 +74,7 @@ final class PushyTransportTest extends TransportTestCase
         $this->assertSame('123', $sentMessage->getMessageId());
     }
 
-    public function testSendWithNotification()
+    public function testSendWithNotification(): void
     {
         $messageSubject = 'testMessageSubject';
         $messageContent = 'testMessageContent';

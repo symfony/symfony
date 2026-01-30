@@ -19,7 +19,7 @@ use Symfony\Component\Translation\PseudoLocalizationTranslator;
 final class PseudoLocalizationTranslatorTest extends TestCase
 {
     #[DataProvider('provideTrans')]
-    public function testTrans(string $expected, string $input, array $options = [])
+    public function testTrans(string $expected, string $input, array $options = []): void
     {
         mt_srand(987);
         $this->assertSame($expected, (new PseudoLocalizationTranslator(new IdentityTranslator(), $options))->trans($input));
@@ -48,7 +48,7 @@ final class PseudoLocalizationTranslatorTest extends TestCase
     }
 
     #[DataProvider('provideInvalidExpansionFactor')]
-    public function testInvalidExpansionFactor(float $expansionFactor)
+    public function testInvalidExpansionFactor(float $expansionFactor): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The expansion factor must be greater than or equal to 1.');

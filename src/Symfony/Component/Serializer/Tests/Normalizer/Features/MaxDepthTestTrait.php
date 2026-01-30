@@ -21,7 +21,7 @@ trait MaxDepthTestTrait
 {
     abstract protected function getNormalizerForMaxDepth(): NormalizerInterface;
 
-    public function testMaxDepth()
+    public function testMaxDepth(): void
     {
         $normalizer = $this->getNormalizerForMaxDepth();
 
@@ -60,7 +60,7 @@ trait MaxDepthTestTrait
         $this->assertEquals($expected, $result);
     }
 
-    public function testMaxDepthHandler()
+    public function testMaxDepthHandler(): void
     {
         $level1 = new MaxDepthDummy();
         $level1->bar = 'level1';

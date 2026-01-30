@@ -20,7 +20,7 @@ use Symfony\Component\RateLimiter\Storage\StorageInterface;
 
 class LimiterTest extends TestCase
 {
-    public function testTokenBucket()
+    public function testTokenBucket(): void
     {
         $factory = $this->createFactory([
             'id' => 'test',
@@ -33,7 +33,7 @@ class LimiterTest extends TestCase
         $this->assertInstanceOf(TokenBucketLimiter::class, $limiter);
     }
 
-    public function testFixedWindow()
+    public function testFixedWindow(): void
     {
         $factory = $this->createFactory([
             'id' => 'test',
@@ -46,7 +46,7 @@ class LimiterTest extends TestCase
         $this->assertInstanceOf(FixedWindowLimiter::class, $limiter);
     }
 
-    public function testWrongInterval()
+    public function testWrongInterval(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot parse interval "1 minut", please use a valid unit as described on https://php.net/datetime.formats#datetime.formats.relative');

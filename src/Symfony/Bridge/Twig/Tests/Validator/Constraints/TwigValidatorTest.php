@@ -38,7 +38,7 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidValues')]
-    public function testTwigIsValid($value)
+    public function testTwigIsValid($value): void
     {
         $this->validator->validate($value, new Twig());
 
@@ -46,7 +46,7 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidValues')]
-    public function testInvalidValues($value, $message, $line)
+    public function testInvalidValues($value, $message, $line): void
     {
         $constraint = new Twig('myMessageTest');
 
@@ -63,7 +63,7 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
      * When deprecations are skipped by the validator, the testsuite reporter will catch them so we need to mark the test as ignoring deprecations.
      */
     #[IgnoreDeprecations]
-    public function testTwigWithSkipDeprecation()
+    public function testTwigWithSkipDeprecation(): void
     {
         $constraint = new Twig(skipDeprecations: true);
 
@@ -72,7 +72,7 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testTwigWithoutSkipDeprecation()
+    public function testTwigWithoutSkipDeprecation(): void
     {
         $constraint = new Twig(skipDeprecations: false);
 

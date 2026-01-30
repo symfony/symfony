@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 
 class AbstractArgumentTest extends TestCase
 {
-    public function testAbstractArgumentGetters()
+    public function testAbstractArgumentGetters(): void
     {
         $argument = new AbstractArgument('should be defined by Pass');
         $this->assertSame('should be defined by Pass', $argument->getText());

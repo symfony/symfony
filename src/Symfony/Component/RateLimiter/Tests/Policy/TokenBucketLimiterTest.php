@@ -37,7 +37,7 @@ class TokenBucketLimiterTest extends TestCase
         ClockMock::register(RateLimit::class);
     }
 
-    public function testReserve()
+    public function testReserve(): void
     {
         $limiter = $this->createLimiter();
 
@@ -46,7 +46,7 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertEquals(1, $limiter->reserve(5)->getWaitDuration());
     }
 
-    public function testReserveMoreTokensThanBucketSize()
+    public function testReserveMoreTokensThanBucketSize(): void
     {
         $limiter = $this->createLimiter();
 
@@ -56,7 +56,7 @@ class TokenBucketLimiterTest extends TestCase
         $limiter->reserve(15);
     }
 
-    public function testReduceBucketSizeWhenAlreadyExistInStorageWithBiggerBucketSize()
+    public function testReduceBucketSizeWhenAlreadyExistInStorageWithBiggerBucketSize(): void
     {
         $limiter = $this->createLimiter(100);
 
@@ -68,7 +68,7 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertFalse($limiter2->consume()->isAccepted());
     }
 
-    public function testReserveMaxWaitingTime()
+    public function testReserveMaxWaitingTime(): void
     {
         $limiter = $this->createLimiter(10, Rate::perMinute());
 
@@ -83,7 +83,7 @@ class TokenBucketLimiterTest extends TestCase
         $limiter->reserve(5, 300);
     }
 
-    public function testConsume()
+    public function testConsume(): void
     {
         $rate = Rate::perSecond(10);
         $limiter = $this->createLimiter(10, $rate);
@@ -104,7 +104,7 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertSame(10, $rateLimit->getLimit());
     }
 
-    public function testWaitIntervalOnConsumeOverLimit()
+    public function testWaitIntervalOnConsumeOverLimit(): void
     {
         $limiter = $this->createLimiter();
 
@@ -118,7 +118,7 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertEqualsWithDelta($start + 1, microtime(true), 1);
     }
 
-    public function testWrongWindowFromCache()
+    public function testWrongWindowFromCache(): void
     {
         $this->storage->save(new DummyWindow());
         $limiter = $this->createLimiter();
@@ -127,7 +127,7 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertEquals(9, $rateLimit->getRemainingTokens());
     }
 
-    public function testBucketResilientToTimeShifting()
+    public function testBucketResilientToTimeShifting(): void
     {
         $serverOneClock = microtime(true) - 1;
         $serverTwoClock = microtime(true) + 1;
@@ -141,7 +141,7 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertSame(100, $bucket->getAvailableTokens($serverOneClock));
     }
 
-    public function testPeekConsume()
+    public function testPeekConsume(): void
     {
         $limiter = $this->createLimiter();
 
@@ -169,7 +169,7 @@ class TokenBucketLimiterTest extends TestCase
         );
     }
 
-    public function testNegativeConsume()
+    public function testNegativeConsume(): void
     {
         $limiter = $this->createLimiter();
 
@@ -182,7 +182,7 @@ class TokenBucketLimiterTest extends TestCase
         }
     }
 
-    public function testBucketRefilledWithStrictFrequency()
+    public function testBucketRefilledWithStrictFrequency(): void
     {
         $limiter = $this->createLimiter(1000, new Rate(\DateInterval::createFromDateString('15 seconds'), 100));
         $rateLimit = $limiter->consume(300);

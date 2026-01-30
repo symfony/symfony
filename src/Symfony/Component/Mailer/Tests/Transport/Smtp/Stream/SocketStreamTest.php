@@ -17,7 +17,7 @@ use Symfony\Component\Mailer\Transport\Smtp\Stream\SocketStream;
 
 class SocketStreamTest extends TestCase
 {
-    public function testSocketErrorNoConnection()
+    public function testSocketErrorNoConnection(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/Connection refused|unable to connect/i');
@@ -27,7 +27,7 @@ class SocketStreamTest extends TestCase
         $s->initialize();
     }
 
-    public function testSocketErrorBeforeConnectError()
+    public function testSocketErrorBeforeConnectError(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/no valid certs found cafile stream|Unable to find the socket transport "ssl"/');

@@ -32,7 +32,7 @@ use Symfony\Component\Lock\Store\InMemoryStore;
  */
 class LockTest extends TestCase
 {
-    public function testAcquireNoBlocking()
+    public function testAcquireNoBlocking(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -48,7 +48,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->acquire(false));
     }
 
-    public function testAcquireNoBlockingWithPersistingStoreInterface()
+    public function testAcquireNoBlockingWithPersistingStoreInterface(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -64,7 +64,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->acquire(false));
     }
 
-    public function testAcquireBlockingWithPersistingStoreInterface()
+    public function testAcquireBlockingWithPersistingStoreInterface(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -80,7 +80,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->acquire(true));
     }
 
-    public function testAcquireBlockingRetryWithPersistingStoreInterface()
+    public function testAcquireBlockingRetryWithPersistingStoreInterface(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createStub(PersistingStoreInterface::class);
@@ -88,7 +88,7 @@ class LockTest extends TestCase
 
         $store
             ->method('save')
-            ->willReturnCallback(static function () {
+            ->willReturnCallback(static function (): void {
                 if (1 === random_int(0, 1)) {
                     return;
                 }
@@ -101,7 +101,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->acquire(true));
     }
 
-    public function testAcquireReturnsFalse()
+    public function testAcquireReturnsFalse(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -118,7 +118,7 @@ class LockTest extends TestCase
         $this->assertFalse($lock->acquire(false));
     }
 
-    public function testAcquireReturnsFalseStoreInterface()
+    public function testAcquireReturnsFalseStoreInterface(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -135,7 +135,7 @@ class LockTest extends TestCase
         $this->assertFalse($lock->acquire(false));
     }
 
-    public function testAcquireBlockingWithBlockingStoreInterface()
+    public function testAcquireBlockingWithBlockingStoreInterface(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(BlockingStoreInterface::class);
@@ -154,7 +154,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->acquire(true));
     }
 
-    public function testAcquireSetsTtl()
+    public function testAcquireSetsTtl(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -174,7 +174,7 @@ class LockTest extends TestCase
         $lock->acquire();
     }
 
-    public function testRefresh()
+    public function testRefresh(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -191,7 +191,7 @@ class LockTest extends TestCase
         $lock->refresh();
     }
 
-    public function testRefreshCustom()
+    public function testRefreshCustom(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -208,7 +208,7 @@ class LockTest extends TestCase
         $lock->refresh(20);
     }
 
-    public function testIsAquired()
+    public function testIsAquired(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createStub(PersistingStoreInterface::class);
@@ -222,7 +222,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->isAcquired());
     }
 
-    public function testRelease()
+    public function testRelease(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -242,7 +242,7 @@ class LockTest extends TestCase
         $lock->release();
     }
 
-    public function testReleaseStoreInterface()
+    public function testReleaseStoreInterface(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(PersistingStoreInterface::class);
@@ -262,7 +262,7 @@ class LockTest extends TestCase
         $lock->release();
     }
 
-    public function testReleaseOnDestruction()
+    public function testReleaseOnDestruction(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(BlockingStoreInterface::class);
@@ -281,7 +281,7 @@ class LockTest extends TestCase
         unset($lock);
     }
 
-    public function testNoAutoReleaseWhenNotConfigured()
+    public function testNoAutoReleaseWhenNotConfigured(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(BlockingStoreInterface::class);
@@ -300,7 +300,7 @@ class LockTest extends TestCase
         unset($lock);
     }
 
-    public function testReleaseThrowsExceptionWhenDeletionFail()
+    public function testReleaseThrowsExceptionWhenDeletionFail(): void
     {
         $this->expectException(LockReleasingException::class);
         $key = new Key(__METHOD__);
@@ -322,7 +322,7 @@ class LockTest extends TestCase
         $lock->release();
     }
 
-    public function testReleaseThrowsExceptionIfNotWellDeleted()
+    public function testReleaseThrowsExceptionIfNotWellDeleted(): void
     {
         $this->expectException(LockReleasingException::class);
         $key = new Key(__METHOD__);
@@ -343,7 +343,7 @@ class LockTest extends TestCase
         $lock->release();
     }
 
-    public function testReleaseThrowsAndLog()
+    public function testReleaseThrowsAndLog(): void
     {
         $this->expectException(LockReleasingException::class);
         $key = new Key(__METHOD__);
@@ -370,7 +370,7 @@ class LockTest extends TestCase
         $lock->release();
     }
 
-    public function testSuccessReleaseLog()
+    public function testSuccessReleaseLog(): void
     {
         $key = new Key((string) random_int(100, 1000));
         $store = new InMemoryStore();
@@ -399,7 +399,7 @@ class LockTest extends TestCase
     }
 
     #[DataProvider('provideExpiredDates')]
-    public function testExpiration($ttls, $expected)
+    public function testExpiration($ttls, $expected): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createStub(PersistingStoreInterface::class);
@@ -416,7 +416,7 @@ class LockTest extends TestCase
     }
 
     #[DataProvider('provideExpiredDates')]
-    public function testExpirationStoreInterface($ttls, $expected)
+    public function testExpirationStoreInterface($ttls, $expected): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createStub(PersistingStoreInterface::class);
@@ -443,7 +443,7 @@ class LockTest extends TestCase
         yield [[-0.1, null], false];
     }
 
-    public function testAcquireReadNoBlockingWithSharedLockStoreInterface()
+    public function testAcquireReadNoBlockingWithSharedLockStoreInterface(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(SharedLockStoreInterface::class);
@@ -460,7 +460,7 @@ class LockTest extends TestCase
     }
 
     #[Group('time-sensitive')]
-    public function testAcquireReadTwiceWithExpiration()
+    public function testAcquireReadTwiceWithExpiration(): void
     {
         $key = new Key(__METHOD__);
         $store = new class implements PersistingStoreInterface {
@@ -502,7 +502,7 @@ class LockTest extends TestCase
     }
 
     #[Group('time-sensitive')]
-    public function testAcquireTwiceWithExpiration()
+    public function testAcquireTwiceWithExpiration(): void
     {
         $key = new Key(__METHOD__);
         $store = new class implements PersistingStoreInterface {
@@ -543,7 +543,7 @@ class LockTest extends TestCase
         $lock->release();
     }
 
-    public function testAcquireReadBlockingWithBlockingSharedLockStoreInterface()
+    public function testAcquireReadBlockingWithBlockingSharedLockStoreInterface(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(BlockingSharedLockStoreInterface::class);
@@ -559,7 +559,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->acquireRead(true));
     }
 
-    public function testAcquireReadBlockingWithSharedLockStoreInterface()
+    public function testAcquireReadBlockingWithSharedLockStoreInterface(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createStub(SharedLockStoreInterface::class);
@@ -567,7 +567,7 @@ class LockTest extends TestCase
 
         $store
             ->method('saveRead')
-            ->willReturnCallback(static function () {
+            ->willReturnCallback(static function (): void {
                 if (1 === random_int(0, 1)) {
                     return;
                 }
@@ -580,7 +580,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->acquireRead(true));
     }
 
-    public function testAcquireReadBlockingWithBlockingLockStoreInterface()
+    public function testAcquireReadBlockingWithBlockingLockStoreInterface(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createMock(BlockingStoreInterface::class);
@@ -596,7 +596,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->acquireRead(true));
     }
 
-    public function testAcquireReadBlockingWithPersistingStoreInterface()
+    public function testAcquireReadBlockingWithPersistingStoreInterface(): void
     {
         $key = new Key(__METHOD__);
         $store = $this->createStub(PersistingStoreInterface::class);
@@ -604,7 +604,7 @@ class LockTest extends TestCase
 
         $store
             ->method('save')
-            ->willReturnCallback(static function () {
+            ->willReturnCallback(static function (): void {
                 if (1 === random_int(0, 1)) {
                     return;
                 }

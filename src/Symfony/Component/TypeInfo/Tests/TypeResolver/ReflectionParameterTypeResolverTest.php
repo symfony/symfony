@@ -30,13 +30,13 @@ class ReflectionParameterTypeResolverTest extends TestCase
         $this->resolver = new ReflectionParameterTypeResolver(new ReflectionTypeResolver(), new TypeContextFactory());
     }
 
-    public function testCannotResolveNonReflectionParameter()
+    public function testCannotResolveNonReflectionParameter(): void
     {
         $this->expectException(UnsupportedException::class);
         $this->resolver->resolve(123);
     }
 
-    public function testCannotResolveReflectionParameterWithoutType()
+    public function testCannotResolveReflectionParameterWithoutType(): void
     {
         $this->expectException(UnsupportedException::class);
 
@@ -46,7 +46,7 @@ class ReflectionParameterTypeResolverTest extends TestCase
         $this->resolver->resolve($reflectionParameter);
     }
 
-    public function testCannotResolveReflectionParameterWithoutTypeOnFunction()
+    public function testCannotResolveReflectionParameterWithoutTypeOnFunction(): void
     {
         $reflectionFunction = new \ReflectionFunction('fclose');
         $reflectionParameter = $reflectionFunction->getParameters()[0];
@@ -57,7 +57,7 @@ class ReflectionParameterTypeResolverTest extends TestCase
         $this->resolver->resolve($reflectionParameter);
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableDummy::class);
         $reflectionParameter = $reflectionClass->getMethod('setBuiltin')->getParameters()[0];
@@ -65,7 +65,7 @@ class ReflectionParameterTypeResolverTest extends TestCase
         $this->assertEquals(Type::int(), $this->resolver->resolve($reflectionParameter));
     }
 
-    public function testResolveOptionalParameter()
+    public function testResolveOptionalParameter(): void
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableDummy::class);
         $reflectionParameter = $reflectionClass->getMethod('setOptional')->getParameters()[0];
@@ -73,7 +73,7 @@ class ReflectionParameterTypeResolverTest extends TestCase
         $this->assertEquals(Type::nullable(Type::int()), $this->resolver->resolve($reflectionParameter));
     }
 
-    public function testResolveSelfFromClassWithoutContext()
+    public function testResolveSelfFromClassWithoutContext(): void
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableDummy::class);
         $reflectionParameter = $reflectionClass->getMethod('setSelf')->getParameters()[0];
@@ -81,7 +81,7 @@ class ReflectionParameterTypeResolverTest extends TestCase
         $this->assertEquals(Type::object(ReflectionExtractableDummy::class), $this->resolver->resolve($reflectionParameter));
     }
 
-    public function testResolveSelfFromTraitWithoutContext()
+    public function testResolveSelfFromTraitWithoutContext(): void
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableTrait::class);
         $reflectionParameter = $reflectionClass->getMethod('setSelf')->getParameters()[0];
@@ -89,7 +89,7 @@ class ReflectionParameterTypeResolverTest extends TestCase
         $this->assertEquals(Type::object(ReflectionExtractableTrait::class), $this->resolver->resolve($reflectionParameter));
     }
 
-    public function testResolveSelfFromTraitWithClassContext()
+    public function testResolveSelfFromTraitWithClassContext(): void
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableTrait::class);
         $reflectionParameter = $reflectionClass->getMethod('setSelf')->getParameters()[0];

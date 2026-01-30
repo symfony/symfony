@@ -20,7 +20,7 @@ use Symfony\Component\RateLimiter\Policy\SlidingWindow;
 #[Group('time-sensitive')]
 class SlidingWindowTest extends TestCase
 {
-    public function testGetExpirationTime()
+    public function testGetExpirationTime(): void
     {
         $window = new SlidingWindow('foo', 10);
         $this->assertSame(2 * 10, $window->getExpirationTime());
@@ -38,13 +38,13 @@ class SlidingWindowTest extends TestCase
         $this->assertIsInt($new->getExpirationTime());
     }
 
-    public function testInvalidInterval()
+    public function testInvalidInterval(): void
     {
         $this->expectException(InvalidIntervalException::class);
         new SlidingWindow('foo', 0);
     }
 
-    public function testLongInterval()
+    public function testLongInterval(): void
     {
         ClockMock::register(SlidingWindow::class);
         $window = new SlidingWindow('foo', 60);
@@ -66,7 +66,7 @@ class SlidingWindowTest extends TestCase
         $this->assertSame(0, $new->getHitCount());
     }
 
-    public function testLongIntervalCreate()
+    public function testLongIntervalCreate(): void
     {
         ClockMock::register(SlidingWindow::class);
         $window = new SlidingWindow('foo', 60);
@@ -76,7 +76,7 @@ class SlidingWindowTest extends TestCase
         $this->assertFalse($new->isExpired());
     }
 
-    public function testCreateFromPreviousWindowUsesMicrotime()
+    public function testCreateFromPreviousWindowUsesMicrotime(): void
     {
         ClockMock::register(SlidingWindow::class);
         $window = new SlidingWindow('foo', 8);
@@ -90,7 +90,7 @@ class SlidingWindowTest extends TestCase
         $this->assertEqualsWithDelta(0.4, $new->calculateTimeForTokens(1, 1), 0.1);
     }
 
-    public function testIsExpiredUsesMicrotime()
+    public function testIsExpiredUsesMicrotime(): void
     {
         ClockMock::register(SlidingWindow::class);
         $window = new SlidingWindow('foo', 10);
@@ -99,7 +99,7 @@ class SlidingWindowTest extends TestCase
         $this->assertTrue($window->isExpired());
     }
 
-    public function testGetRetryAfterUsesMicrotime()
+    public function testGetRetryAfterUsesMicrotime(): void
     {
         $window = new SlidingWindow('foo', 10);
         $window->add();
@@ -109,7 +109,7 @@ class SlidingWindowTest extends TestCase
         $this->assertEqualsWithDelta(0.5, $window->calculateTimeForTokens(1, 1), 0.1);
     }
 
-    public function testCreateAtExactTime()
+    public function testCreateAtExactTime(): void
     {
         $window = new SlidingWindow('foo', 10);
         $this->assertEquals(30, $window->calculateTimeForTokens(1, 4));

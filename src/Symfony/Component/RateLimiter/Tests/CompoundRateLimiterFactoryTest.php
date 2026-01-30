@@ -19,7 +19,7 @@ use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
 class CompoundRateLimiterFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $factory1 = $this->createStub(RateLimiterFactoryInterface::class);
         $factory1

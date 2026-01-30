@@ -20,7 +20,7 @@ use Symfony\Component\TypeInfo\Type;
 
 class DateTimeTypePropertyMetadataLoaderTest extends TestCase
 {
-    public function testAddStringToDateTimeValueTransformer()
+    public function testAddStringToDateTimeValueTransformer(): void
     {
         $loader = new DateTimeTypePropertyMetadataLoader(self::propertyMetadataLoader([
             'interface' => new PropertyMetadata('interface', Type::object(\DateTimeInterface::class)),
@@ -35,7 +35,7 @@ class DateTimeTypePropertyMetadataLoaderTest extends TestCase
         ], $loader->load(self::class));
     }
 
-    public function testThrowWhenDateTimeType()
+    public function testThrowWhenDateTimeType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "DateTime" class is not supported. Use "DateTimeImmutable" instead.');
@@ -47,7 +47,7 @@ class DateTimeTypePropertyMetadataLoaderTest extends TestCase
         $loader->load(self::class);
     }
 
-    public function testThrowWhenDateTimeSubclassType()
+    public function testThrowWhenDateTimeSubclassType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "DateTime" class is not supported. Use "DateTimeImmutable" instead.');

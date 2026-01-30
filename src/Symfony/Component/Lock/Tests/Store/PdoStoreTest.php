@@ -53,12 +53,12 @@ class PdoStoreTest extends AbstractStoreTestCase
         return new PdoStore('sqlite:'.self::$dbFile);
     }
 
-    public function testAbortAfterExpiration()
+    public function testAbortAfterExpiration(): void
     {
         $this->markTestSkipped('Pdo expects a TTL greater than 1 sec. Simulating a slow network is too hard');
     }
 
-    public function testInvalidTtl()
+    public function testInvalidTtl(): void
     {
         $this->expectException(InvalidTtlException::class);
         $store = $this->getStore();
@@ -73,7 +73,7 @@ class PdoStoreTest extends AbstractStoreTestCase
     }
 
     #[DataProvider('provideDsnWithSQLite')]
-    public function testDsnWithSQLite(string $dsn, ?string $file = null)
+    public function testDsnWithSQLite(string $dsn, ?string $file = null): void
     {
         $key = new Key(__METHOD__);
 
@@ -98,7 +98,7 @@ class PdoStoreTest extends AbstractStoreTestCase
 
     #[RequiresPhpExtension('pdo_pgsql')]
     #[Group('integration')]
-    public function testDsnWithPostgreSQL()
+    public function testDsnWithPostgreSQL(): void
     {
         if (!$host = getenv('POSTGRES_HOST')) {
             $this->markTestSkipped('Missing POSTGRES_HOST env variable');

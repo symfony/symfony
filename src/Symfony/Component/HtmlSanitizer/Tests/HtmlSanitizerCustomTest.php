@@ -18,7 +18,7 @@ use Symfony\Component\HtmlSanitizer\Visitor\AttributeSanitizer\AttributeSanitize
 
 class HtmlSanitizerCustomTest extends TestCase
 {
-    public function testSanitizeForHead()
+    public function testSanitizeForHead(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div')
@@ -30,7 +30,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testSanitizeForTextarea()
+    public function testSanitizeForTextarea(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div')
@@ -42,7 +42,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testSanitizeForTitle()
+    public function testSanitizeForTitle(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div')
@@ -54,7 +54,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testSanitizeDeepNestedString()
+    public function testSanitizeDeepNestedString(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div')
@@ -63,13 +63,13 @@ class HtmlSanitizerCustomTest extends TestCase
         $this->assertNotEmpty($this->sanitize($config, str_repeat('<div>T', 10000)));
     }
 
-    public function testSanitizeNullByte()
+    public function testSanitizeNullByte(): void
     {
         $this->assertSame('Null byte�', $this->sanitize(new HtmlSanitizerConfig(), "Null byte\0"));
         $this->assertSame('Null byte�', $this->sanitize(new HtmlSanitizerConfig(), 'Null byte&#0;'));
     }
 
-    public function testSanitizeDefaultBody()
+    public function testSanitizeDefaultBody(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div')
@@ -81,7 +81,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testAllowElement()
+    public function testAllowElement(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div')
@@ -98,7 +98,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testAllowElementWithAttribute()
+    public function testAllowElementWithAttribute(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div', ['style'])
@@ -115,7 +115,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testBlockElement()
+    public function testBlockElement(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->blockElement('div')
@@ -132,7 +132,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testDropElement()
+    public function testDropElement(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->blockElement('div')
@@ -150,7 +150,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testAllowAttributeOnElement()
+    public function testAllowAttributeOnElement(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div')
@@ -169,7 +169,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testAllowAttributeEverywhere()
+    public function testAllowAttributeEverywhere(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div')
@@ -188,7 +188,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testDropAttributeOnElement()
+    public function testDropAttributeOnElement(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div')
@@ -208,7 +208,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testDropAttributeEverywhere()
+    public function testDropAttributeEverywhere(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div')
@@ -228,7 +228,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testForceAttribute()
+    public function testForceAttribute(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div')
@@ -264,7 +264,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testForceHttps()
+    public function testForceHttps(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('a', ['href'])
@@ -287,7 +287,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testAllowLinksSchemes()
+    public function testAllowLinksSchemes(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('a', ['href'])
@@ -305,7 +305,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testAllowLinksHosts()
+    public function testAllowLinksHosts(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('a', ['href'])
@@ -323,7 +323,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testAllowLinksRelative()
+    public function testAllowLinksRelative(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('a', ['href'])
@@ -341,7 +341,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testAllowMediaSchemes()
+    public function testAllowMediaSchemes(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('img', ['src'])
@@ -364,7 +364,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testAllowMediasHosts()
+    public function testAllowMediasHosts(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('img', ['src'])
@@ -387,7 +387,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testAllowMediasRelative()
+    public function testAllowMediasRelative(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('img', ['src'])
@@ -405,7 +405,7 @@ class HtmlSanitizerCustomTest extends TestCase
         );
     }
 
-    public function testCustomAttributeSanitizer()
+    public function testCustomAttributeSanitizer(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->allowElement('div', ['data-attr'])

@@ -40,7 +40,7 @@ class FFICasterTest extends TestCase
         }
     }
 
-    public function testCastAnonymousStruct()
+    public function testCastAnonymousStruct(): void
     {
         $this->assertDumpEquals(<<<'PHP'
             FFI\CData<struct <anonymous>> size 4 align 4 {
@@ -51,7 +51,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastNamedStruct()
+    public function testCastNamedStruct(): void
     {
         $this->assertDumpEquals(<<<'PHP'
             FFI\CData<struct Example> size 4 align 4 {
@@ -62,7 +62,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastAnonymousUnion()
+    public function testCastAnonymousUnion(): void
     {
         $this->assertDumpEquals(<<<'PHP'
             FFI\CData<union <anonymous>> size 4 align 4 {
@@ -74,7 +74,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastNamedUnion()
+    public function testCastNamedUnion(): void
     {
         $this->assertDumpEquals(<<<'PHP'
             FFI\CData<union Example> size 4 align 4 {
@@ -86,7 +86,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastAnonymousEnum()
+    public function testCastAnonymousEnum(): void
     {
         $this->assertDumpEquals(<<<'PHP'
             FFI\CData<enum <anonymous>> size 4 align 4 {
@@ -97,7 +97,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastNamedEnum()
+    public function testCastNamedEnum(): void
     {
         $this->assertDumpEquals(<<<'PHP'
             FFI\CData<enum Example> size 4 align 4 {
@@ -128,7 +128,7 @@ class FFICasterTest extends TestCase
     }
 
     #[DataProvider('scalarsDataProvider')]
-    public function testCastScalar(string $type, string $value, int $size, int $align)
+    public function testCastScalar(string $type, string $value, int $size, int $align): void
     {
         $this->assertDumpEquals(<<<PHP
             FFI\CData<$type> size $size align $align {
@@ -139,7 +139,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastVoidFunction()
+    public function testCastVoidFunction(): void
     {
         $abi = \PHP_OS_FAMILY === 'Windows' ? '[cdecl]' : '[fastcall]';
 
@@ -152,7 +152,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastIntFunction()
+    public function testCastIntFunction(): void
     {
         $abi = \PHP_OS_FAMILY === 'Windows' ? '[cdecl]' : '[fastcall]';
 
@@ -165,7 +165,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastFunctionWithArguments()
+    public function testCastFunctionWithArguments(): void
     {
         $abi = \PHP_OS_FAMILY === 'Windows' ? '[cdecl]' : '[fastcall]';
 
@@ -178,7 +178,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastNonCuttedPointerToChar()
+    public function testCastNonCuttedPointerToChar(): void
     {
         $actualMessage = "Hello World!\0";
 
@@ -195,7 +195,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastCuttedPointerToChar()
+    public function testCastCuttedPointerToChar(): void
     {
         $actualMessage = str_repeat('Hello World!', 30)."\0";
         $actualLength = \strlen($actualMessage);
@@ -227,7 +227,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastNonTrailingCharPointer()
+    public function testCastNonTrailingCharPointer(): void
     {
         $actualMessage = 'Hello World!';
         $actualLength = \strlen($actualMessage);
@@ -248,7 +248,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastUnionWithDirectReferencedFields()
+    public function testCastUnionWithDirectReferencedFields(): void
     {
         $ffi = \FFI::cdef(<<<'CPP'
             typedef union Event {
@@ -268,7 +268,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastUnionWithPointerReferencedFields()
+    public function testCastUnionWithPointerReferencedFields(): void
     {
         $ffi = \FFI::cdef(<<<'CPP'
             typedef union Event {
@@ -292,7 +292,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastUnionWithMixedFields()
+    public function testCastUnionWithMixedFields(): void
     {
         $ffi = \FFI::cdef(<<<'CPP'
             typedef union Event {
@@ -320,7 +320,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastPointerToEmptyScalars()
+    public function testCastPointerToEmptyScalars(): void
     {
         $ffi = \FFI::cdef(<<<'CPP'
             typedef struct {
@@ -350,7 +350,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastPointerToNonEmptyScalars()
+    public function testCastPointerToNonEmptyScalars(): void
     {
         $ffi = \FFI::cdef(<<<'CPP'
             typedef struct {
@@ -414,7 +414,7 @@ class FFICasterTest extends TestCase
         );
     }
 
-    public function testCastPointerToStruct()
+    public function testCastPointerToStruct(): void
     {
         $ffi = \FFI::cdef(<<<'CPP'
             typedef struct {
@@ -454,7 +454,7 @@ class FFICasterTest extends TestCase
         \FFI::free($struct);
     }
 
-    public function testCastComplexType()
+    public function testCastComplexType(): void
     {
         $ffi = \FFI::cdef(<<<'CPP'
             typedef struct {

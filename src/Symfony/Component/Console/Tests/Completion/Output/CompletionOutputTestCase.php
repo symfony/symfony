@@ -26,7 +26,7 @@ abstract class CompletionOutputTestCase extends TestCase
 
     abstract public function getExpectedValuesOutput(): string;
 
-    public function testOptionsOutput()
+    public function testOptionsOutput(): void
     {
         $options = [
             new InputOption('option1', 'o', InputOption::VALUE_NONE, 'First Option'),
@@ -40,7 +40,7 @@ abstract class CompletionOutputTestCase extends TestCase
         $this->assertEquals($this->getExpectedOptionsOutput(), stream_get_contents($stream));
     }
 
-    public function testValuesOutput()
+    public function testValuesOutput(): void
     {
         $suggestions = new CompletionSuggestions();
         $suggestions->suggestValues([

@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 class HandleTraitTest extends TestCase
 {
-    public function testItThrowsOnNoMessageBusInstance()
+    public function testItThrowsOnNoMessageBusInstance(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('You must provide a "Symfony\Component\Messenger\MessageBusInterface" instance in the "Symfony\Component\Messenger\Tests\TestQueryBus::$messageBus" property, but that property has not been initialized yet.');
@@ -33,7 +33,7 @@ class HandleTraitTest extends TestCase
         $queryBus->query($query);
     }
 
-    public function testHandleReturnsHandledStampResult()
+    public function testHandleReturnsHandledStampResult(): void
     {
         $bus = $this->createMock(MessageBus::class);
         $queryBus = new TestQueryBus($bus);
@@ -46,7 +46,7 @@ class HandleTraitTest extends TestCase
         $this->assertSame('result', $queryBus->query($query));
     }
 
-    public function testHandleAcceptsEnvelopes()
+    public function testHandleAcceptsEnvelopes(): void
     {
         $bus = $this->createMock(MessageBus::class);
         $queryBus = new TestQueryBus($bus);
@@ -57,7 +57,7 @@ class HandleTraitTest extends TestCase
         $this->assertSame('result', $queryBus->query($envelope));
     }
 
-    public function testHandleWithStamps()
+    public function testHandleWithStamps(): void
     {
         $bus = $this->createMock(MessageBus::class);
         $queryBus = new TestQueryBus($bus);
@@ -71,7 +71,7 @@ class HandleTraitTest extends TestCase
         $queryBus->query($query, [$stamp]);
     }
 
-    public function testHandleThrowsOnNoHandledStamp()
+    public function testHandleThrowsOnNoHandledStamp(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled zero times. Exactly one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()".');
@@ -84,7 +84,7 @@ class HandleTraitTest extends TestCase
         $queryBus->query($query);
     }
 
-    public function testHandleThrowsOnMultipleHandledStamps()
+    public function testHandleThrowsOnMultipleHandledStamps(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Message of type "Symfony\Component\Messenger\Tests\Fixtures\DummyMessage" was handled multiple times. Only one handler is expected when using "Symfony\Component\Messenger\Tests\TestQueryBus::handle()", got 2: "FirstDummyHandler::__invoke", "SecondDummyHandler::__invoke".');

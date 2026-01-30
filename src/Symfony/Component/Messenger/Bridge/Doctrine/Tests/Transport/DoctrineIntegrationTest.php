@@ -42,7 +42,7 @@ class DoctrineIntegrationTest extends TestCase
         $this->driverConnection->close();
     }
 
-    public function testConnectionSendAndGet()
+    public function testConnectionSendAndGet(): void
     {
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
         $encoded = $this->connection->get();
@@ -50,7 +50,7 @@ class DoctrineIntegrationTest extends TestCase
         $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
     }
 
-    public function testSendWithDelay()
+    public function testSendWithDelay(): void
     {
         $this->connection->send('{"message": "Hi i am delayed"}', ['type' => DummyMessage::class], 600000);
 
@@ -68,7 +68,7 @@ class DoctrineIntegrationTest extends TestCase
         $this->assertGreaterThan($now, $availableAt);
     }
 
-    public function testSendWithNegativeDelay()
+    public function testSendWithNegativeDelay(): void
     {
         $this->connection->send('{"message": "Hi, I am not actually delayed"}', ['type' => DummyMessage::class], -600000);
 
@@ -86,7 +86,7 @@ class DoctrineIntegrationTest extends TestCase
         $this->assertLessThan($now, $availableAt);
     }
 
-    public function testItRetrieveTheFirstAvailableMessage()
+    public function testItRetrieveTheFirstAvailableMessage(): void
     {
         $this->connection->setup();
         // insert messages
@@ -120,7 +120,7 @@ class DoctrineIntegrationTest extends TestCase
         $this->assertEquals('{"message": "Hi available"}', $encoded['body']);
     }
 
-    public function testItCountMessages()
+    public function testItCountMessages(): void
     {
         $this->connection->setup();
         // insert messages
@@ -161,7 +161,7 @@ class DoctrineIntegrationTest extends TestCase
         $this->assertSame(2, $this->connection->getMessageCount());
     }
 
-    public function testItRetrieveTheMessageThatIsOlderThanRedeliverTimeout()
+    public function testItRetrieveTheMessageThatIsOlderThanRedeliverTimeout(): void
     {
         $this->connection->setup();
         $twoHoursAgo = new \DateTimeImmutable('now -2 hours', new \DateTimeZone('UTC'));
@@ -186,7 +186,7 @@ class DoctrineIntegrationTest extends TestCase
         $this->connection->reject($next['id']);
     }
 
-    public function testTheTransportIsSetupOnGet()
+    public function testTheTransportIsSetupOnGet(): void
     {
         $this->driverConnection->executeStatement('CREATE TABLE unrelated (unknown_type_column)');
         $this->assertFalse($this->driverConnection->createSchemaManager()->tablesExist(['messenger_messages']));

@@ -37,7 +37,7 @@ class FlashBagTest extends TestCase
         unset($this->bag);
     }
 
-    public function testInitialize()
+    public function testInitialize(): void
     {
         $bag = new FlashBag();
         $bag->initialize($this->array);
@@ -47,21 +47,21 @@ class FlashBagTest extends TestCase
         $this->assertEquals($array, $bag->peekAll());
     }
 
-    public function testGetStorageKey()
+    public function testGetStorageKey(): void
     {
         $this->assertEquals('_symfony_flashes', $this->bag->getStorageKey());
         $attributeBag = new FlashBag('test');
         $this->assertEquals('test', $attributeBag->getStorageKey());
     }
 
-    public function testGetSetName()
+    public function testGetSetName(): void
     {
         $this->assertEquals('flashes', $this->bag->getName());
         $this->bag->setName('foo');
         $this->assertEquals('foo', $this->bag->getName());
     }
 
-    public function testPeek()
+    public function testPeek(): void
     {
         $this->assertEquals([], $this->bag->peek('non_existing'));
         $this->assertEquals(['default'], $this->bag->peek('not_existing', ['default']));
@@ -69,7 +69,7 @@ class FlashBagTest extends TestCase
         $this->assertEquals(['A previous flash message'], $this->bag->peek('notice'));
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $tab = ['bar' => 'baz'];
         $this->bag->add('string_message', 'lorem');
@@ -81,7 +81,7 @@ class FlashBagTest extends TestCase
         $this->assertEquals([$tab], $this->bag->get('array_message'));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $this->assertEquals([], $this->bag->get('non_existing'));
         $this->assertEquals(['default'], $this->bag->get('not_existing', ['default']));
@@ -89,7 +89,7 @@ class FlashBagTest extends TestCase
         $this->assertEquals([], $this->bag->get('notice'));
     }
 
-    public function testAll()
+    public function testAll(): void
     {
         $this->bag->set('notice', 'Foo');
         $this->bag->set('error', 'Bar');
@@ -101,25 +101,25 @@ class FlashBagTest extends TestCase
         $this->assertEquals([], $this->bag->all());
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $this->bag->set('notice', 'Foo');
         $this->bag->set('notice', 'Bar');
         $this->assertEquals(['Bar'], $this->bag->peek('notice'));
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $this->assertFalse($this->bag->has('nothing'));
         $this->assertTrue($this->bag->has('notice'));
     }
 
-    public function testKeys()
+    public function testKeys(): void
     {
         $this->assertEquals(['notice'], $this->bag->keys());
     }
 
-    public function testSetAll()
+    public function testSetAll(): void
     {
         $this->bag->add('one_flash', 'Foo');
         $this->bag->add('another_flash', 'Bar');
@@ -132,7 +132,7 @@ class FlashBagTest extends TestCase
         $this->assertSame([], $this->bag->all());
     }
 
-    public function testPeekAll()
+    public function testPeekAll(): void
     {
         $this->bag->set('notice', 'Foo');
         $this->bag->set('error', 'Bar');

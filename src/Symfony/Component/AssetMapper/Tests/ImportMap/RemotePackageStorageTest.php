@@ -36,13 +36,13 @@ class RemotePackageStorageTest extends TestCase
         $this->filesystem->remove(self::$writableRoot);
     }
 
-    public function testGetStorageDir()
+    public function testGetStorageDir(): void
     {
         $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
         $this->assertSame(realpath(self::$writableRoot.'/assets/vendor'), realpath($storage->getStorageDir()));
     }
 
-    public function testSaveThrowsWhenFailing()
+    public function testSaveThrowsWhenFailing(): void
     {
         $vendorDir = self::$writableRoot.'/assets/acme/vendor';
         $this->filesystem->mkdir($vendorDir.'/module_specifier');
@@ -70,7 +70,7 @@ class RemotePackageStorageTest extends TestCase
         }
     }
 
-    public function testIsDownloaded()
+    public function testIsDownloaded(): void
     {
         $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
         $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
@@ -82,7 +82,7 @@ class RemotePackageStorageTest extends TestCase
         $this->assertTrue($storage->isDownloaded($entry));
     }
 
-    public function testIsExtraFileDownloaded()
+    public function testIsExtraFileDownloaded(): void
     {
         $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
         $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
@@ -94,7 +94,7 @@ class RemotePackageStorageTest extends TestCase
         $this->assertTrue($storage->isExtraFileDownloaded($entry, '/path/to/extra.woff'));
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
         $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
@@ -104,7 +104,7 @@ class RemotePackageStorageTest extends TestCase
         $this->assertEquals('any content', $this->filesystem->readFile($targetPath));
     }
 
-    public function testSaveExtraFile()
+    public function testSaveExtraFile(): void
     {
         $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
         $entry = ImportMapEntry::createRemote('foo', ImportMapType::JS, '/does/not/matter', '1.0.0', 'module_specifier', false);
@@ -115,7 +115,7 @@ class RemotePackageStorageTest extends TestCase
     }
 
     #[DataProvider('getDownloadPathTests')]
-    public function testGetDownloadedPath(string $packageModuleSpecifier, ImportMapType $importMapType, string $expectedPath)
+    public function testGetDownloadedPath(string $packageModuleSpecifier, ImportMapType $importMapType, string $expectedPath): void
     {
         $storage = new RemotePackageStorage(self::$writableRoot.'/assets/vendor');
         $this->assertSame(self::$writableRoot.$expectedPath, $storage->getDownloadPath($packageModuleSpecifier, $importMapType));

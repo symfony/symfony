@@ -26,7 +26,7 @@ use Symfony\Component\Ldap\Tests\LdapTestCase;
 #[Group('integration')]
 class AdapterTest extends LdapTestCase
 {
-    public function testLdapEscape()
+    public function testLdapEscape(): void
     {
         $ldap = new Adapter();
 
@@ -34,7 +34,7 @@ class AdapterTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testSaslBind()
+    public function testSaslBind(): void
     {
         $h = @ldap_connect('ldap://'.getenv('LDAP_HOST').':'.getenv('LDAP_PORT'));
         @ldap_set_option($h, \LDAP_OPT_PROTOCOL_VERSION, 3);
@@ -57,7 +57,7 @@ class AdapterTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testWhoamiWithoutSaslBind()
+    public function testWhoamiWithoutSaslBind(): void
     {
         $ldap = new Adapter($this->getLdapConfig());
 
@@ -68,7 +68,7 @@ class AdapterTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testLdapQuery()
+    public function testLdapQuery(): void
     {
         $ldap = new Adapter($this->getLdapConfig());
 
@@ -86,7 +86,7 @@ class AdapterTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testLdapQueryIterator()
+    public function testLdapQueryIterator(): void
     {
         $ldap = new Adapter($this->getLdapConfig());
 
@@ -102,7 +102,7 @@ class AdapterTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testLdapQueryWithoutBind()
+    public function testLdapQueryWithoutBind(): void
     {
         $ldap = new Adapter($this->getLdapConfig());
         $this->expectException(NotBoundException::class);
@@ -110,7 +110,7 @@ class AdapterTest extends LdapTestCase
         $query->execute();
     }
 
-    public function testLdapQueryScopeBase()
+    public function testLdapQueryScopeBase(): void
     {
         $ldap = new Adapter($this->getLdapConfig());
 
@@ -126,7 +126,7 @@ class AdapterTest extends LdapTestCase
         $this->assertEquals(['Fabien Potencier'], $entry->getAttribute('cn'));
     }
 
-    public function testLdapQueryScopeOneLevel()
+    public function testLdapQueryScopeOneLevel(): void
     {
         $ldap = new Adapter($this->getLdapConfig());
 
@@ -143,7 +143,7 @@ class AdapterTest extends LdapTestCase
         $this->assertEquals(['Ldap'], $one_level_result[0]->getAttribute('ou'));
     }
 
-    public function testLdapPagination()
+    public function testLdapPagination(): void
     {
         $ldap = new Adapter($this->getLdapConfig());
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');
@@ -209,7 +209,7 @@ class AdapterTest extends LdapTestCase
         return $entries;
     }
 
-    private function destroyEntries($ldap, $entries)
+    private function destroyEntries($ldap, $entries): void
     {
         $em = $ldap->getEntryManager();
         foreach ($entries as $entry) {
@@ -217,7 +217,7 @@ class AdapterTest extends LdapTestCase
         }
     }
 
-    public function testLdapPaginationLimits()
+    public function testLdapPaginationLimits(): void
     {
         $ldap = new Adapter($this->getLdapConfig());
         $ldap->getConnection()->bind('cn=admin,dc=symfony,dc=com', 'symfony');

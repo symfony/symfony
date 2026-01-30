@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 #[Group('functional')]
 class ContainerDebugCommandTest extends AbstractWebTestCase
 {
-    public function testDumpContainerIfNotExists()
+    public function testDumpContainerIfNotExists(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
 
@@ -38,7 +38,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertFileExists(static::getContainer()->getParameter('debug.container.dump'));
     }
 
-    public function testNoDebug()
+    public function testNoDebug(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => false]);
 
@@ -51,7 +51,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('public', $tester->getDisplay());
     }
 
-    public function testNoDumpedXML()
+    public function testNoDumpedXML(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'no_dump.yml', 'debug' => true]);
 
@@ -64,7 +64,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('public', $tester->getDisplay());
     }
 
-    public function testPrivateAlias()
+    public function testPrivateAlias(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
@@ -84,7 +84,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('The "private_alias" service or alias has been removed', $tester->getDisplay());
     }
 
-    public function testDeprecatedServiceAndAlias()
+    public function testDeprecatedServiceAndAlias(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
@@ -100,7 +100,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('[WARNING] The "deprecated_alias" alias is deprecated since foo/bar 1.9 and will be removed in 2.0', $tester->getDisplay());
     }
 
-    public function testExcludedService()
+    public function testExcludedService(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
@@ -114,7 +114,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideIgnoreBackslashWhenFindingService')]
-    public function testIgnoreBackslashWhenFindingService(string $validServiceId)
+    public function testIgnoreBackslashWhenFindingService(string $validServiceId): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
@@ -126,7 +126,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringNotContainsString('No services found', $tester->getDisplay());
     }
 
-    public function testTagsPartialSearch()
+    public function testTagsPartialSearch(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
@@ -151,7 +151,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         );
     }
 
-    public function testDescribeEnvVars()
+    public function testDescribeEnvVars(): void
     {
         putenv('REAL=value');
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
@@ -190,7 +190,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         putenv('REAL');
     }
 
-    public function testDescribeEnvVar()
+    public function testDescribeEnvVar(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
 
@@ -205,7 +205,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString(file_get_contents(__DIR__.'/Fixtures/describe_env_vars.txt'), $tester->getDisplay(true));
     }
 
-    public function testGetDeprecation()
+    public function testGetDeprecation(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
         $path = \sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.build_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
@@ -235,7 +235,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('/home/hamza/project/contrib/sf/vendor/symfony/framework-bundle/Controller/Controller.php', $tester->getDisplay());
     }
 
-    public function testGetDeprecationNone()
+    public function testGetDeprecationNone(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
         $path = \sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.build_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
@@ -254,7 +254,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('[OK] There are no deprecations in the logs!', $tester->getDisplay());
     }
 
-    public function testGetDeprecationNoFile()
+    public function testGetDeprecationNoFile(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
         $path = \sprintf('%s/%sDeprecations.log', static::$kernel->getContainer()->getParameter('kernel.build_dir'), static::$kernel->getContainer()->getParameter('kernel.container_class'));
@@ -282,7 +282,7 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions, array $notExpectedSuggestions = [])
+    public function testComplete(array $input, array $expectedSuggestions, array $notExpectedSuggestions = []): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
 

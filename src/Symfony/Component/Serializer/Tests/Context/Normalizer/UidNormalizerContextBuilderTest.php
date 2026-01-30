@@ -33,7 +33,7 @@ class UidNormalizerContextBuilderTest extends TestCase
      * @param array<string, mixed> $values
      */
     #[DataProvider('withersDataProvider')]
-    public function testWithers(array $values)
+    public function testWithers(array $values): void
     {
         $context = $this->contextBuilder
             ->withNormalizationFormat($values[UidNormalizer::NORMALIZATION_FORMAT_KEY])
@@ -56,7 +56,7 @@ class UidNormalizerContextBuilderTest extends TestCase
         ]];
     }
 
-    public function testCannotSetInvalidUidNormalizationFormat()
+    public function testCannotSetInvalidUidNormalizationFormat(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->contextBuilder->withNormalizationFormat('invalid format');

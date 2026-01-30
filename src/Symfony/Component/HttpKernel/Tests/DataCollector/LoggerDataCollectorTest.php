@@ -23,7 +23,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
 
 class LoggerDataCollectorTest extends TestCase
 {
-    public function testCollectWithUnexpectedFormat()
+    public function testCollectWithUnexpectedFormat(): void
     {
         $logger = $this
             ->getMockBuilder(DebugLoggerInterface::class)
@@ -47,7 +47,7 @@ class LoggerDataCollectorTest extends TestCase
         ], $compilerLogs['Unknown Compiler Pass']);
     }
 
-    public function testCollectFromDeprecationsLog()
+    public function testCollectFromDeprecationsLog(): void
     {
         $containerPathPrefix = __DIR__.'/';
         $path = $containerPathPrefix.'Deprecations.log';
@@ -93,7 +93,7 @@ class LoggerDataCollectorTest extends TestCase
         @unlink($path);
     }
 
-    public function testWithMainRequest()
+    public function testWithMainRequest(): void
     {
         $mainRequest = new Request();
         $stack = new RequestStack();
@@ -112,7 +112,7 @@ class LoggerDataCollectorTest extends TestCase
         $c->lateCollect();
     }
 
-    public function testWithSubRequest()
+    public function testWithSubRequest(): void
     {
         $mainRequest = new Request();
         $subRequest = new Request();
@@ -134,7 +134,7 @@ class LoggerDataCollectorTest extends TestCase
     }
 
     #[DataProvider('getCollectTestData')]
-    public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount, $expectedScreamCount, $expectedPriorities = null)
+    public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount, $expectedScreamCount, $expectedPriorities = null): void
     {
         $logger = $this
             ->getMockBuilder(DebugLoggerInterface::class)

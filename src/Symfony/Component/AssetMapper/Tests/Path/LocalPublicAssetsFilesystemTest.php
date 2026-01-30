@@ -34,7 +34,7 @@ class LocalPublicAssetsFilesystemTest extends TestCase
         $this->filesystem->remove(self::$writableRoot);
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $filesystem = new LocalPublicAssetsFilesystem(self::$writableRoot);
         $filesystem->write('foo/bar.js', 'foobar');
@@ -46,7 +46,7 @@ class LocalPublicAssetsFilesystemTest extends TestCase
         $this->assertFileExists(self::$writableRoot.'/foo/baz/bar.js');
     }
 
-    public function testCopy()
+    public function testCopy(): void
     {
         $filesystem = new LocalPublicAssetsFilesystem(self::$writableRoot);
         $filesystem->copy(__DIR__.'/../Fixtures/importmaps/assets/pizza/index.js', 'foo/bar.js');
@@ -54,7 +54,7 @@ class LocalPublicAssetsFilesystemTest extends TestCase
         $this->assertSame("console.log('pizza/index.js');", trim($this->filesystem->readFile(self::$writableRoot.'/foo/bar.js')));
     }
 
-    public function testCompress()
+    public function testCompress(): void
     {
         $filesystem = new LocalPublicAssetsFilesystem(self::$writableRoot, new GzipCompressor(), ['js']);
         $filesystem->write('foo/baz/bar.js', 'foobar');

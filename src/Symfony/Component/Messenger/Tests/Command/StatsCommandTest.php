@@ -56,7 +56,7 @@ class StatsCommandTest extends TestCase
         ]);
     }
 
-    public function testWithoutArgument()
+    public function testWithoutArgument(): void
     {
         $tester = new CommandTester($this->command);
         $tester->execute([]);
@@ -68,7 +68,7 @@ class StatsCommandTest extends TestCase
         $this->assertStringContainsString('! [NOTE] Unable to get message count for the following transports: "simple".', $display);
     }
 
-    public function testWithoutArgumentJsonFormat()
+    public function testWithoutArgumentJsonFormat(): void
     {
         $tester = new CommandTester($this->command);
         $tester->execute(['--format' => 'json']);
@@ -85,7 +85,7 @@ class StatsCommandTest extends TestCase
 }', $display);
     }
 
-    public function testWithOneExistingMessageCountableTransport()
+    public function testWithOneExistingMessageCountableTransport(): void
     {
         $tester = new CommandTester($this->command);
         $tester->execute(['transport_names' => ['message_countable']]);
@@ -97,7 +97,7 @@ class StatsCommandTest extends TestCase
         $this->assertStringNotContainsString(' ! [NOTE] Unable to get message count for the following transports: "simple".', $display);
     }
 
-    public function testWithOneExistingMessageCountableTransportJsonFormat()
+    public function testWithOneExistingMessageCountableTransportJsonFormat(): void
     {
         $tester = new CommandTester($this->command);
         $tester->execute(['transport_names' => ['message_countable'], '--format' => 'json']);
@@ -110,7 +110,7 @@ class StatsCommandTest extends TestCase
 }', $display);
     }
 
-    public function testWithMultipleExistingMessageCountableTransport()
+    public function testWithMultipleExistingMessageCountableTransport(): void
     {
         $tester = new CommandTester($this->command);
         $tester->execute(['transport_names' => ['message_countable', 'another_message_countable']]);
@@ -122,7 +122,7 @@ class StatsCommandTest extends TestCase
         $this->assertStringNotContainsString('! [NOTE] Unable to get message count for the following transports: "simple".', $display);
     }
 
-    public function testWithMultipleExistingMessageCountableTransportJsonFormat()
+    public function testWithMultipleExistingMessageCountableTransportJsonFormat(): void
     {
         $tester = new CommandTester($this->command);
         $tester->execute(['transport_names' => ['message_countable', 'another_message_countable'], '--format' => 'json']);
@@ -136,7 +136,7 @@ class StatsCommandTest extends TestCase
 }', $display);
     }
 
-    public function testWithNotMessageCountableTransport()
+    public function testWithNotMessageCountableTransport(): void
     {
         $tester = new CommandTester($this->command);
         $tester->execute(['transport_names' => ['simple']]);
@@ -148,7 +148,7 @@ class StatsCommandTest extends TestCase
         $this->assertStringContainsString('! [NOTE] Unable to get message count for the following transports: "simple".', $display);
     }
 
-    public function testWithNotExistingTransport()
+    public function testWithNotExistingTransport(): void
     {
         $tester = new CommandTester($this->command);
         $tester->execute(['transport_names' => ['unexisting']]);
@@ -160,7 +160,7 @@ class StatsCommandTest extends TestCase
         $this->assertStringNotContainsString('! [NOTE] Unable to get message count for the following transports: "simple".', $display);
     }
 
-    public function testTableOutputGoesToStdout()
+    public function testTableOutputGoesToStdout(): void
     {
         $tester = new CommandTester($this->command);
         $tester->execute([], ['capture_stderr_separately' => true]);
@@ -176,7 +176,7 @@ class StatsCommandTest extends TestCase
         $this->assertStringNotContainsString('Transport', $stderr);
     }
 
-    public function testWarningsGoToStderrWithSpecificTransport()
+    public function testWarningsGoToStderrWithSpecificTransport(): void
     {
         $tester = new CommandTester($this->command);
         $tester->execute(['transport_names' => ['message_countable']], ['capture_stderr_separately' => true]);

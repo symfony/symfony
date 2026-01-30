@@ -20,7 +20,7 @@ use Symfony\Component\WebLink\Link;
  */
 class LinkTest extends TestCase
 {
-    public function testCanSetAndRetrieveValues()
+    public function testCanSetAndRetrieveValues(): void
     {
         $link = (new Link())
             ->withHref('http://www.google.com')
@@ -34,7 +34,7 @@ class LinkTest extends TestCase
         $this->assertSame('you', $link->getAttributes()['me']);
     }
 
-    public function testCanRemoveValues()
+    public function testCanRemoveValues(): void
     {
         $link = (new Link())
             ->withHref('http://www.google.com')
@@ -50,7 +50,7 @@ class LinkTest extends TestCase
         $this->assertArrayNotHasKey('me', $link->getAttributes());
     }
 
-    public function testMultipleRels()
+    public function testMultipleRels(): void
     {
         $link = (new Link())
             ->withHref('http://www.google.com')
@@ -62,7 +62,7 @@ class LinkTest extends TestCase
         $this->assertContains('reference', $link->getRels());
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $link = new Link('next', 'http://www.google.com');
 
@@ -71,7 +71,7 @@ class LinkTest extends TestCase
     }
 
     #[DataProvider('templatedHrefProvider')]
-    public function testTemplated(string $href)
+    public function testTemplated(string $href): void
     {
         $link = (new Link())
             ->withHref($href);
@@ -80,7 +80,7 @@ class LinkTest extends TestCase
     }
 
     #[DataProvider('notTemplatedHrefProvider')]
-    public function testNotTemplated(string $href)
+    public function testNotTemplated(string $href): void
     {
         $link = (new Link())
             ->withHref($href);

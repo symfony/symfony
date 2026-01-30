@@ -125,7 +125,7 @@ class SpanishInflectorTest extends TestCase
     }
 
     #[DataProvider('singularizeProvider')]
-    public function testSingularize(string $plural, $singular)
+    public function testSingularize(string $plural, $singular): void
     {
         $this->assertSame(
             \is_array($singular) ? $singular : [$singular],
@@ -134,7 +134,7 @@ class SpanishInflectorTest extends TestCase
     }
 
     #[DataProvider('pluralizeProvider')]
-    public function testPluralize(string $singular, $plural)
+    public function testPluralize(string $singular, $plural): void
     {
         $this->assertSame(
             \is_array($plural) ? $plural : [$plural],
@@ -143,7 +143,7 @@ class SpanishInflectorTest extends TestCase
     }
 
     #[DataProvider('uninflectedProvider')]
-    public function testUninflected(string $word)
+    public function testUninflected(string $word): void
     {
         $this->assertSame(
             [$word],

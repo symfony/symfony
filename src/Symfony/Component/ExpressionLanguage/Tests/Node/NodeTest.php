@@ -18,7 +18,7 @@ use Symfony\Component\ExpressionLanguage\Node\Node;
 
 class NodeTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $node = new Node([new ConstantNode('foo')]);
 
@@ -31,7 +31,7 @@ class NodeTest extends TestCase
         );
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $node = new Node(['foo' => 'bar'], ['bar' => 'foo']);
 
@@ -41,7 +41,7 @@ class NodeTest extends TestCase
         $this->assertEquals($node, $unserializedNode);
     }
 
-    public function testCompileActuallyCompilesAllNodes()
+    public function testCompileActuallyCompilesAllNodes(): void
     {
         $nodes = [];
         foreach (range(1, 10) as $ignored) {
@@ -55,7 +55,7 @@ class NodeTest extends TestCase
         $node->compile(new Compiler([]));
     }
 
-    public function testEvaluateActuallyEvaluatesAllNodes()
+    public function testEvaluateActuallyEvaluatesAllNodes(): void
     {
         $nodes = [];
         foreach (range(1, 3) as $i) {

@@ -21,7 +21,7 @@ use Symfony\Component\JsonPath\JsonPath;
 
 class JsonCrawlerTest extends TestCase
 {
-    public function testNotStringOrResourceThrows()
+    public function testNotStringOrResourceThrows(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Expected string or resource, got "int".');
@@ -29,7 +29,7 @@ class JsonCrawlerTest extends TestCase
         new JsonCrawler(42);
     }
 
-    public function testInvalidInputJson()
+    public function testInvalidInputJson(): void
     {
         $this->expectException(InvalidJsonStringInputException::class);
         $this->expectExceptionMessage('Invalid JSON input: Syntax error');
@@ -37,7 +37,7 @@ class JsonCrawlerTest extends TestCase
         (new JsonCrawler('invalid'))->find('$..*');
     }
 
-    public function testAllAuthors()
+    public function testAllAuthors(): void
     {
         $result = self::getBookstoreCrawler()->find('$..author');
 
@@ -50,7 +50,7 @@ class JsonCrawlerTest extends TestCase
         ], $result);
     }
 
-    public function testAllAuthorsWithBrackets()
+    public function testAllAuthorsWithBrackets(): void
     {
         $result = self::getBookstoreCrawler()->find('$..["author"]');
 
@@ -63,7 +63,7 @@ class JsonCrawlerTest extends TestCase
         ], $result);
     }
 
-    public function testAllThingsInStore()
+    public function testAllThingsInStore(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store.*');
 
@@ -72,7 +72,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertArrayHasKey('color', $result[1]);
     }
 
-    public function testAllThingsInStoreWithBrackets()
+    public function testAllThingsInStoreWithBrackets(): void
     {
         $result = self::getBookstoreCrawler()->find('$["store"][*]');
 
@@ -81,7 +81,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertArrayHasKey('color', $result[1]);
     }
 
-    public function testEscapedDoubleQuotesInFieldName()
+    public function testEscapedDoubleQuotesInFieldName(): void
     {
         $crawler = new JsonCrawler(<<<JSON
             {"a": {"b\\"c": 42}}
@@ -92,7 +92,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame(42, $result[0]);
     }
 
-    public function testMultipleKeysAtOnce()
+    public function testMultipleKeysAtOnce(): void
     {
         $crawler = new JsonCrawler(<<<JSON
             {"a": {"b\\"c": 42}, "b": {"c": 43}}
@@ -106,7 +106,7 @@ class JsonCrawlerTest extends TestCase
         ], $result);
     }
 
-    public function testMultipleKeysAtOnceOnArray()
+    public function testMultipleKeysAtOnceOnArray(): void
     {
         $crawler = new JsonCrawler(<<<JSON
             [{"a": 1}, {"b": 2}, {"c": 3}, {"a,b,c":  5}, {"d": 4}]
@@ -121,7 +121,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame(['d' => 4], $result[3]);
     }
 
-    public function testBasicNameSelector()
+    public function testBasicNameSelector(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store.book')[0];
 
@@ -129,7 +129,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Nigel Rees', $result[0]['author']);
     }
 
-    public function testBasicNameSelectorWithBrackts()
+    public function testBasicNameSelectorWithBrackts(): void
     {
         $result = self::getBookstoreCrawler()->find('$["store"]["book"]')[0];
 
@@ -137,7 +137,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Nigel Rees', $result[0]['author']);
     }
 
-    public function testAllPrices()
+    public function testAllPrices(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store..price');
 
@@ -145,7 +145,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([8.95, 12.99, 8.99, 22.99, 399], $result);
     }
 
-    public function testSpecificBookByIndex()
+    public function testSpecificBookByIndex(): void
     {
         $result = self::getBookstoreCrawler()->find('$..book[2]');
 
@@ -153,7 +153,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Moby Dick', $result[0]['title']);
     }
 
-    public function testLastBookInOrder()
+    public function testLastBookInOrder(): void
     {
         $result = self::getBookstoreCrawler()->find('$..book[-1]');
 
@@ -161,7 +161,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('The Lord of the Rings', $result[0]['title']);
     }
 
-    public function testFirstTwoBooks()
+    public function testFirstTwoBooks(): void
     {
         $result = self::getBookstoreCrawler()->find('$..book[0,1]');
 
@@ -170,7 +170,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sword of Honour', $result[1]['title']);
     }
 
-    public function testBooksWithIsbn()
+    public function testBooksWithIsbn(): void
     {
         $result = self::getBookstoreCrawler()->find('$..book[?(@.isbn)]');
 
@@ -181,7 +181,7 @@ class JsonCrawlerTest extends TestCase
         ], [$result[0]['isbn'], $result[1]['isbn']]);
     }
 
-    public function testBooksWithPublisherAddress()
+    public function testBooksWithPublisherAddress(): void
     {
         $result = self::getBookstoreCrawler()->find('$..book[?(@.publisher.address)]');
 
@@ -189,7 +189,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sword of Honour', $result[0]['title']);
     }
 
-    public function testBooksWithBracketsAndFilter()
+    public function testBooksWithBracketsAndFilter(): void
     {
         $result = self::getBookstoreCrawler()->find('$..["book"][?(@.isbn)]');
 
@@ -200,7 +200,7 @@ class JsonCrawlerTest extends TestCase
         ], [$result[0]['isbn'], $result[1]['isbn']]);
     }
 
-    public function testBooksLessThanTenDollars()
+    public function testBooksLessThanTenDollars(): void
     {
         $result = self::getBookstoreCrawler()->find('$..book[?(@.price < 10)]');
 
@@ -211,14 +211,14 @@ class JsonCrawlerTest extends TestCase
         ], [$result[0]['title'], $result[1]['title']]);
     }
 
-    public function testRecursiveWildcard()
+    public function testRecursiveWildcard(): void
     {
         $result = self::getBookstoreCrawler()->find('$..*');
 
         $this->assertNotEmpty($result);
     }
 
-    public function testSliceWithStep()
+    public function testSliceWithStep(): void
     {
         $crawler = new JsonCrawler(<<<JSON
             {"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
@@ -228,7 +228,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([5, 2], $result);
     }
 
-    public function testNegativeSlice()
+    public function testNegativeSlice(): void
     {
         $crawler = new JsonCrawler(<<<JSON
             {"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
@@ -239,7 +239,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertCount(3, $result);
     }
 
-    public function testBooleanAndNullValues()
+    public function testBooleanAndNullValues(): void
     {
         $crawler = new JsonCrawler('{"a": true, "b": false, "c": null}');
 
@@ -247,7 +247,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([true, false, null], $result);
     }
 
-    public function testFullArraySlice()
+    public function testFullArraySlice(): void
     {
         $crawler = self::getSimpleCollectionCrawler();
 
@@ -255,7 +255,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([3, 5, 1, 2, 4, 6], $result);
     }
 
-    public function testReverseArraySlice()
+    public function testReverseArraySlice(): void
     {
         $crawler = self::getSimpleCollectionCrawler();
 
@@ -263,7 +263,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([6, 4, 2, 1, 5, 3], $result);
     }
 
-    public function testLastTwoElementsSlice()
+    public function testLastTwoElementsSlice(): void
     {
         $crawler = self::getSimpleCollectionCrawler();
 
@@ -271,7 +271,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([4, 6], $result);
     }
 
-    public function testAllButLastTwoElementsSlice()
+    public function testAllButLastTwoElementsSlice(): void
     {
         $crawler = self::getSimpleCollectionCrawler();
 
@@ -279,7 +279,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([3, 5, 1, 2], $result);
     }
 
-    public function testEverySecondElementSlice()
+    public function testEverySecondElementSlice(): void
     {
         $crawler = self::getSimpleCollectionCrawler();
 
@@ -287,7 +287,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([3, 1, 4], $result);
     }
 
-    public function testEverySecondElementReverseSlice()
+    public function testEverySecondElementReverseSlice(): void
     {
         $crawler = self::getSimpleCollectionCrawler();
 
@@ -295,7 +295,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([6, 2, 5], $result);
     }
 
-    public function testEverySecondElementReverseSliceAndBrackets()
+    public function testEverySecondElementReverseSliceAndBrackets(): void
     {
         $crawler = self::getSimpleCollectionCrawler();
 
@@ -303,7 +303,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([6, 2, 5], $result);
     }
 
-    public function testEmptyResults()
+    public function testEmptyResults(): void
     {
         $crawler = self::getSimpleCollectionCrawler();
 
@@ -312,7 +312,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertEmpty($crawler->find('$.a[5:2]'));
     }
 
-    public function testNegativeIndicesEdgeCases()
+    public function testNegativeIndicesEdgeCases(): void
     {
         $crawler = self::getSimpleCollectionCrawler();
 
@@ -326,7 +326,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([4, 2, 1], $result);
     }
 
-    public function testBoundaryConditions()
+    public function testBoundaryConditions(): void
     {
         $crawler = new JsonCrawler(<<<JSON
             {"a": [3, 5, 1, 2, 4, 6]}
@@ -342,7 +342,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([1], $result);
     }
 
-    public function testFilterByValue()
+    public function testFilterByValue(): void
     {
         $crawler = new JsonCrawler(<<<JSON
             {"a": [3, 5, 1, 2, 4, 6, {"b": "j"}, {"b": "k"}, {"b": {}}, {"b": "kilo"}]}
@@ -354,7 +354,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('kilo', $result[0]['b']);
     }
 
-    public function testMultipleConditions()
+    public function testMultipleConditions(): void
     {
         $result = self::getBookstoreCrawler()->find("$..book[?(@.price < 10 && @.category == 'reference')]");
 
@@ -362,21 +362,21 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sayings of the Century', $result[0]['title']);
     }
 
-    public function testEmptyResult()
+    public function testEmptyResult(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?(@.price > 1000)]');
 
         $this->assertEmpty($result);
     }
 
-    public function testDirectRecursion()
+    public function testDirectRecursion(): void
     {
         $result = self::getBookstoreCrawler()->find('$..price');
 
         $this->assertCount(5, $result);
     }
 
-    public function testCombinedFilters()
+    public function testCombinedFilters(): void
     {
         $result = self::getBookstoreCrawler()->find("$..book[?(@.price > 20 && @.category == 'fiction')]");
 
@@ -384,7 +384,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('The Lord of the Rings', $result[0]['title']);
     }
 
-    public function testMatchFunction()
+    public function testMatchFunction(): void
     {
         $result = self::getBookstoreCrawler()->find("$.store.book[?match(@.title, 'Sw[a-z]rd of Honour')]");
 
@@ -392,14 +392,14 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sword of Honour', $result[0]['title']);
     }
 
-    public function testMatchFunctionDoesNotMatchSubstring()
+    public function testMatchFunctionDoesNotMatchSubstring(): void
     {
         $result = self::getBookstoreCrawler()->find("$.store.book[?match(@.title, 'Sw[a-z]rd')]");
 
         $this->assertCount(0, $result);
     }
 
-    public function testMatchFunctionWithOuterParentheses()
+    public function testMatchFunctionWithOuterParentheses(): void
     {
         $result = self::getBookstoreCrawler()->find("$.store.book[?(match(@.title, 'Sw[a-z]rd of Honour'))]");
 
@@ -407,7 +407,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sword of Honour', $result[0]['title']);
     }
 
-    public function testSearchFunctionMatchSubstring()
+    public function testSearchFunctionMatchSubstring(): void
     {
         $result = self::getBookstoreCrawler()->find("$.store.book[?search(@.title, 'of H[ou]nour')]");
 
@@ -415,7 +415,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sword of Honour', $result[0]['title']);
     }
 
-    public function testSearchFunctionWithOuterParentheses()
+    public function testSearchFunctionWithOuterParentheses(): void
     {
         $result = self::getBookstoreCrawler()->find("$.store.book[?(search(@.title, 'of Hon.{2}r'))]");
 
@@ -423,7 +423,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sword of Honour', $result[0]['title']);
     }
 
-    public function testValueFunction()
+    public function testValueFunction(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?value(@.price) == 8.95]');
 
@@ -431,7 +431,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sayings of the Century', $result[0]['title']);
     }
 
-    public function testDeepExpressionInFilter()
+    public function testDeepExpressionInFilter(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?(@.publisher.address.city == "Springfield")]');
 
@@ -439,7 +439,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sword of Honour', $result[0]['title']);
     }
 
-    public function testWildcardInFilter()
+    public function testWildcardInFilter(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?(@.publisher.* == "my-publisher")]');
 
@@ -447,7 +447,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sword of Honour', $result[0]['title']);
     }
 
-    public function testWildcardInFunction()
+    public function testWildcardInFunction(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?match(@.publisher.*.city, "Spring.+")]');
 
@@ -455,7 +455,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sword of Honour', $result[0]['title']);
     }
 
-    public function testUseAtSymbolReturnsAll()
+    public function testUseAtSymbolReturnsAll(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store.bicycle[?(@ == @)]');
 
@@ -465,7 +465,7 @@ class JsonCrawlerTest extends TestCase
         ], $result);
     }
 
-    public function testUseAtSymbolAloneReturnsAll()
+    public function testUseAtSymbolAloneReturnsAll(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store.bicycle[?(@)]');
 
@@ -475,7 +475,7 @@ class JsonCrawlerTest extends TestCase
         ], $result);
     }
 
-    public function testValueFunctionWithOuterParentheses()
+    public function testValueFunctionWithOuterParentheses(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?(value(@.price) == 8.95)]');
 
@@ -483,7 +483,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('Sayings of the Century', $result[0]['title']);
     }
 
-    public function testLengthFunction()
+    public function testLengthFunction(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?length(@.author) > 12]');
 
@@ -492,7 +492,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('J. R. R. Tolkien', $result[1]['author']);
     }
 
-    public function testLengthFunctionWithOuterParentheses()
+    public function testLengthFunctionWithOuterParentheses(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?(length(@.author) > 12)]');
 
@@ -501,14 +501,14 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('J. R. R. Tolkien', $result[1]['author']);
     }
 
-    public function testMatchFunctionWithMultipleSpacesTrimmed()
+    public function testMatchFunctionWithMultipleSpacesTrimmed(): void
     {
         $result = self::getBookstoreCrawler()->find("$.store.book[?(match(@.title, 'Sword   of  Honour'))]");
 
         $this->assertSame([], $result);
     }
 
-    public function testFilterMultiline()
+    public function testFilterMultiline(): void
     {
         $result = self::getBookstoreCrawler()->find(
             '$
@@ -523,7 +523,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('J. R. R. Tolkien', $result[1]['author']);
     }
 
-    public function testCountFunction()
+    public function testCountFunction(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?count(@.extra) != 0]');
 
@@ -531,7 +531,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([42], $result[0]['extra']);
     }
 
-    public function testCountFunctionWithOuterParentheses()
+    public function testCountFunctionWithOuterParentheses(): void
     {
         $result = self::getBookstoreCrawler()->find('$.store.book[?(count(@.extra) != 0)]');
 
@@ -539,7 +539,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame([42], $result[0]['extra']);
     }
 
-    public function testUnknownFunction()
+    public function testUnknownFunction(): void
     {
         $this->expectException(JsonCrawlerException::class);
         $this->expectExceptionMessage('invalid function "unknown"');
@@ -547,7 +547,7 @@ class JsonCrawlerTest extends TestCase
         self::getBookstoreCrawler()->find('$.store.book[?unknown(@.extra) != 0]');
     }
 
-    public function testAcceptsJsonPath()
+    public function testAcceptsJsonPath(): void
     {
         $bicyclePath = new JsonPath('$.store.bicycle');
 
@@ -557,7 +557,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame('red', $result[0]['color']);
     }
 
-    public function testStarAsKey()
+    public function testStarAsKey(): void
     {
         $crawler = new JsonCrawler(<<<JSON
             {"*": {"a": 1, "b": 2}, "something else": {"c": 3}}
@@ -570,7 +570,7 @@ class JsonCrawlerTest extends TestCase
     }
 
     #[DataProvider('provideUnicodeEscapeSequencesProvider')]
-    public function testUnicodeEscapeSequences(string $jsonPath, array $expected)
+    public function testUnicodeEscapeSequences(string $jsonPath, array $expected): void
     {
         $this->assertSame($expected, self::getUnicodeDocumentCrawler()->find($jsonPath));
     }
@@ -622,7 +622,7 @@ class JsonCrawlerTest extends TestCase
     }
 
     #[DataProvider('provideSingleQuotedStringProvider')]
-    public function testSingleQuotedStrings(string $jsonPath, array $expected)
+    public function testSingleQuotedStrings(string $jsonPath, array $expected): void
     {
         $this->assertSame($expected, self::getUnicodeDocumentCrawler()->find($jsonPath));
     }
@@ -674,7 +674,7 @@ class JsonCrawlerTest extends TestCase
     }
 
     #[DataProvider('provideFilterWithUnicodeProvider')]
-    public function testFilterWithUnicodeStrings(string $jsonPath, int $expectedCount, string $expectedCountry)
+    public function testFilterWithUnicodeStrings(string $jsonPath, int $expectedCount, string $expectedCountry): void
     {
         $result = self::getUnicodeDocumentCrawler()->find($jsonPath);
 
@@ -717,7 +717,7 @@ class JsonCrawlerTest extends TestCase
     }
 
     #[DataProvider('provideComplexUnicodePath')]
-    public function testComplexUnicodePaths(string $jsonPath, array $expected)
+    public function testComplexUnicodePaths(string $jsonPath, array $expected): void
     {
         $complexJson = [
             'データ' => [
@@ -754,7 +754,7 @@ class JsonCrawlerTest extends TestCase
         ];
     }
 
-    public function testSurrogatePairHandling()
+    public function testSurrogatePairHandling(): void
     {
         $json = ['𝒽𝑒𝓁𝓁𝑜' => 'mathematical script hello'];
         $crawler = new JsonCrawler(json_encode($json));
@@ -764,7 +764,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame(['mathematical script hello'], $result);
     }
 
-    public function testMixedQuoteTypes()
+    public function testMixedQuoteTypes(): void
     {
         $json = ['key"with"quotes' => 'value1', "key'with'apostrophes" => 'value2'];
         $crawler = new JsonCrawler(json_encode($json));
@@ -776,7 +776,7 @@ class JsonCrawlerTest extends TestCase
         $this->assertSame(['value2'], $result);
     }
 
-    public function testEmptyLengthFunction()
+    public function testEmptyLengthFunction(): void
     {
         $crawler = new JsonCrawler('{"choices": [{"message": {"content": null}}]}');
         $result = $crawler->find('$.choices[?length(@.message.content) >= 0].message.content');

@@ -37,7 +37,7 @@ use Symfony\Component\Validator\Validation;
  */
 class DoctrineLoaderTest extends TestCase
 {
-    public function testLoadClassMetadata()
+    public function testLoadClassMetadata(): void
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAttributeMapping()
@@ -139,7 +139,7 @@ class DoctrineLoaderTest extends TestCase
         $this->assertSame(AutoMappingStrategy::DISABLED, $noAutoMappingMetadata[0]->getAutoMappingStrategy());
     }
 
-    public function testExtractEnum()
+    public function testExtractEnum(): void
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAttributeMapping()
@@ -156,7 +156,7 @@ class DoctrineLoaderTest extends TestCase
         $this->assertCount(0, $enumStringMetadata); // asserts the length constraint is not added to an enum
     }
 
-    public function testFieldMappingsConfiguration()
+    public function testFieldMappingsConfiguration(): void
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAttributeMapping()
@@ -177,7 +177,7 @@ class DoctrineLoaderTest extends TestCase
     }
 
     #[DataProvider('regexpProvider')]
-    public function testClassValidator(bool $expected, ?string $classValidatorRegexp = null)
+    public function testClassValidator(bool $expected, ?string $classValidatorRegexp = null): void
     {
         $doctrineLoader = new DoctrineLoader(DoctrineTestHelper::createTestEntityManager(), $classValidatorRegexp, false);
 
@@ -195,7 +195,7 @@ class DoctrineLoaderTest extends TestCase
         ];
     }
 
-    public function testClassNoAutoMapping()
+    public function testClassNoAutoMapping(): void
     {
         $validator = Validation::createValidatorBuilder()
             ->enableAttributeMapping()

@@ -17,7 +17,7 @@ use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 class StaticVersionStrategyTest extends TestCase
 {
-    public function testGetVersion()
+    public function testGetVersion(): void
     {
         $version = 'v1';
         $path = 'test-path';
@@ -26,7 +26,7 @@ class StaticVersionStrategyTest extends TestCase
     }
 
     #[DataProvider('getConfigs')]
-    public function testApplyVersion($path, $version, $format)
+    public function testApplyVersion($path, $version, $format): void
     {
         $staticVersionStrategy = new StaticVersionStrategy($version, $format);
         $formatted = \sprintf($format ?: '%s?%s', $path, $version);

@@ -50,7 +50,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideConstraints')]
-    public function testPasswordIsValid(UserPassword $constraint)
+    public function testPasswordIsValid(UserPassword $constraint): void
     {
         $this->hasher->expects($this->once())
             ->method('isPasswordValid')
@@ -63,7 +63,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideConstraints')]
-    public function testPasswordIsNotValid(UserPassword $constraint)
+    public function testPasswordIsNotValid(UserPassword $constraint): void
     {
         $this->hasher->expects($this->once())
             ->method('isPasswordValid')
@@ -85,7 +85,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('emptyPasswordData')]
-    public function testEmptyPasswordsAreNotValid($password)
+    public function testEmptyPasswordsAreNotValid($password): void
     {
         $constraint = new UserPassword([
             'message' => 'myMessage',
@@ -106,7 +106,7 @@ abstract class UserPasswordValidatorTestCase extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testUserIsNotValid()
+    public function testUserIsNotValid(): void
     {
         $user = new \stdClass();
 

@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class AbstractTokenTest extends TestCase
 {
     #[DataProvider('provideUsers')]
-    public function testGetUserIdentifier($user, string $username)
+    public function testGetUserIdentifier($user, string $username): void
     {
         $token = new ConcreteToken(['ROLE_FOO']);
         $token->setUser($user);
@@ -32,7 +32,7 @@ class AbstractTokenTest extends TestCase
         yield [new InMemoryUser('fabien', null), 'fabien'];
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $token = new ConcreteToken(['ROLE_FOO', 'ROLE_BAR']);
         $token->setAttributes(['foo' => 'bar']);
@@ -43,13 +43,13 @@ class AbstractTokenTest extends TestCase
         $this->assertEquals($token->getAttributes(), $uToken->getAttributes());
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $token = new ConcreteToken(['ROLE_FOO']);
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $attributes = ['foo' => 'bar'];
         $token = new ConcreteToken();
@@ -72,7 +72,7 @@ class AbstractTokenTest extends TestCase
     }
 
     #[DataProvider('provideUsers')]
-    public function testSetUser($user, string $username)
+    public function testSetUser($user, string $username): void
     {
         $token = new ConcreteToken();
         $token->setUser($user);

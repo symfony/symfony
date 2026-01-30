@@ -20,55 +20,55 @@ use Symfony\Component\TypeInfo\Type\UnionType;
 
 class UnionTypeTest extends TestCase
 {
-    public function testCannotCreateWithOnlyOneType()
+    public function testCannotCreateWithOnlyOneType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new UnionType(Type::int());
     }
 
-    public function testCannotCreateWithUnionTypePart()
+    public function testCannotCreateWithUnionTypePart(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new UnionType(Type::int(), new UnionType());
     }
 
-    public function testCannotCreateWithNullPart()
+    public function testCannotCreateWithNullPart(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new UnionType(Type::int(), Type::null());
     }
 
-    public function testCannotCreateWithStandaloneTypePart()
+    public function testCannotCreateWithStandaloneTypePart(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new UnionType(Type::int(), Type::mixed());
     }
 
-    public function testCannotCreateWithTrueAndFalseTypeParts()
+    public function testCannotCreateWithTrueAndFalseTypeParts(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new UnionType(Type::true(), Type::false());
     }
 
-    public function testCannotCreateWithMultipleBooleanTypeParts()
+    public function testCannotCreateWithMultipleBooleanTypeParts(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new UnionType(Type::true(), Type::bool());
     }
 
-    public function testCannotCreateWithBuiltinObjectAndClassTypeParts()
+    public function testCannotCreateWithBuiltinObjectAndClassTypeParts(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new UnionType(Type::object(), Type::object(\DateTime::class));
     }
 
-    public function testSortTypesOnCreation()
+    public function testSortTypesOnCreation(): void
     {
         $type = new UnionType(Type::int(), Type::string(), Type::bool());
         $this->assertEquals([Type::bool(), Type::int(), Type::string()], $type->getTypes());
     }
 
-    public function testComposedTypesAreSatisfiedBy()
+    public function testComposedTypesAreSatisfiedBy(): void
     {
         $type = new UnionType(Type::object(\Iterator::class), Type::int());
         $this->assertTrue($type->composedTypesAreSatisfiedBy(static fn (Type $t): bool => $t instanceof BuiltinType));
@@ -77,7 +77,7 @@ class UnionTypeTest extends TestCase
         $this->assertFalse($type->composedTypesAreSatisfiedBy(static fn (Type $t): bool => $t instanceof ObjectType));
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $type = new UnionType(Type::int(), Type::string(), Type::float());
         $this->assertSame('float|int|string', (string) $type);
@@ -86,7 +86,7 @@ class UnionTypeTest extends TestCase
         $this->assertSame(\sprintf('(%s&%s)|int|string', \DateTime::class, \Iterator::class), (string) $type);
     }
 
-    public function testAccepts()
+    public function testAccepts(): void
     {
         $type = new UnionType(Type::int(), Type::bool());
 

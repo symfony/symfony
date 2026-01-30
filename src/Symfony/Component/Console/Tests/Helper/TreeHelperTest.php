@@ -19,7 +19,7 @@ use Symfony\Component\Console\Output\BufferedOutput;
 
 class TreeHelperTest extends TestCase
 {
-    public function testRenderWithoutNode()
+    public function testRenderWithoutNode(): void
     {
         $output = new BufferedOutput();
         $tree = TreeHelper::createTree($output);
@@ -28,7 +28,7 @@ class TreeHelperTest extends TestCase
         $this->assertSame(\PHP_EOL, $output->fetch());
     }
 
-    public function testRenderSingleNode()
+    public function testRenderSingleNode(): void
     {
         $rootNode = new TreeNode('Root');
         $output = new BufferedOutput();
@@ -38,7 +38,7 @@ class TreeHelperTest extends TestCase
         $this->assertSame("Root\n", self::normalizeLineBreaks($output->fetch()));
     }
 
-    public function testRenderTwoLevelTree()
+    public function testRenderTwoLevelTree(): void
     {
         $rootNode = new TreeNode('Root');
         $child1 = new TreeNode('Child 1');
@@ -60,7 +60,7 @@ class TreeHelperTest extends TestCase
         );
     }
 
-    public function testRenderThreeLevelTree()
+    public function testRenderThreeLevelTree(): void
     {
         $rootNode = new TreeNode('Root');
         $child1 = new TreeNode('Child 1');
@@ -85,7 +85,7 @@ class TreeHelperTest extends TestCase
         );
     }
 
-    public function testRenderMultiLevelTree()
+    public function testRenderMultiLevelTree(): void
     {
         $rootNode = new TreeNode('Root');
         $child1 = new TreeNode('Child 1');
@@ -116,7 +116,7 @@ class TreeHelperTest extends TestCase
         );
     }
 
-    public function testRenderSingleNodeTree()
+    public function testRenderSingleNodeTree(): void
     {
         $rootNode = new TreeNode('Root');
         $output = new BufferedOutput();
@@ -130,7 +130,7 @@ class TreeHelperTest extends TestCase
         );
     }
 
-    public function testRenderEmptyTree()
+    public function testRenderEmptyTree(): void
     {
         $rootNode = new TreeNode('Root');
         $output = new BufferedOutput();
@@ -144,7 +144,7 @@ class TreeHelperTest extends TestCase
         );
     }
 
-    public function testRenderDeeplyNestedTree()
+    public function testRenderDeeplyNestedTree(): void
     {
         $rootNode = new TreeNode('Root');
         $current = $rootNode;
@@ -184,7 +184,7 @@ class TreeHelperTest extends TestCase
         );
     }
 
-    public function testRenderNodeWithMultipleChildren()
+    public function testRenderNodeWithMultipleChildren(): void
     {
         $rootNode = new TreeNode('Root');
         $child1 = new TreeNode('Child 1');
@@ -209,7 +209,7 @@ class TreeHelperTest extends TestCase
         );
     }
 
-    public function testRenderNodeWithMultipleChildrenWithStringConversion()
+    public function testRenderNodeWithMultipleChildrenWithStringConversion(): void
     {
         $rootNode = new TreeNode('Root');
 
@@ -231,7 +231,7 @@ class TreeHelperTest extends TestCase
         );
     }
 
-    public function testRenderTreeWithDuplicateNodeNames()
+    public function testRenderTreeWithDuplicateNodeNames(): void
     {
         $rootNode = new TreeNode('Root');
         $child1 = new TreeNode('Child');
@@ -256,7 +256,7 @@ class TreeHelperTest extends TestCase
         );
     }
 
-    public function testRenderTreeWithComplexNodeNames()
+    public function testRenderTreeWithComplexNodeNames(): void
     {
         $rootNode = new TreeNode('Root');
         $child1 = new TreeNode('Child 1 (special)');
@@ -281,7 +281,7 @@ class TreeHelperTest extends TestCase
         );
     }
 
-    public function testRenderTreeWithCycle()
+    public function testRenderTreeWithCycle(): void
     {
         $rootNode = new TreeNode('Root');
         $child1 = new TreeNode('Child 1');
@@ -300,7 +300,7 @@ class TreeHelperTest extends TestCase
         $tree->render();
     }
 
-    public function testRenderWideTree()
+    public function testRenderWideTree(): void
     {
         $rootNode = new TreeNode('Root');
         for ($i = 1; $i <= 100; ++$i) {
@@ -318,7 +318,7 @@ class TreeHelperTest extends TestCase
         $this->assertSame('└── Child 100', end($lines));
     }
 
-    public function testCreateWithRoot()
+    public function testCreateWithRoot(): void
     {
         $output = new BufferedOutput();
         $array = ['child1', 'child2'];
@@ -335,7 +335,7 @@ class TreeHelperTest extends TestCase
         );
     }
 
-    public function testCreateWithNestedArray()
+    public function testCreateWithNestedArray(): void
     {
         $output = new BufferedOutput();
         $array = ['child1', 'child2' => ['child2.1', 'child2.2' => ['child2.2.1']], 'child3'];
@@ -356,7 +356,7 @@ class TreeHelperTest extends TestCase
         );
     }
 
-    public function testCreateWithoutRoot()
+    public function testCreateWithoutRoot(): void
     {
         $output = new BufferedOutput();
         $array = ['child1', 'child2'];
@@ -372,7 +372,7 @@ class TreeHelperTest extends TestCase
         );
     }
 
-    public function testCreateWithEmptyArray()
+    public function testCreateWithEmptyArray(): void
     {
         $output = new BufferedOutput();
         $array = [];

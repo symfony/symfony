@@ -24,7 +24,7 @@ use Symfony\Component\Serializer\Tests\Dummy\DummyClassWithDiscriminatorMap;
  */
 class DebugCommandTest extends TestCase
 {
-    public function testOutputWithClassArgument()
+    public function testOutputWithClassArgument(): void
     {
         $command = new DebugCommand(new ClassMetadataFactory(new AttributeLoader()));
 
@@ -79,7 +79,7 @@ class DebugCommandTest extends TestCase
         );
     }
 
-    public function testOutputWithDiscriminatorMapClass()
+    public function testOutputWithDiscriminatorMapClass(): void
     {
         $command = new DebugCommand(new ClassMetadataFactory(new AttributeLoader()));
 
@@ -114,7 +114,7 @@ class DebugCommandTest extends TestCase
         );
     }
 
-    public function testOutputWithInvalidClassArgument()
+    public function testOutputWithInvalidClassArgument(): void
     {
         $command = new DebugCommand(new ClassMetadataFactory(new AttributeLoader()));
 

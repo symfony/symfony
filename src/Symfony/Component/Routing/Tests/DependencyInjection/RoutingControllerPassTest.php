@@ -18,7 +18,7 @@ use Symfony\Component\Routing\DependencyInjection\RoutingControllerPass;
 
 class RoutingControllerPassTest extends TestCase
 {
-    public function testProcessInjectsTaggedControllerClassesOrderedAndUnique()
+    public function testProcessInjectsTaggedControllerClassesOrderedAndUnique(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('ctrl_a.class', CtrlA::class);
@@ -39,7 +39,7 @@ class RoutingControllerPassTest extends TestCase
         ], $container->getDefinition('routing.loader.attribute.services')->getArgument(0));
     }
 
-    public function testProcessWithNoTaggedControllersSetsEmptyList()
+    public function testProcessWithNoTaggedControllersSetsEmptyList(): void
     {
         $container = new ContainerBuilder();
 

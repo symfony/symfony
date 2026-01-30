@@ -796,7 +796,7 @@ class CountriesWithUserAssignedTest extends ResourceBundleTestCase
         Countries::withUserAssigned(false);
     }
 
-    public function testAllGettersGenerateTheSameDataSetCount()
+    public function testAllGettersGenerateTheSameDataSetCount(): void
     {
         $expected = \count(self::COUNTRIES_WITH_USER_ASSIGNED);
         $alpha2Count = \count(Countries::getCountryCodes());
@@ -811,13 +811,13 @@ class CountriesWithUserAssignedTest extends ResourceBundleTestCase
         $this->assertEquals($expected, $numericCodesCount, 'Numeric codes count does not match');
     }
 
-    public function testGetCountryCodes()
+    public function testGetCountryCodes(): void
     {
         $this->assertSame(self::COUNTRIES_WITH_USER_ASSIGNED, Countries::getCountryCodes());
     }
 
     #[DataProvider('provideLocales')]
-    public function testGetNames($displayLocale)
+    public function testGetNames($displayLocale): void
     {
         if ('en' !== $displayLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -834,7 +834,7 @@ class CountriesWithUserAssignedTest extends ResourceBundleTestCase
      * This test is for backward compatibility; testGetNames already checks `XK` is included.
      */
     #[DataProvider('provideLocaleAliases')]
-    public function testGetNamesSupportsAliases($alias, $ofLocale)
+    public function testGetNamesSupportsAliases($alias, $ofLocale): void
     {
         if ('en' !== $ofLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -850,7 +850,7 @@ class CountriesWithUserAssignedTest extends ResourceBundleTestCase
      * This test is for backward compatibility; testGetNames already checks `XK` is included.
      */
     #[DataProvider('provideLocales')]
-    public function testGetName($displayLocale)
+    public function testGetName($displayLocale): void
     {
         if ('en' !== $displayLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -864,7 +864,7 @@ class CountriesWithUserAssignedTest extends ResourceBundleTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testLocaleAliasesAreLoaded()
+    public function testLocaleAliasesAreLoaded(): void
     {
         \Locale::setDefault('zh_TW');
         $countryNameZhTw = Countries::getName('AD');
@@ -879,32 +879,32 @@ class CountriesWithUserAssignedTest extends ResourceBundleTestCase
         $this->assertNotSame($countryNameZh, $countryNameZhTw, 'zh_TW does not fall back to zh');
     }
 
-    public function testGetNameWithInvalidCountryCode()
+    public function testGetNameWithInvalidCountryCode(): void
     {
         $this->expectException(MissingResourceException::class);
         Countries::getName('PAL'); // PSE is commonly confused with PAL
     }
 
-    public function testExists()
+    public function testExists(): void
     {
         $this->assertTrue(Countries::exists('NL'));
         $this->assertTrue(Countries::exists('XK'));
         $this->assertFalse(Countries::exists('ZZ'));
     }
 
-    public function testGetAlpha3Codes()
+    public function testGetAlpha3Codes(): void
     {
         $this->assertSame(self::ALPHA2_TO_ALPHA3_WITH_USER_ASSIGNED, Countries::getAlpha3Codes());
     }
 
-    public function testGetAlpha3Code()
+    public function testGetAlpha3Code(): void
     {
         foreach (self::COUNTRIES_WITH_USER_ASSIGNED as $country) {
             $this->assertSame(self::ALPHA2_TO_ALPHA3_WITH_USER_ASSIGNED[$country], Countries::getAlpha3Code($country));
         }
     }
 
-    public function testGetAlpha2Code()
+    public function testGetAlpha2Code(): void
     {
         foreach (self::COUNTRIES_WITH_USER_ASSIGNED as $alpha2Code) {
             $alpha3Code = self::ALPHA2_TO_ALPHA3_WITH_USER_ASSIGNED[$alpha2Code];
@@ -912,7 +912,7 @@ class CountriesWithUserAssignedTest extends ResourceBundleTestCase
         }
     }
 
-    public function testAlpha3CodeExists()
+    public function testAlpha3CodeExists(): void
     {
         $this->assertTrue(Countries::alpha3CodeExists('ALB'));
         $this->assertTrue(Countries::alpha3CodeExists('DEU'));
@@ -923,7 +923,7 @@ class CountriesWithUserAssignedTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLocales')]
-    public function testGetAlpha3Name($displayLocale)
+    public function testGetAlpha3Name($displayLocale): void
     {
         if ('en' !== $displayLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -937,7 +937,7 @@ class CountriesWithUserAssignedTest extends ResourceBundleTestCase
         }
     }
 
-    public function testGetAlpha3NameWithInvalidCountryCode()
+    public function testGetAlpha3NameWithInvalidCountryCode(): void
     {
         $this->expectException(MissingResourceException::class);
 
@@ -945,7 +945,7 @@ class CountriesWithUserAssignedTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLocales')]
-    public function testGetAlpha3Names($displayLocale)
+    public function testGetAlpha3Names($displayLocale): void
     {
         if ('en' !== $displayLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -960,19 +960,19 @@ class CountriesWithUserAssignedTest extends ResourceBundleTestCase
         $this->assertEqualsCanonicalizing(array_values($alpha2Names), array_values($names));
     }
 
-    public function testGetNumericCodes()
+    public function testGetNumericCodes(): void
     {
         $this->assertSame(self::ALPHA2_TO_NUMERIC_WITH_USER_ASSIGNED, Countries::getNumericCodes());
     }
 
-    public function testGetNumericCode()
+    public function testGetNumericCode(): void
     {
         foreach (self::COUNTRIES_WITH_USER_ASSIGNED as $country) {
             $this->assertSame(self::ALPHA2_TO_NUMERIC_WITH_USER_ASSIGNED[$country], Countries::getNumericCode($country));
         }
     }
 
-    public function testNumericCodeExists()
+    public function testNumericCodeExists(): void
     {
         $this->assertTrue(Countries::numericCodeExists('250'));
         $this->assertTrue(Countries::numericCodeExists('008'));
@@ -981,7 +981,7 @@ class CountriesWithUserAssignedTest extends ResourceBundleTestCase
         $this->assertFalse(Countries::numericCodeExists('667'));
     }
 
-    public function testGetAlpha2FromNumeric()
+    public function testGetAlpha2FromNumeric(): void
     {
         $alpha2Lookup = array_flip(self::ALPHA2_TO_NUMERIC_WITH_USER_ASSIGNED);
 
@@ -990,7 +990,7 @@ class CountriesWithUserAssignedTest extends ResourceBundleTestCase
         }
     }
 
-    public function testNumericCodesDoNotContainDenyListItems()
+    public function testNumericCodesDoNotContainDenyListItems(): void
     {
         $numericCodes = Countries::getNumericCodes();
 

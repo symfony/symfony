@@ -20,7 +20,7 @@ use Symfony\Component\Form\Tests\Fixtures\ArrayChoiceLoader;
  */
 class LazyChoiceListTest extends TestCase
 {
-    public function testGetChoiceLoadersLoadsLoadedListOnFirstCall()
+    public function testGetChoiceLoadersLoadsLoadedListOnFirstCall(): void
     {
         $choices = ['RESULT'];
         $calls = 0;
@@ -35,7 +35,7 @@ class LazyChoiceListTest extends TestCase
         $this->assertSame(2, $calls);
     }
 
-    public function testGetValuesLoadsLoadedListOnFirstCall()
+    public function testGetValuesLoadsLoadedListOnFirstCall(): void
     {
         $calls = 0;
         $list = new LazyChoiceList(new ArrayChoiceLoader(['RESULT']), static function ($choice) use (&$calls) {
@@ -49,7 +49,7 @@ class LazyChoiceListTest extends TestCase
         $this->assertSame(2, $calls);
     }
 
-    public function testGetStructuredValuesLoadsLoadedListOnFirstCall()
+    public function testGetStructuredValuesLoadsLoadedListOnFirstCall(): void
     {
         $calls = 0;
         $list = new LazyChoiceList(new ArrayChoiceLoader(['RESULT']), static function ($choice) use (&$calls) {
@@ -63,7 +63,7 @@ class LazyChoiceListTest extends TestCase
         $this->assertSame(2, $calls);
     }
 
-    public function testGetOriginalKeysLoadsLoadedListOnFirstCall()
+    public function testGetOriginalKeysLoadsLoadedListOnFirstCall(): void
     {
         $calls = 0;
         $choices = [
@@ -82,7 +82,7 @@ class LazyChoiceListTest extends TestCase
         $this->assertSame(6, $calls);
     }
 
-    public function testGetChoicesForValuesForwardsCallIfListNotLoaded()
+    public function testGetChoicesForValuesForwardsCallIfListNotLoaded(): void
     {
         $calls = 0;
         $choices = [
@@ -101,7 +101,7 @@ class LazyChoiceListTest extends TestCase
         $this->assertSame(6, $calls);
     }
 
-    public function testGetChoicesForValuesUsesLoadedList()
+    public function testGetChoicesForValuesUsesLoadedList(): void
     {
         $choices = [
             'a' => 'foo',
@@ -117,7 +117,7 @@ class LazyChoiceListTest extends TestCase
         $this->assertSame(['foo', 'bar'], $list->getChoicesForValues(['a', 'b']));
     }
 
-    public function testGetValuesForChoicesUsesLoadedList()
+    public function testGetValuesForChoicesUsesLoadedList(): void
     {
         $choices = [
             'a' => 'foo',

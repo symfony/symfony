@@ -21,7 +21,7 @@ require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
 class AutowireRequiredMethodsPassTest extends TestCase
 {
-    public function testSetterInjectionWithAttribute()
+    public function testSetterInjectionWithAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class);
@@ -37,7 +37,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $this->assertSame([['setFoo', []]], $methodCalls);
     }
 
-    public function testExplicitMethodInjectionAttribute()
+    public function testExplicitMethodInjectionAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class);
@@ -62,7 +62,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $this->assertEquals([], $methodCalls[0][1]);
     }
 
-    public function testWitherWithStaticReturnTypeInjection()
+    public function testWitherWithStaticReturnTypeInjection(): void
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class);
@@ -83,7 +83,7 @@ class AutowireRequiredMethodsPassTest extends TestCase
         $this->assertSame($expected, $methodCalls);
     }
 
-    public function testWitherInjectionWithAttribute()
+    public function testWitherInjectionWithAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class);

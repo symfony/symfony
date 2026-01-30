@@ -22,7 +22,7 @@ use Symfony\Component\Mime\RawMessage;
 class EnvelopeListenerTest extends TestCase
 {
     #[DataProvider('provideRecipientsTests')]
-    public function testRecipients(array $expected, ?array $recipients = null, array $allowedRecipients = [])
+    public function testRecipients(array $expected, ?array $recipients = null, array $allowedRecipients = []): void
     {
         $listener = new EnvelopeListener(null, $recipients, $allowedRecipients);
         $message = new RawMessage('message');

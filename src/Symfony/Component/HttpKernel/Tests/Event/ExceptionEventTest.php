@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Tests\TestHttpKernel;
 
 class ExceptionEventTest extends TestCase
 {
-    public function testAllowSuccessfulResponseIsFalseByDefault()
+    public function testAllowSuccessfulResponseIsFalseByDefault(): void
     {
         $event = new ExceptionEvent(new TestHttpKernel(), new Request(), 1, new \Exception());
 

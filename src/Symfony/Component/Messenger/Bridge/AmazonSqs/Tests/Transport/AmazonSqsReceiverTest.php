@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 class AmazonSqsReceiverTest extends TestCase
 {
-    public function testItReturnsTheDecodedMessageToTheHandler()
+    public function testItReturnsTheDecodedMessageToTheHandler(): void
     {
         $serializer = $this->createSerializer();
 
@@ -40,7 +40,7 @@ class AmazonSqsReceiverTest extends TestCase
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
     }
 
-    public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException()
+    public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException(): void
     {
         $this->expectException(MessageDecodingFailedException::class);
 
@@ -56,7 +56,7 @@ class AmazonSqsReceiverTest extends TestCase
         iterator_to_array($receiver->get());
     }
 
-    public function testKeepalive()
+    public function testKeepalive(): void
     {
         $serializer = $this->createSerializer();
 
@@ -67,7 +67,7 @@ class AmazonSqsReceiverTest extends TestCase
         $receiver->keepalive(new Envelope(new DummyMessage('foo'), [new AmazonSqsReceivedStamp('123')]), 10);
     }
 
-    public function testReject()
+    public function testReject(): void
     {
         $serializer = $this->createSerializer();
 

@@ -27,7 +27,7 @@ use Symfony\Component\HttpKernel\Tests\TestHttpKernel;
 class ControllerEventTest extends TestCase
 {
     #[DataProvider('provideGetAttributes')]
-    public function testGetAttributes(callable $controller)
+    public function testGetAttributes(callable $controller): void
     {
         $event = new ControllerEvent(new TestHttpKernel(), $controller, new Request(), HttpKernelInterface::MAIN_REQUEST);
 
@@ -45,7 +45,7 @@ class ControllerEventTest extends TestCase
     }
 
     #[DataProvider('provideGetAttributes')]
-    public function testGetAttributesByClassName(callable $controller)
+    public function testGetAttributesByClassName(callable $controller): void
     {
         $event = new ControllerEvent(new TestHttpKernel(), $controller, new Request(), HttpKernelInterface::MAIN_REQUEST);
 
@@ -58,14 +58,14 @@ class ControllerEventTest extends TestCase
     }
 
     #[DataProvider('provideGetAttributes')]
-    public function testGetAttributesByInvalidClassName(callable $controller)
+    public function testGetAttributesByInvalidClassName(callable $controller): void
     {
         $event = new ControllerEvent(new TestHttpKernel(), $controller, new Request(), HttpKernelInterface::MAIN_REQUEST);
 
         $this->assertEquals([], $event->getAttributes(\stdClass::class));
     }
 
-    public function testControllerAttributesAreStoredInRequestAttributes()
+    public function testControllerAttributesAreStoredInRequestAttributes(): void
     {
         $request = new Request();
         $controller = [new AttributeController(), '__invoke'];
@@ -85,7 +85,7 @@ class ControllerEventTest extends TestCase
         $this->assertArrayHasKey(Bar::class, $attributes);
     }
 
-    public function testSetControllerWithAttributesStoresInRequest()
+    public function testSetControllerWithAttributesStoresInRequest(): void
     {
         $request = new Request();
         $controller = [new AttributeController(), '__invoke'];
@@ -104,7 +104,7 @@ class ControllerEventTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testSetControllerWithGroupedAttributesConvertsToFlat()
+    public function testSetControllerWithGroupedAttributesConvertsToFlat(): void
     {
         $request = new Request();
         $controller = [new AttributeController(), '__invoke'];
@@ -120,7 +120,7 @@ class ControllerEventTest extends TestCase
         $this->assertInstanceOf(Bar::class, $stored[0]);
     }
 
-    public function testSetControllerWithoutAttributesRemovesFromRequestWhenControllerChanges()
+    public function testSetControllerWithoutAttributesRemovesFromRequestWhenControllerChanges(): void
     {
         $request = new Request();
         $controller1 = [new AttributeController(), '__invoke'];
@@ -142,6 +142,6 @@ class ControllerEventTest extends TestCase
         yield [[new AttributeController(), '__invoke']];
         yield [new AttributeController()];
         yield [(new AttributeController())->__invoke(...)];
-        yield [#[Bar('class'), Bar('method'), Baz] static function () {}];
+        yield [#[Bar('class'), Bar('method'), Baz] static function (): void {}];
     }
 }

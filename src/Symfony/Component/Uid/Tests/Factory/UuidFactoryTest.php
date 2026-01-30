@@ -25,13 +25,13 @@ use Symfony\Component\Uid\UuidV7;
 
 final class UuidFactoryTest extends TestCase
 {
-    public function testCreateNamedDefaultVersion()
+    public function testCreateNamedDefaultVersion(): void
     {
         $this->assertInstanceOf(UuidV5::class, (new UuidFactory())->nameBased('6f80c216-0492-4421-bd82-c10ab929ae84')->create('foo'));
         $this->assertInstanceOf(UuidV3::class, (new UuidFactory(6, 6, 3))->nameBased('6f80c216-0492-4421-bd82-c10ab929ae84')->create('foo'));
     }
 
-    public function testCreateNamed()
+    public function testCreateNamed(): void
     {
         $uuidFactory = new UuidFactory();
 
@@ -50,13 +50,13 @@ final class UuidFactoryTest extends TestCase
         $this->assertInstanceOf(UuidV3::class, $uuid3);
     }
 
-    public function testCreateTimedDefaultVersion()
+    public function testCreateTimedDefaultVersion(): void
     {
         $this->assertInstanceOf(UuidV7::class, (new UuidFactory())->timeBased()->create());
         $this->assertInstanceOf(UuidV1::class, (new UuidFactory(6, 1))->timeBased()->create());
     }
 
-    public function testCreateTimed()
+    public function testCreateTimed(): void
     {
         $uuidFactory = new UuidFactory(6, 6, 5, 4, '6f80c216-0492-4421-bd82-c10ab929ae84');
 
@@ -81,7 +81,7 @@ final class UuidFactoryTest extends TestCase
         $this->assertSame('-12219292800.000000', $uuid4->getDateTime()->format('U.u'));
     }
 
-    public function testInvalidCreateTimed()
+    public function testInvalidCreateTimed(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The timestamp must be positive.');
@@ -89,12 +89,12 @@ final class UuidFactoryTest extends TestCase
         (new UuidFactory())->timeBased()->create(new \DateTimeImmutable('@-12219292800.001000'));
     }
 
-    public function testCreateRandom()
+    public function testCreateRandom(): void
     {
         $this->assertInstanceOf(UuidV4::class, (new UuidFactory())->randomBased()->create());
     }
 
-    public function testCreateNamedWithNamespacePredefinedKeyword()
+    public function testCreateNamedWithNamespacePredefinedKeyword(): void
     {
         $this->assertSame('1002657d-3019-59b1-96dc-afc2a3e57c61', (string) (new UuidFactory())->nameBased('dns')->create('symfony.com'));
     }

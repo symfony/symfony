@@ -34,7 +34,7 @@ class LocaleAwareListenerTest extends TestCase
         $this->listener = new LocaleAwareListener(new \ArrayIterator([$this->localeAwareService]), $this->requestStack);
     }
 
-    public function testLocaleIsSetInOnKernelRequest()
+    public function testLocaleIsSetInOnKernelRequest(): void
     {
         $this->localeAwareService
             ->expects($this->once())
@@ -45,7 +45,7 @@ class LocaleAwareListenerTest extends TestCase
         $this->listener->onKernelRequest($event);
     }
 
-    public function testDefaultLocaleIsUsedOnExceptionsInOnKernelRequest()
+    public function testDefaultLocaleIsUsedOnExceptionsInOnKernelRequest(): void
     {
         $this->localeAwareService
             ->expects($this->exactly(2))
@@ -65,7 +65,7 @@ class LocaleAwareListenerTest extends TestCase
         $this->listener->onKernelRequest($event);
     }
 
-    public function testLocaleIsSetInOnKernelFinishRequestWhenParentRequestExists()
+    public function testLocaleIsSetInOnKernelFinishRequestWhenParentRequestExists(): void
     {
         $this->localeAwareService
             ->expects($this->once())
@@ -79,7 +79,7 @@ class LocaleAwareListenerTest extends TestCase
         $this->listener->onKernelFinishRequest($event);
     }
 
-    public function testLocaleIsSetToDefaultOnKernelFinishRequestWhenParentRequestDoesNotExist()
+    public function testLocaleIsSetToDefaultOnKernelFinishRequestWhenParentRequestDoesNotExist(): void
     {
         $this->localeAwareService
             ->expects($this->once())
@@ -92,7 +92,7 @@ class LocaleAwareListenerTest extends TestCase
         $this->listener->onKernelFinishRequest($event);
     }
 
-    public function testDefaultLocaleIsUsedOnExceptionsInOnKernelFinishRequest()
+    public function testDefaultLocaleIsUsedOnExceptionsInOnKernelFinishRequest(): void
     {
         $this->localeAwareService
             ->expects($this->exactly(2))

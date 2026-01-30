@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\ClickSend\ClickSendOptions;
 
 class ClickSendOptionsTest extends TestCase
 {
-    public function testClickSendOptions()
+    public function testClickSendOptions(): void
     {
         $clickSendOptions = (new ClickSendOptions())
             ->country('test_country')

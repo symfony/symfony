@@ -51,7 +51,7 @@ class DateTimeValueResolverTest extends TestCase
         yield [FooDateTime::class];
     }
 
-    public function testUnsupportedArgument()
+    public function testUnsupportedArgument(): void
     {
         $resolver = new DateTimeValueResolver();
 
@@ -61,7 +61,7 @@ class DateTimeValueResolverTest extends TestCase
     }
 
     #[DataProvider('getTimeZones')]
-    public function testFullDate(string $timezone, bool $withClock)
+    public function testFullDate(string $timezone, bool $withClock): void
     {
         date_default_timezone_set($withClock ? 'UTC' : $timezone);
         $resolver = new DateTimeValueResolver($withClock ? new MockClock('now', $timezone) : null);
@@ -78,7 +78,7 @@ class DateTimeValueResolverTest extends TestCase
     }
 
     #[DataProvider('getTimeZones')]
-    public function testUnixTimestamp(string $timezone, bool $withClock)
+    public function testUnixTimestamp(string $timezone, bool $withClock): void
     {
         date_default_timezone_set($withClock ? 'UTC' : $timezone);
         $resolver = new DateTimeValueResolver($withClock ? new MockClock('now', $timezone) : null);
@@ -94,7 +94,7 @@ class DateTimeValueResolverTest extends TestCase
         $this->assertEquals('2001-05-11 00:42:00', $results[0]->format('Y-m-d H:i:s'));
     }
 
-    public function testNullableWithEmptyAttribute()
+    public function testNullableWithEmptyAttribute(): void
     {
         $resolver = new DateTimeValueResolver();
 
@@ -111,7 +111,7 @@ class DateTimeValueResolverTest extends TestCase
      * @param class-string<\DateTimeInterface> $class
      */
     #[DataProvider('getClasses')]
-    public function testNow(string $class)
+    public function testNow(string $class): void
     {
         date_default_timezone_set($timezone = 'Pacific/Honolulu');
         $resolver = new DateTimeValueResolver();
@@ -131,7 +131,7 @@ class DateTimeValueResolverTest extends TestCase
      * @param class-string<\DateTimeInterface> $class
      */
     #[DataProvider('getClasses')]
-    public function testNowWithClock(string $class)
+    public function testNowWithClock(string $class): void
     {
         date_default_timezone_set('Pacific/Honolulu');
         $clock = new MockClock('2022-02-20 22:20:02');
@@ -152,7 +152,7 @@ class DateTimeValueResolverTest extends TestCase
      * @param class-string<\DateTimeInterface> $class
      */
     #[DataProvider('getClasses')]
-    public function testPreviouslyConvertedAttribute(string $class)
+    public function testPreviouslyConvertedAttribute(string $class): void
     {
         $resolver = new DateTimeValueResolver();
 
@@ -166,7 +166,7 @@ class DateTimeValueResolverTest extends TestCase
         $this->assertInstanceOf($class, $results[0]);
     }
 
-    public function testCustomClass()
+    public function testCustomClass(): void
     {
         date_default_timezone_set('UTC');
         $resolver = new DateTimeValueResolver();
@@ -182,7 +182,7 @@ class DateTimeValueResolverTest extends TestCase
     }
 
     #[DataProvider('getTimeZones')]
-    public function testDateTimeImmutable(string $timezone, bool $withClock)
+    public function testDateTimeImmutable(string $timezone, bool $withClock): void
     {
         date_default_timezone_set($withClock ? 'UTC' : $timezone);
         $resolver = new DateTimeValueResolver($withClock ? new MockClock('now', $timezone) : null);
@@ -199,7 +199,7 @@ class DateTimeValueResolverTest extends TestCase
     }
 
     #[DataProvider('getTimeZones')]
-    public function testWithFormat(string $timezone, bool $withClock)
+    public function testWithFormat(string $timezone, bool $withClock): void
     {
         date_default_timezone_set($withClock ? 'UTC' : $timezone);
         $resolver = new DateTimeValueResolver($withClock ? new MockClock('now', $timezone) : null);
@@ -236,7 +236,7 @@ class DateTimeValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideInvalidDates')]
-    public function test404Exception(ArgumentMetadata $argument, Request $request)
+    public function test404Exception(ArgumentMetadata $argument, Request $request): void
     {
         $resolver = new DateTimeValueResolver();
 

@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ResolveReferencesToAliasesPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->setAlias('bar', 'foo');
@@ -37,7 +37,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->assertEquals('foo', (string) $arguments[0]);
     }
 
-    public function testProcessRecursively()
+    public function testProcessRecursively(): void
     {
         $container = new ContainerBuilder();
         $container->setAlias('bar', 'foo');
@@ -53,7 +53,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->assertEquals('foo', (string) $arguments[0]);
     }
 
-    public function testAliasCircularReference()
+    public function testAliasCircularReference(): void
     {
         $this->expectException(ServiceCircularReferenceException::class);
         $container = new ContainerBuilder();
@@ -62,7 +62,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testResolveFactory()
+    public function testResolveFactory(): void
     {
         $container = new ContainerBuilder();
         $container->register('factory', 'Factory');
@@ -87,7 +87,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
      * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
     #[IgnoreDeprecations]
-    public function testDeprecationNoticeWhenReferencedByAlias()
+    public function testDeprecationNoticeWhenReferencedByAlias(): void
     {
         $this->expectUserDeprecationMessage('Since foobar 1.2.3.4: The "deprecated_foo_alias" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "alias" alias.');
         $container = new ContainerBuilder();
@@ -108,7 +108,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
      * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
     #[IgnoreDeprecations]
-    public function testDeprecationNoticeWhenReferencedByDefinition()
+    public function testDeprecationNoticeWhenReferencedByDefinition(): void
     {
         $this->expectUserDeprecationMessage('Since foobar 1.2.3.4: The "foo_aliased" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "definition" service.');
         $container = new ContainerBuilder();
@@ -127,7 +127,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testNoDeprecationNoticeWhenReferencedByDeprecatedAlias()
+    public function testNoDeprecationNoticeWhenReferencedByDeprecatedAlias(): void
     {
         $container = new ContainerBuilder();
 
@@ -145,7 +145,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testNoDeprecationNoticeWhenReferencedByDeprecatedDefinition()
+    public function testNoDeprecationNoticeWhenReferencedByDeprecatedDefinition(): void
     {
         $container = new ContainerBuilder();
 
@@ -165,7 +165,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testDeprecationIsPreservedWhenResolvingAliasChain()
+    public function testDeprecationIsPreservedWhenResolvingAliasChain(): void
     {
         $container = new ContainerBuilder();
 
@@ -189,7 +189,7 @@ class ResolveReferencesToAliasesPassTest extends TestCase
         $this->assertSame('my/package', $resolvedAlias->getDeprecation('deprecated_alias')['package']);
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new ResolveReferencesToAliasesPass();
         $pass->process($container);

@@ -19,7 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Slugger\Sl
 class SluggerLocaleAwareTest extends AbstractWebTestCase
 {
     #[RequiresPhpExtension('intl')]
-    public function testLocalizedSlugger()
+    public function testLocalizedSlugger(): void
     {
         $kernel = static::createKernel(['test_case' => 'Slugger', 'root_config' => 'config.yml']);
         $kernel->boot();

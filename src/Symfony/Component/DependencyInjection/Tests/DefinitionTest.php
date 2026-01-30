@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class DefinitionTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $def = new Definition('stdClass');
         $this->assertEquals('stdClass', $def->getClass(), '__construct() takes the class name as its first argument');
@@ -30,7 +30,7 @@ class DefinitionTest extends TestCase
         $this->assertEquals(['foo'], $def->getArguments(), '__construct() takes an optional array of arguments as its second argument');
     }
 
-    public function testSetGetFactory()
+    public function testSetGetFactory(): void
     {
         $def = new Definition();
 
@@ -45,14 +45,14 @@ class DefinitionTest extends TestCase
         $this->assertSame(['factory' => true], $def->getChanges());
     }
 
-    public function testSetGetClass()
+    public function testSetGetClass(): void
     {
         $def = new Definition('stdClass');
         $this->assertSame($def, $def->setClass('foo'), '->setClass() implements a fluent interface');
         $this->assertEquals('foo', $def->getClass(), '->getClass() returns the class name');
     }
 
-    public function testSetGetDecoratedService()
+    public function testSetGetDecoratedService(): void
     {
         $def = new Definition('stdClass');
         $this->assertNull($def->getDecoratedService());
@@ -89,7 +89,7 @@ class DefinitionTest extends TestCase
         $def->setDecoratedService('foo', 'foo');
     }
 
-    public function testArguments()
+    public function testArguments(): void
     {
         $def = new Definition('stdClass');
         $this->assertSame($def, $def->setArguments(['foo']), '->setArguments() implements a fluent interface');
@@ -98,7 +98,7 @@ class DefinitionTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $def->getArguments(), '->addArgument() adds an argument');
     }
 
-    public function testMethodCalls()
+    public function testMethodCalls(): void
     {
         $def = new Definition('stdClass');
         $this->assertSame($def, $def->setMethodCalls([['foo', ['foo']]]), '->setMethodCalls() implements a fluent interface');
@@ -117,7 +117,7 @@ class DefinitionTest extends TestCase
         $this->assertEquals([['foobar', ['foobar'], true]], $def->getMethodCalls(), '->addMethodCall() adds a method to call');
     }
 
-    public function testExceptionOnEmptyMethodCall()
+    public function testExceptionOnEmptyMethodCall(): void
     {
         $def = new Definition('stdClass');
 
@@ -127,14 +127,14 @@ class DefinitionTest extends TestCase
         $def->addMethodCall('');
     }
 
-    public function testSetGetFile()
+    public function testSetGetFile(): void
     {
         $def = new Definition('stdClass');
         $this->assertSame($def, $def->setFile('foo'), '->setFile() implements a fluent interface');
         $this->assertEquals('foo', $def->getFile(), '->getFile() returns the file to include');
     }
 
-    public function testSetIsShared()
+    public function testSetIsShared(): void
     {
         $def = new Definition('stdClass');
         $this->assertTrue($def->isShared(), '->isShared() returns true by default');
@@ -142,7 +142,7 @@ class DefinitionTest extends TestCase
         $this->assertFalse($def->isShared(), '->isShared() returns false if the instance must not be shared');
     }
 
-    public function testSetIsPublic()
+    public function testSetIsPublic(): void
     {
         $def = new Definition('stdClass');
         $this->assertFalse($def->isPublic(), '->isPublic() returns false by default');
@@ -150,7 +150,7 @@ class DefinitionTest extends TestCase
         $this->assertTrue($def->isPublic(), '->isPublic() returns true if the service is public.');
     }
 
-    public function testSetIsSynthetic()
+    public function testSetIsSynthetic(): void
     {
         $def = new Definition('stdClass');
         $this->assertFalse($def->isSynthetic(), '->isSynthetic() returns false by default');
@@ -158,7 +158,7 @@ class DefinitionTest extends TestCase
         $this->assertTrue($def->isSynthetic(), '->isSynthetic() returns true if the service is synthetic.');
     }
 
-    public function testSetIsLazy()
+    public function testSetIsLazy(): void
     {
         $def = new Definition('stdClass');
         $this->assertFalse($def->isLazy(), '->isLazy() returns false by default');
@@ -166,7 +166,7 @@ class DefinitionTest extends TestCase
         $this->assertTrue($def->isLazy(), '->isLazy() returns true if the service is lazy.');
     }
 
-    public function testSetIsAbstract()
+    public function testSetIsAbstract(): void
     {
         $def = new Definition('stdClass');
         $this->assertFalse($def->isAbstract(), '->isAbstract() returns false by default');
@@ -174,7 +174,7 @@ class DefinitionTest extends TestCase
         $this->assertTrue($def->isAbstract(), '->isAbstract() returns true if the instance must not be public.');
     }
 
-    public function testSetIsDeprecated()
+    public function testSetIsDeprecated(): void
     {
         $def = new Definition('stdClass');
         $this->assertFalse($def->isDeprecated(), '->isDeprecated() returns false by default');
@@ -188,7 +188,7 @@ class DefinitionTest extends TestCase
     }
 
     #[DataProvider('invalidDeprecationMessageProvider')]
-    public function testSetDeprecatedWithInvalidDeprecationTemplate($message)
+    public function testSetDeprecatedWithInvalidDeprecationTemplate($message): void
     {
         $def = new Definition('stdClass');
 
@@ -207,14 +207,14 @@ class DefinitionTest extends TestCase
         ];
     }
 
-    public function testSetGetConfigurator()
+    public function testSetGetConfigurator(): void
     {
         $def = new Definition('stdClass');
         $this->assertSame($def, $def->setConfigurator('foo'), '->setConfigurator() implements a fluent interface');
         $this->assertEquals('foo', $def->getConfigurator(), '->getConfigurator() returns the configurator');
     }
 
-    public function testClearTags()
+    public function testClearTags(): void
     {
         $def = new Definition('stdClass');
         $this->assertSame($def, $def->clearTags(), '->clearTags() implements a fluent interface');
@@ -223,7 +223,7 @@ class DefinitionTest extends TestCase
         $this->assertEquals([], $def->getTags(), '->clearTags() removes all current tags');
     }
 
-    public function testClearTag()
+    public function testClearTag(): void
     {
         $def = new Definition('stdClass');
         $this->assertSame($def, $def->clearTags(), '->clearTags() implements a fluent interface');
@@ -239,7 +239,7 @@ class DefinitionTest extends TestCase
         $this->assertTrue($def->hasTag('3foo3'));
     }
 
-    public function testTags()
+    public function testTags(): void
     {
         $def = new Definition('stdClass');
         $this->assertEquals([], $def->getTag('foo'), '->getTag() returns an empty array if the tag is not defined');
@@ -256,7 +256,7 @@ class DefinitionTest extends TestCase
         ], $def->getTags(), '->getTags() returns all tags');
     }
 
-    public function testAddResourceTag()
+    public function testAddResourceTag(): void
     {
         $def = new Definition('stdClass');
         $def->addResourceTag('foo', ['bar' => true]);
@@ -266,7 +266,7 @@ class DefinitionTest extends TestCase
         $this->assertSame([['source' => 'by tag "foo"']], $def->getTag('container.excluded'));
     }
 
-    public function testSetArgument()
+    public function testSetArgument(): void
     {
         $def = new Definition('stdClass');
 
@@ -284,7 +284,7 @@ class DefinitionTest extends TestCase
         $this->assertSame(['foo', 'bar'], $def->getArguments());
     }
 
-    public function testGetArgumentShouldCheckBounds()
+    public function testGetArgumentShouldCheckBounds(): void
     {
         $def = new Definition('stdClass');
         $def->addArgument('foo');
@@ -294,7 +294,7 @@ class DefinitionTest extends TestCase
         $def->getArgument(1);
     }
 
-    public function testReplaceArgumentShouldCheckBounds()
+    public function testReplaceArgumentShouldCheckBounds(): void
     {
         $def = new Definition('stdClass');
         $def->addArgument('foo');
@@ -305,7 +305,7 @@ class DefinitionTest extends TestCase
         $def->replaceArgument(1, 'bar');
     }
 
-    public function testReplaceArgumentWithoutExistingArgumentsShouldCheckBounds()
+    public function testReplaceArgumentWithoutExistingArgumentsShouldCheckBounds(): void
     {
         $def = new Definition('stdClass');
 
@@ -315,7 +315,7 @@ class DefinitionTest extends TestCase
         $def->replaceArgument(0, 'bar');
     }
 
-    public function testReplaceArgumentWithNonConsecutiveIntIndex()
+    public function testReplaceArgumentWithNonConsecutiveIntIndex(): void
     {
         $def = new Definition('stdClass');
 
@@ -326,7 +326,7 @@ class DefinitionTest extends TestCase
         $this->assertSame([1 => 'bar'], $def->getArguments());
     }
 
-    public function testSetGetProperties()
+    public function testSetGetProperties(): void
     {
         $def = new Definition('stdClass');
 
@@ -335,7 +335,7 @@ class DefinitionTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $def->getProperties());
     }
 
-    public function testSetProperty()
+    public function testSetProperty(): void
     {
         $def = new Definition('stdClass');
 
@@ -344,7 +344,7 @@ class DefinitionTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $def->getProperties());
     }
 
-    public function testAutowired()
+    public function testAutowired(): void
     {
         $def = new Definition('stdClass');
         $this->assertFalse($def->isAutowired());
@@ -356,14 +356,14 @@ class DefinitionTest extends TestCase
         $this->assertFalse($def->isAutowired());
     }
 
-    public function testChangesNoChanges()
+    public function testChangesNoChanges(): void
     {
         $def = new Definition();
 
         $this->assertSame([], $def->getChanges());
     }
 
-    public function testGetChangesWithChanges()
+    public function testGetChangesWithChanges(): void
     {
         $def = new Definition('stdClass', ['fooarg']);
 
@@ -403,7 +403,7 @@ class DefinitionTest extends TestCase
         $this->assertSame([], $def->getChanges());
     }
 
-    public function testShouldAutoconfigure()
+    public function testShouldAutoconfigure(): void
     {
         $def = new Definition('stdClass');
         $this->assertFalse($def->isAutoconfigured());
@@ -411,7 +411,7 @@ class DefinitionTest extends TestCase
         $this->assertTrue($def->isAutoconfigured());
     }
 
-    public function testAddError()
+    public function testAddError(): void
     {
         $def = new Definition('stdClass');
         $this->assertFalse($def->hasErrors());
@@ -420,7 +420,7 @@ class DefinitionTest extends TestCase
         $this->assertSame(['First error', 'Second error'], $def->getErrors());
     }
 
-    public function testMultipleMethodCalls()
+    public function testMultipleMethodCalls(): void
     {
         $def = new Definition('stdClass');
 

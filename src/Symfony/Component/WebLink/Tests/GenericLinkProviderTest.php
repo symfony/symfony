@@ -20,7 +20,7 @@ use Symfony\Component\WebLink\Link;
  */
 class GenericLinkProviderTest extends TestCase
 {
-    public function testCanAddLinksByMethod()
+    public function testCanAddLinksByMethod(): void
     {
         $link = (new Link())
             ->withHref('http://www.google.com')
@@ -34,7 +34,7 @@ class GenericLinkProviderTest extends TestCase
         $this->assertContains($link, $provider->getLinks());
     }
 
-    public function testCanAddLinksByConstructor()
+    public function testCanAddLinksByConstructor(): void
     {
         $link = (new Link())
             ->withHref('http://www.google.com')
@@ -48,7 +48,7 @@ class GenericLinkProviderTest extends TestCase
         $this->assertContains($link, $provider->getLinks());
     }
 
-    public function testCanGetLinksByRel()
+    public function testCanGetLinksByRel(): void
     {
         $link1 = (new Link())
             ->withHref('http://www.google.com')
@@ -70,7 +70,7 @@ class GenericLinkProviderTest extends TestCase
         $this->assertNotContains($link1, $links);
     }
 
-    public function testCanRemoveLinks()
+    public function testCanRemoveLinks(): void
     {
         $link = (new Link())
             ->withHref('http://www.google.com')

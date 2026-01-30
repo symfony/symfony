@@ -16,7 +16,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 class MessageCatalogueTest extends TestCase
 {
-    public function testIcuMetadataKept()
+    public function testIcuMetadataKept(): void
     {
         $mc = new MessageCatalogue('en', ['messages' => ['a' => 'new_a']]);
         $metadata = ['metadata' => 'value'];

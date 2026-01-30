@@ -21,7 +21,7 @@ use Symfony\Component\Workflow\Command\WorkflowDumpCommand;
 class WorkflowDumpCommandTest extends TestCase
 {
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $application = new Application();
         $application->addCommand(new WorkflowDumpCommand(new ServiceLocator([])));

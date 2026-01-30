@@ -20,7 +20,7 @@ use Symfony\Component\ExpressionLanguage\SyntaxError;
 
 class ParserTest extends TestCase
 {
-    public function testParseWithInvalidName()
+    public function testParseWithInvalidName(): void
     {
         $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage('Variable "foo" is not valid around position 1 for expression `foo`.');
@@ -29,7 +29,7 @@ class ParserTest extends TestCase
         $parser->parse($lexer->tokenize('foo'));
     }
 
-    public function testParseWithZeroInNames()
+    public function testParseWithZeroInNames(): void
     {
         $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage('Variable "foo" is not valid around position 1 for expression `foo`.');
@@ -38,7 +38,7 @@ class ParserTest extends TestCase
         $parser->parse($lexer->tokenize('foo'), [0]);
     }
 
-    public function testParsePrimaryExpressionWithUnknownFunctionThrows()
+    public function testParsePrimaryExpressionWithUnknownFunctionThrows(): void
     {
         $parser = new Parser([]);
         $stream = (new Lexer())->tokenize('foo()');
@@ -49,7 +49,7 @@ class ParserTest extends TestCase
         $parser->parse($stream);
     }
 
-    public function testParseUnknownFunction()
+    public function testParseUnknownFunction(): void
     {
         $parser = new Parser([]);
         $tokenized = (new Lexer())->tokenize('foo()');
@@ -61,7 +61,7 @@ class ParserTest extends TestCase
     }
 
     #[DataProvider('getParseData')]
-    public function testParse($node, $expression, $names = [])
+    public function testParse($node, $expression, $names = []): void
     {
         $lexer = new Lexer();
         $parser = new Parser([]);
@@ -269,7 +269,7 @@ class ParserTest extends TestCase
     }
 
     #[DataProvider('getInvalidPostfixData')]
-    public function testParseWithInvalidPostfixData($expr, $names = [])
+    public function testParseWithInvalidPostfixData($expr, $names = []): void
     {
         $this->expectException(SyntaxError::class);
         $lexer = new Lexer();
@@ -299,7 +299,7 @@ class ParserTest extends TestCase
         ];
     }
 
-    public function testNameProposal()
+    public function testNameProposal(): void
     {
         $this->expectException(SyntaxError::class);
         $this->expectExceptionMessage('Did you mean "baz"?');
@@ -310,7 +310,7 @@ class ParserTest extends TestCase
     }
 
     #[DataProvider('getLintData')]
-    public function testLint($expression, $names, int $checks = 0, ?string $exception = null)
+    public function testLint($expression, $names, int $checks = 0, ?string $exception = null): void
     {
         if ($exception) {
             $this->expectException(SyntaxError::class);

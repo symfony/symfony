@@ -35,7 +35,7 @@ class LocoProviderWithoutTranslatorBagTest extends LocoProviderTest
      * Ensure the Last-Modified is not sent when $translatorBag is null.
      */
     #[DataProvider('getResponsesForReadWithLastModified')]
-    public function testReadWithLastModified(array $locales, array $domains, array $responseContents, array $lastModifieds, TranslatorBag $expectedTranslatorBag)
+    public function testReadWithLastModified(array $locales, array $domains, array $responseContents, array $lastModifieds, TranslatorBag $expectedTranslatorBag): void
     {
         $responses = [];
         $consecutiveLoadArguments = [];

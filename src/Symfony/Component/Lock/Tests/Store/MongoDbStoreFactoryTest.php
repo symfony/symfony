@@ -26,7 +26,7 @@ require_once __DIR__.'/stubs/mongodb.php';
 #[RequiresPhpExtension('mongodb')]
 class MongoDbStoreFactoryTest extends TestCase
 {
-    public function testCreateMongoDbCollectionStore()
+    public function testCreateMongoDbCollectionStore(): void
     {
         $collection = $this->createMock(Collection::class);
         $collection->expects($this->once())
@@ -44,7 +44,7 @@ class MongoDbStoreFactoryTest extends TestCase
         $this->assertInstanceOf(MongoDbStore::class, $store);
     }
 
-    public function testCreateMongoDbCollectionStoreAsDsn()
+    public function testCreateMongoDbCollectionStoreAsDsn(): void
     {
         $store = StoreFactory::createStore('mongodb://localhost/test?collection=lock');
 

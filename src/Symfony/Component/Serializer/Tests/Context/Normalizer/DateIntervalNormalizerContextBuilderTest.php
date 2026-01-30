@@ -32,7 +32,7 @@ class DateIntervalNormalizerContextBuilderTest extends TestCase
      * @param array<string, mixed> $values
      */
     #[DataProvider('withersDataProvider')]
-    public function testWithers(array $values)
+    public function testWithers(array $values): void
     {
         $context = $this->contextBuilder
             ->withFormat($values[DateIntervalNormalizer::FORMAT_KEY])

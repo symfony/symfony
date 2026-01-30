@@ -18,21 +18,21 @@ use Symfony\Component\Console\Output\Output;
 
 class OutputTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $output = new TestOutput(Output::VERBOSITY_QUIET, true);
         $this->assertEquals(Output::VERBOSITY_QUIET, $output->getVerbosity(), '__construct() takes the verbosity as its first argument');
         $this->assertTrue($output->isDecorated(), '__construct() takes the decorated flag as its second argument');
     }
 
-    public function testSetIsDecorated()
+    public function testSetIsDecorated(): void
     {
         $output = new TestOutput();
         $output->setDecorated(true);
         $this->assertTrue($output->isDecorated(), 'setDecorated() sets the decorated flag');
     }
 
-    public function testSetGetVerbosity()
+    public function testSetGetVerbosity(): void
     {
         $output = new TestOutput();
         $output->setVerbosity(Output::VERBOSITY_QUIET);
@@ -68,21 +68,21 @@ class OutputTest extends TestCase
         $this->assertTrue($output->isDebug());
     }
 
-    public function testWriteWithVerbosityQuiet()
+    public function testWriteWithVerbosityQuiet(): void
     {
         $output = new TestOutput(Output::VERBOSITY_QUIET);
         $output->writeln('foo');
         $this->assertEquals('', $output->output, '->writeln() outputs nothing if verbosity is set to VERBOSITY_QUIET');
     }
 
-    public function testWriteAnArrayOfMessages()
+    public function testWriteAnArrayOfMessages(): void
     {
         $output = new TestOutput();
         $output->writeln(['foo', 'bar']);
         $this->assertEquals("foo\nbar\n", $output->output, '->writeln() can take an array of messages to output');
     }
 
-    public function testWriteAnIterableOfMessages()
+    public function testWriteAnIterableOfMessages(): void
     {
         $output = new TestOutput();
         $output->writeln($this->generateMessages());
@@ -96,7 +96,7 @@ class OutputTest extends TestCase
     }
 
     #[DataProvider('provideWriteArguments')]
-    public function testWriteRawMessage($message, $type, $expectedOutput)
+    public function testWriteRawMessage($message, $type, $expectedOutput): void
     {
         $output = new TestOutput();
         $output->writeln($message, $type);
@@ -111,7 +111,7 @@ class OutputTest extends TestCase
         ];
     }
 
-    public function testWriteWithDecorationTurnedOff()
+    public function testWriteWithDecorationTurnedOff(): void
     {
         $output = new TestOutput();
         $output->setDecorated(false);
@@ -119,7 +119,7 @@ class OutputTest extends TestCase
         $this->assertEquals("foo\n", $output->output, '->writeln() strips decoration tags if decoration is set to false');
     }
 
-    public function testWriteDecoratedMessage()
+    public function testWriteDecoratedMessage(): void
     {
         $fooStyle = new OutputFormatterStyle('yellow', 'red', ['blink']);
         $output = new TestOutput();
@@ -129,7 +129,7 @@ class OutputTest extends TestCase
         $this->assertEquals("\033[33;41;5mfoo\033[39;49;25m\n", $output->output, '->writeln() decorates the output');
     }
 
-    public function testWriteWithInvalidStyle()
+    public function testWriteWithInvalidStyle(): void
     {
         $output = new TestOutput();
 
@@ -143,7 +143,7 @@ class OutputTest extends TestCase
     }
 
     #[DataProvider('verbosityProvider')]
-    public function testWriteWithVerbosityOption($verbosity, $expected, $msg)
+    public function testWriteWithVerbosityOption($verbosity, $expected, $msg): void
     {
         $output = new TestOutput();
 
@@ -175,7 +175,7 @@ class TestOutput extends Output
 {
     public string $output = '';
 
-    public function clear()
+    public function clear(): void
     {
         $this->output = '';
     }

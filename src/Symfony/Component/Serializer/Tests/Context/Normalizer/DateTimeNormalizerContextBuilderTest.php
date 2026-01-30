@@ -33,7 +33,7 @@ class DateTimeNormalizerContextBuilderTest extends TestCase
      * @param array<string, mixed> $values
      */
     #[DataProvider('withersDataProvider')]
-    public function testWithers(array $values)
+    public function testWithers(array $values): void
     {
         $context = $this->contextBuilder
             ->withFormat($values[DateTimeNormalizer::FORMAT_KEY])
@@ -64,7 +64,7 @@ class DateTimeNormalizerContextBuilderTest extends TestCase
         ]];
     }
 
-    public function testCastTimezoneStringToTimezone()
+    public function testCastTimezoneStringToTimezone(): void
     {
         $this->assertEquals(
             [DateTimeNormalizer::TIMEZONE_KEY => new \DateTimeZone('GMT'), DateTimeNormalizer::FORCE_TIMEZONE_KEY => null],
@@ -72,7 +72,7 @@ class DateTimeNormalizerContextBuilderTest extends TestCase
         );
     }
 
-    public function testCannotSetInvalidTimezone()
+    public function testCannotSetInvalidTimezone(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->contextBuilder->withTimezone('not a timezone');

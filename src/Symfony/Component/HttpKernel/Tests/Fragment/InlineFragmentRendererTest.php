@@ -30,21 +30,21 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 #[Group('time-sensitive')]
 class InlineFragmentRendererTest extends TestCase
 {
-    public function testRender()
+    public function testRender(): void
     {
         $strategy = new InlineFragmentRenderer($this->getKernel(new Response('foo')));
 
         $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
 
-    public function testRenderWithControllerReference()
+    public function testRenderWithControllerReference(): void
     {
         $strategy = new InlineFragmentRenderer($this->getKernel(new Response('foo')));
 
         $this->assertEquals('foo', $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'))->getContent());
     }
 
-    public function testRenderWithObjectsAsAttributes()
+    public function testRenderWithObjectsAsAttributes(): void
     {
         $object = new \stdClass();
 
@@ -60,7 +60,7 @@ class InlineFragmentRendererTest extends TestCase
         $this->assertSame('foo', $strategy->render(new ControllerReference('main_controller', ['object' => $object], []), Request::create('/'))->getContent());
     }
 
-    public function testRenderWithTrustedHeaderDisabled()
+    public function testRenderWithTrustedHeaderDisabled(): void
     {
         Request::setTrustedProxies([], 0);
 
@@ -74,7 +74,7 @@ class InlineFragmentRendererTest extends TestCase
         Request::setTrustedProxies([], -1);
     }
 
-    public function testRenderExceptionNoIgnoreErrors()
+    public function testRenderExceptionNoIgnoreErrors(): void
     {
         $this->expectException(\RuntimeException::class);
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
@@ -85,7 +85,7 @@ class InlineFragmentRendererTest extends TestCase
         $this->assertEquals('foo', $strategy->render('/', Request::create('/'))->getContent());
     }
 
-    public function testRenderExceptionIgnoreErrors()
+    public function testRenderExceptionIgnoreErrors(): void
     {
         $exception = new \RuntimeException('foo');
         $kernel = $this->getKernel($exception);
@@ -99,7 +99,7 @@ class InlineFragmentRendererTest extends TestCase
         $this->assertSame('', $strategy->render('/', $request, ['ignore_errors' => true])->getContent());
     }
 
-    public function testRenderExceptionIgnoreErrorsWithAlt()
+    public function testRenderExceptionIgnoreErrorsWithAlt(): void
     {
         $strategy = new InlineFragmentRenderer($this->getKernel(static function () {
             static $firstCall = true;
@@ -134,13 +134,13 @@ class InlineFragmentRendererTest extends TestCase
         return $kernel;
     }
 
-    public function testExceptionInSubRequestsDoesNotMangleOutputBuffers()
+    public function testExceptionInSubRequestsDoesNotMangleOutputBuffers(): void
     {
         $controllerResolver = $this->createMock(ControllerResolverInterface::class);
         $controllerResolver
             ->expects($this->once())
             ->method('getController')
-            ->willReturn(static function () {
+            ->willReturn(static function (): void {
                 ob_start();
                 echo 'bar';
                 throw new \RuntimeException();
@@ -167,7 +167,7 @@ class InlineFragmentRendererTest extends TestCase
         $this->assertEquals('Foo', ob_get_clean());
     }
 
-    public function testLocaleAndFormatAreKeptInSubrequest()
+    public function testLocaleAndFormatAreKeptInSubrequest(): void
     {
         $expectedSubRequest = Request::create('/');
         $expectedSubRequest->attributes->set('_format', 'foo');
@@ -187,7 +187,7 @@ class InlineFragmentRendererTest extends TestCase
         $strategy->render('/', $request);
     }
 
-    public function testESIHeaderIsKeptInSubrequest()
+    public function testESIHeaderIsKeptInSubrequest(): void
     {
         $expectedSubRequest = Request::create('/');
         $expectedSubRequest->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
@@ -206,7 +206,7 @@ class InlineFragmentRendererTest extends TestCase
         $strategy->render('/', $request);
     }
 
-    public function testESIHeaderIsKeptInSubrequestWithTrustedHeaderDisabled()
+    public function testESIHeaderIsKeptInSubrequestWithTrustedHeaderDisabled(): void
     {
         Request::setTrustedProxies([], Request::HEADER_FORWARDED);
 
@@ -215,7 +215,7 @@ class InlineFragmentRendererTest extends TestCase
         Request::setTrustedProxies([], -1);
     }
 
-    public function testHeadersPossiblyResultingIn304AreNotAssignedToSubrequest()
+    public function testHeadersPossiblyResultingIn304AreNotAssignedToSubrequest(): void
     {
         $expectedSubRequest = Request::create('/');
         $expectedSubRequest->headers->set('x-forwarded-for', ['127.0.0.1']);
@@ -228,7 +228,7 @@ class InlineFragmentRendererTest extends TestCase
         $strategy->render('/', $request);
     }
 
-    public function testFirstTrustedProxyIsSetAsRemote()
+    public function testFirstTrustedProxyIsSetAsRemote(): void
     {
         Request::setTrustedProxies(['1.1.1.1'], -1);
 
@@ -249,7 +249,7 @@ class InlineFragmentRendererTest extends TestCase
         Request::setTrustedProxies([], -1);
     }
 
-    public function testIpAddressOfRangedTrustedProxyIsSetAsRemote()
+    public function testIpAddressOfRangedTrustedProxyIsSetAsRemote(): void
     {
         $expectedSubRequest = Request::create('/');
         $expectedSubRequest->headers->set('Surrogate-Capability', 'abc="ESI/1.0"');
@@ -270,7 +270,7 @@ class InlineFragmentRendererTest extends TestCase
         Request::setTrustedProxies([], -1);
     }
 
-    public function testStatelessAttributeIsForwardedByDefault()
+    public function testStatelessAttributeIsForwardedByDefault(): void
     {
         $request = Request::create('/');
         $request->attributes->set('_stateless', true);
@@ -285,7 +285,7 @@ class InlineFragmentRendererTest extends TestCase
         $strategy->render('/', $request);
     }
 
-    public function testStatelessAttributeCanBeDisabled()
+    public function testStatelessAttributeCanBeDisabled(): void
     {
         $request = Request::create('/');
         $request->attributes->set('_stateless', true);

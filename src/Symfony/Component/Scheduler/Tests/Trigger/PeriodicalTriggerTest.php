@@ -20,7 +20,7 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 class PeriodicalTriggerTest extends TestCase
 {
     #[DataProvider('provideForConstructor')]
-    public function testConstructor(PeriodicalTrigger $trigger, bool $optimizable = true)
+    public function testConstructor(PeriodicalTrigger $trigger, bool $optimizable = true): void
     {
         $run = new \DateTimeImmutable('2922-02-22 12:34:00+00:00');
 
@@ -57,7 +57,7 @@ class PeriodicalTriggerTest extends TestCase
     }
 
     #[DataProvider('getInvalidIntervals')]
-    public function testInvalidInterval($interval, $expectedExceptionMessage)
+    public function testInvalidInterval($interval, $expectedExceptionMessage): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
@@ -76,7 +76,7 @@ class PeriodicalTriggerTest extends TestCase
     }
 
     #[DataProvider('provideForToString')]
-    public function testToString(string $expected, PeriodicalTrigger $trigger)
+    public function testToString(string $expected, PeriodicalTrigger $trigger): void
     {
         $this->assertSame($expected, (string) $trigger);
     }
@@ -98,7 +98,7 @@ class PeriodicalTriggerTest extends TestCase
     }
 
     #[DataProvider('providerGetNextRunDates')]
-    public function testGetNextRunDates(\DateTimeImmutable $from, TriggerInterface $trigger, array $expected, int $count)
+    public function testGetNextRunDates(\DateTimeImmutable $from, TriggerInterface $trigger, array $expected, int $count): void
     {
         $this->assertEquals($expected, $this->getNextRunDates($from, $trigger, $count));
     }
@@ -149,7 +149,7 @@ class PeriodicalTriggerTest extends TestCase
     }
 
     #[DataProvider('providerGetNextRunDateAgain')]
-    public function testGetNextRunDateAgain(PeriodicalTrigger $trigger, \DateTimeImmutable $lastRun, ?\DateTimeImmutable $expected)
+    public function testGetNextRunDateAgain(PeriodicalTrigger $trigger, \DateTimeImmutable $lastRun, ?\DateTimeImmutable $expected): void
     {
         $this->assertEquals($expected, $trigger->getNextRunDate($lastRun));
     }

@@ -20,7 +20,7 @@ class RadioTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         return $this->factory->create(RadioType::class, null, $options);
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 

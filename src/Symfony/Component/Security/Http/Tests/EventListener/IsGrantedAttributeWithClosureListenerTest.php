@@ -31,7 +31,7 @@ use Symfony\Component\Security\Http\Tests\Fixtures\IsGrantedAttributeWithClosure
 #[RequiresPhp('>=8.5')]
 class IsGrantedAttributeWithClosureListenerTest extends TestCase
 {
-    public function testAttribute()
+    public function testAttribute(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->exactly(2))
@@ -66,7 +66,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testNothingHappensWithNoConfig()
+    public function testNothingHappensWithNoConfig(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->never())
@@ -84,7 +84,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedCalledCorrectly()
+    public function testIsGrantedCalledCorrectly(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())
@@ -104,7 +104,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedSubjectFromArguments()
+    public function testIsGrantedSubjectFromArguments(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())
@@ -126,7 +126,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedSubjectFromArgumentsWithArray()
+    public function testIsGrantedSubjectFromArgumentsWithArray(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())
@@ -151,7 +151,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedNullSubjectFromArguments()
+    public function testIsGrantedNullSubjectFromArguments(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())
@@ -171,7 +171,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedArrayWithNullValueSubjectFromArguments()
+    public function testIsGrantedArrayWithNullValueSubjectFromArguments(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())
@@ -194,7 +194,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testExceptionWhenMissingSubjectAttribute()
+    public function testExceptionWhenMissingSubjectAttribute(): void
     {
         $authChecker = $this->createStub(AuthorizationCheckerInterface::class);
 
@@ -214,7 +214,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
     }
 
     #[DataProvider('getAccessDeniedMessageTests')]
-    public function testAccessDeniedMessages(string|array|null $subject, string $method, int $numOfArguments, string $expectedMessage)
+    public function testAccessDeniedMessages(string|array|null $subject, string $method, int $numOfArguments, string $expectedMessage): void
     {
         $authChecker = new AuthorizationChecker(new TokenStorage(), new AccessDecisionManager((static function () use (&$authChecker) {
             yield new ClosureVoter($authChecker);
@@ -255,7 +255,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         yield [['author' => 'bar', 'alias' => 'bar'], 'withNestArgsInSubject', 2, 'Access Denied. Closure {closure:Symfony\Component\Security\Http\Tests\Fixtures\IsGrantedAttributeMethodsWithClosureController::withNestArgsInSubject():85} returned false.'];
     }
 
-    public function testNotFoundHttpException()
+    public function testNotFoundHttpException(): void
     {
         $authChecker = $this->createStub(AuthorizationCheckerInterface::class);
         $authChecker
@@ -278,7 +278,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedWithClosureAsSubject()
+    public function testIsGrantedWithClosureAsSubject(): void
     {
         $request = new Request();
 
@@ -300,7 +300,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedWithNestedExpressionInSubject()
+    public function testIsGrantedWithNestedExpressionInSubject(): void
     {
         $request = new Request();
 
@@ -322,7 +322,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testHttpExceptionWithExceptionCode()
+    public function testHttpExceptionWithExceptionCode(): void
     {
         $authChecker = $this->createStub(AuthorizationCheckerInterface::class);
         $authChecker
@@ -346,7 +346,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testAccessDeniedExceptionWithExceptionCode()
+    public function testAccessDeniedExceptionWithExceptionCode(): void
     {
         $authChecker = $this->createStub(AuthorizationCheckerInterface::class);
         $authChecker

@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Worker;
 class StopWorkerOnMessageLimitListenerTest extends TestCase
 {
     #[DataProvider('countProvider')]
-    public function testWorkerStopsWhenMaximumCountExceeded(int $max, bool $shouldStop)
+    public function testWorkerStopsWhenMaximumCountExceeded(int $max, bool $shouldStop): void
     {
         $worker = $this->createMock(Worker::class);
         $worker->expects($shouldStop ? $this->atLeastOnce() : $this->never())->method('stop');
@@ -43,7 +43,7 @@ class StopWorkerOnMessageLimitListenerTest extends TestCase
         yield [4, false];
     }
 
-    public function testWorkerLogsMaximumCountExceededWhenLoggerIsGiven()
+    public function testWorkerLogsMaximumCountExceededWhenLoggerIsGiven(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('info')

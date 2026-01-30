@@ -17,7 +17,7 @@ use Symfony\Component\Validator\ValidatorBuilder;
 
 class ValidValidatorTest extends TestCase
 {
-    public function testPropertyPathsArePassedToNestedContexts()
+    public function testPropertyPathsArePassedToNestedContexts(): void
     {
         $validatorBuilder = new ValidatorBuilder();
         $validator = $validatorBuilder->enableAttributeMapping()->getValidator();
@@ -28,7 +28,7 @@ class ValidValidatorTest extends TestCase
         $this->assertSame('fooBar.fooBarBaz.foo', $violations->get(0)->getPropertyPath());
     }
 
-    public function testNullValues()
+    public function testNullValues(): void
     {
         $validatorBuilder = new ValidatorBuilder();
         $validator = $validatorBuilder->enableAttributeMapping()->getValidator();

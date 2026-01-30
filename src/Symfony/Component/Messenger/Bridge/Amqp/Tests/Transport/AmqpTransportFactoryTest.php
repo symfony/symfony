@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class AmqpTransportFactoryTest extends TestCase
 {
-    public function testSupportsOnlyAmqpTransports()
+    public function testSupportsOnlyAmqpTransports(): void
     {
         $factory = new AmqpTransportFactory();
 
@@ -30,7 +30,7 @@ class AmqpTransportFactoryTest extends TestCase
     }
 
     #[RequiresPhpExtension('amqp')]
-    public function testItCreatesTheTransport()
+    public function testItCreatesTheTransport(): void
     {
         $factory = new AmqpTransportFactory();
         $serializer = $this->createStub(SerializerInterface::class);

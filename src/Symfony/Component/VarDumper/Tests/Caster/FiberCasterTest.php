@@ -18,7 +18,7 @@ class FiberCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testCastFiberNotStarted()
+    public function testCastFiberNotStarted(): void
     {
         $fiber = new \Fiber(static fn () => true);
 
@@ -31,7 +31,7 @@ class FiberCasterTest extends TestCase
         $this->assertDumpEquals($expected, $fiber);
     }
 
-    public function testCastFiberTerminated()
+    public function testCastFiberTerminated(): void
     {
         $fiber = new \Fiber(static fn () => true);
         $fiber->start();
@@ -45,7 +45,7 @@ class FiberCasterTest extends TestCase
         $this->assertDumpEquals($expected, $fiber);
     }
 
-    public function testCastFiberSuspended()
+    public function testCastFiberSuspended(): void
     {
         $fiber = new \Fiber(\Fiber::suspend(...));
         $fiber->start();
@@ -59,9 +59,9 @@ class FiberCasterTest extends TestCase
         $this->assertDumpEquals($expected, $fiber);
     }
 
-    public function testCastFiberRunning()
+    public function testCastFiberRunning(): void
     {
-        $fiber = new \Fiber(function () {
+        $fiber = new \Fiber(function (): void {
             $expected = <<<EODUMP
                 Fiber {
                   status: "running"

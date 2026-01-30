@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 abstract class AbstractAttributeRoutingTestCase extends AbstractWebTestCase
 {
     #[DataProvider('getRoutes')]
-    public function testAnnotatedController(string $path, string $expectedValue)
+    public function testAnnotatedController(string $path, string $expectedValue): void
     {
         $client = $this->createClient(['test_case' => $this->getTestCaseApp(), 'root_config' => 'config.yml']);
         $client->request('GET', '/annotated'.$path);

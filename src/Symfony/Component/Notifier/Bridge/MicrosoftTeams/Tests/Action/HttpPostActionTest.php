@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\HttpPostAction;
 
 final class HttpPostActionTest extends TestCase
 {
-    public function testName()
+    public function testName(): void
     {
         $action = (new HttpPostAction())
             ->name($value = 'My name');
@@ -25,7 +25,7 @@ final class HttpPostActionTest extends TestCase
         $this->assertSame($value, $action->toArray()['name']);
     }
 
-    public function testTarget()
+    public function testTarget(): void
     {
         $action = (new HttpPostAction())
             ->target($value = 'https://symfony.com');
@@ -33,7 +33,7 @@ final class HttpPostActionTest extends TestCase
         $this->assertSame($value, $action->toArray()['target']);
     }
 
-    public function testHeader()
+    public function testHeader(): void
     {
         $header = (new Header())
             ->name($name = 'Header-Name')
@@ -51,7 +51,7 @@ final class HttpPostActionTest extends TestCase
         );
     }
 
-    public function testBody()
+    public function testBody(): void
     {
         $action = (new HttpPostAction())
             ->body($value = 'content');
@@ -59,7 +59,7 @@ final class HttpPostActionTest extends TestCase
         $this->assertSame($value, $action->toArray()['body']);
     }
 
-    public function testBodyContentType()
+    public function testBodyContentType(): void
     {
         $action = (new HttpPostAction())
             ->bodyContentType($value = 'application/json');
@@ -67,7 +67,7 @@ final class HttpPostActionTest extends TestCase
         $this->assertSame($value, $action->toArray()['bodyContentType']);
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $this->assertSame(
             [

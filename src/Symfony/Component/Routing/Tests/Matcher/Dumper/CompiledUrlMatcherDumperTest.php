@@ -37,7 +37,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
         @unlink($this->dumpPath);
     }
 
-    public function testRedirectPreservesUrlEncoding()
+    public function testRedirectPreservesUrlEncoding(): void
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo:bar/'));
@@ -49,7 +49,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
     }
 
     #[DataProvider('getRouteCollections')]
-    public function testDump(RouteCollection $collection, $fixture)
+    public function testDump(RouteCollection $collection, $fixture): void
     {
         $basePath = __DIR__.'/../../Fixtures/dumper/';
 
@@ -486,7 +486,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
             ->getMock();
     }
 
-    public function testGenerateDumperMatcherWithObject()
+    public function testGenerateDumperMatcherWithObject(): void
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('_', new Route('/', [new \stdClass()]));

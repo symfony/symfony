@@ -26,7 +26,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 class ImportMapVersionCheckerTest extends TestCase
 {
     #[DataProvider('getCheckVersionsTests')]
-    public function testCheckVersions(array $importMapEntries, array $dependencies, array $expectedRequests, array $expectedProblems)
+    public function testCheckVersions(array $importMapEntries, array $dependencies, array $expectedRequests, array $expectedProblems): void
     {
         $configReader = $this->createMock(ImportMapConfigReader::class);
         $configReader->expects($this->once())
@@ -283,7 +283,7 @@ class ImportMapVersionCheckerTest extends TestCase
     }
 
     #[DataProvider('getNpmSpecificVersionConstraints')]
-    public function testNpmSpecificConstraints(string $npmConstraint, ?string $expectedComposerConstraint)
+    public function testNpmSpecificConstraints(string $npmConstraint, ?string $expectedComposerConstraint): void
     {
         $this->assertSame($expectedComposerConstraint, ImportMapVersionChecker::convertNpmConstraint($npmConstraint));
     }

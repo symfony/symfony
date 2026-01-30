@@ -36,20 +36,20 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  */
 class ConsoleHandlerTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $handler = new ConsoleHandler(null, false);
         $this->assertFalse($handler->getBubble(), 'the bubble parameter gets propagated');
     }
 
-    public function testIsHandling()
+    public function testIsHandling(): void
     {
         $handler = new ConsoleHandler();
         $this->assertFalse($handler->isHandling(RecordFactory::create()), '->isHandling returns false when no output is set');
     }
 
     #[DataProvider('provideVerbosityMappingTests')]
-    public function testVerbosityMapping($verbosity, $level, $isHandling, array $map = [])
+    public function testVerbosityMapping($verbosity, $level, $isHandling, array $map = []): void
     {
         $output = $this->createMock(OutputInterface::class);
         $output
@@ -102,7 +102,7 @@ class ConsoleHandlerTest extends TestCase
     }
 
     #[DataProvider('provideHandleOrBubbleSilentTests')]
-    public function testHandleOrBubbleSilent(int $verbosity, Level $level, bool $isHandling, bool $isWriting, array $map = [])
+    public function testHandleOrBubbleSilent(int $verbosity, Level $level, bool $isHandling, bool $isWriting, array $map = []): void
     {
         $output = $this->createMock(OutputInterface::class);
         $output
@@ -143,7 +143,7 @@ class ConsoleHandlerTest extends TestCase
         ];
     }
 
-    public function testVerbosityChanged()
+    public function testVerbosityChanged(): void
     {
         $output = $this->createMock(OutputInterface::class);
         $output
@@ -160,7 +160,7 @@ class ConsoleHandlerTest extends TestCase
         );
     }
 
-    public function testGetFormatter()
+    public function testGetFormatter(): void
     {
         $handler = new ConsoleHandler();
         $this->assertInstanceOf(
@@ -169,7 +169,7 @@ class ConsoleHandlerTest extends TestCase
         );
     }
 
-    public function testWritingAndFormatting()
+    public function testWritingAndFormatting(): void
     {
         $output = $this->createMock(OutputInterface::class);
         $output
@@ -191,7 +191,7 @@ class ConsoleHandlerTest extends TestCase
         $this->assertTrue($handler->handle($infoRecord), 'The handler finished handling the log as bubble is false.');
     }
 
-    public function testLogsFromListeners()
+    public function testLogsFromListeners(): void
     {
         $output = new BufferedOutput();
         $output->setVerbosity(OutputInterface::VERBOSITY_DEBUG);
@@ -202,19 +202,19 @@ class ConsoleHandlerTest extends TestCase
         $logger->pushHandler($handler);
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(ConsoleEvents::COMMAND, static function () use ($logger) {
+        $dispatcher->addListener(ConsoleEvents::COMMAND, static function () use ($logger): void {
             $logger->info('Before command message.');
         });
-        $dispatcher->addListener(ConsoleEvents::TERMINATE, static function () use ($logger) {
+        $dispatcher->addListener(ConsoleEvents::TERMINATE, static function () use ($logger): void {
             $logger->info('Before terminate message.');
         });
 
         $dispatcher->addSubscriber($handler);
 
-        $dispatcher->addListener(ConsoleEvents::COMMAND, static function () use ($logger) {
+        $dispatcher->addListener(ConsoleEvents::COMMAND, static function () use ($logger): void {
             $logger->info('After command message.');
         });
-        $dispatcher->addListener(ConsoleEvents::TERMINATE, static function () use ($logger) {
+        $dispatcher->addListener(ConsoleEvents::TERMINATE, static function () use ($logger): void {
             $logger->info('After terminate message.');
         });
 
@@ -229,7 +229,7 @@ class ConsoleHandlerTest extends TestCase
         $this->assertStringContainsString('After terminate message.', $out);
     }
 
-    public function testInteractiveOnly()
+    public function testInteractiveOnly(): void
     {
         $output = $this->createStub(OutputInterface::class);
 

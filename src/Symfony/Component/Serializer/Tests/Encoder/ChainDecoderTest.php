@@ -23,7 +23,7 @@ class ChainDecoderTest extends TestCase
     private const FORMAT_2 = 'format2';
     private const FORMAT_3 = 'format3';
 
-    public function testSupportsDecoding()
+    public function testSupportsDecoding(): void
     {
         $decoder1 = $this->createDecoder1();
         $decoder1
@@ -50,7 +50,7 @@ class ChainDecoderTest extends TestCase
         $this->assertEquals('result2', $chainDecoder->decode('', self::FORMAT_3, ['foo' => 'bar2']));
     }
 
-    public function testDecode()
+    public function testDecode(): void
     {
         $decoder1 = $this->createDecoder1(true);
         $decoder1->expects($this->never())->method('decode');
@@ -61,7 +61,7 @@ class ChainDecoderTest extends TestCase
         $chainDecoder->decode('string_to_decode', self::FORMAT_2);
     }
 
-    public function testDecodeUnsupportedFormat()
+    public function testDecodeUnsupportedFormat(): void
     {
         $chainDecoder = new ChainDecoder([$this->createDecoder1(), $this->createDecoder2()]);
         $this->expectException(RuntimeException::class);

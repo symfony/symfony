@@ -26,7 +26,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 class DispatchAfterCurrentBusMiddlewareTest extends TestCase
 {
-    public function testEventsInNewTransactionAreHandledAfterMainMessage()
+    public function testEventsInNewTransactionAreHandledAfterMainMessage(): void
     {
         $message = new DummyMessage('Hello');
 
@@ -72,7 +72,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $messageBus->dispatch($message);
     }
 
-    public function testThrowingEventsHandlingWontStopExecution()
+    public function testThrowingEventsHandlingWontStopExecution(): void
     {
         $message = new DummyMessage('Hello');
 
@@ -126,7 +126,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $messageBus->dispatch($message);
     }
 
-    public function testLongChainWithExceptions()
+    public function testLongChainWithExceptions(): void
     {
         $command = new DummyMessage('Level 0');
 
@@ -216,7 +216,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $commandBus->dispatch($command);
     }
 
-    public function testHandleDelayedEventFromQueue()
+    public function testHandleDelayedEventFromQueue(): void
     {
         $message = new DummyMessage('Hello');
         $event = new DummyEvent('Event on queue');
@@ -269,7 +269,7 @@ class DispatchAfterCurrentBusMiddlewareTest extends TestCase
         $messageBus->dispatch($message);
     }
 
-    public function testDispatchOutOfAnotherHandlerDispatchesAndRemoveStamp()
+    public function testDispatchOutOfAnotherHandlerDispatchesAndRemoveStamp(): void
     {
         $event = new DummyEvent('First event');
 

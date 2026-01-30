@@ -17,7 +17,7 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 class ExcludeTimeTriggerTest extends TestCase
 {
-    public function testGetNextRun()
+    public function testGetNextRun(): void
     {
         $inner = $this->createStub(TriggerInterface::class);
         $inner

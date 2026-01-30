@@ -20,14 +20,14 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class ReflectionClassResourceTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $res = new ReflectionClassResource(new \ReflectionClass(\ErrorException::class));
 
         $this->assertSame('reflection.ErrorException', (string) $res);
     }
 
-    public function testSerializeUnserialize()
+    public function testSerializeUnserialize(): void
     {
         $res = new ReflectionClassResource(new \ReflectionClass(DummyInterface::class));
         $ser = unserialize(serialize($res));
@@ -38,7 +38,7 @@ class ReflectionClassResourceTest extends TestCase
         $this->assertSame((string) $res, (string) $ser);
     }
 
-    public function testIsFresh()
+    public function testIsFresh(): void
     {
         $res = new ReflectionClassResource(new \ReflectionClass(__CLASS__));
         $mtime = filemtime(__FILE__);
@@ -48,7 +48,7 @@ class ReflectionClassResourceTest extends TestCase
         $this->assertTrue($res->isFresh($mtime - 86400), '->isFresh() returns true if the resource has not changed');
     }
 
-    public function testIsFreshForDeletedResources()
+    public function testIsFreshForDeletedResources(): void
     {
         $now = time();
         $tmp = sys_get_temp_dir().'/tmp.php';
@@ -63,7 +63,7 @@ class ReflectionClassResourceTest extends TestCase
     }
 
     #[DataProvider('provideHashedSignature')]
-    public function testHashedSignature(bool $changeExpected, int $changedLine, ?string $changedCode, int $resourceClassNameSuffix, ?\Closure $setContext = null)
+    public function testHashedSignature(bool $changeExpected, int $changedLine, ?string $changedCode, int $resourceClassNameSuffix, ?\Closure $setContext = null): void
     {
         if ($setContext) {
             $setContext();
@@ -165,10 +165,10 @@ class ReflectionClassResourceTest extends TestCase
         yield [true, 17, 'public function ccc($bar = 187) {}', ++$i];
         yield [true, 17, 'public function ccc($bar = ANOTHER_ONE_THAT_WILL_NEVER_BE_DEFINED_CCCCCCCCC) {}', ++$i];
         yield [true, 17, 'public function ccc($bar = parent::BOOM) {}', ++$i];
-        yield [false, 17, null, ++$i, static function () { \define('A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC', 'foo'); }];
+        yield [false, 17, null, ++$i, static function (): void { \define('A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC', 'foo'); }];
     }
 
-    public function testEventSubscriber()
+    public function testEventSubscriber(): void
     {
         $res = new ReflectionClassResource(new \ReflectionClass(TestEventSubscriber::class));
         $this->assertTrue($res->isFresh(0));
@@ -180,7 +180,7 @@ class ReflectionClassResourceTest extends TestCase
         $this->assertTrue($res->isFresh(0));
     }
 
-    public function testServiceSubscriber()
+    public function testServiceSubscriber(): void
     {
         $res = new ReflectionClassResource(new \ReflectionClass(TestServiceSubscriber::class));
         $this->assertTrue($res->isFresh(0));
@@ -192,7 +192,7 @@ class ReflectionClassResourceTest extends TestCase
         $this->assertTrue($res->isFresh(0));
     }
 
-    public function testIgnoresObjectsInSignature()
+    public function testIgnoresObjectsInSignature(): void
     {
         $res = new ReflectionClassResource(new \ReflectionClass(TestServiceWithStaticProperty::class));
         $this->assertTrue($res->isFresh(0));
@@ -201,7 +201,7 @@ class ReflectionClassResourceTest extends TestCase
         $this->assertTrue($res->isFresh(0));
     }
 
-    public function testEnum()
+    public function testEnum(): void
     {
         $res = new ReflectionClassResource($enum = new \ReflectionClass(SomeEnum::class));
         $r = new \ReflectionClass(ReflectionClassResource::class);
@@ -212,7 +212,7 @@ class ReflectionClassResourceTest extends TestCase
         $this->assertStringContainsString('Beta', $actual);
     }
 
-    public function testBackedEnum()
+    public function testBackedEnum(): void
     {
         $res = new ReflectionClassResource($enum = new \ReflectionClass(SomeBackedEnum::class));
         $r = new \ReflectionClass(ReflectionClassResource::class);

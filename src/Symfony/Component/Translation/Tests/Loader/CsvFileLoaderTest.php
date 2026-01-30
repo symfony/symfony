@@ -19,7 +19,7 @@ use Symfony\Component\Translation\Loader\CsvFileLoader;
 
 class CsvFileLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new CsvFileLoader();
         $resource = __DIR__.'/../Fixtures/resources.csv';
@@ -30,7 +30,7 @@ class CsvFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
-    public function testLoadDoesNothingIfEmpty()
+    public function testLoadDoesNothingIfEmpty(): void
     {
         $loader = new CsvFileLoader();
         $resource = __DIR__.'/../Fixtures/empty.csv';
@@ -41,14 +41,14 @@ class CsvFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $this->expectException(NotFoundResourceException::class);
 
         (new CsvFileLoader())->load(__DIR__.'/../Fixtures/not-exists.csv', 'en', 'domain1');
     }
 
-    public function testLoadNonLocalResource()
+    public function testLoadNonLocalResource(): void
     {
         $this->expectException(InvalidResourceException::class);
 

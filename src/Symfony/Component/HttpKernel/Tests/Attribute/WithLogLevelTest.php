@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Attribute\WithLogLevel;
  */
 class WithLogLevelTest extends TestCase
 {
-    public function testWithValidLogLevel()
+    public function testWithValidLogLevel(): void
     {
         $logLevel = LogLevel::NOTICE;
 
@@ -29,7 +29,7 @@ class WithLogLevelTest extends TestCase
         $this->assertSame($logLevel, $attribute->level);
     }
 
-    public function testWithInvalidLogLevel()
+    public function testWithInvalidLogLevel(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid log level "invalid".');

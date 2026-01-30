@@ -20,7 +20,7 @@ class SearchTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         return $this->factory->create(SearchType::class, null, $options);
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 

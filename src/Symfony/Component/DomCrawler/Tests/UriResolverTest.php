@@ -18,7 +18,7 @@ use Symfony\Component\DomCrawler\UriResolver;
 class UriResolverTest extends TestCase
 {
     #[DataProvider('provideResolverTests')]
-    public function testResolver(string $uri, string $baseUri, string $expected)
+    public function testResolver(string $uri, string $baseUri, string $expected): void
     {
         $this->assertEquals($expected, UriResolver::resolve($uri, $baseUri));
     }

@@ -19,14 +19,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class FileLinkFormatterTest extends TestCase
 {
-    public function testWhenNoFileLinkFormatAndNoRequest()
+    public function testWhenNoFileLinkFormatAndNoRequest(): void
     {
         $sut = new FileLinkFormatter([]);
 
         $this->assertFalse($sut->format('/kernel/root/src/my/very/best/file.php', 3));
     }
 
-    public function testAfterUnserialize()
+    public function testAfterUnserialize(): void
     {
         if (get_cfg_var('xdebug.file_link_format')) {
             // There is no way to override "xdebug.file_link_format" option in a test.
@@ -46,7 +46,7 @@ class FileLinkFormatterTest extends TestCase
         }
     }
 
-    public function testWhenFileLinkFormatAndNoRequest()
+    public function testWhenFileLinkFormatAndNoRequest(): void
     {
         $file = __DIR__.\DIRECTORY_SEPARATOR.'file.php';
 
@@ -55,7 +55,7 @@ class FileLinkFormatterTest extends TestCase
         $this->assertSame("debug://open?url=file://$file&line=3", $sut->format($file, 3));
     }
 
-    public function testWhenNoFileLinkFormatAndRequest()
+    public function testWhenNoFileLinkFormatAndRequest(): void
     {
         $file = __DIR__.\DIRECTORY_SEPARATOR.'file.php';
         $requestStack = new RequestStack();
@@ -73,7 +73,7 @@ class FileLinkFormatterTest extends TestCase
         $this->assertSame('http://www.example.org/_profiler/open?file=file.php&line=3#line3', $sut->format($file, 3));
     }
 
-    public function testIdeFileLinkFormat()
+    public function testIdeFileLinkFormat(): void
     {
         $file = __DIR__.\DIRECTORY_SEPARATOR.'file.php';
 
@@ -82,13 +82,13 @@ class FileLinkFormatterTest extends TestCase
         $this->assertSame("atom://core/open/file?filename=$file&line=3", $sut->format($file, 3));
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $this->assertInstanceOf(FileLinkFormatter::class, unserialize(serialize(new FileLinkFormatter())));
     }
 
     #[DataProvider('providePathMappings')]
-    public function testIdeFileLinkFormatWithPathMappingParameters($mappings)
+    public function testIdeFileLinkFormatWithPathMappingParameters($mappings): void
     {
         $params = array_reduce($mappings, static fn ($c, $m) => "$c&".implode('>', $m), '');
         $sut = new FileLinkFormatter("vscode://file/%f:%l$params");

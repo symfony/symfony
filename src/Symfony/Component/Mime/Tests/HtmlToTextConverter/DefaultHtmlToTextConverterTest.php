@@ -16,7 +16,7 @@ use Symfony\Component\Mime\HtmlToTextConverter\DefaultHtmlToTextConverter;
 
 class DefaultHtmlToTextConverterTest extends TestCase
 {
-    public function testConvert()
+    public function testConvert(): void
     {
         $converter = new DefaultHtmlToTextConverter();
         $this->assertSame('HTML', $converter->convert('<head><meta charset="utf-8"></head><b>HTML</b><style>css</style>', 'UTF-8'));

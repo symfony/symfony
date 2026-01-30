@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\IsSignatureValidAttributeMethods
 
 class IsSignatureValidAttributeListenerTest extends TestCase
 {
-    public function testInvokableControllerWithValidSignature()
+    public function testInvokableControllerWithValidSignature(): void
     {
         $request = new Request();
 
@@ -43,7 +43,7 @@ class IsSignatureValidAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testNoAttributeSkipsValidation()
+    public function testNoAttributeSkipsValidation(): void
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
         $signer = $this->createMock(UriSigner::class);
@@ -61,7 +61,7 @@ class IsSignatureValidAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testDefaultCheckRequestSucceeds()
+    public function testDefaultCheckRequestSucceeds(): void
     {
         $request = new Request();
         $signer = $this->createMock(UriSigner::class);
@@ -80,7 +80,7 @@ class IsSignatureValidAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testCheckRequestFailsThrowsHttpException()
+    public function testCheckRequestFailsThrowsHttpException(): void
     {
         $request = new Request();
         $signer = $this->createMock(UriSigner::class);
@@ -101,7 +101,7 @@ class IsSignatureValidAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testMultipleAttributesAllValid()
+    public function testMultipleAttributesAllValid(): void
     {
         $request = new Request();
 
@@ -121,7 +121,7 @@ class IsSignatureValidAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testValidationWithStringMethod()
+    public function testValidationWithStringMethod(): void
     {
         $request = new Request([], [], [], [], [], ['REQUEST_METHOD' => 'POST']);
 
@@ -141,7 +141,7 @@ class IsSignatureValidAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testValidationWithArrayMethods()
+    public function testValidationWithArrayMethods(): void
     {
         $request = new Request([], [], [], [], [], ['REQUEST_METHOD' => 'POST']);
 
@@ -161,7 +161,7 @@ class IsSignatureValidAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testValidationSkippedForNonMatchingMethod()
+    public function testValidationSkippedForNonMatchingMethod(): void
     {
         $request = new Request([], [], [], [], [], ['REQUEST_METHOD' => 'GET']);
 

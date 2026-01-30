@@ -26,7 +26,7 @@ class RedisTransportFactoryTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testSupportsOnlyRedisTransports()
+    public function testSupportsOnlyRedisTransports(): void
     {
         $factory = new RedisTransportFactory();
 
@@ -41,7 +41,7 @@ class RedisTransportFactoryTest extends TestCase
 
     #[DataProvider('createTransportProvider')]
     #[Group('integration')]
-    public function testCreateTransport(string $dsn, array $options = [])
+    public function testCreateTransport(string $dsn, array $options = []): void
     {
         $this->skipIfRedisUnavailable();
 
@@ -77,7 +77,7 @@ class RedisTransportFactoryTest extends TestCase
         }
     }
 
-    private function skipIfRedisUnavailable()
+    private function skipIfRedisUnavailable(): void
     {
         try {
             (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));

@@ -20,7 +20,7 @@ use Symfony\Component\Console\Descriptor\ApplicationDescription;
 final class ApplicationDescriptionTest extends TestCase
 {
     #[DataProvider('getNamespacesProvider')]
-    public function testGetNamespaces(array $expected, array $names)
+    public function testGetNamespaces(array $expected, array $names): void
     {
         $application = new TestApplication();
         foreach ($names as $name) {

@@ -52,7 +52,7 @@ final class FakeSmsEmailTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendWithDefaultTransport()
+    public function testSendWithDefaultTransport(): void
     {
         $transportName = null;
 
@@ -75,7 +75,7 @@ final class FakeSmsEmailTransportTest extends TransportTestCase
         $this->assertFalse($sentEmail->getHeaders()->has('X-Transport'));
     }
 
-    public function testSendWithCustomTransport()
+    public function testSendWithCustomTransport(): void
     {
         $transportName = 'mailchimp';
 
@@ -99,7 +99,7 @@ final class FakeSmsEmailTransportTest extends TransportTestCase
         $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());
     }
 
-    public function testSendWithFromInSmsMessage()
+    public function testSendWithFromInSmsMessage(): void
     {
         $mailer = new DummyMailer();
         $transport = new FakeSmsEmailTransport($mailer, 'recipient@example.com', 'sender@example.com');

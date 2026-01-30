@@ -23,22 +23,22 @@ use Symfony\Component\HttpKernel\Tests\TestHttpKernel;
 
 class ControllerArgumentsEventTest extends TestCase
 {
-    public function testControllerArgumentsEvent()
+    public function testControllerArgumentsEvent(): void
     {
-        $event = new ControllerArgumentsEvent(new TestHttpKernel(), static function () {}, ['test'], new Request(), HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent(new TestHttpKernel(), static function (): void {}, ['test'], new Request(), HttpKernelInterface::MAIN_REQUEST);
         $this->assertSame(['test'], $event->getArguments());
     }
 
-    public function testSetAttributes()
+    public function testSetAttributes(): void
     {
-        $controller = static function () {};
+        $controller = static function (): void {};
         $event = new ControllerArgumentsEvent(new TestHttpKernel(), $controller, ['test'], new Request(), HttpKernelInterface::MAIN_REQUEST);
         $event->setController($controller, []);
 
         $this->assertSame([], $event->getAttributes());
     }
 
-    public function testGetAttributes()
+    public function testGetAttributes(): void
     {
         $controller = new AttributeController();
         $request = new Request();
@@ -82,7 +82,7 @@ class ControllerArgumentsEventTest extends TestCase
         $this->assertSame($controllerEvent->getAttributes(), $event->getAttributes());
     }
 
-    public function testGetAttributesByClassName()
+    public function testGetAttributesByClassName(): void
     {
         $controller = new AttributeController();
         $request = new Request();

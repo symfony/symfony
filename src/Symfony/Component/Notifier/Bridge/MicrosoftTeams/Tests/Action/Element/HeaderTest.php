@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\Element\Header;
 
 final class HeaderTest extends TestCase
 {
-    public function testName()
+    public function testName(): void
     {
         $action = (new Header())
             ->name($value = 'My name');
@@ -24,7 +24,7 @@ final class HeaderTest extends TestCase
         $this->assertSame($value, $action->toArray()['name']);
     }
 
-    public function testValue()
+    public function testValue(): void
     {
         $action = (new Header())
             ->value($value = 'The value...');

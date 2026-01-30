@@ -37,7 +37,7 @@ class RemotePackageDownloaderTest extends TestCase
         $this->filesystem->remove(self::$writableRoot);
     }
 
-    public function testDownloadPackagesDownloadsEverythingWithNoInstalled()
+    public function testDownloadPackagesDownloadsEverythingWithNoInstalled(): void
     {
         $configReader = $this->createMock(ImportMapConfigReader::class);
         $packageResolver = $this->createMock(PackageResolverInterface::class);
@@ -96,7 +96,7 @@ class RemotePackageDownloaderTest extends TestCase
         );
     }
 
-    public function testPackagesWithCorrectInstalledVersionSkipped()
+    public function testPackagesWithCorrectInstalledVersionSkipped(): void
     {
         $this->filesystem->mkdir(self::$writableRoot.'/assets/vendor');
         $installed = [
@@ -163,7 +163,7 @@ class RemotePackageDownloaderTest extends TestCase
         );
     }
 
-    public function testGetVendorDir()
+    public function testGetVendorDir(): void
     {
         $remotePackageStorage = new RemotePackageStorage('/foo/assets/vendor');
         $downloader = new RemotePackageDownloader(

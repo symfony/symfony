@@ -20,7 +20,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 class CustomExpressionLanguageFunctionTest extends TestCase
 {
-    public function testDump()
+    public function testDump(): void
     {
         $container = new ContainerBuilder();
         $container->register('test', 'stdClass')

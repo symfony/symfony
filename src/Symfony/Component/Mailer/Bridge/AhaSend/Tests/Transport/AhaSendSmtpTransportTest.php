@@ -18,7 +18,7 @@ use Symfony\Component\Mime\Email;
 
 class AhaSendSmtpTransportTest extends TestCase
 {
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
@@ -31,7 +31,7 @@ class AhaSendSmtpTransportTest extends TestCase
         $this->assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
     }
 
-    public function testMultipleTags()
+    public function testMultipleTags(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('tag1'));

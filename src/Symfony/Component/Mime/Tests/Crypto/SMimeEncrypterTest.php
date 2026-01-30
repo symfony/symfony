@@ -20,7 +20,7 @@ use Symfony\Component\Mime\Message;
 #[RequiresPhpExtension('openssl')]
 class SMimeEncrypterTest extends SMimeTestCase
 {
-    public function testEncryptMessage()
+    public function testEncryptMessage(): void
     {
         $message = (new Email())
             ->date(new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
@@ -37,7 +37,7 @@ class SMimeEncrypterTest extends SMimeTestCase
         $this->assertMessageIsEncryptedProperly($encryptedMessage, $message);
     }
 
-    public function testEncryptSignedMessage()
+    public function testEncryptSignedMessage(): void
     {
         $message = (new Email())
             ->date(new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))
@@ -58,7 +58,7 @@ class SMimeEncrypterTest extends SMimeTestCase
         $this->assertMessageIsEncryptedProperly($encryptedMessage, $signedMessage);
     }
 
-    public function testEncryptMessageWithMultipleCerts()
+    public function testEncryptMessageWithMultipleCerts(): void
     {
         $message = (new Email())
             ->date(new \DateTimeImmutable('2019-04-07 10:36:30', new \DateTimeZone('Europe/Paris')))

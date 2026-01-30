@@ -23,12 +23,12 @@ class DynamoDbStoreTest extends TestCase
     private HttpClientInterface $httpClient;
 
     #[Before]
-    public function createMockHttpClient()
+    public function createMockHttpClient(): void
     {
         $this->httpClient = new MockHttpClient([]);
     }
 
-    public function testExtraOptions()
+    public function testExtraOptions(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new DynamoDbStore('dynamodb://default/lock_keys', [
@@ -36,13 +36,13 @@ class DynamoDbStoreTest extends TestCase
         ]);
     }
 
-    public function testExtraParamsInQuery()
+    public function testExtraParamsInQuery(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new DynamoDbStore('dynamodb://default/lock_keys?extra_param=some_value');
     }
 
-    public function testFromInvalidDsn()
+    public function testFromInvalidDsn(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The given Amazon DynamoDB DSN is invalid.');
@@ -50,7 +50,7 @@ class DynamoDbStoreTest extends TestCase
         new DynamoDbStore('dynamodb://');
     }
 
-    public function testFromUnsupportedDsn()
+    public function testFromUnsupportedDsn(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Unsupported DSN for DynamoDB.');
@@ -58,7 +58,7 @@ class DynamoDbStoreTest extends TestCase
         new DynamoDbStore('unsupported://');
     }
 
-    public function testFromDsn()
+    public function testFromDsn(): void
     {
         $this->assertEquals(
             new DynamoDbStore(new DynamoDbClient(['region' => null, 'accessKeyId' => null, 'accessKeySecret' => null], null, $this->httpClient), ['table_name' => 'table']),
@@ -66,7 +66,7 @@ class DynamoDbStoreTest extends TestCase
         );
     }
 
-    public function testDsnPrecedence()
+    public function testDsnPrecedence(): void
     {
         $this->assertEquals(
             new DynamoDbStore(new DynamoDbClient(['region' => 'us-east-2', 'accessKeyId' => 'key_dsn', 'accessKeySecret' => 'secret_dsn'], null, $this->httpClient), ['table_name' => 'table_dsn']),
@@ -74,7 +74,7 @@ class DynamoDbStoreTest extends TestCase
         );
     }
 
-    public function testFromDsnWithRegion()
+    public function testFromDsnWithRegion(): void
     {
         $this->assertEquals(
             new DynamoDbStore(new DynamoDbClient(['region' => 'us-west-2', 'accessKeyId' => null, 'accessKeySecret' => null], null, $this->httpClient), ['table_name' => 'table']),
@@ -82,7 +82,7 @@ class DynamoDbStoreTest extends TestCase
         );
     }
 
-    public function testFromDsnWithCustomEndpoint()
+    public function testFromDsnWithCustomEndpoint(): void
     {
         $this->assertEquals(
             new DynamoDbStore(new DynamoDbClient(['region' => null, 'endpoint' => 'https://localhost', 'accessKeyId' => null, 'accessKeySecret' => null], null, $this->httpClient), ['table_name' => 'table']),
@@ -90,7 +90,7 @@ class DynamoDbStoreTest extends TestCase
         );
     }
 
-    public function testFromDsnWithSslMode()
+    public function testFromDsnWithSslMode(): void
     {
         $this->assertEquals(
             new DynamoDbStore(new DynamoDbClient(['region' => null, 'endpoint' => 'http://localhost', 'accessKeyId' => null, 'accessKeySecret' => null], null, $this->httpClient), ['table_name' => 'table']),
@@ -98,7 +98,7 @@ class DynamoDbStoreTest extends TestCase
         );
     }
 
-    public function testFromDsnWithSslModeOnDefault()
+    public function testFromDsnWithSslModeOnDefault(): void
     {
         $this->assertEquals(
             new DynamoDbStore(new DynamoDbClient(['region' => null, 'accessKeyId' => null, 'accessKeySecret' => null], null, $this->httpClient), ['table_name' => 'table']),
@@ -106,7 +106,7 @@ class DynamoDbStoreTest extends TestCase
         );
     }
 
-    public function testFromDsnWithCustomEndpointAndPort()
+    public function testFromDsnWithCustomEndpointAndPort(): void
     {
         $this->assertEquals(
             new DynamoDbStore(new DynamoDbClient(['region' => null, 'endpoint' => 'https://localhost:1234', 'accessKeyId' => null, 'accessKeySecret' => null], null, $this->httpClient), ['table_name' => 'table']),
@@ -114,7 +114,7 @@ class DynamoDbStoreTest extends TestCase
         );
     }
 
-    public function testFromDsnWithQueryOptions()
+    public function testFromDsnWithQueryOptions(): void
     {
         $this->assertEquals(
             new DynamoDbStore(new DynamoDbClient(['region' => null, 'accessKeyId' => null, 'accessKeySecret' => null], null, $this->httpClient), ['table_name' => 'table', 'id_attr' => 'id_dsn']),
@@ -122,7 +122,7 @@ class DynamoDbStoreTest extends TestCase
         );
     }
 
-    public function testFromDsnWithTableNameOption()
+    public function testFromDsnWithTableNameOption(): void
     {
         $this->assertEquals(
             new DynamoDbStore(new DynamoDbClient(['region' => null, 'accessKeyId' => null, 'accessKeySecret' => null], null, $this->httpClient), ['table_name' => 'table']),
@@ -135,7 +135,7 @@ class DynamoDbStoreTest extends TestCase
         );
     }
 
-    public function testFromDsnWithInvalidQueryString()
+    public function testFromDsnWithInvalidQueryString(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('|Unknown option found in DSN: \[foo\]\. Allowed options are \[session_token, |');
@@ -143,7 +143,7 @@ class DynamoDbStoreTest extends TestCase
         new DynamoDbStore('dynamodb://default?foo=foo');
     }
 
-    public function testFromDsnWithInvalidOption()
+    public function testFromDsnWithInvalidOption(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('|Unknown option found: \[bar\]\. Allowed options are \[session_token, |');
@@ -151,7 +151,7 @@ class DynamoDbStoreTest extends TestCase
         new DynamoDbStore('dynamodb://default', ['bar' => 'bar']);
     }
 
-    public function testFromDsnWithInvalidQueryStringAndOption()
+    public function testFromDsnWithInvalidQueryStringAndOption(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('|Unknown option found: \[bar\]\. Allowed options are \[session_token, |');

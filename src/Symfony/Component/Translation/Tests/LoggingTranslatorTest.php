@@ -18,7 +18,7 @@ use Symfony\Component\Translation\Translator;
 
 class LoggingTranslatorTest extends TestCase
 {
-    public function testTransWithNoTranslationIsLogged()
+    public function testTransWithNoTranslationIsLogged(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->exactly(1))

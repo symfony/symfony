@@ -18,7 +18,7 @@ use Symfony\Component\Console\SignalRegistry\SignalMap;
 class SignalMapTest extends TestCase
 {
     #[RequiresPhpExtension('pcntl')]
-    public function testSignalExists()
+    public function testSignalExists(): void
     {
         $this->assertSame('SIGINT', SignalMap::getSignalName(\SIGINT));
         $this->assertSame('SIGKILL', SignalMap::getSignalName(\SIGKILL));
@@ -26,7 +26,7 @@ class SignalMapTest extends TestCase
         $this->assertSame('SIGSYS', SignalMap::getSignalName(\SIGSYS));
     }
 
-    public function testSignalDoesNotExist()
+    public function testSignalDoesNotExist(): void
     {
         $this->assertNull(SignalMap::getSignalName(999999));
     }

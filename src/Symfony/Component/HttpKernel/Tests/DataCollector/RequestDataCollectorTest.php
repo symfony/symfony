@@ -35,7 +35,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\DataCollector\DummyController;
 
 class RequestDataCollectorTest extends TestCase
 {
-    public function testCollect()
+    public function testCollect(): void
     {
         $c = new RequestDataCollector();
 
@@ -66,7 +66,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame('application/json', $c->getContentType());
     }
 
-    public function testCollectWithoutRouteParams()
+    public function testCollectWithoutRouteParams(): void
     {
         $request = $this->createRequest([]);
 
@@ -78,7 +78,7 @@ class RequestDataCollectorTest extends TestCase
     }
 
     #[DataProvider('provideControllerCallables')]
-    public function testControllerInspection($name, $callable, $expected)
+    public function testControllerInspection($name, $callable, $expected): void
     {
         $c = new RequestDataCollector();
         $request = $this->createRequest();
@@ -202,7 +202,7 @@ class RequestDataCollectorTest extends TestCase
         ];
     }
 
-    public function testItIgnoresInvalidCallables()
+    public function testItIgnoresInvalidCallables(): void
     {
         $request = $this->createRequestWithSession();
         $response = new RedirectResponse('/');
@@ -213,7 +213,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame('n/a', $c->getController());
     }
 
-    public function testItAddsRedirectedAttributesWhenRequestContainsSpecificCookie()
+    public function testItAddsRedirectedAttributesWhenRequestContainsSpecificCookie(): void
     {
         $request = $this->createRequest();
         $request->cookies->add([
@@ -228,7 +228,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertTrue($request->attributes->get('_redirected'));
     }
 
-    public function testItSetsARedirectCookieIfTheResponseIsARedirection()
+    public function testItSetsARedirectCookieIfTheResponseIsARedirection(): void
     {
         $c = new RequestDataCollector();
 
@@ -246,7 +246,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertFalse($cookie->isSecure());
     }
 
-    public function testItCollectsTheRedirectionAndClearTheCookie()
+    public function testItCollectsTheRedirectionAndClearTheCookie(): void
     {
         $c = new RequestDataCollector();
 
@@ -265,7 +265,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertNull($cookie->getValue());
     }
 
-    public function testItCollectsTheSessionTraceProperly()
+    public function testItCollectsTheSessionTraceProperly(): void
     {
         $collector = new RequestDataCollector();
         $request = $this->createRequest();
@@ -302,7 +302,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertSame(\sprintf('%s:%s', $class, $line), $usages[0]['name']);
     }
 
-    public function testStatelessCheck()
+    public function testStatelessCheck(): void
     {
         $requestStack = new RequestStack();
         $request = $this->createRequest();
@@ -335,7 +335,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertFalse($collector->getStatelessCheck());
     }
 
-    public function testItHidesPassword()
+    public function testItHidesPassword(): void
     {
         $c = new RequestDataCollector();
 
@@ -394,7 +394,7 @@ class RequestDataCollectorTest extends TestCase
     /**
      * Inject the given controller callable into the data collector.
      */
-    protected function injectController($collector, $controller, $request)
+    protected function injectController($collector, $controller, $request): void
     {
         $resolver = $this->createStub(ControllerResolverInterface::class);
         $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->createStub(ArgumentResolverInterface::class));
@@ -414,7 +414,7 @@ class RequestDataCollectorTest extends TestCase
     }
 
     #[DataProvider('provideJsonContentTypes')]
-    public function testIsJson($contentType, $expected)
+    public function testIsJson($contentType, $expected): void
     {
         $response = $this->createResponse();
         $request = $this->createRequest();
@@ -440,7 +440,7 @@ class RequestDataCollectorTest extends TestCase
     }
 
     #[DataProvider('providePrettyJson')]
-    public function testGetPrettyJsonValidity($content, $expected)
+    public function testGetPrettyJsonValidity($content, $expected): void
     {
         $response = $this->createResponse();
         $request = Request::create('/', 'POST', [], [], [], [], $content);

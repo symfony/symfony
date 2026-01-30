@@ -26,7 +26,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
     private static string $domain = 'domain';
 
     #[DataProvider('getDefaultDomainAssignmentTestData')]
-    public function testDefaultDomainAssignment(Node $node)
+    public function testDefaultDomainAssignment(Node $node): void
     {
         $env = new Environment(new ArrayLoader(), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
         $visitor = new TranslationDefaultDomainNodeVisitor();
@@ -52,7 +52,7 @@ class TranslationDefaultDomainNodeVisitorTest extends TestCase
     }
 
     #[DataProvider('getDefaultDomainAssignmentTestData')]
-    public function testNewModuleWithoutDefaultDomainTag(Node $node)
+    public function testNewModuleWithoutDefaultDomainTag(Node $node): void
     {
         $env = new Environment(new ArrayLoader(), ['cache' => false, 'autoescape' => false, 'optimizations' => 0]);
         $visitor = new TranslationDefaultDomainNodeVisitor();

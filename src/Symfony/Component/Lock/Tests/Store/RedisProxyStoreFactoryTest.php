@@ -20,7 +20,7 @@ use Symfony\Component\Lock\Store\StoreFactory;
 #[RequiresPhpExtension('redis')]
 class RedisProxyStoreFactoryTest extends TestCase
 {
-    public function testCreateStore()
+    public function testCreateStore(): void
     {
         if (!class_exists(RedisProxy::class)) {
             $this->markTestSkipped();

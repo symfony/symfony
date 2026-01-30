@@ -31,7 +31,7 @@ class ArrayAdapterTest extends AdapterTestCase
         return new ArrayAdapter($defaultLifetime);
     }
 
-    public function testGetValuesHitAndMiss()
+    public function testGetValuesHitAndMiss(): void
     {
         /** @var ArrayAdapter $cache */
         $cache = $this->createCachePool();
@@ -50,7 +50,7 @@ class ArrayAdapterTest extends AdapterTestCase
 
         // Fail (should be missing from $values)
         $item = $cache->getItem('buz');
-        $cache->save($item->set(static function () {}));
+        $cache->save($item->set(static function (): void {}));
 
         $values = $cache->getValues();
 
@@ -61,7 +61,7 @@ class ArrayAdapterTest extends AdapterTestCase
         $this->assertNull($values['bar']);
     }
 
-    public function testMaxLifetime()
+    public function testMaxLifetime(): void
     {
         $cache = new ArrayAdapter(0, false, 1);
 
@@ -74,7 +74,7 @@ class ArrayAdapterTest extends AdapterTestCase
         $this->assertFalse($cache->hasItem('foo'));
     }
 
-    public function testMaxItems()
+    public function testMaxItems(): void
     {
         $cache = new ArrayAdapter(0, false, 0, 2);
 
@@ -93,7 +93,7 @@ class ArrayAdapterTest extends AdapterTestCase
         $this->assertTrue($cache->hasItem('foo'));
     }
 
-    public function testEnum()
+    public function testEnum(): void
     {
         $cache = new ArrayAdapter();
         $item = $cache->getItem('foo');
@@ -103,7 +103,7 @@ class ArrayAdapterTest extends AdapterTestCase
         $this->assertSame(TestEnum::Foo, $cache->getItem('foo')->get());
     }
 
-    public function testClockAware()
+    public function testClockAware(): void
     {
         $clock = new MockClock();
         $cache = new ArrayAdapter(10, false, 0, 0, $clock);

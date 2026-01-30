@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Section\Field\Fact;
 
 final class FactTest extends TestCase
 {
-    public function testName()
+    public function testName(): void
     {
         $field = (new Fact())
             ->name($value = 'Current version');
@@ -24,7 +24,7 @@ final class FactTest extends TestCase
         $this->assertSame($value, $field->toArray()['name']);
     }
 
-    public function testTitle()
+    public function testTitle(): void
     {
         $field = (new Fact())
             ->value($value = '5.3');

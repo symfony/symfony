@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Controller\ControllerResolver;
 
 class ControllerResolverTest extends TestCase
 {
-    public function testGetControllerWithoutControllerParameter()
+    public function testGetControllerWithoutControllerParameter(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('warning')->with('Unable to look for the controller as the "_controller" parameter is missing.');
@@ -31,17 +31,17 @@ class ControllerResolverTest extends TestCase
         $this->assertFalse($resolver->getController($request), '->getController() returns false when the request has no _controller attribute');
     }
 
-    public function testGetControllerWithLambda()
+    public function testGetControllerWithLambda(): void
     {
         $resolver = $this->createControllerResolver();
 
         $request = Request::create('/');
-        $request->attributes->set('_controller', $lambda = static function () {});
+        $request->attributes->set('_controller', $lambda = static function (): void {});
         $controller = $resolver->getController($request);
         $this->assertSame($lambda, $controller);
     }
 
-    public function testGetControllerWithObjectAndInvokeMethod()
+    public function testGetControllerWithObjectAndInvokeMethod(): void
     {
         $resolver = $this->createControllerResolver();
         $object = new InvokableController();
@@ -52,7 +52,7 @@ class ControllerResolverTest extends TestCase
         $this->assertSame($object, $controller);
     }
 
-    public function testGetControllerWithObjectAndMethod()
+    public function testGetControllerWithObjectAndMethod(): void
     {
         $resolver = $this->createControllerResolver();
         $object = new ControllerTest();
@@ -63,7 +63,7 @@ class ControllerResolverTest extends TestCase
         $this->assertSame([$object, 'publicAction'], $controller);
     }
 
-    public function testGetControllerWithClassAndMethodAsArray()
+    public function testGetControllerWithClassAndMethodAsArray(): void
     {
         $resolver = $this->createControllerResolver();
 
@@ -74,7 +74,7 @@ class ControllerResolverTest extends TestCase
         $this->assertSame('publicAction', $controller[1]);
     }
 
-    public function testGetControllerWithClassAndMethodAsString()
+    public function testGetControllerWithClassAndMethodAsString(): void
     {
         $resolver = $this->createControllerResolver();
 
@@ -85,7 +85,7 @@ class ControllerResolverTest extends TestCase
         $this->assertSame('publicAction', $controller[1]);
     }
 
-    public function testGetControllerWithInvokableClass()
+    public function testGetControllerWithInvokableClass(): void
     {
         $resolver = $this->createControllerResolver();
 
@@ -95,7 +95,7 @@ class ControllerResolverTest extends TestCase
         $this->assertInstanceOf(InvokableController::class, $controller);
     }
 
-    public function testGetControllerOnObjectWithoutInvokeMethod()
+    public function testGetControllerOnObjectWithoutInvokeMethod(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $resolver = $this->createControllerResolver();
@@ -105,7 +105,7 @@ class ControllerResolverTest extends TestCase
         $resolver->getController($request);
     }
 
-    public function testGetControllerWithFunction()
+    public function testGetControllerWithFunction(): void
     {
         $resolver = $this->createControllerResolver();
 
@@ -115,7 +115,7 @@ class ControllerResolverTest extends TestCase
         $this->assertSame('Symfony\Component\HttpKernel\Tests\Controller\some_controller_function', $controller);
     }
 
-    public function testGetControllerWithClosure()
+    public function testGetControllerWithClosure(): void
     {
         $resolver = $this->createControllerResolver();
 
@@ -129,7 +129,7 @@ class ControllerResolverTest extends TestCase
     }
 
     #[DataProvider('getStaticControllers')]
-    public function testGetControllerWithStaticController($staticController, $returnValue)
+    public function testGetControllerWithStaticController($staticController, $returnValue): void
     {
         $resolver = $this->createControllerResolver();
 
@@ -151,7 +151,7 @@ class ControllerResolverTest extends TestCase
     }
 
     #[DataProvider('getUndefinedControllers')]
-    public function testGetControllerWithUndefinedController($controller, $exceptionName = null, $exceptionMessage = null)
+    public function testGetControllerWithUndefinedController($controller, $exceptionName = null, $exceptionMessage = null): void
     {
         $resolver = $this->createControllerResolver();
         $this->expectException($exceptionName);
@@ -184,7 +184,7 @@ class ControllerResolverTest extends TestCase
         ];
     }
 
-    public function testAllowedControllerTypes()
+    public function testAllowedControllerTypes(): void
     {
         $resolver = $this->createControllerResolver();
 
@@ -208,7 +208,7 @@ class ControllerResolverTest extends TestCase
         $this->assertSame($action, $resolver->getController($request));
     }
 
-    public function testAllowedControllerAttributes()
+    public function testAllowedControllerAttributes(): void
     {
         $resolver = $this->createControllerResolver();
 
@@ -233,7 +233,7 @@ class ControllerResolverTest extends TestCase
         $this->assertSame($controller, $resolver->getController($request));
     }
 
-    public function testAllowedAsControllerAttribute()
+    public function testAllowedAsControllerAttribute(): void
     {
         $resolver = $this->createControllerResolver();
 
@@ -255,7 +255,7 @@ class ControllerResolverTest extends TestCase
 }
 
 #[DummyController]
-function some_controller_function($foo, $foobar)
+function some_controller_function($foo, $foobar): void
 {
 }
 
@@ -270,19 +270,19 @@ class ControllerTest
         return '';
     }
 
-    public function publicAction()
+    public function publicAction(): void
     {
     }
 
-    private function privateAction()
+    private function privateAction(): void
     {
     }
 
-    protected function protectedAction()
+    protected function protectedAction(): void
     {
     }
 
-    public static function staticAction()
+    public static function staticAction(): void
     {
     }
 }
@@ -290,7 +290,7 @@ class ControllerTest
 #[AsController]
 class InvokableController
 {
-    public function __invoke($foo, $bar = null)
+    public function __invoke($foo, $bar = null): void
     {
     }
 }

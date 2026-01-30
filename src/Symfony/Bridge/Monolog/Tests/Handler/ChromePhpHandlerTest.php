@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ChromePhpHandlerTest extends TestCase
 {
-    public function testOnKernelResponseShouldNotTriggerDeprecation()
+    public function testOnKernelResponseShouldNotTriggerDeprecation(): void
     {
         $this->expectNotToPerformAssertions();
 

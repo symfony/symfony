@@ -17,7 +17,7 @@ use Symfony\Component\String\LazyString;
 
 class LazyStringTest extends TestCase
 {
-    public function testLazyString()
+    public function testLazyString(): void
     {
         $count = 0;
         $s = LazyString::fromCallable(static function () use (&$count) {
@@ -30,7 +30,7 @@ class LazyStringTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testReturnTypeError()
+    public function testReturnTypeError(): void
     {
         $s = LazyString::fromCallable(static fn () => []);
 
@@ -40,7 +40,7 @@ class LazyStringTest extends TestCase
         (string) $s;
     }
 
-    public function testLazyCallable()
+    public function testLazyCallable(): void
     {
         $count = 0;
         $s = LazyString::fromCallable([static function () use (&$count) {
@@ -66,7 +66,7 @@ class LazyStringTest extends TestCase
         $this->assertSame(1, $count);
     }
 
-    public function testFromStringable()
+    public function testFromStringable(): void
     {
         $this->assertInstanceOf(LazyString::class, LazyString::fromStringable('abc'));
         $this->assertSame('abc', (string) LazyString::fromStringable('abc'));
@@ -77,7 +77,7 @@ class LazyStringTest extends TestCase
         $this->assertStringContainsString('hello', (string) LazyString::fromStringable(new \Exception('hello')));
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $this->assertSame('abc', LazyString::resolve('abc'));
         $this->assertSame('1', LazyString::resolve(true));
@@ -87,7 +87,7 @@ class LazyStringTest extends TestCase
         $this->assertStringContainsString('hello', LazyString::resolve(new \Exception('hello')));
     }
 
-    public function testIsStringable()
+    public function testIsStringable(): void
     {
         $this->assertTrue(LazyString::isStringable('abc'));
         $this->assertTrue(LazyString::isStringable(true));
@@ -97,7 +97,7 @@ class LazyStringTest extends TestCase
         $this->assertTrue(LazyString::isStringable(new \Exception('hello')));
     }
 
-    public function testIsNotStringable()
+    public function testIsNotStringable(): void
     {
         $this->assertFalse(LazyString::isStringable(null));
         $this->assertFalse(LazyString::isStringable([]));

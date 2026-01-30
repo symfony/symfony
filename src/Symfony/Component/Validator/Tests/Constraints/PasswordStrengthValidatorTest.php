@@ -25,7 +25,7 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidValues')]
-    public function testValidValues(string|\Stringable $value, int $expectedStrength)
+    public function testValidValues(string|\Stringable $value, int $expectedStrength): void
     {
         $this->validator->validate($value, new PasswordStrength(minScore: $expectedStrength));
 
@@ -53,7 +53,7 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideInvalidConstraints')]
-    public function testThePasswordIsWeak(PasswordStrength $constraint, string $password, string $expectedMessage, string $expectedCode, string $strength)
+    public function testThePasswordIsWeak(PasswordStrength $constraint, string $password, string $expectedMessage, string $expectedCode, string $strength): void
     {
         $this->validator->validate($password, $constraint);
 
@@ -91,7 +91,7 @@ class PasswordStrengthValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getPasswordValues')]
-    public function testStrengthEstimator(string $password, int $expectedStrength)
+    public function testStrengthEstimator(string $password, int $expectedStrength): void
     {
         self::assertSame($expectedStrength, PasswordStrengthValidator::estimateStrength((string) $password));
     }

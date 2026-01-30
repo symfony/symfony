@@ -19,13 +19,13 @@ use Symfony\Component\Console\Input\InputOption;
 
 class InputTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $input = new ArrayInput(['name' => 'foo'], new InputDefinition([new InputArgument('name')]));
         $this->assertSame('foo', $input->getArgument('name'), '->__construct() takes a InputDefinition as an argument');
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $input = new ArrayInput(['--name' => 'foo'], new InputDefinition([new InputOption('name')]));
         $this->assertSame('foo', $input->getOption('name'), '->getOption() returns the value for the given option');
@@ -61,7 +61,7 @@ class InputTest extends TestCase
         $this->assertNull($input->getOption('no-name'));
     }
 
-    public function testSetInvalidOption()
+    public function testSetInvalidOption(): void
     {
         $input = new ArrayInput(['--name' => 'foo'], new InputDefinition([new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
 
@@ -71,7 +71,7 @@ class InputTest extends TestCase
         $input->setOption('foo', 'bar');
     }
 
-    public function testGetInvalidOption()
+    public function testGetInvalidOption(): void
     {
         $input = new ArrayInput(['--name' => 'foo'], new InputDefinition([new InputOption('name'), new InputOption('bar', '', InputOption::VALUE_OPTIONAL, '', 'default')]));
 
@@ -81,7 +81,7 @@ class InputTest extends TestCase
         $input->getOption('foo');
     }
 
-    public function testArguments()
+    public function testArguments(): void
     {
         $input = new ArrayInput(['name' => 'foo'], new InputDefinition([new InputArgument('name')]));
         $this->assertSame('foo', $input->getArgument('name'), '->getArgument() returns the value for the given argument');
@@ -95,7 +95,7 @@ class InputTest extends TestCase
         $this->assertSame(['name' => 'foo', 'bar' => 'default'], $input->getArguments(), '->getArguments() returns all argument values, even optional ones');
     }
 
-    public function testSetInvalidArgument()
+    public function testSetInvalidArgument(): void
     {
         $input = new ArrayInput(['name' => 'foo'], new InputDefinition([new InputArgument('name'), new InputArgument('bar', InputArgument::OPTIONAL, '', 'default')]));
 
@@ -105,7 +105,7 @@ class InputTest extends TestCase
         $input->setArgument('foo', 'bar');
     }
 
-    public function testGetInvalidArgument()
+    public function testGetInvalidArgument(): void
     {
         $input = new ArrayInput(['name' => 'foo'], new InputDefinition([new InputArgument('name'), new InputArgument('bar', InputArgument::OPTIONAL, '', 'default')]));
 
@@ -115,7 +115,7 @@ class InputTest extends TestCase
         $input->getArgument('foo');
     }
 
-    public function testValidateWithMissingArguments()
+    public function testValidateWithMissingArguments(): void
     {
         $input = new ArrayInput([]);
         $input->bind(new InputDefinition([new InputArgument('name', InputArgument::REQUIRED)]));
@@ -126,7 +126,7 @@ class InputTest extends TestCase
         $input->validate();
     }
 
-    public function testValidateWithMissingRequiredArguments()
+    public function testValidateWithMissingRequiredArguments(): void
     {
         $input = new ArrayInput(['bar' => 'baz']);
         $input->bind(new InputDefinition([new InputArgument('name', InputArgument::REQUIRED), new InputArgument('bar', InputArgument::OPTIONAL)]));
@@ -137,7 +137,7 @@ class InputTest extends TestCase
         $input->validate();
     }
 
-    public function testValidate()
+    public function testValidate(): void
     {
         $input = new ArrayInput(['name' => 'foo']);
         $input->bind(new InputDefinition([new InputArgument('name', InputArgument::REQUIRED)]));
@@ -145,7 +145,7 @@ class InputTest extends TestCase
         $this->assertNull($input->validate());
     }
 
-    public function testSetGetInteractive()
+    public function testSetGetInteractive(): void
     {
         $input = new ArrayInput([]);
         $this->assertTrue($input->isInteractive(), '->isInteractive() returns whether the input should be interactive or not');
@@ -153,7 +153,7 @@ class InputTest extends TestCase
         $this->assertFalse($input->isInteractive(), '->setInteractive() changes the interactive flag');
     }
 
-    public function testSetGetStream()
+    public function testSetGetStream(): void
     {
         $input = new ArrayInput([]);
         $stream = fopen('php://memory', 'r+', false);

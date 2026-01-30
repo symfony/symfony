@@ -21,7 +21,7 @@ class DatePointTest extends TestCase
 {
     use ClockSensitiveTrait;
 
-    public function testDatePoint()
+    public function testDatePoint(): void
     {
         self::mockTime('2010-01-28 15:00:00 UTC');
 
@@ -35,7 +35,7 @@ class DatePointTest extends TestCase
         $this->assertSame('2022-01-28 15:00:00 Europe/Paris', $date->format('Y-m-d H:i:s e'));
     }
 
-    public function testCreateFromFormat()
+    public function testCreateFromFormat(): void
     {
         $date = DatePoint::createFromFormat('Y-m-d H:i:s', '2010-01-28 15:00:00');
 
@@ -48,7 +48,7 @@ class DatePointTest extends TestCase
     }
 
     #[DataProvider('provideValidTimestamps')]
-    public function testCreateFromTimestamp(int|float $timestamp, string $expected)
+    public function testCreateFromTimestamp(int|float $timestamp, string $expected): void
     {
         $date = DatePoint::createFromTimestamp($timestamp);
 
@@ -69,7 +69,7 @@ class DatePointTest extends TestCase
     }
 
     #[DataProvider('provideOutOfRangeFloatTimestamps')]
-    public function testCreateFromTimestampWithFloatOutOfRange(float $timestamp)
+    public function testCreateFromTimestampWithFloatOutOfRange(float $timestamp): void
     {
         $this->expectException(\DateRangeError::class);
         $this->expectExceptionMessage('DateTimeImmutable::createFromTimestamp(): Argument #1 ($timestamp) must be a finite number between');
@@ -84,7 +84,7 @@ class DatePointTest extends TestCase
         yield 'infinity' => [\INF];
     }
 
-    public function testModify()
+    public function testModify(): void
     {
         $date = new DatePoint('2010-01-28 15:00:00');
         $date = $date->modify('+1 day');
@@ -97,7 +97,7 @@ class DatePointTest extends TestCase
         $date->modify('Bad Date');
     }
 
-    public function testMicrosecond()
+    public function testMicrosecond(): void
     {
         $date = new DatePoint('2010-01-28 15:00:00.123456');
 
@@ -117,7 +117,7 @@ class DatePointTest extends TestCase
     #[TestWith(['2024-04-09 00:00:00.000000', '2024-04-09'])]
     #[TestWith(['2024-04-09 03:00:00.000000', '2024-04-09 03:00'])]
     #[TestWith(['2024-04-09 00:00:00.123456', '2024-04-09 00:00:00.123456'])]
-    public function testTimeDefaultsToMidnight(string $expected, string $datetime)
+    public function testTimeDefaultsToMidnight(string $expected, string $datetime): void
     {
         $date = new \DateTimeImmutable($datetime);
         $this->assertSame($expected, $date->format('Y-m-d H:i:s.u'));

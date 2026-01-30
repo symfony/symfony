@@ -19,13 +19,13 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 
 class DelegatingLoaderTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         new DelegatingLoader($resolver = new LoaderResolver());
         $this->assertTrue(true, '__construct() takes a loader resolver as its first argument');
     }
 
-    public function testGetSetResolver()
+    public function testGetSetResolver(): void
     {
         $resolver = new LoaderResolver();
         $loader = new DelegatingLoader($resolver);
@@ -34,7 +34,7 @@ class DelegatingLoaderTest extends TestCase
         $this->assertSame($resolver, $loader->getResolver(), '->setResolver() sets the resolver loader');
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $loader1 = $this->createMock(LoaderInterface::class);
         $loader1->expects($this->once())->method('supports')->willReturn(true);
@@ -47,7 +47,7 @@ class DelegatingLoaderTest extends TestCase
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns false if the resource is not loadable');
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->once())->method('supports')->willReturn(true);
@@ -58,7 +58,7 @@ class DelegatingLoaderTest extends TestCase
         $loader->load('foo');
     }
 
-    public function testLoadThrowsAnExceptionIfTheResourceCannotBeLoaded()
+    public function testLoadThrowsAnExceptionIfTheResourceCannotBeLoaded(): void
     {
         $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->once())->method('supports')->willReturn(false);

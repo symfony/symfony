@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\HttpCache\ResponseCacheStrategy;
 
 class ResponseCacheStrategyTest extends TestCase
 {
-    public function testMinimumSharedMaxAgeWins()
+    public function testMinimumSharedMaxAgeWins(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -38,7 +38,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertSame('60', $response->headers->getCacheControlDirective('s-maxage'));
     }
 
-    public function testSharedMaxAgeNotSetIfNotSetInAnyEmbeddedRequest()
+    public function testSharedMaxAgeNotSetIfNotSetInAnyEmbeddedRequest(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -56,7 +56,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($response->headers->hasCacheControlDirective('s-maxage'));
     }
 
-    public function testSharedMaxAgeNotSetIfNotSetInMainRequest()
+    public function testSharedMaxAgeNotSetIfNotSetInMainRequest(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -74,7 +74,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($response->headers->hasCacheControlDirective('s-maxage'));
     }
 
-    public function testExpiresHeaderUpdatedFromMaxAge()
+    public function testExpiresHeaderUpdatedFromMaxAge(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -95,7 +95,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertSame($response->headers->get('Date'), $response->headers->get('Expires'));
     }
 
-    public function testMaxAgeUpdatedFromExpiresHeader()
+    public function testMaxAgeUpdatedFromExpiresHeader(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -113,7 +113,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertSame((new \DateTime('+ 1 hour', new \DateTimeZone('UTC')))->format('D, d M Y H:i:s').' GMT', $response->headers->get('Expires'));
     }
 
-    public function testMaxAgeAndSharedMaxAgeUpdatedFromExpiresHeader()
+    public function testMaxAgeAndSharedMaxAgeUpdatedFromExpiresHeader(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -132,7 +132,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertSame((new \DateTime('+ 1 hour', new \DateTimeZone('UTC')))->format('D, d M Y H:i:s').' GMT', $response->headers->get('Expires'));
     }
 
-    public function testMainResponseNotCacheableWhenEmbeddedResponseRequiresValidation()
+    public function testMainResponseNotCacheableWhenEmbeddedResponseRequiresValidation(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -149,7 +149,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($mainResponse->isFresh());
     }
 
-    public function testValidationOnMainResponseIsNotPossibleWhenItContainsEmbeddedResponses()
+    public function testValidationOnMainResponseIsNotPossibleWhenItContainsEmbeddedResponses(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -172,7 +172,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertTrue($mainResponse->headers->hasCacheControlDirective('must-revalidate'));
     }
 
-    public function testMainResponseWithValidationIsUnchangedWhenThereIsNoEmbeddedResponse()
+    public function testMainResponseWithValidationIsUnchangedWhenThereIsNoEmbeddedResponse(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -183,7 +183,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertTrue($mainResponse->isValidateable());
     }
 
-    public function testMainResponseWithExpirationIsUnchangedWhenThereIsNoEmbeddedResponse()
+    public function testMainResponseWithExpirationIsUnchangedWhenThereIsNoEmbeddedResponse(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -194,7 +194,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertTrue($mainResponse->isFresh());
     }
 
-    public function testLastModifiedIsMergedWithEmbeddedResponse()
+    public function testLastModifiedIsMergedWithEmbeddedResponse(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -212,7 +212,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertSame($embeddedDate->getTimestamp(), $mainResponse->getLastModified()->getTimestamp());
     }
 
-    public function testLastModifiedIsRemovedWhenEmbeddedResponseHasNoLastModified()
+    public function testLastModifiedIsRemovedWhenEmbeddedResponseHasNoLastModified(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -227,7 +227,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($mainResponse->headers->has('Last-Modified'));
     }
 
-    public function testLastModifiedIsNotAddedWhenMainResponseHasNoLastModified()
+    public function testLastModifiedIsNotAddedWhenMainResponseHasNoLastModified(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -242,7 +242,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($mainResponse->headers->has('Last-Modified'));
     }
 
-    public function testMainResponseIsNotCacheableWhenEmbeddedResponseIsNotCacheable()
+    public function testMainResponseIsNotCacheableWhenEmbeddedResponseIsNotCacheable(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -263,7 +263,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($mainResponse->isFresh());
     }
 
-    public function testEmbeddingPrivateResponseMakesMainResponsePrivate()
+    public function testEmbeddingPrivateResponseMakesMainResponsePrivate(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -282,7 +282,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($mainResponse->headers->hasCacheControlDirective('public'));
     }
 
-    public function testEmbeddingPublicResponseDoesNotMakeMainResponsePublic()
+    public function testEmbeddingPublicResponseDoesNotMakeMainResponsePublic(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -301,7 +301,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($mainResponse->headers->hasCacheControlDirective('public'));
     }
 
-    public function testResponseIsExiprableWhenEmbeddedResponseCombinesExpiryAndValidation()
+    public function testResponseIsExiprableWhenEmbeddedResponseCombinesExpiryAndValidation(): void
     {
         /* When "expiration wins over validation" (https://symfony.com/doc/current/http_cache/validation.html)
          * and both the main and embedded response provide s-maxage, then the more restricting value of both
@@ -323,7 +323,7 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertEqualsWithDelta(60, (int) $mainResponse->headers->getCacheControlDirective('s-maxage'), 1);
     }
 
-    public function testResponseIsExpirableButNotValidateableWhenMainResponseCombinesExpirationAndValidation()
+    public function testResponseIsExpirableButNotValidateableWhenMainResponseCombinesExpirationAndValidation(): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
 
@@ -344,7 +344,7 @@ class ResponseCacheStrategyTest extends TestCase
 
     #[DataProvider('cacheControlMergingProvider')]
     #[Group('time-sensitive')]
-    public function testCacheControlMerging(array $expects, array $main, array $surrogates)
+    public function testCacheControlMerging(array $expects, array $main, array $surrogates): void
     {
         $cacheStrategy = new ResponseCacheStrategy();
         $buildResponse = static function ($config) {

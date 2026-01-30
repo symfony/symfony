@@ -27,7 +27,7 @@ class FragmentRendererPassTest extends TestCase
      * Tests that content rendering not implementing FragmentRendererInterface
      * triggers an exception.
      */
-    public function testContentRendererWithoutInterface()
+    public function testContentRendererWithoutInterface(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $builder = new ContainerBuilder();
@@ -41,7 +41,7 @@ class FragmentRendererPassTest extends TestCase
         $this->assertEquals([['addRendererService', ['foo', 'my_content_renderer']]], $fragmentHandlerDefinition->getMethodCalls());
     }
 
-    public function testValidContentRenderer()
+    public function testValidContentRenderer(): void
     {
         $builder = new ContainerBuilder();
         $fragmentHandlerDefinition = $builder->register('fragment.handler')

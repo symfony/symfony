@@ -19,7 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 final class ControllerTest extends WebTestCase
 {
-    public function testServerRequestAction()
+    public function testServerRequestAction(): void
     {
         $client = self::createClient();
         $crawler = $client->request('GET', '/server-request');
@@ -28,7 +28,7 @@ final class ControllerTest extends WebTestCase
         self::assertSame('GET', $crawler->text());
     }
 
-    public function testRequestAction()
+    public function testRequestAction(): void
     {
         $client = self::createClient();
         $crawler = $client->request('POST', '/request', [], [], [], 'some content');
@@ -37,7 +37,7 @@ final class ControllerTest extends WebTestCase
         self::assertSame('POST some content', $crawler->text());
     }
 
-    public function testMessageAction()
+    public function testMessageAction(): void
     {
         $client = self::createClient();
         $crawler = $client->request('PUT', '/message', [], [], ['HTTP_X_MY_HEADER' => 'some content']);

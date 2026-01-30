@@ -25,13 +25,13 @@ use Symfony\Component\Mime\RawMessage;
 #[Group('time-sensitive')]
 class RoundRobinTransportTest extends TestCase
 {
-    public function testSendNoTransports()
+    public function testSendNoTransports(): void
     {
         $this->expectException(TransportException::class);
         new RoundRobinTransport([]);
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->once())->method('__toString')->willReturn('t1://local');
@@ -41,7 +41,7 @@ class RoundRobinTransportTest extends TestCase
         $this->assertEquals('roundrobin(t1://local t2://local)', (string) $t);
     }
 
-    public function testSendAlternate()
+    public function testSendAlternate(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->atLeast(1))->method('send');
@@ -56,7 +56,7 @@ class RoundRobinTransportTest extends TestCase
         $this->assertTransports($t, 0 === $cursor ? 1 : 0, []);
     }
 
-    public function testSendAllDead()
+    public function testSendAllDead(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->once())->method('send')->willThrowException(new TransportException());
@@ -79,7 +79,7 @@ class RoundRobinTransportTest extends TestCase
         $this->fail('The expected exception was not thrown.');
     }
 
-    public function testSendOneDead()
+    public function testSendOneDead(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->once())->method('send')->willThrowException(new TransportException());
@@ -96,7 +96,7 @@ class RoundRobinTransportTest extends TestCase
         $this->assertTransports($t, 0, [$t1]);
     }
 
-    public function testSendOneDeadAndRecoveryNotWithinRetryPeriod()
+    public function testSendOneDeadAndRecoveryNotWithinRetryPeriod(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->exactly(4))->method('send');
@@ -115,7 +115,7 @@ class RoundRobinTransportTest extends TestCase
         $this->assertTransports($t, 1, [$t2]);
     }
 
-    public function testSendOneDeadAndRecoveryWithinRetryPeriod()
+    public function testSendOneDeadAndRecoveryWithinRetryPeriod(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->exactly(3))->method('send');
@@ -146,11 +146,11 @@ class RoundRobinTransportTest extends TestCase
         $this->assertTransports($t, 1, []);
     }
 
-    public function testSendOneDeadMessageAlterationsDoNotPersist()
+    public function testSendOneDeadMessageAlterationsDoNotPersist(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->once())->method('send')
-            ->willReturnCallback(static function (Message $message) {
+            ->willReturnCallback(static function (Message $message): void {
                 $message->getHeaders()->addTextHeader('X-Transport-1', 'value');
                 throw new TransportException();
             });
@@ -167,7 +167,7 @@ class RoundRobinTransportTest extends TestCase
         $this->assertFalse($message->getHeaders()->has('X-Transport-1'));
     }
 
-    public function testLoggerReceivesExceptions()
+    public function testLoggerReceivesExceptions(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $t1->expects($this->exactly(2))->method('send');
@@ -193,7 +193,7 @@ class RoundRobinTransportTest extends TestCase
         $this->assertTransports($t, 1, [$t2]);
     }
 
-    public function testFailureDebugInformation()
+    public function testFailureDebugInformation(): void
     {
         $t1 = $this->createMock(TransportInterface::class);
         $e1 = new TransportException();

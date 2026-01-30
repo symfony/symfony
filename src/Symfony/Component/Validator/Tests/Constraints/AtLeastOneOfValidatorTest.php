@@ -56,7 +56,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidCombinations')]
-    public function testValidCombinations($value, $constraints)
+    public function testValidCombinations($value, $constraints): void
     {
         $this->assertCount(0, Validation::createValidator()->validate($value, new AtLeastOneOf($constraints)));
     }
@@ -96,7 +96,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidCombinations')]
-    public function testInvalidCombinationsWithDefaultMessage($value, $constraints)
+    public function testInvalidCombinationsWithDefaultMessage($value, $constraints): void
     {
         $atLeastOneOf = new AtLeastOneOf(constraints: $constraints);
         $validator = Validation::createValidator();
@@ -116,7 +116,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidCombinations')]
-    public function testInvalidCombinationsWithCustomMessage($value, $constraints)
+    public function testInvalidCombinationsWithCustomMessage($value, $constraints): void
     {
         $atLeastOneOf = new AtLeastOneOf(
             constraints: $constraints,
@@ -164,7 +164,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testGroupsArePropagatedToNestedConstraints()
+    public function testGroupsArePropagatedToNestedConstraints(): void
     {
         $validator = Validation::createValidator();
 
@@ -187,7 +187,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $this->assertCount(1, $violations);
     }
 
-    public function testContextIsPropagatedToNestedConstraints()
+    public function testContextIsPropagatedToNestedConstraints(): void
     {
         $validator = Validation::createValidatorBuilder()
             ->setMetadataFactory(new class implements MetadataFactoryInterface {
@@ -213,7 +213,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $this->assertCount(0, $violations);
     }
 
-    public function testEmbeddedMessageTakenFromFailingConstraint()
+    public function testEmbeddedMessageTakenFromFailingConstraint(): void
     {
         $validator = Validation::createValidatorBuilder()
             ->setMetadataFactory(new class implements MetadataFactoryInterface {
@@ -242,7 +242,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $this->assertSame('This value should satisfy at least one of the following constraints: [1] custom message bar', $violations->get(1)->getMessage());
     }
 
-    public function testNestedConstraintsAreNotExecutedWhenGroupDoesNotMatch()
+    public function testNestedConstraintsAreNotExecutedWhenGroupDoesNotMatch(): void
     {
         $validator = Validation::createValidator();
 
@@ -264,7 +264,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $this->assertCount(1, $violations);
     }
 
-    public function testTranslatorIsCalledOnConstraintBaseMessageAndViolations()
+    public function testTranslatorIsCalledOnConstraintBaseMessageAndViolations(): void
     {
         $translator = new class implements TranslatorInterface, LocaleAwareInterface {
             use TranslatorTrait;
@@ -298,7 +298,7 @@ class AtLeastOneOfValidatorTest extends ConstraintValidatorTestCase
         $this->assertSame('Dummy translation: [1] Dummy violation.', $violations->get(0)->getMessage());
     }
 
-    public function testValidateNestedAtLeaseOneOfConstraints()
+    public function testValidateNestedAtLeaseOneOfConstraints(): void
     {
         $data = [
             'foo' => [

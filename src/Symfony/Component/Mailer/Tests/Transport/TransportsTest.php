@@ -22,7 +22,7 @@ use Symfony\Component\Mime\Part\TextPart;
 
 class TransportsTest extends TestCase
 {
-    public function testDefaultTransport()
+    public function testDefaultTransport(): void
     {
         $transport = new Transports([
             'foo' => $foo = $this->createMock(TransportInterface::class),
@@ -36,7 +36,7 @@ class TransportsTest extends TestCase
         $transport->send($email);
     }
 
-    public function testOverrideTransport()
+    public function testOverrideTransport(): void
     {
         $transport = new Transports([
             'foo' => $foo = $this->createMock(TransportInterface::class),
@@ -51,7 +51,7 @@ class TransportsTest extends TestCase
         $transport->send($email);
     }
 
-    public function testTransportDoesNotExist()
+    public function testTransportDoesNotExist(): void
     {
         $transport = new Transports([
             'foo' => new DummyTransport('localhost'),
@@ -66,7 +66,7 @@ class TransportsTest extends TestCase
         $transport->send($email);
     }
 
-    public function testTransportRestoredAfterFailure()
+    public function testTransportRestoredAfterFailure(): void
     {
         $exception = new \Exception();
 

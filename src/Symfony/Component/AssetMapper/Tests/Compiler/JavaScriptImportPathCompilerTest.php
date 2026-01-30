@@ -27,7 +27,7 @@ use Symfony\Component\AssetMapper\MappedAsset;
 class JavaScriptImportPathCompilerTest extends TestCase
 {
     #[DataProvider('provideCompileTests')]
-    public function testCompileFindsCorrectImports(string $input, array $expectedJavaScriptImports)
+    public function testCompileFindsCorrectImports(string $input, array $expectedJavaScriptImports): void
     {
         $asset = new MappedAsset('app.js', '/project/assets/app.js', publicPathWithoutDigest: '/assets/app.js');
 
@@ -376,7 +376,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         ];
     }
 
-    public function testCompileFindsRelativePathsViaSourcePath()
+    public function testCompileFindsRelativePathsViaSourcePath(): void
     {
         $inputAsset = new MappedAsset('app.js', '/project/assets/app.js', publicPathWithoutDigest: '/assets/app.js');
 
@@ -406,7 +406,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $this->assertSame('root_asset.js', $inputAsset->getJavaScriptImports()[2]->assetLogicalPath);
     }
 
-    public function testCompileFindsRelativePathsWithWindowsPathsViaSourcePath()
+    public function testCompileFindsRelativePathsWithWindowsPathsViaSourcePath(): void
     {
         if ('\\' !== \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Must be on windows where dirname() understands backslashes');
@@ -440,7 +440,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
     }
 
     #[DataProvider('providePathsCanUpdateTests')]
-    public function testImportPathsCanUpdateForDifferentPublicPath(string $input, string $inputAssetPublicPath, string $importedPublicPath, string $expectedOutput)
+    public function testImportPathsCanUpdateForDifferentPublicPath(string $input, string $inputAssetPublicPath, string $importedPublicPath, string $expectedOutput): void
     {
         $asset = new MappedAsset('app.js', '/path/to/assets/app.js', publicPathWithoutDigest: $inputAssetPublicPath);
 
@@ -499,7 +499,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         ];
     }
 
-    public function testCompileHandlesCircularRelativeAssets()
+    public function testCompileHandlesCircularRelativeAssets(): void
     {
         $appAsset = new MappedAsset('app.js', '/project/assets/app.js', '/assets/app.js');
         $otherAsset = new MappedAsset('other.js', '/project/assets/other.js', '/assets/other.js');
@@ -518,7 +518,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $this->assertSame($otherAsset->logicalPath, $appAsset->getJavaScriptImports()[0]->assetLogicalPath);
     }
 
-    public function testCompileHandlesCircularBareImportAssets()
+    public function testCompileHandlesCircularBareImportAssets(): void
     {
         $bootstrapAsset = new MappedAsset('bootstrap', 'anythingbootstrap', '/assets/bootstrap.js');
         $popperAsset = new MappedAsset('@popperjs/core', 'anythingpopper', '/assets/popper.js');
@@ -546,7 +546,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $this->assertSame($popperAsset->logicalPath, $bootstrapAsset->getJavaScriptImports()[0]->assetLogicalPath);
     }
 
-    public function testCompileIgnoresSelfReferencingBareImportAssets()
+    public function testCompileIgnoresSelfReferencingBareImportAssets(): void
     {
         $bootstrapAsset = new MappedAsset('foo.js', 'foo.js', 'foo.js');
 
@@ -575,7 +575,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
     }
 
     #[DataProvider('provideMissingImportModeTests')]
-    public function testMissingImportMode(string $sourceLogicalName, string $input, ?string $expectedExceptionMessage)
+    public function testMissingImportMode(string $sourceLogicalName, string $input, ?string $expectedExceptionMessage): void
     {
         if (null !== $expectedExceptionMessage) {
             $this->expectException(RuntimeException::class);
@@ -630,7 +630,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         ];
     }
 
-    public function testErrorMessageAvoidsCircularException()
+    public function testErrorMessageAvoidsCircularException(): void
     {
         $assetMapper = $this->createStub(AssetMapperInterface::class);
         $assetMapper
@@ -655,7 +655,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
         $this->assertSame($content, $compiled);
     }
 
-    public function testCompilerThrowsExceptionOnPcreError()
+    public function testCompilerThrowsExceptionOnPcreError(): void
     {
         $compiler = new JavaScriptImportPathCompiler($this->createStub(ImportMapConfigReader::class));
         $content = str_repeat('foo "import *  ', 50);

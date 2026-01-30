@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\MyOwnException;
 
 class HandlerFailedExceptionTest extends TestCase
 {
-    public function testThatStringErrorCodeConvertsToInteger()
+    public function testThatStringErrorCodeConvertsToInteger(): void
     {
         $envelope = new Envelope(new \stdClass());
         $exception = new class extends \RuntimeException {
@@ -41,7 +41,7 @@ class HandlerFailedExceptionTest extends TestCase
         $this->assertSame($exception->getCode(), $originalException->getCode(), 'Original exception code is not modified');
     }
 
-    public function testThatNestedExceptionClassAreFound()
+    public function testThatNestedExceptionClassAreFound(): void
     {
         $envelope = new Envelope(new \stdClass());
         $exception = new MyOwnException();
@@ -50,7 +50,7 @@ class HandlerFailedExceptionTest extends TestCase
         $this->assertSame([$exception], $handlerException->getWrappedExceptions(MyOwnException::class));
     }
 
-    public function testThatNestedExceptionClassAreFoundWhenUsingChildException()
+    public function testThatNestedExceptionClassAreFoundWhenUsingChildException(): void
     {
         $envelope = new Envelope(new \stdClass());
         $exception = new MyOwnChildException();
@@ -59,7 +59,7 @@ class HandlerFailedExceptionTest extends TestCase
         $this->assertSame([$exception], $handlerException->getWrappedExceptions(MyOwnException::class));
     }
 
-    public function testThatNestedExceptionClassAreNotFoundIfNotPresent()
+    public function testThatNestedExceptionClassAreNotFoundIfNotPresent(): void
     {
         $envelope = new Envelope(new \stdClass());
         $exception = new \LogicException();
@@ -68,7 +68,7 @@ class HandlerFailedExceptionTest extends TestCase
         $this->assertCount(0, $handlerException->getWrappedExceptions(MyOwnException::class));
     }
 
-    public function testThatWrappedExceptionsRecursive()
+    public function testThatWrappedExceptionsRecursive(): void
     {
         $envelope = new Envelope(new \stdClass());
         $exception1 = new \LogicException();
@@ -79,7 +79,7 @@ class HandlerFailedExceptionTest extends TestCase
         $this->assertSame([$exception1, $exception2, $exception3], $handlerException->getWrappedExceptions(recursive: true));
     }
 
-    public function testThatWrappedExceptionsRecursiveStringKeys()
+    public function testThatWrappedExceptionsRecursiveStringKeys(): void
     {
         $envelope = new Envelope(new \stdClass());
         $exception1 = new \LogicException();
@@ -90,7 +90,7 @@ class HandlerFailedExceptionTest extends TestCase
         $this->assertSame(['first' => $exception1, 'second' => $exception2, 'third' => $exception3], $handlerException->getWrappedExceptions(recursive: true));
     }
 
-    public function testThatWrappedExceptionsByClassRecursive()
+    public function testThatWrappedExceptionsByClassRecursive(): void
     {
         $envelope = new Envelope(new \stdClass());
         $exception1 = new \LogicException();

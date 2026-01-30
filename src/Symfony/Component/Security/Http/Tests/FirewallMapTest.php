@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\FirewallMap;
 
 class FirewallMapTest extends TestCase
 {
-    public function testGetListeners()
+    public function testGetListeners(): void
     {
         $map = new FirewallMap();
 
@@ -33,7 +33,7 @@ class FirewallMapTest extends TestCase
             ->willReturn(false)
         ;
 
-        $map->add($notMatchingMatcher, [static function () {}]);
+        $map->add($notMatchingMatcher, [static function (): void {}]);
 
         $matchingMatcher = $this->createMock(RequestMatcherInterface::class);
         $matchingMatcher
@@ -42,7 +42,7 @@ class FirewallMapTest extends TestCase
             ->with($this->equalTo($request))
             ->willReturn(true)
         ;
-        $theListener = static function () {};
+        $theListener = static function (): void {};
         $theException = $this->createStub(ExceptionListener::class);
 
         $map->add($matchingMatcher, [$theListener], $theException);
@@ -53,7 +53,7 @@ class FirewallMapTest extends TestCase
             ->method('matches')
         ;
 
-        $map->add($tooLateMatcher, [static function () {}]);
+        $map->add($tooLateMatcher, [static function (): void {}]);
 
         [$listeners, $exception] = $map->getListeners($request);
 
@@ -61,7 +61,7 @@ class FirewallMapTest extends TestCase
         $this->assertEquals($theException, $exception);
     }
 
-    public function testGetListenersWithAnEntryHavingNoRequestMatcher()
+    public function testGetListenersWithAnEntryHavingNoRequestMatcher(): void
     {
         $map = new FirewallMap();
 
@@ -75,9 +75,9 @@ class FirewallMapTest extends TestCase
             ->willReturn(false)
         ;
 
-        $map->add($notMatchingMatcher, [static function () {}]);
+        $map->add($notMatchingMatcher, [static function (): void {}]);
 
-        $theListener = static function () {};
+        $theListener = static function (): void {};
         $theException = $this->createStub(ExceptionListener::class);
 
         $map->add(null, [$theListener], $theException);
@@ -88,7 +88,7 @@ class FirewallMapTest extends TestCase
             ->method('matches')
         ;
 
-        $map->add($tooLateMatcher, [static function () {}]);
+        $map->add($tooLateMatcher, [static function (): void {}]);
 
         [$listeners, $exception] = $map->getListeners($request);
 
@@ -96,7 +96,7 @@ class FirewallMapTest extends TestCase
         $this->assertEquals($theException, $exception);
     }
 
-    public function testGetListenersWithNoMatchingEntry()
+    public function testGetListenersWithNoMatchingEntry(): void
     {
         $map = new FirewallMap();
 
@@ -110,7 +110,7 @@ class FirewallMapTest extends TestCase
             ->willReturn(false)
         ;
 
-        $map->add($notMatchingMatcher, [static function () {}]);
+        $map->add($notMatchingMatcher, [static function (): void {}]);
 
         [$listeners, $exception] = $map->getListeners($request);
 

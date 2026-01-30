@@ -20,7 +20,7 @@ use Symfony\Component\Webhook\Server\PayloadSerializerInterface;
 
 class JsonBodyConfiguratorTest extends TestCase
 {
-    public function testPayloadWithPayloadSerializer()
+    public function testPayloadWithPayloadSerializer(): void
     {
         $payload = ['foo' => 'bar'];
 
@@ -41,7 +41,7 @@ class JsonBodyConfiguratorTest extends TestCase
         $configurator->configure(new RemoteEvent('event-name', 'event-id', $payload), 's3cr3t', $httpOptions);
     }
 
-    public function testPayloadWithSerializer()
+    public function testPayloadWithSerializer(): void
     {
         $payload = ['foo' => 'bar'];
 

@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\Group;
 class FormLoginTest extends AbstractWebTestCase
 {
     #[DataProvider('provideClientOptions')]
-    public function testFormLogin(array $options)
+    public function testFormLogin(array $options): void
     {
         $client = $this->createClient($options);
 
@@ -34,7 +34,7 @@ class FormLoginTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideClientOptions')]
-    public function testFormLogout(array $options)
+    public function testFormLogout(array $options): void
     {
         $client = $this->createClient($options);
 
@@ -65,7 +65,7 @@ class FormLoginTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideClientOptions')]
-    public function testFormLoginWithCustomTargetPath(array $options)
+    public function testFormLoginWithCustomTargetPath(array $options): void
     {
         $client = $this->createClient($options);
 
@@ -83,7 +83,7 @@ class FormLoginTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideClientOptions')]
-    public function testFormLoginRedirectsToProtectedResourceAfterLogin(array $options)
+    public function testFormLoginRedirectsToProtectedResourceAfterLogin(array $options): void
     {
         $client = $this->createClient($options);
 
@@ -102,7 +102,7 @@ class FormLoginTest extends AbstractWebTestCase
     }
 
     #[Group('time-sensitive')]
-    public function testLoginThrottling()
+    public function testLoginThrottling(): void
     {
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_throttling.yml']);
 

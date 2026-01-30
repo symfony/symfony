@@ -20,7 +20,7 @@ use Symfony\Bridge\Doctrine\Middleware\IdleConnection\Driver;
 class DriverTest extends TestCase
 {
     #[Group('time-sensitive')]
-    public function testConnect()
+    public function testConnect(): void
     {
         $driverMock = $this->createMock(DriverInterface::class);
         $connectionMock = $this->createStub(ConnectionInterface::class);

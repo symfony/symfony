@@ -18,7 +18,7 @@ use Symfony\Component\Translation\Formatter\MessageFormatter;
 class MessageFormatterTest extends TestCase
 {
     #[DataProvider('getTransMessages')]
-    public function testFormat($expected, $message, $parameters = [])
+    public function testFormat($expected, $message, $parameters = []): void
     {
         $this->assertEquals($expected, $this->getMessageFormatter()->format($message, 'en', $parameters));
     }

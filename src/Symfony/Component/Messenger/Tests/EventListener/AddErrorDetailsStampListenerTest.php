@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
 
 final class AddErrorDetailsStampListenerTest extends TestCase
 {
-    public function testExceptionDetailsAreAdded()
+    public function testExceptionDetailsAreAdded(): void
     {
         $listener = new AddErrorDetailsStampListener();
 
@@ -33,7 +33,7 @@ final class AddErrorDetailsStampListenerTest extends TestCase
         $this->assertEquals($expectedStamp, $event->getEnvelope()->last(ErrorDetailsStamp::class));
     }
 
-    public function testWorkerAddsNewErrorDetailsStampOnFailure()
+    public function testWorkerAddsNewErrorDetailsStampOnFailure(): void
     {
         $listener = new AddErrorDetailsStampListener();
 
@@ -51,7 +51,7 @@ final class AddErrorDetailsStampListenerTest extends TestCase
         $this->assertCount(2, $event->getEnvelope()->all(ErrorDetailsStamp::class));
     }
 
-    public function testWorkerDoesNotAddDuplicateErrorDetailsStampOnFailure()
+    public function testWorkerDoesNotAddDuplicateErrorDetailsStampOnFailure(): void
     {
         $listener = new AddErrorDetailsStampListener();
 

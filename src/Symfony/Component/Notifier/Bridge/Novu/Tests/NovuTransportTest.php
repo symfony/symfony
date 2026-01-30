@@ -46,7 +46,7 @@ class NovuTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testWithErrorResponseThrows()
+    public function testWithErrorResponseThrows(): void
     {
         $client = new MockHttpClient(new MockResponse(json_encode(['error' => 'Bad request', 'message' => 'subscriberId under property to is not configured']), ['http_code' => 400]));
 

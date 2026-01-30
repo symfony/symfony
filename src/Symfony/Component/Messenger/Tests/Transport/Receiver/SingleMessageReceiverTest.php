@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Transport\Receiver\SingleMessageReceiver;
 
 class SingleMessageReceiverTest extends TestCase
 {
-    public function testItReceivesOnlyOneMessage()
+    public function testItReceivesOnlyOneMessage(): void
     {
         $innerReceiver = $this->createStub(ReceiverInterface::class);
         $envelope = new Envelope(new \stdClass());
@@ -31,7 +31,7 @@ class SingleMessageReceiverTest extends TestCase
         $this->assertSame([], $receiver->get());
     }
 
-    public function testCallsAreForwarded()
+    public function testCallsAreForwarded(): void
     {
         $envelope = new Envelope(new \stdClass());
 

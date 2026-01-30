@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class RegisterCommandArgumentLocatorsPassTest extends TestCase
 {
-    public function testProcessWithoutServiceResolver()
+    public function testProcessWithoutServiceResolver(): void
     {
         $container = new ContainerBuilder();
         $pass = new RegisterCommandArgumentLocatorsPass();
@@ -31,7 +31,7 @@ class RegisterCommandArgumentLocatorsPassTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testProcessWithServiceArguments()
+    public function testProcessWithServiceArguments(): void
     {
         $container = new ContainerBuilder();
         $container->register('logger', LoggerInterface::class);
@@ -58,7 +58,7 @@ class RegisterCommandArgumentLocatorsPassTest extends TestCase
         $this->assertArrayHasKey('test:command', $commands);
     }
 
-    public function testProcessWithManualArgumentMapping()
+    public function testProcessWithManualArgumentMapping(): void
     {
         $container = new ContainerBuilder();
         $container->register('my.logger', LoggerInterface::class);
@@ -84,7 +84,7 @@ class RegisterCommandArgumentLocatorsPassTest extends TestCase
         $this->assertArrayHasKey('test:command', $commands);
     }
 
-    public function testProcessSkipsInputOutputParameters()
+    public function testProcessSkipsInputOutputParameters(): void
     {
         $container = new ContainerBuilder();
         $container->register('console.argument_resolver.service')->addArgument(null);
@@ -107,7 +107,7 @@ class RegisterCommandArgumentLocatorsPassTest extends TestCase
         $this->assertArrayNotHasKey('test:command', $commands);
     }
 
-    public function testProcessWithMultipleMethods()
+    public function testProcessWithMultipleMethods(): void
     {
         $container = new ContainerBuilder();
         $container->register('logger', LoggerInterface::class);
@@ -133,7 +133,7 @@ class RegisterCommandArgumentLocatorsPassTest extends TestCase
         $this->assertArrayHasKey('test:cmd2', $commands);
     }
 
-    public function testProcessThrowsOnMissingArgumentAttribute()
+    public function testProcessThrowsOnMissingArgumentAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register('console.argument_resolver.service')->addArgument(null);
@@ -151,7 +151,7 @@ class RegisterCommandArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testProcessThrowsOnMissingIdAttribute()
+    public function testProcessThrowsOnMissingIdAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register('console.argument_resolver.service')->addArgument(null);

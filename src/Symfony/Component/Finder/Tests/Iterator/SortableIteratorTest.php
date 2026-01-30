@@ -16,7 +16,7 @@ use Symfony\Component\Finder\Iterator\SortableIterator;
 
 class SortableIteratorTest extends RealIteratorTestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         try {
             new SortableIterator(new Iterator([]), -255);
@@ -27,7 +27,7 @@ class SortableIteratorTest extends RealIteratorTestCase
     }
 
     #[DataProvider('getAcceptData')]
-    public function testAccept($mode, $expected)
+    public function testAccept($mode, $expected): void
     {
         if (!\is_callable($mode)) {
             switch ($mode) {

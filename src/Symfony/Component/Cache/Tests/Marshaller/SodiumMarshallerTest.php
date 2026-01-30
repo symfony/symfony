@@ -26,7 +26,7 @@ class SodiumMarshallerTest extends TestCase
         $this->decryptionKey = sodium_crypto_box_keypair();
     }
 
-    public function testMarshall()
+    public function testMarshall(): void
     {
         $defaultMarshaller = new DefaultMarshaller();
         $sodiumMarshaller = new SodiumMarshaller([$this->decryptionKey], $defaultMarshaller);
@@ -41,7 +41,7 @@ class SodiumMarshallerTest extends TestCase
         $this->assertSame($defaultResult, $sodiumResult);
     }
 
-    public function testUnmarshall()
+    public function testUnmarshall(): void
     {
         $defaultMarshaller = new DefaultMarshaller();
         $sodiumMarshaller = new SodiumMarshaller([$this->decryptionKey], $defaultMarshaller);

@@ -22,7 +22,7 @@ use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
 class TagAwareAndProxyAdapterIntegrationTest extends TestCase
 {
     #[DataProvider('dataProvider')]
-    public function testIntegrationUsingProxiedAdapter(CacheItemPoolInterface $proxiedAdapter)
+    public function testIntegrationUsingProxiedAdapter(CacheItemPoolInterface $proxiedAdapter): void
     {
         $cache = new TagAwareAdapter(new ProxyAdapter($proxiedAdapter));
 
@@ -38,7 +38,7 @@ class TagAwareAndProxyAdapterIntegrationTest extends TestCase
         $this->assertFalse($cache->getItem('foo')->isHit());
     }
 
-    public function testIntegrationUsingProxiedAdapterForTagsPool()
+    public function testIntegrationUsingProxiedAdapterForTagsPool(): void
     {
         $arrayAdapter = new ArrayAdapter();
         $cache = new TagAwareAdapter($arrayAdapter, new ProxyAdapter($arrayAdapter));

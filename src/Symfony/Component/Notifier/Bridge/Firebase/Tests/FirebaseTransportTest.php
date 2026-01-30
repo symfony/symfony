@@ -51,7 +51,7 @@ final class FirebaseTransportTest extends TransportTestCase
     }
 
     #[DataProvider('sendWithErrorThrowsExceptionProvider')]
-    public function testSendWithErrorThrowsTransportException(ResponseInterface $response)
+    public function testSendWithErrorThrowsTransportException(ResponseInterface $response): void
     {
         $this->expectException(TransportException::class);
 

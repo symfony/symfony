@@ -31,7 +31,7 @@ class XliffLintCommandTest extends TestCase
 {
     private array $files;
 
-    public function testGetHelp()
+    public function testGetHelp(): void
     {
         $command = new XliffLintCommand();
         $expected = <<<EOF
@@ -43,7 +43,7 @@ class XliffLintCommandTest extends TestCase
         $this->assertStringContainsString($expected, $command->getHelp());
     }
 
-    public function testLintFilesFromBundleDirectory()
+    public function testLintFilesFromBundleDirectory(): void
     {
         $tester = $this->createCommandTester($this->getKernelAwareApplicationMock());
         $tester->execute(

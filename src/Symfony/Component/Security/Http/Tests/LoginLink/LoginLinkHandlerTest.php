@@ -49,7 +49,7 @@ class LoginLinkHandlerTest extends TestCase
 
     #[DataProvider('provideCreateLoginLinkData')]
     #[Group('time-sensitive')]
-    public function testCreateLoginLink($user, array $extraProperties, ?Request $request = null)
+    public function testCreateLoginLink($user, array $extraProperties, ?Request $request = null): void
     {
         $this->router = $this->createMock(UrlGeneratorInterface::class);
         $this->router->expects($this->once())
@@ -80,7 +80,7 @@ class LoginLinkHandlerTest extends TestCase
 
             $this->router->expects($this->exactly(2))
                 ->method('setContext')
-                ->willReturnCallback(function (RequestContext $context) use (&$series) {
+                ->willReturnCallback(function (RequestContext $context) use (&$series): void {
                     $expectedContext = array_shift($series);
 
                     if ($expectedContext instanceof Constraint) {
@@ -119,7 +119,7 @@ class LoginLinkHandlerTest extends TestCase
         ];
     }
 
-    public function testCreateLoginLinkWithLifetime()
+    public function testCreateLoginLinkWithLifetime(): void
     {
         $extraProperties = ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'];
 
@@ -151,7 +151,7 @@ class LoginLinkHandlerTest extends TestCase
         $this->assertSame('https://example.com/login/verify?user=weaverryan&hash=abchash&expires=1654244256', $loginLink->getUrl());
     }
 
-    public function testConsumeLoginLink()
+    public function testConsumeLoginLink(): void
     {
         $expires = time() + 500;
         $signature = $this->createSignatureHash('weaverryan', $expires);
@@ -168,7 +168,7 @@ class LoginLinkHandlerTest extends TestCase
         $this->assertSame(1, $item->get());
     }
 
-    public function testConsumeLoginLinkWithExpired()
+    public function testConsumeLoginLinkWithExpired(): void
     {
         $expires = time() - 500;
         $signature = $this->createSignatureHash('weaverryan', $expires);
@@ -179,7 +179,7 @@ class LoginLinkHandlerTest extends TestCase
         $linker->consumeLoginLink($request);
     }
 
-    public function testConsumeLoginLinkWithUserNotFound()
+    public function testConsumeLoginLinkWithUserNotFound(): void
     {
         $request = Request::create('/login/verify?user=weaverryan&hash=thehash&expires='.(time() + 500));
 
@@ -188,7 +188,7 @@ class LoginLinkHandlerTest extends TestCase
         $linker->consumeLoginLink($request);
     }
 
-    public function testConsumeLoginLinkWithDifferentSignature()
+    public function testConsumeLoginLinkWithDifferentSignature(): void
     {
         $request = Request::create(\sprintf('/login/verify?user=weaverryan&hash=fake_hash&expires=%d', time() + 500));
 
@@ -197,7 +197,7 @@ class LoginLinkHandlerTest extends TestCase
         $linker->consumeLoginLink($request);
     }
 
-    public function testConsumeLoginLinkExceedsMaxUsage()
+    public function testConsumeLoginLinkExceedsMaxUsage(): void
     {
         $expires = time() + 500;
         $signature = $this->createSignatureHash('weaverryan', $expires);
@@ -215,7 +215,7 @@ class LoginLinkHandlerTest extends TestCase
         $linker->consumeLoginLink($request);
     }
 
-    public function testConsumeLoginLinkWithMissingHash()
+    public function testConsumeLoginLinkWithMissingHash(): void
     {
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->createUser($user);
@@ -227,7 +227,7 @@ class LoginLinkHandlerTest extends TestCase
         $linker->consumeLoginLink($request);
     }
 
-    public function testConsumeLoginLinkWithMissingExpiration()
+    public function testConsumeLoginLinkWithMissingExpiration(): void
     {
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->createUser($user);
@@ -239,7 +239,7 @@ class LoginLinkHandlerTest extends TestCase
         $linker->consumeLoginLink($request);
     }
 
-    public function testConsumeLoginLinkWithInvalidExpiration()
+    public function testConsumeLoginLinkWithInvalidExpiration(): void
     {
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->createUser($user);
@@ -251,7 +251,7 @@ class LoginLinkHandlerTest extends TestCase
         $linker->consumeLoginLink($request);
     }
 
-    public function testConsumeLoginLinkWithInvalidHash()
+    public function testConsumeLoginLinkWithInvalidHash(): void
     {
         $user = new TestLoginLinkHandlerUser('weaverryan', 'ryan@symfonycasts.com', 'pwhash');
         $this->userProvider->createUser($user);

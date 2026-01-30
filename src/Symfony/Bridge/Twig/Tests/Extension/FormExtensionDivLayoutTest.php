@@ -25,7 +25,7 @@ use Twig\Loader\FilesystemLoader;
 
 class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
 {
-    public function testThemeBlockInheritanceUsingUse()
+    public function testThemeBlockInheritanceUsingUse(): void
     {
         $view = $this->factory
             ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
@@ -40,7 +40,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         );
     }
 
-    public function testThemeBlockInheritanceUsingExtend()
+    public function testThemeBlockInheritanceUsingExtend(): void
     {
         $view = $this->factory
             ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
@@ -55,7 +55,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         );
     }
 
-    public function testThemeBlockInheritanceUsingDynamicExtend()
+    public function testThemeBlockInheritanceUsingDynamicExtend(): void
     {
         $view = $this->factory
             ->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType')
@@ -86,14 +86,14 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
     }
 
     #[DataProvider('isSelectedChoiceProvider')]
-    public function testIsChoiceSelected($expected, $choice, $value)
+    public function testIsChoiceSelected($expected, $choice, $value): void
     {
         $choice = new ChoiceView($choice, $choice, $choice.' label');
 
         $this->assertSame($expected, \Symfony\Bridge\Twig\Extension\twig_is_selected_choice($choice, $value));
     }
 
-    public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
+    public function testStartTagHasNoActionAttributeWhenActionIsEmpty(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
@@ -105,7 +105,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         $this->assertSame('<form name="form" method="get">', $html);
     }
 
-    public function testStartTagHasActionAttributeWhenActionIsZero()
+    public function testStartTagHasActionAttributeWhenActionIsZero(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
@@ -126,12 +126,12 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
     }
 
     #[DataProvider('isRootFormProvider')]
-    public function testIsRootForm($expected, FormView $formView)
+    public function testIsRootForm($expected, FormView $formView): void
     {
         $this->assertSame($expected, \Symfony\Bridge\Twig\Extension\twig_is_root_form($formView));
     }
 
-    public function testMoneyWidgetInIso()
+    public function testMoneyWidgetInIso(): void
     {
         $environment = new Environment(new FilesystemLoader([
             __DIR__.'/../../Resources/views/Form',
@@ -156,7 +156,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         $this->assertSame('&euro; <input type="text" id="name" name="name" required="required" inputmode="decimal" />', $this->renderWidget($view));
     }
 
-    public function testHelpAttr()
+    public function testHelpAttr(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help text test!',
@@ -176,7 +176,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         );
     }
 
-    public function testHelpHtmlDefaultIsFalse()
+    public function testHelpHtmlDefaultIsFalse(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help <b>text</b> test!',
@@ -203,7 +203,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         );
     }
 
-    public function testHelpHtmlIsFalse()
+    public function testHelpHtmlIsFalse(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help <b>text</b> test!',
@@ -231,7 +231,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         );
     }
 
-    public function testHelpHtmlIsTrue()
+    public function testHelpHtmlIsTrue(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help <b>text</b> test!',
@@ -259,7 +259,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         );
     }
 
-    public function testLabelHtmlDefaultIsFalse()
+    public function testLabelHtmlDefaultIsFalse(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'label' => '<b>Bolded label</b>',
@@ -275,7 +275,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class required"]/b[.="Bolded label"]', 0);
     }
 
-    public function testLabelHtmlIsTrue()
+    public function testLabelHtmlIsTrue(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'label' => '<b>Bolded label</b>',

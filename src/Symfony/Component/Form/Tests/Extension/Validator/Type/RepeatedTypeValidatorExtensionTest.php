@@ -20,7 +20,7 @@ class RepeatedTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         return $this->factory->create(RepeatedType::class, null, $options);
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 

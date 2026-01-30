@@ -25,7 +25,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Section\Section;
 
 final class SectionTest extends TestCase
 {
-    public function testTitle()
+    public function testTitle(): void
     {
         $section = (new Section())
             ->title($value = 'Symfony is great!');
@@ -33,7 +33,7 @@ final class SectionTest extends TestCase
         $this->assertSame($value, $section->toArray()['title']);
     }
 
-    public function testText()
+    public function testText(): void
     {
         $section = (new Section())
             ->text($value = 'Community power is awesome!');
@@ -42,7 +42,7 @@ final class SectionTest extends TestCase
     }
 
     #[DataProvider('allowedActions')]
-    public function testAction(array $expected, ActionInterface $action)
+    public function testAction(array $expected, ActionInterface $action): void
     {
         $section = (new Section())
             ->action($action);
@@ -59,7 +59,7 @@ final class SectionTest extends TestCase
         yield [[['@type' => 'OpenUri']], new OpenUriAction()];
     }
 
-    public function testActivity()
+    public function testActivity(): void
     {
         $activity = (new Activity())
             ->image($imageUrl = 'https://symfony.com/logo.png')
@@ -81,7 +81,7 @@ final class SectionTest extends TestCase
         );
     }
 
-    public function testImage()
+    public function testImage(): void
     {
         $image = (new Image())
             ->image($imageUrl = 'https://symfony.com/logo.png')
@@ -99,7 +99,7 @@ final class SectionTest extends TestCase
         );
     }
 
-    public function testFact()
+    public function testFact(): void
     {
         $fact = (new Fact())
             ->name($name = 'Current version')
@@ -117,7 +117,7 @@ final class SectionTest extends TestCase
         );
     }
 
-    public function testMarkdownWithTrue()
+    public function testMarkdownWithTrue(): void
     {
         $action = (new Section())
             ->markdown(true);
@@ -125,7 +125,7 @@ final class SectionTest extends TestCase
         $this->assertTrue($action->toArray()['markdown']);
     }
 
-    public function testMarkdownWithFalse()
+    public function testMarkdownWithFalse(): void
     {
         $action = (new Section())
             ->markdown(false);

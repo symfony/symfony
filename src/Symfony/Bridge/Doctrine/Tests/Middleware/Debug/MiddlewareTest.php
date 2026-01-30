@@ -88,7 +88,7 @@ class MiddlewareTest extends TestCase
     }
 
     #[DataProvider('provideExecuteMethod')]
-    public function testWithoutBinding(callable $executeMethod)
+    public function testWithoutBinding(callable $executeMethod): void
     {
         $this->init();
 
@@ -103,7 +103,7 @@ class MiddlewareTest extends TestCase
     }
 
     #[DataProvider('provideExecuteMethod')]
-    public function testWithValueBound(callable $executeMethod)
+    public function testWithValueBound(callable $executeMethod): void
     {
         $this->init();
 
@@ -131,7 +131,7 @@ class MiddlewareTest extends TestCase
     }
 
     #[DataProvider('provideExecuteMethod')]
-    public function testWithParamBound(callable $executeMethod)
+    public function testWithParamBound(callable $executeMethod): void
     {
         $this->init();
 
@@ -168,7 +168,7 @@ class MiddlewareTest extends TestCase
     }
 
     #[DataProvider('provideEndTransactionMethod')]
-    public function testTransaction(callable $endTransactionMethod, string $expectedEndTransactionDebug)
+    public function testTransaction(callable $endTransactionMethod, string $expectedEndTransactionDebug): void
     {
         $this->init();
 
@@ -220,7 +220,7 @@ class MiddlewareTest extends TestCase
     }
 
     #[DataProvider('provideExecuteAndEndTransactionMethods')]
-    public function testGlobalDoctrineDuration(callable $sqlMethod, callable $endTransactionMethod)
+    public function testGlobalDoctrineDuration(callable $sqlMethod, callable $endTransactionMethod): void
     {
         $this->init();
 
@@ -244,7 +244,7 @@ class MiddlewareTest extends TestCase
     }
 
     #[DataProvider('provideExecuteAndEndTransactionMethods')]
-    public function testWithoutStopwatch(callable $sqlMethod, callable $endTransactionMethod)
+    public function testWithoutStopwatch(callable $sqlMethod, callable $endTransactionMethod): void
     {
         $this->init(false);
 

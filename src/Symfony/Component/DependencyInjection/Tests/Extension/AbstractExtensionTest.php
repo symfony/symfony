@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class AbstractExtensionTest extends TestCase
 {
-    public function testConfiguration()
+    public function testConfiguration(): void
     {
         $extension = new class extends AbstractExtension {
             public function configure(DefinitionConfigurator $definition): void
@@ -54,7 +54,7 @@ class AbstractExtensionTest extends TestCase
         self::assertSame($expected, $this->processConfiguration($extension));
     }
 
-    public function testPrependExtensionConfig()
+    public function testPrependExtensionConfig(): void
     {
         $extension = new class extends AbstractExtension {
             public function configure(DefinitionConfigurator $definition): void
@@ -105,7 +105,7 @@ class AbstractExtensionTest extends TestCase
         self::assertSame('bar', $container->getParameter('foo_param'));
     }
 
-    public function testLoadExtension()
+    public function testLoadExtension(): void
     {
         $extension = new class extends AbstractExtension {
             public function configure(DefinitionConfigurator $definition): void

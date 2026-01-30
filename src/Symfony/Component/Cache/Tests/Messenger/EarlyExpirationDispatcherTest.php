@@ -34,7 +34,7 @@ class EarlyExpirationDispatcherTest extends TestCase
         (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
-    public function testFetch()
+    public function testFetch(): void
     {
         $logger = new TestLogger();
         $pool = new FilesystemAdapter();
@@ -79,7 +79,7 @@ class EarlyExpirationDispatcherTest extends TestCase
         $this->assertSame($expected, $logger->records);
     }
 
-    public function testEarlyExpiration()
+    public function testEarlyExpiration(): void
     {
         $logger = new TestLogger();
         $pool = new FilesystemAdapter();
@@ -112,7 +112,7 @@ class EarlyExpirationDispatcherTest extends TestCase
         $dispatcher = new EarlyExpirationDispatcher($bus, $reverseContainer);
 
         $saveResult = true;
-        $setMetadata = static function () {
+        $setMetadata = static function (): void {
         };
         $dispatcher($computationService, $item, $saveResult, $pool, $setMetadata, $logger);
 

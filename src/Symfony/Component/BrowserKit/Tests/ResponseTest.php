@@ -18,25 +18,25 @@ use Symfony\Component\BrowserKit\Response;
 
 class ResponseTest extends TestCase
 {
-    public function testGetUri()
+    public function testGetUri(): void
     {
         $response = new Response('foo');
         $this->assertEquals('foo', $response->getContent(), '->getContent() returns the content of the response');
     }
 
-    public function testGetStatusCode()
+    public function testGetStatusCode(): void
     {
         $response = new Response('foo', 304);
         $this->assertEquals('304', $response->getStatusCode(), '->getStatusCode() returns the status of the response');
     }
 
-    public function testGetHeaders()
+    public function testGetHeaders(): void
     {
         $response = new Response('foo', 200, ['foo' => 'bar']);
         $this->assertEquals(['foo' => 'bar'], $response->getHeaders(), '->getHeaders() returns the headers of the response');
     }
 
-    public function testGetHeader()
+    public function testGetHeader(): void
     {
         $response = new Response('foo', 200, [
             'Content-Type' => 'text/html',
@@ -53,14 +53,14 @@ class ResponseTest extends TestCase
         $this->assertEquals([], $response->getHeader('foo', false), '->getHeader() returns an empty array if the header is not defined and first is set to false');
     }
 
-    public function testMagicToString()
+    public function testMagicToString(): void
     {
         $response = new Response('foo', 304, ['foo' => 'bar']);
 
         $this->assertEquals("foo: bar\n\nfoo", $response->__toString(), '->__toString() returns the headers and the content as a string');
     }
 
-    public function testMagicToStringWithMultipleSetCookieHeader()
+    public function testMagicToStringWithMultipleSetCookieHeader(): void
     {
         $headers = [
             'content-type' => 'text/html; charset=utf-8',
@@ -77,7 +77,7 @@ class ResponseTest extends TestCase
         $this->assertEquals($expected, $response->__toString(), '->__toString() returns the headers and the content as a string');
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $response = new Response('{"foo":"foo","bar":{"baz":"baz","qux":33,"quux":12345678901234567890}}');
 
@@ -92,7 +92,7 @@ class ResponseTest extends TestCase
     }
 
     #[DataProvider('provideInvalidJson')]
-    public function testToArrayThrowsErrorOnInvalidJson(string $data)
+    public function testToArrayThrowsErrorOnInvalidJson(string $data): void
     {
         $response = new Response($data);
 
@@ -109,7 +109,7 @@ class ResponseTest extends TestCase
         yield 'Malformed json' => ['{"foo", "bar", "baz"}'];
     }
 
-    public function testToArrayThrowsErrorOnNonArray()
+    public function testToArrayThrowsErrorOnNonArray(): void
     {
         $response = new Response('"foo"');
 

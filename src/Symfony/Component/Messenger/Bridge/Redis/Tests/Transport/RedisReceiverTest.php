@@ -32,7 +32,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 class RedisReceiverTest extends TestCase
 {
     #[DataProvider('redisEnvelopeProvider')]
-    public function testItReturnsTheDecodedMessageToTheHandler(array $redisEnvelope, $expectedMessage, SerializerInterface $serializer)
+    public function testItReturnsTheDecodedMessageToTheHandler(array $redisEnvelope, $expectedMessage, SerializerInterface $serializer): void
     {
         $connection = $this->createStub(Connection::class);
         $connection->method('get')->willReturn($redisEnvelope);
@@ -51,7 +51,7 @@ class RedisReceiverTest extends TestCase
     }
 
     #[DataProvider('rejectedRedisEnvelopeProvider')]
-    public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException(array $redisEnvelope)
+    public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException(array $redisEnvelope): void
     {
         $this->expectException(MessageDecodingFailedException::class);
 
@@ -134,7 +134,7 @@ class RedisReceiverTest extends TestCase
         ];
     }
 
-    public function testKeepalive()
+    public function testKeepalive(): void
     {
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('keepalive')->with('redisid-123');

@@ -36,7 +36,7 @@ class MainConfigurationTest extends TestCase
         ],
     ];
 
-    public function testNoConfigForProvider()
+    public function testNoConfigForProvider(): void
     {
         $config = [
             'providers' => [
@@ -52,7 +52,7 @@ class MainConfigurationTest extends TestCase
         $processor->processConfiguration($configuration, [$config]);
     }
 
-    public function testManyConfigForProvider()
+    public function testManyConfigForProvider(): void
     {
         $config = [
             'providers' => [
@@ -71,7 +71,7 @@ class MainConfigurationTest extends TestCase
         $processor->processConfiguration($configuration, [$config]);
     }
 
-    public function testCsrfAliases()
+    public function testCsrfAliases(): void
     {
         $config = [
             'firewalls' => [
@@ -94,7 +94,7 @@ class MainConfigurationTest extends TestCase
         $this->assertEquals('a_token_id', $processedConfig['firewalls']['stub']['logout']['csrf_token_id']);
     }
 
-    public function testLogoutCsrf()
+    public function testLogoutCsrf(): void
     {
         $config = [
             'firewalls' => [
@@ -143,7 +143,7 @@ class MainConfigurationTest extends TestCase
         }
     }
 
-    public function testLogoutDeleteCookies()
+    public function testLogoutDeleteCookies(): void
     {
         $config = [
             'firewalls' => [
@@ -176,7 +176,7 @@ class MainConfigurationTest extends TestCase
         $this->assertTrue($deleteCookies['my_cookie']['partitioned']);
     }
 
-    public function testDefaultUserCheckers()
+    public function testDefaultUserCheckers(): void
     {
         $processor = new Processor();
         $configuration = new MainConfiguration([], []);
@@ -185,7 +185,7 @@ class MainConfigurationTest extends TestCase
         $this->assertEquals('security.user_checker', $processedConfig['firewalls']['stub']['user_checker']);
     }
 
-    public function testUserCheckers()
+    public function testUserCheckers(): void
     {
         $config = [
             'firewalls' => [
@@ -203,7 +203,7 @@ class MainConfigurationTest extends TestCase
         $this->assertEquals('app.henk_checker', $processedConfig['firewalls']['stub']['user_checker']);
     }
 
-    public function testConfigMergeWithAccessDecisionManager()
+    public function testConfigMergeWithAccessDecisionManager(): void
     {
         $config = [
             'access_decision_manager' => [
@@ -221,7 +221,7 @@ class MainConfigurationTest extends TestCase
         $this->assertSame(MainConfiguration::STRATEGY_UNANIMOUS, $processedConfig['access_decision_manager']['strategy']);
     }
 
-    public function testFirewalls()
+    public function testFirewalls(): void
     {
         $factory = $this->createMock(AuthenticatorFactoryInterface::class);
         $factory->expects($this->once())->method('addConfiguration');
@@ -232,7 +232,7 @@ class MainConfigurationTest extends TestCase
     }
 
     #[DataProvider('provideHideUserNotFoundData')]
-    public function testExposeSecurityErrors(array $config, ExposeSecurityLevel $expectedExposeSecurityErrors)
+    public function testExposeSecurityErrors(array $config, ExposeSecurityLevel $expectedExposeSecurityErrors): void
     {
         $config = array_merge(static::$minimalConfig, $config);
 

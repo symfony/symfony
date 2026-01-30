@@ -31,7 +31,7 @@ class AttributeDirectoryLoaderTest extends TestCase
         $this->loader = new AttributeDirectoryLoader(new FileLocator(), $this->classLoader);
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $this->loader->load(__DIR__.'/../Fixtures/AttributedClasses');
 
@@ -43,7 +43,7 @@ class AttributeDirectoryLoaderTest extends TestCase
         ], $this->classLoader->foundClasses);
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $fixturesDir = __DIR__.'/../Fixtures';
 
@@ -54,18 +54,18 @@ class AttributeDirectoryLoaderTest extends TestCase
         $this->assertFalse($this->loader->supports($fixturesDir, 'foo'), '->supports() checks the resource type if specified');
     }
 
-    public function testItSupportsAnyAttribute()
+    public function testItSupportsAnyAttribute(): void
     {
         $this->assertTrue($this->loader->supports(__DIR__.'/../Fixtures/even-with-not-existing-folder', 'attribute'));
     }
 
-    public function testLoadFileIfLocatedResourceIsFile()
+    public function testLoadFileIfLocatedResourceIsFile(): void
     {
         $this->loader->load(__DIR__.'/../Fixtures/AttributedClasses/FooClass.php');
         self::assertSame([FooClass::class], $this->classLoader->foundClasses);
     }
 
-    public function testLoadAbstractClass()
+    public function testLoadAbstractClass(): void
     {
         self::assertNull($this->loader->load(__DIR__.'/../Fixtures/AttributedClasses/AbstractClass.php'));
         self::assertSame([], $this->classLoader->foundClasses);

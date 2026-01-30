@@ -19,13 +19,13 @@ use Symfony\Component\Console\Output\AnsiColorMode;
 class AnsiColorModeTest extends TestCase
 {
     #[DataProvider('provideColorsConversion')]
-    public function testColorsConversionToAnsi4(string $corlorHex, array $expected)
+    public function testColorsConversionToAnsi4(string $corlorHex, array $expected): void
     {
         $this->assertSame((string) $expected[AnsiColorMode::Ansi4->name], AnsiColorMode::Ansi4->convertFromHexToAnsiColorCode($corlorHex));
     }
 
     #[DataProvider('provideColorsConversion')]
-    public function testColorsConversionToAnsi8(string $corlorHex, array $expected)
+    public function testColorsConversionToAnsi8(string $corlorHex, array $expected): void
     {
         $this->assertSame('8;5;'.$expected[AnsiColorMode::Ansi8->name], AnsiColorMode::Ansi8->convertFromHexToAnsiColorCode($corlorHex));
     }
@@ -73,17 +73,17 @@ class AnsiColorModeTest extends TestCase
         ]];
     }
 
-    public function testColorsConversionWithoutSharp()
+    public function testColorsConversionWithoutSharp(): void
     {
         $this->assertSame('8;5;102', AnsiColorMode::Ansi8->convertFromHexToAnsiColorCode('547869'));
     }
 
-    public function testColorsConversionWithout3Characters()
+    public function testColorsConversionWithout3Characters(): void
     {
         $this->assertSame('8;5;241', AnsiColorMode::Ansi8->convertFromHexToAnsiColorCode('#666'));
     }
 
-    public function testInvalidHexCode()
+    public function testInvalidHexCode(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid "#6666" color.');

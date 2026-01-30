@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class AddFifoStampTest extends MiddlewareTestCase
 {
-    public function testAddStampWithGroupIdOnly()
+    public function testAddStampWithGroupIdOnly(): void
     {
         $middleware = new AddFifoStampMiddleware();
         $envelope = new Envelope(new WithMessageGroupIdMessage('groupId'));
@@ -31,7 +31,7 @@ class AddFifoStampTest extends MiddlewareTestCase
         $this->assertNull($stamp->getMessageDeduplicationId());
     }
 
-    public function testHandleWithDeduplicationIdOnly()
+    public function testHandleWithDeduplicationIdOnly(): void
     {
         $middleware = new AddFifoStampMiddleware();
         $envelope = new Envelope(new WithMessageDeduplicationIdMessage('deduplicationId'));
@@ -42,7 +42,7 @@ class AddFifoStampTest extends MiddlewareTestCase
         $this->assertNull($stamp->getMessageGroupId());
     }
 
-    public function testHandleWithGroupIdAndDeduplicationId()
+    public function testHandleWithGroupIdAndDeduplicationId(): void
     {
         $middleware = new AddFifoStampMiddleware();
         $envelope = new Envelope(new WithMessageDeduplicationIdAndMessageGroupIdMessage('my_group', 'my_random_id'));
@@ -53,7 +53,7 @@ class AddFifoStampTest extends MiddlewareTestCase
         $this->assertSame('my_group', $stamp->getMessageGroupId());
     }
 
-    public function testHandleWithoutId()
+    public function testHandleWithoutId(): void
     {
         $middleware = new AddFifoStampMiddleware();
         $envelope = new Envelope(new WithoutIdMessage());

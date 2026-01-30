@@ -20,7 +20,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateIntervalToArrayTra
  */
 class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $transformer = new DateIntervalToArrayTransformer();
         $input = new \DateInterval('P1Y2M3DT4H5M6S');
@@ -36,7 +36,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertSame($output, $transformer->transform($input));
     }
 
-    public function testTransformEmpty()
+    public function testTransformEmpty(): void
     {
         $transformer = new DateIntervalToArrayTransformer();
         $output = [
@@ -51,7 +51,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertSame($output, $transformer->transform(null));
     }
 
-    public function testTransformEmptyWithFields()
+    public function testTransformEmptyWithFields(): void
     {
         $transformer = new DateIntervalToArrayTransformer(['years', 'weeks', 'minutes', 'seconds']);
         $output = [
@@ -63,7 +63,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertSame($output, $transformer->transform(null));
     }
 
-    public function testTransformWithFields()
+    public function testTransformWithFields(): void
     {
         $transformer = new DateIntervalToArrayTransformer(['years', 'minutes', 'seconds']);
         $input = new \DateInterval('P1Y2M3DT4H5M6S');
@@ -75,7 +75,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertSame($output, $transformer->transform($input));
     }
 
-    public function testTransformWithWeek()
+    public function testTransformWithWeek(): void
     {
         $transformer = new DateIntervalToArrayTransformer(['weeks', 'minutes', 'seconds']);
         $input = new \DateInterval('P1Y2M3WT4H5M6S');
@@ -90,7 +90,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertSame($output, $input);
     }
 
-    public function testTransformWithZeroWeek()
+    public function testTransformWithZeroWeek(): void
     {
         $transformer = new DateIntervalToArrayTransformer(['weeks', 'minutes', 'seconds']);
         $input = new \DateInterval('P1Y2M0WT4H5M6S');
@@ -105,7 +105,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertSame($output, $input);
     }
 
-    public function testTransformDaysToWeeks()
+    public function testTransformDaysToWeeks(): void
     {
         $transformer = new DateIntervalToArrayTransformer(['weeks', 'minutes', 'seconds']);
         $input = new \DateInterval('P1Y2M23DT4H5M6S');
@@ -120,7 +120,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertSame($output, $input);
     }
 
-    public function testTransformDaysNotOverflowingToWeeks()
+    public function testTransformDaysNotOverflowingToWeeks(): void
     {
         $transformer = new DateIntervalToArrayTransformer(['days', 'minutes', 'seconds']);
         $input = new \DateInterval('P1Y2M23DT4H5M6S');
@@ -132,7 +132,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertSame($output, $transformer->transform($input));
     }
 
-    public function testTransformWithInvert()
+    public function testTransformWithInvert(): void
     {
         $transformer = new DateIntervalToArrayTransformer(['years', 'invert']);
         $input = new \DateInterval('P1Y');
@@ -144,7 +144,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertSame($output, $transformer->transform($input));
     }
 
-    public function testTransformWithPadding()
+    public function testTransformWithPadding(): void
     {
         $transformer = new DateIntervalToArrayTransformer(null, true);
         $input = new \DateInterval('P1Y2M3DT4H5M6S');
@@ -160,7 +160,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertSame($output, $transformer->transform($input));
     }
 
-    public function testTransformWithFieldsAndPadding()
+    public function testTransformWithFieldsAndPadding(): void
     {
         $transformer = new DateIntervalToArrayTransformer(['years', 'minutes', 'seconds'], true);
         $input = new \DateInterval('P1Y2M3DT4H5M6S');
@@ -172,7 +172,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertSame($output, $transformer->transform($input));
     }
 
-    public function testReverseTransformRequiresDateTime()
+    public function testReverseTransformRequiresDateTime(): void
     {
         $transformer = new DateIntervalToArrayTransformer();
         $this->assertNull($transformer->reverseTransform(null));
@@ -180,7 +180,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $transformer->reverseTransform('12345');
     }
 
-    public function testReverseTransformWithUnsetFields()
+    public function testReverseTransformWithUnsetFields(): void
     {
         $transformer = new DateIntervalToArrayTransformer();
         $input = ['years' => '1'];
@@ -188,7 +188,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $transformer->reverseTransform($input);
     }
 
-    public function testReverseTransformWithEmptyFields()
+    public function testReverseTransformWithEmptyFields(): void
     {
         $transformer = new DateIntervalToArrayTransformer(['years', 'minutes', 'seconds']);
         $input = [
@@ -201,7 +201,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $transformer->reverseTransform($input);
     }
 
-    public function testReverseTransformWithWrongInvertType()
+    public function testReverseTransformWithWrongInvertType(): void
     {
         $transformer = new DateIntervalToArrayTransformer(['invert']);
         $input = [
@@ -212,7 +212,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $transformer->reverseTransform($input);
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $transformer = new DateIntervalToArrayTransformer();
         $input = [
@@ -228,7 +228,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertDateIntervalEquals($output, $transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformWithWeek()
+    public function testReverseTransformWithWeek(): void
     {
         $transformer = new DateIntervalToArrayTransformer(
             ['years', 'months', 'weeks', 'hours', 'minutes', 'seconds']
@@ -245,7 +245,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertDateIntervalEquals($output, $transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformWithFields()
+    public function testReverseTransformWithFields(): void
     {
         $transformer = new DateIntervalToArrayTransformer(['years', 'minutes', 'seconds']);
         $input = [
@@ -257,7 +257,7 @@ class DateIntervalToArrayTransformerTest extends DateIntervalTestCase
         $this->assertDateIntervalEquals($output, $transformer->reverseTransform($input));
     }
 
-    public function testBothTransformsWithWeek()
+    public function testBothTransformsWithWeek(): void
     {
         $transformer = new DateIntervalToArrayTransformer(
             ['years', 'months', 'weeks', 'hours', 'minutes', 'seconds']

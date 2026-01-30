@@ -26,7 +26,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AddSecurityVotersPassTest extends TestCase
 {
-    public function testNoVoters()
+    public function testNoVoters(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -42,7 +42,7 @@ class AddSecurityVotersPassTest extends TestCase
         $compilerPass->process($container);
     }
 
-    public function testThatSecurityVotersAreProcessedInPriorityOrder()
+    public function testThatSecurityVotersAreProcessedInPriorityOrder(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -77,7 +77,7 @@ class AddSecurityVotersPassTest extends TestCase
         $this->assertCount(4, $refs);
     }
 
-    public function testThatVotersAreTraceableInDebugMode()
+    public function testThatVotersAreTraceableInDebugMode(): void
     {
         $container = new ContainerBuilder();
 
@@ -109,7 +109,7 @@ class AddSecurityVotersPassTest extends TestCase
         $this->assertCount(2, $voters, 'Incorrect count of voters');
     }
 
-    public function testThatVotersAreNotTraceableWithoutDebugMode()
+    public function testThatVotersAreNotTraceableWithoutDebugMode(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -133,7 +133,7 @@ class AddSecurityVotersPassTest extends TestCase
         $this->assertFalse($container->has('debug.security.voter.voter2'), 'voter2 should not be traced');
     }
 
-    public function testVoterMissingInterface()
+    public function testVoterMissingInterface(): void
     {
         $exception = LogicException::class;
         $message = '"stdClass" must implement the "Symfony\Component\Security\Core\Authorization\Voter\VoterInterface" when used as a voter.';
@@ -155,7 +155,7 @@ class AddSecurityVotersPassTest extends TestCase
         $compilerPass->process($container);
     }
 
-    public function testVotersWithAsTaggedItemAndTagPriorities()
+    public function testVotersWithAsTaggedItemAndTagPriorities(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);

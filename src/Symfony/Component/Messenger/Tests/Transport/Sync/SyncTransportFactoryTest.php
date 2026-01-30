@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory;
 
 class SyncTransportFactoryTest extends TestCase
 {
-    public function testCreateTransport()
+    public function testCreateTransport(): void
     {
         $serializer = $this->createStub(SerializerInterface::class);
         $factory = new SyncTransportFactory(new MessageBus());

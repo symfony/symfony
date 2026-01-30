@@ -18,7 +18,7 @@ use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 
 class MigratingPasswordHasherTest extends TestCase
 {
-    public function testValidation()
+    public function testValidation(): void
     {
         $bestHasher = new NativePasswordHasher(4, 12000, 4);
 
@@ -38,7 +38,7 @@ class MigratingPasswordHasherTest extends TestCase
         $this->assertFalse($hasher->verify($hash, 'bar', 'salt'));
     }
 
-    public function testFallback()
+    public function testFallback(): void
     {
         $bestHasher = new NativePasswordHasher(4, 12000, 4);
 

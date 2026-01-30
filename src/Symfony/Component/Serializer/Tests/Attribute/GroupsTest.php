@@ -20,19 +20,19 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  */
 class GroupsTest extends TestCase
 {
-    public function testEmptyGroupsParameter()
+    public function testEmptyGroupsParameter(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new Groups([]);
     }
 
-    public function testInvalidGroupsParameter()
+    public function testInvalidGroupsParameter(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new Groups(['a', 1, new \stdClass()]);
     }
 
-    public function testGroupsParameters()
+    public function testGroupsParameters(): void
     {
         $validData = ['a', 'b'];
 
@@ -40,7 +40,7 @@ class GroupsTest extends TestCase
         $this->assertEquals($validData, $groups->groups);
     }
 
-    public function testSingleGroup()
+    public function testSingleGroup(): void
     {
         $groups = new Groups('a');
         $this->assertEquals(['a'], $groups->groups);

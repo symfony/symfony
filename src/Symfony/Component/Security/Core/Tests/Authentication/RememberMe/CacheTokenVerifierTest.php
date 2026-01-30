@@ -18,21 +18,21 @@ use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 
 class CacheTokenVerifierTest extends TestCase
 {
-    public function testVerifyCurrentToken()
+    public function testVerifyCurrentToken(): void
     {
         $verifier = new CacheTokenVerifier(new ArrayAdapter());
         $token = new PersistentToken('user', 'series1@special:chars=/', 'value', new \DateTimeImmutable());
         $this->assertTrue($verifier->verifyToken($token, 'value'));
     }
 
-    public function testVerifyFailsInvalidToken()
+    public function testVerifyFailsInvalidToken(): void
     {
         $verifier = new CacheTokenVerifier(new ArrayAdapter());
         $token = new PersistentToken('user', 'series1@special:chars=/', 'value', new \DateTimeImmutable());
         $this->assertFalse($verifier->verifyToken($token, 'wrong-value'));
     }
 
-    public function testVerifyOutdatedToken()
+    public function testVerifyOutdatedToken(): void
     {
         $verifier = new CacheTokenVerifier(new ArrayAdapter());
         $outdatedToken = new PersistentToken('user', 'series1@special:chars=/', 'value', new \DateTimeImmutable());

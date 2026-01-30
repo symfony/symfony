@@ -17,7 +17,7 @@ use Symfony\Component\DomCrawler\Link;
 
 class LinkTest extends TestCase
 {
-    public function testConstructorWithANonATag()
+    public function testConstructorWithANonATag(): void
     {
         $this->expectException(\LogicException::class);
         $dom = new \DOMDocument();
@@ -26,7 +26,7 @@ class LinkTest extends TestCase
         new Link($dom->getElementsByTagName('div')->item(0), 'http://www.example.com/');
     }
 
-    public function testBaseUriIsOptionalWhenLinkUrlIsAbsolute()
+    public function testBaseUriIsOptionalWhenLinkUrlIsAbsolute(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><a href="https://example.com/foo">foo</a></html>');
@@ -35,7 +35,7 @@ class LinkTest extends TestCase
         $this->assertSame('https://example.com/foo', $link->getUri());
     }
 
-    public function testAbsoluteBaseUriIsMandatoryWhenLinkUrlIsRelative()
+    public function testAbsoluteBaseUriIsMandatoryWhenLinkUrlIsRelative(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $dom = new \DOMDocument();
@@ -45,7 +45,7 @@ class LinkTest extends TestCase
         $link->getUri();
     }
 
-    public function testGetNode()
+    public function testGetNode(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><a href="/foo">foo</a></html>');
@@ -56,7 +56,7 @@ class LinkTest extends TestCase
         $this->assertEquals($node, $link->getNode(), '->getNode() returns the node associated with the link');
     }
 
-    public function testGetMethod()
+    public function testGetMethod(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><a href="/foo">foo</a></html>');
@@ -71,7 +71,7 @@ class LinkTest extends TestCase
     }
 
     #[DataProvider('getGetUriTests')]
-    public function testGetUri($url, $currentUri, $expected)
+    public function testGetUri($url, $currentUri, $expected): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML(\sprintf('<html><a href="%s">foo</a></html>', $url));
@@ -81,7 +81,7 @@ class LinkTest extends TestCase
     }
 
     #[DataProvider('getGetUriTests')]
-    public function testGetUriOnArea($url, $currentUri, $expected)
+    public function testGetUriOnArea($url, $currentUri, $expected): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML(\sprintf('<html><map><area href="%s" /></map></html>', $url));
@@ -91,7 +91,7 @@ class LinkTest extends TestCase
     }
 
     #[DataProvider('getGetUriTests')]
-    public function testGetUriOnLink($url, $currentUri, $expected)
+    public function testGetUriOnLink($url, $currentUri, $expected): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML(\sprintf('<html><head><link href="%s" /></head></html>', $url));

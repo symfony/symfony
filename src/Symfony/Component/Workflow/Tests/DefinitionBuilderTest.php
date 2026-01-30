@@ -18,7 +18,7 @@ use Symfony\Component\Workflow\Transition;
 
 class DefinitionBuilderTest extends TestCase
 {
-    public function testSetInitialPlaces()
+    public function testSetInitialPlaces(): void
     {
         $builder = new DefinitionBuilder(['a', 'b']);
         $builder->setInitialPlaces('b');
@@ -27,7 +27,7 @@ class DefinitionBuilderTest extends TestCase
         $this->assertEquals(['b'], $definition->getInitialPlaces());
     }
 
-    public function testAddTransition()
+    public function testAddTransition(): void
     {
         $places = range('a', 'b');
 
@@ -43,7 +43,7 @@ class DefinitionBuilderTest extends TestCase
         $this->assertSame($transition1, $definition->getTransitions()[1]);
     }
 
-    public function testAddPlace()
+    public function testAddPlace(): void
     {
         $builder = new DefinitionBuilder(['a'], []);
         $builder->addPlace('b');
@@ -55,7 +55,7 @@ class DefinitionBuilderTest extends TestCase
         $this->assertEquals('b', $definition->getPlaces()['b']);
     }
 
-    public function testSetMetadataStore()
+    public function testSetMetadataStore(): void
     {
         $builder = new DefinitionBuilder(['a']);
         $metadataStore = new InMemoryMetadataStore();

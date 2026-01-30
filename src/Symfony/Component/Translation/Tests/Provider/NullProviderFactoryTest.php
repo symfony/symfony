@@ -22,14 +22,14 @@ use Symfony\Component\Translation\Provider\NullProviderFactory;
  */
 class NullProviderFactoryTest extends TestCase
 {
-    public function testCreateThrowsUnsupportedSchemeException()
+    public function testCreateThrowsUnsupportedSchemeException(): void
     {
         $this->expectException(UnsupportedSchemeException::class);
 
         (new NullProviderFactory())->create(new Dsn('foo://localhost'));
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $this->assertInstanceOf(NullProvider::class, (new NullProviderFactory())->create(new Dsn('null://null')));
     }

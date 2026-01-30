@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class AtLeastOneOfTest extends TestCase
 {
-    public function testRejectNonConstraints()
+    public function testRejectNonConstraints(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         new AtLeastOneOf([
@@ -30,7 +30,7 @@ class AtLeastOneOfTest extends TestCase
         ]);
     }
 
-    public function testRejectValidConstraint()
+    public function testRejectValidConstraint(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         new AtLeastOneOf([
@@ -38,7 +38,7 @@ class AtLeastOneOfTest extends TestCase
         ]);
     }
 
-    public function testMissingConstraints()
+    public function testMissingConstraints(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage(\sprintf('The options "constraints" must be set for constraint "%s".', AtLeastOneOf::class));
@@ -46,7 +46,7 @@ class AtLeastOneOfTest extends TestCase
         new AtLeastOneOf(null);
     }
 
-    public function testMissingConstraintsDoctrineStyle()
+    public function testMissingConstraintsDoctrineStyle(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage(\sprintf('The options "constraints" must be set for constraint "%s".', AtLeastOneOf::class));

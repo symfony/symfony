@@ -36,7 +36,7 @@ class AuthorizationCheckerTest extends TestCase
         $this->authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager);
     }
 
-    public function testVoteWithoutAuthenticationToken()
+    public function testVoteWithoutAuthenticationToken(): void
     {
         $authorizationChecker = new AuthorizationChecker($this->tokenStorage, $this->accessDecisionManager);
 
@@ -46,7 +46,7 @@ class AuthorizationCheckerTest extends TestCase
     }
 
     #[DataProvider('isGrantedProvider')]
-    public function testIsGranted($decide)
+    public function testIsGranted($decide): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('username', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
 
@@ -63,7 +63,7 @@ class AuthorizationCheckerTest extends TestCase
         return [[true], [false]];
     }
 
-    public function testIsGrantedWithObjectAttribute()
+    public function testIsGrantedWithObjectAttribute(): void
     {
         $attribute = new \stdClass();
 
@@ -79,7 +79,7 @@ class AuthorizationCheckerTest extends TestCase
     }
 
     #[DataProvider('isGrantedForUserProvider')]
-    public function testIsGrantedForUser(bool $decide, array $roles)
+    public function testIsGrantedForUser(bool $decide, array $roles): void
     {
         $user = new InMemoryUser('username', 'password', $roles);
 
@@ -100,7 +100,7 @@ class AuthorizationCheckerTest extends TestCase
         ];
     }
 
-    public function testIsGrantedForUserWithObjectAttribute()
+    public function testIsGrantedForUserWithObjectAttribute(): void
     {
         $attribute = new \stdClass();
 

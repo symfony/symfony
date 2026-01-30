@@ -19,7 +19,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class TypeTest extends TestCase
 {
-    public function testIsIdentifiedBy()
+    public function testIsIdentifiedBy(): void
     {
         $this->assertTrue(Type::intersection(Type::object(\Iterator::class), Type::object(\Stringable::class))->isIdentifiedBy(TypeIdentifier::OBJECT));
         $this->assertTrue(Type::union(Type::int(), Type::string())->isIdentifiedBy(TypeIdentifier::INT));
@@ -28,7 +28,7 @@ class TypeTest extends TestCase
         $this->assertTrue(Type::nullable(Type::union(Type::collection(Type::object(\Iterator::class)), Type::string()))->isIdentifiedBy(TypeIdentifier::OBJECT));
     }
 
-    public function testIsNullable()
+    public function testIsNullable(): void
     {
         $this->assertTrue(Type::null()->isNullable());
         $this->assertTrue(Type::mixed()->isNullable());
@@ -37,7 +37,7 @@ class TypeTest extends TestCase
         $this->assertFalse(Type::int()->isNullable());
     }
 
-    public function testIsSatisfiedBy()
+    public function testIsSatisfiedBy(): void
     {
         $this->assertTrue(Type::union(Type::int(), Type::string())->isSatisfiedBy(static fn (Type $t): bool => 'int' === (string) $t));
         $this->assertTrue(Type::union(Type::int(), Type::string())->isSatisfiedBy(static fn (Type $t): bool => $t instanceof UnionType));
@@ -45,7 +45,7 @@ class TypeTest extends TestCase
         $this->assertFalse(Type::list(Type::int())->isSatisfiedBy(static fn (Type $t): bool => 'int' === (string) $t));
     }
 
-    public function testTraverse()
+    public function testTraverse(): void
     {
         $this->assertEquals([Type::int()], iterator_to_array(Type::int()->traverse()));
 

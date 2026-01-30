@@ -27,41 +27,41 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
         return new UlidValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Ulid());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Ulid());
 
         $this->assertNoViolation();
     }
 
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Ulid());
     }
 
-    public function testValidUlid()
+    public function testValidUlid(): void
     {
         $this->validator->validate('01ARZ3NDEKTSV4RRFFQ69G5FAV', new Ulid());
 
         $this->assertNoViolation();
     }
 
-    public function testValidUlidAsBase58()
+    public function testValidUlidAsBase58(): void
     {
         $this->validator->validate('1CCD2w4mK2m455S2BAXFht', new Ulid(format: Ulid::FORMAT_BASE_58));
 
         $this->assertNoViolation();
     }
 
-    public function testValidUlidAsRfc4122()
+    public function testValidUlidAsRfc4122(): void
     {
         $this->validator->validate('01912bf3-feff-fa6c-00f2-90d2f2e00564', new Ulid(format: Ulid::FORMAT_RFC_4122));
 
@@ -69,7 +69,7 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidUlids')]
-    public function testInvalidUlid(string $ulid, string $code)
+    public function testInvalidUlid(string $ulid, string $code): void
     {
         $constraint = new Ulid(message: 'testMessage');
 
@@ -96,7 +96,7 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidBase58Ulids')]
-    public function testInvalidBase58Ulid(string $ulid, string $code)
+    public function testInvalidBase58Ulid(string $ulid, string $code): void
     {
         $constraint = new Ulid(message: 'testMessage', format: Ulid::FORMAT_BASE_58);
 
@@ -122,7 +122,7 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidRfc4122Ulids')]
-    public function testInvalidInvalid4122Ulid(string $ulid, string $code)
+    public function testInvalidInvalid4122Ulid(string $ulid, string $code): void
     {
         $constraint = new Ulid(message: 'testMessage', format: Ulid::FORMAT_RFC_4122);
 
@@ -149,7 +149,7 @@ class UlidValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testInvalidUlidNamed()
+    public function testInvalidUlidNamed(): void
     {
         $constraint = new Ulid(message: 'testMessage');
 

@@ -46,14 +46,14 @@ final class SweegoTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSupportWithNotSmsMessage()
+    public function testSupportWithNotSmsMessage(): void
     {
         $transport = new SweegoTransport('apiKey', 'REGION', 'CAMPAIGN_TYPE', false, 'CAMPAIGN_ID', true, false);
         $message = $this->createStub(MessageInterface::class);
         $this->assertFalse($transport->supports($message));
     }
 
-    public function testSupportWithNotSweegoOptions()
+    public function testSupportWithNotSweegoOptions(): void
     {
         $transport = new SweegoTransport('apiKey', 'REGION', 'CAMPAIGN_TYPE', false, 'CAMPAIGN_ID', true, false);
         $message = new SmsMessage('test', 'test');
@@ -62,7 +62,7 @@ final class SweegoTransportTest extends TransportTestCase
         $this->assertFalse($transport->supports($message));
     }
 
-    public function testSendWithInvalidMessageType()
+    public function testSendWithInvalidMessageType(): void
     {
         $this->expectException(UnsupportedMessageTypeException::class);
         $transport = new SweegoTransport('apiKey', 'REGION', 'CAMPAIGN_TYPE', false, 'CAMPAIGN_ID', true, false);
@@ -70,7 +70,7 @@ final class SweegoTransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testSendSmsMessage()
+    public function testSendSmsMessage(): void
     {
         $client = new MockHttpClient(function ($method, $url, $options) {
             $this->assertSame('POST', $method);

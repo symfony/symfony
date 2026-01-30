@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 
 class RequestValueResolverTest extends TestCase
 {
-    public function testSameRequestReturned()
+    public function testSameRequestReturned(): void
     {
         $resolver = new RequestValueResolver();
         $expectedRequest = Request::create('/');
@@ -29,7 +29,7 @@ class RequestValueResolverTest extends TestCase
         self::assertSame($expectedRequest, $actualRequest[0] ?? null);
     }
 
-    public function testRequestIsNotResolvedForRandomClass()
+    public function testRequestIsNotResolvedForRandomClass(): void
     {
         $resolver = new RequestValueResolver();
         $expectedRequest = Request::create('/');
@@ -37,7 +37,7 @@ class RequestValueResolverTest extends TestCase
         self::assertCount(0, $actualRequest);
     }
 
-    public function testExceptionThrownForRandomRequestClass()
+    public function testExceptionThrownForRandomRequestClass(): void
     {
         $resolver = new RequestValueResolver();
         $expectedRequest = Request::create('/');

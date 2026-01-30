@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Tests\Constraints\Fixtures\TypedDummy;
 
 trait CompareWithNullValueAtPropertyAtTestTrait
 {
-    public function testCompareWithNullValueAtPropertyAt()
+    public function testCompareWithNullValueAtPropertyAt(): void
     {
         $constraint = $this->createConstraint(['propertyPath' => 'value']);
         $constraint->message = 'Constraint Message';
@@ -28,7 +28,7 @@ trait CompareWithNullValueAtPropertyAtTestTrait
         $this->assertNoViolation();
     }
 
-    public function testCompareWithUninitializedPropertyAtPropertyPath()
+    public function testCompareWithUninitializedPropertyAtPropertyPath(): void
     {
         $this->setObject(new TypedDummy());
 

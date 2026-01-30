@@ -20,7 +20,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class BundlePathsTest extends AbstractWebTestCase
 {
-    public function testBundlePublicDir()
+    public function testBundlePublicDir(): void
     {
         $kernel = static::bootKernel(['test_case' => 'BundlePaths']);
         $projectDir = tempnam(sys_get_temp_dir(), 'sf_bundle_paths_');
@@ -38,7 +38,7 @@ class BundlePathsTest extends AbstractWebTestCase
         $fs->remove($projectDir);
     }
 
-    public function testBundleTwigTemplatesDir()
+    public function testBundleTwigTemplatesDir(): void
     {
         static::bootKernel(['test_case' => 'BundlePaths']);
         $twig = static::getContainer()->get('twig.alias');
@@ -51,7 +51,7 @@ class BundlePathsTest extends AbstractWebTestCase
         $this->assertSame("OK\n", $twig->render('@Modern/index.html.twig'));
     }
 
-    public function testBundleTranslationsDir()
+    public function testBundleTranslationsDir(): void
     {
         static::bootKernel(['test_case' => 'BundlePaths']);
         $translator = static::getContainer()->get('translator.alias');
@@ -60,7 +60,7 @@ class BundlePathsTest extends AbstractWebTestCase
         $this->assertSame('OK', $translator->trans('ok_label', [], 'modern'));
     }
 
-    public function testBundleValidationConfigDir()
+    public function testBundleValidationConfigDir(): void
     {
         static::bootKernel(['test_case' => 'BundlePaths']);
         $validator = static::getContainer()->get('validator.alias');
@@ -74,7 +74,7 @@ class BundlePathsTest extends AbstractWebTestCase
         $this->assertSame('This value should be greater than 18.', $constraintViolationList->get(0)->getMessage());
     }
 
-    public function testBundleSerializationConfigDir()
+    public function testBundleSerializationConfigDir(): void
     {
         static::bootKernel(['test_case' => 'BundlePaths']);
         $serializer = static::getContainer()->get('serializer.alias');

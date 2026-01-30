@@ -35,7 +35,7 @@ class LdapManagerTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testLdapAddAndRemove()
+    public function testLdapAddAndRemove(): void
     {
         $this->executeSearchQuery(1);
 
@@ -56,7 +56,7 @@ class LdapManagerTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testLdapAddInvalidEntry()
+    public function testLdapAddInvalidEntry(): void
     {
         $this->expectException(LdapException::class);
         $this->executeSearchQuery(1);
@@ -73,7 +73,7 @@ class LdapManagerTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testLdapAddDouble()
+    public function testLdapAddDouble(): void
     {
         $this->expectException(LdapException::class);
         $this->executeSearchQuery(1);
@@ -95,7 +95,7 @@ class LdapManagerTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testLdapUpdate()
+    public function testLdapUpdate(): void
     {
         $result = $this->executeSearchQuery(1);
 
@@ -119,7 +119,7 @@ class LdapManagerTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testLdapUnboundAdd()
+    public function testLdapUnboundAdd(): void
     {
         $this->adapter = new Adapter($this->getLdapConfig());
         $this->expectException(NotBoundException::class);
@@ -128,7 +128,7 @@ class LdapManagerTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testLdapUnboundRemove()
+    public function testLdapUnboundRemove(): void
     {
         $this->adapter = new Adapter($this->getLdapConfig());
         $this->expectException(NotBoundException::class);
@@ -137,7 +137,7 @@ class LdapManagerTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testLdapUnboundUpdate()
+    public function testLdapUnboundUpdate(): void
     {
         $this->adapter = new Adapter($this->getLdapConfig());
         $this->expectException(NotBoundException::class);
@@ -159,7 +159,7 @@ class LdapManagerTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testLdapRename()
+    public function testLdapRename(): void
     {
         $result = $this->executeSearchQuery(1);
 
@@ -178,7 +178,7 @@ class LdapManagerTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testLdapRenameWithoutRemovingOldRdn()
+    public function testLdapRenameWithoutRemovingOldRdn(): void
     {
         $result = $this->executeSearchQuery(1);
 
@@ -200,7 +200,7 @@ class LdapManagerTest extends LdapTestCase
         }
     }
 
-    public function testLdapAddRemoveAttributeValues()
+    public function testLdapAddRemoveAttributeValues(): void
     {
         $entryManager = $this->adapter->getEntryManager();
 
@@ -222,7 +222,7 @@ class LdapManagerTest extends LdapTestCase
         $this->assertCount(2, $newNewEntry->getAttribute('mail'));
     }
 
-    public function testLdapRemoveAttributeValuesError()
+    public function testLdapRemoveAttributeValuesError(): void
     {
         $entryManager = $this->adapter->getEntryManager();
 
@@ -234,7 +234,7 @@ class LdapManagerTest extends LdapTestCase
         $entryManager->removeAttributeValues($entry, 'mail', ['fabpot@example.org']);
     }
 
-    public function testLdapAddAttributeValuesError()
+    public function testLdapAddAttributeValuesError(): void
     {
         $entryManager = $this->adapter->getEntryManager();
 
@@ -246,7 +246,7 @@ class LdapManagerTest extends LdapTestCase
         $entryManager->addAttributeValues($entry, 'mail', $entry->getAttribute('mail'));
     }
 
-    public function testLdapApplyOperationsRemoveAll()
+    public function testLdapApplyOperationsRemoveAll(): void
     {
         $entryManager = $this->adapter->getEntryManager();
 
@@ -263,7 +263,7 @@ class LdapManagerTest extends LdapTestCase
         $entryManager->addAttributeValues($entry, 'mail', ['fabpot@symfony.com', 'fabien@potencier.com']);
     }
 
-    public function testLdapApplyOperationsRemoveAllWithArrayError()
+    public function testLdapApplyOperationsRemoveAllWithArrayError(): void
     {
         $entryManager = $this->adapter->getEntryManager();
 
@@ -275,7 +275,7 @@ class LdapManagerTest extends LdapTestCase
         $entryManager->applyOperations($entry->getDn(), [new UpdateOperation(\LDAP_MODIFY_BATCH_REMOVE_ALL, 'mail', [])]);
     }
 
-    public function testLdapApplyOperationsWithWrongConstantError()
+    public function testLdapApplyOperationsWithWrongConstantError(): void
     {
         $entryManager = $this->adapter->getEntryManager();
 
@@ -287,7 +287,7 @@ class LdapManagerTest extends LdapTestCase
         $entryManager->applyOperations($entry->getDn(), [new UpdateOperation(512, 'mail', [])]);
     }
 
-    public function testApplyOperationsAddRemoveAttributeValues()
+    public function testApplyOperationsAddRemoveAttributeValues(): void
     {
         $entryManager = $this->adapter->getEntryManager();
 
@@ -315,7 +315,7 @@ class LdapManagerTest extends LdapTestCase
         $this->assertCount(2, $newNewEntry->getAttribute('mail'));
     }
 
-    public function testUpdateOperationsWithIterator()
+    public function testUpdateOperationsWithIterator(): void
     {
         $iteratorAdd = new \ArrayIterator([
             new UpdateOperation(\LDAP_MODIFY_BATCH_ADD, 'mail', ['fabpot@example.org', 'fabpot2@example.org']),
@@ -347,7 +347,7 @@ class LdapManagerTest extends LdapTestCase
         $this->assertCount(2, $newNewEntry->getAttribute('mail'));
     }
 
-    public function testUpdateOperationsThrowsExceptionWhenAddedDuplicatedValue()
+    public function testUpdateOperationsThrowsExceptionWhenAddedDuplicatedValue(): void
     {
         $duplicateIterator = new \ArrayIterator([
             new UpdateOperation(\LDAP_MODIFY_BATCH_ADD, 'mail', ['fabpot@example.org']),
@@ -365,7 +365,7 @@ class LdapManagerTest extends LdapTestCase
     }
 
     #[Group('functional')]
-    public function testLdapMove()
+    public function testLdapMove(): void
     {
         $result = $this->executeSearchQuery(1);
 

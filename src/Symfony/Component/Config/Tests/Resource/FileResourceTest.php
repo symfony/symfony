@@ -35,44 +35,44 @@ class FileResourceTest extends TestCase
         }
     }
 
-    public function testGetResource()
+    public function testGetResource(): void
     {
         $this->assertSame(realpath($this->file), $this->resource->getResource(), '->getResource() returns the path to the resource');
     }
 
-    public function testGetResourceWithScheme()
+    public function testGetResourceWithScheme(): void
     {
         $resource = new FileResource('file://'.$this->file);
         $this->assertSame('file://'.$this->file, $resource->getResource(), '->getResource() returns the path to the schemed resource');
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertSame(realpath($this->file), (string) $this->resource);
     }
 
-    public function testResourceDoesNotExist()
+    public function testResourceDoesNotExist(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The file ".*" does not exist./');
         new FileResource('/____foo/foobar'.random_int(1, 999999));
     }
 
-    public function testIsFresh()
+    public function testIsFresh(): void
     {
         $this->assertTrue($this->resource->isFresh($this->time), '->isFresh() returns true if the resource has not changed in same second');
         $this->assertTrue($this->resource->isFresh($this->time + 10), '->isFresh() returns true if the resource has not changed');
         $this->assertFalse($this->resource->isFresh($this->time - 86400), '->isFresh() returns false if the resource has been updated');
     }
 
-    public function testIsFreshForDeletedResources()
+    public function testIsFreshForDeletedResources(): void
     {
         unlink($this->file);
 
         $this->assertFalse($this->resource->isFresh($this->time), '->isFresh() returns false if the resource does not exist');
     }
 
-    public function testSerializeUnserialize()
+    public function testSerializeUnserialize(): void
     {
         unserialize(serialize($this->resource));
 

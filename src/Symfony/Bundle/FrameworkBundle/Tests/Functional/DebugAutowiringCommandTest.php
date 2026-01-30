@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 #[Group('functional')]
 class DebugAutowiringCommandTest extends AbstractWebTestCase
 {
-    public function testBasicFunctionality()
+    public function testBasicFunctionality(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
@@ -39,7 +39,7 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('alias:http_kernel', $tester->getDisplay());
     }
 
-    public function testSearchArgument()
+    public function testSearchArgument(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
@@ -53,7 +53,7 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $this->assertStringNotContainsString(RouterInterface::class, $tester->getDisplay());
     }
 
-    public function testSearchIgnoreBackslashWhenFindingService()
+    public function testSearchIgnoreBackslashWhenFindingService(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
@@ -65,7 +65,7 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString(HttpKernelInterface::class, $tester->getDisplay());
     }
 
-    public function testSearchNoResults()
+    public function testSearchNoResults(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
@@ -79,7 +79,7 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $this->assertEquals(1, $tester->getStatusCode());
     }
 
-    public function testSearchNotAliasedService()
+    public function testSearchNotAliasedService(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
@@ -92,7 +92,7 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString(' more concrete service would be displayed when adding the "--all" option.', $tester->getDisplay());
     }
 
-    public function testSearchNotAliasedServiceWithAll()
+    public function testSearchNotAliasedServiceWithAll(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
@@ -104,7 +104,7 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('Pro-tip: use interfaces in your type-hints instead of classes to benefit from the dependency inversion principle.', $tester->getDisplay());
     }
 
-    public function testNotConfusedByClassAliases()
+    public function testNotConfusedByClassAliases(): void
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
 
@@ -117,7 +117,7 @@ class DebugAutowiringCommandTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $kernel = static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);
         $command = (new Application($kernel))->addCommand(new DebugAutowiringCommand());

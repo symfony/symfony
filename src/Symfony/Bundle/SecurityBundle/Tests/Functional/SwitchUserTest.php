@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 class SwitchUserTest extends AbstractWebTestCase
 {
     #[DataProvider('getTestParameters')]
-    public function testSwitchUser($originalUser, $targetUser, $expectedUser, $expectedStatus)
+    public function testSwitchUser($originalUser, $targetUser, $expectedUser, $expectedStatus): void
     {
         $client = $this->createAuthenticatedClient($originalUser, ['root_config' => 'switchuser.yml']);
 
@@ -28,7 +28,7 @@ class SwitchUserTest extends AbstractWebTestCase
         $this->assertEquals($expectedUser, $client->getProfile()->getCollector('security')->getUser());
     }
 
-    public function testSwitchedUserCanSwitchToOther()
+    public function testSwitchedUserCanSwitchToOther(): void
     {
         $client = $this->createAuthenticatedClient('user_can_switch');
 
@@ -39,7 +39,7 @@ class SwitchUserTest extends AbstractWebTestCase
         $this->assertEquals('user_cannot_switch_2', $client->getProfile()->getCollector('security')->getUser());
     }
 
-    public function testSwitchedUserExit()
+    public function testSwitchedUserExit(): void
     {
         $client = $this->createAuthenticatedClient('user_can_switch');
 
@@ -50,7 +50,7 @@ class SwitchUserTest extends AbstractWebTestCase
         $this->assertEquals('user_can_switch', $client->getProfile()->getCollector('security')->getUser());
     }
 
-    public function testSwitchUserStateless()
+    public function testSwitchUserStateless(): void
     {
         $client = $this->createClient(['test_case' => 'JsonLogin', 'root_config' => 'switchuser_stateless.yml']);
         $client->request('POST', '/chk', [], [], ['HTTP_X_SWITCH_USER' => 'dunglas', 'CONTENT_TYPE' => 'application/json'], '{"user": {"login": "user_can_switch", "password": "test"}}');

@@ -36,7 +36,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
         $this->listener = new CheckRememberMeConditionsListener();
     }
 
-    public function testSuccessfulHttpLoginWithoutSupportingAuthenticator()
+    public function testSuccessfulHttpLoginWithoutSupportingAuthenticator(): void
     {
         $this->createHttpRequest();
 
@@ -47,7 +47,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
         $this->assertFalse($passport->hasBadge(RememberMeBadge::class));
     }
 
-    public function testSuccessfulJsonLoginWithoutSupportingAuthenticator()
+    public function testSuccessfulJsonLoginWithoutSupportingAuthenticator(): void
     {
         $this->createJsonRequest();
 
@@ -57,7 +57,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
         $this->assertFalse($passport->hasBadge(RememberMeBadge::class));
     }
 
-    public function testSuccessfulLoginWithoutRequestParameter()
+    public function testSuccessfulLoginWithoutRequestParameter(): void
     {
         $this->request = Request::create('/login');
         $this->response = new Response();
@@ -68,7 +68,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
         $this->assertFalse($passport->getBadge(RememberMeBadge::class)->isEnabled());
     }
 
-    public function testSuccessfulHttpLoginWhenRememberMeAlwaysIsTrue()
+    public function testSuccessfulHttpLoginWhenRememberMeAlwaysIsTrue(): void
     {
         $this->createHttpRequest();
 
@@ -79,7 +79,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
         $this->assertTrue($passport->getBadge(RememberMeBadge::class)->isEnabled());
     }
 
-    public function testSuccessfulJsonLoginWhenRememberMeAlwaysIsTrue()
+    public function testSuccessfulJsonLoginWhenRememberMeAlwaysIsTrue(): void
     {
         $this->createJsonRequest();
 
@@ -91,7 +91,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
     }
 
     #[DataProvider('provideRememberMeOptInValues')]
-    public function testSuccessfulHttpLoginWithOptInRequestParameter($optInValue)
+    public function testSuccessfulHttpLoginWithOptInRequestParameter($optInValue): void
     {
         $this->createHttpRequest();
 
@@ -104,7 +104,7 @@ class CheckRememberMeConditionsListenerTest extends TestCase
     }
 
     #[DataProvider('provideRememberMeOptInValues')]
-    public function testSuccessfulJsonLoginWithOptInRequestParameter($optInValue)
+    public function testSuccessfulJsonLoginWithOptInRequestParameter($optInValue): void
     {
         $this->createJsonRequest(['_remember_me' => $optInValue]);
 

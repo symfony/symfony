@@ -21,7 +21,7 @@ class DnsMockTest extends TestCase
         DnsMock::withMockedHosts([]);
     }
 
-    public function testCheckdnsrr()
+    public function testCheckdnsrr(): void
     {
         DnsMock::withMockedHosts(['example.com' => [['type' => 'MX']]]);
         $this->assertTrue(DnsMock::checkdnsrr('example.com'));
@@ -33,7 +33,7 @@ class DnsMockTest extends TestCase
         $this->assertFalse(DnsMock::checkdnsrr('foobar.com', 'ANY'));
     }
 
-    public function testGetmxrr()
+    public function testGetmxrr(): void
     {
         DnsMock::withMockedHosts([
             'example.com' => [[
@@ -49,7 +49,7 @@ class DnsMockTest extends TestCase
         $this->assertSame([10], $weight);
     }
 
-    public function testGethostbyaddr()
+    public function testGethostbyaddr(): void
     {
         DnsMock::withMockedHosts([
             'example.com' => [
@@ -69,7 +69,7 @@ class DnsMockTest extends TestCase
         $this->assertSame('example.com', DnsMock::gethostbyaddr('1.2.3.4'));
     }
 
-    public function testGethostbyname()
+    public function testGethostbyname(): void
     {
         DnsMock::withMockedHosts([
             'example.com' => [
@@ -88,7 +88,7 @@ class DnsMockTest extends TestCase
         $this->assertSame('1.2.3.4', DnsMock::gethostbyname('example.com'));
     }
 
-    public function testGethostbynamel()
+    public function testGethostbynamel(): void
     {
         DnsMock::withMockedHosts([
             'example.com' => [
@@ -107,7 +107,7 @@ class DnsMockTest extends TestCase
         $this->assertSame(['1.2.3.4', '2.3.4.5'], DnsMock::gethostbynamel('example.com'));
     }
 
-    public function testDnsGetRecord()
+    public function testDnsGetRecord(): void
     {
         DnsMock::withMockedHosts([
             'example.com' => [

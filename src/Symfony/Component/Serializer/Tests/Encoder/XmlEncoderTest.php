@@ -41,7 +41,7 @@ class XmlEncoderTest extends TestCase
     }
 
     #[DataProvider('validEncodeProvider')]
-    public function testEncode(string $expected, mixed $data, array $context = [])
+    public function testEncode(string $expected, mixed $data, array $context = []): void
     {
         $this->assertSame($expected, $this->encoder->encode($data, 'xml', $context));
     }
@@ -267,7 +267,7 @@ class XmlEncoderTest extends TestCase
         ];
     }
 
-    public function testEncodeSerializerXmlRootNodeNameOption()
+    public function testEncodeSerializerXmlRootNodeNameOption(): void
     {
         $options = ['xml_root_node_name' => 'test'];
         $this->encoder = new XmlEncoder();
@@ -284,7 +284,7 @@ class XmlEncoderTest extends TestCase
         $this->assertSame($expected, $serializer->serialize($array, 'xml', $options));
     }
 
-    public function testEncodeTraversableWhenNormalizable()
+    public function testEncodeTraversableWhenNormalizable(): void
     {
         $this->encoder = new XmlEncoder();
         $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
@@ -299,14 +299,14 @@ class XmlEncoderTest extends TestCase
         $this->assertSame($expected, $serializer->serialize(new NormalizableTraversableDummy(), 'xml'));
     }
 
-    public function testDocTypeIsNotAllowed()
+    public function testDocTypeIsNotAllowed(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Document types are not allowed.');
         $this->encoder->decode('<?xml version="1.0"?><!DOCTYPE foo><foo></foo>', 'foo');
     }
 
-    public function testDecodeScalar()
+    public function testDecodeScalar(): void
     {
         $source = '<?xml version="1.0"?>'."\n".
             '<response>foo</response>'."\n";
@@ -314,7 +314,7 @@ class XmlEncoderTest extends TestCase
         $this->assertSame('foo', $this->encoder->decode($source, 'xml'));
     }
 
-    public function testDecodeBigDigitAttributes()
+    public function testDecodeBigDigitAttributes(): void
     {
         $source = <<<XML
             <?xml version="1.0"?>
@@ -324,7 +324,7 @@ class XmlEncoderTest extends TestCase
         $this->assertSame(['@index' => 182077241760011681341821060401202210011000045913000000017100, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
     }
 
-    public function testDecodeNegativeIntAttribute()
+    public function testDecodeNegativeIntAttribute(): void
     {
         $source = <<<XML
             <?xml version="1.0"?>
@@ -334,7 +334,7 @@ class XmlEncoderTest extends TestCase
         $this->assertSame(['@index' => -1234, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
     }
 
-    public function testDecodeFloatAttribute()
+    public function testDecodeFloatAttribute(): void
     {
         $source = <<<XML
             <?xml version="1.0"?>
@@ -344,7 +344,7 @@ class XmlEncoderTest extends TestCase
         $this->assertSame(['@index' => 12.11, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
     }
 
-    public function testDecodeNegativeFloatAttribute()
+    public function testDecodeNegativeFloatAttribute(): void
     {
         $source = <<<XML
             <?xml version="1.0"?>
@@ -354,7 +354,7 @@ class XmlEncoderTest extends TestCase
         $this->assertSame(['@index' => -12.11, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
     }
 
-    public function testDecodeFloatAttributeWithZeroWholeNumber()
+    public function testDecodeFloatAttributeWithZeroWholeNumber(): void
     {
         $source = <<<XML
             <?xml version="1.0"?>
@@ -364,7 +364,7 @@ class XmlEncoderTest extends TestCase
         $this->assertSame(['@index' => 0.123, '#' => 'Name'], $this->encoder->decode($source, 'xml'));
     }
 
-    public function testNoTypeCastRootAttribute()
+    public function testNoTypeCastRootAttribute(): void
     {
         $source = <<<XML
             <?xml version="1.0"?>
@@ -379,7 +379,7 @@ class XmlEncoderTest extends TestCase
         $this->assertSame($expected, $data);
     }
 
-    public function testNoTypeCastAttribute()
+    public function testNoTypeCastAttribute(): void
     {
         $source = <<<XML
             <?xml version="1.0"?>
@@ -401,7 +401,7 @@ class XmlEncoderTest extends TestCase
         $this->assertSame($expected, $data);
     }
 
-    public function testDoesNotTypeCastStringsStartingWith0()
+    public function testDoesNotTypeCastStringsStartingWith0(): void
     {
         $source = <<<XML
             <?xml version="1.0"?>
@@ -412,13 +412,13 @@ class XmlEncoderTest extends TestCase
         $this->assertSame('018', $data['@a']);
     }
 
-    public function testEncodeException()
+    public function testEncodeException(): void
     {
         $this->expectException(NotEncodableValueException::class);
         $this->encoder->encode('Invalid character: '.\chr(7), 'xml');
     }
 
-    public function testDecode()
+    public function testDecode(): void
     {
         $source = $this->getXmlSource();
         $obj = $this->getObject();
@@ -426,7 +426,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals(get_object_vars($obj), $this->encoder->decode($source, 'xml'));
     }
 
-    public function testDecodeCdataWrapping()
+    public function testDecodeCdataWrapping(): void
     {
         $expected = [
             'firstname' => 'Paul <or Me>',
@@ -438,7 +438,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->decode($xml, 'xml'));
     }
 
-    public function testDecodeCdataWrappingAndWhitespace()
+    public function testDecodeCdataWrappingAndWhitespace(): void
     {
         $expected = [
             'firstname' => 'Paul <or Me>',
@@ -451,7 +451,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->decode($xml, 'xml'));
     }
 
-    public function testDecodeWithNamespace()
+    public function testDecodeWithNamespace(): void
     {
         $source = $this->getNamespacedXmlSource();
         $array = $this->getNamespacedArray();
@@ -470,7 +470,7 @@ class XmlEncoderTest extends TestCase
         ], $this->encoder->decode($source, 'xml'));
     }
 
-    public function testDecodeScalarWithAttribute()
+    public function testDecodeScalarWithAttribute(): void
     {
         $source = '<?xml version="1.0"?>'."\n".
             '<response><person eye-color="brown">Peter</person></response>'."\n";
@@ -482,7 +482,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
-    public function testDecodeScalarRootAttributes()
+    public function testDecodeScalarRootAttributes(): void
     {
         $source = '<?xml version="1.0"?>'."\n".
             '<person eye-color="brown">Peter</person>'."\n";
@@ -495,7 +495,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
-    public function testDecodeRootAttributes()
+    public function testDecodeRootAttributes(): void
     {
         $source = '<?xml version="1.0"?>'."\n".
             '<person eye-color="brown"><firstname>Peter</firstname><lastname>Mac Calloway</lastname></person>'."\n";
@@ -509,7 +509,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
-    public function testDecodeArray()
+    public function testDecodeArray(): void
     {
         $source = '<?xml version="1.0"?>'."\n".
             '<response>'.
@@ -529,7 +529,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
-    public function testDecodeXMLWithProcessInstruction()
+    public function testDecodeXMLWithProcessInstruction(): void
     {
         $source = <<<'XML'
             <?xml version="1.0"?>
@@ -567,7 +567,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals(get_object_vars($obj), $this->encoder->decode($source, 'xml'));
     }
 
-    public function testCDataNamePattern()
+    public function testCDataNamePattern(): void
     {
         $expected = <<<'XML'
             <?xml version="1.0"?>
@@ -584,7 +584,7 @@ class XmlEncoderTest extends TestCase
         ]));
     }
 
-    public function testDecodeIgnoreWhiteSpace()
+    public function testDecodeIgnoreWhiteSpace(): void
     {
         $source = <<<'XML'
             <?xml version="1.0"?>
@@ -607,7 +607,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
-    public function testDecodeIgnoreComments()
+    public function testDecodeIgnoreComments(): void
     {
         $source = <<<'XML'
             <?xml version="1.0"?>
@@ -634,7 +634,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
-    public function testDecodeIgnoreDocumentType()
+    public function testDecodeIgnoreDocumentType(): void
     {
         $source = <<<'XML'
             <?xml version="1.0"?>
@@ -661,7 +661,7 @@ class XmlEncoderTest extends TestCase
         ));
     }
 
-    public function testDecodePreserveComments()
+    public function testDecodePreserveComments(): void
     {
         $source = <<<'XML'
             <?xml version="1.0"?>
@@ -693,7 +693,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml'));
     }
 
-    public function testDecodeAlwaysAsCollection()
+    public function testDecodeAlwaysAsCollection(): void
     {
         $this->encoder = new XmlEncoder([XmlEncoder::ROOT_NODE_NAME => 'response']);
         $serializer = new Serializer([new CustomNormalizer()], ['xml' => new XmlEncoder()]);
@@ -720,7 +720,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->decode($source, 'xml', ['as_collection' => true]));
     }
 
-    public function testDecodeWithoutItemHash()
+    public function testDecodeWithoutItemHash(): void
     {
         $obj = new ScalarDummy();
         $obj->xmlFoo = [
@@ -753,19 +753,19 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->decode($xml, 'xml'));
     }
 
-    public function testDecodeInvalidXml()
+    public function testDecodeInvalidXml(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->encoder->decode('<?xml version="1.0"?><invalid><xml>', 'xml');
     }
 
-    public function testPreventsComplexExternalEntities()
+    public function testPreventsComplexExternalEntities(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->encoder->decode('<?xml version="1.0"?><!DOCTYPE scan[<!ENTITY test SYSTEM "php://filter/read=convert.base64-encode/resource=XmlEncoderTest.php">]><scan>&test;</scan>', 'xml');
     }
 
-    public function testDecodeEmptyXml()
+    public function testDecodeEmptyXml(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('Invalid XML data, it cannot be empty.');
@@ -846,7 +846,7 @@ class XmlEncoderTest extends TestCase
         return $obj;
     }
 
-    public function testEncodeXmlWithBoolValue()
+    public function testEncodeXmlWithBoolValue(): void
     {
         $expectedXml = <<<'XML'
             <?xml version="1.0"?>
@@ -859,7 +859,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expectedXml, $actualXml);
     }
 
-    public function testEncodeXmlWithDomNodeValue()
+    public function testEncodeXmlWithDomNodeValue(): void
     {
         $expectedXml = <<<'XML'
             <?xml version="1.0"?>
@@ -873,7 +873,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expectedXml, $actualXml);
     }
 
-    public function testEncodeXmlWithDateTimeObjectValue()
+    public function testEncodeXmlWithDateTimeObjectValue(): void
     {
         $xmlEncoder = $this->createXmlEncoderWithDateTimeNormalizer();
 
@@ -882,7 +882,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($this->createXmlWithDateTime(), $actualXml);
     }
 
-    public function testEncodeXmlWithDateTimeObjectField()
+    public function testEncodeXmlWithDateTimeObjectField(): void
     {
         $xmlEncoder = $this->createXmlEncoderWithDateTimeNormalizer();
 
@@ -891,7 +891,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($this->createXmlWithDateTimeField(), $actualXml);
     }
 
-    public function testNotEncodableValueExceptionMessageForAResource()
+    public function testNotEncodableValueExceptionMessageForAResource(): void
     {
         $this->expectException(NotEncodableValueException::class);
         $this->expectExceptionMessage('An unexpected value could not be serialized: stream resource');
@@ -899,7 +899,7 @@ class XmlEncoderTest extends TestCase
         (new XmlEncoder())->encode(tmpfile(), 'xml');
     }
 
-    public function testReentrantXmlEncoder()
+    public function testReentrantXmlEncoder(): void
     {
         $envelope = new EnvelopeObject();
         $message = new EnvelopedMessage();
@@ -916,7 +916,7 @@ class XmlEncoderTest extends TestCase
         $this->assertSame($expected, $encoder->encode($envelope, 'xml'));
     }
 
-    public function testEncodeComment()
+    public function testEncodeComment(): void
     {
         $expected = <<<'XML'
             <?xml version="1.0"?>
@@ -929,7 +929,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->encode($data, 'xml'));
     }
 
-    public function testEncodeWithoutPi()
+    public function testEncodeWithoutPi(): void
     {
         $encoder = new XmlEncoder([
             XmlEncoder::ROOT_NODE_NAME => 'response',
@@ -941,7 +941,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $encoder->encode([], 'xml'));
     }
 
-    public function testEncodeWithoutComment()
+    public function testEncodeWithoutComment(): void
     {
         $encoder = new XmlEncoder([
             XmlEncoder::ROOT_NODE_NAME => 'response',
@@ -959,7 +959,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $encoder->encode($data, 'xml'));
     }
 
-    public function testEncodeNan()
+    public function testEncodeNan(): void
     {
         $value = \NAN;
 
@@ -969,7 +969,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->encode($value, 'xml'));
     }
 
-    public function testEncodeInfinite()
+    public function testEncodeInfinite(): void
     {
         $value = \INF;
 
@@ -1041,7 +1041,7 @@ class XmlEncoderTest extends TestCase
 ', $this->exampleDateTimeString);
     }
 
-    public function testEncodeIgnoringEmptyAttribute()
+    public function testEncodeIgnoringEmptyAttribute(): void
     {
         $expected = <<<'XML'
             <?xml version="1.0"?>
@@ -1054,7 +1054,7 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->encode($data, 'xml', ['ignore_empty_attributes' => true]));
     }
 
-    public function testEncodeArrayAsItem()
+    public function testEncodeArrayAsItem(): void
     {
         $expected = <<<'XML'
             <?xml version="1.0"?>
@@ -1071,7 +1071,7 @@ class XmlEncoderTest extends TestCase
         ]));
     }
 
-    public function testDecodeArrayAsItem()
+    public function testDecodeArrayAsItem(): void
     {
         $source = <<<'XML'
             <?xml version="1.0"?>
@@ -1098,7 +1098,7 @@ class XmlEncoderTest extends TestCase
         ]));
     }
 
-    public function testEncodeEmptyArrayWithoutPreservingKeys()
+    public function testEncodeEmptyArrayWithoutPreservingKeys(): void
     {
         $source = ['person' => []];
         $expected = <<<'XML'

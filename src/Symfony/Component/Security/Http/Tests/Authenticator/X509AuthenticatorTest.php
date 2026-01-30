@@ -31,7 +31,7 @@ class X509AuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideServerVars')]
-    public function testAuthentication($username, $credentials)
+    public function testAuthentication($username, $credentials): void
     {
         $serverVars = [];
         if ('' !== $username) {
@@ -57,7 +57,7 @@ class X509AuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideServerVarsNoUser')]
-    public function testAuthenticationNoUser($emailAddress, $credentials)
+    public function testAuthenticationNoUser($emailAddress, $credentials): void
     {
         $request = $this->createRequest(['SSL_CLIENT_S_DN' => $credentials]);
 
@@ -80,14 +80,14 @@ class X509AuthenticatorTest extends TestCase
         yield ['firstname.lastname@mycompany.co.uk', 'emailAddress=firstname.lastname@mycompany.co.uk,CN=Firstname.Lastname,OU=london,OU=company design and engineering,OU=Issuer London,OU=Roaming,OU=Interactive,OU=Users,OU=Standard,OU=Business,DC=england,DC=core,DC=company,DC=co,DC=uk'];
     }
 
-    public function testSupportNoData()
+    public function testSupportNoData(): void
     {
         $request = $this->createRequest([]);
 
         $this->assertFalse($this->authenticator->supports($request));
     }
 
-    public function testAuthenticationCustomUserKey()
+    public function testAuthenticationCustomUserKey(): void
     {
         $authenticator = new X509Authenticator($this->userProvider, new TokenStorage(), 'main', 'TheUserKey');
 
@@ -102,7 +102,7 @@ class X509AuthenticatorTest extends TestCase
         $this->assertEquals('TheUser', $passport->getUser()->getUserIdentifier());
     }
 
-    public function testAuthenticationCustomCredentialsKey()
+    public function testAuthenticationCustomCredentialsKey(): void
     {
         $authenticator = new X509Authenticator($this->userProvider, new TokenStorage(), 'main', 'SSL_CLIENT_S_DN_Email', 'TheCertKey');
 
@@ -118,7 +118,7 @@ class X509AuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideServerVarsUserIdentifier')]
-    public function testAuthenticationCustomCredentialsUserIdentifier($username, $credentials)
+    public function testAuthenticationCustomCredentialsUserIdentifier($username, $credentials): void
     {
         $authenticator = new X509Authenticator($this->userProvider, new TokenStorage(), 'main', 'SSL_CLIENT_S_DN_Email', 'SSL_CLIENT_S_DN', null, 'CN');
 

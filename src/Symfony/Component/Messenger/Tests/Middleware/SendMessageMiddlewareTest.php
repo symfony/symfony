@@ -30,7 +30,7 @@ use Symfony\Component\Messenger\Transport\Sender\SendersLocator;
 
 class SendMessageMiddlewareTest extends MiddlewareTestCase
 {
-    public function testItSendsTheMessageToAssignedSender()
+    public function testItSendsTheMessageToAssignedSender(): void
     {
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
@@ -48,7 +48,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $this->assertSame($sender::class, $stamp->getSenderClass());
     }
 
-    public function testItSendsTheMessageToMultipleSenders()
+    public function testItSendsTheMessageToMultipleSenders(): void
     {
         $envelope = new Envelope(new DummyMessage('Hey'));
         $sender = $this->createMock(SenderInterface::class);
@@ -82,7 +82,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $this->assertCount(2, $sentStamps);
     }
 
-    public function testItSendsTheMessageToAssignedSenderWithPreWrappedMessage()
+    public function testItSendsTheMessageToAssignedSenderWithPreWrappedMessage(): void
     {
         $envelope = new Envelope(new ChildDummyMessage('Hey'));
         $sender = $this->createMock(SenderInterface::class);
@@ -95,7 +95,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock(false));
     }
 
-    public function testItSendsTheMessageBasedOnTheMessageParentClass()
+    public function testItSendsTheMessageBasedOnTheMessageParentClass(): void
     {
         $message = new ChildDummyMessage('Hey');
         $envelope = new Envelope($message);
@@ -109,7 +109,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock(false));
     }
 
-    public function testItSendsTheMessageBasedOnTheMessageInterface()
+    public function testItSendsTheMessageBasedOnTheMessageInterface(): void
     {
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
@@ -123,7 +123,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock(false));
     }
 
-    public function testItSendsTheMessageBasedOnWildcard()
+    public function testItSendsTheMessageBasedOnWildcard(): void
     {
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
@@ -137,7 +137,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock(false));
     }
 
-    public function testItCallsTheNextMiddlewareWhenNoSenderForThisMessage()
+    public function testItCallsTheNextMiddlewareWhenNoSenderForThisMessage(): void
     {
         $message = new DummyMessage('Hey');
         $envelope = new Envelope($message);
@@ -147,7 +147,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock());
     }
 
-    public function testItSkipsReceivedMessages()
+    public function testItSkipsReceivedMessages(): void
     {
         $envelope = (new Envelope(new DummyMessage('Hey')))->with(new ReceivedStamp('transport'));
 
@@ -163,7 +163,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $this->assertNull($envelope->last(SentStamp::class), 'it does not add sent stamp for received messages');
     }
 
-    public function testItDispatchesTheEventOneTime()
+    public function testItDispatchesTheEventOneTime(): void
     {
         $envelope = new Envelope(new DummyMessage('original envelope'));
 
@@ -177,7 +177,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         ];
         $dispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->willReturnCallback(function (object $event) use (&$expectedEvents) {
+            ->willReturnCallback(function (object $event) use (&$expectedEvents): void {
                 $expectedEvent = array_shift($expectedEvents);
 
                 $this->assertEquals($expectedEvent, $event);
@@ -192,7 +192,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock(false));
     }
 
-    public function testItDoesNotDispatchWithNoSenders()
+    public function testItDoesNotDispatchWithNoSenders(): void
     {
         $envelope = new Envelope(new DummyMessage('original envelope'));
 
@@ -204,7 +204,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock());
     }
 
-    public function testThrowsNoRoutingException()
+    public function testThrowsNoRoutingException(): void
     {
         $envelope = new Envelope(new DummyMessage('original envelope'));
 
@@ -217,7 +217,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         $middleware->handle($envelope, $this->getStackMock(false));
     }
 
-    public function testAllowNoRouting()
+    public function testAllowNoRouting(): void
     {
         $envelope = new Envelope(new DummyMessage('original envelope'));
 
@@ -230,7 +230,7 @@ class SendMessageMiddlewareTest extends MiddlewareTestCase
         ];
         $dispatcher->expects($this->exactly(2))
             ->method('dispatch')
-            ->willReturnCallback(function (object $event) use (&$expectedEvents) {
+            ->willReturnCallback(function (object $event) use (&$expectedEvents): void {
                 $expectedEvent = array_shift($expectedEvents);
 
                 $this->assertEquals($expectedEvent, $event);

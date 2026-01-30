@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class CardSchemeTest extends TestCase
 {
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(CardSchemeDummy::class);
         $loader = new AttributeLoader();
@@ -39,7 +39,7 @@ class CardSchemeTest extends TestCase
         self::assertSame('some attached data', $cConstraint->payload);
     }
 
-    public function testMissingSchemes()
+    public function testMissingSchemes(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage(\sprintf('The options "schemes" must be set for constraint "%s".', CardScheme::class));

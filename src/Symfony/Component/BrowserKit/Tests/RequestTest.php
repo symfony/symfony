@@ -16,43 +16,43 @@ use Symfony\Component\BrowserKit\Request;
 
 class RequestTest extends TestCase
 {
-    public function testGetUri()
+    public function testGetUri(): void
     {
         $request = new Request('http://www.example.com/', 'get');
         $this->assertEquals('http://www.example.com/', $request->getUri(), '->getUri() returns the URI of the request');
     }
 
-    public function testGetMethod()
+    public function testGetMethod(): void
     {
         $request = new Request('http://www.example.com/', 'get');
         $this->assertEquals('get', $request->getMethod(), '->getMethod() returns the method of the request');
     }
 
-    public function testGetParameters()
+    public function testGetParameters(): void
     {
         $request = new Request('http://www.example.com/', 'get', ['foo' => 'bar']);
         $this->assertEquals(['foo' => 'bar'], $request->getParameters(), '->getParameters() returns the parameters of the request');
     }
 
-    public function testGetFiles()
+    public function testGetFiles(): void
     {
         $request = new Request('http://www.example.com/', 'get', [], ['foo' => 'bar']);
         $this->assertEquals(['foo' => 'bar'], $request->getFiles(), '->getFiles() returns the uploaded files of the request');
     }
 
-    public function testGetCookies()
+    public function testGetCookies(): void
     {
         $request = new Request('http://www.example.com/', 'get', [], [], ['foo' => 'bar']);
         $this->assertEquals(['foo' => 'bar'], $request->getCookies(), '->getCookies() returns the cookies of the request');
     }
 
-    public function testGetServer()
+    public function testGetServer(): void
     {
         $request = new Request('http://www.example.com/', 'get', [], [], [], ['foo' => 'bar']);
         $this->assertEquals(['foo' => 'bar'], $request->getServer(), '->getServer() returns the server parameters of the request');
     }
 
-    public function testAllParameterValuesAreConvertedToString()
+    public function testAllParameterValuesAreConvertedToString(): void
     {
         $parameters = [
             'foo' => 1,

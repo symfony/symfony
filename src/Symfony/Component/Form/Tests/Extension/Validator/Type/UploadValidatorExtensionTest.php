@@ -28,7 +28,7 @@ class UploadValidatorExtensionTest extends TypeTestCase
         parent::setUp();
     }
 
-    public function testPostMaxSizeTranslation()
+    public function testPostMaxSizeTranslation(): void
     {
         $extension = new UploadValidatorExtension(new DummyTranslator());
 

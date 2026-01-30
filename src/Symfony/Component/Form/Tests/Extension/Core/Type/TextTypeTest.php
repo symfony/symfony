@@ -18,12 +18,12 @@ class TextTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = TextType::class;
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    public function testSubmitNullReturnsNullWithEmptyDataAsString()
+    public function testSubmitNullReturnsNullWithEmptyDataAsString(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, 'name', array_merge($this->getTestOptions(), [
             'empty_data' => '',
@@ -48,7 +48,7 @@ class TextTypeTest extends BaseTypeTestCase
      * @see https://github.com/symfony/symfony/issues/1986
      */
     #[DataProvider('provideZeros')]
-    public function testSetDataThroughParamsWithZero($data, $dataAsString)
+    public function testSetDataThroughParamsWithZero($data, $dataAsString): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, array_merge($this->getTestOptions(), [
             'data' => $data,

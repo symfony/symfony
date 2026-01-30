@@ -19,28 +19,28 @@ use Symfony\Component\Console\Formatter\NullOutputFormatterStyle;
  */
 class NullOutputFormatterStyleTest extends TestCase
 {
-    public function testApply()
+    public function testApply(): void
     {
         $style = new NullOutputFormatterStyle();
 
         $this->assertSame('foo', $style->apply('foo'));
     }
 
-    public function testSetForeground()
+    public function testSetForeground(): void
     {
         $style = new NullOutputFormatterStyle();
         $style->setForeground('black');
         $this->assertSame('foo', $style->apply('foo'));
     }
 
-    public function testSetBackground()
+    public function testSetBackground(): void
     {
         $style = new NullOutputFormatterStyle();
         $style->setBackground('blue');
         $this->assertSame('foo', $style->apply('foo'));
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $style = new NullOutputFormatterStyle();
 

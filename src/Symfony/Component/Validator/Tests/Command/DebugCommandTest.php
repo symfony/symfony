@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Tests\Dummy\DummyClassOne;
  */
 class DebugCommandTest extends TestCase
 {
-    public function testOutputWithClassArgument()
+    public function testOutputWithClassArgument(): void
     {
         $command = new DebugCommand(new LazyLoadingMetadataFactory(new AttributeLoader()));
 
@@ -79,7 +79,7 @@ class DebugCommandTest extends TestCase
         );
     }
 
-    public function testOutputWithPathArgument()
+    public function testOutputWithPathArgument(): void
     {
         $command = new DebugCommand(new LazyLoadingMetadataFactory(new AttributeLoader()));
 
@@ -177,7 +177,7 @@ class DebugCommandTest extends TestCase
         );
     }
 
-    public function testOutputWithInvalidClassArgument()
+    public function testOutputWithInvalidClassArgument(): void
     {
         $command = new DebugCommand(new LazyLoadingMetadataFactory());
 

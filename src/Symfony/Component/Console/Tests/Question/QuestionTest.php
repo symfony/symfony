@@ -29,35 +29,35 @@ class QuestionTest extends TestCase
         return [[true], [false]];
     }
 
-    public function testGetQuestion()
+    public function testGetQuestion(): void
     {
         self::assertSame('Test question', $this->question->getQuestion());
     }
 
-    public function testGetDefault()
+    public function testGetDefault(): void
     {
         $question = new Question('Test question', 'Default value');
         self::assertSame('Default value', $question->getDefault());
     }
 
-    public function testGetDefaultDefault()
+    public function testGetDefaultDefault(): void
     {
         self::assertNull($this->question->getDefault());
     }
 
     #[DataProvider('providerTrueFalse')]
-    public function testIsSetHidden(bool $hidden)
+    public function testIsSetHidden(bool $hidden): void
     {
         $this->question->setHidden($hidden);
         self::assertSame($hidden, $this->question->isHidden());
     }
 
-    public function testIsHiddenDefault()
+    public function testIsHiddenDefault(): void
     {
         self::assertFalse($this->question->isHidden());
     }
 
-    public function testSetHiddenWithAutocompleterCallback()
+    public function testSetHiddenWithAutocompleterCallback(): void
     {
         $this->question->setAutocompleterCallback(
             static fn (string $input): array => []
@@ -71,7 +71,7 @@ class QuestionTest extends TestCase
         $this->question->setHidden(true);
     }
 
-    public function testSetHiddenWithNoAutocompleterCallback()
+    public function testSetHiddenWithNoAutocompleterCallback(): void
     {
         $this->question->setAutocompleterCallback(
             static fn (string $input): array => []
@@ -89,13 +89,13 @@ class QuestionTest extends TestCase
     }
 
     #[DataProvider('providerTrueFalse')]
-    public function testIsSetHiddenFallback(bool $hidden)
+    public function testIsSetHiddenFallback(bool $hidden): void
     {
         $this->question->setHiddenFallback($hidden);
         self::assertSame($hidden, $this->question->isHiddenFallback());
     }
 
-    public function testIsHiddenFallbackDefault()
+    public function testIsHiddenFallbackDefault(): void
     {
         self::assertTrue($this->question->isHiddenFallback());
     }
@@ -120,7 +120,7 @@ class QuestionTest extends TestCase
     }
 
     #[DataProvider('providerGetSetAutocompleterValues')]
-    public function testGetSetAutocompleterValues($values, $expectValues)
+    public function testGetSetAutocompleterValues($values, $expectValues): void
     {
         $this->question->setAutocompleterValues($values);
         self::assertSame(
@@ -139,14 +139,14 @@ class QuestionTest extends TestCase
     }
 
     #[DataProvider('providerSetAutocompleterValuesInvalid')]
-    public function testSetAutocompleterValuesInvalid($values)
+    public function testSetAutocompleterValuesInvalid($values): void
     {
         self::expectException(\TypeError::class);
 
         $this->question->setAutocompleterValues($values);
     }
 
-    public function testSetAutocompleterValuesWithTraversable()
+    public function testSetAutocompleterValuesWithTraversable(): void
     {
         $question1 = new Question('Test question 1');
         $iterator1 = $this->createMock(\IteratorAggregate::class);
@@ -172,12 +172,12 @@ class QuestionTest extends TestCase
         self::assertSame(['Carrot'], $question2->getAutocompleterValues());
     }
 
-    public function testGetAutocompleterValuesDefault()
+    public function testGetAutocompleterValuesDefault(): void
     {
         self::assertNull($this->question->getAutocompleterValues());
     }
 
-    public function testGetSetAutocompleterCallback()
+    public function testGetSetAutocompleterCallback(): void
     {
         $callback = static fn (string $input): array => [];
 
@@ -185,12 +185,12 @@ class QuestionTest extends TestCase
         self::assertSame($callback, $this->question->getAutocompleterCallback());
     }
 
-    public function testGetAutocompleterCallbackDefault()
+    public function testGetAutocompleterCallbackDefault(): void
     {
         self::assertNull($this->question->getAutocompleterCallback());
     }
 
-    public function testSetAutocompleterCallbackWhenHidden()
+    public function testSetAutocompleterCallbackWhenHidden(): void
     {
         $this->question->setHidden(true);
 
@@ -204,7 +204,7 @@ class QuestionTest extends TestCase
         );
     }
 
-    public function testSetAutocompleterCallbackWhenNotHidden()
+    public function testSetAutocompleterCallbackWhenNotHidden(): void
     {
         $this->question->setHidden(true);
         $this->question->setHidden(false);
@@ -230,13 +230,13 @@ class QuestionTest extends TestCase
     }
 
     #[DataProvider('providerGetSetValidator')]
-    public function testGetSetValidator($callback)
+    public function testGetSetValidator($callback): void
     {
         $this->question->setValidator($callback);
         self::assertSame($callback, $this->question->getValidator());
     }
 
-    public function testGetValidatorDefault()
+    public function testGetValidatorDefault(): void
     {
         self::assertNull($this->question->getValidator());
     }
@@ -247,7 +247,7 @@ class QuestionTest extends TestCase
     }
 
     #[DataProvider('providerGetSetMaxAttempts')]
-    public function testGetSetMaxAttempts($attempts)
+    public function testGetSetMaxAttempts($attempts): void
     {
         $this->question->setMaxAttempts($attempts);
         self::assertSame($attempts, $this->question->getMaxAttempts());
@@ -259,7 +259,7 @@ class QuestionTest extends TestCase
     }
 
     #[DataProvider('providerSetMaxAttemptsInvalid')]
-    public function testSetMaxAttemptsInvalid($attempts)
+    public function testSetMaxAttemptsInvalid($attempts): void
     {
         self::expectException(\InvalidArgumentException::class);
         self::expectExceptionMessage('Maximum number of attempts must be a positive value.');
@@ -267,31 +267,31 @@ class QuestionTest extends TestCase
         $this->question->setMaxAttempts($attempts);
     }
 
-    public function testGetMaxAttemptsDefault()
+    public function testGetMaxAttemptsDefault(): void
     {
         self::assertNull($this->question->getMaxAttempts());
     }
 
-    public function testGetSetNormalizer()
+    public function testGetSetNormalizer(): void
     {
         $normalizer = static fn ($input) => $input;
         $this->question->setNormalizer($normalizer);
         self::assertSame($normalizer, $this->question->getNormalizer());
     }
 
-    public function testGetNormalizerDefault()
+    public function testGetNormalizerDefault(): void
     {
         self::assertNull($this->question->getNormalizer());
     }
 
     #[DataProvider('providerTrueFalse')]
-    public function testSetMultiline(bool $multiline)
+    public function testSetMultiline(bool $multiline): void
     {
         self::assertSame($this->question, $this->question->setMultiline($multiline));
         self::assertSame($multiline, $this->question->isMultiline());
     }
 
-    public function testIsMultilineDefault()
+    public function testIsMultilineDefault(): void
     {
         self::assertFalse($this->question->isMultiline());
     }

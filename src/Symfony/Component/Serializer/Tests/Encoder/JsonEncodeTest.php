@@ -26,14 +26,14 @@ class JsonEncodeTest extends TestCase
         $this->encode = new JsonEncode();
     }
 
-    public function testSupportsEncoding()
+    public function testSupportsEncoding(): void
     {
         $this->assertTrue($this->encode->supportsEncoding(JsonEncoder::FORMAT));
         $this->assertFalse($this->encode->supportsEncoding('foobar'));
     }
 
     #[DataProvider('encodeProvider')]
-    public function testEncode($toEncode, $expected, $context)
+    public function testEncode($toEncode, $expected, $context): void
     {
         $this->assertEquals(
             $expected,
@@ -51,7 +51,7 @@ class JsonEncodeTest extends TestCase
         ];
     }
 
-    public function testEncodeWithError()
+    public function testEncodeWithError(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->encode->encode("\xB1\x31", JsonEncoder::FORMAT);

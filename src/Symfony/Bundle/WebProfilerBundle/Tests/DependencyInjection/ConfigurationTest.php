@@ -19,7 +19,7 @@ use Symfony\Component\Config\Definition\Processor;
 class ConfigurationTest extends TestCase
 {
     #[DataProvider('getDebugModes')]
-    public function testConfigTree(array $options, array $expectedResult)
+    public function testConfigTree(array $options, array $expectedResult): void
     {
         $processor = new Processor();
         $configuration = new Configuration();
@@ -79,7 +79,7 @@ class ConfigurationTest extends TestCase
     }
 
     #[DataProvider('getInterceptRedirectsConfiguration')]
-    public function testConfigTreeUsingInterceptRedirects(bool $interceptRedirects, array $expectedResult)
+    public function testConfigTreeUsingInterceptRedirects(bool $interceptRedirects, array $expectedResult): void
     {
         $processor = new Processor();
         $configuration = new Configuration();

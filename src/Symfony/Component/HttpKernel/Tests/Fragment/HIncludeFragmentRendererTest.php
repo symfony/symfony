@@ -21,21 +21,21 @@ use Twig\Loader\ArrayLoader;
 
 class HIncludeFragmentRendererTest extends TestCase
 {
-    public function testRenderExceptionWhenControllerAndNoSigner()
+    public function testRenderExceptionWhenControllerAndNoSigner(): void
     {
         $this->expectException(\LogicException::class);
         $strategy = new HIncludeFragmentRenderer();
         $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'));
     }
 
-    public function testRenderWithControllerAndSigner()
+    public function testRenderWithControllerAndSigner(): void
     {
         $strategy = new HIncludeFragmentRenderer(null, new UriSigner('foo'));
 
         $this->assertMatchesRegularExpression('#^<hx:include src="/_fragment\?_hash=.+&amp;_path=_format%3Dhtml%26_locale%3Den%26_controller%3Dmain_controller"></hx:include>$#', $strategy->render(new ControllerReference('main_controller', [], []), Request::create('/'))->getContent());
     }
 
-    public function testRenderWithUri()
+    public function testRenderWithUri(): void
     {
         $strategy = new HIncludeFragmentRenderer();
         $this->assertEquals('<hx:include src="/foo"></hx:include>', $strategy->render('/foo', Request::create('/'))->getContent());
@@ -44,7 +44,7 @@ class HIncludeFragmentRendererTest extends TestCase
         $this->assertEquals('<hx:include src="/foo"></hx:include>', $strategy->render('/foo', Request::create('/'))->getContent());
     }
 
-    public function testRenderWithDefault()
+    public function testRenderWithDefault(): void
     {
         // only default
         $strategy = new HIncludeFragmentRenderer();
@@ -59,7 +59,7 @@ class HIncludeFragmentRendererTest extends TestCase
         $this->assertEquals('<hx:include src="/foo">default</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'default'])->getContent());
     }
 
-    public function testRenderWithAttributesOptions()
+    public function testRenderWithAttributesOptions(): void
     {
         // with id
         $strategy = new HIncludeFragmentRenderer();
@@ -74,7 +74,7 @@ class HIncludeFragmentRendererTest extends TestCase
         $this->assertEquals('<hx:include src="/foo" p1="v1" p2="v2" id="bar">default</hx:include>', $strategy->render('/foo', Request::create('/'), ['default' => 'default', 'id' => 'bar', 'attributes' => ['p1' => 'v1', 'p2' => 'v2']])->getContent());
     }
 
-    public function testRenderWithTwigAndDefaultText()
+    public function testRenderWithTwigAndDefaultText(): void
     {
         $twig = new Environment($loader = new ArrayLoader());
         $strategy = new HIncludeFragmentRenderer($twig);

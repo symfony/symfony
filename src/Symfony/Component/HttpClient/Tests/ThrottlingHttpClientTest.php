@@ -20,13 +20,13 @@ use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 
 class ThrottlingHttpClientTest extends TestCase
 {
-    public function testThrottling()
+    public function testThrottling(): void
     {
-        $failPauseHandler = static function (float $duration) {
+        $failPauseHandler = static function (float $duration): void {
             self::fail(\sprintf('The pause handler should\'t have been called, but it was called with %f.', $duration));
         };
 
-        $pauseHandler = static fn (float $expectedDuration) => static function (float $duration) use ($expectedDuration) {
+        $pauseHandler = static fn (float $expectedDuration) => static function (float $duration) use ($expectedDuration): void {
             self::assertEqualsWithDelta($expectedDuration, $duration, 1);
         };
 

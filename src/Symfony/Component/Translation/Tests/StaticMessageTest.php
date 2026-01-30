@@ -18,7 +18,7 @@ use Symfony\Component\Translation\Translator;
 
 class StaticMessageTest extends TestCase
 {
-    public function testTrans()
+    public function testTrans(): void
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());

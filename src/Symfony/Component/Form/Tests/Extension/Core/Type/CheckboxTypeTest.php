@@ -20,7 +20,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = CheckboxType::class;
 
-    public function testDataIsFalseByDefault()
+    public function testDataIsFalseByDefault(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
 
@@ -29,7 +29,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
         $this->assertNull($form->getViewData());
     }
 
-    public function testPassValueToView()
+    public function testPassValueToView(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, ['value' => 'foobar'])
             ->createView();
@@ -37,7 +37,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
         $this->assertEquals('foobar', $view->vars['value']);
     }
 
-    public function testCheckedIfDataTrue()
+    public function testCheckedIfDataTrue(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE)
             ->setData(true)
@@ -46,7 +46,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
         $this->assertTrue($view->vars['checked']);
     }
 
-    public function testCheckedIfDataTrueWithEmptyValue()
+    public function testCheckedIfDataTrueWithEmptyValue(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, ['value' => ''])
             ->setData(true)
@@ -55,7 +55,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
         $this->assertTrue($view->vars['checked']);
     }
 
-    public function testNotCheckedIfDataFalse()
+    public function testNotCheckedIfDataFalse(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE)
             ->setData(false)
@@ -64,7 +64,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
         $this->assertFalse($view->vars['checked']);
     }
 
-    public function testSubmitWithValueChecked()
+    public function testSubmitWithValueChecked(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'value' => 'foobar',
@@ -75,7 +75,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
         $this->assertEquals('foobar', $form->getViewData());
     }
 
-    public function testSubmitWithRandomValueChecked()
+    public function testSubmitWithRandomValueChecked(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'value' => 'foobar',
@@ -86,7 +86,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
         $this->assertEquals('foobar', $form->getViewData());
     }
 
-    public function testSubmitWithValueUnchecked()
+    public function testSubmitWithValueUnchecked(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'value' => 'foobar',
@@ -97,7 +97,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
         $this->assertNull($form->getViewData());
     }
 
-    public function testSubmitWithEmptyValueChecked()
+    public function testSubmitWithEmptyValueChecked(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'value' => '',
@@ -108,7 +108,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
         $this->assertSame('', $form->getViewData());
     }
 
-    public function testSubmitWithEmptyValueUnchecked()
+    public function testSubmitWithEmptyValueUnchecked(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'value' => '',
@@ -119,7 +119,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
         $this->assertNull($form->getViewData());
     }
 
-    public function testSubmitWithEmptyValueAndFalseUnchecked()
+    public function testSubmitWithEmptyValueAndFalseUnchecked(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'value' => '',
@@ -130,7 +130,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
         $this->assertNull($form->getViewData());
     }
 
-    public function testSubmitWithEmptyValueAndTrueChecked()
+    public function testSubmitWithEmptyValueAndTrueChecked(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'value' => '',
@@ -142,7 +142,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('provideCustomModelTransformerData')]
-    public function testCustomModelTransformer($data, $checked)
+    public function testCustomModelTransformer($data, $checked): void
     {
         // present a binary status field as a checkbox
         $transformer = new CallbackTransformer(
@@ -171,7 +171,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('provideCustomFalseValues')]
-    public function testCustomFalseValues($falseValue)
+    public function testCustomFalseValues($falseValue): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'false_values' => [$falseValue],
@@ -189,7 +189,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
         ];
     }
 
-    public function testDontAllowNonArrayFalseValues()
+    public function testDontAllowNonArrayFalseValues(): void
     {
         $this->expectException(InvalidOptionsException::class);
         $this->expectExceptionMessageMatches('/"false_values" with value "invalid" is expected to be of type "array"/');
@@ -198,12 +198,12 @@ class CheckboxTypeTest extends BaseTypeTestCase
         ]);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull(false, false, null);
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = true)
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = true): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => $emptyData,
@@ -216,7 +216,7 @@ class CheckboxTypeTest extends BaseTypeTestCase
         $this->assertSame($expectedData, $form->getData());
     }
 
-    public function testSubmitNullIsEmpty()
+    public function testSubmitNullIsEmpty(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE);
 

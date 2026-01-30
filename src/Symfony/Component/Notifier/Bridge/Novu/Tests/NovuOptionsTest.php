@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Novu\NovuOptions;
 
 class NovuOptionsTest extends TestCase
 {
-    public function testToArray()
+    public function testToArray(): void
     {
         $options = new NovuOptions(
             123,

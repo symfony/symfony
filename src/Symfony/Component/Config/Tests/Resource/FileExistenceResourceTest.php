@@ -34,17 +34,17 @@ class FileExistenceResourceTest extends TestCase
         }
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertSame('existence.'.$this->file, (string) $this->resource);
     }
 
-    public function testGetResource()
+    public function testGetResource(): void
     {
         $this->assertSame($this->file, $this->resource->getResource(), '->getResource() returns the path to the resource');
     }
 
-    public function testIsFreshWithExistingResource()
+    public function testIsFreshWithExistingResource(): void
     {
         touch($this->file, $this->time);
         $serialized = serialize(new FileExistenceResource($this->file));
@@ -57,7 +57,7 @@ class FileExistenceResourceTest extends TestCase
         $this->assertFalse($resource->isFresh($this->time), '->isFresh() returns false if the resource has been deleted');
     }
 
-    public function testIsFreshWithAbsentResource()
+    public function testIsFreshWithAbsentResource(): void
     {
         $serialized = serialize(new FileExistenceResource($this->file));
 

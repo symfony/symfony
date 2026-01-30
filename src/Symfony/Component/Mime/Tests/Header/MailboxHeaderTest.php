@@ -17,14 +17,14 @@ use Symfony\Component\Mime\Header\MailboxHeader;
 
 class MailboxHeaderTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $header = new MailboxHeader('Sender', $address = new Address('fabien@symfony.com'));
         $this->assertEquals($address, $header->getAddress());
         $this->assertEquals($address, $header->getBody());
     }
 
-    public function testAddress()
+    public function testAddress(): void
     {
         $header = new MailboxHeader('Sender', new Address('fabien@symfony.com'));
         $header->setBody($address = new Address('helene@symfony.com'));
@@ -35,7 +35,7 @@ class MailboxHeaderTest extends TestCase
         $this->assertEquals($address, $header->getBody());
     }
 
-    public function testgetBodyAsString()
+    public function testgetBodyAsString(): void
     {
         $header = new MailboxHeader('Sender', new Address('fabien@symfony.com'));
         $this->assertEquals('fabien@symfony.com', $header->getBodyAsString());
@@ -58,7 +58,7 @@ class MailboxHeaderTest extends TestCase
         $this->assertEquals('Fabien =?'.$header->getCharset().'?Q?P=8Ftencier?= <fabien@symfony.com>', $header->getBodyAsString());
     }
 
-    public function testUtf8CharsInLocalPart()
+    public function testUtf8CharsInLocalPart(): void
     {
         $header = new MailboxHeader('Sender', new Address('fabïen@symfony.com'));
         $this->assertSame('fabïen@symfony.com', $header->getBodyAsString());
@@ -72,7 +72,7 @@ class MailboxHeaderTest extends TestCase
         $this->assertSame('=?utf-8?Q?Fab=C3=AFen__P=C3=B6tencier?= <fabïen@symfony.com>', $header->getBodyAsString());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $header = new MailboxHeader('Sender', new Address('fabien@symfony.com'));
         $this->assertEquals('Sender: fabien@symfony.com', $header->toString());

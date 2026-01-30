@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Firewall\ChannelListener;
 
 class ChannelListenerTest extends TestCase
 {
-    public function testHandleWithNotSecuredRequestAndHttpChannel()
+    public function testHandleWithNotSecuredRequestAndHttpChannel(): void
     {
         $request = Request::create('http://symfony.com');
 
@@ -34,7 +34,7 @@ class ChannelListenerTest extends TestCase
         $this->assertFalse($listener->supports($request));
     }
 
-    public function testHandleWithSecuredRequestAndHttpsChannel()
+    public function testHandleWithSecuredRequestAndHttpsChannel(): void
     {
         $request = Request::create('https://symfony.com');
 
@@ -45,7 +45,7 @@ class ChannelListenerTest extends TestCase
         $this->assertFalse($listener->supports($request));
     }
 
-    public function testHandleWithNotSecuredRequestAndHttpsChannel()
+    public function testHandleWithNotSecuredRequestAndHttpsChannel(): void
     {
         $request = Request::create('http://symfony.com');
 
@@ -64,7 +64,7 @@ class ChannelListenerTest extends TestCase
         $this->assertEquals('https://symfony.com/', $response->getTargetUrl());
     }
 
-    public function testHandleWithSecuredRequestAndHttpChannel()
+    public function testHandleWithSecuredRequestAndHttpChannel(): void
     {
         $request = Request::create('https://symfony.com');
 
@@ -83,7 +83,7 @@ class ChannelListenerTest extends TestCase
         $this->assertEquals('http://symfony.com/', $response->getTargetUrl());
     }
 
-    public function testSupportsWithoutHeaders()
+    public function testSupportsWithoutHeaders(): void
     {
         $request = Request::create('http://symfony.com');
         $request->headers = new HeaderBag();

@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\CheckAliasValidityPass\
 
 class CheckAliasValidityPassTest extends TestCase
 {
-    public function testProcessDetectsClassNotImplementingAliasedInterface()
+    public function testProcessDetectsClassNotImplementingAliasedInterface(): void
     {
         $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
@@ -32,7 +32,7 @@ class CheckAliasValidityPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcessAcceptsClassImplementingAliasedInterface()
+    public function testProcessAcceptsClassImplementingAliasedInterface(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->setClass(FooImplementing::class);
@@ -42,7 +42,7 @@ class CheckAliasValidityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessIgnoresArbitraryAlias()
+    public function testProcessIgnoresArbitraryAlias(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->setClass(FooImplementing::class);
@@ -52,7 +52,7 @@ class CheckAliasValidityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessIgnoresTargetWithFactory()
+    public function testProcessIgnoresTargetWithFactory(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->setFactory(new Reference('foo'));
@@ -62,7 +62,7 @@ class CheckAliasValidityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessIgnoresTargetWithoutClass()
+    public function testProcessIgnoresTargetWithoutClass(): void
     {
         $container = new ContainerBuilder();
         $container->register('a');

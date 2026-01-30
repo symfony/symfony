@@ -19,7 +19,7 @@ use Symfony\Component\Config\FileLocator;
 
 class DefinitionFileLoaderTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $loader = new DefinitionFileLoader(new TreeBuilder('test'), new FileLocator());
 
@@ -28,7 +28,7 @@ class DefinitionFileLoaderTest extends TestCase
         $this->assertTrue($loader->supports('with_wrong_ext.yml', 'php'), '->supports() returns true if the resource with forced type is loadable');
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new DefinitionFileLoader($treeBuilder = new TreeBuilder('test'), new FileLocator());
         $loader->load(__DIR__.'/../../Fixtures/Loader/node_simple.php');

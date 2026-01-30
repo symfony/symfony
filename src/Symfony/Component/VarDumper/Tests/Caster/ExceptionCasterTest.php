@@ -53,7 +53,7 @@ class ExceptionCasterTest extends TestCase
         ExceptionCaster::$traceArgs = true;
     }
 
-    public function testDefaultSettings()
+    public function testDefaultSettings(): void
     {
         $ref = ['foo'];
         $e = $this->getTestException('foo', $ref);
@@ -79,7 +79,7 @@ class ExceptionCasterTest extends TestCase
         $this->assertSame(['foo'], $ref);
     }
 
-    public function testDefaultSettingsOnError()
+    public function testDefaultSettingsOnError(): void
     {
         $e = $this->getTestError('foo');
 
@@ -103,7 +103,7 @@ class ExceptionCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $e);
     }
 
-    public function testDefaultSettingsOnErrorException()
+    public function testDefaultSettingsOnErrorException(): void
     {
         $e = $this->getTestErrorException('foo');
 
@@ -129,7 +129,7 @@ class ExceptionCasterTest extends TestCase
     }
 
     #[RequiresMethod(SilencedErrorContext::class, '__construct')]
-    public function testCastSilencedErrorContext()
+    public function testCastSilencedErrorContext(): void
     {
         $e = $this->getTestSilencedErrorContext();
 
@@ -150,7 +150,7 @@ class ExceptionCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $e);
     }
 
-    public function testSeek()
+    public function testSeek(): void
     {
         $e = $this->getTestException(2);
 
@@ -169,7 +169,7 @@ class ExceptionCasterTest extends TestCase
         $this->assertStringMatchesFormat($expectedDump, $this->getDump($e, 'trace'));
     }
 
-    public function testNoArgs()
+    public function testNoArgs(): void
     {
         $e = $this->getTestException(1);
         ExceptionCaster::$traceArgs = false;
@@ -194,7 +194,7 @@ class ExceptionCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $e);
     }
 
-    public function testNoSrcContext()
+    public function testNoSrcContext(): void
     {
         $e = $this->getTestException(1);
         ExceptionCaster::$srcContext = -1;
@@ -214,7 +214,7 @@ class ExceptionCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $e);
     }
 
-    public function testShouldReturnTraceForConcreteTwigWithError()
+    public function testShouldReturnTraceForConcreteTwigWithError(): void
     {
         require_once \dirname(__DIR__).'/Fixtures/Twig.php';
 
@@ -238,7 +238,7 @@ class ExceptionCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $nestingWrapper);
     }
 
-    public function testHtmlDump()
+    public function testHtmlDump(): void
     {
         if (\ini_get('xdebug.file_link_format') || get_cfg_var('xdebug.file_link_format')) {
             $this->markTestSkipped('A custom file_link_format is defined.');
@@ -273,7 +273,7 @@ class ExceptionCasterTest extends TestCase
         $this->assertStringMatchesFormat($expectedDump, $dump);
     }
 
-    public function testFrameWithTwig()
+    public function testFrameWithTwig(): void
     {
         require_once \dirname(__DIR__).'/Fixtures/Twig.php';
 
@@ -322,7 +322,7 @@ class ExceptionCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $f);
     }
 
-    public function testExcludeVerbosity()
+    public function testExcludeVerbosity(): void
     {
         $e = $this->getTestException('foo');
 
@@ -338,7 +338,7 @@ class ExceptionCasterTest extends TestCase
         $this->assertDumpMatchesFormat($expectedDump, $e, Caster::EXCLUDE_VERBOSE);
     }
 
-    public function testAnonymous()
+    public function testAnonymous(): void
     {
         $e = new \Exception(\sprintf('Boo "%s" ba.', (new class('Foo') extends \Exception {
         })::class));
@@ -356,7 +356,7 @@ class ExceptionCasterTest extends TestCase
     }
 
     #[RequiresMethod(FlattenException::class, 'create')]
-    public function testFlattenException()
+    public function testFlattenException(): void
     {
         $f = FlattenException::createFromThrowable(new \Exception('Hello'));
 

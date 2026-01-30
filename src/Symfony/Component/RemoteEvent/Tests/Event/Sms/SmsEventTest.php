@@ -16,7 +16,7 @@ use Symfony\Component\RemoteEvent\Event\Sms\SmsEvent;
 
 class SmsEventTest extends TestCase
 {
-    public function testPhone()
+    public function testPhone(): void
     {
         $event = new SmsEvent('name', 'id', []);
         $event->setRecipientPhone($phone = '0102030405');

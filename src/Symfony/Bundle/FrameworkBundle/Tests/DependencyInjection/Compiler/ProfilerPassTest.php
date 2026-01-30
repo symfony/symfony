@@ -33,7 +33,7 @@ class ProfilerPassTest extends TestCase
      *
      *     <tag name="data_collector" template="YourBundle:Collector:templatename" id="your_collector_name" />
      */
-    public function testTemplateNoIdThrowsException()
+    public function testTemplateNoIdThrowsException(): void
     {
         $builder = new ContainerBuilder();
         $builder->register('profiler', 'ProfilerClass');
@@ -47,7 +47,7 @@ class ProfilerPassTest extends TestCase
         $profilerPass->process($builder);
     }
 
-    public function testValidCollector()
+    public function testValidCollector(): void
     {
         $container = new ContainerBuilder();
         $profilerDefinition = $container->register('profiler', 'ProfilerClass');
@@ -100,7 +100,7 @@ class ProfilerPassTest extends TestCase
     }
 
     #[DataProvider('provideValidCollectorWithTemplateUsingAutoconfigure')]
-    public function testValidCollectorWithTemplateUsingAutoconfigure(TemplateAwareDataCollectorInterface $dataCollector)
+    public function testValidCollectorWithTemplateUsingAutoconfigure(TemplateAwareDataCollectorInterface $dataCollector): void
     {
         $container = new ContainerBuilder();
         $profilerDefinition = $container->register('profiler', 'ProfilerClass');

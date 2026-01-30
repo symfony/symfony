@@ -47,14 +47,14 @@ final class NtfyTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testCanSetCustomHost()
+    public function testCanSetCustomHost(): void
     {
         $transport = $this->createTransport();
         $transport->setHost($customHost = self::CUSTOM_HOST);
         $this->assertSame(\sprintf('ntfy://%s/test', $customHost), (string) $transport);
     }
 
-    public function testCanSetCustomHostAndPort()
+    public function testCanSetCustomHostAndPort(): void
     {
         $transport = $this->createTransport();
         $transport->setHost($customHost = self::CUSTOM_HOST);
@@ -62,7 +62,7 @@ final class NtfyTransportTest extends TransportTestCase
         $this->assertSame(\sprintf('ntfy://%s:%s/test', $customHost, $customPort), (string) $transport);
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
             $expectedBody = json_encode(['topic' => 'test', 'title' => 'Hello', 'message' => 'World']);
@@ -78,7 +78,7 @@ final class NtfyTransportTest extends TransportTestCase
         $this->assertSame('2BYIwRmvBKcv', $sentMessage->getMessageId());
     }
 
-    public function testSendWithPassword()
+    public function testSendWithPassword(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
             $expectedBody = json_encode(['topic' => 'test', 'title' => 'Hello', 'message' => 'World']);
@@ -96,7 +96,7 @@ final class NtfyTransportTest extends TransportTestCase
         $this->assertSame('2BYIwRmvBKcv', $sentMessage->getMessageId());
     }
 
-    public function testSendWithUserAndPassword()
+    public function testSendWithUserAndPassword(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
             $expectedBody = json_encode(['topic' => 'test', 'title' => 'Hello', 'message' => 'World']);

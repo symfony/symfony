@@ -30,7 +30,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class SecurityTest extends AbstractWebTestCase
 {
-    public function testServiceIsFunctional()
+    public function testServiceIsFunctional(): void
     {
         $kernel = self::createKernel(['test_case' => 'SecurityHelper', 'root_config' => 'config.yml']);
         $kernel->boot();
@@ -50,7 +50,7 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertSame('main', $firewallConfig->getName());
     }
 
-    public function testUserAuthorizationChecker()
+    public function testUserAuthorizationChecker(): void
     {
         $kernel = self::createKernel(['test_case' => 'SecurityHelper', 'root_config' => 'config.yml']);
         $kernel->boot();
@@ -69,7 +69,7 @@ class SecurityTest extends AbstractWebTestCase
     }
 
     #[DataProvider('userWillBeMarkedAsChangedIfRolesHasChangedProvider')]
-    public function testUserWillBeMarkedAsChangedIfRolesHasChanged(UserInterface $userWithAdminRole, UserInterface $userWithoutAdminRole)
+    public function testUserWillBeMarkedAsChangedIfRolesHasChanged(UserInterface $userWithAdminRole, UserInterface $userWithoutAdminRole): void
     {
         $client = $this->createClient(['test_case' => 'AbstractTokenCompareRoles', 'root_config' => 'config.yml']);
         $client->disableReboot();
@@ -111,7 +111,7 @@ class SecurityTest extends AbstractWebTestCase
 
     #[TestWith(['form_login'])]
     #[TestWith([ApiAuthenticator::class])]
-    public function testLogin(string $authenticator)
+    public function testLogin(string $authenticator): void
     {
         $client = $this->createClient(['test_case' => 'SecurityHelper', 'root_config' => 'config.yml', 'debug' > true]);
         static::getContainer()->get(ForceLoginController::class)->authenticator = $authenticator;
@@ -124,7 +124,7 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertSame('chalasr', static::getContainer()->get('security.helper')->getUser()->getUserIdentifier());
     }
 
-    public function testLogout()
+    public function testLogout(): void
     {
         $client = $this->createClient(['test_case' => 'SecurityHelper', 'root_config' => 'config.yml', 'debug' => true]);
         $client->loginUser(new InMemoryUser('chalasr', 'the-password', ['ROLE_FOO']), 'main');
@@ -137,7 +137,7 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertSame(['message' => 'Logout successful'], json_decode($response->getContent(), true));
     }
 
-    public function testLogoutWithCsrf()
+    public function testLogoutWithCsrf(): void
     {
         $client = $this->createClient(['test_case' => 'SecurityHelper', 'root_config' => 'config_logout_csrf.yml', 'debug' => true]);
         $client->loginUser(new InMemoryUser('chalasr', 'the-password', ['ROLE_FOO']), 'main');
@@ -145,7 +145,7 @@ class SecurityTest extends AbstractWebTestCase
         // put a csrf token in the storage
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
-        $setCsrfToken = static function (RequestEvent $event) {
+        $setCsrfToken = static function (RequestEvent $event): void {
             static::getContainer()->get('security.csrf.token_storage')->setToken('logout', 'bar');
             $event->setResponse(new Response(''));
         };
@@ -165,7 +165,7 @@ class SecurityTest extends AbstractWebTestCase
         $this->assertSame(['message' => 'Logout successful'], json_decode($response->getContent(), true));
     }
 
-    public function testLogoutBypassCsrf()
+    public function testLogoutBypassCsrf(): void
     {
         $client = $this->createClient(['test_case' => 'SecurityHelper', 'root_config' => 'config_logout_csrf.yml']);
         $client->loginUser(new InMemoryUser('chalasr', 'the-password', ['ROLE_FOO']), 'main');

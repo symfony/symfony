@@ -40,7 +40,7 @@ class StopWorkerOnCustomStopExceptionListenerTest extends TestCase
     }
 
     #[DataProvider('provideTests')]
-    public function test(\Throwable $throwable, bool $shouldStop)
+    public function test(\Throwable $throwable, bool $shouldStop): void
     {
         $listener = new StopWorkerOnCustomStopExceptionListener();
 

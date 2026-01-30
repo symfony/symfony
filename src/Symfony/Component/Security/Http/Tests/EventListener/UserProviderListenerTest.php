@@ -32,7 +32,7 @@ class UserProviderListenerTest extends TestCase
         $this->listener = new UserProviderListener($this->userProvider);
     }
 
-    public function testSetUserProvider()
+    public function testSetUserProvider(): void
     {
         $passport = new SelfValidatingPassport(new UserBadge('wouter'));
 
@@ -44,7 +44,7 @@ class UserProviderListenerTest extends TestCase
     }
 
     #[DataProvider('provideCompletePassports')]
-    public function testNotOverrideUserLoader($passport)
+    public function testNotOverrideUserLoader($passport): void
     {
         $badgeBefore = $passport->hasBadge(UserBadge::class) ? $passport->getBadge(UserBadge::class) : null;
         $this->listener->checkPassport(new CheckPassportEvent(new DummyAuthenticator(), $passport));
@@ -54,6 +54,6 @@ class UserProviderListenerTest extends TestCase
 
     public static function provideCompletePassports()
     {
-        yield [new SelfValidatingPassport(new UserBadge('wouter', static function () {}))];
+        yield [new SelfValidatingPassport(new UserBadge('wouter', static function (): void {}))];
     }
 }

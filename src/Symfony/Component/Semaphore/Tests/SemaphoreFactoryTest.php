@@ -23,7 +23,7 @@ use Symfony\Component\Semaphore\SemaphoreFactory;
  */
 class SemaphoreFactoryTest extends TestCase
 {
-    public function testCreateSemaphore()
+    public function testCreateSemaphore(): void
     {
         $store = $this->createMock(PersistingStoreInterface::class);
 
@@ -50,7 +50,7 @@ class SemaphoreFactoryTest extends TestCase
         $this->assertNotSame($keys[0], $keys[1]);
     }
 
-    public function testCreateSemaphoreFromKey()
+    public function testCreateSemaphoreFromKey(): void
     {
         $store = $this->createMock(PersistingStoreInterface::class);
 

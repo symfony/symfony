@@ -20,10 +20,10 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 class AttributeAutoconfigurationPassTest extends TestCase
 {
-    public function testProcessAddsNoEmptyInstanceofConditionals()
+    public function testProcessAddsNoEmptyInstanceofConditionals(): void
     {
         $container = new ContainerBuilder();
-        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, static function () {});
+        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, static function (): void {});
         $container->register('foo', \stdClass::class)
             ->setAutoconfigured(true)
         ;
@@ -33,10 +33,10 @@ class AttributeAutoconfigurationPassTest extends TestCase
         $this->assertSame([], $container->getDefinition('foo')->getInstanceofConditionals());
     }
 
-    public function testAttributeConfiguratorCallableMissingType()
+    public function testAttributeConfiguratorCallableMissingType(): void
     {
         $container = new ContainerBuilder();
-        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, static function (ChildDefinition $definition, AsTaggedItem $attribute, $reflector) {});
+        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, static function (ChildDefinition $definition, AsTaggedItem $attribute, $reflector): void {});
         $container->register('foo', \stdClass::class)
             ->setAutoconfigured(true)
         ;
@@ -46,10 +46,10 @@ class AttributeAutoconfigurationPassTest extends TestCase
         (new AttributeAutoconfigurationPass())->process($container);
     }
 
-    public function testProcessesAbstractServicesWithContainerExcludedTag()
+    public function testProcessesAbstractServicesWithContainerExcludedTag(): void
     {
         $container = new ContainerBuilder();
-        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, static function (ChildDefinition $definition, AsTaggedItem $attribute, \ReflectionClass $reflector) {
+        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, static function (ChildDefinition $definition, AsTaggedItem $attribute, \ReflectionClass $reflector): void {
             $definition->addTag('processed.tag');
         });
 

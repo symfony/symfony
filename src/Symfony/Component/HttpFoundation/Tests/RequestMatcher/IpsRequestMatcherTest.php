@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\IpsRequestMatcher;
 class IpsRequestMatcherTest extends TestCase
 {
     #[DataProvider('getData')]
-    public function test($ips, bool $expected)
+    public function test($ips, bool $expected): void
     {
         $matcher = new IpsRequestMatcher($ips);
         $request = Request::create('', 'GET', [], [], [], ['REMOTE_ADDR' => '127.0.0.1']);

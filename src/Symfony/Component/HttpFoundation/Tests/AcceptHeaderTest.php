@@ -18,14 +18,14 @@ use Symfony\Component\HttpFoundation\AcceptHeaderItem;
 
 class AcceptHeaderTest extends TestCase
 {
-    public function testFirst()
+    public function testFirst(): void
     {
         $header = AcceptHeader::fromString('text/plain; q=0.5, text/html, text/x-dvi; q=0.8, text/x-c');
         $this->assertSame('text/html', $header->first()->getValue());
     }
 
     #[DataProvider('provideFromStringData')]
-    public function testFromString($string, array $items)
+    public function testFromString($string, array $items): void
     {
         $header = AcceptHeader::fromString($string);
         $parsed = array_values($header->all());
@@ -50,7 +50,7 @@ class AcceptHeaderTest extends TestCase
     }
 
     #[DataProvider('provideToStringData')]
-    public function testToString(array $items, $string)
+    public function testToString(array $items, $string): void
     {
         $header = new AcceptHeader($items);
         $this->assertEquals($string, (string) $header);
@@ -67,7 +67,7 @@ class AcceptHeaderTest extends TestCase
     }
 
     #[DataProvider('provideFilterData')]
-    public function testFilter($string, $filter, array $values)
+    public function testFilter($string, $filter, array $values): void
     {
         $header = AcceptHeader::fromString($string)->filter($filter);
         $this->assertEquals($values, array_keys($header->all()));
@@ -81,7 +81,7 @@ class AcceptHeaderTest extends TestCase
     }
 
     #[DataProvider('provideSortingData')]
-    public function testSorting($string, array $values)
+    public function testSorting($string, array $values): void
     {
         $header = AcceptHeader::fromString($string);
         $this->assertEquals($values, array_keys($header->all()));
@@ -99,7 +99,7 @@ class AcceptHeaderTest extends TestCase
     }
 
     #[DataProvider('provideDefaultValueData')]
-    public function testDefaultValue($acceptHeader, $value, $expectedQuality)
+    public function testDefaultValue($acceptHeader, $value, $expectedQuality): void
     {
         $header = AcceptHeader::fromString($acceptHeader);
         $this->assertSame($expectedQuality, $header->get($value)?->getQuality());

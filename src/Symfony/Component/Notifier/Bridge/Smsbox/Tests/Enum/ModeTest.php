@@ -18,7 +18,7 @@ use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Mode;
 class ModeTest extends TestCase
 {
     #[DataProvider('provideModeValues')]
-    public function testModeValues(Mode $mode, string $value)
+    public function testModeValues(Mode $mode, string $value): void
     {
         self::assertSame($value, $mode->value);
     }

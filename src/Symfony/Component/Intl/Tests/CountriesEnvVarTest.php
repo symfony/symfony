@@ -19,19 +19,19 @@ use Symfony\Component\Intl\Countries;
 #[Group('intl-data-isolate')]
 class CountriesEnvVarTest extends TestCase
 {
-    public function testWhenEnvVarNotSet()
+    public function testWhenEnvVarNotSet(): void
     {
         $this->assertFalse(Countries::exists('XK'));
     }
 
-    public function testWhenEnvVarSetFalse()
+    public function testWhenEnvVarSetFalse(): void
     {
         putenv('SYMFONY_INTL_WITH_USER_ASSIGNED=false');
 
         $this->assertFalse(Countries::exists('XK'));
     }
 
-    public function testWhenEnvVarSetTrue()
+    public function testWhenEnvVarSetTrue(): void
     {
         putenv('SYMFONY_INTL_WITH_USER_ASSIGNED=true');
 

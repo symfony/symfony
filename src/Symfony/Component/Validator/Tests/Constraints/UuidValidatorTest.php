@@ -29,21 +29,21 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         return new UuidValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Uuid());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Uuid());
 
         $this->assertNoViolation();
     }
 
-    public function testExpectsUuidConstraintCompatibleType()
+    public function testExpectsUuidConstraintCompatibleType(): void
     {
         $constraint = $this->createStub(Constraint::class);
 
@@ -52,14 +52,14 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('216fff40-98d9-11e3-a5e2-0800200c9a66', $constraint);
     }
 
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Uuid());
     }
 
     #[DataProvider('getValidStrictUuids')]
-    public function testValidStrictUuids($uuid, $versions = null)
+    public function testValidStrictUuids($uuid, $versions = null): void
     {
         $constraint = new Uuid();
 
@@ -88,7 +88,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidStrictUuidsWithWhitespaces')]
-    public function testValidStrictUuidsWithWhitespaces($uuid, $versions = null)
+    public function testValidStrictUuidsWithWhitespaces($uuid, $versions = null): void
     {
         $constraint = new Uuid(normalizer: 'trim');
 
@@ -113,7 +113,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testValidStrictUuidWithWhitespacesNamed()
+    public function testValidStrictUuidWithWhitespacesNamed(): void
     {
         $this->validator->validate(
             "\x09\x09216fff40-98d9-11e3-a5e2-0800200c9a66",
@@ -124,7 +124,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidStrictUuids')]
-    public function testInvalidStrictUuids($uuid, $code, $versions = null)
+    public function testInvalidStrictUuids($uuid, $code, $versions = null): void
     {
         $constraint = new Uuid(message: 'testMessage');
 
@@ -184,7 +184,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidNonStrictUuids')]
-    public function testValidNonStrictUuids($uuid)
+    public function testValidNonStrictUuids($uuid): void
     {
         $constraint = new Uuid(strict: false);
 
@@ -211,7 +211,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidNonStrictUuids')]
-    public function testInvalidNonStrictUuids($uuid, $code)
+    public function testInvalidNonStrictUuids($uuid, $code): void
     {
         $constraint = new Uuid(
             strict: false,
@@ -239,7 +239,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testInvalidNonStrictUuidNamed()
+    public function testInvalidNonStrictUuidNamed(): void
     {
         $this->validator->validate(
             '216fff40-98d9-11e3-a5e2_0800200c9a66',
@@ -253,7 +253,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getUuidForTimeBasedAssertions')]
-    public function testTimeBasedUuid(string $uid, bool $expectedTimeBased)
+    public function testTimeBasedUuid(string $uid, bool $expectedTimeBased): void
     {
         $constraint = new Uuid(versions: Uuid::TIME_BASED_VERSIONS);
 
@@ -281,7 +281,7 @@ class UuidValidatorTest extends ConstraintValidatorTestCase
         yield Uuid::V8_CUSTOM => ['00112233-4455-8677-8899-aabbccddeeff', false];
     }
 
-    public function testAcceptsSingleIntegerAsVersion()
+    public function testAcceptsSingleIntegerAsVersion(): void
     {
         $constraint = new Uuid(versions: 7);
 

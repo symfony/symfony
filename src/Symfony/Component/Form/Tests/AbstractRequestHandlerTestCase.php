@@ -78,7 +78,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     }
 
     #[DataProvider('methodProvider')]
-    public function testSubmitIfNameInRequest($method)
+    public function testSubmitIfNameInRequest($method): void
     {
         $form = $this->createForm('param1', $method);
 
@@ -93,7 +93,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     }
 
     #[DataProvider('methodProvider')]
-    public function testDoNotSubmitIfWrongRequestMethod($method)
+    public function testDoNotSubmitIfWrongRequestMethod($method): void
     {
         $form = $this->createForm('param1', $method);
 
@@ -109,7 +109,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     }
 
     #[DataProvider('methodExceptGetProvider')]
-    public function testDoNoSubmitSimpleFormIfNameNotInRequestAndNotGetRequest($method)
+    public function testDoNoSubmitSimpleFormIfNameNotInRequestAndNotGetRequest($method): void
     {
         $form = $this->createForm('param1', $method, false);
 
@@ -123,7 +123,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     }
 
     #[DataProvider('methodExceptGetProvider')]
-    public function testDoNotSubmitCompoundFormIfNameNotInRequestAndNotGetRequest($method)
+    public function testDoNotSubmitCompoundFormIfNameNotInRequestAndNotGetRequest($method): void
     {
         $form = $this->createForm('param1', $method, true);
 
@@ -136,7 +136,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->assertFalse($form->isSubmitted());
     }
 
-    public function testDoNotSubmitIfNameNotInRequestAndGetRequest()
+    public function testDoNotSubmitIfNameNotInRequestAndGetRequest(): void
     {
         $form = $this->createForm('param1', 'GET');
 
@@ -150,7 +150,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     }
 
     #[DataProvider('methodProvider')]
-    public function testSubmitFormWithEmptyNameIfAtLeastOneFieldInRequest($method)
+    public function testSubmitFormWithEmptyNameIfAtLeastOneFieldInRequest($method): void
     {
         $form = $this->createForm('', $method, true);
         $form->add($this->createForm('param1'));
@@ -177,7 +177,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     }
 
     #[DataProvider('methodProvider')]
-    public function testDoNotSubmitFormWithEmptyNameIfNoFieldInRequest($method)
+    public function testDoNotSubmitFormWithEmptyNameIfNoFieldInRequest($method): void
     {
         $form = $this->createForm('', $method, true);
         $form->add($this->createForm('param1'));
@@ -193,7 +193,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     }
 
     #[DataProvider('methodExceptGetProvider')]
-    public function testMergeParamsAndFiles($method)
+    public function testMergeParamsAndFiles($method): void
     {
         $form = $this->createForm('param1', $method, true);
         $form->add($this->createForm('field1'));
@@ -217,7 +217,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->assertSame($file, $form->get('field2')->getData());
     }
 
-    public function testIntegerChildren()
+    public function testIntegerChildren(): void
     {
         $form = $this->createForm('root', 'POST', true);
         $form->add('0', TextType::class);
@@ -236,7 +236,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     }
 
     #[DataProvider('methodExceptGetProvider')]
-    public function testMergeParamsAndFilesMultiple($method)
+    public function testMergeParamsAndFilesMultiple($method): void
     {
         $form = $this->createForm('param1', $method, true);
         $form->add($this->createBuilder('field1', false, ['allow_file_upload' => true, 'multiple' => true])->getForm());
@@ -270,7 +270,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     }
 
     #[DataProvider('methodExceptGetProvider')]
-    public function testParamTakesPrecedenceOverFile($method)
+    public function testParamTakesPrecedenceOverFile($method): void
     {
         $form = $this->createForm('param1', $method);
         $file = $this->getUploadedFile();
@@ -287,7 +287,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->assertSame('DATA', $form->getData());
     }
 
-    public function testMergeZeroIndexedCollection()
+    public function testMergeZeroIndexedCollection(): void
     {
         $form = $this->createForm('root', 'POST', true);
         $form->add('items', CollectionType::class, [
@@ -330,7 +330,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     }
 
     #[DataProvider('methodExceptGetProvider')]
-    public function testSubmitFileIfNoParam($method)
+    public function testSubmitFileIfNoParam($method): void
     {
         $form = $this->createBuilder('param1', false, ['allow_file_upload' => true])
             ->setMethod($method)
@@ -350,7 +350,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     }
 
     #[DataProvider('methodExceptGetProvider')]
-    public function testSubmitMultipleFiles($method)
+    public function testSubmitMultipleFiles($method): void
     {
         $form = $this->createBuilder('param1', false, ['allow_file_upload' => true])
             ->setMethod($method)
@@ -372,7 +372,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     }
 
     #[DataProvider('methodExceptGetProvider')]
-    public function testSubmitFileWithNamelessForm($method)
+    public function testSubmitFileWithNamelessForm($method): void
     {
         $form = $this->createForm('', $method, true);
         $fileForm = $this->createBuilder('document', false, ['allow_file_upload' => true])->getForm();
@@ -390,7 +390,7 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
     }
 
     #[DataProvider('getPostMaxSizeFixtures')]
-    public function testAddFormErrorIfPostMaxSizeExceeded(?int $contentLength, string $iniMax, bool $shouldFail, array $errorParams = [])
+    public function testAddFormErrorIfPostMaxSizeExceeded(?int $contentLength, string $iniMax, bool $shouldFail, array $errorParams = []): void
     {
         $this->serverParams->contentLength = $contentLength;
         $this->serverParams->postMaxSize = $iniMax;
@@ -428,18 +428,18 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         ];
     }
 
-    public function testUploadedFilesAreAccepted()
+    public function testUploadedFilesAreAccepted(): void
     {
         $this->assertTrue($this->requestHandler->isFileUpload($this->getUploadedFile()));
     }
 
-    public function testInvalidFilesAreRejected()
+    public function testInvalidFilesAreRejected(): void
     {
         $this->assertFalse($this->requestHandler->isFileUpload($this->getInvalidFile()));
     }
 
     #[DataProvider('uploadFileErrorCodes')]
-    public function testFailedFileUploadIsTurnedIntoFormError($errorCode, $expectedErrorCode)
+    public function testFailedFileUploadIsTurnedIntoFormError($errorCode, $expectedErrorCode): void
     {
         $this->assertSame($expectedErrorCode, $this->requestHandler->getUploadFileError($this->getFailedUploadedFile($errorCode)));
     }

@@ -18,7 +18,7 @@ use Symfony\Component\CssSelector\Exception\ParseException;
 
 class CssSelectorConverterTest extends TestCase
 {
-    public function testCssToXPath()
+    public function testCssToXPath(): void
     {
         $converter = new CssSelectorConverter();
 
@@ -34,7 +34,7 @@ class CssSelectorConverterTest extends TestCase
         $this->assertEquals('descendant-or-self::h1', $converter->toXPath('H1'));
     }
 
-    public function testCssToXPathXml()
+    public function testCssToXPathXml(): void
     {
         $converter = new CssSelectorConverter(false);
 
@@ -45,7 +45,7 @@ class CssSelectorConverterTest extends TestCase
         $this->assertEquals('descendant-or-self::H1', $converter->toXPath('H1'));
     }
 
-    public function testParseExceptions()
+    public function testParseExceptions(): void
     {
         $this->expectException(ParseException::class);
         $this->expectExceptionMessage('Expected identifier, but <eof at 3> found.');
@@ -53,7 +53,7 @@ class CssSelectorConverterTest extends TestCase
     }
 
     #[DataProvider('getCssToXPathWithoutPrefixTestData')]
-    public function testCssToXPathWithoutPrefix($css, $xpath)
+    public function testCssToXPathWithoutPrefix($css, $xpath): void
     {
         $converter = new CssSelectorConverter();
 

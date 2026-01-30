@@ -30,13 +30,13 @@ class ContainerParametersResourceCheckerTest extends TestCase
         $this->resourceChecker = new ContainerParametersResourceChecker($this->container);
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $this->assertTrue($this->resourceChecker->supports($this->resource));
     }
 
     #[DataProvider('isFreshProvider')]
-    public function testIsFresh(callable $mockContainer, $expected)
+    public function testIsFresh(callable $mockContainer, $expected): void
     {
         $mockContainer($this->container, $this);
 
@@ -45,14 +45,14 @@ class ContainerParametersResourceCheckerTest extends TestCase
 
     public static function isFreshProvider()
     {
-        yield 'not fresh on missing parameter' => [static function (Container $container) {
+        yield 'not fresh on missing parameter' => [static function (Container $container): void {
         }, false];
 
-        yield 'not fresh on different value' => [static function (Container $container) {
+        yield 'not fresh on different value' => [static function (Container $container): void {
             $container->setParameter('locales', ['nl', 'es']);
         }, false];
 
-        yield 'fresh on every identical parameters' => [static function (Container $container) {
+        yield 'fresh on every identical parameters' => [static function (Container $container): void {
             $container->setParameter('locales', ['fr', 'en']);
             $container->setParameter('default_locale', 'fr');
         }, true];

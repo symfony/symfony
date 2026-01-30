@@ -19,14 +19,14 @@ use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 class MethodRequestMatcherTest extends TestCase
 {
     #[DataProvider('getData')]
-    public function test(string $requestMethod, array|string $matcherMethod, bool $isMatch)
+    public function test(string $requestMethod, array|string $matcherMethod, bool $isMatch): void
     {
         $matcher = new MethodRequestMatcher($matcherMethod);
         $request = Request::create('', $requestMethod);
         $this->assertSame($isMatch, $matcher->matches($request));
     }
 
-    public function testAlwaysMatchesOnEmptyMethod()
+    public function testAlwaysMatchesOnEmptyMethod(): void
     {
         $matcher = new MethodRequestMatcher([]);
         $request = Request::create('https://example.com', 'POST');

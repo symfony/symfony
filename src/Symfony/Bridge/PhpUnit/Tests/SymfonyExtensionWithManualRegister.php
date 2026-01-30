@@ -36,22 +36,22 @@ class SymfonyExtensionWithManualRegister extends TestCase
         DnsMock::withMockedHosts([]);
     }
 
-    public function testDate()
+    public function testDate(): void
     {
         self::assertSame('2024-05-20 15:30:00', date('Y-m-d H:i:s'));
     }
 
-    public function testGetHostByName()
+    public function testGetHostByName(): void
     {
         self::assertSame('1.2.3.4', gethostbyname('example.com'));
     }
 
-    public function testTime()
+    public function testTime(): void
     {
         self::assertSame(1716219000, time());
     }
 
-    public function testDnsGetRecord()
+    public function testDnsGetRecord(): void
     {
         self::assertSame([[
             'host' => 'example.com',

@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Notification\Notification;
 final class MobytOptionsTest extends TestCase
 {
     #[DataProvider('fromNotificationDataProvider')]
-    public function testFromNotification(string $importance, string $expectedMessageType)
+    public function testFromNotification(string $importance, string $expectedMessageType): void
     {
         $notification = (new Notification('Foo'))->importance($importance);
 
@@ -40,7 +40,7 @@ final class MobytOptionsTest extends TestCase
         yield [Notification::IMPORTANCE_LOW, MobytOptions::MESSAGE_TYPE_QUALITY_LOW];
     }
 
-    public function testFromNotificationDefaultLevel()
+    public function testFromNotificationDefaultLevel(): void
     {
         $notification = (new Notification('Foo'))->importance('Bar');
 
@@ -50,7 +50,7 @@ final class MobytOptionsTest extends TestCase
     }
 
     #[DataProvider('validMessageTypes')]
-    public function testMessageType(string $type)
+    public function testMessageType(string $type): void
     {
         $mobytOptions = new MobytOptions();
         $mobytOptions->messageType($type);
@@ -65,7 +65,7 @@ final class MobytOptionsTest extends TestCase
         yield [MobytOptions::MESSAGE_TYPE_QUALITY_LOW];
     }
 
-    public function testCallingMessageTypeMethodWithUnknownTypeThrowsInvalidArgumentException()
+    public function testCallingMessageTypeMethodWithUnknownTypeThrowsInvalidArgumentException(): void
     {
         $mobytOptions = new MobytOptions();
 
@@ -75,7 +75,7 @@ final class MobytOptionsTest extends TestCase
         $mobytOptions->messageType('foo-bar');
     }
 
-    public function testSettingMessageTypeViaConstructorWithUnknownTypeThrowsInvalidArgumentException()
+    public function testSettingMessageTypeViaConstructorWithUnknownTypeThrowsInvalidArgumentException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(

@@ -29,7 +29,7 @@ class ObjectDummy
         return $this->foo;
     }
 
-    public function setFoo($foo)
+    public function setFoo($foo): void
     {
         $this->foo = $foo;
     }
@@ -39,7 +39,7 @@ class ObjectDummy
         return $this->baz;
     }
 
-    public function setBaz($baz)
+    public function setBaz($baz): void
     {
         $this->baz = $baz;
     }
@@ -54,17 +54,17 @@ class ObjectDummy
         return $this->camelCase;
     }
 
-    public function setCamelCase($camelCase)
+    public function setCamelCase($camelCase): void
     {
         $this->camelCase = $camelCase;
     }
 
-    public function otherMethod()
+    public function otherMethod(): void
     {
         throw new \RuntimeException('Dummy::otherMethod() should not be called');
     }
 
-    public function setObject($object)
+    public function setObject($object): void
     {
         $this->object = $object;
     }
@@ -74,7 +74,7 @@ class ObjectDummy
         return $this->object;
     }
 
-    public function setGo($go)
+    public function setGo($go): void
     {
         $this->go = $go;
     }

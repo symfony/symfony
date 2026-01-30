@@ -39,7 +39,7 @@ abstract class AbstractRedisStoreTestCase extends AbstractStoreTestCase
         return new RedisStore($this->getRedisConnection());
     }
 
-    public function testBackwardCompatibility()
+    public function testBackwardCompatibility(): void
     {
         $key1 = new Key(static::class.__METHOD__);
         $key2 = new Key(static::class.__METHOD__);
@@ -64,7 +64,7 @@ class Symfony51Store
         $this->redis = $redis;
     }
 
-    public function save(Key $key)
+    public function save(Key $key): void
     {
         $script = '
             if redis.call("GET", KEYS[1]) == ARGV[1] then

@@ -39,7 +39,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         }
     }
 
-    public function testPassMoneyPatternToView()
+    public function testPassMoneyPatternToView(): void
     {
         \Locale::setDefault('de_DE');
 
@@ -49,7 +49,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame('{{ widget }} €', $view->vars['money_pattern']);
     }
 
-    public function testMoneyPatternWorksForYen()
+    public function testMoneyPatternWorksForYen(): void
     {
         \Locale::setDefault('en_US');
 
@@ -60,7 +60,7 @@ class MoneyTypeTest extends BaseTypeTestCase
     }
 
     // https://github.com/symfony/symfony/issues/5458
-    public function testPassDifferentPatternsForDifferentCurrencies()
+    public function testPassDifferentPatternsForDifferentCurrencies(): void
     {
         \Locale::setDefault('de_DE');
 
@@ -71,12 +71,12 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame('{{ widget }} €', $view2->vars['money_pattern']);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    public function testMoneyPatternWithoutCurrency()
+    public function testMoneyPatternWithoutCurrency(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE, null, ['currency' => false])
             ->createView();
@@ -84,7 +84,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame('{{ widget }}', $view->vars['money_pattern']);
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = '10.00', $expectedData = 10.0)
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = '10.00', $expectedData = 10.0): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => $emptyData,
@@ -96,7 +96,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame($expectedData, $form->getData());
     }
 
-    public function testDefaultFormattingWithDefaultRounding()
+    public function testDefaultFormattingWithDefaultRounding(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 0]);
         $form->setData('12345.54321');
@@ -104,7 +104,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame('12346', $form->createView()->vars['value']);
     }
 
-    public function testDefaultFormattingWithSpecifiedRounding()
+    public function testDefaultFormattingWithSpecifiedRounding(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 0, 'rounding_mode' => \NumberFormatter::ROUND_DOWN]);
         $form->setData('12345.54321');
@@ -112,7 +112,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame('12345', $form->createView()->vars['value']);
     }
 
-    public function testHtml5EnablesSpecificFormatting()
+    public function testHtml5EnablesSpecificFormatting(): void
     {
         // Since we test against "de_CH", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
@@ -126,7 +126,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame('number', $form->createView()->vars['type']);
     }
 
-    public function testHtml5AddsStepAttributeIfNotSet()
+    public function testHtml5AddsStepAttributeIfNotSet(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'html5' => true,
@@ -149,7 +149,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame('numeric', $view->vars['attr']['inputmode']);
     }
 
-    public function testHtml5DoesNotOverrideUserProvidedStep()
+    public function testHtml5DoesNotOverrideUserProvidedStep(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'html5' => true,
@@ -166,7 +166,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame('decimal', $view->vars['attr']['inputmode']);
     }
 
-    public function testDefaultInput()
+    public function testDefaultInput(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['divisor' => 100]);
         $form->submit('12345.67');
@@ -174,7 +174,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame(1234567.0, $form->getData());
     }
 
-    public function testIntegerInput()
+    public function testIntegerInput(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['divisor' => 100, 'input' => 'integer']);
         $form->submit('12345.67');
@@ -182,7 +182,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame(1234567, $form->getData());
     }
 
-    public function testIntegerInputWithoutDivisor()
+    public function testIntegerInputWithoutDivisor(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'integer']);
         $form->submit('1234567');
@@ -190,7 +190,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame(1234567, $form->getData());
     }
 
-    public function testDefaultFormattingWithScaleAndStringInput()
+    public function testDefaultFormattingWithScaleAndStringInput(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['scale' => 2, 'input' => 'string']);
         $form->setData('12345.67890');
@@ -198,7 +198,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame('12345.68', $form->createView()->vars['value']);
     }
 
-    public function testStringInputWithFloatData()
+    public function testStringInputWithFloatData(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected a numeric string.');
@@ -209,7 +209,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         ]);
     }
 
-    public function testStringInputWithIntData()
+    public function testStringInputWithIntData(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage('Expected a numeric string.');
@@ -220,7 +220,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         ]);
     }
 
-    public function testSubmitStringInputWithDefaultScale()
+    public function testSubmitStringInputWithDefaultScale(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'string']);
         $form->submit('1.234');
@@ -230,7 +230,7 @@ class MoneyTypeTest extends BaseTypeTestCase
         $this->assertSame('1.23', $form->getViewData());
     }
 
-    public function testSubmitStringInputWithScale()
+    public function testSubmitStringInputWithScale(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, ['input' => 'string', 'scale' => 3]);
         $form->submit('1.234');

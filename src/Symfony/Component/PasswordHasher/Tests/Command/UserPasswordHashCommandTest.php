@@ -27,7 +27,7 @@ class UserPasswordHashCommandTest extends TestCase
     private ?CommandTester $passwordHasherCommandTester = null;
     private string|false $colSize;
 
-    public function testEncodePasswordEmptySalt()
+    public function testEncodePasswordEmptySalt(): void
     {
         $this->passwordHasherCommandTester->execute([
             'password' => 'password',
@@ -38,7 +38,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertStringContainsString(' Password hash   password', $this->passwordHasherCommandTester->getDisplay());
     }
 
-    public function testEncodeNoPasswordNoInteraction()
+    public function testEncodeNoPasswordNoInteraction(): void
     {
         $statusCode = $this->passwordHasherCommandTester->execute([
         ], ['interactive' => false]);
@@ -47,7 +47,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertEquals(1, $statusCode);
     }
 
-    public function testEncodePasswordBcrypt()
+    public function testEncodePasswordBcrypt(): void
     {
         $this->setupBcrypt();
         $this->passwordHasherCommandTester->execute([
@@ -64,7 +64,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertTrue($hasher->verify($hash, 'password', null));
     }
 
-    public function testEncodePasswordArgon2i()
+    public function testEncodePasswordArgon2i(): void
     {
         if (!($sodium = SodiumPasswordHasher::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
             $this->markTestSkipped('Argon2i algorithm not available.');
@@ -84,7 +84,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertTrue($hasher->verify($hash, 'password', null));
     }
 
-    public function testEncodePasswordArgon2id()
+    public function testEncodePasswordArgon2id(): void
     {
         if (!($sodium = (SodiumPasswordHasher::isSupported() && \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13'))) && !\defined('PASSWORD_ARGON2ID')) {
             $this->markTestSkipped('Argon2id algorithm not available.');
@@ -104,7 +104,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertTrue($hasher->verify($hash, 'password', null));
     }
 
-    public function testEncodePasswordNative()
+    public function testEncodePasswordNative(): void
     {
         $this->passwordHasherCommandTester->execute([
             'password' => 'password',
@@ -120,7 +120,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertTrue($hasher->verify($hash, 'password', null));
     }
 
-    public function testEncodePasswordSodium()
+    public function testEncodePasswordSodium(): void
     {
         if (!SodiumPasswordHasher::isSupported()) {
             $this->markTestSkipped('Libsodium is not available.');
@@ -139,7 +139,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertTrue((new SodiumPasswordHasher())->verify($hash, 'password', null));
     }
 
-    public function testEncodePasswordPbkdf2()
+    public function testEncodePasswordPbkdf2(): void
     {
         $this->passwordHasherCommandTester->execute([
             'password' => 'password',
@@ -157,7 +157,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertTrue($hasher->verify($hash, 'password', $salt));
     }
 
-    public function testEncodePasswordOutput()
+    public function testEncodePasswordOutput(): void
     {
         $this->passwordHasherCommandTester->execute(
             [
@@ -170,7 +170,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertStringContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
     }
 
-    public function testEncodePasswordEmptySaltOutput()
+    public function testEncodePasswordEmptySaltOutput(): void
     {
         $this->passwordHasherCommandTester->execute([
             'password' => 'p@ssw0rd',
@@ -183,7 +183,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
     }
 
-    public function testEncodePasswordNativeOutput()
+    public function testEncodePasswordNativeOutput(): void
     {
         $this->passwordHasherCommandTester->execute([
             'password' => 'p@ssw0rd',
@@ -193,7 +193,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
     }
 
-    public function testEncodePasswordArgon2iOutput()
+    public function testEncodePasswordArgon2iOutput(): void
     {
         if (!(SodiumPasswordHasher::isSupported() && !\defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2I')) {
             $this->markTestSkipped('Argon2i algorithm not available.');
@@ -208,7 +208,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
     }
 
-    public function testEncodePasswordArgon2idOutput()
+    public function testEncodePasswordArgon2idOutput(): void
     {
         if (!(SodiumPasswordHasher::isSupported() && \defined('SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13')) && !\defined('PASSWORD_ARGON2ID')) {
             $this->markTestSkipped('Argon2id algorithm not available.');
@@ -223,7 +223,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
     }
 
-    public function testEncodePasswordSodiumOutput()
+    public function testEncodePasswordSodiumOutput(): void
     {
         if (!SodiumPasswordHasher::isSupported()) {
             $this->markTestSkipped('Libsodium is not available.');
@@ -238,7 +238,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertStringNotContainsString(' Generated salt ', $this->passwordHasherCommandTester->getDisplay());
     }
 
-    public function testEncodePasswordNoConfigForGivenUserClass()
+    public function testEncodePasswordNoConfigForGivenUserClass(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('No password hasher has been configured for account "Foo\Bar\User".');
@@ -249,7 +249,7 @@ class UserPasswordHashCommandTest extends TestCase
         ], ['interactive' => false]);
     }
 
-    public function testEncodePasswordAsksNonProvidedUserClass()
+    public function testEncodePasswordAsksNonProvidedUserClass(): void
     {
         $this->passwordHasherCommandTester->setInputs(['Custom\Class\Pbkdf2\User', "\n"]);
         $this->passwordHasherCommandTester->execute([
@@ -267,7 +267,7 @@ class UserPasswordHashCommandTest extends TestCase
         );
     }
 
-    public function testNonInteractiveEncodePasswordUsesFirstUserClass()
+    public function testNonInteractiveEncodePasswordUsesFirstUserClass(): void
     {
         $this->passwordHasherCommandTester->execute([
             'password' => 'password',
@@ -276,7 +276,7 @@ class UserPasswordHashCommandTest extends TestCase
         $this->assertStringContainsString('Hasher used      Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher', $this->passwordHasherCommandTester->getDisplay());
     }
 
-    public function testThrowsExceptionOnNoConfiguredHashers()
+    public function testThrowsExceptionOnNoConfiguredHashers(): void
     {
         $tester = new CommandTester(new UserPasswordHashCommand(new PasswordHasherFactory([]), []));
 
@@ -289,7 +289,7 @@ class UserPasswordHashCommandTest extends TestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testCompletionSuggestions(array $input, array $expectedSuggestions)
+    public function testCompletionSuggestions(array $input, array $expectedSuggestions): void
     {
         $command = new UserPasswordHashCommand(new PasswordHasherFactory([]), ['App\Entity\User']);
         $tester = new CommandCompletionTester($command);
@@ -334,7 +334,7 @@ class UserPasswordHashCommandTest extends TestCase
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
-    private function setupArgon2i()
+    private function setupArgon2i(): void
     {
         $hasherFactory = new PasswordHasherFactory([
             'Custom\Class\Argon2i\User' => ['algorithm' => 'argon2i'],
@@ -345,7 +345,7 @@ class UserPasswordHashCommandTest extends TestCase
         );
     }
 
-    private function setupArgon2id()
+    private function setupArgon2id(): void
     {
         $hasherFactory = new PasswordHasherFactory([
             'Custom\Class\Argon2id\User' => ['algorithm' => 'argon2id'],
@@ -356,7 +356,7 @@ class UserPasswordHashCommandTest extends TestCase
         );
     }
 
-    private function setupBcrypt()
+    private function setupBcrypt(): void
     {
         $hasherFactory = new PasswordHasherFactory([
             'Custom\Class\Bcrypt\User' => ['algorithm' => 'bcrypt'],
@@ -368,7 +368,7 @@ class UserPasswordHashCommandTest extends TestCase
         ));
     }
 
-    private function setupSodium()
+    private function setupSodium(): void
     {
         $hasherFactory = new PasswordHasherFactory([
             'Custom\Class\Sodium\User' => ['algorithm' => 'sodium'],

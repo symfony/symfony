@@ -53,34 +53,34 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         $this->file = null;
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new File());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new File());
 
         $this->assertNoViolation();
     }
 
-    public function testExpectsStringCompatibleTypeOrFile()
+    public function testExpectsStringCompatibleTypeOrFile(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new File());
     }
 
-    public function testValidFile()
+    public function testValidFile(): void
     {
         $this->validator->validate($this->path, new File());
 
         $this->assertNoViolation();
     }
 
-    public function testValidUploadedfile()
+    public function testValidUploadedfile(): void
     {
         file_put_contents($this->path, '1');
         $file = new UploadedFile($this->path, 'originalName', null, null, true);
@@ -161,7 +161,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideMaxSizeExceededTests')]
-    public function testMaxSizeExceeded($bytesWritten, $limit, $sizeAsString, $limitAsString, $suffix)
+    public function testMaxSizeExceeded($bytesWritten, $limit, $sizeAsString, $limitAsString, $suffix): void
     {
         fseek($this->file, $bytesWritten - 1, \SEEK_SET);
         fwrite($this->file, '0');
@@ -211,7 +211,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideMaxSizeNotExceededTests')]
-    public function testMaxSizeNotExceeded($bytesWritten, $limit)
+    public function testMaxSizeNotExceeded($bytesWritten, $limit): void
     {
         fseek($this->file, $bytesWritten - 1, \SEEK_SET);
         fwrite($this->file, '0');
@@ -227,7 +227,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testInvalidMaxSize()
+    public function testInvalidMaxSize(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         new File(maxSize: '1abc');
@@ -256,7 +256,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideBinaryFormatTests')]
-    public function testBinaryFormat($bytesWritten, $limit, $binaryFormat, $sizeAsString, $limitAsString, $suffix)
+    public function testBinaryFormat($bytesWritten, $limit, $binaryFormat, $sizeAsString, $limitAsString, $suffix): void
     {
         fseek($this->file, $bytesWritten - 1, \SEEK_SET);
         fwrite($this->file, '0');
@@ -280,7 +280,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testBinaryFormatNamed()
+    public function testBinaryFormatNamed(): void
     {
         fseek($this->file, 10, \SEEK_SET);
         fwrite($this->file, '0');
@@ -300,7 +300,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testValidMimeType()
+    public function testValidMimeType(): void
     {
         $file = $this
             ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
@@ -322,7 +322,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidWildcardMimeType()
+    public function testValidWildcardMimeType(): void
     {
         $file = $this
             ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
@@ -344,7 +344,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testInvalidMimeType()
+    public function testInvalidMimeType(): void
     {
         $file = $this
             ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
@@ -370,7 +370,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidWildcardMimeType()
+    public function testInvalidWildcardMimeType(): void
     {
         $file = $this
             ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
@@ -401,7 +401,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testDisallowEmpty()
+    public function testDisallowEmpty(): void
     {
         ftruncate($this->file, 0);
 
@@ -415,7 +415,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('uploadedFileErrorProvider')]
-    public function testUploadedFileError($error, $message, array $params = [], $maxSize = null)
+    public function testUploadedFileError($error, $message, array $params = [], $maxSize = null): void
     {
         $file = new UploadedFile(tempnam(sys_get_temp_dir(), 'file-validator-test-'), 'originalName', 'mime', $error);
 
@@ -475,7 +475,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         return $tests;
     }
 
-    public function testNegativeMaxSize()
+    public function testNegativeMaxSize(): void
     {
         $file = new File();
 
@@ -486,7 +486,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('providerValidExtension')]
-    public function testExtensionValid(string $name)
+    public function testExtensionValid(string $name): void
     {
         $path = __DIR__.'/Fixtures/'.$name;
         $file = new \Symfony\Component\HttpFoundation\File\File($path);
@@ -513,7 +513,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideInvalidExtension')]
-    public function testExtensionInvalid(string $name, string $extension)
+    public function testExtensionInvalid(string $name, string $extension): void
     {
         $path = __DIR__.'/Fixtures/'.$name;
         $file = new \Symfony\Component\HttpFoundation\File\File($path);
@@ -540,7 +540,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
         yield ['bar', ''];
     }
 
-    public function testExtensionAutodetectMimeTypesInvalid()
+    public function testExtensionAutodetectMimeTypesInvalid(): void
     {
         $path = __DIR__.'/Fixtures/invalid-content.gif';
         $file = new \Symfony\Component\HttpFoundation\File\File($path);
@@ -566,7 +566,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testExtensionTypesIncoherent()
+    public function testExtensionTypesIncoherent(): void
     {
         $path = __DIR__.'/Fixtures/invalid-content.gif';
         $file = new \Symfony\Component\HttpFoundation\File\File($path);
@@ -592,7 +592,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testUploadedFileExtensions()
+    public function testUploadedFileExtensions(): void
     {
         $file = new UploadedFile(__DIR__.'/Fixtures/bar', 'bar.txt', 'text/plain', \UPLOAD_ERR_OK, true);
 
@@ -610,7 +610,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideFilenameMaxLengthIsTooLong')]
-    public function testFilenameMaxLengthIsTooLong(File $constraintFile, string $filename, string $messageViolation)
+    public function testFilenameMaxLengthIsTooLong(File $constraintFile, string $filename, string $messageViolation): void
     {
         file_put_contents($this->path, '1');
 
@@ -654,7 +654,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideFilenameCountUnit')]
-    public function testValidCountUnitFilenameMaxLength(int $maxLength, string $countUnit)
+    public function testValidCountUnitFilenameMaxLength(int $maxLength, string $countUnit): void
     {
         file_put_contents($this->path, '1');
 
@@ -665,7 +665,7 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideFilenameCharset')]
-    public function testFilenameCharset(string $filename, string $charset, bool $isValid)
+    public function testFilenameCharset(string $filename, string $charset, bool $isValid): void
     {
         file_put_contents($this->path, '1');
 

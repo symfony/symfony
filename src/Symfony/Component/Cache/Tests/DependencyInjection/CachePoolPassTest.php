@@ -37,7 +37,7 @@ class CachePoolPassTest extends TestCase
         $this->cachePoolPass = new CachePoolPass();
     }
 
-    public function testNamespaceArgumentIsReplaced()
+    public function testNamespaceArgumentIsReplaced(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');
@@ -57,7 +57,7 @@ class CachePoolPassTest extends TestCase
         $this->assertSame('cKLcR15Llk', $cachePool->getArgument(0));
     }
 
-    public function testNamespaceArgumentIsSeededWithAdapterClassName()
+    public function testNamespaceArgumentIsSeededWithAdapterClassName(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');
@@ -78,7 +78,7 @@ class CachePoolPassTest extends TestCase
         $this->assertSame('mVXLns1cYU', $cachePool->getArgument(0));
     }
 
-    public function testNamespaceArgumentIsSeededWithAdapterClassNameWithoutAffectingOtherCachePools()
+    public function testNamespaceArgumentIsSeededWithAdapterClassNameWithoutAffectingOtherCachePools(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');
@@ -106,7 +106,7 @@ class CachePoolPassTest extends TestCase
     }
 
     #[DataProvider('providerAdaptersNotNamespace')]
-    public function testNamespaceArgumentIsNotReplacedIfAdapterWithoutNamespace(string $adapterClass)
+    public function testNamespaceArgumentIsNotReplacedIfAdapterWithoutNamespace(string $adapterClass): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');
@@ -130,7 +130,7 @@ class CachePoolPassTest extends TestCase
         yield [TagAwareAdapter::class];
     }
 
-    public function testArgsAreReplaced()
+    public function testArgsAreReplaced(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');
@@ -153,7 +153,7 @@ class CachePoolPassTest extends TestCase
         $this->assertSame(3, $cachePool->getArgument(2));
     }
 
-    public function testWithNameAttribute()
+    public function testWithNameAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');
@@ -173,7 +173,7 @@ class CachePoolPassTest extends TestCase
         $this->assertSame('5SvqAqqNBH', $cachePool->getArgument(1));
     }
 
-    public function testThrowsExceptionWhenCachePoolTagHasUnknownAttributes()
+    public function testThrowsExceptionWhenCachePoolTagHasUnknownAttributes(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');
@@ -192,7 +192,7 @@ class CachePoolPassTest extends TestCase
         $this->cachePoolPass->process($container);
     }
 
-    public function testChainAdapterPool()
+    public function testChainAdapterPool(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');
@@ -231,7 +231,7 @@ class CachePoolPassTest extends TestCase
         $this->assertSame('cache.app', $doctrineCachePool->getParent());
     }
 
-    public function testChainChildDefinitionGetsOwnNamespace()
+    public function testChainChildDefinitionGetsOwnNamespace(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('cache.prefix.seed', 'test');
@@ -260,7 +260,7 @@ class CachePoolPassTest extends TestCase
         $this->assertNotSame($parentNamespace, $childNamespace);
     }
 
-    public function testGlobalClearerAlias()
+    public function testGlobalClearerAlias(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');

@@ -19,7 +19,7 @@ use Symfony\Component\RateLimiter\Storage\CacheStorage;
 
 class CacheStorageTest extends TestCase
 {
-    public function testSave()
+    public function testSave(): void
     {
         $pool = $this->createMock(CacheItemPoolInterface::class);
         $storage = new CacheStorage($pool);
@@ -37,7 +37,7 @@ class CacheStorageTest extends TestCase
         $storage->save($window);
     }
 
-    public function testFetchExistingState()
+    public function testFetchExistingState(): void
     {
         $pool = $this->createStub(CacheItemPoolInterface::class);
         $storage = new CacheStorage($pool);
@@ -52,7 +52,7 @@ class CacheStorageTest extends TestCase
         $this->assertEquals($window, $storage->fetch('test'));
     }
 
-    public function testFetchExistingJunk()
+    public function testFetchExistingJunk(): void
     {
         $pool = $this->createStub(CacheItemPoolInterface::class);
         $storage = new CacheStorage($pool);
@@ -67,7 +67,7 @@ class CacheStorageTest extends TestCase
         $this->assertNull($storage->fetch('test'));
     }
 
-    public function testFetchNonExistingState()
+    public function testFetchNonExistingState(): void
     {
         $pool = $this->createStub(CacheItemPoolInterface::class);
         $storage = new CacheStorage($pool);
@@ -80,7 +80,7 @@ class CacheStorageTest extends TestCase
         $this->assertNull($storage->fetch('test'));
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $pool = $this->createMock(CacheItemPoolInterface::class);
         $storage = new CacheStorage($pool);

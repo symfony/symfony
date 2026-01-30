@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CheckReferenceValidityPassTest extends TestCase
 {
-    public function testProcessDetectsReferenceToAbstractDefinition()
+    public function testProcessDetectsReferenceToAbstractDefinition(): void
     {
         $container = new ContainerBuilder();
 
@@ -30,7 +30,7 @@ class CheckReferenceValidityPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->addArgument(new Reference('b'));
@@ -41,7 +41,7 @@ class CheckReferenceValidityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new CheckReferenceValidityPass();
         $pass->process($container);

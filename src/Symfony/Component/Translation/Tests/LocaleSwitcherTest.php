@@ -32,7 +32,7 @@ class LocaleSwitcherTest extends TestCase
         \Locale::setDefault($this->intlLocale);
     }
 
-    public function testCanSwitchLocale()
+    public function testCanSwitchLocale(): void
     {
         \Locale::setDefault('en');
 
@@ -50,7 +50,7 @@ class LocaleSwitcherTest extends TestCase
         $this->assertSame('fr', $switcher->getLocale());
     }
 
-    public function testCanSwitchLocaleForCallback()
+    public function testCanSwitchLocaleForCallback(): void
     {
         \Locale::setDefault('en');
 
@@ -61,7 +61,7 @@ class LocaleSwitcherTest extends TestCase
         $this->assertSame('en', $service->getLocale());
         $this->assertSame('en', $switcher->getLocale());
 
-        $switcher->runWithLocale('fr', function (string $locale) use ($switcher, $service) {
+        $switcher->runWithLocale('fr', function (string $locale) use ($switcher, $service): void {
             $this->assertSame('fr', \Locale::getDefault());
             $this->assertSame('fr', $service->getLocale());
             $this->assertSame('fr', $switcher->getLocale());
@@ -73,7 +73,7 @@ class LocaleSwitcherTest extends TestCase
         $this->assertSame('en', $switcher->getLocale());
     }
 
-    public function testWithRequestContext()
+    public function testWithRequestContext(): void
     {
         $context = new RequestContext();
         $service = new LocaleSwitcher('en', [], $context);

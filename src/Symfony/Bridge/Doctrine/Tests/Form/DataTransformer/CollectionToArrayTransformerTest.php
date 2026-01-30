@@ -29,7 +29,7 @@ class CollectionToArrayTransformerTest extends TestCase
         $this->transformer = new CollectionToArrayTransformer();
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $array = [
             2 => 'foo',
@@ -46,7 +46,7 @@ class CollectionToArrayTransformerTest extends TestCase
      *
      * See https://github.com/symfony/symfony/pull/9308
      */
-    public function testTransformArray()
+    public function testTransformArray(): void
     {
         $array = [
             2 => 'foo',
@@ -56,18 +56,18 @@ class CollectionToArrayTransformerTest extends TestCase
         $this->assertSame($array, $this->transformer->transform($array));
     }
 
-    public function testTransformNull()
+    public function testTransformNull(): void
     {
         $this->assertSame([], $this->transformer->transform(null));
     }
 
-    public function testTransformExpectsArrayOrCollection()
+    public function testTransformExpectsArrayOrCollection(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->transformer->transform('Foo');
     }
 
-    public function testTransformReadableCollection()
+    public function testTransformReadableCollection(): void
     {
         $array = [
             2 => 'foo',
@@ -178,7 +178,7 @@ class CollectionToArrayTransformerTest extends TestCase
         $this->assertSame($array, $this->transformer->transform($collection));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $array = [
             2 => 'foo',
@@ -188,12 +188,12 @@ class CollectionToArrayTransformerTest extends TestCase
         $this->assertEquals(new ArrayCollection($array), $this->transformer->reverseTransform($array));
     }
 
-    public function testReverseTransformEmpty()
+    public function testReverseTransformEmpty(): void
     {
         $this->assertEquals(new ArrayCollection(), $this->transformer->reverseTransform(''));
     }
 
-    public function testReverseTransformNull()
+    public function testReverseTransformNull(): void
     {
         $this->assertEquals(new ArrayCollection(), $this->transformer->reverseTransform(null));
     }

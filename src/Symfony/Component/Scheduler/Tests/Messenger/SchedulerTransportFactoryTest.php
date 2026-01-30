@@ -27,7 +27,7 @@ use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class SchedulerTransportFactoryTest extends TestCase
 {
-    public function testCreateTransport()
+    public function testCreateTransport(): void
     {
         $trigger = $this->createStub(TriggerInterface::class);
         $serializer = $this->createStub(SerializerInterface::class);
@@ -51,7 +51,7 @@ class SchedulerTransportFactoryTest extends TestCase
         $this->assertEquals($custom, $factory->createTransport('schedule://custom', ['cache' => 'app'], $serializer));
     }
 
-    public function testInvalidDsn()
+    public function testInvalidDsn(): void
     {
         $factory = $this->makeTransportFactoryWithStubs();
 
@@ -61,7 +61,7 @@ class SchedulerTransportFactoryTest extends TestCase
         $factory->createTransport('schedule://#wrong', [], $this->createStub(SerializerInterface::class));
     }
 
-    public function testNoName()
+    public function testNoName(): void
     {
         $factory = $this->makeTransportFactoryWithStubs();
 
@@ -71,7 +71,7 @@ class SchedulerTransportFactoryTest extends TestCase
         $factory->createTransport('schedule://', [], $this->createStub(SerializerInterface::class));
     }
 
-    public function testNotFound()
+    public function testNotFound(): void
     {
         $factory = $this->makeTransportFactoryWithStubs();
 
@@ -81,7 +81,7 @@ class SchedulerTransportFactoryTest extends TestCase
         $factory->createTransport('schedule://not-exists', [], $this->createStub(SerializerInterface::class));
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $factory = $this->makeTransportFactoryWithStubs();
 

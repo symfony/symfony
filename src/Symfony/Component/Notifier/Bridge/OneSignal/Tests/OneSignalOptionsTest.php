@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\OneSignal\OneSignalOptions;
 
 final class OneSignalOptionsTest extends TestCase
 {
-    public function testOneSignalOptions()
+    public function testOneSignalOptions(): void
     {
         $oneSignalOptions = (new OneSignalOptions())
             ->headings(['en' => 'English Heading', 'fr' => 'French Heading'])

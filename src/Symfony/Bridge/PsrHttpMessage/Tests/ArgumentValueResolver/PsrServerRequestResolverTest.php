@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Controller\ArgumentResolver;
  */
 final class PsrServerRequestResolverTest extends TestCase
 {
-    public function testServerRequest()
+    public function testServerRequest(): void
     {
         $symfonyRequest = new Request();
         $psrRequest = $this->createStub(ServerRequestInterface::class);
@@ -35,7 +35,7 @@ final class PsrServerRequestResolverTest extends TestCase
         self::assertSame([$psrRequest], $resolver->getArguments($symfonyRequest, static function (ServerRequestInterface $serverRequest): void {}));
     }
 
-    public function testRequest()
+    public function testRequest(): void
     {
         $symfonyRequest = new Request();
         $psrRequest = $this->createStub(ServerRequestInterface::class);
@@ -45,7 +45,7 @@ final class PsrServerRequestResolverTest extends TestCase
         self::assertSame([$psrRequest], $resolver->getArguments($symfonyRequest, static function (RequestInterface $request): void {}));
     }
 
-    public function testMessage()
+    public function testMessage(): void
     {
         $symfonyRequest = new Request();
         $psrRequest = $this->createStub(ServerRequestInterface::class);

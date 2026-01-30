@@ -50,7 +50,7 @@ class RequestFunctionalTest extends TestCase
     }
 
     #[DataProvider('provideMethodsRequiringExplicitBodyParsing')]
-    public function testFormUrlEncodedBodyParsing(string $method)
+    public function testFormUrlEncodedBodyParsing(string $method): void
     {
         $response = file_get_contents('http://localhost:8054/', false, stream_context_create([
             'http' => [
@@ -64,7 +64,7 @@ class RequestFunctionalTest extends TestCase
     }
 
     #[DataProvider('provideMethodsRequiringExplicitBodyParsing')]
-    public function testMultipartFormDataBodyParsing(string $method)
+    public function testMultipartFormDataBodyParsing(string $method): void
     {
         $response = file_get_contents('http://localhost:8054/', false, stream_context_create([
             'http' => [

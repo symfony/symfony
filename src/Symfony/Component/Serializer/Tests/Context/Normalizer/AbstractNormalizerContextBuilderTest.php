@@ -33,7 +33,7 @@ class AbstractNormalizerContextBuilderTest extends TestCase
      * @param array<string, mixed> $values
      */
     #[DataProvider('withersDataProvider')]
-    public function testWithers(array $values)
+    public function testWithers(array $values): void
     {
         $context = $this->contextBuilder
             ->withCircularReferenceLimit($values[AbstractNormalizer::CIRCULAR_REFERENCE_LIMIT])
@@ -83,12 +83,12 @@ class AbstractNormalizerContextBuilderTest extends TestCase
         ]];
     }
 
-    public function testCastSingleGroupToArray()
+    public function testCastSingleGroupToArray(): void
     {
         $this->assertSame([AbstractNormalizer::GROUPS => ['group']], $this->contextBuilder->withGroups('group')->toArray());
     }
 
-    public function testCannotSetNonStringAttributes()
+    public function testCannotSetNonStringAttributes(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->contextBuilder->withAttributes(['attribute', ['nested attribute', 1]]);

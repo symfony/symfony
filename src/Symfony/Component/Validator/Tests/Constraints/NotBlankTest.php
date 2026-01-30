@@ -21,14 +21,14 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class NotBlankTest extends TestCase
 {
-    public function testNormalizerCanBeSet()
+    public function testNormalizerCanBeSet(): void
     {
         $notBlank = new NotBlank(normalizer: 'trim');
 
         $this->assertEquals('trim', $notBlank->normalizer);
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(NotBlankDummy::class);
         $loader = new AttributeLoader();

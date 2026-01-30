@@ -16,7 +16,7 @@ use Symfony\Component\Validator\Constraints\Compound;
 
 class CompoundTest extends TestCase
 {
-    public function testGroupsAndPayload()
+    public function testGroupsAndPayload(): void
     {
         $payload = new \stdClass();
         $compound = new EmptyCompound(groups: ['my-group', 'my-other-group'], payload: $payload);

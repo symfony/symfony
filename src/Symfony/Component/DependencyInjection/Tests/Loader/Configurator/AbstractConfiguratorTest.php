@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\Loader\Configurator\AbstractConfigurat
 
 class AbstractConfiguratorTest extends TestCase
 {
-    public function testProcessClosure()
+    public function testProcessClosure(): void
     {
         $this->assertSame(
             [\DateTime::class, 'createFromFormat'],
@@ -30,7 +30,7 @@ class AbstractConfiguratorTest extends TestCase
         );
     }
 
-    public function testProcessNonStaticNamedClosure()
+    public function testProcessNonStaticNamedClosure(): void
     {
         self::expectException(InvalidArgumentException::class);
         self::expectExceptionMessage('The method "DateTime::format(...)" is not static');
@@ -38,7 +38,7 @@ class AbstractConfiguratorTest extends TestCase
         AbstractConfigurator::processValue((new \DateTime())->format(...));
     }
 
-    public function testProcessAnonymousClosure()
+    public function testProcessAnonymousClosure(): void
     {
         self::expectException(InvalidArgumentException::class);
         self::expectExceptionMessage('Anonymous closure not supported. The closure must be created from a static method or a global function.');

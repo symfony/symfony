@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class RememberMeTokenTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $user = $this->getUser();
         $token = new RememberMeToken($user, 'fookey');

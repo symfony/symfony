@@ -20,7 +20,7 @@ use Symfony\Component\Security\Http\Session\SessionAuthenticationStrategy;
 
 class SessionAuthenticationStrategyTest extends TestCase
 {
-    public function testSessionIsNotChanged()
+    public function testSessionIsNotChanged(): void
     {
         $request = $this->createMock(Request::class);
         $request->expects($this->never())->method('getSession');
@@ -29,7 +29,7 @@ class SessionAuthenticationStrategyTest extends TestCase
         $strategy->onAuthentication($request, new NullToken());
     }
 
-    public function testUnsupportedStrategy()
+    public function testUnsupportedStrategy(): void
     {
         $request = $this->createMock(Request::class);
         $request->expects($this->never())->method('getSession');
@@ -42,7 +42,7 @@ class SessionAuthenticationStrategyTest extends TestCase
         $strategy->onAuthentication($request, new NullToken());
     }
 
-    public function testSessionIsMigrated()
+    public function testSessionIsMigrated(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())->method('migrate')->with($this->equalTo(true));
@@ -51,7 +51,7 @@ class SessionAuthenticationStrategyTest extends TestCase
         $strategy->onAuthentication($this->getRequest($session), new NullToken());
     }
 
-    public function testSessionIsInvalidated()
+    public function testSessionIsInvalidated(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())->method('invalidate');
@@ -60,7 +60,7 @@ class SessionAuthenticationStrategyTest extends TestCase
         $strategy->onAuthentication($this->getRequest($session), new NullToken());
     }
 
-    public function testCsrfTokensAreCleared()
+    public function testCsrfTokensAreCleared(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $session->expects($this->once())->method('migrate')->with($this->equalTo(true));

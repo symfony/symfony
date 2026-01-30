@@ -37,7 +37,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
     }
 
     #[DataProvider('messageWhereSchemeIsPartOfSchemeToPackageMapProvider')]
-    public function testMessageWhereSchemeIsPartOfSchemeToPackageMap(string $scheme, string $package)
+    public function testMessageWhereSchemeIsPartOfSchemeToPackageMap(string $scheme, string $package): void
     {
         $dsn = new Dsn(\sprintf('%s://localhost', $scheme));
 
@@ -56,7 +56,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
     }
 
     #[DataProvider('messageWhereSchemeIsNotPartOfSchemeToPackageMapProvider')]
-    public function testMessageWhereSchemeIsNotPartOfSchemeToPackageMap(string $expected, Dsn $dsn, ?string $name, array $supported)
+    public function testMessageWhereSchemeIsNotPartOfSchemeToPackageMap(string $expected, Dsn $dsn, ?string $name, array $supported): void
     {
         $this->assertSame(
             $expected,

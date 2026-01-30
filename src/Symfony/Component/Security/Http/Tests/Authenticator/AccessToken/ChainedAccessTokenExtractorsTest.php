@@ -39,7 +39,7 @@ class ChainedAccessTokenExtractorsTest extends TestCase
     }
 
     #[DataProvider('provideSupportData')]
-    public function testSupport($request)
+    public function testSupport($request): void
     {
         $this->setUpAuthenticator();
 
@@ -52,7 +52,7 @@ class ChainedAccessTokenExtractorsTest extends TestCase
         yield [new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer INVALID_ACCESS_TOKEN'])];
     }
 
-    public function testAuthenticate()
+    public function testAuthenticate(): void
     {
         $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', new UserBadge('foo'));
         $this->setUpAuthenticator();
@@ -63,7 +63,7 @@ class ChainedAccessTokenExtractorsTest extends TestCase
     }
 
     #[DataProvider('provideInvalidAuthenticateData')]
-    public function testAuthenticateInvalid(Request $request, string $errorMessage, string $exceptionType)
+    public function testAuthenticateInvalid(Request $request, string $errorMessage, string $exceptionType): void
     {
         $this->setUpAuthenticator();
 

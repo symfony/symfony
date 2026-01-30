@@ -25,7 +25,7 @@ abstract class AbstractStoreTestCase extends TestCase
 {
     abstract protected function getStore(): PersistingStoreInterface;
 
-    public function testSaveExistAndDelete()
+    public function testSaveExistAndDelete(): void
     {
         $store = $this->getStore();
 
@@ -38,7 +38,7 @@ abstract class AbstractStoreTestCase extends TestCase
         $this->assertFalse($store->exists($key));
     }
 
-    public function testSaveWithDifferentResources()
+    public function testSaveWithDifferentResources(): void
     {
         $store = $this->getStore();
 
@@ -62,7 +62,7 @@ abstract class AbstractStoreTestCase extends TestCase
         $this->assertFalse($store->exists($key2));
     }
 
-    public function testSaveWithDifferentKeysOnSameResource()
+    public function testSaveWithDifferentKeysOnSameResource(): void
     {
         $store = $this->getStore();
 
@@ -97,7 +97,7 @@ abstract class AbstractStoreTestCase extends TestCase
         $this->assertFalse($store->exists($key2));
     }
 
-    public function testSaveWithLimitAt2()
+    public function testSaveWithLimitAt2(): void
     {
         $store = $this->getStore();
 
@@ -141,7 +141,7 @@ abstract class AbstractStoreTestCase extends TestCase
         $store->delete($key3);
     }
 
-    public function testSaveWithWeightAndLimitAt3()
+    public function testSaveWithWeightAndLimitAt3(): void
     {
         $store = $this->getStore();
 
@@ -185,7 +185,7 @@ abstract class AbstractStoreTestCase extends TestCase
         $store->delete($key3);
     }
 
-    public function testPutOffExpiration()
+    public function testPutOffExpiration(): void
     {
         $store = $this->getStore();
         $key = new Key(__METHOD__, 4, 2);
@@ -197,7 +197,7 @@ abstract class AbstractStoreTestCase extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testPutOffExpirationWhenSaveHasNotBeenCalled()
+    public function testPutOffExpirationWhenSaveHasNotBeenCalled(): void
     {
         // This test simulate the key has expired since it does not exist
         $store = $this->getStore();
@@ -209,7 +209,7 @@ abstract class AbstractStoreTestCase extends TestCase
         $store->putOffExpiration($key1, 20);
     }
 
-    public function testSaveTwice()
+    public function testSaveTwice(): void
     {
         $store = $this->getStore();
 

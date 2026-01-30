@@ -27,7 +27,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm = new ContainerAwareEventManager($this->container);
     }
 
-    public function testDispatchEventRespectOrder()
+    public function testDispatchEventRespectOrder(): void
     {
         $this->evm = new ContainerAwareEventManager($this->container, [[['foo'], 'list1'], [['foo'], 'list2']]);
 
@@ -37,7 +37,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame([$listener1, $listener2], array_values($this->evm->getListeners('foo')));
     }
 
-    public function testUsingDoctrineSubscribersThrows()
+    public function testUsingDoctrineSubscribersThrows(): void
     {
         $this->evm = new ContainerAwareEventManager($this->container, [new MySubscriber(['foo'])]);
 
@@ -46,7 +46,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->evm->getListeners('foo');
     }
 
-    public function testDispatchEvent()
+    public function testDispatchEvent(): void
     {
         $this->container->set('lazy1', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy1');
@@ -73,7 +73,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame(1, $listener5->calledByEventNameCount);
     }
 
-    public function testAddEventListenerAfterDispatchEvent()
+    public function testAddEventListenerAfterDispatchEvent(): void
     {
         $this->container->set('lazy1', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy1');
@@ -124,7 +124,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame(1, $listener10->calledByEventNameCount);
     }
 
-    public function testGetListenersForEvent()
+    public function testGetListenersForEvent(): void
     {
         $this->container->set('lazy', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy');
@@ -133,7 +133,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame([$listener1, $listener2], array_values($this->evm->getListeners('foo')));
     }
 
-    public function testGetAllListeners()
+    public function testGetAllListeners(): void
     {
         $this->container->set('lazy', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy');
@@ -142,7 +142,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame([$listener1, $listener2], array_values($this->evm->getAllListeners()['foo']));
     }
 
-    public function testRemoveEventListener()
+    public function testRemoveEventListener(): void
     {
         $this->container->set('lazy', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy');
@@ -155,7 +155,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame([], $this->evm->getListeners('foo'));
     }
 
-    public function testRemoveAllEventListener()
+    public function testRemoveAllEventListener(): void
     {
         $this->container->set('lazy', new MyListener());
         $this->evm->addEventListener('foo', 'lazy');
@@ -170,7 +170,7 @@ class ContainerAwareEventManagerTest extends TestCase
         $this->assertSame([], $this->evm->getListeners('foo'));
     }
 
-    public function testRemoveEventListenerAfterDispatchEvent()
+    public function testRemoveEventListenerAfterDispatchEvent(): void
     {
         $this->container->set('lazy', $listener1 = new MyListener());
         $this->evm->addEventListener('foo', 'lazy');

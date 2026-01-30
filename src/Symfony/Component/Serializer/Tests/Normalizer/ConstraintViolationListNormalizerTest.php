@@ -32,13 +32,13 @@ class ConstraintViolationListNormalizerTest extends TestCase
         $this->normalizer = new ConstraintViolationListNormalizer();
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsNormalization(new ConstraintViolationList()));
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $list = new ConstraintViolationList([
             new ConstraintViolation('a', 'b', ['value' => 'foo'], 'c', 'd', 'e', null, 'f'),
@@ -73,7 +73,7 @@ class ConstraintViolationListNormalizerTest extends TestCase
         $this->assertEquals($expected, $this->normalizer->normalize($list));
     }
 
-    public function testNormalizeWithNameConverter()
+    public function testNormalizeWithNameConverter(): void
     {
         $normalizer = new ConstraintViolationListNormalizer([], new CamelCaseToSnakeCaseNameConverter());
 
@@ -115,7 +115,7 @@ error',
     }
 
     #[DataProvider('payloadFieldsProvider')]
-    public function testNormalizePayloadFields($fields, ?array $expected = null)
+    public function testNormalizePayloadFields($fields, ?array $expected = null): void
     {
         $constraint = new NotNull();
         $constraint->payload = ['severity' => 'warning', 'anotherField2' => 'aValue'];

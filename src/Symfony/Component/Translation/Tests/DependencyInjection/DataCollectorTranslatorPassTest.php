@@ -45,7 +45,7 @@ class DataCollectorTranslatorPassTest extends TestCase
     }
 
     #[DataProvider('getImplementingTranslatorBagInterfaceTranslatorClassNames')]
-    public function testProcessKeepsDataCollectorTranslatorIfItImplementsTranslatorBagInterface($class)
+    public function testProcessKeepsDataCollectorTranslatorIfItImplementsTranslatorBagInterface($class): void
     {
         $this->container->register('translator', $class);
 
@@ -55,7 +55,7 @@ class DataCollectorTranslatorPassTest extends TestCase
     }
 
     #[DataProvider('getImplementingTranslatorBagInterfaceTranslatorClassNames')]
-    public function testProcessKeepsDataCollectorIfTranslatorImplementsTranslatorBagInterface($class)
+    public function testProcessKeepsDataCollectorIfTranslatorImplementsTranslatorBagInterface($class): void
     {
         $this->container->register('translator', $class);
 
@@ -73,7 +73,7 @@ class DataCollectorTranslatorPassTest extends TestCase
     }
 
     #[DataProvider('getNotImplementingTranslatorBagInterfaceTranslatorClassNames')]
-    public function testProcessRemovesDataCollectorTranslatorIfItDoesNotImplementTranslatorBagInterface($class)
+    public function testProcessRemovesDataCollectorTranslatorIfItDoesNotImplementTranslatorBagInterface($class): void
     {
         $this->container->register('translator', $class);
 
@@ -83,7 +83,7 @@ class DataCollectorTranslatorPassTest extends TestCase
     }
 
     #[DataProvider('getNotImplementingTranslatorBagInterfaceTranslatorClassNames')]
-    public function testProcessRemovesDataCollectorIfTranslatorDoesNotImplementTranslatorBagInterface($class)
+    public function testProcessRemovesDataCollectorIfTranslatorDoesNotImplementTranslatorBagInterface($class): void
     {
         $this->container->register('translator', $class);
 

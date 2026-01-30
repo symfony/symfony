@@ -18,7 +18,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyCommandHandler;
 
 class HandledStampTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $stamp = new HandledStamp('some result', 'FooHandler::__invoke()');
 
@@ -31,7 +31,7 @@ class HandledStampTest extends TestCase
         $this->assertSame('FooHandler::__invoke()', $stamp->getHandlerName());
     }
 
-    public function testFromDescriptor()
+    public function testFromDescriptor(): void
     {
         $stamp = HandledStamp::fromDescriptor(new HandlerDescriptor(new DummyCommandHandler()), 'some_result');
 

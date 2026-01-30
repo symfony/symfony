@@ -27,14 +27,14 @@ class ConnectionTest extends TestCase
 {
     private const DEFAULT_EXCHANGE_NAME = 'messages';
 
-    public function testItCannotBeConstructedWithAWrongDsn()
+    public function testItCannotBeConstructedWithAWrongDsn(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The given AMQP DSN is invalid.');
         Connection::fromDsn('amqp://:');
     }
 
-    public function testItCanBeConstructedWithDefaults()
+    public function testItCanBeConstructedWithDefaults(): void
     {
         $this->assertEquals(
             new Connection([
@@ -50,7 +50,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testItCanBeConstructedWithAnAmqpsDsn()
+    public function testItCanBeConstructedWithAnAmqpsDsn(): void
     {
         $this->assertEquals(
             new Connection([
@@ -68,7 +68,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testItGetsParametersFromTheDsn()
+    public function testItGetsParametersFromTheDsn(): void
     {
         $this->assertEquals(
             new Connection([
@@ -84,7 +84,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testOverrideOptionsViaQueryParameters()
+    public function testOverrideOptionsViaQueryParameters(): void
     {
         $this->assertEquals(
             new Connection([
@@ -102,7 +102,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testOptionsAreTakenIntoAccountAndOverwrittenByDsn()
+    public function testOptionsAreTakenIntoAccountAndOverwrittenByDsn(): void
     {
         $this->assertEquals(
             new Connection([
@@ -122,31 +122,31 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testExceptionIfInvalidOptionIsPassedWithDsn()
+    public function testExceptionIfInvalidOptionIsPassedWithDsn(): void
     {
         $this->expectExceptionMessage('Invalid option(s) "foo" passed to the AMQP Messenger transport.');
         Connection::fromDsn('amqp://host?foo=bar');
     }
 
-    public function testExceptionIfInvalidOptionIsPassedAsArgument()
+    public function testExceptionIfInvalidOptionIsPassedAsArgument(): void
     {
         $this->expectExceptionMessage('Invalid option(s) "foo" passed to the AMQP Messenger transport.');
         Connection::fromDsn('amqp://host', ['foo' => 'bar']);
     }
 
-    public function testExceptionIfInvalidQueueOptionIsPassed()
+    public function testExceptionIfInvalidQueueOptionIsPassed(): void
     {
         $this->expectExceptionMessage('Invalid queue option(s) "foo" passed to the AMQP Messenger transport.');
         Connection::fromDsn('amqp://host', ['queues' => ['queueName' => ['foo' => 'bar']]]);
     }
 
-    public function testExceptionIfInvalidExchangeOptionIsPassed()
+    public function testExceptionIfInvalidExchangeOptionIsPassed(): void
     {
         $this->expectExceptionMessage('Invalid exchange option(s) "foo" passed to the AMQP Messenger transport.');
         Connection::fromDsn('amqp://host', ['exchange' => ['foo' => 'bar']]);
     }
 
-    public function testSetsParametersOnTheQueueAndExchange()
+    public function testSetsParametersOnTheQueueAndExchange(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createStub(\AMQPConnection::class),
@@ -223,7 +223,7 @@ class ConnectionTest extends TestCase
     }
 
     #[DataProvider('invalidQueueArgumentsDataProvider')]
-    public function testFromDsnWithInvalidValueOnQueueArguments(string $dsn, array $options)
+    public function testFromDsnWithInvalidValueOnQueueArguments(string $dsn, array $options): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Integer expected for queue argument');
@@ -231,7 +231,7 @@ class ConnectionTest extends TestCase
         Connection::fromDsn($dsn, $options);
     }
 
-    public function testItUsesANormalConnectionByDefault()
+    public function testItUsesANormalConnectionByDefault(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createMock(\AMQPConnection::class),
@@ -248,7 +248,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testItAllowsToUseAPersistentConnection()
+    public function testItAllowsToUseAPersistentConnection(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createMock(\AMQPConnection::class),
@@ -265,7 +265,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testItSetupsTheConnectionWithDefaults()
+    public function testItSetupsTheConnectionWithDefaults(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createStub(\AMQPConnection::class),
@@ -283,7 +283,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testItSetupsTheConnection()
+    public function testItSetupsTheConnection(): void
     {
         $amqpConnection = $this->createStub(\AMQPConnection::class);
         $amqpChannel = $this->createStub(\AMQPChannel::class);
@@ -304,7 +304,7 @@ class ConnectionTest extends TestCase
         $amqpExchange->expects($this->once())->method('publish')->with('body', 'routing_key', \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
         $amqpQueue0->expects($this->once())->method('declareQueue');
         $amqpQueue0->expects($this->exactly(2))->method('bind')
-            ->willReturnCallback(function (...$args) {
+            ->willReturnCallback(function (...$args): void {
                 static $series = [
                     [self::DEFAULT_EXCHANGE_NAME, 'binding_key0', []],
                     [self::DEFAULT_EXCHANGE_NAME, 'binding_key1', []],
@@ -316,7 +316,7 @@ class ConnectionTest extends TestCase
         ;
         $amqpQueue1->expects($this->once())->method('declareQueue');
         $amqpQueue1->expects($this->exactly(2))->method('bind')
-            ->willReturnCallback(function (...$args) {
+            ->willReturnCallback(function (...$args): void {
                 static $series = [
                     [self::DEFAULT_EXCHANGE_NAME, 'binding_key2', []],
                     [self::DEFAULT_EXCHANGE_NAME, 'binding_key3', []],
@@ -338,7 +338,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testItSetupsTheTTLConnection()
+    public function testItSetupsTheTTLConnection(): void
     {
         $amqpConnection = $this->createStub(\AMQPConnection::class);
         $amqpChannel = $this->createStub(\AMQPChannel::class);
@@ -358,7 +358,7 @@ class ConnectionTest extends TestCase
         $amqpExchange->expects($this->once())->method('publish')->with('body', 'routing_key', \AMQP_NOPARAM, ['headers' => [], 'delivery_mode' => 2, 'timestamp' => time()]);
         $amqpQueue0->expects($this->once())->method('declareQueue');
         $amqpQueue0->expects($this->exactly(2))->method('bind')
-            ->willReturnCallback(function (...$args) {
+            ->willReturnCallback(function (...$args): void {
                 static $series = [
                     [self::DEFAULT_EXCHANGE_NAME, 'binding_key0', []],
                     [self::DEFAULT_EXCHANGE_NAME, 'binding_key1', []],
@@ -370,7 +370,7 @@ class ConnectionTest extends TestCase
         ;
         $amqpQueue1->expects($this->once())->method('declareQueue');
         $amqpQueue1->expects($this->exactly(2))->method('bind')
-            ->willReturnCallback(function (...$args) {
+            ->willReturnCallback(function (...$args): void {
                 static $series = [
                     [self::DEFAULT_EXCHANGE_NAME, 'binding_key2', []],
                     [self::DEFAULT_EXCHANGE_NAME, 'binding_key3', []],
@@ -393,7 +393,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testQueueBindingArguments()
+    public function testQueueBindingArguments(): void
     {
         $amqpConnection = $this->createStub(\AMQPConnection::class);
         $amqpChannel = $this->createStub(\AMQPChannel::class);
@@ -418,7 +418,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testExchangeBindingArguments()
+    public function testExchangeBindingArguments(): void
     {
         $factory = new TestAmqpFactory(
             $this->createStub(\AMQPConnection::class),
@@ -429,7 +429,7 @@ class ConnectionTest extends TestCase
 
         $amqpExchange->expects($this->once())->method('declareExchange');
         $amqpExchange->expects($this->exactly(4))->method('bind')
-            ->willReturnCallback(function (...$args) {
+            ->willReturnCallback(function (...$args): void {
                 static $series = [
                     ['exchange0', 'binding_key0', ['x-match' => 'all']],
                     ['exchange0', 'binding_key1', ['x-match' => 'all']],
@@ -455,7 +455,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testNoBindingKeysInExchangeBindings()
+    public function testNoBindingKeysInExchangeBindings(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "binding_keys" option must be set to a non-empty array for exchange "exchange0".');
@@ -474,7 +474,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testItCanDisableTheSetup()
+    public function testItCanDisableTheSetup(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createStub(\AMQPConnection::class),
@@ -497,7 +497,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testItSetupQueuesOnce()
+    public function testItSetupQueuesOnce(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createStub(\AMQPConnection::class),
@@ -515,7 +515,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testAutoSetupWithDelayDeclaresExchangeQueuesAndDelay()
+    public function testAutoSetupWithDelayDeclaresExchangeQueuesAndDelay(): void
     {
         $amqpConnection = $this->createStub(\AMQPConnection::class);
         $amqpChannel = $this->createStub(\AMQPChannel::class);
@@ -546,7 +546,7 @@ class ConnectionTest extends TestCase
         $connection->publish('{}', ['x-some-headers' => 'foo'], 5000);
     }
 
-    public function testItDelaysTheMessage()
+    public function testItDelaysTheMessage(): void
     {
         $delayExchange = $this->createMock(\AMQPExchange::class);
         $delayExchange->expects($this->once())
@@ -561,7 +561,7 @@ class ConnectionTest extends TestCase
         $connection->publish('{}', ['x-some-headers' => 'foo'], 5000);
     }
 
-    public function testItPublishesImmediatelyWithNegativeDelay()
+    public function testItPublishesImmediatelyWithNegativeDelay(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createStub(\AMQPConnection::class),
@@ -591,7 +591,7 @@ class ConnectionTest extends TestCase
         $connection->publish('{}', ['x-some-headers' => 'foo'], -5000);
     }
 
-    public function testItRetriesTheMessage()
+    public function testItRetriesTheMessage(): void
     {
         $delayExchange = $this->createMock(\AMQPExchange::class);
         $delayExchange->expects($this->once())
@@ -604,7 +604,7 @@ class ConnectionTest extends TestCase
         $connection->publish('{}', [], 5000, $amqpStamp);
     }
 
-    public function testItDelaysTheMessageWithADifferentRoutingKeyAndTTLs()
+    public function testItDelaysTheMessageWithADifferentRoutingKeyAndTTLs(): void
     {
         $amqpConnection = $this->createStub(\AMQPConnection::class);
         $amqpChannel = $this->createStub(\AMQPChannel::class);
@@ -642,7 +642,7 @@ class ConnectionTest extends TestCase
         $connection->publish('{}', [], 120000);
     }
 
-    public function testNoCredentialLeakageWhenConnectionFails()
+    public function testNoCredentialLeakageWhenConnectionFails(): void
     {
         $this->expectException(\AMQPException::class);
         $this->expectExceptionMessage('Could not connect to the AMQP server. Please verify the provided DSN.');
@@ -661,7 +661,7 @@ class ConnectionTest extends TestCase
         $connection->channel();
     }
 
-    public function testNoCaCertOnSslConnectionFromDsn()
+    public function testNoCaCertOnSslConnectionFromDsn(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('No CA certificate has been provided. Set "amqp.cacert" in your php.ini or pass the "cacert" parameter in the DSN to use SSL. Alternatively, you can use amqp:// to use without SSL.');
@@ -682,7 +682,7 @@ class ConnectionTest extends TestCase
         }
     }
 
-    public function testAmqpStampHeadersAreUsed()
+    public function testAmqpStampHeadersAreUsed(): void
     {
         $factory = new TestAmqpFactory(
             $this->createStub(\AMQPConnection::class),
@@ -697,7 +697,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body', ['Foo' => 'X'], 0, new AmqpStamp(null, \AMQP_NOPARAM, ['headers' => ['Bar' => 'Y']]));
     }
 
-    public function testAmqpStampDeliveryModeIsUsed()
+    public function testAmqpStampDeliveryModeIsUsed(): void
     {
         $factory = new TestAmqpFactory(
             $this->createStub(\AMQPConnection::class),
@@ -712,7 +712,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body', [], 0, new AmqpStamp(null, \AMQP_NOPARAM, ['delivery_mode' => 1]));
     }
 
-    public function testItCanPublishWithTheDefaultRoutingKey()
+    public function testItCanPublishWithTheDefaultRoutingKey(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createStub(\AMQPConnection::class),
@@ -727,7 +727,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testItCanPublishWithASuppliedRoutingKey()
+    public function testItCanPublishWithASuppliedRoutingKey(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createStub(\AMQPConnection::class),
@@ -742,7 +742,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body', [], 0, new AmqpStamp('routing_key'));
     }
 
-    public function testItDelaysTheMessageWithTheInitialSuppliedRoutingKeyAsArgument()
+    public function testItDelaysTheMessageWithTheInitialSuppliedRoutingKeyAsArgument(): void
     {
         $amqpConnection = $this->createStub(\AMQPConnection::class);
         $amqpChannel = $this->createStub(\AMQPChannel::class);
@@ -780,7 +780,7 @@ class ConnectionTest extends TestCase
         $connection->publish('{}', [], 120000, new AmqpStamp('routing_key'));
     }
 
-    public function testItCanPublishWithCustomFlagsAndAttributes()
+    public function testItCanPublishWithCustomFlagsAndAttributes(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createStub(\AMQPConnection::class),
@@ -800,7 +800,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body', ['type' => DummyMessage::class], 0, new AmqpStamp('routing_key', \AMQP_IMMEDIATE, ['delivery_mode' => 2]));
     }
 
-    public function testItPublishMessagesWithoutWaitingForConfirmation()
+    public function testItPublishMessagesWithoutWaitingForConfirmation(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createStub(\AMQPConnection::class),
@@ -815,7 +815,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testSetChannelToConfirmMessage()
+    public function testSetChannelToConfirmMessage(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createStub(\AMQPConnection::class),
@@ -830,7 +830,7 @@ class ConnectionTest extends TestCase
         $connection->setup();
     }
 
-    public function testItCanPublishAndWaitForConfirmation()
+    public function testItCanPublishAndWaitForConfirmation(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createStub(\AMQPConnection::class),
@@ -845,7 +845,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testItCanBeConstructedWithTLSOptionsAndNonTLSDsn()
+    public function testItCanBeConstructedWithTLSOptionsAndNonTLSDsn(): void
     {
         $this->assertEquals(
             new Connection([
@@ -866,7 +866,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testItCanRetryPublishWhenAMQPConnectionExceptionIsThrown()
+    public function testItCanRetryPublishWhenAMQPConnectionExceptionIsThrown(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createStub(\AMQPConnection::class),
@@ -886,7 +886,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body');
     }
 
-    public function testItCanRetryPublishWithDelayWhenAMQPConnectionExceptionIsThrown()
+    public function testItCanRetryPublishWithDelayWhenAMQPConnectionExceptionIsThrown(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createStub(\AMQPConnection::class),
@@ -906,7 +906,7 @@ class ConnectionTest extends TestCase
         $connection->publish('body', [], 5000);
     }
 
-    public function testItWillRetryMaxThreeTimesWhenAMQPConnectionExceptionIsThrown()
+    public function testItWillRetryMaxThreeTimesWhenAMQPConnectionExceptionIsThrown(): void
     {
         $factory = new TestAmqpFactory(
             $amqpConnection = $this->createStub(\AMQPConnection::class),
@@ -960,7 +960,7 @@ class ConnectionTest extends TestCase
         return Connection::fromDsn('amqp://localhost', [], $factory);
     }
 
-    public function testGettingDefaultExchange()
+    public function testGettingDefaultExchange(): void
     {
         $factory = $this->createMock(AmqpFactory::class);
 
@@ -985,7 +985,7 @@ class ConnectionTest extends TestCase
         $connection->exchange();
     }
 
-    public function testBindIsNotCalledWhenPublishingInDefaultExchange()
+    public function testBindIsNotCalledWhenPublishingInDefaultExchange(): void
     {
         $factory = $this->createMock(AmqpFactory::class);
 

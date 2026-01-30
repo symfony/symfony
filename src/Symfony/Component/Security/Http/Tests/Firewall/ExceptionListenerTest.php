@@ -34,7 +34,7 @@ use Symfony\Component\Security\Http\HttpUtils;
 class ExceptionListenerTest extends TestCase
 {
     #[DataProvider('getAuthenticationExceptionProvider')]
-    public function testAuthenticationExceptionWithoutEntryPoint(\Exception $exception, \Exception $eventException)
+    public function testAuthenticationExceptionWithoutEntryPoint(\Exception $exception, \Exception $eventException): void
     {
         $event = $this->createEvent($exception);
 
@@ -46,7 +46,7 @@ class ExceptionListenerTest extends TestCase
     }
 
     #[DataProvider('getAuthenticationExceptionProvider')]
-    public function testAuthenticationExceptionWithEntryPoint(\Exception $exception, \Exception $eventException)
+    public function testAuthenticationExceptionWithEntryPoint(\Exception $exception, \Exception $eventException): void
     {
         $event = $this->createEvent($exception);
 
@@ -74,7 +74,7 @@ class ExceptionListenerTest extends TestCase
     }
 
     #[DataProvider('getAccessDeniedExceptionProvider')]
-    public function testAccessDeniedExceptionFullFledgedAndWithoutAccessDeniedHandlerAndWithoutErrorPage(\Exception $exception, ?\Exception $eventException = null)
+    public function testAccessDeniedExceptionFullFledgedAndWithoutAccessDeniedHandlerAndWithoutErrorPage(\Exception $exception, ?\Exception $eventException = null): void
     {
         $event = $this->createEvent($exception);
 
@@ -86,7 +86,7 @@ class ExceptionListenerTest extends TestCase
     }
 
     #[DataProvider('getAccessDeniedExceptionProvider')]
-    public function testAccessDeniedExceptionFullFledgedAndWithoutAccessDeniedHandlerAndWithErrorPage(\Exception $exception, ?\Exception $eventException = null)
+    public function testAccessDeniedExceptionFullFledgedAndWithoutAccessDeniedHandlerAndWithErrorPage(\Exception $exception, ?\Exception $eventException = null): void
     {
         $kernel = $this->createStub(HttpKernelInterface::class);
         $kernel->method('handle')->willReturn(new Response('Unauthorized', 401));
@@ -107,7 +107,7 @@ class ExceptionListenerTest extends TestCase
     }
 
     #[DataProvider('getAccessDeniedExceptionProvider')]
-    public function testAccessDeniedExceptionFullFledgedAndWithAccessDeniedHandlerAndWithoutErrorPage(\Exception $exception, ?\Exception $eventException = null)
+    public function testAccessDeniedExceptionFullFledgedAndWithAccessDeniedHandlerAndWithoutErrorPage(\Exception $exception, ?\Exception $eventException = null): void
     {
         $event = $this->createEvent($exception);
 
@@ -122,7 +122,7 @@ class ExceptionListenerTest extends TestCase
     }
 
     #[DataProvider('getAccessDeniedExceptionProvider')]
-    public function testAccessDeniedExceptionNotFullFledged(\Exception $exception, ?\Exception $eventException = null)
+    public function testAccessDeniedExceptionNotFullFledged(\Exception $exception, ?\Exception $eventException = null): void
     {
         $event = $this->createEvent($exception);
 
@@ -136,7 +136,7 @@ class ExceptionListenerTest extends TestCase
         $this->assertSame($eventException ?? $exception, $event->getThrowable()->getPrevious());
     }
 
-    public function testLogoutException()
+    public function testLogoutException(): void
     {
         $event = $this->createEvent(new LogoutException('Invalid CSRF.'));
 
@@ -147,7 +147,7 @@ class ExceptionListenerTest extends TestCase
         $this->assertEquals(403, $event->getThrowable()->getStatusCode());
     }
 
-    public function testUnregister()
+    public function testUnregister(): void
     {
         $listener = $this->createExceptionListener();
         $dispatcher = new EventDispatcher();

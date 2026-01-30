@@ -20,13 +20,13 @@ use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 
 class FilesLoaderTest extends TestCase
 {
-    public function testCallsGetFileLoaderInstanceForeachPath()
+    public function testCallsGetFileLoaderInstanceForeachPath(): void
     {
         $loader = $this->getFilesLoader(new StaticMethodLoader());
         $this->assertEquals(4, $loader->getTimesCalled());
     }
 
-    public function testCallsActualFileLoaderForMetadata()
+    public function testCallsActualFileLoaderForMetadata(): void
     {
         $fileLoader = $this->createMock(LoaderInterface::class);
         $fileLoader->expects($this->exactly(4))

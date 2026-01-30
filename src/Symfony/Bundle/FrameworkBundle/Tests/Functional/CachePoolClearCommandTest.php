@@ -28,7 +28,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         static::bootKernel(['test_case' => 'CachePoolClear', 'root_config' => 'config.yml']);
     }
 
-    public function testClearPrivatePool()
+    public function testClearPrivatePool(): void
     {
         $tester = $this->createCommandTester();
         $tester->execute(['pools' => ['cache.private_pool']], ['decorated' => false]);
@@ -38,7 +38,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
 
-    public function testClearPublicPool()
+    public function testClearPublicPool(): void
     {
         $tester = $this->createCommandTester();
         $tester->execute(['pools' => ['cache.public_pool']], ['decorated' => false]);
@@ -48,7 +48,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
 
-    public function testClearPoolWithCustomClearer()
+    public function testClearPoolWithCustomClearer(): void
     {
         $tester = $this->createCommandTester();
         $tester->execute(['pools' => ['cache.pool_with_clearer']], ['decorated' => false]);
@@ -58,7 +58,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
 
-    public function testCallClearer()
+    public function testCallClearer(): void
     {
         $tester = $this->createCommandTester();
         $tester->execute(['pools' => ['cache.app_clearer']], ['decorated' => false]);
@@ -68,7 +68,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
 
-    public function testClearUnexistingPool()
+    public function testClearUnexistingPool(): void
     {
         $this->expectException(ServiceNotFoundException::class);
         $this->expectExceptionMessage('You have requested a non-existent service "unknown_pool"');
@@ -76,7 +76,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
             ->execute(['pools' => ['unknown_pool']], ['decorated' => false]);
     }
 
-    public function testClearAll()
+    public function testClearAll(): void
     {
         $tester = $this->createCommandTester(['cache.app_clearer']);
         $tester->execute(['--all' => true], ['decorated' => false]);
@@ -87,7 +87,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('[OK] Cache was successfully cleared.', $tester->getDisplay());
     }
 
-    public function testClearWithoutPoolNames()
+    public function testClearWithoutPoolNames(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Could not clear all cache pools, try specifying a specific pool or cache clearer.');
@@ -95,7 +95,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $this->createCommandTester()->execute(['--all' => true], ['decorated' => false]);
     }
 
-    public function testClearNoOptions()
+    public function testClearNoOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Either specify at least one pool name, or provide the --all option to clear all pools.');
@@ -103,7 +103,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $this->createCommandTester()->execute([], ['decorated' => false]);
     }
 
-    public function testClearFailed()
+    public function testClearFailed(): void
     {
         $tester = $this->createCommandTester();
         /** @var FilesystemAdapter $pool */
@@ -131,7 +131,7 @@ class CachePoolClearCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('[WARNING] Cache pool "cache.public_pool" could not be cleared.', $tester->getDisplay());
     }
 
-    public function testExcludedPool()
+    public function testExcludedPool(): void
     {
         $tester = $this->createCommandTester(['cache.app_clearer']);
         $tester->execute(['--all' => true, '--exclude' => ['cache.app_clearer']], ['decorated' => false]);

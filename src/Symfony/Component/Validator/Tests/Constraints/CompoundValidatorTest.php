@@ -22,14 +22,14 @@ class CompoundValidatorTest extends ConstraintValidatorTestCase
         return new CompoundValidator();
     }
 
-    public function testValidValue()
+    public function testValidValue(): void
     {
         $this->validator->validate('foo', new DummyCompoundConstraint());
 
         $this->assertNoViolation();
     }
 
-    public function testValidateWithConstraints()
+    public function testValidateWithConstraints(): void
     {
         $value = 'foo';
         $constraint = new DummyCompoundConstraint();

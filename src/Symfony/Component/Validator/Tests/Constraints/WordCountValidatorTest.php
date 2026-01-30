@@ -28,14 +28,14 @@ class WordCountValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideValidValues')]
-    public function testValidWordCount(string|\Stringable|null $value, int $expectedWordCount)
+    public function testValidWordCount(string|\Stringable|null $value, int $expectedWordCount): void
     {
         $this->validator->validate($value, new WordCount(min: $expectedWordCount, max: $expectedWordCount));
 
         $this->assertNoViolation();
     }
 
-    public function testTooShort()
+    public function testTooShort(): void
     {
         $constraint = new WordCount(min: 4, minMessage: 'myMessage');
         $this->validator->validate('my ascii string', $constraint);
@@ -48,7 +48,7 @@ class WordCountValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testTooLong()
+    public function testTooLong(): void
     {
         $constraint = new WordCount(max: 3, maxMessage: 'myMessage');
         $this->validator->validate('my beautiful ascii string', $constraint);
@@ -62,7 +62,7 @@ class WordCountValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideInvalidTypes')]
-    public function testNonStringValues(mixed $value)
+    public function testNonStringValues(mixed $value): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessageMatches('/Expected argument of type "string", ".*" given/');

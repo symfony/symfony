@@ -23,20 +23,20 @@ use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 class HttpCodeActivationStrategyTest extends TestCase
 {
-    public function testExclusionsWithoutCode()
+    public function testExclusionsWithoutCode(): void
     {
         $this->expectException(\LogicException::class);
         new HttpCodeActivationStrategy(new RequestStack(), [['urls' => []]], new ErrorLevelActivationStrategy(Level::Warning));
     }
 
-    public function testExclusionsWithoutUrls()
+    public function testExclusionsWithoutUrls(): void
     {
         $this->expectException(\LogicException::class);
         new HttpCodeActivationStrategy(new RequestStack(), [['code' => 404]], new ErrorLevelActivationStrategy(Level::Warning));
     }
 
     #[DataProvider('isActivatedProvider')]
-    public function testIsActivated($url, $record, $expected)
+    public function testIsActivated($url, $record, $expected): void
     {
         $requestStack = new RequestStack();
         $requestStack->push(Request::create($url));

@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Worker;
 class StopWorkerOnTimeLimitListenerTest extends TestCase
 {
     #[Group('time-sensitive')]
-    public function testWorkerStopsWhenTimeLimitIsReached()
+    public function testWorkerStopsWhenTimeLimitIsReached(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())->method('info')

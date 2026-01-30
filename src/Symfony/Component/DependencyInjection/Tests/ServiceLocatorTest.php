@@ -27,7 +27,7 @@ class ServiceLocatorTest extends ServiceLocatorTestCase
         return new ServiceLocator($factories);
     }
 
-    public function testGetThrowsOnUndefinedService()
+    public function testGetThrowsOnUndefinedService(): void
     {
         $locator = $this->getServiceLocator([
             'foo' => static fn () => 'bar',
@@ -40,19 +40,19 @@ class ServiceLocatorTest extends ServiceLocatorTestCase
         $locator->get('dummy');
     }
 
-    public function testThrowsOnCircularReference()
+    public function testThrowsOnCircularReference(): void
     {
         $this->expectException(ServiceCircularReferenceException::class);
         $this->expectExceptionMessage('Circular reference detected for service "bar", path: "bar -> baz -> bar".');
         parent::testThrowsOnCircularReference();
     }
 
-    public function testThrowsInServiceSubscriber()
+    public function testThrowsInServiceSubscriber(): void
     {
         $container = new Container();
         $container->set('foo', new \stdClass());
         $subscriber = new SomeServiceSubscriber();
-        $subscriber->container = $this->getServiceLocator(['bar' => static function () {}]);
+        $subscriber->container = $this->getServiceLocator(['bar' => static function (): void {}]);
         $subscriber->container = $subscriber->container->withContext('caller', $container);
 
         $this->expectException(NotFoundExceptionInterface::class);
@@ -61,7 +61,7 @@ class ServiceLocatorTest extends ServiceLocatorTestCase
         $subscriber->getFoo();
     }
 
-    public function testGetThrowsServiceNotFoundException()
+    public function testGetThrowsServiceNotFoundException(): void
     {
         $container = new Container();
         $container->set('foo', new \stdClass());
@@ -75,7 +75,7 @@ class ServiceLocatorTest extends ServiceLocatorTestCase
         $locator->get('foo');
     }
 
-    public function testInvoke()
+    public function testInvoke(): void
     {
         $locator = $this->getServiceLocator([
             'foo' => static fn () => 'bar',
@@ -87,7 +87,7 @@ class ServiceLocatorTest extends ServiceLocatorTestCase
         $this->assertNull($locator('dummy'), '->__invoke() should return null on invalid service');
     }
 
-    public function testProvidesServicesInformation()
+    public function testProvidesServicesInformation(): void
     {
         $locator = new ServiceLocator([
             'foo' => static fn () => 'bar',
@@ -102,7 +102,7 @@ class ServiceLocatorTest extends ServiceLocatorTestCase
         ]);
     }
 
-    public function testIsCountableAndIterable()
+    public function testIsCountableAndIterable(): void
     {
         $locator = $this->getServiceLocator([
             'foo' => static fn () => 'bar',

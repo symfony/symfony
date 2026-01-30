@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\EventListener\CookieClearingLogoutListener;
 
 class CookieClearingLogoutListenerTest extends TestCase
 {
-    public function testLogout()
+    public function testLogout(): void
     {
         $response = new Response();
         $event = new LogoutEvent(new Request(), null);

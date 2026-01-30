@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\HttpUtils;
 class DefaultAuthenticationSuccessHandlerTest extends TestCase
 {
     #[DataProvider('getRequestRedirections')]
-    public function testRequestRedirections(Request $request, $options, $redirectedUrl)
+    public function testRequestRedirections(Request $request, $options, $redirectedUrl): void
     {
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
         $urlGenerator->method('generate')->willReturn('http://localhost/login');
@@ -39,7 +39,7 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $this->assertSame('http://localhost'.$redirectedUrl, $handler->onAuthenticationSuccess($request, new NullToken())->getTargetUrl());
     }
 
-    public function testRequestRedirectionsWithTargetPathInSessions()
+    public function testRequestRedirectionsWithTargetPathInSessions(): void
     {
         $session = new Session(new MockArraySessionStorage());
         $session->set('_security.admin.target_path', '/admin/dashboard');
@@ -56,7 +56,7 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $this->assertFalse($session->has('_security.admin.target_path'));
     }
 
-    public function testStatelessRequestRedirections()
+    public function testStatelessRequestRedirections(): void
     {
         $session = $this->createMock(SessionInterface::class);
         $session->expects($this->never())->method('get')->with('_security.admin.target_path');
@@ -140,7 +140,7 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         ];
     }
 
-    public function testTargetPathFromRequestWithInvalidUrl()
+    public function testTargetPathFromRequestWithInvalidUrl(): void
     {
         $options = ['target_path_parameter' => '_my_target_path'];
 
@@ -157,7 +157,7 @@ class DefaultAuthenticationSuccessHandlerTest extends TestCase
         $handler->onAuthenticationSuccess($request, new NullToken());
     }
 
-    public function testTargetPathWithAbsoluteUrlFromRequest()
+    public function testTargetPathWithAbsoluteUrlFromRequest(): void
     {
         $options = ['target_path_parameter' => '_my_target_path'];
 

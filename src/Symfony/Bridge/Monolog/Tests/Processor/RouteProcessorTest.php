@@ -27,7 +27,7 @@ class RouteProcessorTest extends TestCase
     private const TEST_ROUTE = 'someRouteName';
     private const TEST_PARAMS = ['param1' => 'value1'];
 
-    public function testProcessor()
+    public function testProcessor(): void
     {
         $request = $this->mockFilledRequest();
         $processor = new RouteProcessor();
@@ -43,7 +43,7 @@ class RouteProcessorTest extends TestCase
         );
     }
 
-    public function testProcessorWithoutParams()
+    public function testProcessorWithoutParams(): void
     {
         $request = $this->mockFilledRequest();
         $processor = new RouteProcessor(false);
@@ -59,7 +59,7 @@ class RouteProcessorTest extends TestCase
         );
     }
 
-    public function testProcessorWithSubRequests()
+    public function testProcessorWithSubRequests(): void
     {
         $controllerFromSubRequest = 'OtherController::otherMethod';
         $mainRequest = $this->mockFilledRequest();
@@ -83,7 +83,7 @@ class RouteProcessorTest extends TestCase
         );
     }
 
-    public function testFinishRequestRemovesRelatedEntry()
+    public function testFinishRequestRemovesRelatedEntry(): void
     {
         $mainRequest = $this->mockFilledRequest();
         $subRequest = $this->mockFilledRequest('OtherController::otherMethod');
@@ -107,7 +107,7 @@ class RouteProcessorTest extends TestCase
         $this->assertArrayNotHasKey('requests', $record['extra']);
     }
 
-    public function testProcessorWithEmptyRequest()
+    public function testProcessorWithEmptyRequest(): void
     {
         $request = $this->mockEmptyRequest();
         $processor = new RouteProcessor();
@@ -117,7 +117,7 @@ class RouteProcessorTest extends TestCase
         $this->assertEquals($this->createRecord(), $record);
     }
 
-    public function testProcessorDoesNothingWhenNoRequest()
+    public function testProcessorDoesNothingWhenNoRequest(): void
     {
         $processor = new RouteProcessor();
 

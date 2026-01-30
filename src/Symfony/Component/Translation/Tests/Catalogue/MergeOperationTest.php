@@ -17,7 +17,7 @@ use Symfony\Component\Translation\MessageCatalogueInterface;
 
 class MergeOperationTest extends AbstractOperationTestCase
 {
-    public function testGetMessagesFromSingleDomain()
+    public function testGetMessagesFromSingleDomain(): void
     {
         $operation = $this->createOperation(
             new MessageCatalogue('en', ['messages' => ['a' => 'old_a', 'b' => 'old_b']]),
@@ -40,7 +40,7 @@ class MergeOperationTest extends AbstractOperationTestCase
         );
     }
 
-    public function testGetResultFromSingleDomain()
+    public function testGetResultFromSingleDomain(): void
     {
         $this->assertEquals(
             new MessageCatalogue('en', [
@@ -53,7 +53,7 @@ class MergeOperationTest extends AbstractOperationTestCase
         );
     }
 
-    public function testGetResultFromIntlDomain()
+    public function testGetResultFromIntlDomain(): void
     {
         $this->assertEquals(
             new MessageCatalogue('en', [
@@ -67,7 +67,7 @@ class MergeOperationTest extends AbstractOperationTestCase
         );
     }
 
-    public function testGetResultWithMetadata()
+    public function testGetResultWithMetadata(): void
     {
         $leftCatalogue = new MessageCatalogue('en', ['messages' => ['a' => 'old_a', 'b' => 'old_b']]);
         $leftCatalogue->setMetadata('a', 'foo', 'messages');
@@ -90,7 +90,7 @@ class MergeOperationTest extends AbstractOperationTestCase
         );
     }
 
-    public function testGetResultWithMetadataFromIntlDomain()
+    public function testGetResultWithMetadataFromIntlDomain(): void
     {
         $leftCatalogue = new MessageCatalogue('en', ['messages+intl-icu' => ['a' => 'old_a', 'b' => 'old_b']]);
         $leftCatalogue->setMetadata('a', 'foo', 'messages+intl-icu');

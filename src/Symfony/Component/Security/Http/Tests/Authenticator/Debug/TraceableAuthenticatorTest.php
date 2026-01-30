@@ -20,10 +20,10 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class TraceableAuthenticatorTest extends TestCase
 {
-    public function testGetInfo()
+    public function testGetInfo(): void
     {
         $request = new Request();
-        $passport = new SelfValidatingPassport(new UserBadge('robin', static function () {}));
+        $passport = new SelfValidatingPassport(new UserBadge('robin', static function (): void {}));
 
         $authenticator = $this->createMock(AuthenticatorInterface::class);
         $authenticator->expects($this->once())
@@ -43,7 +43,7 @@ class TraceableAuthenticatorTest extends TestCase
         $this->assertSame($passport, $traceable->getInfo()['passport']);
     }
 
-    public function testGetInfoWithoutAuth()
+    public function testGetInfoWithoutAuth(): void
     {
         $request = new Request();
 

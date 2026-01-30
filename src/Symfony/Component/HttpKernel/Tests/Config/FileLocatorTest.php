@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class FileLocatorTest extends TestCase
 {
-    public function testLocate()
+    public function testLocate(): void
     {
         $kernel = $this->createMock(KernelInterface::class);
         $kernel

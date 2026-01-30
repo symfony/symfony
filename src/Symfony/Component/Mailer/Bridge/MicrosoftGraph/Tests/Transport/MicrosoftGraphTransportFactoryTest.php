@@ -78,7 +78,7 @@ class MicrosoftGraphTransportFactoryTest extends AbstractTransportFactoryTestCas
     }
 
     #[DataProvider('invalidHttpDsnProvider')]
-    public function testValidatesHttpNotProvided(string $graph, string $auth, string $failingType)
+    public function testValidatesHttpNotProvided(string $graph, string $auth, string $failingType): void
     {
         $factory = $this->getFactory();
         $dsn = new Dsn('microsoftgraph+api', $graph, self::USER, self::PASSWORD, null, ['tenantId' => self::TENANT, 'authEndpoint' => $auth]);

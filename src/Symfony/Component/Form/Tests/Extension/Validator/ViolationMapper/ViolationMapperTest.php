@@ -93,7 +93,7 @@ class ViolationMapperTest extends TestCase
         return $error;
     }
 
-    public function testMappingErrorsWhenFormIsNotMapped()
+    public function testMappingErrorsWhenFormIsNotMapped(): void
     {
         $form = $this->getForm('name', null, Issue::class, [
             'child1' => 'child2',
@@ -120,7 +120,7 @@ class ViolationMapperTest extends TestCase
         $this->assertCount(1, $form->get('child2')->getErrors());
     }
 
-    public function testMapToFormInheritingParentDataIfDataDoesNotMatch()
+    public function testMapToFormInheritingParentDataIfDataDoesNotMatch(): void
     {
         $violation = $this->getConstraintViolation('children[address].data.foo');
         $parent = $this->getForm('parent');
@@ -139,7 +139,7 @@ class ViolationMapperTest extends TestCase
         $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
     }
 
-    public function testFollowDotRules()
+    public function testFollowDotRules(): void
     {
         $violation = $this->getConstraintViolation('data.foo');
         $parent = $this->getForm('parent', null, null, [
@@ -167,7 +167,7 @@ class ViolationMapperTest extends TestCase
         $this->assertEquals([$this->getFormError($violation, $grandGrandChild)], iterator_to_array($grandGrandChild->getErrors()), $grandGrandChild->getName().' should have an error, but has none');
     }
 
-    public function testAbortMappingIfNotSynchronized()
+    public function testAbortMappingIfNotSynchronized(): void
     {
         $violation = $this->getConstraintViolation('children[address].data.street');
         $parent = $this->getForm('parent');
@@ -189,7 +189,7 @@ class ViolationMapperTest extends TestCase
         $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
     }
 
-    public function testAbortDotRuleMappingIfNotSynchronized()
+    public function testAbortDotRuleMappingIfNotSynchronized(): void
     {
         $violation = $this->getConstraintViolation('data.address');
         $parent = $this->getForm('parent');
@@ -213,7 +213,7 @@ class ViolationMapperTest extends TestCase
         $this->assertCount(0, $grandChild->getErrors(), $grandChild->getName().' should not have an error, but has one');
     }
 
-    public function testMappingIfNotSubmitted()
+    public function testMappingIfNotSubmitted(): void
     {
         $violation = $this->getConstraintViolation('children[address].data.street');
         $parent = $this->getForm('parent');
@@ -236,7 +236,7 @@ class ViolationMapperTest extends TestCase
         $this->assertCount(1, $grandChild->getErrors(), $grandChild->getName().' should have one error');
     }
 
-    public function testDotRuleMappingIfNotSubmitted()
+    public function testDotRuleMappingIfNotSubmitted(): void
     {
         $violation = $this->getConstraintViolation('data.address');
         $parent = $this->getForm('parent');
@@ -788,7 +788,7 @@ class ViolationMapperTest extends TestCase
     }
 
     #[DataProvider('provideDefaultTests')]
-    public function testDefaultErrorMapping($target, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath)
+    public function testDefaultErrorMapping($target, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath): void
     {
         $violation = $this->getConstraintViolation($violationPath);
         $parent = $this->getForm('parent');
@@ -1241,7 +1241,7 @@ class ViolationMapperTest extends TestCase
     }
 
     #[DataProvider('provideCustomDataErrorTests')]
-    public function testCustomDataErrorMapping($target, $mapFrom, $mapTo, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath)
+    public function testCustomDataErrorMapping($target, $mapFrom, $mapTo, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath): void
     {
         $violation = $this->getConstraintViolation($violationPath);
         $parent = $this->getForm('parent', null, null, [$mapFrom => $mapTo]);
@@ -1439,7 +1439,7 @@ class ViolationMapperTest extends TestCase
     }
 
     #[DataProvider('provideCustomFormErrorTests')]
-    public function testCustomFormErrorMapping($target, $mapFrom, $mapTo, $errorName, $errorPath, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath)
+    public function testCustomFormErrorMapping($target, $mapFrom, $mapTo, $errorName, $errorPath, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath): void
     {
         $violation = $this->getConstraintViolation($violationPath);
         $parent = $this->getForm('parent', null, null, [$mapFrom => $mapTo]);
@@ -1504,7 +1504,7 @@ class ViolationMapperTest extends TestCase
     }
 
     #[DataProvider('provideErrorTestsForFormInheritingParentData')]
-    public function testErrorMappingForFormInheritingParentData($target, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath)
+    public function testErrorMappingForFormInheritingParentData($target, $childName, $childPath, $grandChildName, $grandChildPath, $violationPath): void
     {
         $violation = $this->getConstraintViolation($violationPath);
         $parent = $this->getForm('parent');
@@ -1533,7 +1533,7 @@ class ViolationMapperTest extends TestCase
         }
     }
 
-    public function testBacktrackIfSeveralSubFormsWithSamePropertyPath()
+    public function testBacktrackIfSeveralSubFormsWithSamePropertyPath(): void
     {
         $parent = $this->getForm('parent');
         $child1 = $this->getForm('subform1', 'address');
@@ -1571,7 +1571,7 @@ class ViolationMapperTest extends TestCase
         $this->assertEquals([$this->getFormError($violation3, $grandChild3)], iterator_to_array($grandChild3->getErrors()), $grandChild3->getName().' should have an error, but has none');
     }
 
-    public function testMessageWithLabel1()
+    public function testMessageWithLabel1(): void
     {
         $this->mapper = new ViolationMapper(new FormRenderer(new DummyFormRendererEngine()), new FixedTranslator(['Name' => 'Custom Name']));
 
@@ -1594,7 +1594,7 @@ class ViolationMapperTest extends TestCase
         }
     }
 
-    public function testMessageWithLabel2()
+    public function testMessageWithLabel2(): void
     {
         $this->mapper = new ViolationMapper(null, new FixedTranslator(['options_label' => 'Translated Label']));
 
@@ -1628,7 +1628,7 @@ class ViolationMapperTest extends TestCase
         }
     }
 
-    public function testMessageWithLabelFormat1()
+    public function testMessageWithLabelFormat1(): void
     {
         $this->mapper = new ViolationMapper(null, new FixedTranslator(['form.custom' => 'Translated 1st Custom Label']));
 
@@ -1662,7 +1662,7 @@ class ViolationMapperTest extends TestCase
         }
     }
 
-    public function testMessageWithLabelFormat2()
+    public function testMessageWithLabelFormat2(): void
     {
         $this->mapper = new ViolationMapper(null, new FixedTranslator(['form_custom-id' => 'Translated 2nd Custom Label']));
 
@@ -1696,7 +1696,7 @@ class ViolationMapperTest extends TestCase
         }
     }
 
-    public function testLabelFormatDefinedByParentType()
+    public function testLabelFormatDefinedByParentType(): void
     {
         $form = $this->getForm('', null, null, [], false, true, [
             'label_format' => 'form.%name%',
@@ -1713,7 +1713,7 @@ class ViolationMapperTest extends TestCase
         $this->assertSame('Message "form.foo"', $errors[0]->getMessage());
     }
 
-    public function testLabelPlaceholderTranslatedWithTranslationDomainDefinedByParentType()
+    public function testLabelPlaceholderTranslatedWithTranslationDomainDefinedByParentType(): void
     {
         $this->mapper = new ViolationMapper(null, new FixedTranslator([
             'foo' => 'translated foo label',
@@ -1736,7 +1736,7 @@ class ViolationMapperTest extends TestCase
         $this->assertSame('Message "translated foo label"', $errors[0]->getMessage());
     }
 
-    public function testLabelPlaceholderTranslatedWithTranslationParametersMergedFromParentForm()
+    public function testLabelPlaceholderTranslatedWithTranslationParametersMergedFromParentForm(): void
     {
         $this->mapper = new ViolationMapper(null, new FixedTranslator([
             'foo' => 'translated foo label',
@@ -1766,7 +1766,7 @@ class ViolationMapperTest extends TestCase
         $this->assertSame('Message "translated foo label"', $errors[0]->getMessage());
     }
 
-    public function testTranslatorNotCalledWithoutLabel()
+    public function testTranslatorNotCalledWithoutLabel(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects($this->never())->method('trans');
@@ -1782,7 +1782,7 @@ class ViolationMapperTest extends TestCase
         $this->mapper->mapViolation($violation, $parent);
     }
 
-    public function testFileUploadErrorIsNotRemovedIfNoFileSizeConstraintViolationWasRaised()
+    public function testFileUploadErrorIsNotRemovedIfNoFileSizeConstraintViolationWasRaised(): void
     {
         $form = $this->getForm('form');
         $form->addError(new FileUploadError(
@@ -1799,7 +1799,7 @@ class ViolationMapperTest extends TestCase
         $this->assertCount(2, $form->getErrors());
     }
 
-    public function testFileUploadErrorIsRemovedIfFileSizeConstraintViolationWasRaised()
+    public function testFileUploadErrorIsRemovedIfFileSizeConstraintViolationWasRaised(): void
     {
         $form = $this->getForm('form');
         $form->addError(new FileUploadError(
@@ -1832,7 +1832,7 @@ class ViolationMapperTest extends TestCase
         $this->assertCount(2, $form->getErrors());
     }
 
-    public function testFileUploadErrorIsRemovedIfFileSizeConstraintViolationWasRaisedOnFieldWithErrorBubbling()
+    public function testFileUploadErrorIsRemovedIfFileSizeConstraintViolationWasRaisedOnFieldWithErrorBubbling(): void
     {
         $parent = $this->getForm('parent');
         $child = $this->getForm('child', 'file', null, [], false, true, [

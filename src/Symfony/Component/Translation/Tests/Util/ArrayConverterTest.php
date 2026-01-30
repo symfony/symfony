@@ -18,7 +18,7 @@ use Symfony\Component\Translation\Util\ArrayConverter;
 class ArrayConverterTest extends TestCase
 {
     #[DataProvider('messagesData')]
-    public function testDump($input, $expectedOutput)
+    public function testDump($input, $expectedOutput): void
     {
         $this->assertEquals($expectedOutput, ArrayConverter::expandToTree($input));
     }

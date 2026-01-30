@@ -22,7 +22,7 @@ class ConnectionTest extends TestCase
 {
     private const VAR_DUMPER_SERVER = 'tcp://127.0.0.1:9913';
 
-    public function testDump()
+    public function testDump(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Skip transient test on Windows');
@@ -41,7 +41,7 @@ class ConnectionTest extends TestCase
 
         $dumped = null;
         $process = $this->getServerProcess();
-        $process->start(function ($type, $buffer) use ($process, &$dumped, $connection, $data) {
+        $process->start(function ($type, $buffer) use ($process, &$dumped, $connection, $data): void {
             if (Process::ERR === $type) {
                 $process->stop();
                 $this->fail();
@@ -70,7 +70,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testNoServer()
+    public function testNoServer(): void
     {
         $cloner = new VarCloner();
         $data = $cloner->cloneVar('foo');

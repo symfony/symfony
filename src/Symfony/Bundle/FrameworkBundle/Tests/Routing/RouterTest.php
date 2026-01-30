@@ -32,14 +32,14 @@ use Symfony\Component\Routing\RouteCollection;
 
 class RouterTest extends TestCase
 {
-    public function testConstructThrowsOnNonSymfonyNorPsr11Container()
+    public function testConstructThrowsOnNonSymfonyNorPsr11Container(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('You should either pass a "Symfony\Component\DependencyInjection\ContainerInterface" instance or provide the $parameters argument of the "Symfony\Bundle\FrameworkBundle\Routing\Router::__construct" method');
         new Router($this->createStub(ContainerInterface::class), 'foo');
     }
 
-    public function testGenerateWithServiceParam()
+    public function testGenerateWithServiceParam(): void
     {
         $routes = new RouteCollection();
 
@@ -66,7 +66,7 @@ class RouterTest extends TestCase
         $this->assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
     }
 
-    public function testGenerateWithServiceParamWithSfContainer()
+    public function testGenerateWithServiceParamWithSfContainer(): void
     {
         $routes = new RouteCollection();
 
@@ -91,7 +91,7 @@ class RouterTest extends TestCase
         $this->assertSame('"bar" == "bar"', $router->getRouteCollection()->get('foo')->getCondition());
     }
 
-    public function testGenerateWithDefaultLocale()
+    public function testGenerateWithDefaultLocale(): void
     {
         $routes = new RouteCollection();
 
@@ -117,7 +117,7 @@ class RouterTest extends TestCase
         $this->assertSame('/test-hr', $router->generate($name, ['_locale' => 'hr']));
     }
 
-    public function testDefaultsPlaceholders()
+    public function testDefaultsPlaceholders(): void
     {
         $routes = new RouteCollection();
 
@@ -158,7 +158,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testDefaultsPlaceholdersWithSfContainer()
+    public function testDefaultsPlaceholdersWithSfContainer(): void
     {
         $routes = new RouteCollection();
 
@@ -197,7 +197,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testRequirementsPlaceholders()
+    public function testRequirementsPlaceholders(): void
     {
         $routes = new RouteCollection();
 
@@ -232,7 +232,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testRequirementsPlaceholdersWithSfContainer()
+    public function testRequirementsPlaceholdersWithSfContainer(): void
     {
         $routes = new RouteCollection();
 
@@ -264,7 +264,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testPatternPlaceholders()
+    public function testPatternPlaceholders(): void
     {
         $routes = new RouteCollection();
 
@@ -282,7 +282,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testPatternPlaceholdersWithSfContainer()
+    public function testPatternPlaceholdersWithSfContainer(): void
     {
         $routes = new RouteCollection();
 
@@ -300,7 +300,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testEnvPlaceholders()
+    public function testEnvPlaceholders(): void
     {
         $routes = new RouteCollection();
 
@@ -314,7 +314,7 @@ class RouterTest extends TestCase
         $router->getRouteCollection();
     }
 
-    public function testEnvPlaceholdersWithSfContainer()
+    public function testEnvPlaceholdersWithSfContainer(): void
     {
         $routes = new RouteCollection();
 
@@ -328,7 +328,7 @@ class RouterTest extends TestCase
         $router->getRouteCollection();
     }
 
-    public function testIndirectEnvPlaceholders()
+    public function testIndirectEnvPlaceholders(): void
     {
         $routes = new RouteCollection();
 
@@ -344,7 +344,7 @@ class RouterTest extends TestCase
         $router->getRouteCollection();
     }
 
-    public function testHostPlaceholders()
+    public function testHostPlaceholders(): void
     {
         $routes = new RouteCollection();
 
@@ -365,7 +365,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testHostPlaceholdersWithSfContainer()
+    public function testHostPlaceholdersWithSfContainer(): void
     {
         $routes = new RouteCollection();
 
@@ -386,7 +386,7 @@ class RouterTest extends TestCase
         );
     }
 
-    public function testExceptionOnNonExistentParameterWithSfContainer()
+    public function testExceptionOnNonExistentParameterWithSfContainer(): void
     {
         $routes = new RouteCollection();
 
@@ -402,7 +402,7 @@ class RouterTest extends TestCase
         $router->getRouteCollection()->get('foo');
     }
 
-    public function testExceptionOnNonStringParameter()
+    public function testExceptionOnNonStringParameter(): void
     {
         $routes = new RouteCollection();
 
@@ -420,7 +420,7 @@ class RouterTest extends TestCase
         $router->getRouteCollection()->get('foo');
     }
 
-    public function testExceptionOnNonStringParameterWithSfContainer()
+    public function testExceptionOnNonStringParameterWithSfContainer(): void
     {
         $routes = new RouteCollection();
 
@@ -440,7 +440,7 @@ class RouterTest extends TestCase
     }
 
     #[DataProvider('getNonStringValues')]
-    public function testDefaultValuesAsNonStrings($value)
+    public function testDefaultValuesAsNonStrings($value): void
     {
         $routes = new RouteCollection();
         $routes->add('foo', new Route('foo', ['foo' => $value], ['foo' => '\d+']));
@@ -455,7 +455,7 @@ class RouterTest extends TestCase
     }
 
     #[DataProvider('getNonStringValues')]
-    public function testDefaultValuesAsNonStringsWithSfContainer($value)
+    public function testDefaultValuesAsNonStringsWithSfContainer($value): void
     {
         $routes = new RouteCollection();
         $routes->add('foo', new Route('foo', ['foo' => $value], ['foo' => '\d+']));
@@ -469,7 +469,7 @@ class RouterTest extends TestCase
         $this->assertSame($value, $route->getDefault('foo'));
     }
 
-    public function testGetRouteCollectionAddsContainerParametersResource()
+    public function testGetRouteCollectionAddsContainerParametersResource(): void
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('/%locale%'));
@@ -484,7 +484,7 @@ class RouterTest extends TestCase
         $this->assertEquals([new ContainerParametersResource(['locale' => 'en'])], $routeCollection->getResources());
     }
 
-    public function testGetRouteCollectionAddsContainerParametersResourceWithSfContainer()
+    public function testGetRouteCollectionAddsContainerParametersResourceWithSfContainer(): void
     {
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('/%locale%'));
@@ -499,7 +499,7 @@ class RouterTest extends TestCase
         $this->assertEquals([new ContainerParametersResource(['locale' => 'en'])], $routeCollection->getResources());
     }
 
-    public function testBooleanContainerParametersWithinRouteCondition()
+    public function testBooleanContainerParametersWithinRouteCondition(): void
     {
         $routes = new RouteCollection();
 
@@ -523,7 +523,7 @@ class RouterTest extends TestCase
     }
 
     #[DataProvider('getContainerParameterForRoute')]
-    public function testCacheValidityWithContainerParameters($parameter)
+    public function testCacheValidityWithContainerParameters($parameter): void
     {
         $cacheDir = tempnam(sys_get_temp_dir(), 'sf_router_');
         unlink($cacheDir);
@@ -559,7 +559,7 @@ class RouterTest extends TestCase
         }
     }
 
-    public function testResolvingSchemes()
+    public function testResolvingSchemes(): void
     {
         $routes = new RouteCollection();
 
@@ -578,7 +578,7 @@ class RouterTest extends TestCase
         $this->assertEquals(['http', 'https'], $route->getSchemes());
     }
 
-    public function testResolvingMethods()
+    public function testResolvingMethods(): void
     {
         $routes = new RouteCollection();
 

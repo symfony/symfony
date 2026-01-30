@@ -17,7 +17,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 class CsvFileDumperTest extends TestCase
 {
-    public function testFormatCatalogue()
+    public function testFormatCatalogue(): void
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(['foo' => 'bar', 'bar' => 'foo

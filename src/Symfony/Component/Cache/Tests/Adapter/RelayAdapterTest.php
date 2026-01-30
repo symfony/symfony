@@ -34,7 +34,7 @@ class RelayAdapterTest extends AbstractRedisAdapterTestCase
         self::assertInstanceOf(RelayProxy::class, self::$redis);
     }
 
-    public function testCreateHostConnection()
+    public function testCreateHostConnection(): void
     {
         $redis = RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST').'?class=Relay\Relay');
         $this->assertInstanceOf(Relay::class, $redis);
@@ -42,7 +42,7 @@ class RelayAdapterTest extends AbstractRedisAdapterTestCase
         $this->assertSame(0, $redis->getDbNum());
     }
 
-    public function testLazyConnection()
+    public function testLazyConnection(): void
     {
         $redis = RedisAdapter::createConnection('redis://nonexistenthost?class=Relay\Relay&lazy=1');
         $this->assertInstanceOf(RelayProxy::class, $redis);

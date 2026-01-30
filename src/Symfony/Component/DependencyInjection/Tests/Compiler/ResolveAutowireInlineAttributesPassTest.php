@@ -24,7 +24,7 @@ require_once __DIR__.'/../Fixtures/includes/autowiring_classes.php';
 
 class ResolveAutowireInlineAttributesPassTest extends TestCase
 {
-    public function testAttribute()
+    public function testAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class, Foo::class)
@@ -56,7 +56,7 @@ class ResolveAutowireInlineAttributesPassTest extends TestCase
         self::assertSame(345, $a->inlined->bar);
     }
 
-    public function testChildDefinition()
+    public function testChildDefinition(): void
     {
         $container = new ContainerBuilder();
 
@@ -68,7 +68,7 @@ class ResolveAutowireInlineAttributesPassTest extends TestCase
         $this->assertSame(['$inlined'], array_keys($container->getDefinition('autowire_inline1')->getArguments()));
     }
 
-    public function testNestedAttribute()
+    public function testNestedAttribute(): void
     {
         $container = new ContainerBuilder();
 

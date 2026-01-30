@@ -20,7 +20,7 @@ class FileValidatorPathTest extends FileValidatorTestCase
         return $filename;
     }
 
-    public function testFileNotFound()
+    public function testFileNotFound(): void
     {
         $constraint = new File(
             notFoundMessage: 'myMessage',

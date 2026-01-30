@@ -46,7 +46,7 @@ class RequestPayloadValueResolverTest extends TestCase
 {
     private const string FIXTURES_BASE_PATH = __DIR__.'/../../Fixtures/Controller/ArgumentResolver/UploadedFile';
 
-    public function testNotTypedArgument()
+    public function testNotTypedArgument(): void
     {
         $resolver = new RequestPayloadValueResolver(
             new Serializer(),
@@ -60,7 +60,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Could not resolve the "$notTyped" controller argument: argument should be typed.');
@@ -68,7 +68,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $resolver->onKernelControllerArguments($event);
     }
 
-    public function testDefaultValueArgument()
+    public function testDefaultValueArgument(): void
     {
         $payload = new RequestPayload(50);
 
@@ -92,7 +92,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertEquals([$payload], $event->getArguments());
     }
 
-    public function testQueryDefaultValueArgument()
+    public function testQueryDefaultValueArgument(): void
     {
         $payload = new RequestPayload(50);
 
@@ -116,7 +116,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertEquals([$payload], $event->getArguments());
     }
 
-    public function testNullableValueArgument()
+    public function testNullableValueArgument(): void
     {
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->never())
@@ -138,7 +138,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertSame([null], $event->getArguments());
     }
 
-    public function testQueryNullableValueArgument()
+    public function testQueryNullableValueArgument(): void
     {
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->never())
@@ -160,7 +160,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertSame([null], $event->getArguments());
     }
 
-    public function testNullPayloadAndNotDefaultOrNullableArgument()
+    public function testNullPayloadAndNotDefaultOrNullableArgument(): void
     {
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->never())
@@ -185,7 +185,7 @@ class RequestPayloadValueResolverTest extends TestCase
         }
     }
 
-    public function testRequestPayloadWithoutContentTypeOnNullableArgumentReturnsNull()
+    public function testRequestPayloadWithoutContentTypeOnNullableArgumentReturnsNull(): void
     {
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->never())
@@ -207,7 +207,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertSame([null], $event->getArguments());
     }
 
-    public function testQueryNullPayloadAndNotDefaultOrNullableArgument()
+    public function testQueryNullPayloadAndNotDefaultOrNullableArgument(): void
     {
         $validator = $this->createMock(ValidatorInterface::class);
         $validator->expects($this->never())
@@ -232,7 +232,7 @@ class RequestPayloadValueResolverTest extends TestCase
         }
     }
 
-    public function testWithoutValidatorAndCouldNotDenormalize()
+    public function testWithoutValidatorAndCouldNotDenormalize(): void
     {
         $content = '{"price": 50, "title": ["not a string"]}';
         $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
@@ -246,7 +246,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         try {
             $resolver->onKernelControllerArguments($event);
@@ -256,7 +256,7 @@ class RequestPayloadValueResolverTest extends TestCase
         }
     }
 
-    public function testValidationNotPassed()
+    public function testValidationNotPassed(): void
     {
         $content = '{"price": 50.0, "title": ["not a string"]}';
         $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
@@ -274,7 +274,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         try {
             $resolver->onKernelControllerArguments($event);
@@ -287,7 +287,7 @@ class RequestPayloadValueResolverTest extends TestCase
         }
     }
 
-    public function testValidationNotPerformedWhenPartialDenormalizationReturnsViolation()
+    public function testValidationNotPerformedWhenPartialDenormalizationReturnsViolation(): void
     {
         $content = '{"password": "abc"}';
         $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
@@ -305,7 +305,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         try {
             $resolver->onKernelControllerArguments($event);
@@ -317,7 +317,7 @@ class RequestPayloadValueResolverTest extends TestCase
         }
     }
 
-    public function testUnsupportedMedia()
+    public function testUnsupportedMedia(): void
     {
         $serializer = new Serializer();
 
@@ -330,7 +330,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         try {
             $resolver->onKernelControllerArguments($event);
@@ -340,7 +340,7 @@ class RequestPayloadValueResolverTest extends TestCase
         }
     }
 
-    public function testRequestContentValidationPassed()
+    public function testRequestContentValidationPassed(): void
     {
         $content = '{"price": 50}';
         $payload = new RequestPayload(50);
@@ -360,7 +360,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $resolver->onKernelControllerArguments($event);
 
@@ -369,7 +369,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
     #[TestWith([null])]
     #[TestWith([[]])]
-    public function testRequestContentWithUntypedErrors(?array $types)
+    public function testRequestContentWithUntypedErrors(?array $types): void
     {
         $this->expectException(HttpException::class);
         $this->expectExceptionMessage('This value was of an unexpected type.');
@@ -388,12 +388,12 @@ class RequestPayloadValueResolverTest extends TestCase
         $arguments = $resolver->resolve($request, new ArgumentMetadata('valid', RequestPayload::class, false, false, null, false, [
             MapRequestPayload::class => new MapRequestPayload(),
         ]));
-        $event = new ControllerArgumentsEvent($this->createStub(HttpKernelInterface::class), static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($this->createStub(HttpKernelInterface::class), static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $resolver->onKernelControllerArguments($event);
     }
 
-    public function testQueryStringValidationPassed()
+    public function testQueryStringValidationPassed(): void
     {
         $payload = new RequestPayload(50);
         $query = ['price' => '50'];
@@ -414,14 +414,14 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $resolver->onKernelControllerArguments($event);
 
         $this->assertEquals([$payload], $event->getArguments());
     }
 
-    public function testQueryStringParameterTypeMismatch()
+    public function testQueryStringParameterTypeMismatch(): void
     {
         $query = ['price' => 'not a float'];
 
@@ -441,7 +441,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         try {
             $resolver->onKernelControllerArguments($event);
@@ -453,7 +453,7 @@ class RequestPayloadValueResolverTest extends TestCase
         }
     }
 
-    public function testRequestInputValidationPassed()
+    public function testRequestInputValidationPassed(): void
     {
         $input = ['price' => '50'];
         $payload = new RequestPayload(50);
@@ -474,14 +474,14 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $resolver->onKernelControllerArguments($event);
 
         $this->assertEquals([$payload], $event->getArguments());
     }
 
-    public function testRequestArrayDenormalization()
+    public function testRequestArrayDenormalization(): void
     {
         $input = [
             ['price' => '50'],
@@ -508,14 +508,14 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $resolver->onKernelControllerArguments($event);
 
         $this->assertEquals([$payload], $event->getArguments());
     }
 
-    public function testRequestInputTypeMismatch()
+    public function testRequestInputTypeMismatch(): void
     {
         $input = ['price' => 'not a float'];
 
@@ -535,7 +535,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         try {
             $resolver->onKernelControllerArguments($event);
@@ -547,7 +547,7 @@ class RequestPayloadValueResolverTest extends TestCase
         }
     }
 
-    public function testItThrowsOnMissingAttributeType()
+    public function testItThrowsOnMissingAttributeType(): void
     {
         $serializer = new Serializer();
         $validator = (new ValidatorBuilder())->getValidator();
@@ -564,7 +564,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
-    public function testItThrowsOnInvalidAttributeTypeUsage()
+    public function testItThrowsOnInvalidAttributeTypeUsage(): void
     {
         $serializer = new Serializer();
         $validator = (new ValidatorBuilder())->getValidator();
@@ -581,7 +581,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
-    public function testItThrowsOnVariadicArgument()
+    public function testItThrowsOnVariadicArgument(): void
     {
         $serializer = new Serializer();
         $validator = (new ValidatorBuilder())->getValidator();
@@ -598,7 +598,7 @@ class RequestPayloadValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideMatchedFormatContext')]
-    public function testAcceptFormatPassed(mixed $acceptFormat, string $contentType, string $content)
+    public function testAcceptFormatPassed(mixed $acceptFormat, string $contentType, string $content): void
     {
         $encoders = ['json' => new JsonEncoder(), 'xml' => new XmlEncoder()];
         $serializer = new Serializer([new ObjectNormalizer()], $encoders);
@@ -613,7 +613,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $resolver->onKernelControllerArguments($event);
 
@@ -660,7 +660,7 @@ class RequestPayloadValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideMismatchedFormatContext')]
-    public function testAcceptFormatNotPassed(mixed $acceptFormat, string $contentType, string $content, string $expectedExceptionMessage)
+    public function testAcceptFormatNotPassed(mixed $acceptFormat, string $contentType, string $content, string $expectedExceptionMessage): void
     {
         $serializer = new Serializer([new ObjectNormalizer()]);
         $validator = (new ValidatorBuilder())->getValidator();
@@ -674,7 +674,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         try {
             $resolver->onKernelControllerArguments($event);
@@ -724,7 +724,7 @@ class RequestPayloadValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideValidationGroupsOnManyTypes')]
-    public function testValidationGroupsPassed(string $method, ValueResolver $attribute)
+    public function testValidationGroupsPassed(string $method, ValueResolver $attribute): void
     {
         $input = ['price' => '50', 'title' => 'A long title, so the validation passes'];
 
@@ -743,7 +743,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $resolver->onKernelControllerArguments($event);
 
@@ -751,7 +751,7 @@ class RequestPayloadValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideValidationGroupsOnManyTypes')]
-    public function testValidationGroupsNotPassed(string $method, ValueResolver $attribute)
+    public function testValidationGroupsNotPassed(string $method, ValueResolver $attribute): void
     {
         $input = ['price' => '50', 'title' => 'Too short'];
 
@@ -766,7 +766,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         try {
             $resolver->onKernelControllerArguments($event);
@@ -812,7 +812,7 @@ class RequestPayloadValueResolverTest extends TestCase
         ];
     }
 
-    public function testQueryValidationErrorCustomStatusCode()
+    public function testQueryValidationErrorCustomStatusCode(): void
     {
         $serializer = new Serializer([new ObjectNormalizer()], []);
 
@@ -831,7 +831,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         try {
             $resolver->onKernelControllerArguments($event);
@@ -844,7 +844,7 @@ class RequestPayloadValueResolverTest extends TestCase
         }
     }
 
-    public function testRequestPayloadValidationErrorCustomStatusCode()
+    public function testRequestPayloadValidationErrorCustomStatusCode(): void
     {
         $content = '{"price": 50, "title": ["not a string"]}';
         $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
@@ -862,7 +862,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         try {
             $resolver->onKernelControllerArguments($event);
@@ -876,7 +876,7 @@ class RequestPayloadValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideBoolArgument')]
-    public function testBoolArgumentInQueryString(mixed $expectedValue, ?string $parameterValue)
+    public function testBoolArgumentInQueryString(mixed $expectedValue, ?string $parameterValue): void
     {
         $serializer = new Serializer([new ObjectNormalizer()]);
         $validator = (new ValidatorBuilder())->getValidator();
@@ -889,7 +889,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $resolver->onKernelControllerArguments($event);
 
@@ -897,7 +897,7 @@ class RequestPayloadValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideBoolArgument')]
-    public function testBoolArgumentInBody(mixed $expectedValue, ?string $parameterValue)
+    public function testBoolArgumentInBody(mixed $expectedValue, ?string $parameterValue): void
     {
         $serializer = new Serializer([new ObjectNormalizer()]);
         $validator = (new ValidatorBuilder())->getValidator();
@@ -910,7 +910,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $resolver->onKernelControllerArguments($event);
 
@@ -933,7 +933,7 @@ class RequestPayloadValueResolverTest extends TestCase
     /**
      * Boolean filtering must be disabled for content types other than form data.
      */
-    public function testBoolArgumentInJsonBody()
+    public function testBoolArgumentInJsonBody(): void
     {
         $serializer = new Serializer([new ObjectNormalizer()]);
         $validator = (new ValidatorBuilder())->getValidator();
@@ -946,14 +946,14 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $resolver->onKernelControllerArguments($event);
 
         $this->assertTrue($event->getArguments()[0]->value);
     }
 
-    public function testConfigKeyForQueryString()
+    public function testConfigKeyForQueryString(): void
     {
         $serializer = new Serializer([new ObjectNormalizer()]);
         $validator = (new ValidatorBuilder())->getValidator();
@@ -966,7 +966,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $arguments = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $arguments, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $resolver->onKernelControllerArguments($event);
 
@@ -974,7 +974,7 @@ class RequestPayloadValueResolverTest extends TestCase
         $this->assertSame(1.0, $event->getArguments()[0]->page);
     }
 
-    public function testMapRequestPayloadWithUploadedFiles()
+    public function testMapRequestPayloadWithUploadedFiles(): void
     {
         $image = new UploadedFile(self::FIXTURES_BASE_PATH.'/file-small.txt', 'file-small.txt');
         $input = ['price' => '50'];
@@ -998,7 +998,7 @@ class RequestPayloadValueResolverTest extends TestCase
 
         $kernel = $this->createStub(HttpKernelInterface::class);
         $argument = $resolver->resolve($request, $argument);
-        $event = new ControllerArgumentsEvent($kernel, static function () {}, $argument, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent($kernel, static function (): void {}, $argument, $request, HttpKernelInterface::MAIN_REQUEST);
 
         $resolver->onKernelControllerArguments($event);
 

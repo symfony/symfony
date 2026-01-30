@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class MockHttpClientTest extends HttpClientTestCase
 {
     #[DataProvider('mockingProvider')]
-    public function testMocking($factory, array $expectedResponses)
+    public function testMocking($factory, array $expectedResponses): void
     {
         $client = new MockHttpClient($factory);
         $this->assertSame(0, $client->getRequestsCount());
@@ -96,7 +96,7 @@ class MockHttpClientTest extends HttpClientTestCase
     }
 
     #[DataProvider('validResponseFactoryProvider')]
-    public function testValidResponseFactory($responseFactory)
+    public function testValidResponseFactory($responseFactory): void
     {
         (new MockHttpClient($responseFactory))->request('GET', 'https://foo.bar');
 
@@ -116,7 +116,7 @@ class MockHttpClientTest extends HttpClientTestCase
     }
 
     #[DataProvider('transportExceptionProvider')]
-    public function testTransportExceptionThrowsIfPerformedMoreRequestsThanConfigured($factory)
+    public function testTransportExceptionThrowsIfPerformedMoreRequestsThanConfigured($factory): void
     {
         $client = new MockHttpClient($factory);
 
@@ -154,7 +154,7 @@ class MockHttpClientTest extends HttpClientTestCase
     }
 
     #[DataProvider('invalidResponseFactoryProvider')]
-    public function testInvalidResponseFactory($responseFactory, string $expectedExceptionMessage)
+    public function testInvalidResponseFactory($responseFactory, string $expectedExceptionMessage): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
@@ -171,14 +171,14 @@ class MockHttpClientTest extends HttpClientTestCase
         ];
     }
 
-    public function testZeroStatusCode()
+    public function testZeroStatusCode(): void
     {
         $client = new MockHttpClient(new MockResponse('', ['response_headers' => ['HTTP/1.1 000 ']]));
         $response = $client->request('GET', 'https://foo.bar');
         $this->assertSame(0, $response->getStatusCode());
     }
 
-    public function testFixContentLength()
+    public function testFixContentLength(): void
     {
         $client = new MockHttpClient();
 
@@ -215,7 +215,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertFalse(isset($requestOptions['normalized_headers']['content-length']));
     }
 
-    public function testThrowExceptionInBodyGenerator()
+    public function testThrowExceptionInBodyGenerator(): void
     {
         $mockHttpClient = new MockHttpClient([
             new MockResponse((static function (): \Generator {
@@ -255,7 +255,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertSame('bar ccc', $chunks[2]->getError());
     }
 
-    public function testMergeDefaultOptions()
+    public function testMergeDefaultOptions(): void
     {
         $mockHttpClient = new MockHttpClient(null, 'https://example.com');
 
@@ -264,7 +264,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $mockHttpClient->request('GET', '/foo', ['base_uri' => null]);
     }
 
-    public function testExceptionDirectlyInBody()
+    public function testExceptionDirectlyInBody(): void
     {
         $mockHttpClient = new MockHttpClient([
             new MockResponse(['foo', new \RuntimeException('foo ccc')]),
@@ -493,22 +493,22 @@ class MockHttpClientTest extends HttpClientTestCase
         return new MockHttpClient($responses);
     }
 
-    public function testHttp2PushVulcain()
+    public function testHttp2PushVulcain(): void
     {
         $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
     }
 
-    public function testHttp2PushVulcainWithUnusedResponse()
+    public function testHttp2PushVulcainWithUnusedResponse(): void
     {
         $this->markTestSkipped('MockHttpClient doesn\'t support HTTP/2 PUSH.');
     }
 
-    public function testUnixSocket()
+    public function testUnixSocket(): void
     {
         $this->markTestSkipped('MockHttpClient doesn\'t support binding to unix sockets.');
     }
 
-    public function testChangeResponseFactory()
+    public function testChangeResponseFactory(): void
     {
         /** @var MockHttpClient $client */
         $client = $this->getHttpClient(__METHOD__);
@@ -520,7 +520,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertSame($expectedBody, $response->getContent());
     }
 
-    public function testStringableBodyParam()
+    public function testStringableBodyParam(): void
     {
         $client = new MockHttpClient();
 
@@ -538,7 +538,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertSame('foo=bar', $response->getRequestOptions()['body']);
     }
 
-    public function testResetsRequestCount()
+    public function testResetsRequestCount(): void
     {
         $client = new MockHttpClient([new MockResponse()]);
         $this->assertSame(0, $client->getRequestsCount());
@@ -550,7 +550,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertSame(0, $client->getRequestsCount());
     }
 
-    public function testCancelingMockResponseExecutesOnProgressWithUpdatedInfo()
+    public function testCancelingMockResponseExecutesOnProgressWithUpdatedInfo(): void
     {
         $client = new MockHttpClient(new MockResponse(['foo', 'bar', 'ccc']));
         $canceled = false;
@@ -571,7 +571,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $this->assertTrue($canceled);
     }
 
-    public function testEmptyResponseFactory()
+    public function testEmptyResponseFactory(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('The response factory iterator passed to MockHttpClient is empty.');
@@ -580,7 +580,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $client->request('GET', 'https://example.com');
     }
 
-    public function testMoreRequestsThanResponseFactoryResponses()
+    public function testMoreRequestsThanResponseFactoryResponses(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('No more response left in the response factory iterator passed to MockHttpClient: the number of requests exceeds the number of responses.');
@@ -590,7 +590,7 @@ class MockHttpClientTest extends HttpClientTestCase
         $client->request('GET', 'https://example.com');
     }
 
-    public function testMockStartTimeInfo()
+    public function testMockStartTimeInfo(): void
     {
         $client = new MockHttpClient(new MockResponse('foobarccc', [
             'start_time' => 1701187598.313123,

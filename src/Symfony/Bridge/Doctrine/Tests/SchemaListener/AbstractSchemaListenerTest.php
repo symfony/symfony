@@ -20,7 +20,7 @@ use Symfony\Bridge\Doctrine\SchemaListener\AbstractSchemaListener;
 #[RequiresPhpExtension('pdo_sqlite')]
 class AbstractSchemaListenerTest extends TestCase
 {
-    public function testSameDatabaseChecker()
+    public function testSameDatabaseChecker(): void
     {
         $connectionParams = [
             'dbname' => ':memory:',

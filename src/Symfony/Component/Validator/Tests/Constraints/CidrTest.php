@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class CidrTest extends TestCase
 {
-    public function testForAll()
+    public function testForAll(): void
     {
         $cidrConstraint = new Cidr();
 
@@ -30,7 +30,7 @@ class CidrTest extends TestCase
         self::assertEquals(128, $cidrConstraint->netmaskMax);
     }
 
-    public function testForV4()
+    public function testForV4(): void
     {
         $cidrConstraint = new Cidr(version: Ip::V4);
 
@@ -39,7 +39,7 @@ class CidrTest extends TestCase
         self::assertEquals(32, $cidrConstraint->netmaskMax);
     }
 
-    public function testForV6()
+    public function testForV6(): void
     {
         $cidrConstraint = new Cidr(version: Ip::V6);
 
@@ -48,7 +48,7 @@ class CidrTest extends TestCase
         self::assertEquals(128, $cidrConstraint->netmaskMax);
     }
 
-    public function testWithInvalidVersion()
+    public function testWithInvalidVersion(): void
     {
         $availableVersions = [
             Ip::V4, Ip::V6, Ip::ALL,
@@ -67,7 +67,7 @@ class CidrTest extends TestCase
     }
 
     #[DataProvider('getValidMinMaxValues')]
-    public function testWithValidMinMaxValues(string $ipVersion, int $netmaskMin, int $netmaskMax)
+    public function testWithValidMinMaxValues(string $ipVersion, int $netmaskMin, int $netmaskMax): void
     {
         $cidrConstraint = new Cidr(
             version: $ipVersion,
@@ -81,7 +81,7 @@ class CidrTest extends TestCase
     }
 
     #[DataProvider('getInvalidMinMaxValues')]
-    public function testWithInvalidMinMaxValues(string $ipVersion, int $netmaskMin, int $netmaskMax)
+    public function testWithInvalidMinMaxValues(string $ipVersion, int $netmaskMin, int $netmaskMax): void
     {
         $expectedMax = Ip::V4 == $ipVersion ? 32 : 128;
 
@@ -125,7 +125,7 @@ class CidrTest extends TestCase
         ];
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(CidrDummy::class);
         $loader = new AttributeLoader();

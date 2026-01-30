@@ -20,7 +20,7 @@ class IntlCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testMessageFormatter()
+    public function testMessageFormatter(): void
     {
         $var = new \MessageFormatter('en', 'Hello {name}');
 
@@ -33,7 +33,7 @@ class IntlCasterTest extends TestCase
         $this->assertDumpEquals($expected, $var);
     }
 
-    public function testCastNumberFormatter()
+    public function testCastNumberFormatter(): void
     {
         $var = new \NumberFormatter('en', \NumberFormatter::DECIMAL);
 
@@ -150,7 +150,7 @@ class IntlCasterTest extends TestCase
         $this->assertDumpEquals($expected, $var);
     }
 
-    public function testCastIntlTimeZoneWithDST()
+    public function testCastIntlTimeZoneWithDST(): void
     {
         $var = \IntlTimeZone::createTimeZone('America/Los_Angeles');
 
@@ -170,7 +170,7 @@ class IntlCasterTest extends TestCase
         $this->assertDumpEquals($expected, $var);
     }
 
-    public function testCastIntlTimeZoneWithoutDST()
+    public function testCastIntlTimeZoneWithoutDST(): void
     {
         $var = \IntlTimeZone::createTimeZone('Asia/Bangkok');
 
@@ -188,7 +188,7 @@ class IntlCasterTest extends TestCase
         $this->assertDumpEquals($expected, $var);
     }
 
-    public function testCastIntlCalendar()
+    public function testCastIntlCalendar(): void
     {
         $var = \IntlCalendar::createInstance('America/Los_Angeles', 'en');
 
@@ -228,7 +228,7 @@ class IntlCasterTest extends TestCase
         $this->assertDumpEquals($expected, $var);
     }
 
-    public function testCastDateFormatter()
+    public function testCastDateFormatter(): void
     {
         $var = new \IntlDateFormatter('en', \IntlDateFormatter::TRADITIONAL, \IntlDateFormatter::TRADITIONAL);
 

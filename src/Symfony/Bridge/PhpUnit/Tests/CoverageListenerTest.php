@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 #[RequiresPhpunit('<10')]
 class CoverageListenerTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $dir = __DIR__.'/../Tests/Fixtures/coverage';
         $phpunit = $_SERVER['argv'][0];

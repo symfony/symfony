@@ -34,7 +34,7 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTestCase
         self::$redis = AbstractAdapter::createConnection('redis:?host['.str_replace(' ', ']&host[', $hosts).']&timeout=0&retry_interval=0&read_timeout=0', ['sentinel' => $service, 'prefix' => 'prefix_']);
     }
 
-    public function testInvalidDSNHasBothClusterAndSentinel()
+    public function testInvalidDSNHasBothClusterAndSentinel(): void
     {
         $dsn = 'redis:?host[redis1]&host[redis2]&host[redis3]&cluster=1&sentinel=mymaster';
 
@@ -44,7 +44,7 @@ class RedisAdapterSentinelTest extends AbstractRedisAdapterTestCase
         RedisAdapter::createConnection($dsn);
     }
 
-    public function testExceptionMessageWhenFailingToRetrieveMasterInformation()
+    public function testExceptionMessageWhenFailingToRetrieveMasterInformation(): void
     {
         $hosts = getenv('REDIS_SENTINEL_HOSTS');
         $dsn = 'redis:?host['.str_replace(' ', ']&host[', $hosts).']';

@@ -33,7 +33,7 @@ class UploadedFileTest extends TestCase
         }
     }
 
-    public function testConstructWhenFileNotExists()
+    public function testConstructWhenFileNotExists(): void
     {
         $this->expectException(FileNotFoundException::class);
 
@@ -44,7 +44,7 @@ class UploadedFileTest extends TestCase
         );
     }
 
-    public function testFileUploadsWithNoMimeType()
+    public function testFileUploadsWithNoMimeType(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -60,7 +60,7 @@ class UploadedFileTest extends TestCase
         }
     }
 
-    public function testFileUploadsWithUnknownMimeType()
+    public function testFileUploadsWithUnknownMimeType(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/.unknownextension',
@@ -72,7 +72,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('application/octet-stream', $file->getClientMimeType());
     }
 
-    public function testGuessClientExtension()
+    public function testGuessClientExtension(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -84,7 +84,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('gif', $file->guessClientExtension());
     }
 
-    public function testGuessClientExtensionWithIncorrectMimeType()
+    public function testGuessClientExtensionWithIncorrectMimeType(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -96,7 +96,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('png', $file->guessClientExtension());
     }
 
-    public function testCaseSensitiveMimeType()
+    public function testCaseSensitiveMimeType(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/case-sensitive-mime-type.xlsm',
@@ -108,7 +108,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('xlsm', $file->guessClientExtension());
     }
 
-    public function testErrorIsOkByDefault()
+    public function testErrorIsOkByDefault(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -120,7 +120,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals(\UPLOAD_ERR_OK, $file->getError());
     }
 
-    public function testGetClientOriginalName()
+    public function testGetClientOriginalName(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -132,7 +132,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('original.gif', $file->getClientOriginalName());
     }
 
-    public function testGetClientOriginalExtension()
+    public function testGetClientOriginalExtension(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -144,7 +144,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('gif', $file->getClientOriginalExtension());
     }
 
-    public function testMoveLocalFileIsNotAllowed()
+    public function testMoveLocalFileIsNotAllowed(): void
     {
         $this->expectException(FileException::class);
         $file = new UploadedFile(
@@ -170,7 +170,7 @@ class UploadedFileTest extends TestCase
     }
 
     #[DataProvider('failedUploadedFile')]
-    public function testMoveFailed(UploadedFile $file)
+    public function testMoveFailed(UploadedFile $file): void
     {
         $exceptionClass = match ($file->getError()) {
             \UPLOAD_ERR_INI_SIZE => IniSizeFileException::class,
@@ -188,7 +188,7 @@ class UploadedFileTest extends TestCase
         $file->move(__DIR__.'/Fixtures/directory');
     }
 
-    public function testMoveLocalFileIsAllowedInTestMode()
+    public function testMoveLocalFileIsAllowedInTestMode(): void
     {
         $path = __DIR__.'/Fixtures/test.copy.gif';
         $targetDir = __DIR__.'/Fixtures/directory';
@@ -214,7 +214,7 @@ class UploadedFileTest extends TestCase
         @unlink($targetPath);
     }
 
-    public function testGetClientOriginalNameSanitizeFilename()
+    public function testGetClientOriginalNameSanitizeFilename(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -225,7 +225,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('original.gif', $file->getClientOriginalName());
     }
 
-    public function testGetSize()
+    public function testGetSize(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -244,7 +244,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals(filesize(__DIR__.'/Fixtures/test'), $file->getSize());
     }
 
-    public function testGetExtension()
+    public function testGetExtension(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -254,7 +254,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('gif', $file->getExtension());
     }
 
-    public function testIsValid()
+    public function testIsValid(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -268,7 +268,7 @@ class UploadedFileTest extends TestCase
     }
 
     #[DataProvider('uploadedFileErrorProvider')]
-    public function testIsInvalidOnUploadError($error)
+    public function testIsInvalidOnUploadError($error): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -291,7 +291,7 @@ class UploadedFileTest extends TestCase
         ];
     }
 
-    public function testIsInvalidIfNotHttpUpload()
+    public function testIsInvalidIfNotHttpUpload(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -303,7 +303,7 @@ class UploadedFileTest extends TestCase
         $this->assertFalse($file->isValid());
     }
 
-    public function testGetMaxFilesize()
+    public function testGetMaxFilesize(): void
     {
         $size = UploadedFile::getMaxFilesize();
 
@@ -320,7 +320,7 @@ class UploadedFileTest extends TestCase
         }
     }
 
-    public function testgetClientOriginalPath()
+    public function testgetClientOriginalPath(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/test.gif',
@@ -331,7 +331,7 @@ class UploadedFileTest extends TestCase
         $this->assertEquals('test.gif', $file->getClientOriginalPath());
     }
 
-    public function testgetClientOriginalPathWebkitDirectory()
+    public function testgetClientOriginalPathWebkitDirectory(): void
     {
         $file = new UploadedFile(
             __DIR__.'/Fixtures/webkitdirectory/test.txt',

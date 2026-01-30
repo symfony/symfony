@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Authenticator\HttpBasicAuthenticator;
 
 class UserAuthenticatorTest extends TestCase
 {
-    public function testThrowsLogicExceptionIfCurrentRequestIsNull()
+    public function testThrowsLogicExceptionIfCurrentRequestIsNull(): void
     {
         $container = new Container();
         $firewallMap = new FirewallMap($container, []);

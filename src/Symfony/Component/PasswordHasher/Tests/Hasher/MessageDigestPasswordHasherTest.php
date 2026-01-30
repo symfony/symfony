@@ -17,14 +17,14 @@ use Symfony\Component\PasswordHasher\Hasher\MessageDigestPasswordHasher;
 
 class MessageDigestPasswordHasherTest extends TestCase
 {
-    public function testVerify()
+    public function testVerify(): void
     {
         $hasher = new MessageDigestPasswordHasher('sha256', false, 1);
 
         $this->assertTrue($hasher->verify(hash('sha256', 'password'), 'password', ''));
     }
 
-    public function testHash()
+    public function testHash(): void
     {
         $hasher = new MessageDigestPasswordHasher('sha256', false, 1);
         $this->assertSame(hash('sha256', 'password'), $hasher->hash('password', ''));
@@ -36,7 +36,7 @@ class MessageDigestPasswordHasherTest extends TestCase
         $this->assertSame(hash('sha256', hash('sha256', 'password', true).'password'), $hasher->hash('password', ''));
     }
 
-    public function testHashAlgorithmDoesNotExist()
+    public function testHashAlgorithmDoesNotExist(): void
     {
         $hasher = new MessageDigestPasswordHasher('foobar');
 
@@ -45,7 +45,7 @@ class MessageDigestPasswordHasherTest extends TestCase
         $hasher->hash('password', '');
     }
 
-    public function testHashLength()
+    public function testHashLength(): void
     {
         $hasher = new MessageDigestPasswordHasher();
 
@@ -54,14 +54,14 @@ class MessageDigestPasswordHasherTest extends TestCase
         $hasher->hash(str_repeat('a', 5000), 'salt');
     }
 
-    public function testCheckPasswordLength()
+    public function testCheckPasswordLength(): void
     {
         $hasher = new MessageDigestPasswordHasher();
 
         $this->assertFalse($hasher->verify('encoded', str_repeat('a', 5000), 'salt'));
     }
 
-    public function testUsingBracketInSaltThrows()
+    public function testUsingBracketInSaltThrows(): void
     {
         $hasher = new MessageDigestPasswordHasher('sha256', false, 1);
 

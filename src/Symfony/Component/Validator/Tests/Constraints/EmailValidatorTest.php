@@ -26,42 +26,42 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         return new EmailValidator(Email::VALIDATION_MODE_HTML5);
     }
 
-    public function testUnknownDefaultModeTriggerException()
+    public function testUnknownDefaultModeTriggerException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "defaultMode" parameter value is not valid.');
         new EmailValidator('Unknown Mode');
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Email());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Email());
 
         $this->assertNoViolation();
     }
 
-    public function testObjectEmptyStringIsValid()
+    public function testObjectEmptyStringIsValid(): void
     {
         $this->validator->validate(new EmptyEmailObject(), new Email());
 
         $this->assertNoViolation();
     }
 
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Email());
     }
 
     #[DataProvider('getValidEmails')]
-    public function testValidEmails($email)
+    public function testValidEmails($email): void
     {
         $this->validator->validate($email, new Email());
 
@@ -69,7 +69,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidEmails')]
-    public function testValidEmailsWithNewLine($email)
+    public function testValidEmailsWithNewLine($email): void
     {
         $this->validator->validate($email."\n", new Email());
 
@@ -89,7 +89,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidEmailsWithWhitespaces')]
-    public function testValidNormalizedEmails($email)
+    public function testValidNormalizedEmails($email): void
     {
         $this->validator->validate($email, new Email(normalizer: 'trim'));
 
@@ -105,7 +105,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidEmailsHtml5')]
-    public function testValidEmailsHtml5($email)
+    public function testValidEmailsHtml5($email): void
     {
         $this->validator->validate($email, new Email(mode: Email::VALIDATION_MODE_HTML5));
 
@@ -123,7 +123,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidEmails')]
-    public function testInvalidEmails($email)
+    public function testInvalidEmails($email): void
     {
         $constraint = new Email(message: 'myMessage');
 
@@ -146,7 +146,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidHtml5Emails')]
-    public function testInvalidHtml5Emails($email)
+    public function testInvalidHtml5Emails($email): void
     {
         $constraint = new Email(
             message: 'myMessage',
@@ -184,7 +184,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidAllowNoTldEmails')]
-    public function testInvalidAllowNoTldEmails($email)
+    public function testInvalidAllowNoTldEmails($email): void
     {
         $constraint = new Email(
             message: 'myMessage',
@@ -210,7 +210,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testModeStrict()
+    public function testModeStrict(): void
     {
         $constraint = new Email(mode: Email::VALIDATION_MODE_STRICT);
 
@@ -219,7 +219,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testModeHtml5()
+    public function testModeHtml5(): void
     {
         $constraint = new Email(mode: Email::VALIDATION_MODE_HTML5);
 
@@ -231,7 +231,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
              ->assertRaised();
     }
 
-    public function testModeHtml5AllowNoTld()
+    public function testModeHtml5AllowNoTld(): void
     {
         $constraint = new Email(mode: Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD);
 
@@ -240,7 +240,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testUnknownModesOnValidateTriggerException()
+    public function testUnknownModesOnValidateTriggerException(): void
     {
         $constraint = new Email();
         $constraint->mode = 'Unknown Mode';
@@ -252,7 +252,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidEmailsForStrictChecks')]
-    public function testStrictWithInvalidEmails($email)
+    public function testStrictWithInvalidEmails($email): void
     {
         $constraint = new Email(
             message: 'myMessage',

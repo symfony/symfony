@@ -19,7 +19,7 @@ class FormFlowCursorTest extends TestCase
 {
     private static array $steps = ['personal', 'professional', 'account'];
 
-    public function testConstructorWithValidStep()
+    public function testConstructorWithValidStep(): void
     {
         $cursor = new FormFlowCursor(self::$steps, 'personal');
 
@@ -27,7 +27,7 @@ class FormFlowCursorTest extends TestCase
         $this->assertSame('personal', $cursor->getCurrentStep());
     }
 
-    public function testConstructorWithInvalidStep()
+    public function testConstructorWithInvalidStep(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Step "invalid" does not exist. Available steps are: "personal", "professional", "account".');
@@ -35,21 +35,21 @@ class FormFlowCursorTest extends TestCase
         new FormFlowCursor(self::$steps, 'invalid');
     }
 
-    public function testGetSteps()
+    public function testGetSteps(): void
     {
         $cursor = new FormFlowCursor(self::$steps, 'personal');
 
         $this->assertSame(self::$steps, $cursor->getSteps());
     }
 
-    public function testGetTotalSteps()
+    public function testGetTotalSteps(): void
     {
         $cursor = new FormFlowCursor(self::$steps, 'personal');
 
         $this->assertSame(3, $cursor->getTotalSteps());
     }
 
-    public function testGetStepIndex()
+    public function testGetStepIndex(): void
     {
         $cursor = new FormFlowCursor(self::$steps, 'personal');
         $this->assertSame(0, $cursor->getStepIndex());
@@ -61,14 +61,14 @@ class FormFlowCursorTest extends TestCase
         $this->assertSame(2, $cursor->getStepIndex());
     }
 
-    public function testGetFirstStep()
+    public function testGetFirstStep(): void
     {
         $cursor = new FormFlowCursor(self::$steps, 'professional');
 
         $this->assertSame('personal', $cursor->getFirstStep());
     }
 
-    public function testGetPrevStep()
+    public function testGetPrevStep(): void
     {
         // First step has no previous step
         $cursor = new FormFlowCursor(self::$steps, 'personal');
@@ -83,14 +83,14 @@ class FormFlowCursorTest extends TestCase
         $this->assertSame('professional', $cursor->getPreviousStep());
     }
 
-    public function testGetCurrentStep()
+    public function testGetCurrentStep(): void
     {
         $cursor = new FormFlowCursor(self::$steps, 'professional');
 
         $this->assertSame('professional', $cursor->getCurrentStep());
     }
 
-    public function testWithCurrentStep()
+    public function testWithCurrentStep(): void
     {
         $cursor = new FormFlowCursor(self::$steps, 'personal');
 
@@ -107,7 +107,7 @@ class FormFlowCursorTest extends TestCase
         $this->assertSame(self::$steps, $newCursor->getSteps());
     }
 
-    public function testGetNextStep()
+    public function testGetNextStep(): void
     {
         // First step has next step
         $cursor = new FormFlowCursor(self::$steps, 'personal');
@@ -122,14 +122,14 @@ class FormFlowCursorTest extends TestCase
         $this->assertNull($cursor->getNextStep());
     }
 
-    public function testGetLastStep()
+    public function testGetLastStep(): void
     {
         $cursor = new FormFlowCursor(self::$steps, 'personal');
 
         $this->assertSame('account', $cursor->getLastStep());
     }
 
-    public function testIsFirstStep()
+    public function testIsFirstStep(): void
     {
         // First step
         $cursor = new FormFlowCursor(self::$steps, 'personal');
@@ -140,7 +140,7 @@ class FormFlowCursorTest extends TestCase
         $this->assertFalse($cursor->isFirstStep());
     }
 
-    public function testIsLastStep()
+    public function testIsLastStep(): void
     {
         // Not last step
         $cursor = new FormFlowCursor(self::$steps, 'personal');
@@ -151,7 +151,7 @@ class FormFlowCursorTest extends TestCase
         $this->assertTrue($cursor->isLastStep());
     }
 
-    public function testCanMovePreviousStep()
+    public function testCanMovePreviousStep(): void
     {
         // First position cannot move a previous step
         $cursor = new FormFlowCursor(self::$steps, 'personal');
@@ -166,7 +166,7 @@ class FormFlowCursorTest extends TestCase
         $this->assertTrue($cursor->canMoveBack());
     }
 
-    public function testCanMoveNext()
+    public function testCanMoveNext(): void
     {
         // First position can move next step
         $cursor = new FormFlowCursor(self::$steps, 'personal');
@@ -181,7 +181,7 @@ class FormFlowCursorTest extends TestCase
         $this->assertFalse($cursor->canMoveNext());
     }
 
-    public function testCursorWithSingleStep()
+    public function testCursorWithSingleStep(): void
     {
         $steps = ['single'];
         $cursor = new FormFlowCursor($steps, 'single');

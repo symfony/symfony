@@ -24,7 +24,7 @@ class ButtonTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = ButtonType::class;
 
-    public function testCreateButtonInstances()
+    public function testCreateButtonInstances(): void
     {
         $this->assertInstanceOf(Button::class, $this->factory->create(static::TESTED_TYPE));
     }
@@ -33,14 +33,14 @@ class ButtonTypeTest extends BaseTypeTestCase
      * @param string $emptyData
      * @param null   $expectedData
      */
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null)
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'empty', $expectedData = null): void
     {
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Buttons do not support empty data.');
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
     }
 
-    public function testFormAttrOnRoot()
+    public function testFormAttrOnRoot(): void
     {
         $view = $this->factory
             ->createNamedBuilder('parent', FormType::class, null, [
@@ -55,7 +55,7 @@ class ButtonTypeTest extends BaseTypeTestCase
         $this->assertSame($view->vars['id'], $view['child2']->vars['attr']['form']);
     }
 
-    public function testFormAttrOnChild()
+    public function testFormAttrOnChild(): void
     {
         $view = $this->factory
             ->createNamedBuilder('parent')
@@ -70,7 +70,7 @@ class ButtonTypeTest extends BaseTypeTestCase
         $this->assertArrayNotHasKey('form', $view['child2']->vars['attr']);
     }
 
-    public function testFormAttrAsBoolWithNoId()
+    public function testFormAttrAsBoolWithNoId(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('form_attr');
@@ -84,7 +84,7 @@ class ButtonTypeTest extends BaseTypeTestCase
             ->createView();
     }
 
-    public function testFormAttrAsStringWithNoId()
+    public function testFormAttrAsStringWithNoId(): void
     {
         $stringId = 'custom-identifier';
         $view = $this->factory

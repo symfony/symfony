@@ -28,7 +28,7 @@ class SchedulerTriggerNormalizerTest extends TestCase
     }
 
     #[DataProvider('normalizeProvider')]
-    public function testNormalize(mixed $data, mixed $expected)
+    public function testNormalize(mixed $data, mixed $expected): void
     {
         self::assertSame($expected, $this->normalizer->normalize($data));
     }
@@ -40,7 +40,7 @@ class SchedulerTriggerNormalizerTest extends TestCase
     }
 
     #[DataProvider('supportsNormalizationProvider')]
-    public function testSupportsNormalization(mixed $data, array $context, bool $expected)
+    public function testSupportsNormalization(mixed $data, array $context, bool $expected): void
     {
         self::assertSame($expected, $this->normalizer->supportsNormalization($data, 'json', $context));
     }
@@ -56,7 +56,7 @@ class SchedulerTriggerNormalizerTest extends TestCase
     }
 
     #[DataProvider('supportsDenormalizationProvider')]
-    public function testSupportsDenormalization(mixed $data, string $type, array $context, bool $expected)
+    public function testSupportsDenormalization(mixed $data, string $type, array $context, bool $expected): void
     {
         self::assertSame($expected, $this->normalizer->supportsDenormalization($data, $type, 'json', $context));
     }
@@ -70,7 +70,7 @@ class SchedulerTriggerNormalizerTest extends TestCase
         yield 'array, normal context' => [['a' => 'b'], TriggerInterface::class, [], false];
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $trigger = $this->normalizer->denormalize('every 5 seconds', TriggerInterface::class);
         self::assertSame('every 5 seconds', (string) $trigger);

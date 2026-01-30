@@ -16,13 +16,13 @@ use Symfony\Component\Mime\Encoder\QpMimeHeaderEncoder;
 
 class QpMimeHeaderEncoderTest extends TestCase
 {
-    public function testNameIsQ()
+    public function testNameIsQ(): void
     {
         $encoder = new QpMimeHeaderEncoder();
         $this->assertEquals('Q', $encoder->getName());
     }
 
-    public function testSpaceAndTabNeverAppear()
+    public function testSpaceAndTabNeverAppear(): void
     {
         /* -- RFC 2047, 4.
          Only a subset of the printable ASCII characters may be used in
@@ -34,7 +34,7 @@ class QpMimeHeaderEncoderTest extends TestCase
         $this->assertDoesNotMatchRegularExpression('~[ \t]~', $encoder->encodeString("a \t b"), 'encoded-words in headers cannot contain LWSP as per RFC 2047.');
     }
 
-    public function testSpaceIsRepresentedByUnderscore()
+    public function testSpaceIsRepresentedByUnderscore(): void
     {
         /* -- RFC 2047, 4.2.
         (2) The 8-bit hexadecimal value 20 (e.g., ISO-8859-1 SPACE) may be
@@ -49,7 +49,7 @@ class QpMimeHeaderEncoderTest extends TestCase
         $this->assertEquals('a_b', $encoder->encodeString('a b'), 'Spaces can be represented by more readable underscores as per RFC 2047.');
     }
 
-    public function testEqualsAndQuestionAndUnderscoreAreEncoded()
+    public function testEqualsAndQuestionAndUnderscoreAreEncoded(): void
     {
         /* -- RFC 2047, 4.2.
         (3) 8-bit values which correspond to printable ASCII characters other
@@ -62,7 +62,7 @@ class QpMimeHeaderEncoderTest extends TestCase
         $this->assertEquals('=3D=3F=5F', $encoder->encodeString('=?_'), 'Chars =, ? and _ (underscore) may not appear as per RFC 2047.');
     }
 
-    public function testParensAndQuotesAreEncoded()
+    public function testParensAndQuotesAreEncoded(): void
     {
         /* -- RFC 2047, 5 (2).
          A "Q"-encoded 'encoded-word' which appears in a 'comment' MUST NOT
@@ -73,7 +73,7 @@ class QpMimeHeaderEncoderTest extends TestCase
         $this->assertEquals('=28=22=29', $encoder->encodeString('(")'), 'Chars (, " (DQUOTE) and ) may not appear as per RFC 2047.');
     }
 
-    public function testOnlyCharactersAllowedInPhrasesAreUsed()
+    public function testOnlyCharactersAllowedInPhrasesAreUsed(): void
     {
         /* -- RFC 2047, 5.
         (3) As a replacement for a 'word' entity within a 'phrase', for example,
@@ -110,7 +110,7 @@ class QpMimeHeaderEncoderTest extends TestCase
         }
     }
 
-    public function testEqualsNeverAppearsAtEndOfLine()
+    public function testEqualsNeverAppearsAtEndOfLine(): void
     {
         /* -- RFC 2047, 5 (3).
         The 'encoded-text' in an 'encoded-word' must be self-contained;

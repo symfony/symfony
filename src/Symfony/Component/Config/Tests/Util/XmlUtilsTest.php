@@ -18,7 +18,7 @@ use Symfony\Component\Config\Util\XmlUtils;
 
 class XmlUtilsTest extends TestCase
 {
-    public function testLoadFile()
+    public function testLoadFile(): void
     {
         $fixtures = __DIR__.'/../Fixtures/Util/';
 
@@ -91,7 +91,7 @@ class XmlUtilsTest extends TestCase
         $this->assertSame([], libxml_get_errors());
     }
 
-    public function testParseWithInvalidValidatorCallable()
+    public function testParseWithInvalidValidatorCallable(): void
     {
         $fixtures = __DIR__.'/../Fixtures/Util/';
 
@@ -104,7 +104,7 @@ class XmlUtilsTest extends TestCase
         XmlUtils::parse(file_get_contents($fixtures.'valid.xml'), [$mock, 'validate']);
     }
 
-    public function testLoadFileWithInternalErrorsEnabled()
+    public function testLoadFileWithInternalErrorsEnabled(): void
     {
         $internalErrors = libxml_use_internal_errors(true);
 
@@ -117,7 +117,7 @@ class XmlUtilsTest extends TestCase
     }
 
     #[DataProvider('getDataForConvertDomToArray')]
-    public function testConvertDomToArray($expected, string $xml, bool $root = false, bool $checkPrefix = true)
+    public function testConvertDomToArray($expected, string $xml, bool $root = false, bool $checkPrefix = true): void
     {
         $dom = new \DOMDocument();
         $dom->loadXML($root ? $xml : '<root>'.$xml.'</root>');
@@ -149,7 +149,7 @@ class XmlUtilsTest extends TestCase
     }
 
     #[DataProvider('getDataForPhpize')]
-    public function testPhpize($expected, string $value)
+    public function testPhpize($expected, string $value): void
     {
         $this->assertSame($expected, XmlUtils::phpize($value));
     }
@@ -188,7 +188,7 @@ class XmlUtilsTest extends TestCase
         ];
     }
 
-    public function testLoadEmptyXmlFile()
+    public function testLoadEmptyXmlFile(): void
     {
         $file = __DIR__.'/../Fixtures/foo.xml';
 
@@ -199,11 +199,11 @@ class XmlUtilsTest extends TestCase
     }
 
     // test for issue https://github.com/symfony/symfony/issues/9731
-    public function testLoadWrongEmptyXMLWithErrorHandler()
+    public function testLoadWrongEmptyXMLWithErrorHandler(): void
     {
         $errorReporting = error_reporting(-1);
 
-        set_error_handler(static function ($errno, $errstr) {
+        set_error_handler(static function ($errno, $errstr): void {
             throw new \Exception($errstr, $errno);
         });
 

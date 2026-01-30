@@ -38,7 +38,7 @@ use Symfony\Component\VarDumper\Caster\ClassStub;
 #[Group('time-sensitive')]
 class TraceableFirewallListenerTest extends TestCase
 {
-    public function testOnKernelRequestRecordsListeners()
+    public function testOnKernelRequestRecordsListeners(): void
     {
         $request = new Request();
         $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
@@ -78,7 +78,7 @@ class TraceableFirewallListenerTest extends TestCase
         $this->assertSame((string) new ClassStub($listener::class), (string) $listeners[0]['stub']);
     }
 
-    public function testOnKernelRequestRecordsAuthenticatorsInfo()
+    public function testOnKernelRequestRecordsAuthenticatorsInfo(): void
     {
         $request = new Request();
 
@@ -94,7 +94,7 @@ class TraceableFirewallListenerTest extends TestCase
             ->expects($this->once())
             ->method('authenticate')
             ->with($request)
-            ->willReturn(new SelfValidatingPassport(new UserBadge('robin', static function () {})));
+            ->willReturn(new SelfValidatingPassport(new UserBadge('robin', static function (): void {})));
         $supportingAuthenticator
             ->expects($this->once())
             ->method('onAuthenticationSuccess')

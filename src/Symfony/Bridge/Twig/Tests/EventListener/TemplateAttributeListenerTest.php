@@ -26,7 +26,7 @@ use Twig\Loader\ArrayLoader;
 
 class TemplateAttributeListenerTest extends TestCase
 {
-    public function testAttribute()
+    public function testAttribute(): void
     {
         $twig = $this->createMock(Environment::class);
         $twig->expects($this->exactly(3))
@@ -67,7 +67,7 @@ class TemplateAttributeListenerTest extends TestCase
         $this->assertSame('Bar', $event->getResponse()->getContent());
     }
 
-    public function testAttributeWithBlock()
+    public function testAttributeWithBlock(): void
     {
         $twig = new Environment(new ArrayLoader([
             'foo.html.twig' => 'ERROR {% block bar %}FOOBAR{% endblock %}',
@@ -94,7 +94,7 @@ class TemplateAttributeListenerTest extends TestCase
         $listener->onKernelView($event);
     }
 
-    public function testForm()
+    public function testForm(): void
     {
         $request = new Request();
         $kernel = $this->createStub(HttpKernelInterface::class);

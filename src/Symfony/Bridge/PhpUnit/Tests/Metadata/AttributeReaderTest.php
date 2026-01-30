@@ -24,7 +24,7 @@ class AttributeReaderTest extends TestCase
      * @dataProvider provideReadCases
      */
     #[DataProvider('provideReadCases')]
-    public function testAttributesAreRead(string $method, string $attributeClass, array $expected)
+    public function testAttributesAreRead(string $method, string $attributeClass, array $expected): void
     {
         $reader = new AttributeReader();
 
@@ -65,7 +65,7 @@ class AttributeReaderTest extends TestCase
         ]];
     }
 
-    public function testAttributesAreCached()
+    public function testAttributesAreCached(): void
     {
         $reader = new AttributeReader();
         $cacheRef = new \ReflectionProperty(AttributeReader::class, 'cache');

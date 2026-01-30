@@ -21,14 +21,14 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class UuidTest extends TestCase
 {
-    public function testNormalizerCanBeSet()
+    public function testNormalizerCanBeSet(): void
     {
         $uuid = new Uuid(normalizer: 'trim');
 
         $this->assertEquals('trim', $uuid->normalizer);
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(UuidDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));

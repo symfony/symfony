@@ -18,7 +18,7 @@ use Symfony\Component\Translation\Loader\IniFileLoader;
 
 class IniFileLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new IniFileLoader();
         $resource = __DIR__.'/../Fixtures/resources.ini';
@@ -29,7 +29,7 @@ class IniFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
-    public function testLoadDoesNothingIfEmpty()
+    public function testLoadDoesNothingIfEmpty(): void
     {
         $loader = new IniFileLoader();
         $resource = __DIR__.'/../Fixtures/empty.ini';
@@ -40,7 +40,7 @@ class IniFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $this->expectException(NotFoundResourceException::class);
 

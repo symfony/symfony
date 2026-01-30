@@ -22,7 +22,7 @@ use Twig\RuntimeLoader\ContainerRuntimeLoader;
 
 class ImportMapExtensionTest extends TestCase
 {
-    public function testItRendersTheImportmap()
+    public function testItRendersTheImportmap(): void
     {
         $twig = new Environment(new ArrayLoader([
             'template' => '{{ importmap("application") }}',

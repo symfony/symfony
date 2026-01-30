@@ -17,7 +17,7 @@ use Symfony\Bundle\MercureBundle\MercureBundle;
 final class NotificationTest extends AbstractWebTestCase
 {
     #[RequiresMethod(MercureBundle::class, 'build')]
-    public function testNotifierAssertion()
+    public function testNotifierAssertion(): void
     {
         $client = $this->createClient(['test_case' => 'Notifier', 'root_config' => 'config.yml', 'debug' => true]);
         $client->request('GET', '/send_notification');

@@ -21,7 +21,7 @@ use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 
 class SendFailedMessageToFailureTransportListenerTest extends TestCase
 {
-    public function testItSendsToTheFailureTransportWithSenderLocator()
+    public function testItSendsToTheFailureTransportWithSenderLocator(): void
     {
         $receiverName = 'my_receiver';
         $sender = $this->createMock(SenderInterface::class);
@@ -46,7 +46,7 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
         $listener->onMessageFailed($event);
     }
 
-    public function testDoNothingOnRetryWithServiceLocator()
+    public function testDoNothingOnRetryWithServiceLocator(): void
     {
         $sender = $this->createMock(SenderInterface::class);
         $sender->expects($this->never())->method('send');
@@ -60,7 +60,7 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
         $listener->onMessageFailed($event);
     }
 
-    public function testDoNotRedeliverToFailedWithServiceLocator()
+    public function testDoNotRedeliverToFailedWithServiceLocator(): void
     {
         $receiverName = 'my_receiver';
 
@@ -76,7 +76,7 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
         $listener->onMessageFailed($event);
     }
 
-    public function testDoNothingIfFailureTransportIsNotDefined()
+    public function testDoNothingIfFailureTransportIsNotDefined(): void
     {
         $sender = $this->createMock(SenderInterface::class);
         $sender->expects($this->never())->method('send');
@@ -90,7 +90,7 @@ class SendFailedMessageToFailureTransportListenerTest extends TestCase
         $listener->onMessageFailed($event);
     }
 
-    public function testItSendsToTheFailureTransportWithMultipleFailedTransports()
+    public function testItSendsToTheFailureTransportWithMultipleFailedTransports(): void
     {
         $receiverName = 'my_receiver';
         $sender = $this->createMock(SenderInterface::class);

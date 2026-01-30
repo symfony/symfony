@@ -48,7 +48,7 @@ final class SpotHitTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testShouldSendAMessageUsingTheSpotHitAPI()
+    public function testShouldSendAMessageUsingTheSpotHitAPI(): void
     {
         $expectedRequest = [
             function ($method, $url, $options) {
@@ -71,21 +71,21 @@ final class SpotHitTransportTest extends TransportTestCase
     public static function argumentsProvider(): \Generator
     {
         yield [
-            static function (SpotHitTransport $transport) { $transport->setSmsLong(true); },
-            static function (array $bodyArguments) { self::assertSame('1', $bodyArguments['smslong']); },
+            static function (SpotHitTransport $transport): void { $transport->setSmsLong(true); },
+            static function (array $bodyArguments): void { self::assertSame('1', $bodyArguments['smslong']); },
         ];
 
         yield [
-            static function (SpotHitTransport $transport) { $transport->setLongNBr(3); },
-            static function (array $bodyArguments) { self::assertSame('3', $bodyArguments['smslongnbr']); },
+            static function (SpotHitTransport $transport): void { $transport->setLongNBr(3); },
+            static function (array $bodyArguments): void { self::assertSame('3', $bodyArguments['smslongnbr']); },
         ];
 
         yield [
-            static function (SpotHitTransport $transport) {
+            static function (SpotHitTransport $transport): void {
                 $transport->setSmsLong(true);
                 $transport->setLongNBr(3);
             },
-            static function (array $bodyArguments) {
+            static function (array $bodyArguments): void {
                 self::assertSame('1', $bodyArguments['smslong']);
                 self::assertSame('3', $bodyArguments['smslongnbr']);
             },
@@ -93,7 +93,7 @@ final class SpotHitTransportTest extends TransportTestCase
     }
 
     #[DataProvider('argumentsProvider')]
-    public function testShouldForwardArgumentToRequest($setupTransport, $assertions)
+    public function testShouldForwardArgumentToRequest($setupTransport, $assertions): void
     {
         $expectedRequest = [
             static function ($method, $url, $options) use ($assertions) {

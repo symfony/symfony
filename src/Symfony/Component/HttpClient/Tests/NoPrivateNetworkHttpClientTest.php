@@ -70,7 +70,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
 
     #[DataProvider('getExcludeIpData')]
     #[Group('dns-sensitive')]
-    public function testExcludeByIp(string $ipAddr, $subnets, bool $mustThrow)
+    public function testExcludeByIp(string $ipAddr, $subnets, bool $mustThrow): void
     {
         $host = strtr($ipAddr, '.:', '--');
         DnsMock::withMockedHosts([
@@ -105,7 +105,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
 
     #[DataProvider('getExcludeHostData')]
     #[Group('dns-sensitive')]
-    public function testExcludeByHost(string $ipAddr, $subnets, bool $mustThrow)
+    public function testExcludeByHost(string $ipAddr, $subnets, bool $mustThrow): void
     {
         $host = strtr($ipAddr, '.:', '--');
         DnsMock::withMockedHosts([
@@ -138,7 +138,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         }
     }
 
-    public function testCustomOnProgressCallback()
+    public function testCustomOnProgressCallback(): void
     {
         $ipAddr = '104.26.14.6';
         $url = \sprintf('http://%s/', $ipAddr);
@@ -158,7 +158,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testNonCallableOnProgressCallback()
+    public function testNonCallableOnProgressCallback(): void
     {
         $ipAddr = '104.26.14.6';
         $url = \sprintf('http://%s/', $ipAddr);
@@ -171,7 +171,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $client->request('GET', $url, ['on_progress' => $customCallback]);
     }
 
-    public function testHeadersArePassedOnRedirect()
+    public function testHeadersArePassedOnRedirect(): void
     {
         $ipAddr = '104.26.14.6';
         $url = \sprintf('http://%s/', $ipAddr);

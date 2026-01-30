@@ -33,7 +33,7 @@ class MapperAwareAssetPackageIntegrationTest extends TestCase
         $this->filesystem->remove($this->kernel->getProjectDir().'/var');
     }
 
-    public function testDefaultAssetPackageIsDecorated()
+    public function testDefaultAssetPackageIsDecorated(): void
     {
         $packages = $this->kernel->getContainer()->get('public.assets.packages');
         \assert($packages instanceof Packages);

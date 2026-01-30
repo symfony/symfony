@@ -18,7 +18,7 @@ use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
 class MaxIdLengthAdapterTest extends TestCase
 {
-    public function testLongKey()
+    public function testLongKey(): void
     {
         $cache = new class extends MaxIdLengthAdapter {
             private static $series = [
@@ -43,7 +43,7 @@ class MaxIdLengthAdapterTest extends TestCase
         $cache->hasItem(str_repeat('-', 39));
     }
 
-    public function testLongKeyVersioning()
+    public function testLongKeyVersioning(): void
     {
         $cache = new class extends MaxIdLengthAdapter {
             public function __construct()
@@ -77,7 +77,7 @@ class MaxIdLengthAdapterTest extends TestCase
         $this->assertLessThanOrEqual(50, \strlen($reflectionMethod->invokeArgs($cache, [str_repeat('-', 40)])));
     }
 
-    public function testTooLongNamespace()
+    public function testTooLongNamespace(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Namespace must be 26 chars max, 40 given ("----------------------------------------")');

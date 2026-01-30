@@ -21,14 +21,14 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class IpTest extends TestCase
 {
-    public function testNormalizerCanBeSet()
+    public function testNormalizerCanBeSet(): void
     {
         $ip = new Ip(normalizer: 'trim');
 
         $this->assertEquals('trim', $ip->normalizer);
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(IpDummy::class);
         $loader = new AttributeLoader();

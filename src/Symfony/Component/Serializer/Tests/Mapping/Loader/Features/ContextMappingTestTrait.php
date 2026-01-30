@@ -24,7 +24,7 @@ trait ContextMappingTestTrait
 {
     abstract protected function getLoaderForContextMapping(): LoaderInterface;
 
-    public function testLoadContexts()
+    public function testLoadContexts(): void
     {
         $this->assertLoadedContexts();
     }

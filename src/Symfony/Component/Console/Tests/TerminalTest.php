@@ -38,7 +38,7 @@ class TerminalTest extends TestCase
         $this->resetStatics();
     }
 
-    private function resetStatics()
+    private function resetStatics(): void
     {
         foreach (['height', 'width', 'stty'] as $name) {
             $property = new \ReflectionProperty(Terminal::class, $name);
@@ -46,7 +46,7 @@ class TerminalTest extends TestCase
         }
     }
 
-    public function test()
+    public function test(): void
     {
         putenv('COLUMNS=100');
         putenv('LINES=50');
@@ -61,7 +61,7 @@ class TerminalTest extends TestCase
         $this->assertSame(60, $terminal->getHeight());
     }
 
-    public function testZeroValues()
+    public function testZeroValues(): void
     {
         putenv('COLUMNS=0');
         putenv('LINES=0');
@@ -72,7 +72,7 @@ class TerminalTest extends TestCase
         $this->assertSame(0, $terminal->getHeight());
     }
 
-    public function testSttyOnWindows()
+    public function testSttyOnWindows(): void
     {
         if ('\\' !== \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Must be on windows');
@@ -97,7 +97,7 @@ class TerminalTest extends TestCase
     }
 
     #[DataProvider('provideTerminalColorEnv')]
-    public function testGetColorMode(?string $testColorTerm, ?string $testTerm, AnsiColorMode $expected)
+    public function testGetColorMode(?string $testColorTerm, ?string $testTerm, AnsiColorMode $expected): void
     {
         $oriColorTerm = getenv('COLORTERM');
         $oriTerm = getenv('TERM');
@@ -126,7 +126,7 @@ class TerminalTest extends TestCase
         yield [null, null, Terminal::DEFAULT_COLOR_MODE];
     }
 
-    public function testSetColorMode()
+    public function testSetColorMode(): void
     {
         $oriColorTerm = getenv('COLORTERM');
         $oriTerm = getenv('TERM');

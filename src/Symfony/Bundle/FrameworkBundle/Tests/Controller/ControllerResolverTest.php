@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ControllerResolverTest extends TestCase
 {
-    public function testAbstractControllerGetsContainerWhenNotSet()
+    public function testAbstractControllerGetsContainerWhenNotSet(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('"Symfony\\Bundle\\FrameworkBundle\\Tests\\Controller\\TestAbstractController" has no container set, did you forget to define it as a service subscriber?');
@@ -42,7 +42,7 @@ class ControllerResolverTest extends TestCase
         $this->assertSame($container, $controller->setContainer($container));
     }
 
-    public function testAbstractControllerServiceWithFqcnIdGetsContainerWhenNotSet()
+    public function testAbstractControllerServiceWithFqcnIdGetsContainerWhenNotSet(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('"Symfony\\Bundle\\FrameworkBundle\\Tests\\Controller\\DummyController" has no container set, did you forget to define it as a service subscriber?');
@@ -63,7 +63,7 @@ class ControllerResolverTest extends TestCase
         $this->assertSame($container, $controller->getContainer());
     }
 
-    public function testAbstractControllerGetsNoContainerWhenSet()
+    public function testAbstractControllerGetsNoContainerWhenSet(): void
     {
         class_exists(AbstractControllerTest::class);
 
@@ -83,7 +83,7 @@ class ControllerResolverTest extends TestCase
         $this->assertSame($controllerContainer, $controller->setContainer($container));
     }
 
-    public function testAbstractControllerServiceWithFcqnIdGetsNoContainerWhenSet()
+    public function testAbstractControllerServiceWithFcqnIdGetsNoContainerWhenSet(): void
     {
         class_exists(AbstractControllerTest::class);
 
@@ -120,7 +120,7 @@ class DummyController extends AbstractController
         return $this->container;
     }
 
-    public function fooAction()
+    public function fooAction(): void
     {
     }
 }

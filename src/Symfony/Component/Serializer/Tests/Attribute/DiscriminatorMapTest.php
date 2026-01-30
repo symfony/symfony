@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  */
 class DiscriminatorMapTest extends TestCase
 {
-    public function testGetTypePropertyAndMapping()
+    public function testGetTypePropertyAndMapping(): void
     {
         $attribute = new DiscriminatorMap(typeProperty: 'type', mapping: [
             'foo' => 'FooClass',
@@ -34,19 +34,19 @@ class DiscriminatorMapTest extends TestCase
         ], $attribute->mapping);
     }
 
-    public function testExceptionWithEmptyTypeProperty()
+    public function testExceptionWithEmptyTypeProperty(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new DiscriminatorMap(typeProperty: '', mapping: ['foo' => 'FooClass']);
     }
 
-    public function testExceptionWithEmptyMappingProperty()
+    public function testExceptionWithEmptyMappingProperty(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new DiscriminatorMap(typeProperty: 'type', mapping: []);
     }
 
-    public function testExceptionWithMissingDefaultTypeInMapping()
+    public function testExceptionWithMissingDefaultTypeInMapping(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('Default type "bar" given to "%s" must be present in "mapping" types.', DiscriminatorMap::class));

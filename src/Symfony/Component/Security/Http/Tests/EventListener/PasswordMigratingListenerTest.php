@@ -50,7 +50,7 @@ class PasswordMigratingListenerTest extends TestCase
     }
 
     #[DataProvider('provideUnsupportedEvents')]
-    public function testUnsupportedEvents($event)
+    public function testUnsupportedEvents($event): void
     {
         $hasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
         $hasherFactory->expects($this->never())->method('getPasswordHasher');
@@ -67,7 +67,7 @@ class PasswordMigratingListenerTest extends TestCase
         yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', static fn () => new DummyTestPasswordAuthenticatedUser()), [new PasswordUpgradeBadge('', self::createPasswordUpgrader())]))];
     }
 
-    public function testUpgradeWithUpgrader()
+    public function testUpgradeWithUpgrader(): void
     {
         $passwordUpgrader = $this->createMock(TestMigratingUserProvider::class);
         $passwordUpgrader->expects($this->once())
@@ -79,7 +79,7 @@ class PasswordMigratingListenerTest extends TestCase
         $this->listener->onLoginSuccess($event);
     }
 
-    public function testUpgradeWithoutUpgrader()
+    public function testUpgradeWithoutUpgrader(): void
     {
         $userLoader = $this->createMock(TestMigratingUserProvider::class);
         $userLoader->expects($this->any())->method('loadUserByIdentifier')->willReturn($this->user);
@@ -96,7 +96,7 @@ class PasswordMigratingListenerTest extends TestCase
         $this->listener->onLoginSuccess($event);
     }
 
-    public function testUserWithoutPassword()
+    public function testUserWithoutPassword(): void
     {
         $this->user = new InMemoryUser('test', null);
 

@@ -42,7 +42,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class SecurityDataCollectorTest extends TestCase
 {
-    public function testCollectWhenSecurityIsDisabled()
+    public function testCollectWhenSecurityIsDisabled(): void
     {
         $collector = new SecurityDataCollector(null, null, null, null, null, null);
         $collector->collect(new Request(), new Response());
@@ -61,7 +61,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertNull($collector->getFirewall());
     }
 
-    public function testCollectWhenAuthenticationTokenIsNull()
+    public function testCollectWhenAuthenticationTokenIsNull(): void
     {
         $tokenStorage = new TokenStorage();
         $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null);
@@ -81,7 +81,7 @@ class SecurityDataCollectorTest extends TestCase
     }
 
     #[DataProvider('provideRoles')]
-    public function testCollectAuthenticationTokenAndRoles(array $roles, array $normalizedRoles, array $inheritedRoles)
+    public function testCollectAuthenticationTokenAndRoles(array $roles, array $normalizedRoles, array $inheritedRoles): void
     {
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('hhamon', 'P4$$w0rD', $roles), 'provider', $roles));
@@ -102,7 +102,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame('hhamon', $collector->getUser());
     }
 
-    public function testCollectSwitchUserToken()
+    public function testCollectSwitchUserToken(): void
     {
         $adminToken = new UsernamePasswordToken(new InMemoryUser('yceruto', 'P4$$w0rD', ['ROLE_ADMIN']), 'provider', ['ROLE_ADMIN']);
 
@@ -124,7 +124,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame('hhamon', $collector->getUser());
     }
 
-    public function testGetFirewall()
+    public function testGetFirewall(): void
     {
         $firewallConfig = new FirewallConfig('dummy', 'security.request_matcher.dummy', 'security.user_checker.dummy');
         $request = new Request();
@@ -157,7 +157,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($firewallConfig->getAuthenticators(), $collected['authenticators']->getValue());
     }
 
-    public function testGetFirewallReturnsNull()
+    public function testGetFirewallReturnsNull(): void
     {
         $request = new Request();
         $response = new Response();
@@ -183,7 +183,7 @@ class SecurityDataCollectorTest extends TestCase
     }
 
     #[Group('time-sensitive')]
-    public function testGetListeners()
+    public function testGetListeners(): void
     {
         $request = new Request();
         $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
@@ -227,7 +227,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame(1, $listener->callCount);
     }
 
-    public function testCollectCollectsDecisionLogWhenStrategyIsAffirmative()
+    public function testCollectCollectsDecisionLogWhenStrategyIsAffirmative(): void
     {
         $voter1 = new DummyVoter();
         $voter2 = new DummyVoter();
@@ -300,7 +300,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');
     }
 
-    public function testCollectCollectsDecisionLogWhenStrategyIsUnanimous()
+    public function testCollectCollectsDecisionLogWhenStrategyIsUnanimous(): void
     {
         $voter1 = new DummyVoter();
         $voter2 = new DummyVoter();
@@ -399,7 +399,7 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame($dataCollector->getVoterStrategy(), $strategy, 'Wrong value returned by getVoterStrategy');
     }
 
-    public function testGetVotersIfAccessDecisionManagerHasNoVoters()
+    public function testGetVotersIfAccessDecisionManagerHasNoVoters(): void
     {
         $strategy = MainConfiguration::STRATEGY_AFFIRMATIVE;
 

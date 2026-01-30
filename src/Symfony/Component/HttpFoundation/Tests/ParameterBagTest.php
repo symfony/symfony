@@ -19,18 +19,18 @@ use Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum;
 
 class ParameterBagTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $this->testAll();
     }
 
-    public function testAll()
+    public function testAll(): void
     {
         $bag = new ParameterBag(['foo' => 'bar']);
         $this->assertEquals(['foo' => 'bar'], $bag->all(), '->all() gets all the input');
     }
 
-    public function testAllWithInputKey()
+    public function testAllWithInputKey(): void
     {
         $bag = new ParameterBag(['foo' => ['bar', 'baz'], 'null' => null]);
 
@@ -38,27 +38,27 @@ class ParameterBagTest extends TestCase
         $this->assertEquals([], $bag->all('unknown'), '->all() returns an empty array if a parameter is not defined');
     }
 
-    public function testAllThrowsForNonArrayValues()
+    public function testAllThrowsForNonArrayValues(): void
     {
         $this->expectException(BadRequestException::class);
         $bag = new ParameterBag(['foo' => 'bar', 'null' => null]);
         $bag->all('foo');
     }
 
-    public function testKeys()
+    public function testKeys(): void
     {
         $bag = new ParameterBag(['foo' => 'bar']);
         $this->assertEquals(['foo'], $bag->keys());
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $bag = new ParameterBag(['foo' => 'bar']);
         $bag->add(['bar' => 'bas']);
         $this->assertEquals(['foo' => 'bar', 'bar' => 'bas'], $bag->all());
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $bag = new ParameterBag(['foo' => 'bar']);
         $bag->add(['bar' => 'bas']);
@@ -67,7 +67,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $bag->all());
     }
 
-    public function testReplace()
+    public function testReplace(): void
     {
         $bag = new ParameterBag(['foo' => 'bar']);
 
@@ -76,7 +76,7 @@ class ParameterBagTest extends TestCase
         $this->assertFalse($bag->has('foo'), '->replace() overrides previously set the input');
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $bag = new ParameterBag(['foo' => 'bar', 'null' => null]);
 
@@ -85,14 +85,14 @@ class ParameterBagTest extends TestCase
         $this->assertNull($bag->get('null', 'default'), '->get() returns null if null is set');
     }
 
-    public function testGetDoesNotUseDeepByDefault()
+    public function testGetDoesNotUseDeepByDefault(): void
     {
         $bag = new ParameterBag(['foo' => ['bar' => 'moo']]);
 
         $this->assertNull($bag->get('foo[bar]'));
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $bag = new ParameterBag([]);
 
@@ -103,7 +103,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals('baz', $bag->get('foo'), '->set() overrides previously set parameter');
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $bag = new ParameterBag(['foo' => 'bar']);
 
@@ -111,7 +111,7 @@ class ParameterBagTest extends TestCase
         $this->assertFalse($bag->has('unknown'), '->has() return false if a parameter is not defined');
     }
 
-    public function testGetAlpha()
+    public function testGetAlpha(): void
     {
         $bag = new ParameterBag(['word' => 'foo_BAR_012', 'bool' => true, 'integer' => 123]);
 
@@ -122,7 +122,7 @@ class ParameterBagTest extends TestCase
         $this->assertSame('', $bag->getAlpha('bool', 'abc_DEF_012'), '->getAlpha() returns empty string if a parameter is a boolean');
     }
 
-    public function testGetAlphaExceptionWithArray()
+    public function testGetAlphaExceptionWithArray(): void
     {
         $bag = new ParameterBag(['word' => ['foo_BAR_012']]);
 
@@ -132,7 +132,7 @@ class ParameterBagTest extends TestCase
         $bag->getAlpha('word');
     }
 
-    public function testGetAlnum()
+    public function testGetAlnum(): void
     {
         $bag = new ParameterBag(['word' => 'foo_BAR_012', 'bool' => true, 'integer' => 123]);
 
@@ -143,7 +143,7 @@ class ParameterBagTest extends TestCase
         $this->assertSame('1', $bag->getAlnum('bool', 'abc_DEF_012'), '->getAlnum() returns 1 if a parameter is true');
     }
 
-    public function testGetAlnumExceptionWithArray()
+    public function testGetAlnumExceptionWithArray(): void
     {
         $bag = new ParameterBag(['word' => ['foo_BAR_012']]);
 
@@ -153,7 +153,7 @@ class ParameterBagTest extends TestCase
         $bag->getAlnum('word');
     }
 
-    public function testGetDigits()
+    public function testGetDigits(): void
     {
         $bag = new ParameterBag(['word' => 'foo_BAR_0+1-2', 'bool' => true, 'integer' => 123]);
 
@@ -164,7 +164,7 @@ class ParameterBagTest extends TestCase
         $this->assertSame('1', $bag->getDigits('bool', 'abc_DEF_012'), '->getDigits() returns 1 if a parameter is true');
     }
 
-    public function testGetDigitsExceptionWithArray()
+    public function testGetDigitsExceptionWithArray(): void
     {
         $bag = new ParameterBag(['word' => ['foo_BAR_012']]);
 
@@ -174,7 +174,7 @@ class ParameterBagTest extends TestCase
         $bag->getDigits('word');
     }
 
-    public function testGetInt()
+    public function testGetInt(): void
     {
         $bag = new ParameterBag(['digits' => '123', 'bool' => true]);
 
@@ -184,7 +184,7 @@ class ParameterBagTest extends TestCase
         $this->assertSame(1, $bag->getInt('bool', 0), '->getInt() returns 1 if a parameter is true');
     }
 
-    public function testGetIntExceptionWithArray()
+    public function testGetIntExceptionWithArray(): void
     {
         $bag = new ParameterBag(['digits' => ['123']]);
 
@@ -194,7 +194,7 @@ class ParameterBagTest extends TestCase
         $bag->getInt('digits');
     }
 
-    public function testGetIntExceptionWithInvalid()
+    public function testGetIntExceptionWithInvalid(): void
     {
         $bag = new ParameterBag(['word' => 'foo_BAR_012']);
 
@@ -204,7 +204,7 @@ class ParameterBagTest extends TestCase
         $bag->getInt('word');
     }
 
-    public function testGetString()
+    public function testGetString(): void
     {
         $bag = new ParameterBag(['integer' => 123, 'bool_true' => true, 'bool_false' => false, 'string' => 'abc', 'stringable' => new class implements \Stringable {
             public function __toString(): string
@@ -222,7 +222,7 @@ class ParameterBagTest extends TestCase
         $this->assertSame('strval', $bag->getString('stringable'), '->getString() gets a value of a stringable parameter as string');
     }
 
-    public function testGetStringExceptionWithArray()
+    public function testGetStringExceptionWithArray(): void
     {
         $bag = new ParameterBag(['key' => ['abc']]);
 
@@ -232,7 +232,7 @@ class ParameterBagTest extends TestCase
         $bag->getString('key');
     }
 
-    public function testGetStringExceptionWithObject()
+    public function testGetStringExceptionWithObject(): void
     {
         $bag = new ParameterBag(['object' => $this]);
 
@@ -242,7 +242,7 @@ class ParameterBagTest extends TestCase
         $bag->getString('object');
     }
 
-    public function testFilter()
+    public function testFilter(): void
     {
         $bag = new ParameterBag([
             'digits' => '0123ab',
@@ -277,7 +277,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(['bang'], $bag->filter('array', ''), '->filter() gets a value of parameter as an array');
     }
 
-    public function testFilterCallback()
+    public function testFilterCallback(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('A Closure must be passed to "Symfony\Component\HttpFoundation\ParameterBag::filter()" when FILTER_CALLBACK is used, "string" given.');
@@ -286,7 +286,7 @@ class ParameterBagTest extends TestCase
         $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => 'strtoupper']);
     }
 
-    public function testFilterClosure()
+    public function testFilterClosure(): void
     {
         $bag = new ParameterBag(['foo' => 'bar']);
         $result = $bag->filter('foo', null, \FILTER_CALLBACK, ['options' => strtoupper(...)]);
@@ -294,7 +294,7 @@ class ParameterBagTest extends TestCase
         $this->assertSame('BAR', $result);
     }
 
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $parameters = ['foo' => 'bar', 'hello' => 'world'];
         $bag = new ParameterBag($parameters);
@@ -308,7 +308,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(\count($parameters), $i);
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $parameters = ['foo' => 'bar', 'hello' => 'world'];
         $bag = new ParameterBag($parameters);
@@ -316,7 +316,7 @@ class ParameterBagTest extends TestCase
         $this->assertCount(\count($parameters), $bag);
     }
 
-    public function testGetBoolean()
+    public function testGetBoolean(): void
     {
         $parameters = ['string_true' => 'true', 'string_false' => 'false', 'string' => 'abc'];
         $bag = new ParameterBag($parameters);
@@ -327,7 +327,7 @@ class ParameterBagTest extends TestCase
         $this->assertTrue($bag->getBoolean('unknown', true), '->getBoolean() returns default if a parameter is not defined');
     }
 
-    public function testGetBooleanExceptionWithInvalid()
+    public function testGetBooleanExceptionWithInvalid(): void
     {
         $bag = new ParameterBag(['invalid' => 'foo']);
 
@@ -337,7 +337,7 @@ class ParameterBagTest extends TestCase
         $bag->getBoolean('invalid');
     }
 
-    public function testGetEnum()
+    public function testGetEnum(): void
     {
         $bag = new ParameterBag(['valid-value' => 1]);
 
@@ -347,7 +347,7 @@ class ParameterBagTest extends TestCase
         $this->assertSame(FooEnum::Bar, $bag->getEnum('invalid-key', FooEnum::class, FooEnum::Bar));
     }
 
-    public function testGetEnumThrowsExceptionWithNotBackingValue()
+    public function testGetEnumThrowsExceptionWithNotBackingValue(): void
     {
         $bag = new ParameterBag(['invalid-value' => 2]);
 
@@ -357,7 +357,7 @@ class ParameterBagTest extends TestCase
         $this->assertNull($bag->getEnum('invalid-value', FooEnum::class));
     }
 
-    public function testGetEnumThrowsExceptionWithInvalidValueType()
+    public function testGetEnumThrowsExceptionWithInvalidValueType(): void
     {
         $bag = new ParameterBag(['invalid-value' => ['foo']]);
 

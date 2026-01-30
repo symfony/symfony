@@ -47,7 +47,7 @@ class FormFactoryTest extends TestCase
         $this->factory = new FormFactory($this->registry);
     }
 
-    public function testCreateNamedBuilderWithTypeName()
+    public function testCreateNamedBuilderWithTypeName(): void
     {
         $builder = $this->factory->createNamedBuilder('name', ConfigurableFormType::class, null, ['a' => '1', 'b' => '2']);
 
@@ -55,28 +55,28 @@ class FormFactoryTest extends TestCase
         $this->assertSame('2', $builder->getOption('b'));
     }
 
-    public function testCreateNamedBuilderFillsDataOption()
+    public function testCreateNamedBuilderFillsDataOption(): void
     {
         $builder = $this->factory->createNamedBuilder('name', ConfigurableFormType::class, 'DATA', ['a' => '1', 'b' => '2']);
 
         $this->assertSame('DATA', $builder->getOption('data'));
     }
 
-    public function testCreateNamedBuilderDoesNotOverrideExistingDataOption()
+    public function testCreateNamedBuilderDoesNotOverrideExistingDataOption(): void
     {
         $builder = $this->factory->createNamedBuilder('name', ConfigurableFormType::class, 'DATA', ['a' => '1', 'b' => '2', 'data' => 'CUSTOM']);
 
         $this->assertSame('CUSTOM', $builder->getOption('data'));
     }
 
-    public function testCreateUsesBlockPrefixIfTypeGivenAsString()
+    public function testCreateUsesBlockPrefixIfTypeGivenAsString(): void
     {
         $form = $this->factory->create(ConfigurableFormType::class);
 
         $this->assertSame('configurable_form_prefix', $form->getName());
     }
 
-    public function testCreateNamed()
+    public function testCreateNamed(): void
     {
         $form = $this->factory->createNamed('name', ConfigurableFormType::class, null, ['a' => '1', 'b' => '2']);
 
@@ -84,14 +84,14 @@ class FormFactoryTest extends TestCase
         $this->assertSame('2', $form->getConfig()->getOption('b'));
     }
 
-    public function testCreateBuilderForPropertyWithoutTypeGuesser()
+    public function testCreateBuilderForPropertyWithoutTypeGuesser(): void
     {
         $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
 
         $this->assertSame('firstName', $builder->getName());
     }
 
-    public function testCreateBuilderForPropertyCreatesFormWithHighestConfidence()
+    public function testCreateBuilderForPropertyCreatesFormWithHighestConfidence(): void
     {
         $this->guesser1->configureTypeGuess(TextType::class, ['attr' => ['maxlength' => 10]], Guess::MEDIUM_CONFIDENCE);
         $this->guesser2->configureTypeGuess(PasswordType::class, ['attr' => ['maxlength' => 7]], Guess::HIGH_CONFIDENCE);
@@ -103,7 +103,7 @@ class FormFactoryTest extends TestCase
         $this->assertInstanceOf(PasswordType::class, $builder->getType()->getInnerType());
     }
 
-    public function testCreateBuilderCreatesTextFormIfNoGuess()
+    public function testCreateBuilderCreatesTextFormIfNoGuess(): void
     {
         $builder = $this->factory->createBuilderForProperty('Application\Author', 'firstName');
 
@@ -111,7 +111,7 @@ class FormFactoryTest extends TestCase
         $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
     }
 
-    public function testOptionsCanBeOverridden()
+    public function testOptionsCanBeOverridden(): void
     {
         $this->guesser1->configureTypeGuess(TextType::class, ['attr' => ['class' => 'foo', 'maxlength' => 10]], Guess::MEDIUM_CONFIDENCE);
 
@@ -122,7 +122,7 @@ class FormFactoryTest extends TestCase
         $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
     }
 
-    public function testCreateBuilderUsesMaxLengthIfFound()
+    public function testCreateBuilderUsesMaxLengthIfFound(): void
     {
         $this->guesser1->configureMaxLengthGuess(15, Guess::MEDIUM_CONFIDENCE);
         $this->guesser2->configureMaxLengthGuess(20, Guess::HIGH_CONFIDENCE);
@@ -134,7 +134,7 @@ class FormFactoryTest extends TestCase
         $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
     }
 
-    public function testCreateBuilderUsesMaxLengthAndPattern()
+    public function testCreateBuilderUsesMaxLengthAndPattern(): void
     {
         $this->guesser1->configureMaxLengthGuess(20, Guess::HIGH_CONFIDENCE);
         $this->guesser2->configurePatternGuess('.{5,}', Guess::HIGH_CONFIDENCE);
@@ -146,7 +146,7 @@ class FormFactoryTest extends TestCase
         $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
     }
 
-    public function testCreateBuilderUsesRequiredSettingWithHighestConfidence()
+    public function testCreateBuilderUsesRequiredSettingWithHighestConfidence(): void
     {
         $this->guesser1->configureRequiredGuess(true, Guess::MEDIUM_CONFIDENCE);
         $this->guesser2->configureRequiredGuess(false, Guess::HIGH_CONFIDENCE);
@@ -158,7 +158,7 @@ class FormFactoryTest extends TestCase
         $this->assertInstanceOf(TextType::class, $builder->getType()->getInnerType());
     }
 
-    public function testCreateBuilderUsesPatternIfFound()
+    public function testCreateBuilderUsesPatternIfFound(): void
     {
         $this->guesser1->configurePatternGuess('[a-z]', Guess::MEDIUM_CONFIDENCE);
         $this->guesser2->configurePatternGuess('[a-zA-Z]', Guess::HIGH_CONFIDENCE);

@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class LengthTest extends TestCase
 {
-    public function testNormalizerCanBeSet()
+    public function testNormalizerCanBeSet(): void
     {
         $length = new Length(
             min: 0,
@@ -33,26 +33,26 @@ class LengthTest extends TestCase
         $this->assertEquals('trim', $length->normalizer);
     }
 
-    public function testDefaultCountUnitIsUsed()
+    public function testDefaultCountUnitIsUsed(): void
     {
         $length = new Length(min: 0, max: 10);
         $this->assertSame(Length::COUNT_CODEPOINTS, $length->countUnit);
     }
 
-    public function testNonDefaultCountUnitCanBeSet()
+    public function testNonDefaultCountUnitCanBeSet(): void
     {
         $length = new Length(min: 0, max: 10, countUnit: Length::COUNT_GRAPHEMES);
         $this->assertSame(Length::COUNT_GRAPHEMES, $length->countUnit);
     }
 
-    public function testInvalidCountUnitThrowsException()
+    public function testInvalidCountUnitThrowsException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('The "countUnit" option must be one of the "%s"::COUNT_* constants ("%s" given).', Length::class, 'nonExistentCountUnit'));
         new Length(min: 0, max: 10, countUnit: 'nonExistentCountUnit');
     }
 
-    public function testConstraintDefaultOption()
+    public function testConstraintDefaultOption(): void
     {
         $constraint = new Length(5);
 
@@ -60,7 +60,7 @@ class LengthTest extends TestCase
         self::assertEquals(5, $constraint->max);
     }
 
-    public function testConstraintAttributeDefaultOption()
+    public function testConstraintAttributeDefaultOption(): void
     {
         $constraint = new Length(exactly: 5, exactMessage: 'message');
 
@@ -69,7 +69,7 @@ class LengthTest extends TestCase
         self::assertEquals('message', $constraint->exactMessage);
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(LengthDummy::class);
         $loader = new AttributeLoader();

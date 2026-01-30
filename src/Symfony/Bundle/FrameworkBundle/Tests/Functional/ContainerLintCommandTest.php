@@ -22,7 +22,7 @@ class ContainerLintCommandTest extends AbstractWebTestCase
     private Application $application;
 
     #[DataProvider('containerLintProvider')]
-    public function testLintContainer(string $configFile, bool $resolveEnvVars, int $expectedExitCode, string $expectedOutput)
+    public function testLintContainer(string $configFile, bool $resolveEnvVars, int $expectedExitCode, string $expectedOutput): void
     {
         $kernel = static::createKernel([
             'test_case' => 'ContainerLint',

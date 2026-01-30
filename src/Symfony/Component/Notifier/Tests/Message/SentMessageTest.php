@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 
 class SentMessageTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $originalMessage = new DummyMessage();
 

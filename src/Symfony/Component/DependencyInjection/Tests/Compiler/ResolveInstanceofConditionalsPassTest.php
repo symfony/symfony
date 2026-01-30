@@ -27,7 +27,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class ResolveInstanceofConditionalsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $def = $container->register('foo', self::class)->addTag('tag')->setAutowired(true)->setChanges([]);
@@ -50,7 +50,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertSame([], $parent->getTags());
     }
 
-    public function testProcessInheritance()
+    public function testProcessInheritance(): void
     {
         $container = new ContainerBuilder();
 
@@ -76,7 +76,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertSame($expected, $container->getDefinition('child')->getMethodCalls());
     }
 
-    public function testProcessDoesReplaceShared()
+    public function testProcessDoesReplaceShared(): void
     {
         $container = new ContainerBuilder();
 
@@ -91,7 +91,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertFalse($def->isShared());
     }
 
-    public function testProcessHandlesMultipleInheritance()
+    public function testProcessHandlesMultipleInheritance(): void
     {
         $container = new ContainerBuilder();
 
@@ -111,7 +111,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertTrue($def->isShared());
     }
 
-    public function testProcessUsesAutoconfiguredInstanceof()
+    public function testProcessUsesAutoconfiguredInstanceof(): void
     {
         $container = new ContainerBuilder();
         $def = $container->register('normal_service', self::class);
@@ -138,7 +138,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertSame(['local_instanceof_tag' => [[]], 'autoconfigured_tag' => [[]]], $def->getTags());
     }
 
-    public function testAutoconfigureInstanceofDoesNotDuplicateTags()
+    public function testAutoconfigureInstanceofDoesNotDuplicateTags(): void
     {
         $container = new ContainerBuilder();
         $def = $container->register('normal_service', self::class);
@@ -161,7 +161,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertSame(['duplicated_tag' => [[], ['and_attributes' => 1]]], $def->getTags());
     }
 
-    public function testProcessDoesNotUseAutoconfiguredInstanceofIfNotEnabled()
+    public function testProcessDoesNotUseAutoconfiguredInstanceofIfNotEnabled(): void
     {
         $container = new ContainerBuilder();
         $def = $container->register('normal_service', self::class);
@@ -179,7 +179,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertFalse($def->isAutowired());
     }
 
-    public function testBadInterfaceThrowsException()
+    public function testBadInterfaceThrowsException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('"App\FakeInterface" is set as an "instanceof" conditional, but it does not exist.');
@@ -193,7 +193,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveInstanceofConditionalsPass())->process($container);
     }
 
-    public function testBadInterfaceForAutomaticInstanceofIsOk()
+    public function testBadInterfaceForAutomaticInstanceofIsOk(): void
     {
         $container = new ContainerBuilder();
         $container->register('normal_service', self::class)
@@ -208,7 +208,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
     /**
      * Test that autoconfigured calls are handled gracefully.
      */
-    public function testProcessForAutoconfiguredCalls()
+    public function testProcessForAutoconfiguredCalls(): void
     {
         $container = new ContainerBuilder();
 
@@ -236,7 +236,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertEquals($expected, $container->findDefinition('foo')->getMethodCalls());
     }
 
-    public function testProcessThrowsExceptionForArguments()
+    public function testProcessThrowsExceptionForArguments(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/Autoconfigured instanceof for type "PHPUnit[\\\\_]Framework[\\\\_]TestCase" defines arguments but these are not supported and should be removed\./');
@@ -247,7 +247,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         (new ResolveInstanceofConditionalsPass())->process($container);
     }
 
-    public function testMergeReset()
+    public function testMergeReset(): void
     {
         $container = new ContainerBuilder();
 
@@ -273,7 +273,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertTrue($abstract->isAbstract());
     }
 
-    public function testProcessForAutoconfiguredBindings()
+    public function testProcessForAutoconfiguredBindings(): void
     {
         $container = new ContainerBuilder();
 
@@ -296,7 +296,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertEquals($expected, $container->findDefinition('foo')->getBindings());
     }
 
-    public function testBindingsOnInstanceofConditionals()
+    public function testBindingsOnInstanceofConditionals(): void
     {
         $container = new ContainerBuilder();
         $def = $container->register('foo', self::class)->setBindings(['$toto' => 123]);
@@ -310,7 +310,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertSame(123, $bindings['$toto']->getValues()[0]);
     }
 
-    public function testDecoratorsAreNotAutomaticallyTagged()
+    public function testDecoratorsAreNotAutomaticallyTagged(): void
     {
         $container = new ContainerBuilder();
 
@@ -340,7 +340,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         ], $container->getDefinition('decorator')->getTags());
     }
 
-    public function testDecoratorsKeepBehaviorDescribingTags()
+    public function testDecoratorsKeepBehaviorDescribingTags(): void
     {
         $container = new ContainerBuilder();
 
@@ -377,7 +377,7 @@ class ResolveInstanceofConditionalsPassTest extends TestCase
         $this->assertFalse($container->hasParameter('container.behavior_describing_tags'));
     }
 
-    public function testSyntheticService()
+    public function testSyntheticService(): void
     {
         $container = new ContainerBuilder();
         $container->register('kernel', \stdClass::class)

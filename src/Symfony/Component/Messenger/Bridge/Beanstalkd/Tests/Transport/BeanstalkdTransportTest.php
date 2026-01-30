@@ -22,14 +22,14 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 final class BeanstalkdTransportTest extends TestCase
 {
-    public function testItIsATransport()
+    public function testItIsATransport(): void
     {
         $transport = $this->getTransport();
 
         $this->assertInstanceOf(TransportInterface::class, $transport);
     }
 
-    public function testReceivesMessages()
+    public function testReceivesMessages(): void
     {
         $transport = $this->getTransport(
             $serializer = $this->createStub(SerializerInterface::class),
@@ -51,7 +51,7 @@ final class BeanstalkdTransportTest extends TestCase
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
     }
 
-    public function testKeepalive()
+    public function testKeepalive(): void
     {
         $transport = $this->getTransport(
             null,

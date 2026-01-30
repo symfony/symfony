@@ -39,7 +39,7 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
         $this->middleware = new DoctrineTransactionMiddleware($managerRegistry);
     }
 
-    public function testMiddlewareWrapsInTransactionAndFlushes()
+    public function testMiddlewareWrapsInTransactionAndFlushes(): void
     {
         $this->connection->expects($this->once())
             ->method('beginTransaction')
@@ -61,7 +61,7 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
         $middleware->handle(new Envelope(new \stdClass()), $this->getStackMock());
     }
 
-    public function testTransactionIsRolledBackOnException()
+    public function testTransactionIsRolledBackOnException(): void
     {
         $this->connection->expects($this->once())->method('beginTransaction');
         $this->connection->expects($this->once())->method('isTransactionActive')->willReturn(true);
@@ -73,7 +73,7 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
         $this->middleware->handle(new Envelope(new \stdClass()), $this->getThrowingStackMock());
     }
 
-    public function testExceptionInRollBackDoesNotHidePreviousException()
+    public function testExceptionInRollBackDoesNotHidePreviousException(): void
     {
         $this->connection->expects($this->once())->method('beginTransaction');
         $this->connection->expects($this->once())->method('isTransactionActive')->willReturn(true);
@@ -94,7 +94,7 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
         self::assertSame('Thrown from next middleware.', $previous->getMessage());
     }
 
-    public function testInvalidEntityManagerThrowsException()
+    public function testInvalidEntityManagerThrowsException(): void
     {
         $this->connection->expects($this->never())->method('getDatabasePlatform');
         $managerRegistry = $this->createStub(ManagerRegistry::class);

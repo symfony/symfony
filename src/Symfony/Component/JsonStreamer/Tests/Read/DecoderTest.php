@@ -17,17 +17,17 @@ use Symfony\Component\JsonStreamer\Read\Decoder;
 
 class DecoderTest extends TestCase
 {
-    public function testDecode()
+    public function testDecode(): void
     {
         $this->assertDecoded('foo', '"foo"');
     }
 
-    public function testDecodeSubset()
+    public function testDecodeSubset(): void
     {
         $this->assertDecoded('bar', '["foo","bar","baz"]', 7, 5);
     }
 
-    public function testDecodeThrowOnInvalidJsonString()
+    public function testDecodeThrowOnInvalidJsonString(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('JSON is not valid: Syntax error');
@@ -35,7 +35,7 @@ class DecoderTest extends TestCase
         Decoder::decodeString('foo"');
     }
 
-    public function testDecodeThrowOnInvalidJsonStream()
+    public function testDecodeThrowOnInvalidJsonStream(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('JSON is not valid: Syntax error');

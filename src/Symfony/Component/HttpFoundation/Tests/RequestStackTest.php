@@ -17,14 +17,14 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class RequestStackTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $request = Request::create('/foo');
         $requestStack = new RequestStack([$request]);
         $this->assertSame($request, $requestStack->getCurrentRequest());
     }
 
-    public function testGetCurrentRequest()
+    public function testGetCurrentRequest(): void
     {
         $requestStack = new RequestStack();
         $this->assertNull($requestStack->getCurrentRequest());
@@ -40,7 +40,7 @@ class RequestStackTest extends TestCase
         $this->assertNull($requestStack->pop());
     }
 
-    public function testGetMainRequest()
+    public function testGetMainRequest(): void
     {
         $requestStack = new RequestStack();
         $this->assertNull($requestStack->getMainRequest());
@@ -54,7 +54,7 @@ class RequestStackTest extends TestCase
         $this->assertSame($mainRequest, $requestStack->getMainRequest());
     }
 
-    public function testGetParentRequest()
+    public function testGetParentRequest(): void
     {
         $requestStack = new RequestStack();
         $this->assertNull($requestStack->getParentRequest());
@@ -75,7 +75,7 @@ class RequestStackTest extends TestCase
         $this->assertSame($firstSubRequest, $requestStack->getParentRequest());
     }
 
-    public function testResetRequestFormats()
+    public function testResetRequestFormats(): void
     {
         $requestStack = new RequestStack();
 

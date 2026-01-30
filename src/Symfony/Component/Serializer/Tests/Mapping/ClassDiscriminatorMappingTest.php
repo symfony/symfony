@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyThirdChi
  */
 class ClassDiscriminatorMappingTest extends TestCase
 {
-    public function testGetClass()
+    public function testGetClass(): void
     {
         $mapping = new ClassDiscriminatorMapping('type', [
             'first' => AbstractDummyFirstChild::class,
@@ -32,7 +32,7 @@ class ClassDiscriminatorMappingTest extends TestCase
         $this->assertNull($mapping->getClassForType('second'));
     }
 
-    public function testMappedObjectType()
+    public function testMappedObjectType(): void
     {
         $mapping = new ClassDiscriminatorMapping('type', [
             'first' => AbstractDummyFirstChild::class,

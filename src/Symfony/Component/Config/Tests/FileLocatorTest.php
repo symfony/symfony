@@ -19,7 +19,7 @@ use Symfony\Component\Config\FileLocator;
 class FileLocatorTest extends TestCase
 {
     #[DataProvider('getIsAbsolutePathTests')]
-    public function testIsAbsolutePath(string $path)
+    public function testIsAbsolutePath(string $path): void
     {
         $loader = new FileLocator([]);
         $r = new \ReflectionObject($loader);
@@ -41,7 +41,7 @@ class FileLocatorTest extends TestCase
         ];
     }
 
-    public function testLocate()
+    public function testLocate(): void
     {
         $loader = new FileLocator(__DIR__.'/Fixtures');
 
@@ -86,7 +86,7 @@ class FileLocatorTest extends TestCase
         );
     }
 
-    public function testLocateThrowsAnExceptionIfTheFileDoesNotExists()
+    public function testLocateThrowsAnExceptionIfTheFileDoesNotExists(): void
     {
         $loader = new FileLocator([__DIR__.'/Fixtures']);
 
@@ -96,7 +96,7 @@ class FileLocatorTest extends TestCase
         $loader->locate('foobar.xml', __DIR__);
     }
 
-    public function testLocateThrowsAnExceptionIfTheFileDoesNotExistsInAbsolutePath()
+    public function testLocateThrowsAnExceptionIfTheFileDoesNotExistsInAbsolutePath(): void
     {
         $loader = new FileLocator([__DIR__.'/Fixtures']);
 
@@ -105,7 +105,7 @@ class FileLocatorTest extends TestCase
         $loader->locate(__DIR__.'/Fixtures/foobar.xml', __DIR__);
     }
 
-    public function testLocateEmpty()
+    public function testLocateEmpty(): void
     {
         $loader = new FileLocator([__DIR__.'/Fixtures']);
 

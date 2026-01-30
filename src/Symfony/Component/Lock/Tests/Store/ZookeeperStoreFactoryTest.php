@@ -22,21 +22,21 @@ use Symfony\Component\Lock\Store\ZookeeperStore;
 #[RequiresPhpExtension('zookeeper')]
 class ZookeeperStoreFactoryTest extends TestCase
 {
-    public function testCreateZooKeeperStore()
+    public function testCreateZooKeeperStore(): void
     {
         $store = StoreFactory::createStore($this->createStub(\Zookeeper::class));
 
         $this->assertInstanceOf(ZookeeperStore::class, $store);
     }
 
-    public function testCreateZooKeeperStoreAsDsn()
+    public function testCreateZooKeeperStoreAsDsn(): void
     {
         $store = StoreFactory::createStore('zookeeper://localhost:2181');
 
         $this->assertInstanceOf(ZookeeperStore::class, $store);
     }
 
-    public function testCreateZooKeeperStoreWithMultipleHosts()
+    public function testCreateZooKeeperStoreWithMultipleHosts(): void
     {
         $store = StoreFactory::createStore('zookeeper://localhost01,localhost02:2181');
 

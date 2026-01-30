@@ -20,14 +20,14 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 
 class EnvPlaceholderParameterBagTest extends TestCase
 {
-    public function testEnumEnvVarProcessorPassesRegex()
+    public function testEnumEnvVarProcessorPassesRegex(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $name = trim((new EnvConfigurator('FOO'))->enum(StringBackedEnum::class), '%');
         $this->assertIsString($bag->get($name));
     }
 
-    public function testGetThrowsInvalidArgumentExceptionIfEnvNameContainsNonWordCharacters()
+    public function testGetThrowsInvalidArgumentExceptionIfEnvNameContainsNonWordCharacters(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $this->expectException(InvalidArgumentException::class);
@@ -35,7 +35,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag->get('env(%foo%)');
     }
 
-    public function testMergeWillNotDuplicateIdenticalParameters()
+    public function testMergeWillNotDuplicateIdenticalParameters(): void
     {
         $envVariableName = 'DB_HOST';
         $parameter = \sprintf('env(%s)', $envVariableName);
@@ -56,7 +56,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertStringContainsString($envVariableName, $placeholder);
     }
 
-    public function testMergeWhereFirstBagIsEmptyWillWork()
+    public function testMergeWhereFirstBagIsEmptyWillWork(): void
     {
         $envVariableName = 'DB_HOST';
         $parameter = \sprintf('env(%s)', $envVariableName);
@@ -79,7 +79,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertStringContainsString($envVariableName, $placeholder);
     }
 
-    public function testMergeWherePlaceholderOnlyExistsInSecond()
+    public function testMergeWherePlaceholderOnlyExistsInSecond(): void
     {
         $uniqueEnvName = 'DB_HOST';
         $commonEnvName = 'DB_USER';
@@ -103,7 +103,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertCount(1, $merged[$commonEnvName]);
     }
 
-    public function testMergeWithDifferentIdentifiersForPlaceholders()
+    public function testMergeWithDifferentIdentifiersForPlaceholders(): void
     {
         $envName = 'DB_USER';
         $paramName = \sprintf('env(%s)', $envName);
@@ -121,7 +121,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertCount(2, $merged[$envName]);
     }
 
-    public function testResolveEnvRequiresStrings()
+    public function testResolveEnvRequiresStrings(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of env parameter "INT_VAR" must be a string or null, "int" given.');
@@ -132,7 +132,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag->resolve();
     }
 
-    public function testGetDefaultScalarEnv()
+    public function testGetDefaultScalarEnv(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "int" given to "env(INT_VAR)".');
@@ -142,7 +142,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag->get('env(INT_VAR)');
     }
 
-    public function testGetDefaultEnv()
+    public function testGetDefaultEnv(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $this->assertStringMatchesFormat('env_%s_INT_VAR_%s', $bag->get('env(INT_VAR)'));
@@ -154,7 +154,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertSame('2', $bag->all()['env(INT_VAR)']);
     }
 
-    public function testResolveEnvAllowsNull()
+    public function testResolveEnvAllowsNull(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->get('env(NULL_VAR)');
@@ -163,7 +163,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertNull($bag->all()['env(NULL_VAR)']);
     }
 
-    public function testResolveThrowsOnBadDefaultValue()
+    public function testResolveThrowsOnBadDefaultValue(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of env parameter "ARRAY_VAR" must be a string or null, "array" given.');
@@ -173,7 +173,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag->resolve();
     }
 
-    public function testGetEnvAllowsNull()
+    public function testGetEnvAllowsNull(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->set('env(NULL_VAR)', null);
@@ -183,7 +183,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertNull($bag->all()['env(NULL_VAR)']);
     }
 
-    public function testGetEnvAllowsDot()
+    public function testGetEnvAllowsDot(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->set('env(dynamic.var)', 'foo');
@@ -193,7 +193,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $this->assertSame('foo', $bag->all()['env(dynamic.var)']);
     }
 
-    public function testGetThrowsOnBadDefaultValue()
+    public function testGetThrowsOnBadDefaultValue(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "array" given to "env(ARRAY_VAR)".');
@@ -203,21 +203,21 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag->resolve();
     }
 
-    public function testDefaultToNullAllowed()
+    public function testDefaultToNullAllowed(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->resolve();
         $this->assertNotNull($bag->get('env(default::BAR)'));
     }
 
-    public function testExtraCharsInProcessor()
+    public function testExtraCharsInProcessor(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->resolve();
         $this->assertStringMatchesFormat('env_%s_key_a_b_c_FOO_%s', $bag->get('env(key:a.b-c:FOO)'));
     }
 
-    public function testGetEnum()
+    public function testGetEnum(): void
     {
         $bag = new EnvPlaceholderParameterBag();
         $bag->set('ENUM_VAR', StringBackedEnum::Bar);

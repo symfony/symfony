@@ -19,7 +19,7 @@ use Symfony\Component\Console\Tester\CommandCompletionTester;
 class DumpCompletionCommandTest extends TestCase
 {
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $tester = new CommandCompletionTester(new DumpCompletionCommand());
         $suggestions = $tester->complete($input);

@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouteCompiler;
 class RouteCompilerTest extends TestCase
 {
     #[DataProvider('provideCompileData')]
-    public function testCompile($name, $arguments, $prefix, $regex, $variables, $tokens)
+    public function testCompile($name, $arguments, $prefix, $regex, $variables, $tokens): void
     {
         $r = new \ReflectionClass(Route::class);
         $route = $r->newInstanceArgs($arguments);
@@ -183,7 +183,7 @@ class RouteCompilerTest extends TestCase
     }
 
     #[DataProvider('provideCompileImplicitUtf8Data')]
-    public function testCompileImplicitUtf8Data($name, $arguments, $prefix, $regex, $variables, $tokens)
+    public function testCompileImplicitUtf8Data($name, $arguments, $prefix, $regex, $variables, $tokens): void
     {
         $this->expectException(\LogicException::class);
         $r = new \ReflectionClass(Route::class);
@@ -247,7 +247,7 @@ class RouteCompilerTest extends TestCase
         ];
     }
 
-    public function testRouteWithSameVariableTwice()
+    public function testRouteWithSameVariableTwice(): void
     {
         $this->expectException(\LogicException::class);
         $route = new Route('/{name}/{name}');
@@ -255,7 +255,7 @@ class RouteCompilerTest extends TestCase
         $route->compile();
     }
 
-    public function testRouteCharsetMismatch()
+    public function testRouteCharsetMismatch(): void
     {
         $route = new Route("/\xE9/{bar}", [], ['bar' => '.'], ['utf8' => true]);
 
@@ -264,7 +264,7 @@ class RouteCompilerTest extends TestCase
         $route->compile();
     }
 
-    public function testRequirementCharsetMismatch()
+    public function testRequirementCharsetMismatch(): void
     {
         $route = new Route('/foo/{bar}', [], ['bar' => "\xE9"], ['utf8' => true]);
 
@@ -273,7 +273,7 @@ class RouteCompilerTest extends TestCase
         $route->compile();
     }
 
-    public function testRouteWithFragmentAsPathParameter()
+    public function testRouteWithFragmentAsPathParameter(): void
     {
         $route = new Route('/{_fragment}');
 
@@ -283,7 +283,7 @@ class RouteCompilerTest extends TestCase
     }
 
     #[DataProvider('getVariableNamesStartingWithADigit')]
-    public function testRouteWithVariableNameStartingWithADigit(string $name)
+    public function testRouteWithVariableNameStartingWithADigit(string $name): void
     {
         $this->expectException(\DomainException::class);
         $route = new Route('/{'.$name.'}');
@@ -300,7 +300,7 @@ class RouteCompilerTest extends TestCase
     }
 
     #[DataProvider('provideCompileWithHostData')]
-    public function testCompileWithHost(string $name, array $arguments, string $prefix, string $regex, array $variables, array $pathVariables, array $tokens, string $hostRegex, array $hostVariables, array $hostTokens)
+    public function testCompileWithHost(string $name, array $arguments, string $prefix, string $regex, array $variables, array $pathVariables, array $tokens, string $hostRegex, array $hostVariables, array $hostTokens): void
     {
         $r = new \ReflectionClass(Route::class);
         $route = $r->newInstanceArgs($arguments);
@@ -368,7 +368,7 @@ class RouteCompilerTest extends TestCase
         ];
     }
 
-    public function testRouteWithTooLongVariableName()
+    public function testRouteWithTooLongVariableName(): void
     {
         $route = new Route(\sprintf('/{%s}', str_repeat('a', RouteCompiler::VARIABLE_MAXIMUM_LENGTH + 1)));
 
@@ -378,7 +378,7 @@ class RouteCompilerTest extends TestCase
     }
 
     #[DataProvider('provideRemoveCapturingGroup')]
-    public function testRemoveCapturingGroup(string $regex, string $requirement)
+    public function testRemoveCapturingGroup(string $regex, string $requirement): void
     {
         $route = new Route('/{foo}', [], ['foo' => $requirement]);
 

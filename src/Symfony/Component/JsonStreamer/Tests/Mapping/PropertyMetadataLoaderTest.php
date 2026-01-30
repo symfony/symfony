@@ -20,7 +20,7 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 
 class PropertyMetadataLoaderTest extends TestCase
 {
-    public function testReadPropertyType()
+    public function testReadPropertyType(): void
     {
         $loader = new PropertyMetadataLoader(TypeResolver::create());
 

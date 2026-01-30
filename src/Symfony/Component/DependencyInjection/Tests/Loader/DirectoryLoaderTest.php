@@ -46,26 +46,26 @@ class DirectoryLoaderTest extends TestCase
         $this->loader->setResolver($resolver);
     }
 
-    public function testDirectoryCanBeLoadedRecursively()
+    public function testDirectoryCanBeLoadedRecursively(): void
     {
         $this->loader->load('directory/');
         $this->assertEquals(['ini' => 'ini', 'yaml' => 'yaml', 'php' => 'php'], $this->container->getParameterBag()->all(), '->load() takes a single directory');
     }
 
-    public function testImports()
+    public function testImports(): void
     {
         $this->loader->resolve('directory/import/import.yml')->load('directory/import/import.yml');
         $this->assertEquals(['ini' => 'ini', 'yaml' => 'yaml'], $this->container->getParameterBag()->all(), '->load() takes a single file that imports a directory');
     }
 
-    public function testExceptionIsRaisedWhenDirectoryDoesNotExist()
+    public function testExceptionIsRaisedWhenDirectoryDoesNotExist(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The file "foo" does not exist (in:');
         $this->loader->load('foo/');
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $loader = new DirectoryLoader(new ContainerBuilder(), new FileLocator());
 

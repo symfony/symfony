@@ -22,14 +22,14 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class UrlTest extends TestCase
 {
-    public function testNormalizerCanBeSet()
+    public function testNormalizerCanBeSet(): void
     {
         $url = new Url(normalizer: 'trim', requireTld: true);
 
         $this->assertEquals('trim', $url->normalizer);
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(UrlDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));
@@ -62,7 +62,7 @@ class UrlTest extends TestCase
 
     #[TestWith(['*'])]
     #[TestWith(['http'])]
-    public function testProtocolsAsString(string $protocol)
+    public function testProtocolsAsString(string $protocol): void
     {
         $constraint = new Url(protocols: $protocol, requireTld: true);
 

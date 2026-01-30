@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\TypedReference;
  */
 class ResolveTaggedIteratorArgumentPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->register('a', 'stdClass')->addTag('foo');
@@ -39,7 +39,7 @@ class ResolveTaggedIteratorArgumentPassTest extends TestCase
         $this->assertEquals($expected, $properties['foos']);
     }
 
-    public function testProcessWithIndexes()
+    public function testProcessWithIndexes(): void
     {
         $container = new ContainerBuilder();
         $container->register('service_a', 'stdClass')->addTag('foo', ['key' => '1']);
@@ -55,7 +55,7 @@ class ResolveTaggedIteratorArgumentPassTest extends TestCase
         $this->assertEquals($expected, $properties['foos']);
     }
 
-    public function testProcesWithAutoExcludeReferencingService()
+    public function testProcesWithAutoExcludeReferencingService(): void
     {
         $container = new ContainerBuilder();
         $container->register('service_a', 'stdClass')->addTag('foo', ['key' => '1']);
@@ -71,7 +71,7 @@ class ResolveTaggedIteratorArgumentPassTest extends TestCase
         $this->assertEquals($expected, $properties['foos']);
     }
 
-    public function testProcesWithoutAutoExcludeReferencingService()
+    public function testProcesWithoutAutoExcludeReferencingService(): void
     {
         $container = new ContainerBuilder();
         $container->register('service_a', 'stdClass')->addTag('foo', ['key' => '1']);

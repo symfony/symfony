@@ -62,7 +62,7 @@ class ValidationListenerTest extends TestCase
     }
 
     // More specific mapping tests can be found in ViolationMapperTest
-    public function testMapViolation()
+    public function testMapViolation(): void
     {
         $violation = new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'data', null, null, null, new FormConstraint());
         $form = new Form(new FormConfigBuilder('street', null, new EventDispatcher()));
@@ -76,7 +76,7 @@ class ValidationListenerTest extends TestCase
         $this->assertSame($violation, $form->getErrors()[0]->getCause());
     }
 
-    public function testMapViolationAllowsNonSyncIfInvalid()
+    public function testMapViolationAllowsNonSyncIfInvalid(): void
     {
         $violation = new ConstraintViolation($this->message, $this->messageTemplate, $this->params, null, 'data', null, null, FormConstraint::NOT_SYNCHRONIZED_ERROR, new FormConstraint());
         $form = new SubmittedNotSynchronizedForm(new FormConfigBuilder('street', null, new EventDispatcher()));
@@ -89,7 +89,7 @@ class ValidationListenerTest extends TestCase
         $this->assertSame($violation, $form->getErrors()[0]->getCause());
     }
 
-    public function testValidateIgnoresNonRoot()
+    public function testValidateIgnoresNonRoot(): void
     {
         $childForm = $this->createForm('child');
 
@@ -103,7 +103,7 @@ class ValidationListenerTest extends TestCase
         $this->assertTrue($childForm->isValid());
     }
 
-    public function testValidateWithEmptyViolationList()
+    public function testValidateWithEmptyViolationList(): void
     {
         $form = $this->createForm();
         $form->submit(null);

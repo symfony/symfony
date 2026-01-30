@@ -17,14 +17,14 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class PreAuthenticatedTokenTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $token = new PreAuthenticatedToken(new InMemoryUser('foo', 'bar', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
         $this->assertEquals(['ROLE_FOO'], $token->getRoleNames());
         $this->assertEquals('key', $token->getFirewallName());
     }
 
-    public function testGetUser()
+    public function testGetUser(): void
     {
         $token = new PreAuthenticatedToken($user = new InMemoryUser('foo', 'bar'), 'key');
         $this->assertEquals($user, $token->getUser());

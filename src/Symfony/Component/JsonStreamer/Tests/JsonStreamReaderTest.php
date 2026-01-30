@@ -45,7 +45,7 @@ class JsonStreamReaderTest extends TestCase
         }
     }
 
-    public function testReadScalar()
+    public function testReadScalar(): void
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir);
 
@@ -57,7 +57,7 @@ class JsonStreamReaderTest extends TestCase
         $this->assertRead($reader, DummyBackedEnum::ONE, '1', Type::enum(DummyBackedEnum::class, Type::string()));
     }
 
-    public function testReadCollection()
+    public function testReadCollection(): void
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir);
 
@@ -75,50 +75,50 @@ class JsonStreamReaderTest extends TestCase
             Type::list(Type::bool()),
         );
 
-        $this->assertRead($reader, function (mixed $read) {
+        $this->assertRead($reader, function (mixed $read): void {
             $this->assertIsIterable($read);
             $this->assertSame([true, false], iterator_to_array($read));
         }, '{"0": true, "1": false}', Type::iterable(Type::bool()));
 
-        $this->assertRead($reader, function (mixed $read) {
+        $this->assertRead($reader, function (mixed $read): void {
             $this->assertIsIterable($read);
             $this->assertSame([true, false], iterator_to_array($read));
         }, '[true, false]', Type::iterable(Type::bool(), Type::int()));
     }
 
-    public function testReadObject()
+    public function testReadObject(): void
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir);
 
-        $this->assertRead($reader, function (mixed $read) {
+        $this->assertRead($reader, function (mixed $read): void {
             $this->assertInstanceOf(ClassicDummy::class, $read);
             $this->assertSame(10, $read->id);
             $this->assertSame('dummy name', $read->name);
         }, '{"id": 10, "name": "dummy name"}', Type::object(ClassicDummy::class));
     }
 
-    public function testReadObjectWithGenerics()
+    public function testReadObjectWithGenerics(): void
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir);
 
-        $this->assertRead($reader, function (mixed $read) {
+        $this->assertRead($reader, function (mixed $read): void {
             $this->assertInstanceOf(DummyWithGenerics::class, $read);
             $this->assertSame(10, $read->dummies[0]->id);
             $this->assertSame('dummy name', $read->dummies[0]->name);
         }, '{"dummies":[{"id":10,"name":"dummy name"}]}', Type::generic(Type::object(DummyWithGenerics::class), Type::object(ClassicDummy::class)));
     }
 
-    public function testReadObjectWithStreamedName()
+    public function testReadObjectWithStreamedName(): void
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir);
 
-        $this->assertRead($reader, function (mixed $read) {
+        $this->assertRead($reader, function (mixed $read): void {
             $this->assertInstanceOf(DummyWithNameAttributes::class, $read);
             $this->assertSame(10, $read->id);
         }, '{"@id": 10}', Type::object(DummyWithNameAttributes::class));
     }
 
-    public function testReadObjectWithValueTransformer()
+    public function testReadObjectWithValueTransformer(): void
     {
         $reader = JsonStreamReader::create(
             [
@@ -128,7 +128,7 @@ class JsonStreamReaderTest extends TestCase
             $this->streamReadersDir,
         );
 
-        $this->assertRead($reader, function (mixed $read) {
+        $this->assertRead($reader, function (mixed $read): void {
             $this->assertInstanceOf(DummyWithValueTransformerAttributes::class, $read);
             $this->assertSame(10, $read->id);
             $this->assertTrue($read->active);
@@ -137,11 +137,11 @@ class JsonStreamReaderTest extends TestCase
         }, '{"id": "20", "active": "true", "name": "lowercase name", "range": "0..1"}', Type::object(DummyWithValueTransformerAttributes::class), ['scale' => 1]);
     }
 
-    public function testReadObjectWithPhpDoc()
+    public function testReadObjectWithPhpDoc(): void
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir);
 
-        $this->assertRead($reader, function (mixed $read) {
+        $this->assertRead($reader, function (mixed $read): void {
             $this->assertInstanceOf(DummyWithPhpDoc::class, $read);
             $this->assertIsArray($read->arrayOfDummies);
             $this->assertContainsOnlyInstancesOf(DummyWithNameAttributes::class, $read->arrayOfDummies);
@@ -149,39 +149,39 @@ class JsonStreamReaderTest extends TestCase
         }, '{"arrayOfDummies":{"key":{"@id":10,"name":"dummy"}}}', Type::object(DummyWithPhpDoc::class));
     }
 
-    public function testReadObjectWithNullableProperties()
+    public function testReadObjectWithNullableProperties(): void
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir);
 
-        $this->assertRead($reader, function (mixed $read) {
+        $this->assertRead($reader, function (mixed $read): void {
             $this->assertInstanceOf(DummyWithNullableProperties::class, $read);
             $this->assertNull($read->name);
             $this->assertNull($read->enum);
         }, '{"name":null,"enum":null}', Type::object(DummyWithNullableProperties::class));
     }
 
-    public function testReadObjectWithDateTimes()
+    public function testReadObjectWithDateTimes(): void
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir);
 
-        $this->assertRead($reader, function (mixed $read) {
+        $this->assertRead($reader, function (mixed $read): void {
             $this->assertInstanceOf(DummyWithDateTimes::class, $read);
             $this->assertEquals(new \DateTimeImmutable('2024-11-20'), $read->interface);
             $this->assertEquals(new \DateTimeImmutable('2025-11-20'), $read->immutable);
         }, '{"interface":"2024-11-20","immutable":"2025-11-20"}', Type::object(DummyWithDateTimes::class));
     }
 
-    public function testReadObjectWithSyntheticProperties()
+    public function testReadObjectWithSyntheticProperties(): void
     {
         $reader = new JsonStreamReader(new Container(), new SyntheticPropertyMetadataLoader(), $this->streamReadersDir);
 
-        $this->assertRead($reader, function (mixed $read) {
+        $this->assertRead($reader, function (mixed $read): void {
             $this->assertInstanceOf(DummyWithSyntheticProperties::class, $read);
             $this->assertSame([], get_object_vars($read));
         }, '{"synthetic":true}', Type::object(DummyWithSyntheticProperties::class));
     }
 
-    public function testCreateStreamReaderFile()
+    public function testCreateStreamReaderFile(): void
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir);
 
@@ -191,7 +191,7 @@ class JsonStreamReaderTest extends TestCase
         $this->assertCount(1, glob($this->streamReadersDir.'/*'));
     }
 
-    public function testCreateStreamReaderFileOnlyIfNotExists()
+    public function testCreateStreamReaderFileOnlyIfNotExists(): void
     {
         $reader = JsonStreamReader::create([], $this->streamReadersDir);
 

@@ -81,13 +81,13 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->normalizer->setSerializer($this->serializer);
     }
 
-    public function testInterface()
+    public function testInterface(): void
     {
         $this->assertInstanceOf(NormalizerInterface::class, $this->normalizer);
         $this->assertInstanceOf(DenormalizerInterface::class, $this->normalizer);
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $obj = new GetSetDummy();
         $object = new \stdClass();
@@ -110,7 +110,7 @@ class GetSetMethodNormalizerTest extends TestCase
         );
     }
 
-    public function testNormalizeWithoutSerializer()
+    public function testNormalizeWithoutSerializer(): void
     {
         $obj = new GetSetDummy();
         $obj->setFoo('foo');
@@ -133,7 +133,7 @@ class GetSetMethodNormalizerTest extends TestCase
         );
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => 'bar', 'baz' => true, 'fooBar' => 'foobar'],
@@ -145,7 +145,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertTrue($obj->isBaz());
     }
 
-    public function testIgnoredAttributesInContext()
+    public function testIgnoredAttributesInContext(): void
     {
         $ignoredAttributes = ['foo', 'bar', 'baz', 'object'];
         $obj = new GetSetDummy();
@@ -161,7 +161,7 @@ class GetSetMethodNormalizerTest extends TestCase
         );
     }
 
-    public function testDenormalizeWithObject()
+    public function testDenormalizeWithObject(): void
     {
         $data = new \stdClass();
         $data->foo = 'foo';
@@ -172,12 +172,12 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->getBar());
     }
 
-    public function testDenormalizeNull()
+    public function testDenormalizeNull(): void
     {
         $this->assertEquals(new GetSetDummy(), $this->normalizer->denormalize(null, GetSetDummy::class));
     }
 
-    public function testConstructorDenormalize()
+    public function testConstructorDenormalize(): void
     {
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => 'bar', 'baz' => true, 'fooBar' => 'foobar'],
@@ -187,7 +187,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertTrue($obj->isBaz());
     }
 
-    public function testConstructorDenormalizeWithNullArgument()
+    public function testConstructorDenormalizeWithNullArgument(): void
     {
         $obj = $this->normalizer->denormalize(
             ['foo' => 'foo', 'bar' => null, 'baz' => true],
@@ -197,7 +197,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertTrue($obj->isBaz());
     }
 
-    public function testConstructorDenormalizeWithMissingOptionalArgument()
+    public function testConstructorDenormalizeWithMissingOptionalArgument(): void
     {
         $obj = $this->normalizer->denormalize(
             ['foo' => 'test', 'baz' => [1, 2, 3]],
@@ -207,7 +207,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertEquals([1, 2, 3], $obj->getBaz());
     }
 
-    public function testConstructorDenormalizeWithOptionalDefaultArgument()
+    public function testConstructorDenormalizeWithOptionalDefaultArgument(): void
     {
         $obj = $this->normalizer->denormalize(
             ['bar' => 'test'],
@@ -216,7 +216,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertEquals('test', $obj->getBar());
     }
 
-    public function testConstructorDenormalizeWithVariadicArgument()
+    public function testConstructorDenormalizeWithVariadicArgument(): void
     {
         $obj = $this->normalizer->denormalize(
             ['foo' => [1, 2, 3]],
@@ -224,7 +224,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertEquals([1, 2, 3], $obj->getFoo());
     }
 
-    public function testConstructorDenormalizeWithMissingVariadicArgument()
+    public function testConstructorDenormalizeWithMissingVariadicArgument(): void
     {
         $obj = $this->normalizer->denormalize(
             [],
@@ -232,7 +232,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertEquals([], $obj->getFoo());
     }
 
-    public function testConstructorWithObjectDenormalize()
+    public function testConstructorWithObjectDenormalize(): void
     {
         $data = new \stdClass();
         $data->foo = 'foo';
@@ -244,7 +244,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertEquals('bar', $obj->getBar());
     }
 
-    public function testConstructorWArgWithPrivateMutator()
+    public function testConstructorWArgWithPrivateMutator(): void
     {
         $obj = $this->normalizer->denormalize(['foo' => 'bar'], ObjectConstructorArgsWithPrivateMutatorDummy::class, 'any');
         $this->assertEquals('bar', $obj->getFoo());
@@ -306,7 +306,7 @@ class GetSetMethodNormalizerTest extends TestCase
         return new GetSetMethodNormalizer();
     }
 
-    public function testGroupsNormalizeWithNameConverter()
+    public function testGroupsNormalizeWithNameConverter(): void
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $this->normalizer = new GetSetMethodNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
@@ -327,7 +327,7 @@ class GetSetMethodNormalizerTest extends TestCase
         );
     }
 
-    public function testGroupsDenormalizeWithNameConverter()
+    public function testGroupsDenormalizeWithNameConverter(): void
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $this->normalizer = new GetSetMethodNormalizer($classMetadataFactory, new CamelCaseToSnakeCaseNameConverter());
@@ -377,7 +377,7 @@ class GetSetMethodNormalizerTest extends TestCase
         return $normalizer;
     }
 
-    public function testRejectInvalidKey()
+    public function testRejectInvalidKey(): void
     {
         $this->markTestSkipped('This test makes no sense with the GetSetMethodNormalizer');
     }
@@ -400,7 +400,7 @@ class GetSetMethodNormalizerTest extends TestCase
         return $normalizer;
     }
 
-    public function testUnableToNormalizeObjectAttribute()
+    public function testUnableToNormalizeObjectAttribute(): void
     {
         $this->normalizer->setSerializer($this->createStub(SerializerInterface::class));
 
@@ -414,7 +414,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->normalizer->normalize($obj, 'any');
     }
 
-    public function testSiblingReference()
+    public function testSiblingReference(): void
     {
         $serializer = new Serializer([$this->normalizer]);
         $this->normalizer->setSerializer($serializer);
@@ -427,7 +427,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertEquals($expected, $this->normalizer->normalize(new SiblingHolder()));
     }
 
-    public function testDenormalizeNonExistingAttribute()
+    public function testDenormalizeNonExistingAttribute(): void
     {
         $this->assertEquals(
             new GetSetDummy(),
@@ -435,7 +435,7 @@ class GetSetMethodNormalizerTest extends TestCase
         );
     }
 
-    public function testDenormalizeShouldNotSetStaticAttribute()
+    public function testDenormalizeShouldNotSetStaticAttribute(): void
     {
         $obj = $this->normalizer->denormalize(['staticObject' => true], GetSetDummy::class);
 
@@ -443,12 +443,12 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertNull(GetSetDummy::getStaticObject());
     }
 
-    public function testNoTraversableSupport()
+    public function testNoTraversableSupport(): void
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \ArrayObject()));
     }
 
-    public function testNoStaticGetSetSupport()
+    public function testNoStaticGetSetSupport(): void
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new ObjectWithJustStaticSetterDummy()));
     }
@@ -457,7 +457,7 @@ class GetSetMethodNormalizerTest extends TestCase
      * @param class-string $class
      */
     #[DataProvider('provideNotIgnoredMethodSupport')]
-    public function testNotIgnoredMethodSupport(string $class)
+    public function testNotIgnoredMethodSupport(string $class): void
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new $class()));
     }
@@ -470,19 +470,19 @@ class GetSetMethodNormalizerTest extends TestCase
         ];
     }
 
-    public function testPrivateSetter()
+    public function testPrivateSetter(): void
     {
         $obj = $this->normalizer->denormalize(['foo' => 'foobar'], ObjectWithPrivateSetterDummy::class);
         $this->assertEquals('bar', $obj->getFoo());
     }
 
-    public function testHasGetterDenormalize()
+    public function testHasGetterDenormalize(): void
     {
         $obj = $this->normalizer->denormalize(['foo' => true], ObjectWithHasGetterDummy::class);
         $this->assertTrue($obj->hasFoo());
     }
 
-    public function testHasGetterNormalize()
+    public function testHasGetterNormalize(): void
     {
         $obj = new ObjectWithHasGetterDummy();
         $obj->setFoo(true);
@@ -493,13 +493,13 @@ class GetSetMethodNormalizerTest extends TestCase
         );
     }
 
-    public function testCallMagicMethodDenormalize()
+    public function testCallMagicMethodDenormalize(): void
     {
         $obj = $this->normalizer->denormalize(['active' => true], ObjectWithMagicMethod::class);
         $this->assertTrue($obj->isActive());
     }
 
-    public function testCallMagicMethodNormalize()
+    public function testCallMagicMethodNormalize(): void
     {
         $obj = new ObjectWithMagicMethod();
 
@@ -530,7 +530,7 @@ class GetSetMethodNormalizerTest extends TestCase
         return new GetSetMethodNormalizer(new ClassMetadataFactory(new AttributeLoader()));
     }
 
-    public function testNormalizeWithDiscriminator()
+    public function testNormalizeWithDiscriminator(): void
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
@@ -539,7 +539,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertSame(['type' => 'one', 'url' => 'URL_ONE'], $normalizer->normalize(new GetSetMethodDiscriminatedDummyOne()));
     }
 
-    public function testNormalizeWithMethodNamesSimilarToAccessors()
+    public function testNormalizeWithMethodNamesSimilarToAccessors(): void
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $normalizer = new GetSetMethodNormalizer($classMetadataFactory);
@@ -547,7 +547,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertSame(['class' => 'class', 123 => 123], $normalizer->normalize(new GetSetWithAccessorishMethod()));
     }
 
-    public function testNormalizeWithScalarValueNormalizer()
+    public function testNormalizeWithScalarValueNormalizer(): void
     {
         $normalizer = new GetSetMethodNormalizer();
         $normalizer->setSerializer(new Serializer([$normalizer, new ScalarNormalizer()]));
@@ -571,7 +571,7 @@ class GetSetMethodNormalizerTest extends TestCase
         );
     }
 
-    public function testDenormalizeWithDiscriminator()
+    public function testDenormalizeWithDiscriminator(): void
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
         $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
@@ -583,7 +583,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertEquals($denormalized, $normalizer->denormalize(['type' => 'two', 'url' => 'url'], GetSetMethodDummyInterface::class));
     }
 
-    public function testSupportsAndNormalizeWithOnlyParentGetter()
+    public function testSupportsAndNormalizeWithOnlyParentGetter(): void
     {
         $obj = new GetSetDummyChild();
         $obj->setFoo('foo');
@@ -592,7 +592,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertSame(['foo' => 'foo'], $this->normalizer->normalize($obj));
     }
 
-    public function testSupportsAndDenormalizeWithOnlyParentSetter()
+    public function testSupportsAndDenormalizeWithOnlyParentSetter(): void
     {
         $this->assertTrue($this->normalizer->supportsDenormalization(['foo' => 'foo'], GetSetDummyChild::class));
 
@@ -602,7 +602,7 @@ class GetSetMethodNormalizerTest extends TestCase
 
     #[TestWith([['foo' => 'foo'], 'getFoo', 'foo'])]
     #[TestWith([['bar' => 'bar'], 'getBar', 'bar'])]
-    public function testSupportsAndDenormalizeWithOptionalSetterArgument(array $data, string $method, string $expected)
+    public function testSupportsAndDenormalizeWithOptionalSetterArgument(array $data, string $method, string $expected): void
     {
         $this->assertTrue($this->normalizer->supportsDenormalization($data, GetSetDummyWithOptionalAndMultipleSetterArgs::class));
 
@@ -610,7 +610,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertSame($expected, $obj->$method());
     }
 
-    public function testDiscriminatorWithAllowExtraAttributesFalse()
+    public function testDiscriminatorWithAllowExtraAttributesFalse(): void
     {
         // Discriminator type property should be allowed with allow_extra_attributes=false
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
@@ -627,7 +627,7 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertInstanceOf(GetSetMethodDiscriminatedDummyOne::class, $obj);
     }
 
-    public function testSkipVoidNeverReturnTypeAccessors()
+    public function testSkipVoidNeverReturnTypeAccessors(): void
     {
         $obj = new VoidNeverReturnTypeDummy();
         $normalized = $this->normalizer->normalize($obj);
@@ -652,7 +652,7 @@ class GetSetDummy
         return $this->foo;
     }
 
-    public function setFoo($foo)
+    public function setFoo($foo): void
     {
         $this->foo = $foo;
     }
@@ -662,7 +662,7 @@ class GetSetDummy
         return $this->bar;
     }
 
-    public function setBar($bar)
+    public function setBar($bar): void
     {
         $this->bar = $bar;
     }
@@ -672,7 +672,7 @@ class GetSetDummy
         return $this->baz;
     }
 
-    public function setBaz($baz)
+    public function setBaz($baz): void
     {
         $this->baz = $baz;
     }
@@ -687,17 +687,17 @@ class GetSetDummy
         return $this->camelCase;
     }
 
-    public function setCamelCase($camelCase)
+    public function setCamelCase($camelCase): void
     {
         $this->camelCase = $camelCase;
     }
 
-    public function otherMethod()
+    public function otherMethod(): void
     {
         throw new \RuntimeException('Dummy::otherMethod() should not be called');
     }
 
-    public function setObject($object)
+    public function setObject($object): void
     {
         $this->object = $object;
     }
@@ -712,12 +712,12 @@ class GetSetDummy
         return self::$staticObject;
     }
 
-    public static function setStaticObject($object)
+    public static function setStaticObject($object): void
     {
         self::$staticObject = $object;
     }
 
-    protected function getPrivate()
+    protected function getPrivate(): void
     {
         throw new \RuntimeException('Dummy::getPrivate() should not be called');
     }
@@ -751,7 +751,7 @@ class GetConstructorDummy
         return $this->baz;
     }
 
-    public function otherMethod()
+    public function otherMethod(): void
     {
         throw new \RuntimeException('Dummy::otherMethod() should not be called');
     }
@@ -785,7 +785,7 @@ class GetConstructorOptionalArgsDummy
         return $this->baz;
     }
 
-    public function otherMethod()
+    public function otherMethod(): void
     {
         throw new \RuntimeException('Dummy::otherMethod() should not be called');
     }
@@ -812,7 +812,7 @@ class GetConstructorArgsWithDefaultValueDummy
         return $this->bar;
     }
 
-    public function otherMethod()
+    public function otherMethod(): void
     {
         throw new \RuntimeException('Dummy::otherMethod() should not be called');
     }
@@ -832,7 +832,7 @@ class ObjectConstructorArgsWithPrivateMutatorDummy
         return $this->foo;
     }
 
-    private function setFoo($foo)
+    private function setFoo($foo): void
     {
         $this->foo = $foo;
     }
@@ -847,7 +847,7 @@ class ObjectWithPrivateSetterDummy
         return $this->foo;
     }
 
-    private function setFoo($foo)
+    private function setFoo($foo): void
     {
     }
 }
@@ -861,7 +861,7 @@ class ObjectWithJustStaticSetterDummy
         return self::$foo;
     }
 
-    public static function setFoo($foo)
+    public static function setFoo($foo): void
     {
         self::$foo = $foo;
     }
@@ -871,7 +871,7 @@ class ObjectWithHasGetterDummy
 {
     private $foo;
 
-    public function setFoo($foo)
+    public function setFoo($foo): void
     {
         $this->foo = $foo;
     }
@@ -891,7 +891,7 @@ class ObjectWithMagicMethod
         return $this->active;
     }
 
-    public function __call($key, $value)
+    public function __call($key, $value): void
     {
         throw new \RuntimeException('__call should not be called. Called with: '.$key);
     }
@@ -948,7 +948,7 @@ class GetSetDummyParent
         return $this->foo;
     }
 
-    public function setFoo($foo)
+    public function setFoo($foo): void
     {
         $this->foo = $foo;
     }
@@ -964,7 +964,7 @@ class GetSetDummyWithOptionalAndMultipleSetterArgs
         return $this->foo;
     }
 
-    public function setFoo($foo = null)
+    public function setFoo($foo = null): void
     {
         $this->foo = $foo;
     }
@@ -974,7 +974,7 @@ class GetSetDummyWithOptionalAndMultipleSetterArgs
         return $this->bar;
     }
 
-    public function setBar($bar = null, $other = true)
+    public function setBar($bar = null, $other = true): void
     {
         $this->bar = $bar;
     }
@@ -997,7 +997,7 @@ class GetSetWithAccessorishMethod
         return 'class';
     }
 
-    public function setClass()
+    public function setClass(): void
     {
     }
 
@@ -1006,19 +1006,19 @@ class GetSetWithAccessorishMethod
         return 123;
     }
 
-    public function set123()
+    public function set123(): void
     {
     }
 
-    public function gettings()
+    public function gettings(): void
     {
     }
 
-    public function settings()
+    public function settings(): void
     {
     }
 
-    public function isolate()
+    public function isolate(): void
     {
     }
 }

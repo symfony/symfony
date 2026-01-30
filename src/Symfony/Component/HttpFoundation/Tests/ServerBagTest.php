@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\ServerBag;
  */
 class ServerBagTest extends TestCase
 {
-    public function testShouldExtractHeadersFromServerArray()
+    public function testShouldExtractHeadersFromServerArray(): void
     {
         $server = [
             'SOME_SERVER_VARIABLE' => 'value',
@@ -46,7 +46,7 @@ class ServerBagTest extends TestCase
         ], $bag->getHeaders());
     }
 
-    public function testHttpPasswordIsOptional()
+    public function testHttpPasswordIsOptional(): void
     {
         $bag = new ServerBag(['PHP_AUTH_USER' => 'foo']);
 
@@ -57,7 +57,7 @@ class ServerBagTest extends TestCase
         ], $bag->getHeaders());
     }
 
-    public function testHttpPasswordIsOptionalWhenPassedWithHttpPrefix()
+    public function testHttpPasswordIsOptionalWhenPassedWithHttpPrefix(): void
     {
         $bag = new ServerBag(['HTTP_PHP_AUTH_USER' => 'foo']);
 
@@ -67,7 +67,7 @@ class ServerBagTest extends TestCase
         ], $bag->getHeaders());
     }
 
-    public function testHttpBasicAuthWithPhpCgi()
+    public function testHttpBasicAuthWithPhpCgi(): void
     {
         $bag = new ServerBag(['HTTP_AUTHORIZATION' => 'Basic '.base64_encode('foo:bar')]);
 
@@ -78,7 +78,7 @@ class ServerBagTest extends TestCase
         ], $bag->getHeaders());
     }
 
-    public function testHttpBasicAuthWithPhpCgiBogus()
+    public function testHttpBasicAuthWithPhpCgiBogus(): void
     {
         $bag = new ServerBag(['HTTP_AUTHORIZATION' => 'Basic_'.base64_encode('foo:bar')]);
 
@@ -88,7 +88,7 @@ class ServerBagTest extends TestCase
         $this->assertArrayNotHasKey('PHP_AUTH_PW', $headers);
     }
 
-    public function testHttpBasicAuthWithPhpCgiRedirect()
+    public function testHttpBasicAuthWithPhpCgiRedirect(): void
     {
         $bag = new ServerBag(['REDIRECT_HTTP_AUTHORIZATION' => 'Basic '.base64_encode('username:pass:word')]);
 
@@ -99,7 +99,7 @@ class ServerBagTest extends TestCase
         ], $bag->getHeaders());
     }
 
-    public function testHttpBasicAuthWithPhpCgiEmptyPassword()
+    public function testHttpBasicAuthWithPhpCgiEmptyPassword(): void
     {
         $bag = new ServerBag(['HTTP_AUTHORIZATION' => 'Basic '.base64_encode('foo:')]);
 
@@ -110,7 +110,7 @@ class ServerBagTest extends TestCase
         ], $bag->getHeaders());
     }
 
-    public function testHttpDigestAuthWithPhpCgi()
+    public function testHttpDigestAuthWithPhpCgi(): void
     {
         $digest = 'Digest username="foo", realm="acme", nonce="'.md5('secret').'", uri="/protected, qop="auth"';
         $bag = new ServerBag(['HTTP_AUTHORIZATION' => $digest]);
@@ -121,7 +121,7 @@ class ServerBagTest extends TestCase
         ], $bag->getHeaders());
     }
 
-    public function testHttpDigestAuthWithPhpCgiBogus()
+    public function testHttpDigestAuthWithPhpCgiBogus(): void
     {
         $digest = 'Digest_username="foo", realm="acme", nonce="'.md5('secret').'", uri="/protected, qop="auth"';
         $bag = new ServerBag(['HTTP_AUTHORIZATION' => $digest]);
@@ -132,7 +132,7 @@ class ServerBagTest extends TestCase
         $this->assertArrayNotHasKey('PHP_AUTH_PW', $headers);
     }
 
-    public function testHttpDigestAuthWithPhpCgiRedirect()
+    public function testHttpDigestAuthWithPhpCgiRedirect(): void
     {
         $digest = 'Digest username="foo", realm="acme", nonce="'.md5('secret').'", uri="/protected, qop="auth"';
         $bag = new ServerBag(['REDIRECT_HTTP_AUTHORIZATION' => $digest]);
@@ -143,7 +143,7 @@ class ServerBagTest extends TestCase
         ], $bag->getHeaders());
     }
 
-    public function testOAuthBearerAuth()
+    public function testOAuthBearerAuth(): void
     {
         $headerContent = 'Bearer L-yLEOr9zhmUYRkzN1jwwxwQ-PBNiKDc8dgfB4hTfvo';
         $bag = new ServerBag(['HTTP_AUTHORIZATION' => $headerContent]);
@@ -153,7 +153,7 @@ class ServerBagTest extends TestCase
         ], $bag->getHeaders());
     }
 
-    public function testOAuthBearerAuthWithRedirect()
+    public function testOAuthBearerAuthWithRedirect(): void
     {
         $headerContent = 'Bearer L-yLEOr9zhmUYRkzN1jwwxwQ-PBNiKDc8dgfB4hTfvo';
         $bag = new ServerBag(['REDIRECT_HTTP_AUTHORIZATION' => $headerContent]);
@@ -166,7 +166,7 @@ class ServerBagTest extends TestCase
     /**
      * @see https://github.com/symfony/symfony/issues/17345
      */
-    public function testItDoesNotOverwriteTheAuthorizationHeaderIfItIsAlreadySet()
+    public function testItDoesNotOverwriteTheAuthorizationHeaderIfItIsAlreadySet(): void
     {
         $headerContent = 'Bearer L-yLEOr9zhmUYRkzN1jwwxwQ-PBNiKDc8dgfB4hTfvo';
         $bag = new ServerBag(['PHP_AUTH_USER' => 'foo', 'HTTP_AUTHORIZATION' => $headerContent]);
@@ -183,7 +183,7 @@ class ServerBagTest extends TestCase
      * the variables $_SERVER['CONTENT_TYPE'] and $_SERVER['CONTENT_LENGTH']
      * containing an empty string in PHP.
      */
-    public function testRequestWithoutContentTypeAndContentLength()
+    public function testRequestWithoutContentTypeAndContentLength(): void
     {
         $bag = new ServerBag([
             'CONTENT_TYPE' => '',

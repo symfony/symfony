@@ -22,7 +22,7 @@ trait FilterBoolTestTrait
     abstract protected function getNormalizerForFilterBool(): DenormalizerInterface;
 
     #[DataProvider('provideObjectWithBoolArguments')]
-    public function testObjectWithBoolArguments(?bool $expectedValue, ?string $parameterValue)
+    public function testObjectWithBoolArguments(?bool $expectedValue, ?string $parameterValue): void
     {
         $normalizer = $this->getNormalizerForFilterBool();
 

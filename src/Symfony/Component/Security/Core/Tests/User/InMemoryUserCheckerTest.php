@@ -18,20 +18,20 @@ use Symfony\Component\Security\Core\User\InMemoryUserChecker;
 
 class InMemoryUserCheckerTest extends TestCase
 {
-    public function testCheckPostAuthNotAdvancedUserInterface()
+    public function testCheckPostAuthNotAdvancedUserInterface(): void
     {
         $checker = new InMemoryUserChecker();
 
         $this->assertNull($checker->checkPostAuth(new InMemoryUser('John', 'password')));
     }
 
-    public function testCheckPostAuthPass()
+    public function testCheckPostAuthPass(): void
     {
         $checker = new InMemoryUserChecker();
         $this->assertNull($checker->checkPostAuth(new InMemoryUser('John', 'password')));
     }
 
-    public function testCheckPreAuthDisabled()
+    public function testCheckPreAuthDisabled(): void
     {
         $this->expectException(DisabledException::class);
         (new InMemoryUserChecker())->checkPreAuth(new InMemoryUser('John', 'password', [], false));

@@ -28,28 +28,28 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
         return new CidrValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Cidr());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Cidr());
 
         $this->assertNoViolation();
     }
 
-    public function testInvalidConstraint()
+    public function testInvalidConstraint(): void
     {
         $this->expectException(UnexpectedTypeException::class);
 
         $this->validator->validate('neko', new NotNull());
     }
 
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
 
@@ -57,7 +57,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getWithInvalidNetmask')]
-    public function testInvalidNetmask(string $cidr)
+    public function testInvalidNetmask(string $cidr): void
     {
         $this->validator->validate($cidr, new Cidr());
 
@@ -68,7 +68,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getWithInvalidIps')]
-    public function testInvalidIpValue(string $cidr)
+    public function testInvalidIpValue(string $cidr): void
     {
         $this->validator->validate($cidr, new Cidr());
 
@@ -79,7 +79,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValid')]
-    public function testValidCidr(string|\Stringable $cidr, string $version)
+    public function testValidCidr(string|\Stringable $cidr, string $version): void
     {
         $this->validator->validate($cidr, new Cidr(version: $version));
 
@@ -87,7 +87,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getWithInvalidMasksAndIps')]
-    public function testInvalidIpAddressAndNetmask(string|\Stringable $cidr)
+    public function testInvalidIpAddressAndNetmask(string|\Stringable $cidr): void
     {
         $this->validator->validate($cidr, new Cidr());
         $this
@@ -97,7 +97,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getOutOfRangeNetmask')]
-    public function testOutOfRangeNetmask(string $cidr, int $maxExpected, ?string $version = null, ?int $min = null, ?int $max = null)
+    public function testOutOfRangeNetmask(string $cidr, int $maxExpected, ?string $version = null, ?int $min = null, ?int $max = null): void
     {
         $cidrConstraint = new Cidr(
             version: $version,
@@ -115,7 +115,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getWithWrongVersion')]
-    public function testWrongVersion(string $cidr, string $version)
+    public function testWrongVersion(string $cidr, string $version): void
     {
         $this->validator->validate($cidr, new Cidr(version: $version));
 
@@ -245,7 +245,7 @@ class CidrValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testDoesNotModifyContextBetweenValidations()
+    public function testDoesNotModifyContextBetweenValidations(): void
     {
         $constraint = new Cidr();
 

@@ -17,7 +17,7 @@ use Symfony\Component\Uid\Command\InspectUlidCommand;
 
 final class InspectUlidCommandTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $commandTester = new CommandTester(new InspectUlidCommand());
 

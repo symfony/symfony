@@ -20,14 +20,14 @@ use Symfony\Component\RateLimiter\RateLimit;
 #[Group('time-sensitive')]
 class RateLimitTest extends TestCase
 {
-    public function testEnsureAcceptedDoesNotThrowExceptionIfAccepted()
+    public function testEnsureAcceptedDoesNotThrowExceptionIfAccepted(): void
     {
         $rateLimit = new RateLimit(10, new \DateTimeImmutable(), true, 10);
 
         $this->assertSame($rateLimit, $rateLimit->ensureAccepted());
     }
 
-    public function testEnsureAcceptedThrowsRateLimitExceptionIfNotAccepted()
+    public function testEnsureAcceptedThrowsRateLimitExceptionIfNotAccepted(): void
     {
         $rateLimit = new RateLimit(10, $retryAfter = new \DateTimeImmutable(), false, 10);
 
@@ -44,7 +44,7 @@ class RateLimitTest extends TestCase
         $this->fail('RateLimitExceededException not thrown.');
     }
 
-    public function testWaitUsesMicrotime()
+    public function testWaitUsesMicrotime(): void
     {
         ClockMock::register(RateLimit::class);
         $retryAfter = time() + 2.5; // get timestamp in the middle of a second (xxx.5)

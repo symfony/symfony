@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class RegexTest extends TestCase
 {
-    public function testConstraintGetDefaultOption()
+    public function testConstraintGetDefaultOption(): void
     {
         $constraint = new Regex('/^[0-9]+$/');
 
@@ -66,7 +66,7 @@ class RegexTest extends TestCase
     }
 
     #[DataProvider('provideHtmlPatterns')]
-    public function testGetHtmlPattern($pattern, $htmlPattern, $match = true)
+    public function testGetHtmlPattern($pattern, $htmlPattern, $match = true): void
     {
         $constraint = new Regex(
             pattern: $pattern,
@@ -77,7 +77,7 @@ class RegexTest extends TestCase
         $this->assertSame($htmlPattern, $constraint->getHtmlPattern());
     }
 
-    public function testGetCustomHtmlPattern()
+    public function testGetCustomHtmlPattern(): void
     {
         $constraint = new Regex(
             pattern: '((?![0-9]$|[a-z]+).)*',
@@ -88,14 +88,14 @@ class RegexTest extends TestCase
         $this->assertSame('foobar', $constraint->getHtmlPattern());
     }
 
-    public function testNormalizerCanBeSet()
+    public function testNormalizerCanBeSet(): void
     {
         $regex = new Regex(pattern: '/^[0-9]+$/', normalizer: 'trim');
 
         $this->assertEquals('trim', $regex->normalizer);
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(RegexDummy::class);
         $loader = new AttributeLoader();
@@ -118,7 +118,7 @@ class RegexTest extends TestCase
         self::assertSame('some attached data', $cConstraint->payload);
     }
 
-    public function testMissingPattern()
+    public function testMissingPattern(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage(\sprintf('The options "pattern" must be set for constraint "%s".', Regex::class));

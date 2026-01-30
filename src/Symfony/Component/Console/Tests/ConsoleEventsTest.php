@@ -43,7 +43,7 @@ class ConsoleEventsTest extends TestCase
         }
     }
 
-    public function testEventAliases()
+    public function testEventAliases(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('event_dispatcher.event_aliases', ConsoleEvents::ALIASES);

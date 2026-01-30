@@ -23,7 +23,7 @@ class CompoundFormPerformanceTest extends FormPerformanceTestCase
      * Create a compound form multiple times, as happens in a collection form.
      */
     #[Group('benchmark')]
-    public function testArrayBasedForm()
+    public function testArrayBasedForm(): void
     {
         $this->setMaxRunningTime(1);
 

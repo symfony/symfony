@@ -28,7 +28,7 @@ final class ExpectDeprecationTraitTest extends TestCase
      * @group legacy
      */
     #[Group('legacy')]
-    public function testOne()
+    public function testOne(): void
     {
         $this->expectDeprecation('foo');
         @trigger_error('foo', \E_USER_DEPRECATED);
@@ -43,7 +43,7 @@ final class ExpectDeprecationTraitTest extends TestCase
      */
     #[Group('legacy')]
     #[RunInSeparateProcess]
-    public function testOneInIsolation()
+    public function testOneInIsolation(): void
     {
         $this->expectDeprecation('foo');
         @trigger_error('foo', \E_USER_DEPRECATED);
@@ -55,7 +55,7 @@ final class ExpectDeprecationTraitTest extends TestCase
      * @group legacy
      */
     #[Group('legacy')]
-    public function testMany()
+    public function testMany(): void
     {
         $this->expectDeprecation('foo');
         $this->expectDeprecation('bar');
@@ -71,7 +71,7 @@ final class ExpectDeprecationTraitTest extends TestCase
      * @expectedDeprecation foo
      */
     #[Group('legacy')]
-    public function testOneWithAnnotation()
+    public function testOneWithAnnotation(): void
     {
         $this->expectDeprecation('bar');
         @trigger_error('foo', \E_USER_DEPRECATED);
@@ -87,7 +87,7 @@ final class ExpectDeprecationTraitTest extends TestCase
      * @expectedDeprecation bar
      */
     #[Group('legacy')]
-    public function testManyWithAnnotation()
+    public function testManyWithAnnotation(): void
     {
         $this->expectDeprecation('ccc');
         $this->expectDeprecation('fcy');

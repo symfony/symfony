@@ -48,7 +48,7 @@ class MastodonTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testBasicStatus()
+    public function testBasicStatus(): void
     {
         $transport = $this->createTransport(new MockHttpClient(function (string $method, string $url, array $options) {
             $this->assertSame('POST', $method);
@@ -64,7 +64,7 @@ class MastodonTransportTest extends TransportTestCase
         $this->assertSame('103254962155278888', $result->getMessageId());
     }
 
-    public function testStatusWithPoll()
+    public function testStatusWithPoll(): void
     {
         $transport = $this->createTransport(new MockHttpClient(function (string $method, string $url, array $options) {
             $this->assertSame('POST', $method);
@@ -82,7 +82,7 @@ class MastodonTransportTest extends TransportTestCase
         $this->assertSame('103254962155278888', $result->getMessageId());
     }
 
-    public function testStatusWithMedia()
+    public function testStatusWithMedia(): void
     {
         $transport = $this->createTransport(new MockHttpClient((function () {
             yield function (string $method, string $url, array $options) {

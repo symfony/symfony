@@ -22,12 +22,12 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class TraceableEventDispatcherTest extends TestCase
 {
-    public function testAddRemoveListener()
+    public function testAddRemoveListener(): void
     {
         $dispatcher = new EventDispatcher();
         $tdispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch());
 
-        $tdispatcher->addListener('foo', $listener = static function () {});
+        $tdispatcher->addListener('foo', $listener = static function (): void {});
         $listeners = $dispatcher->getListeners('foo');
         $this->assertCount(1, $listeners);
         $this->assertSame($listener, $listeners[0]);
@@ -36,16 +36,16 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertCount(0, $dispatcher->getListeners('foo'));
     }
 
-    public function testGetListeners()
+    public function testGetListeners(): void
     {
         $dispatcher = new EventDispatcher();
         $tdispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch());
 
-        $tdispatcher->addListener('foo', $listener = static function () {});
+        $tdispatcher->addListener('foo', $listener = static function (): void {});
         $this->assertSame($dispatcher->getListeners('foo'), $tdispatcher->getListeners('foo'));
     }
 
-    public function testHasListeners()
+    public function testHasListeners(): void
     {
         $dispatcher = new EventDispatcher();
         $tdispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch());
@@ -53,17 +53,17 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertFalse($dispatcher->hasListeners('foo'));
         $this->assertFalse($tdispatcher->hasListeners('foo'));
 
-        $tdispatcher->addListener('foo', $listener = static function () {});
+        $tdispatcher->addListener('foo', $listener = static function (): void {});
         $this->assertTrue($dispatcher->hasListeners('foo'));
         $this->assertTrue($tdispatcher->hasListeners('foo'));
     }
 
-    public function testGetListenerPriority()
+    public function testGetListenerPriority(): void
     {
         $dispatcher = new EventDispatcher();
         $tdispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch());
 
-        $tdispatcher->addListener('foo', static function () {}, 123);
+        $tdispatcher->addListener('foo', static function (): void {}, 123);
 
         $listeners = $dispatcher->getListeners('foo');
         $this->assertSame(123, $tdispatcher->getListenerPriority('foo', $listeners[0]));
@@ -75,12 +75,12 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertSame(123, $tdispatcher->getListenerPriority('foo', $listeners[0]));
     }
 
-    public function testGetListenerPriorityWhileDispatching()
+    public function testGetListenerPriorityWhileDispatching(): void
     {
         $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
         $priorityWhileDispatching = null;
 
-        $listener = static function () use ($tdispatcher, &$priorityWhileDispatching, &$listener) {
+        $listener = static function () use ($tdispatcher, &$priorityWhileDispatching, &$listener): void {
             $priorityWhileDispatching = $tdispatcher->getListenerPriority('bar', $listener);
         };
 
@@ -89,7 +89,7 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertSame(5, $priorityWhileDispatching);
     }
 
-    public function testAddRemoveSubscriber()
+    public function testAddRemoveSubscriber(): void
     {
         $dispatcher = new EventDispatcher();
         $tdispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch());
@@ -105,10 +105,10 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertCount(0, $dispatcher->getListeners('foo'));
     }
 
-    public function testGetCalledListeners()
+    public function testGetCalledListeners(): void
     {
         $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $tdispatcher->addListener('foo', static function () {}, 5);
+        $tdispatcher->addListener('foo', static function (): void {}, 5);
 
         $listeners = $tdispatcher->getNotCalledListeners();
         $this->assertArrayHasKey('stub', $listeners[0]);
@@ -125,22 +125,22 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertEquals([], $tdispatcher->getNotCalledListeners());
     }
 
-    public function testGetNotCalledClosureListeners()
+    public function testGetNotCalledClosureListeners(): void
     {
         $instantiationCount = 0;
 
         $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $tdispatcher->addListener('foo', [static function () use (&$instantiationCount) { ++$instantiationCount; }, 'onFoo']);
+        $tdispatcher->addListener('foo', [static function () use (&$instantiationCount): void { ++$instantiationCount; }, 'onFoo']);
 
         $tdispatcher->getNotCalledListeners();
 
         $this->assertSame(0, $instantiationCount);
     }
 
-    public function testClearCalledListeners()
+    public function testClearCalledListeners(): void
     {
         $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $tdispatcher->addListener('foo', static function () {}, 5);
+        $tdispatcher->addListener('foo', static function (): void {}, 5);
 
         $tdispatcher->dispatch(new Event(), 'foo');
         $tdispatcher->reset();
@@ -152,10 +152,10 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertEquals([['event' => 'foo', 'pretty' => 'closure', 'priority' => 5]], $listeners);
     }
 
-    public function testDispatchAfterReset()
+    public function testDispatchAfterReset(): void
     {
         $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $tdispatcher->addListener('foo', static function () {}, 5);
+        $tdispatcher->addListener('foo', static function (): void {}, 5);
 
         $tdispatcher->reset();
         $tdispatcher->dispatch(new Event(), 'foo');
@@ -164,28 +164,28 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertArrayHasKey('stub', $listeners[0]);
     }
 
-    public function testGetCalledListenersNested()
+    public function testGetCalledListenersNested(): void
     {
         $tdispatcher = null;
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $dispatcher->addListener('foo', static function (Event $event, $eventName, $dispatcher) use (&$tdispatcher) {
+        $dispatcher->addListener('foo', static function (Event $event, $eventName, $dispatcher) use (&$tdispatcher): void {
             $tdispatcher = $dispatcher;
             $dispatcher->dispatch(new Event(), 'bar');
         });
-        $dispatcher->addListener('bar', static function (Event $event) {});
+        $dispatcher->addListener('bar', static function (Event $event): void {});
         $dispatcher->dispatch(new Event(), 'foo');
         $this->assertSame($dispatcher, $tdispatcher);
         $this->assertCount(2, $dispatcher->getCalledListeners());
     }
 
-    public function testItReturnsNoOrphanedEventsWhenCreated()
+    public function testItReturnsNoOrphanedEventsWhenCreated(): void
     {
         $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
         $events = $tdispatcher->getOrphanedEvents();
         $this->assertSame([], $events);
     }
 
-    public function testItReturnsOrphanedEventsAfterDispatch()
+    public function testItReturnsOrphanedEventsAfterDispatch(): void
     {
         $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
         $tdispatcher->dispatch(new Event(), 'foo');
@@ -194,23 +194,23 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertEquals(['foo'], $events);
     }
 
-    public function testItDoesNotReturnHandledEvents()
+    public function testItDoesNotReturnHandledEvents(): void
     {
         $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $tdispatcher->addListener('foo', static function () {});
+        $tdispatcher->addListener('foo', static function (): void {});
         $tdispatcher->dispatch(new Event(), 'foo');
         $events = $tdispatcher->getOrphanedEvents();
         $this->assertSame([], $events);
     }
 
-    public function testLogger()
+    public function testLogger(): void
     {
         $logger = new BufferingLogger();
 
         $dispatcher = new EventDispatcher();
         $tdispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch(), $logger);
-        $tdispatcher->addListener('foo', $listener1 = static function () {});
-        $tdispatcher->addListener('foo', $listener2 = static function () {});
+        $tdispatcher->addListener('foo', $listener1 = static function (): void {});
+        $tdispatcher->addListener('foo', $listener2 = static function (): void {});
 
         $tdispatcher->dispatch(new Event(), 'foo');
 
@@ -228,14 +228,14 @@ class TraceableEventDispatcherTest extends TestCase
         ], $logger->cleanLogs());
     }
 
-    public function testLoggerWithStoppedEvent()
+    public function testLoggerWithStoppedEvent(): void
     {
         $logger = new BufferingLogger();
 
         $dispatcher = new EventDispatcher();
         $tdispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch(), $logger);
-        $tdispatcher->addListener('foo', $listener1 = static function (Event $event) { $event->stopPropagation(); });
-        $tdispatcher->addListener('foo', $listener2 = static function () {});
+        $tdispatcher->addListener('foo', $listener1 = static function (Event $event): void { $event->stopPropagation(); });
+        $tdispatcher->addListener('foo', $listener2 = static function (): void {});
 
         $tdispatcher->dispatch(new Event(), 'foo');
 
@@ -258,32 +258,32 @@ class TraceableEventDispatcherTest extends TestCase
         ], $logger->cleanLogs());
     }
 
-    public function testDispatchCallListeners()
+    public function testDispatchCallListeners(): void
     {
         $called = [];
 
         $dispatcher = new EventDispatcher();
         $tdispatcher = new TraceableEventDispatcher($dispatcher, new Stopwatch());
-        $tdispatcher->addListener('foo', static function () use (&$called) { $called[] = 'foo1'; }, 10);
-        $tdispatcher->addListener('foo', static function () use (&$called) { $called[] = 'foo2'; }, 20);
+        $tdispatcher->addListener('foo', static function () use (&$called): void { $called[] = 'foo1'; }, 10);
+        $tdispatcher->addListener('foo', static function () use (&$called): void { $called[] = 'foo2'; }, 20);
 
         $tdispatcher->dispatch(new Event(), 'foo');
 
         $this->assertSame(['foo2', 'foo1'], $called);
     }
 
-    public function testDispatchNested()
+    public function testDispatchNested(): void
     {
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
         $loop = 1;
         $dispatchedEvents = 0;
-        $dispatcher->addListener('foo', $listener1 = static function () use ($dispatcher, &$loop) {
+        $dispatcher->addListener('foo', $listener1 = static function () use ($dispatcher, &$loop): void {
             ++$loop;
             if (2 == $loop) {
                 $dispatcher->dispatch(new Event(), 'foo');
             }
         });
-        $dispatcher->addListener('foo', static function () use (&$dispatchedEvents) {
+        $dispatcher->addListener('foo', static function () use (&$dispatchedEvents): void {
             ++$dispatchedEvents;
         });
 
@@ -292,14 +292,14 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertSame(2, $dispatchedEvents);
     }
 
-    public function testDispatchReusedEventNested()
+    public function testDispatchReusedEventNested(): void
     {
         $nestedCall = false;
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $dispatcher->addListener('foo', static function (Event $e) use ($dispatcher) {
+        $dispatcher->addListener('foo', static function (Event $e) use ($dispatcher): void {
             $dispatcher->dispatch(new Event(), 'bar', $e);
         });
-        $dispatcher->addListener('bar', static function (Event $e) use (&$nestedCall) {
+        $dispatcher->addListener('bar', static function (Event $e) use (&$nestedCall): void {
             $nestedCall = true;
         });
 
@@ -308,20 +308,20 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertTrue($nestedCall);
     }
 
-    public function testListenerCanRemoveItselfWhenExecuted()
+    public function testListenerCanRemoveItselfWhenExecuted(): void
     {
         $eventDispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $listener1 = static function ($event, $eventName, EventDispatcherInterface $dispatcher) use (&$listener1) {
+        $listener1 = static function ($event, $eventName, EventDispatcherInterface $dispatcher) use (&$listener1): void {
             $dispatcher->removeListener('foo', $listener1);
         };
         $eventDispatcher->addListener('foo', $listener1);
-        $eventDispatcher->addListener('foo', static function () {});
+        $eventDispatcher->addListener('foo', static function (): void {});
         $eventDispatcher->dispatch(new Event(), 'foo');
 
         $this->assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');
     }
 
-    public function testClearOrphanedEvents()
+    public function testClearOrphanedEvents(): void
     {
         $tdispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
         $tdispatcher->dispatch(new Event(), 'foo');

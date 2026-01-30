@@ -37,7 +37,7 @@ class PsrHttpFactoryTest extends TestCase
     }
 
     #[DataProvider('provideFactories')]
-    public function testCreateRequest(PsrHttpFactory $factory)
+    public function testCreateRequest(PsrHttpFactory $factory): void
     {
         $stdClass = new \stdClass();
         $request = new Request(
@@ -117,7 +117,7 @@ class PsrHttpFactoryTest extends TestCase
         $this->assertSame(['2.8'], $psrRequest->getHeader('X-Symfony'));
     }
 
-    public function testGetContentCanBeCalledAfterRequestCreation()
+    public function testGetContentCanBeCalledAfterRequestCreation(): void
     {
         $header = ['HTTP_HOST' => 'dunglas.fr'];
         $request = new Request([], [], [], [], [], $header, 'Content');
@@ -137,7 +137,7 @@ class PsrHttpFactoryTest extends TestCase
     }
 
     #[DataProvider('provideFactories')]
-    public function testCreateResponse(PsrHttpFactory $factory)
+    public function testCreateResponse(PsrHttpFactory $factory): void
     {
         $response = new Response(
             'Response content.',
@@ -162,9 +162,9 @@ class PsrHttpFactoryTest extends TestCase
         $this->assertMatchesRegularExpression('{city=Lille; expires=Wed, 13.Jan.2021 22:23:01 GMT;( max-age=\d+;)? path=/; httponly}i', $cookieHeader[0]);
     }
 
-    public function testCreateResponseFromStreamed()
+    public function testCreateResponseFromStreamed(): void
     {
-        $response = new StreamedResponse(static function () {
+        $response = new StreamedResponse(static function (): void {
             echo "Line 1\n";
             flush();
 
@@ -177,7 +177,7 @@ class PsrHttpFactoryTest extends TestCase
         $this->assertSame("Line 1\nLine 2\n", $psrResponse->getBody()->__toString());
     }
 
-    public function testCreateResponseFromBinaryFile()
+    public function testCreateResponseFromBinaryFile(): void
     {
         $path = $this->createTempFile();
         file_put_contents($path, 'Binary');
@@ -189,7 +189,7 @@ class PsrHttpFactoryTest extends TestCase
         $this->assertSame('Binary', $psrResponse->getBody()->__toString());
     }
 
-    public function testCreateResponseFromBinaryFileWithRange()
+    public function testCreateResponseFromBinaryFileWithRange(): void
     {
         $path = $this->createTempFile();
         file_put_contents($path, 'Binary');
@@ -206,7 +206,7 @@ class PsrHttpFactoryTest extends TestCase
         $this->assertSame('bytes 1-4/6', $psrResponse->getHeaderLine('Content-Range'));
     }
 
-    public function testUploadErrNoFile()
+    public function testUploadErrNoFile(): void
     {
         $file = new UploadedFile(__FILE__, '', null, \UPLOAD_ERR_NO_FILE, true);
 
@@ -235,7 +235,7 @@ class PsrHttpFactoryTest extends TestCase
         $this->assertSame(\UPLOAD_ERR_NO_FILE, $uploadedFiles['f2']->getError());
     }
 
-    public function testJsonContent()
+    public function testJsonContent(): void
     {
         $headers = [
             'HTTP_HOST' => 'http_host.fr',
@@ -247,7 +247,7 @@ class PsrHttpFactoryTest extends TestCase
         $this->assertSame(['city' => 'Paris', 'country' => 'France'], $psrRequest->getParsedBody());
     }
 
-    public function testEmptyJsonContent()
+    public function testEmptyJsonContent(): void
     {
         $headers = [
             'HTTP_HOST' => 'http_host.fr',
@@ -259,7 +259,7 @@ class PsrHttpFactoryTest extends TestCase
         $this->assertSame([], $psrRequest->getParsedBody());
     }
 
-    public function testWrongJsonContent()
+    public function testWrongJsonContent(): void
     {
         $headers = [
             'HTTP_HOST' => 'http_host.fr',

@@ -47,7 +47,7 @@ class FormFlowTest extends TestCase
             ->getFormFactory();
     }
 
-    public function testFlowConfig()
+    public function testFlowConfig(): void
     {
         $flow = $this->factory->create(UserSignUpType::class, new UserSignUp());
         $config = $flow->getConfig();
@@ -60,7 +60,7 @@ class FormFlowTest extends TestCase
         self::assertTrue($config->hasStep('account'));
     }
 
-    public function testFlowCursor()
+    public function testFlowCursor(): void
     {
         $flow = $this->factory->create(UserSignUpType::class, new UserSignUp());
         $cursor = $flow->getCursor();
@@ -107,7 +107,7 @@ class FormFlowTest extends TestCase
         self::assertFalse($cursor->canMoveNext());
     }
 
-    public function testFlowViewVars()
+    public function testFlowViewVars(): void
     {
         $view = $this->factory->create(UserSignUpType::class, new UserSignUp())
             ->createView();
@@ -156,7 +156,7 @@ class FormFlowTest extends TestCase
         self::assertSame($step3, $view->vars['visible_steps']['account']);
     }
 
-    public function testWholeStepsFlow()
+    public function testWholeStepsFlow(): void
     {
         $data = new UserSignUp();
         $flow = $this->factory->create(UserSignUpType::class, $data);
@@ -286,7 +286,7 @@ class FormFlowTest extends TestCase
         self::assertSame('eBvU2vBLfSXqf36', $data->password);
     }
 
-    public function testPreviousActionWithPurgeSubmission()
+    public function testPreviousActionWithPurgeSubmission(): void
     {
         $data = new UserSignUp();
         $data->firstName = 'John';
@@ -322,7 +322,7 @@ class FormFlowTest extends TestCase
         self::assertNull($data->role, 'pro step should be silenced on submit');
     }
 
-    public function testPreviousActionWithoutPurgeSubmission()
+    public function testPreviousActionWithoutPurgeSubmission(): void
     {
         $data = new UserSignUp();
         $data->firstName = 'John';
@@ -366,7 +366,7 @@ class FormFlowTest extends TestCase
         self::assertSame('ROLE_DEVELOPER', $data->role, 'pro step should NOT be silenced on submit');
     }
 
-    public function testSkipStepBasedOnData()
+    public function testSkipStepBasedOnData(): void
     {
         $flow = $this->factory->create(UserSignUpType::class, new UserSignUp());
 
@@ -397,7 +397,7 @@ class FormFlowTest extends TestCase
         self::assertTrue($flow->has('account'));
     }
 
-    public function testResetAction()
+    public function testResetAction(): void
     {
         $data = new UserSignUp();
         $data->firstName = 'John';
@@ -444,7 +444,7 @@ class FormFlowTest extends TestCase
         self::assertNull($data->role);
     }
 
-    public function testResetManually()
+    public function testResetManually(): void
     {
         $data = new UserSignUp();
         $data->firstName = 'John';
@@ -466,7 +466,7 @@ class FormFlowTest extends TestCase
         self::assertSame('personal', $flow->getCursor()->getCurrentStep());
     }
 
-    public function testSkipAction()
+    public function testSkipAction(): void
     {
         $data = new UserSignUp();
         $data->firstName = 'John';
@@ -514,7 +514,7 @@ class FormFlowTest extends TestCase
         self::assertNull($data->role);
     }
 
-    public function testTypeExtensionAndStepsPriority()
+    public function testTypeExtensionAndStepsPriority(): void
     {
         $factory = Forms::createFormFactoryBuilder()
             ->addTypeExtension(new UserSignUpTypeExtension())
@@ -526,7 +526,7 @@ class FormFlowTest extends TestCase
         self::assertSame(['first', 'personal', 'professional', 'account', 'last'], $flow->getCursor()->getSteps());
     }
 
-    public function testMoveBackToStep()
+    public function testMoveBackToStep(): void
     {
         $data = new UserSignUp();
         $data->firstName = 'John';
@@ -571,7 +571,7 @@ class FormFlowTest extends TestCase
         self::assertSame('jdoe@acme.com', $data->email);
     }
 
-    public function testMoveManually()
+    public function testMoveManually(): void
     {
         $data = new UserSignUp();
         $data->firstName = 'John';
@@ -602,7 +602,7 @@ class FormFlowTest extends TestCase
         self::assertTrue($flow->has('professional'));
     }
 
-    public function testInvalidMovePreviousUntilAheadStep()
+    public function testInvalidMovePreviousUntilAheadStep(): void
     {
         $data = new UserSignUp();
         $data->currentStep = 'personal';
@@ -614,7 +614,7 @@ class FormFlowTest extends TestCase
         $flow->movePrevious('account');
     }
 
-    public function testInvalidMovePreviousUntilSkippedStep()
+    public function testInvalidMovePreviousUntilSkippedStep(): void
     {
         $data = new UserSignUp();
         $data->worker = false;
@@ -627,7 +627,7 @@ class FormFlowTest extends TestCase
         $flow->movePrevious('professional');
     }
 
-    public function testInvalidStepForm()
+    public function testInvalidStepForm(): void
     {
         $flow = $this->factory->create(UserSignUpType::class, new UserSignUp());
 
@@ -652,7 +652,7 @@ class FormFlowTest extends TestCase
         self::assertSame('This value should not be blank.', $flow->getErrors(true)->current()->getMessage());
     }
 
-    public function testCannotModifyStepConfigAfterFormBuilding()
+    public function testCannotModifyStepConfigAfterFormBuilding(): void
     {
         $flow = $this->factory->create(UserSignUpType::class, new UserSignUp());
 
@@ -662,7 +662,7 @@ class FormFlowTest extends TestCase
         $flow->getConfig()->getStep('personal')->setPriority(0);
     }
 
-    public function testIgnoreSubmissionIfStepIsMissing()
+    public function testIgnoreSubmissionIfStepIsMissing(): void
     {
         $flow = $this->factory->create(UserSignUpType::class, new UserSignUp());
 
@@ -682,7 +682,7 @@ class FormFlowTest extends TestCase
         self::assertFalse($flow->isSubmitted());
     }
 
-    public function testViewVars()
+    public function testViewVars(): void
     {
         $flow = $this->factory->create(UserSignUpType::class, new UserSignUp());
         $view = $flow->createView();
@@ -701,7 +701,7 @@ class FormFlowTest extends TestCase
         self::assertFalse($view->vars['steps']['account']['is_skipped']);
     }
 
-    public function testFallbackCurrentStep()
+    public function testFallbackCurrentStep(): void
     {
         $flow = $this->factory->create(UserSignUpType::class, new UserSignUp());
 
@@ -712,7 +712,7 @@ class FormFlowTest extends TestCase
         self::assertSame('personal', $data->currentStep);
     }
 
-    public function testInitialCurrentStep()
+    public function testInitialCurrentStep(): void
     {
         $data = new UserSignUp();
         $data->currentStep = 'professional';
@@ -722,7 +722,7 @@ class FormFlowTest extends TestCase
         self::assertSame('professional', $data->currentStep);
     }
 
-    public function testFormFlowWithArrayData()
+    public function testFormFlowWithArrayData(): void
     {
         $flow = $this->factory->create(UserSignUpType::class, [], [
             'data_class' => null,
@@ -854,7 +854,7 @@ class FormFlowTest extends TestCase
         self::assertSame('eBvU2vBLfSXqf36', $data['password']);
     }
 
-    public function testHandleActionManually()
+    public function testHandleActionManually(): void
     {
         $flow = $this->factory->create(UserSignUpType::class, new UserSignUp());
 
@@ -881,11 +881,11 @@ class FormFlowTest extends TestCase
         self::assertSame('professional', $flow->getCursor()->getCurrentStep());
     }
 
-    public function testAddFormErrorOnActionHandling()
+    public function testAddFormErrorOnActionHandling(): void
     {
         $flow = $this->factory->create(UserSignUpType::class, new UserSignUp());
         $flow->get('navigator')->add('next', NextFlowType::class, [
-            'handler' => static function (mixed $data, ButtonFlowInterface $button, FormFlowInterface $flow) {
+            'handler' => static function (mixed $data, ButtonFlowInterface $button, FormFlowInterface $flow): void {
                 $flow->addError(new FormError('Action error'));
             },
         ]);
@@ -917,7 +917,7 @@ class FormFlowTest extends TestCase
         self::assertSame('personal', $flow->getCursor()->getCurrentStep());
     }
 
-    public function testStepValidationGroups()
+    public function testStepValidationGroups(): void
     {
         $data = new UserSignUp();
         $data->worker = true;
@@ -934,7 +934,7 @@ class FormFlowTest extends TestCase
         self::assertEquals(['Default', 'professional'], $flow->getConfig()->getOption('validation_groups')($flow));
     }
 
-    public function testLastStepSkippedMarkFlowAsFinished()
+    public function testLastStepSkippedMarkFlowAsFinished(): void
     {
         $flow = $this->factory->create(LastStepSkippedType::class, ['currentStep' => 'step1']);
 

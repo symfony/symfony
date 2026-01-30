@@ -23,7 +23,7 @@ use Symfony\Component\Translation\Translator;
 final class TranslationLintCommandTest extends TestCase
 {
     #[RequiresPhpExtension('intl')]
-    public function testLintCorrectTranslations()
+    public function testLintCorrectTranslations(): void
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());
@@ -62,7 +62,7 @@ final class TranslationLintCommandTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testLintMalformedIcuTranslations()
+    public function testLintMalformedIcuTranslations(): void
     {
         $translator = new Translator('en');
         $translator->addLoader('array', new ArrayLoader());

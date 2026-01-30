@@ -19,13 +19,13 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class GenericTypeTest extends TestCase
 {
-    public function testCannotCreateInvalidBuiltinType()
+    public function testCannotCreateInvalidBuiltinType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new GenericType(Type::int(), Type::string());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $type = new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::bool());
         $this->assertEquals('array<bool>', (string) $type);
@@ -37,7 +37,7 @@ class GenericTypeTest extends TestCase
         $this->assertEquals(\sprintf('%s<bool|string, int, float>', self::class), (string) $type);
     }
 
-    public function testWrappedTypeIsSatisfiedBy()
+    public function testWrappedTypeIsSatisfiedBy(): void
     {
         $type = new GenericType(Type::builtin(TypeIdentifier::ARRAY), Type::bool());
         $this->assertTrue($type->wrappedTypeIsSatisfiedBy(static fn (Type $t): bool => 'array' === (string) $t));
@@ -46,7 +46,7 @@ class GenericTypeTest extends TestCase
         $this->assertFalse($type->wrappedTypeIsSatisfiedBy(static fn (Type $t): bool => 'array' === (string) $t));
     }
 
-    public function testAccepts()
+    public function testAccepts(): void
     {
         $type = new GenericType(Type::object(self::class), Type::string());
 

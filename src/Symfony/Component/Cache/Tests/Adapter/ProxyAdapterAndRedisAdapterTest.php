@@ -36,7 +36,7 @@ class ProxyAdapterAndRedisAdapterTest extends AbstractRedisAdapterTestCase
         return new ProxyAdapter(new RedisAdapter(self::$redis, str_replace('\\', '.', __CLASS__), 100), 'ProxyNS', $defaultLifetime);
     }
 
-    public function testSaveItemPermanently()
+    public function testSaveItemPermanently(): void
     {
         $setCacheItemExpiry = \Closure::bind(
             static function (CacheItem $item, $expiry) {

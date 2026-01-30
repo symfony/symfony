@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 class AbstractLoginFormAuthenticatorTest extends TestCase
 {
     #[DataProvider('provideSupportsData')]
-    public function testSupports(string $loginUrl, Request $request, bool $expected)
+    public function testSupports(string $loginUrl, Request $request, bool $expected): void
     {
         $authenticator = new ConcreteFormAuthenticator($loginUrl);
         $this->assertSame($expected, $authenticator->supports($request));

@@ -21,7 +21,7 @@ final class JsonPathComplianceTestSuiteTest extends TestCase
     private const COMPLIANCE_TEST_SUITE_FILE = 'vendor/jsonpath-standard/jsonpath-compliance-test-suite/cts.json';
 
     #[DataProvider('complianceCaseProvider')]
-    public function testComplianceTestCase(?string $selector, mixed $document, array $expectedResults, bool $invalidSelector)
+    public function testComplianceTestCase(?string $selector, mixed $document, array $expectedResults, bool $invalidSelector): void
     {
         if (null === $selector) {
             $this->markTestSkipped('The JsonPath compliance test suite is not available. Did you run "composer update"?');
@@ -41,7 +41,7 @@ final class JsonPathComplianceTestSuiteTest extends TestCase
     }
 
     #[DataProvider('resourceComplianceCaseProvider')]
-    public function testComplianceTestCaseWithResource(?string $selector, mixed $document, array $expectedResults, bool $invalidSelector)
+    public function testComplianceTestCaseWithResource(?string $selector, mixed $document, array $expectedResults, bool $invalidSelector): void
     {
         if (null === $selector) {
             $this->markTestSkipped('The JsonPath compliance test suite is not available. Did you run "composer update"?');

@@ -19,14 +19,14 @@ use Symfony\Component\Serializer\Serializer;
 
 class SerializerErrorRendererTest extends TestCase
 {
-    public function testDefaultContent()
+    public function testDefaultContent(): void
     {
         $errorRenderer = new SerializerErrorRenderer(new Serializer(), 'html');
 
         self::assertStringContainsString('<h2>The server returned a "500 Internal Server Error".</h2>', $errorRenderer->render(new \RuntimeException())->getAsString());
     }
 
-    public function testSerializerContent()
+    public function testSerializerContent(): void
     {
         $exception = new \RuntimeException('Foo');
         $errorRenderer = new SerializerErrorRenderer(

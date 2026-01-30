@@ -22,7 +22,7 @@ use Symfony\Component\Scheduler\Generator\Checkpoint;
 
 class CheckpointTest extends TestCase
 {
-    public function testWithoutLockAndWithoutState()
+    public function testWithoutLockAndWithoutState(): void
     {
         $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
         $later = $now->modify('1 hour');
@@ -40,7 +40,7 @@ class CheckpointTest extends TestCase
         $checkpoint->release($later, null);
     }
 
-    public function testWithStateInitStateOnFirstAcquiring()
+    public function testWithStateInitStateOnFirstAcquiring(): void
     {
         $checkpoint = new Checkpoint('cache', new NoLock(), $cache = new ArrayAdapter());
         $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
@@ -51,7 +51,7 @@ class CheckpointTest extends TestCase
         $this->assertEquals([$now, -1, $now], $cache->get('cache', static fn () => []));
     }
 
-    public function testWithStateLoadStateOnAcquiring()
+    public function testWithStateLoadStateOnAcquiring(): void
     {
         $checkpoint = new Checkpoint('cache', new NoLock(), $cache = new ArrayAdapter());
         $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
@@ -64,7 +64,7 @@ class CheckpointTest extends TestCase
         $this->assertEquals([$now, 0, $startedAt], $cache->get('cache', static fn () => []));
     }
 
-    public function testWithLockInitStateOnFirstAcquiring()
+    public function testWithLockInitStateOnFirstAcquiring(): void
     {
         $lock = new Lock(new Key('lock'), new InMemoryStore());
         $checkpoint = new Checkpoint('dummy', $lock);
@@ -77,7 +77,7 @@ class CheckpointTest extends TestCase
         $this->assertTrue($lock->isAcquired());
     }
 
-    public function testWithLockLoadStateOnAcquiring()
+    public function testWithLockLoadStateOnAcquiring(): void
     {
         $lock = new Lock(new Key('lock'), new InMemoryStore());
         $checkpoint = new Checkpoint('dummy', $lock);
@@ -92,7 +92,7 @@ class CheckpointTest extends TestCase
         $this->assertTrue($lock->isAcquired());
     }
 
-    public function testWithLockCannotAcquireIfAlreadyAcquired()
+    public function testWithLockCannotAcquireIfAlreadyAcquired(): void
     {
         $concurrentLock = new Lock(new Key('locked'), $store = new InMemoryStore(), autoRelease: false);
         $concurrentLock->acquire();
@@ -103,7 +103,7 @@ class CheckpointTest extends TestCase
         $this->assertFalse($checkpoint->acquire(new \DateTimeImmutable()));
     }
 
-    public function testWithCacheSave()
+    public function testWithCacheSave(): void
     {
         $checkpoint = new Checkpoint('cache', new NoLock(), $cache = new ArrayAdapter());
         $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
@@ -116,7 +116,7 @@ class CheckpointTest extends TestCase
         $this->assertEquals([$now, 3, $startedAt], $cache->get('cache', static fn () => []));
     }
 
-    public function testWithLockSave()
+    public function testWithLockSave(): void
     {
         $lock = new Lock(new Key('lock'), new InMemoryStore());
         $checkpoint = new Checkpoint('dummy', $lock);
@@ -130,7 +130,7 @@ class CheckpointTest extends TestCase
         $this->assertSame($startTime, $checkpoint->from());
     }
 
-    public function testWithLockAndCacheSave()
+    public function testWithLockAndCacheSave(): void
     {
         $lock = new Lock(new Key('lock'), new InMemoryStore());
         $checkpoint = new Checkpoint('dummy', $lock, $cache = new ArrayAdapter());
@@ -144,7 +144,7 @@ class CheckpointTest extends TestCase
         $this->assertEquals([$now, 3, $startTime], $cache->get('dummy', static fn () => []));
     }
 
-    public function testWithCacheFullCycle()
+    public function testWithCacheFullCycle(): void
     {
         $checkpoint = new Checkpoint('cache', new NoLock(), $cache = new ArrayAdapter());
         $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
@@ -168,7 +168,7 @@ class CheckpointTest extends TestCase
         $this->assertEquals([$now, 0, $now], $cache->get('cache', static fn () => []));
     }
 
-    public function testWithLockResetStateAfterLockedAcquiring()
+    public function testWithLockResetStateAfterLockedAcquiring(): void
     {
         $concurrentLock = new Lock(new Key('locked'), $store = new InMemoryStore(), autoRelease: false);
         $concurrentLock->acquire();
@@ -190,7 +190,7 @@ class CheckpointTest extends TestCase
         $this->assertFalse($concurrentLock->isAcquired());
     }
 
-    public function testWithLockResetStateAfterLockedAcquiringCache()
+    public function testWithLockResetStateAfterLockedAcquiringCache(): void
     {
         $concurrentLock = new Lock(new Key('locked'), $store = new InMemoryStore(), autoRelease: false);
         $concurrentLock->acquire();
@@ -214,7 +214,7 @@ class CheckpointTest extends TestCase
         $this->assertFalse($concurrentLock->isAcquired());
     }
 
-    public function testWithLockKeepLock()
+    public function testWithLockKeepLock(): void
     {
         $lock = new Lock(new Key('lock'), new InMemoryStore());
         $checkpoint = new Checkpoint('dummy', $lock);
@@ -226,7 +226,7 @@ class CheckpointTest extends TestCase
         $this->assertTrue($lock->isAcquired());
     }
 
-    public function testWithLockReleaseLock()
+    public function testWithLockReleaseLock(): void
     {
         $lock = new Lock(new Key('lock'), new InMemoryStore());
         $checkpoint = new Checkpoint('dummy', $lock);
@@ -238,7 +238,7 @@ class CheckpointTest extends TestCase
         $this->assertFalse($lock->isAcquired());
     }
 
-    public function testWithLockRefreshLock()
+    public function testWithLockRefreshLock(): void
     {
         $lock = $this->createMock(LockInterface::class);
         $lock->method('acquire')->willReturn(true);
@@ -253,7 +253,7 @@ class CheckpointTest extends TestCase
         $checkpoint->release($now, $now->modify('60 sec'));
     }
 
-    public function testWithLockFullCycle()
+    public function testWithLockFullCycle(): void
     {
         $lock = new Lock(new Key('lock'), new InMemoryStore());
         $checkpoint = new Checkpoint('dummy', $lock);

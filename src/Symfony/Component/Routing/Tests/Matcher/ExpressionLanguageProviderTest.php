@@ -42,7 +42,7 @@ class ExpressionLanguageProviderTest extends TestCase
     }
 
     #[DataProvider('compileProvider')]
-    public function testCompile(string $expression, string $expected)
+    public function testCompile(string $expression, string $expected): void
     {
         $this->assertSame($expected, $this->expressionLanguage->compile($expression));
     }
@@ -57,7 +57,7 @@ class ExpressionLanguageProviderTest extends TestCase
     }
 
     #[DataProvider('evaluateProvider')]
-    public function testEvaluate(string $expression, $expected)
+    public function testEvaluate(string $expression, $expected): void
     {
         $this->assertSame($expected, $this->expressionLanguage->evaluate($expression, ['context' => $this->context]));
     }

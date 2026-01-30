@@ -17,7 +17,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeZoneToStringTr
 
 class DateTimeZoneToStringTransformerTest extends TestCase
 {
-    public function testSingle()
+    public function testSingle(): void
     {
         $transformer = new DateTimeZoneToStringTransformer();
 
@@ -28,7 +28,7 @@ class DateTimeZoneToStringTransformerTest extends TestCase
         $this->assertEquals(new \DateTimeZone('Europe/Amsterdam'), $transformer->reverseTransform('Europe/Amsterdam'));
     }
 
-    public function testMultiple()
+    public function testMultiple(): void
     {
         $transformer = new DateTimeZoneToStringTransformer(true);
 
@@ -39,13 +39,13 @@ class DateTimeZoneToStringTransformerTest extends TestCase
         $this->assertEquals([new \DateTimeZone('Europe/Amsterdam')], $transformer->reverseTransform(['Europe/Amsterdam']));
     }
 
-    public function testInvalidTimezone()
+    public function testInvalidTimezone(): void
     {
         $this->expectException(TransformationFailedException::class);
         (new DateTimeZoneToStringTransformer())->transform(1);
     }
 
-    public function testUnknownTimezone()
+    public function testUnknownTimezone(): void
     {
         $this->expectException(TransformationFailedException::class);
         (new DateTimeZoneToStringTransformer(true))->reverseTransform(['Foo/Bar']);

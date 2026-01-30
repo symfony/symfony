@@ -24,7 +24,7 @@ use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 
 class SmsboxOptionsTest extends TestCase
 {
-    public function testSmsboxOptions()
+    public function testSmsboxOptions(): void
     {
         $smsboxOptions = (new SmsboxOptions())
             ->mode(Mode::Expert)
@@ -48,7 +48,7 @@ class SmsboxOptionsTest extends TestCase
         ], $smsboxOptions->toArray());
     }
 
-    public function testSmsboxOptionsInvalidDestIso()
+    public function testSmsboxOptionsInvalidDestIso(): void
     {
         if (!class_exists(Countries::class)) {
             $this->markTestSkipped('The "symfony/intl" component is required to run this test.');
@@ -64,7 +64,7 @@ class SmsboxOptionsTest extends TestCase
             ->destIso('X1');
     }
 
-    public function testDateIsCalledWithDateTime()
+    public function testDateIsCalledWithDateTime(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Either Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::dateTime() or Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::date() and Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::hour() must be called, but not both.');
@@ -74,7 +74,7 @@ class SmsboxOptionsTest extends TestCase
             ->date('01/01/2021');
     }
 
-    public function testDateInWrongFormat()
+    public function testDateInWrongFormat(): void
     {
         $this->expectException(\DateMalformedStringException::class);
         $this->expectExceptionMessage('The date must be in DD/MM/YYYY format.');
@@ -83,7 +83,7 @@ class SmsboxOptionsTest extends TestCase
             ->date('01/2021');
     }
 
-    public function testHourIsCalledWithDateTime()
+    public function testHourIsCalledWithDateTime(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Either Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::dateTime() or Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::date() and Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::hour() must be called, but not both.');
@@ -93,7 +93,7 @@ class SmsboxOptionsTest extends TestCase
             ->hour('12:00');
     }
 
-    public function testHourInWrongFormat()
+    public function testHourInWrongFormat(): void
     {
         $this->expectException(\DateMalformedStringException::class);
         $this->expectExceptionMessage('Hour must be in HH:MM format.');
@@ -102,7 +102,7 @@ class SmsboxOptionsTest extends TestCase
             ->hour('12:00:00');
     }
 
-    public function testDateTimeIsCalledWithDate()
+    public function testDateTimeIsCalledWithDate(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Either Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::dateTime() or Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::date() and Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::hour() must be called, but not both.');
@@ -112,7 +112,7 @@ class SmsboxOptionsTest extends TestCase
             ->dateTime(new \DateTimeImmutable('+1 day'));
     }
 
-    public function testDateTimeIsCalledWithHour()
+    public function testDateTimeIsCalledWithHour(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Either Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::dateTime() or Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::date() and Symfony\Component\Notifier\Bridge\Smsbox\SmsboxOptions::hour() must be called, but not both.');
@@ -122,7 +122,7 @@ class SmsboxOptionsTest extends TestCase
             ->dateTime(new \DateTimeImmutable('+1 day'));
     }
 
-    public function testDateTimeIsInPast()
+    public function testDateTimeIsInPast(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The given DateTime must be greater to the current date.');
@@ -133,7 +133,7 @@ class SmsboxOptionsTest extends TestCase
 
     #[TestWith([0])]
     #[TestWith([9])]
-    public function testMaxPartIsInvalid(int $maxPart)
+    public function testMaxPartIsInvalid(int $maxPart): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('The "max_parts" option must be an integer between 1 and 8, got "%d".', $maxPart));
@@ -144,7 +144,7 @@ class SmsboxOptionsTest extends TestCase
 
     #[TestWith([4])]
     #[TestWith([1441])]
-    public function testValidityIsInvalid(int $validity)
+    public function testValidityIsInvalid(int $validity): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('The "validity" option must be an integer between 5 and 1440, got "%d".', $validity));
@@ -153,7 +153,7 @@ class SmsboxOptionsTest extends TestCase
             ->validity($validity);
     }
 
-    public function testDayMinIsAfterMax()
+    public function testDayMinIsAfterMax(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The minimum day must be before the maximum day or the same.');
@@ -162,7 +162,7 @@ class SmsboxOptionsTest extends TestCase
             ->daysMinMax(Day::Sunday, Day::Friday);
     }
 
-    public function testHourIsNegative()
+    public function testHourIsNegative(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The minimum hour must be greater than 0 and lower than the maximum hour.');
@@ -171,7 +171,7 @@ class SmsboxOptionsTest extends TestCase
             ->hoursMinMax(-1, 12);
     }
 
-    public function testMinHourIsAfterMax()
+    public function testMinHourIsAfterMax(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The minimum hour must be greater than 0 and lower than the maximum hour.');
@@ -180,7 +180,7 @@ class SmsboxOptionsTest extends TestCase
             ->hoursMinMax(12, 11);
     }
 
-    public function testMaxHourIsOutOfBounds()
+    public function testMaxHourIsOutOfBounds(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The maximum hour must be lower or equal to 23.');

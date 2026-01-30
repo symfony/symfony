@@ -44,7 +44,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         $this->requestStack->push($this->request);
     }
 
-    public function testCreateRememberMeCookie()
+    public function testCreateRememberMeCookie(): void
     {
         $tokenProvider = $this->createMock(TokenProviderInterface::class);
         $tokenProvider->expects($this->once())
@@ -54,7 +54,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         (new PersistentRememberMeHandler($tokenProvider, $this->userProvider, $this->requestStack, []))->createRememberMeCookie(new InMemoryUser('wouter', null));
     }
 
-    public function testClearRememberMeCookie()
+    public function testClearRememberMeCookie(): void
     {
         $tokenProvider = $this->createMock(TokenProviderInterface::class);
         $tokenProvider->expects($this->once())
@@ -72,7 +72,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         $this->assertNull($cookie->getValue());
     }
 
-    public function testClearRememberMeCookieMalformedCookie()
+    public function testClearRememberMeCookieMalformedCookie(): void
     {
         $tokenProvider = $this->createMock(TokenProviderInterface::class);
         $tokenProvider->expects($this->exactly(0))
@@ -89,7 +89,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         $this->assertNull($cookie->getValue());
     }
 
-    public function testConsumeRememberMeCookieValid()
+    public function testConsumeRememberMeCookieValid(): void
     {
         if (method_exists(PersistentToken::class, 'getClass')) {
             $persistentToken = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', $lastUsed = new \DateTimeImmutable('-10 min'), false);
@@ -124,7 +124,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         $this->assertSame(explode(':', $rememberParts[3])[0], explode(':', $cookieParts[3])[0]); // series
     }
 
-    public function testConsumeRememberMeCookieInvalidOwner()
+    public function testConsumeRememberMeCookieInvalidOwner(): void
     {
         if (method_exists(PersistentToken::class, 'getClass')) {
             $persistentToken = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('-10 min'), false);
@@ -146,7 +146,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         (new PersistentRememberMeHandler($tokenProvider, $this->userProvider, $this->requestStack, []))->consumeRememberMeCookie($rememberMeDetails);
     }
 
-    public function testConsumeRememberMeCookieInvalidValue()
+    public function testConsumeRememberMeCookieInvalidValue(): void
     {
         if (method_exists(PersistentToken::class, 'getClass')) {
             $persistentToken = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('-10 min'), false);
@@ -163,7 +163,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         (new PersistentRememberMeHandler($this->tokenProvider, $this->userProvider, $this->requestStack, []))->consumeRememberMeCookie($rememberMeDetails);
     }
 
-    public function testConsumeRememberMeCookieValidByValidatorWithoutUpdate()
+    public function testConsumeRememberMeCookieValidByValidatorWithoutUpdate(): void
     {
         $verifier = $this->createStub(TokenVerifierInterface::class);
         $handler = new PersistentRememberMeHandler($this->tokenProvider, $this->userProvider, $this->requestStack, [], null, $verifier);
@@ -188,7 +188,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         $this->assertFalse($this->request->attributes->has(ResponseListener::COOKIE_ATTR_NAME));
     }
 
-    public function testConsumeRememberMeCookieInvalidToken()
+    public function testConsumeRememberMeCookieInvalidToken(): void
     {
         if (method_exists(PersistentToken::class, 'getClass')) {
             $persistentToken = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue1', new \DateTimeImmutable('-10 min'), false);
@@ -209,7 +209,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         (new PersistentRememberMeHandler($tokenProvider, $this->userProvider, $this->requestStack, []))->consumeRememberMeCookie(new RememberMeDetails('wouter', 360, 'series1:tokenvalue'));
     }
 
-    public function testConsumeRememberMeCookieExpired()
+    public function testConsumeRememberMeCookieExpired(): void
     {
         if (method_exists(PersistentToken::class, 'getClass')) {
             $persistentToken = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('@'.(time() - (31536000 + 1))), false);
@@ -231,7 +231,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         (new PersistentRememberMeHandler($tokenProvider, $this->userProvider, $this->requestStack, []))->consumeRememberMeCookie(new RememberMeDetails('wouter', 360, 'series1:tokenvalue'));
     }
 
-    public function testBase64EncodedTokens()
+    public function testBase64EncodedTokens(): void
     {
         if (method_exists(PersistentToken::class, 'getClass')) {
             $persistentToken = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('-10 min'), false);
@@ -255,7 +255,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         (new PersistentRememberMeHandler($tokenProvider, $this->userProvider, $this->requestStack, []))->consumeRememberMeCookie($rememberMeDetails);
     }
 
-    public function testBase64EncodedTokensLegacyFormat()
+    public function testBase64EncodedTokensLegacyFormat(): void
     {
         if (method_exists(PersistentToken::class, 'getClass')) {
             $persistentToken = new PersistentToken(InMemoryUser::class, 'wouter', 'series1', 'tokenvalue', new \DateTimeImmutable('-10 min'), false);

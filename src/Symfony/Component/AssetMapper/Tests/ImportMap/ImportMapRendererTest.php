@@ -21,7 +21,7 @@ use Symfony\Component\WebLink\GenericLinkProvider;
 
 class ImportMapRendererTest extends TestCase
 {
-    public function testBasicRender()
+    public function testBasicRender(): void
     {
         $importMapGenerator = $this->createMock(ImportMapGenerator::class);
         $importMapGenerator->expects($this->once())
@@ -100,13 +100,13 @@ class ImportMapRendererTest extends TestCase
         $this->assertStringContainsString('"/subdirectory/assets/implicitly-added": "/subdirectory/assets/implicitly-added-d1g35t.js"', $html);
     }
 
-    public function testNoPolyfill()
+    public function testNoPolyfill(): void
     {
         $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator(), null, 'UTF-8', false);
         $this->assertStringNotContainsString('https://ga.jspm.io/npm:es-module-shims', $renderer->render([]));
     }
 
-    public function testDefaultPolyfillUsedIfNotInImportmap()
+    public function testDefaultPolyfillUsedIfNotInImportmap(): void
     {
         $importMapGenerator = $this->createMock(ImportMapGenerator::class);
         $importMapGenerator->expects($this->once())
@@ -124,7 +124,7 @@ class ImportMapRendererTest extends TestCase
         $this->assertStringContainsString("script.setAttribute('crossorigin', 'anonymous');\n    script.setAttribute('integrity', 'sha384-", $html);
     }
 
-    public function testCustomScriptAttributes()
+    public function testCustomScriptAttributes(): void
     {
         $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator(), null, 'UTF-8', 'es-module-shims', [
             'something' => true,
@@ -142,7 +142,7 @@ class ImportMapRendererTest extends TestCase
         );
     }
 
-    public function testWithEntrypoint()
+    public function testWithEntrypoint(): void
     {
         $renderer = new ImportMapRenderer($this->createBasicImportMapGenerator());
         $this->assertStringContainsString("<script type=\"module\">import 'application';</script>", $renderer->render('application'));
@@ -176,7 +176,7 @@ class ImportMapRendererTest extends TestCase
         return $importMapGenerator;
     }
 
-    public function testItAddsPreloadLinks()
+    public function testItAddsPreloadLinks(): void
     {
         $importMapGenerator = $this->createMock(ImportMapGenerator::class);
         $importMapGenerator->expects($this->once())

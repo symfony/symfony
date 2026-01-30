@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 
 class LoaderChainTest extends TestCase
 {
-    public function testAllLoadersAreCalled()
+    public function testAllLoadersAreCalled(): void
     {
         $metadata = new ClassMetadata('\stdClass');
 
@@ -40,7 +40,7 @@ class LoaderChainTest extends TestCase
         $chain->loadClassMetadata($metadata);
     }
 
-    public function testReturnsTrueIfAnyLoaderReturnedTrue()
+    public function testReturnsTrueIfAnyLoaderReturnedTrue(): void
     {
         $metadata = new ClassMetadata('\stdClass');
 
@@ -62,7 +62,7 @@ class LoaderChainTest extends TestCase
         $this->assertTrue($chain->loadClassMetadata($metadata));
     }
 
-    public function testReturnsFalseIfNoLoaderReturnedTrue()
+    public function testReturnsFalseIfNoLoaderReturnedTrue(): void
     {
         $metadata = new ClassMetadata('\stdClass');
 

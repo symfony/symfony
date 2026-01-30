@@ -20,7 +20,7 @@ use Symfony\Component\Mime\Email;
 
 class MailtrapSmtpTransportTest extends TestCase
 {
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
@@ -33,7 +33,7 @@ class MailtrapSmtpTransportTest extends TestCase
         $this->assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
     }
 
-    public function testTagAndMetadata()
+    public function testTagAndMetadata(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
@@ -51,7 +51,7 @@ class MailtrapSmtpTransportTest extends TestCase
         $this->assertSame('X-MT-Custom-Variables: {"Color":"blue","Client-ID":"12345"}', $email->getHeaders()->get('X-MT-Custom-Variables')->toString());
     }
 
-    public function testMultipleTagsAreNotAllowed()
+    public function testMultipleTagsAreNotAllowed(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('tag1'));

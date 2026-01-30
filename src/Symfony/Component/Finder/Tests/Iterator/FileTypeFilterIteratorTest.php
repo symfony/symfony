@@ -17,7 +17,7 @@ use Symfony\Component\Finder\Iterator\FileTypeFilterIterator;
 class FileTypeFilterIteratorTest extends RealIteratorTestCase
 {
     #[DataProvider('getAcceptData')]
-    public function testAccept($mode, $expected)
+    public function testAccept($mode, $expected): void
     {
         $inner = new InnerTypeIterator(self::$files);
 

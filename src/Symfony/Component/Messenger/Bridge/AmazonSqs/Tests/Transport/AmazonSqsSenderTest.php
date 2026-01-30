@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class AmazonSqsSenderTest extends TestCase
 {
-    public function testSend()
+    public function testSend(): void
     {
         $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
@@ -37,7 +37,7 @@ class AmazonSqsSenderTest extends TestCase
         $sender->send($envelope);
     }
 
-    public function testSendWithAmazonSqsFifoStamp()
+    public function testSendWithAmazonSqsFifoStamp(): void
     {
         $envelope = (new Envelope(new DummyMessage('Oy')))
             ->with($stamp = new AmazonSqsFifoStamp('testGroup', 'testDeduplicationId'));
@@ -55,7 +55,7 @@ class AmazonSqsSenderTest extends TestCase
         $sender->send($envelope);
     }
 
-    public function testSendWithAmazonSqsXrayTraceHeaderStamp()
+    public function testSendWithAmazonSqsXrayTraceHeaderStamp(): void
     {
         $envelope = (new Envelope(new DummyMessage('Oy')))
             ->with($stamp = new AmazonSqsXrayTraceHeaderStamp('traceHeader'));
@@ -73,7 +73,7 @@ class AmazonSqsSenderTest extends TestCase
         $sender->send($envelope);
     }
 
-    public function testSendEncodeBodyToRespectAmazonRequirements()
+    public function testSendEncodeBodyToRespectAmazonRequirements(): void
     {
         $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = ['body' => "\x7", 'headers' => ['type' => DummyMessage::class]];

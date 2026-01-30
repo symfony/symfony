@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 class HandlersLocatorTest extends TestCase
 {
-    public function testItYieldsHandlerDescriptors()
+    public function testItYieldsHandlerDescriptors(): void
     {
         $handler = new HandlersLocatorTestCallable();
         $locator = new HandlersLocator([
@@ -33,7 +33,7 @@ class HandlersLocatorTest extends TestCase
         $this->assertEquals([$descriptor], iterator_to_array($locator->getHandlers(new Envelope(new DummyMessage('a')))));
     }
 
-    public function testItReturnsOnlyHandlersMatchingTransport()
+    public function testItReturnsOnlyHandlersMatchingTransport(): void
     {
         $firstHandler = new HandlersLocatorTestCallable();
         $secondHandler = new HandlersLocatorTestCallable();
@@ -57,7 +57,7 @@ class HandlersLocatorTest extends TestCase
         )));
     }
 
-    public function testItReturnsOnlyHandlersMatchingMessageNamespace()
+    public function testItReturnsOnlyHandlersMatchingMessageNamespace(): void
     {
         $firstHandler = new HandlersLocatorTestCallable();
         $secondHandler = new HandlersLocatorTestCallable();
@@ -83,7 +83,7 @@ class HandlersLocatorTest extends TestCase
 
 class HandlersLocatorTestCallable
 {
-    public function __invoke()
+    public function __invoke(): void
     {
     }
 }

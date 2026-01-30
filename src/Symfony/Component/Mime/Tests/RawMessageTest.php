@@ -19,7 +19,7 @@ use Symfony\Component\Mime\RawMessage;
 class RawMessageTest extends TestCase
 {
     #[DataProvider('provideMessages')]
-    public function testToString(mixed $messageParameter, bool $supportReuse)
+    public function testToString(mixed $messageParameter, bool $supportReuse): void
     {
         $message = new RawMessage($messageParameter);
         $this->assertEquals('some string', $message->toString());
@@ -33,7 +33,7 @@ class RawMessageTest extends TestCase
     }
 
     #[DataProvider('provideMessages')]
-    public function testSerialization(mixed $messageParameter, bool $supportReuse)
+    public function testSerialization(mixed $messageParameter, bool $supportReuse): void
     {
         $message = new RawMessage($messageParameter);
         $this->assertEquals('some string', unserialize(serialize($message))->toString());
@@ -45,7 +45,7 @@ class RawMessageTest extends TestCase
     }
 
     #[DataProvider('provideMessages')]
-    public function testToIterable(mixed $messageParameter, bool $supportReuse)
+    public function testToIterable(mixed $messageParameter, bool $supportReuse): void
     {
         $message = new RawMessage($messageParameter);
         $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
@@ -57,7 +57,7 @@ class RawMessageTest extends TestCase
     }
 
     #[DataProvider('provideMessages')]
-    public function testToIterableLegacy(mixed $messageParameter, bool $supportReuse)
+    public function testToIterableLegacy(mixed $messageParameter, bool $supportReuse): void
     {
         $message = new RawMessage($messageParameter);
         $this->assertEquals('some string', implode('', iterator_to_array($message->toIterable())));
@@ -68,7 +68,7 @@ class RawMessageTest extends TestCase
         }
     }
 
-    public function testToIterableOnResourceRewindsAndYieldsLines()
+    public function testToIterableOnResourceRewindsAndYieldsLines(): void
     {
         $handle = fopen('php://memory', 'r+');
         fwrite($handle, "line1\nline2\nline3\n");
@@ -77,7 +77,7 @@ class RawMessageTest extends TestCase
         $this->assertSame("line1\nline2\nline3\n", implode('', iterator_to_array($message->toIterable())));
     }
 
-    public function testDestructClosesResource()
+    public function testDestructClosesResource(): void
     {
         $handle = fopen('php://memory', 'r+');
 

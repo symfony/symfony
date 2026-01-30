@@ -51,12 +51,12 @@ class ObjectOuter
         return $this->inner;
     }
 
-    public function setInner(ObjectInner $inner)
+    public function setInner(ObjectInner $inner): void
     {
         $this->inner = $inner;
     }
 
-    public function setDate(\DateTimeInterface $date)
+    public function setDate(\DateTimeInterface $date): void
     {
         $this->date = $date;
     }
@@ -66,7 +66,7 @@ class ObjectOuter
         return $this->date;
     }
 
-    public function setInners(array $inners)
+    public function setInners(array $inners): void
     {
         $this->inners = $inners;
     }

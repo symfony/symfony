@@ -19,7 +19,7 @@ use Symfony\Component\Scheduler\Tests\Fixtures\SomeScheduleProvider;
 
 class RegisterProviderTest extends TestCase
 {
-    public function testErrorOnMultipleProvidersForTheSameSchedule()
+    public function testErrorOnMultipleProvidersForTheSameSchedule(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionCode(1);

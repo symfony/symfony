@@ -45,7 +45,7 @@ class KernelTest extends TestCase
         }
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $env = 'test_env';
         $debug = true;
@@ -57,7 +57,7 @@ class KernelTest extends TestCase
         $this->assertLessThanOrEqual(microtime(true), $kernel->getStartTime());
     }
 
-    public function testEmptyEnv()
+    public function testEmptyEnv(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('Invalid environment provided to "%s": the environment cannot be empty.', KernelForTest::class));
@@ -65,7 +65,7 @@ class KernelTest extends TestCase
         new KernelForTest('', false);
     }
 
-    public function testClone()
+    public function testClone(): void
     {
         $env = 'test_env';
         $debug = true;
@@ -79,7 +79,7 @@ class KernelTest extends TestCase
         $this->assertLessThanOrEqual(microtime(true), $clone->getStartTime());
     }
 
-    public function testClassNameValidityGetter()
+    public function testClassNameValidityGetter(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The environment "test.env" contains invalid characters, it can only contain characters allowed in PHP class names.');
@@ -91,7 +91,7 @@ class KernelTest extends TestCase
         $kernel->boot();
     }
 
-    public function testInitializeContainerClearsOldContainers()
+    public function testInitializeContainerClearsOldContainers(): void
     {
         $fs = new Filesystem();
         $legacyContainerDir = __DIR__.'/Fixtures/var/cache/custom/ContainerA123456';
@@ -106,7 +106,7 @@ class KernelTest extends TestCase
         $this->assertFileExists($containerDir);
         $this->assertFileDoesNotExist($containerDir.'.legacy');
 
-        $kernel = new CustomProjectDirKernel(static function ($container) { $container->register('foo', 'stdClass')->setPublic(true); });
+        $kernel = new CustomProjectDirKernel(static function ($container): void { $container->register('foo', 'stdClass')->setPublic(true); });
         $kernel->boot();
 
         $this->assertFileExists($containerDir);
@@ -116,7 +116,7 @@ class KernelTest extends TestCase
         $this->assertFileDoesNotExist($legacyContainerDir.'.legacy');
     }
 
-    public function testBootInitializesBundlesAndContainer()
+    public function testBootInitializesBundlesAndContainer(): void
     {
         $kernel = $this->getKernel(['initializeBundles']);
         $kernel->expects($this->once())
@@ -125,7 +125,7 @@ class KernelTest extends TestCase
         $kernel->boot();
     }
 
-    public function testBootSetsTheContainerToTheBundles()
+    public function testBootSetsTheContainerToTheBundles(): void
     {
         $bundle = $this->createMock(Bundle::class);
         $bundle->expects($this->once())
@@ -139,7 +139,7 @@ class KernelTest extends TestCase
         $kernel->boot();
     }
 
-    public function testBootSetsTheBootedFlagToTrue()
+    public function testBootSetsTheBootedFlagToTrue(): void
     {
         // use test kernel to access isBooted()
         $kernel = new KernelForTest('test', false);
@@ -148,7 +148,7 @@ class KernelTest extends TestCase
         $this->assertTrue($kernel->isBooted());
     }
 
-    public function testClassCacheIsNotLoadedByDefault()
+    public function testClassCacheIsNotLoadedByDefault(): void
     {
         $kernel = $this->getKernel(['initializeBundles', 'doLoadClassCache'], [], false, KernelForTestWithLoadClassCache::class);
         $kernel->expects($this->never())
@@ -157,7 +157,7 @@ class KernelTest extends TestCase
         $kernel->boot();
     }
 
-    public function testBootKernelSeveralTimesOnlyInitializesBundlesOnce()
+    public function testBootKernelSeveralTimesOnlyInitializesBundlesOnce(): void
     {
         $kernel = $this->getKernel(['initializeBundles']);
         $kernel->expects($this->once())
@@ -167,7 +167,7 @@ class KernelTest extends TestCase
         $kernel->boot();
     }
 
-    public function testShutdownCallsShutdownOnAllBundles()
+    public function testShutdownCallsShutdownOnAllBundles(): void
     {
         $bundle = $this->createMock(Bundle::class);
         $bundle->expects($this->once())
@@ -179,12 +179,12 @@ class KernelTest extends TestCase
         $kernel->shutdown();
     }
 
-    public function testShutdownGivesNullContainerToAllBundles()
+    public function testShutdownGivesNullContainerToAllBundles(): void
     {
         $bundle = $this->createMock(Bundle::class);
         $bundle->expects($this->exactly(2))
             ->method('setContainer')
-            ->willReturnCallback(function ($container) {
+            ->willReturnCallback(function ($container): void {
                 if (null !== $container) {
                     $this->assertInstanceOf(ContainerInterface::class, $container);
                 }
@@ -197,7 +197,7 @@ class KernelTest extends TestCase
         $kernel->shutdown();
     }
 
-    public function testHandleCallsHandleOnHttpKernel()
+    public function testHandleCallsHandleOnHttpKernel(): void
     {
         $type = HttpKernelInterface::MAIN_REQUEST;
         $catch = true;
@@ -219,7 +219,7 @@ class KernelTest extends TestCase
         $kernel->handle($request, $type, $catch);
     }
 
-    public function testHandleBootsTheKernel()
+    public function testHandleBootsTheKernel(): void
     {
         $type = HttpKernelInterface::MAIN_REQUEST;
         $catch = true;
@@ -238,7 +238,7 @@ class KernelTest extends TestCase
         $kernel->handle($request, $type, $catch);
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $env = 'test_env';
         $debug = true;
@@ -247,25 +247,25 @@ class KernelTest extends TestCase
         $this->assertEquals($expected, serialize($kernel));
     }
 
-    public function testLocateResourceThrowsExceptionWhenNameIsNotValid()
+    public function testLocateResourceThrowsExceptionWhenNameIsNotValid(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         (new KernelForTest('test', false))->locateResource('Foo');
     }
 
-    public function testLocateResourceThrowsExceptionWhenNameIsUnsafe()
+    public function testLocateResourceThrowsExceptionWhenNameIsUnsafe(): void
     {
         $this->expectException(\RuntimeException::class);
         (new KernelForTest('test', false))->locateResource('@FooBundle/../bar');
     }
 
-    public function testLocateResourceThrowsExceptionWhenBundleDoesNotExist()
+    public function testLocateResourceThrowsExceptionWhenBundleDoesNotExist(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         (new KernelForTest('test', false))->locateResource('@FooBundle/config/routing.xml');
     }
 
-    public function testLocateResourceThrowsExceptionWhenResourceDoesNotExist()
+    public function testLocateResourceThrowsExceptionWhenResourceDoesNotExist(): void
     {
         $bundle = $this->createStub(BundleInterface::class);
         $bundle->method('getPath')->willReturn(__DIR__.'/Fixtures/Bundle1Bundle');
@@ -280,7 +280,7 @@ class KernelTest extends TestCase
         $kernel->locateResource('@Bundle1Bundle/config/routing.xml');
     }
 
-    public function testLocateResourceReturnsTheFirstThatMatches()
+    public function testLocateResourceReturnsTheFirstThatMatches(): void
     {
         $bundle = $this->createStub(BundleInterface::class);
         $bundle->method('getPath')->willReturn(__DIR__.'/Fixtures/Bundle1Bundle');
@@ -294,7 +294,7 @@ class KernelTest extends TestCase
         $this->assertEquals(__DIR__.'/Fixtures/Bundle1Bundle/foo.txt', $kernel->locateResource('@Bundle1Bundle/foo.txt'));
     }
 
-    public function testLocateResourceOnDirectories()
+    public function testLocateResourceOnDirectories(): void
     {
         $bundle = $this->createStub(BundleInterface::class);
         $bundle->method('getName')->willReturn('Bundle1Bundle');
@@ -316,7 +316,7 @@ class KernelTest extends TestCase
         );
     }
 
-    public function testInitializeBundleThrowsExceptionWhenRegisteringTwoBundlesWithTheSameName()
+    public function testInitializeBundleThrowsExceptionWhenRegisteringTwoBundlesWithTheSameName(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Trying to register two bundles with the same name "DuplicateName"');
@@ -329,7 +329,7 @@ class KernelTest extends TestCase
         $kernel->boot();
     }
 
-    public function testTerminateReturnsSilentlyIfKernelIsNotBooted()
+    public function testTerminateReturnsSilentlyIfKernelIsNotBooted(): void
     {
         $kernel = $this->getKernel(['getHttpKernel']);
         $kernel->expects($this->never())
@@ -338,7 +338,7 @@ class KernelTest extends TestCase
         $kernel->terminate(Request::create('/'), new Response());
     }
 
-    public function testTerminateDelegatesTerminationOnlyForTerminableInterface()
+    public function testTerminateDelegatesTerminationOnlyForTerminableInterface(): void
     {
         // does not implement TerminableInterface
         $httpKernel = new TestKernel();
@@ -372,7 +372,7 @@ class KernelTest extends TestCase
         $kernel->terminate(Request::create('/'), new Response());
     }
 
-    public function testKernelWithoutBundles()
+    public function testKernelWithoutBundles(): void
     {
         $kernel = new KernelWithoutBundles('test', true);
         $kernel->boot();
@@ -380,7 +380,7 @@ class KernelTest extends TestCase
         $this->assertTrue($kernel->getContainer()->getParameter('test_executed'));
     }
 
-    public function testProjectDirExtension()
+    public function testProjectDirExtension(): void
     {
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
@@ -389,7 +389,7 @@ class KernelTest extends TestCase
         $this->assertSame(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures', $kernel->getContainer()->getParameter('kernel.project_dir'));
     }
 
-    public function testKernelReset()
+    public function testKernelReset(): void
     {
         $this->tearDown();
 
@@ -407,7 +407,7 @@ class KernelTest extends TestCase
         $this->assertFileExists($containerFile);
         unlink(__DIR__.'/Fixtures/var/cache/custom/Symfony_Component_HttpKernel_Tests_CustomProjectDirKernelCustomDebugContainer.php.meta');
 
-        $kernel = new CustomProjectDirKernel(static function ($container) { $container->register('foo', 'stdClass')->setPublic(true); });
+        $kernel = new CustomProjectDirKernel(static function ($container): void { $container->register('foo', 'stdClass')->setPublic(true); });
         $kernel->boot();
 
         $this->assertNotInstanceOf($containerClass, $kernel->getContainer());
@@ -415,7 +415,7 @@ class KernelTest extends TestCase
         $this->assertFileExists(\dirname($containerFile).'.legacy');
     }
 
-    public function testKernelExtension()
+    public function testKernelExtension(): void
     {
         $kernel = new class extends CustomProjectDirKernel implements ExtensionInterface {
             public function load(array $configs, ContainerBuilder $container): void
@@ -449,7 +449,7 @@ class KernelTest extends TestCase
         $this->assertTrue($kernel->getContainer()->getParameter('test.extension-registered'));
     }
 
-    public function testKernelPass()
+    public function testKernelPass(): void
     {
         $kernel = new PassKernel();
         $kernel->boot();
@@ -457,7 +457,7 @@ class KernelTest extends TestCase
         $this->assertTrue($kernel->getContainer()->getParameter('test.processed'));
     }
 
-    public function testWarmup()
+    public function testWarmup(): void
     {
         $kernel = new CustomProjectDirKernel();
         $kernel->boot();
@@ -466,7 +466,7 @@ class KernelTest extends TestCase
         $this->assertSame(realpath($kernel->getBuildDir()), $kernel->warmedUpBuildDir);
     }
 
-    public function testServicesResetter()
+    public function testServicesResetter(): void
     {
         $httpKernelMock = $this->getMockBuilder(HttpKernelInterface::class)
             ->disableOriginalConstructor()
@@ -475,7 +475,7 @@ class KernelTest extends TestCase
             ->expects($this->exactly(2))
             ->method('handle');
 
-        $kernel = new CustomProjectDirKernel(static function ($container) {
+        $kernel = new CustomProjectDirKernel(static function ($container): void {
             $container->addCompilerPass(new ResettableServicePass());
             $container->register('one', ResettableService::class)
                 ->setPublic(true)
@@ -498,12 +498,12 @@ class KernelTest extends TestCase
         $this->assertEquals(1, ResettableService::$counter);
     }
 
-    public function testServicesAreNotResetBetweenHttpCacheFragments()
+    public function testServicesAreNotResetBetweenHttpCacheFragments(): void
     {
         ResettableService::$counter = 0;
         $fragmentKernel = new FragmentHandlingKernel();
 
-        $kernel = new CustomProjectDirKernel(static function (ContainerBuilder $container) {
+        $kernel = new CustomProjectDirKernel(static function (ContainerBuilder $container): void {
             $container->addCompilerPass(new ResettableServicePass());
             $container->register('kernel', CustomProjectDirKernel::class)
                 ->setSynthetic(true)
@@ -531,9 +531,9 @@ class KernelTest extends TestCase
         $this->assertSame(1, ResettableService::$counter);
     }
 
-    public function testHttpCacheHandlesRequestsAfterKernelBoot()
+    public function testHttpCacheHandlesRequestsAfterKernelBoot(): void
     {
-        $kernel = new CustomProjectDirKernel(static function (ContainerBuilder $container) {
+        $kernel = new CustomProjectDirKernel(static function (ContainerBuilder $container): void {
             $container->register('http_cache', RecordingHttpCache::class)
                 ->setPublic(true);
         }, new ThrowingHttpKernel(), 'http_cache_worker');
@@ -555,7 +555,7 @@ class KernelTest extends TestCase
     }
 
     #[Group('time-sensitive')]
-    public function testKernelStartTimeIsResetWhileBootingAlreadyBootedKernel()
+    public function testKernelStartTimeIsResetWhileBootingAlreadyBootedKernel(): void
     {
         $kernel = new KernelForTest('test', true);
         $kernel->boot();
@@ -567,7 +567,7 @@ class KernelTest extends TestCase
         $this->assertGreaterThan($preReBoot, $kernel->getStartTime());
     }
 
-    public function testAnonymousKernelGeneratesValidContainerClass()
+    public function testAnonymousKernelGeneratesValidContainerClass(): void
     {
         $kernel = new class('test', true) extends Kernel {
             public function registerBundles(): iterable
@@ -588,9 +588,9 @@ class KernelTest extends TestCase
         $this->assertMatchesRegularExpression('/^[a-zA-Z_\x80-\xff][a-zA-Z0-9_\x80-\xff]*TestDebugContainer$/', $kernel->getContainerClass());
     }
 
-    public function testTrustedParameters()
+    public function testTrustedParameters(): void
     {
-        $kernel = new CustomProjectDirKernel(static function (ContainerBuilder $container) {
+        $kernel = new CustomProjectDirKernel(static function (ContainerBuilder $container): void {
             $container->setParameter('kernel.trusted_hosts', '^a{2,3}.com$, ^b{2,}.com$');
             $container->setParameter('kernel.trusted_proxies', 'a,b');
             $container->setParameter('kernel.trusted_headers', 'x-forwarded-for');
@@ -607,7 +607,7 @@ class KernelTest extends TestCase
         }
     }
 
-    public function testSourceDateEpoch()
+    public function testSourceDateEpoch(): void
     {
         $sourceDateEpoch = 1609459200; // 2021-01-01 00:00:00 UTC
 
@@ -635,14 +635,14 @@ class KernelTest extends TestCase
         $this->assertSame($sourceDateEpoch, $container->getParameter('container.build_time'));
     }
 
-    public function testSourceDateEpochWithKernelContainerBuildTime()
+    public function testSourceDateEpochWithKernelContainerBuildTime(): void
     {
         $sourceDateEpoch = 1609459200; // 2021-01-01 00:00:00 UTC
         $kernelBuildTime = 1609545600; // 2021-01-02 00:00:00 UTC
 
         $_SERVER['SOURCE_DATE_EPOCH'] = $sourceDateEpoch;
 
-        $kernel = new CustomProjectDirKernel(static function (ContainerBuilder $container) use ($kernelBuildTime) {
+        $kernel = new CustomProjectDirKernel(static function (ContainerBuilder $container) use ($kernelBuildTime): void {
             $container->setParameter('kernel.container_build_time', $kernelBuildTime);
         });
         $kernel->boot();

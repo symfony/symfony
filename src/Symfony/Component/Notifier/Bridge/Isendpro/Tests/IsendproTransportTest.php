@@ -44,7 +44,7 @@ final class IsendproTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendWithErrorResponseThrowsTransportException()
+    public function testSendWithErrorResponseThrowsTransportException(): void
     {
         $client = new MockHttpClient(new MockResponse('', ['http_code' => 500]));
 
@@ -56,7 +56,7 @@ final class IsendproTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('phone', 'testMessage'));
     }
 
-    public function testSendWithErrorResponseContainingDetailsThrowsTransportException()
+    public function testSendWithErrorResponseContainingDetailsThrowsTransportException(): void
     {
         $client = new MockHttpClient(new MockResponse(json_encode(['etat' => ['etat' => [['code' => '3', 'message' => 'Your credentials are incorrect']]]]), ['http_code' => 400]));
 
@@ -68,7 +68,7 @@ final class IsendproTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('phone', 'testMessage'));
     }
 
-    public function testSendWithSuccessfulResponseDispatchesMessageEvent()
+    public function testSendWithSuccessfulResponseDispatchesMessageEvent(): void
     {
         $client = new MockHttpClient(new MockResponse(json_encode(['etat' => ['etat' => [['code' => 0]]]])));
 

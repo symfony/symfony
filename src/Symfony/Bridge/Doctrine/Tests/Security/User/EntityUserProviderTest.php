@@ -31,7 +31,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class EntityUserProviderTest extends TestCase
 {
-    public function testRefreshUserGetsUserByPrimaryKey()
+    public function testRefreshUserGetsUserByPrimaryKey(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
         $this->createSchema($em);
@@ -51,7 +51,7 @@ class EntityUserProviderTest extends TestCase
         $this->assertSame($user1, $provider->refreshUser($user1));
     }
 
-    public function testLoadUserByIdentifier()
+    public function testLoadUserByIdentifier(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
         $this->createSchema($em);
@@ -66,7 +66,7 @@ class EntityUserProviderTest extends TestCase
         $this->assertSame($user, $provider->loadUserByIdentifier('user1'));
     }
 
-    public function testLoadUserByIdentifierWithUserLoaderRepositoryAndWithoutProperty()
+    public function testLoadUserByIdentifierWithUserLoaderRepositoryAndWithoutProperty(): void
     {
         $user = new User(1, 1, 'user1');
 
@@ -88,7 +88,7 @@ class EntityUserProviderTest extends TestCase
         $this->assertSame($user, $provider->loadUserByIdentifier('user1'));
     }
 
-    public function testLoadUserByIdentifierWithNonUserLoaderRepositoryAndWithoutProperty()
+    public function testLoadUserByIdentifierWithNonUserLoaderRepositoryAndWithoutProperty(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
         $this->createSchema($em);
@@ -106,7 +106,7 @@ class EntityUserProviderTest extends TestCase
         $provider->loadUserByIdentifier('user1');
     }
 
-    public function testRefreshUserRequiresId()
+    public function testRefreshUserRequiresId(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
 
@@ -118,7 +118,7 @@ class EntityUserProviderTest extends TestCase
         $provider->refreshUser($user1);
     }
 
-    public function testRefreshInvalidUser()
+    public function testRefreshInvalidUser(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
         $this->createSchema($em);
@@ -137,7 +137,7 @@ class EntityUserProviderTest extends TestCase
         $provider->refreshUser($user2);
     }
 
-    public function testSupportProxy()
+    public function testSupportProxy(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
         $this->createSchema($em);
@@ -154,7 +154,7 @@ class EntityUserProviderTest extends TestCase
         $this->assertTrue($provider->supportsClass($user2::class));
     }
 
-    public function testLoadUserByIdentifierShouldLoadUserWhenProperInterfaceProvided()
+    public function testLoadUserByIdentifierShouldLoadUserWhenProperInterfaceProvided(): void
     {
         $repository = $this->createMock(UserLoaderRepository::class);
         $repository->expects($this->once())
@@ -172,7 +172,7 @@ class EntityUserProviderTest extends TestCase
         $provider->loadUserByIdentifier('name');
     }
 
-    public function testLoadUserByIdentifierShouldPassAttributesToTheUserLoader()
+    public function testLoadUserByIdentifierShouldPassAttributesToTheUserLoader(): void
     {
         $repository = $this->createMock(UserLoaderRepository::class);
         $repository->expects($this->once())
@@ -190,7 +190,7 @@ class EntityUserProviderTest extends TestCase
         $provider->loadUserByIdentifier('name', ['foo' => 'bar']);
     }
 
-    public function testLoadUserByIdentifierShouldDeclineInvalidInterface()
+    public function testLoadUserByIdentifierShouldDeclineInvalidInterface(): void
     {
         $repository = $this->createStub(ObjectRepository::class);
 
@@ -204,7 +204,7 @@ class EntityUserProviderTest extends TestCase
         $provider->loadUserByIdentifier('name');
     }
 
-    public function testPasswordUpgrades()
+    public function testPasswordUpgrades(): void
     {
         $user = new User(1, 1, 'user1');
 
@@ -221,7 +221,7 @@ class EntityUserProviderTest extends TestCase
         $provider->upgradePassword($user, 'foobar');
     }
 
-    public function testRefreshedUserProxyIsLoaded()
+    public function testRefreshedUserProxyIsLoaded(): void
     {
         $em = DoctrineTestHelper::createTestEntityManager();
         $this->createSchema($em);
@@ -262,7 +262,7 @@ class EntityUserProviderTest extends TestCase
         return $objectManager;
     }
 
-    private function createSchema($em)
+    private function createSchema($em): void
     {
         $schemaTool = new SchemaTool($em);
         $schemaTool->createSchema([

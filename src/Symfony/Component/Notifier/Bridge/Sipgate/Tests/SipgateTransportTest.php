@@ -46,7 +46,7 @@ class SipgateTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendSuccessfully()
+    public function testSendSuccessfully(): void
     {
         $response = new MockResponse('', ['http_code' => 204]);
 
@@ -58,7 +58,7 @@ class SipgateTransportTest extends TransportTestCase
     }
 
     #[DataProvider('errorProvider')]
-    public function testExceptionIsThrownWhenSendFailed(int $statusCode, string $content, string $expectedExceptionMessage)
+    public function testExceptionIsThrownWhenSendFailed(int $statusCode, string $content, string $expectedExceptionMessage): void
     {
         $client = new MockHttpClient(new MockResponse($content, ['http_code' => $statusCode]));
         $transport = $this->createTransport($client);

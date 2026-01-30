@@ -18,7 +18,7 @@ use Symfony\Component\Console\Helper\OutputWrapper;
 class OutputWrapperTest extends TestCase
 {
     #[DataProvider('textProvider')]
-    public function testBasicWrap(string $text, int $width, bool $allowCutUrls, string $expected)
+    public function testBasicWrap(string $text, int $width, bool $allowCutUrls, string $expected): void
     {
         $wrapper = new OutputWrapper($allowCutUrls);
         $result = $wrapper->wrap($text, $width);

@@ -18,7 +18,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class HttpClientTest extends TestCase
 {
-    public function testCreateClient()
+    public function testCreateClient(): void
     {
         $this->assertInstanceOf(HttpClientInterface::class, HttpClient::create());
         $this->assertNotInstanceOf(NativeHttpClient::class, HttpClient::create());

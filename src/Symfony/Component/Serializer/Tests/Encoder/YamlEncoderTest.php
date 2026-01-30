@@ -21,7 +21,7 @@ use Symfony\Component\Yaml\Yaml;
  */
 class YamlEncoderTest extends TestCase
 {
-    public function testEncode()
+    public function testEncode(): void
     {
         $encoder = new YamlEncoder();
 
@@ -31,7 +31,7 @@ class YamlEncoderTest extends TestCase
         $this->assertEquals('{ foo: 1 }', $encoder->encode(new \ArrayObject(['foo' => 1]), 'yaml', ['preserve_empty_objects' => true]));
     }
 
-    public function testSupportsEncoding()
+    public function testSupportsEncoding(): void
     {
         $encoder = new YamlEncoder();
 
@@ -40,7 +40,7 @@ class YamlEncoderTest extends TestCase
         $this->assertFalse($encoder->supportsEncoding('json'));
     }
 
-    public function testDecode()
+    public function testDecode(): void
     {
         $encoder = new YamlEncoder();
 
@@ -48,7 +48,7 @@ class YamlEncoderTest extends TestCase
         $this->assertEquals(['foo' => 1], $encoder->decode('{ foo: 1 }', 'yaml'));
     }
 
-    public function testSupportsDecoding()
+    public function testSupportsDecoding(): void
     {
         $encoder = new YamlEncoder();
 
@@ -57,7 +57,7 @@ class YamlEncoderTest extends TestCase
         $this->assertFalse($encoder->supportsDecoding('json'));
     }
 
-    public function testIndentation()
+    public function testIndentation(): void
     {
         $encoder = new YamlEncoder(null, null, [YamlEncoder::YAML_INLINE => 100, YamlEncoder::YAML_INDENTATION => 7]);
 
@@ -68,7 +68,7 @@ class YamlEncoderTest extends TestCase
         $this->assertSame($expected."\n", $encoder->encode(['foo' => ['bar' => 'baz']], 'yaml'));
     }
 
-    public function testContext()
+    public function testContext(): void
     {
         $encoder = new YamlEncoder(null, null, [YamlEncoder::YAML_INLINE => 1, YamlEncoder::YAML_INDENT => 4, YamlEncoder::YAML_FLAGS => Yaml::DUMP_OBJECT | Yaml::PARSE_OBJECT]);
 
@@ -83,7 +83,7 @@ class YamlEncoderTest extends TestCase
         $this->assertEquals(['foo' => null], $encoder->decode("foo: !php/object 'O:8:\"stdClass\":1:{s:3:\"bar\";i:2;}'", 'yaml', [YamlEncoder::YAML_FLAGS => 0]));
     }
 
-    public function testInvalidYaml()
+    public function testInvalidYaml(): void
     {
         $encoder = new YamlEncoder();
 

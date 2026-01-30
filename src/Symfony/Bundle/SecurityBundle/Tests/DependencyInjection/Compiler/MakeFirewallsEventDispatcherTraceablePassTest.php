@@ -45,7 +45,7 @@ class MakeFirewallsEventDispatcherTraceablePassTest extends TestCase
         $securityBundle->build($this->container);
     }
 
-    public function testEventDispatcherIsDecoratedOnDebugMode()
+    public function testEventDispatcherIsDecoratedOnDebugMode(): void
     {
         $this->container->setParameter('kernel.debug', true);
 
@@ -60,7 +60,7 @@ class MakeFirewallsEventDispatcherTraceablePassTest extends TestCase
         );
     }
 
-    public function testEventDispatcherIsNotDecoratedOnNonDebugMode()
+    public function testEventDispatcherIsNotDecoratedOnNonDebugMode(): void
     {
         $this->container->setParameter('kernel.debug', false);
 

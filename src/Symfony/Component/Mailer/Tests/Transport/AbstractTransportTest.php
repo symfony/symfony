@@ -32,7 +32,7 @@ use Twig\Loader\ArrayLoader;
 #[Group('time-sensitive')]
 class AbstractTransportTest extends TestCase
 {
-    public function testThrottling()
+    public function testThrottling(): void
     {
         $transport = new NullTransport();
         $transport->setMaxPerSecond(2 / 10);
@@ -57,7 +57,7 @@ class AbstractTransportTest extends TestCase
         $this->assertEqualsWithDelta(0, time() - $start, 1);
     }
 
-    public function testSendingRawMessages()
+    public function testSendingRawMessages(): void
     {
         $this->expectException(LogicException::class);
 
@@ -65,7 +65,7 @@ class AbstractTransportTest extends TestCase
         $transport->send(new RawMessage('Some raw email message'));
     }
 
-    public function testNotRenderedTemplatedEmail()
+    public function testNotRenderedTemplatedEmail(): void
     {
         $this->expectException(LogicException::class);
 
@@ -73,7 +73,7 @@ class AbstractTransportTest extends TestCase
         $transport->send((new TemplatedEmail())->htmlTemplate('Some template'));
     }
 
-    public function testRenderedTemplatedEmail()
+    public function testRenderedTemplatedEmail(): void
     {
         $transport = new NullTransport($dispatcher = new EventDispatcher());
         $dispatcher->addSubscriber(new MessageListener(null, new BodyRenderer(new Environment(new ArrayLoader(['tpl' => 'Some message'])))));
@@ -82,7 +82,7 @@ class AbstractTransportTest extends TestCase
         $this->assertMatchesRegularExpression('/Some message/', $sentMessage->getMessage()->toString());
     }
 
-    public function testRejectMessage()
+    public function testRejectMessage(): void
     {
         $dispatcher = new EventDispatcher();
         $dispatcher->addListener(MessageEvent::class, static fn (MessageEvent $event) => $event->reject(), 255);

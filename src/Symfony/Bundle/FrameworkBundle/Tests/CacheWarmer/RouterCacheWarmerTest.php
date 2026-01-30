@@ -19,7 +19,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class RouterCacheWarmerTest extends TestCase
 {
-    public function testWarmUpWithWarmableInterfaceWithBuildDir()
+    public function testWarmUpWithWarmableInterfaceWithBuildDir(): void
     {
         $container = new Container();
 
@@ -34,7 +34,7 @@ class RouterCacheWarmerTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testWarmUpWithoutWarmableInterfaceWithBuildDir()
+    public function testWarmUpWithoutWarmableInterfaceWithBuildDir(): void
     {
         $container = new Container();
 
@@ -46,7 +46,7 @@ class RouterCacheWarmerTest extends TestCase
         $routerCacheWarmer->warmUp('/tmp/cache', '/tmp/build');
     }
 
-    public function testWarmUpWithWarmableInterfaceWithoutBuildDir()
+    public function testWarmUpWithWarmableInterfaceWithoutBuildDir(): void
     {
         $container = new Container();
 
@@ -60,7 +60,7 @@ class RouterCacheWarmerTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testWarmUpWithoutWarmableInterfaceWithoutBuildDir()
+    public function testWarmUpWithoutWarmableInterfaceWithoutBuildDir(): void
     {
         $container = new Container();
 

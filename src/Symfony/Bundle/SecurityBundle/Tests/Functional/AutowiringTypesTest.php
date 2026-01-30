@@ -17,7 +17,7 @@ use Symfony\Component\Security\Core\Authorization\TraceableAccessDecisionManager
 
 class AutowiringTypesTest extends AbstractWebTestCase
 {
-    public function testAccessDecisionManagerAutowiring()
+    public function testAccessDecisionManagerAutowiring(): void
     {
         static::bootKernel(['debug' => false]);
 

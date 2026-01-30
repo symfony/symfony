@@ -29,7 +29,7 @@ use Symfony\Component\Security\Http\Tests\Fixtures\CustomUser;
 
 class UserValueResolverTest extends TestCase
 {
-    public function testSupportsFailsWithNoType()
+    public function testSupportsFailsWithNoType(): void
     {
         $tokenStorage = new TokenStorage();
         $resolver = new UserValueResolver($tokenStorage);
@@ -38,7 +38,7 @@ class UserValueResolverTest extends TestCase
         $this->assertSame([], $resolver->resolve(Request::create('/'), $metadata));
     }
 
-    public function testSupportsFailsWhenDefaultValAndNoUser()
+    public function testSupportsFailsWhenDefaultValAndNoUser(): void
     {
         $tokenStorage = new TokenStorage();
         $resolver = new UserValueResolver($tokenStorage);
@@ -47,7 +47,7 @@ class UserValueResolverTest extends TestCase
         $this->assertSame([$default], $resolver->resolve(Request::create('/'), $metadata));
     }
 
-    public function testResolveSucceedsWithUserInterface()
+    public function testResolveSucceedsWithUserInterface(): void
     {
         $user = new InMemoryUser('username', 'password');
         $token = new UsernamePasswordToken($user, 'provider');
@@ -60,7 +60,7 @@ class UserValueResolverTest extends TestCase
         $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
     }
 
-    public function testResolveSucceedsWithSubclassType()
+    public function testResolveSucceedsWithSubclassType(): void
     {
         $user = new InMemoryUser('username', 'password');
         $token = new UsernamePasswordToken($user, 'provider');
@@ -73,7 +73,7 @@ class UserValueResolverTest extends TestCase
         $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
     }
 
-    public function testResolveSucceedsWithNullableParamAndNoUser()
+    public function testResolveSucceedsWithNullableParamAndNoUser(): void
     {
         $token = new NullToken();
         $tokenStorage = new TokenStorage();
@@ -85,7 +85,7 @@ class UserValueResolverTest extends TestCase
         $this->assertSame([null], $resolver->resolve(Request::create('/'), $metadata));
     }
 
-    public function testResolveSucceedsWithNullableAttribute()
+    public function testResolveSucceedsWithNullableAttribute(): void
     {
         $user = new InMemoryUser('username', 'password');
         $token = new UsernamePasswordToken($user, 'provider');
@@ -98,7 +98,7 @@ class UserValueResolverTest extends TestCase
         $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
     }
 
-    public function testResolveSucceedsWithTypedAttribute()
+    public function testResolveSucceedsWithTypedAttribute(): void
     {
         $user = new InMemoryUser('username', 'password');
         $token = new UsernamePasswordToken($user, 'provider');
@@ -111,7 +111,7 @@ class UserValueResolverTest extends TestCase
         $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
     }
 
-    public function testResolveSucceedsWithUnionTypedAttribute()
+    public function testResolveSucceedsWithUnionTypedAttribute(): void
     {
         $user = new InMemoryUser('username', 'password');
         $token = new UsernamePasswordToken($user, 'provider');
@@ -124,7 +124,7 @@ class UserValueResolverTest extends TestCase
         $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
     }
 
-    public function testResolveThrowsAccessDeniedWithWrongUserClass()
+    public function testResolveThrowsAccessDeniedWithWrongUserClass(): void
     {
         $user = new CustomUser('John', ['ROLE_USER'], 'password', 'hash');
         $token = new UsernamePasswordToken($user, 'provider');
@@ -139,7 +139,7 @@ class UserValueResolverTest extends TestCase
         $resolver->resolve(Request::create('/'), $metadata);
     }
 
-    public function testResolveThrowsAccessDeniedWithAttributeAndNoUser()
+    public function testResolveThrowsAccessDeniedWithAttributeAndNoUser(): void
     {
         $tokenStorage = new TokenStorage();
 
@@ -151,7 +151,7 @@ class UserValueResolverTest extends TestCase
         $resolver->resolve(Request::create('/'), $metadata);
     }
 
-    public function testResolveThrowsAcessDeniedWithNoToken()
+    public function testResolveThrowsAcessDeniedWithNoToken(): void
     {
         $tokenStorage = new TokenStorage();
         $resolver = new UserValueResolver($tokenStorage);
@@ -161,7 +161,7 @@ class UserValueResolverTest extends TestCase
         $resolver->resolve(Request::create('/'), $metadata);
     }
 
-    public function testIntegration()
+    public function testIntegration(): void
     {
         $user = new InMemoryUser('username', 'password');
         $token = new UsernamePasswordToken($user, 'provider');
@@ -169,14 +169,14 @@ class UserValueResolverTest extends TestCase
         $tokenStorage->setToken($token);
 
         $argumentResolver = new ArgumentResolver(null, [new UserValueResolver($tokenStorage)]);
-        $this->assertSame([$user], $argumentResolver->getArguments(Request::create('/'), static function (UserInterface $user) {}));
+        $this->assertSame([$user], $argumentResolver->getArguments(Request::create('/'), static function (UserInterface $user): void {}));
     }
 
-    public function testIntegrationNoUser()
+    public function testIntegrationNoUser(): void
     {
         $tokenStorage = new TokenStorage();
 
         $argumentResolver = new ArgumentResolver(null, [new UserValueResolver($tokenStorage), new DefaultValueResolver()]);
-        $this->assertSame([null], $argumentResolver->getArguments(Request::create('/'), static function (?UserInterface $user = null) {}));
+        $this->assertSame([null], $argumentResolver->getArguments(Request::create('/'), static function (?UserInterface $user = null): void {}));
     }
 }

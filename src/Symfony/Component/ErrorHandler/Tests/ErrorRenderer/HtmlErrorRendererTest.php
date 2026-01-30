@@ -18,7 +18,7 @@ use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 class HtmlErrorRendererTest extends TestCase
 {
     #[DataProvider('getRenderData')]
-    public function testRender(\Throwable $exception, HtmlErrorRenderer $errorRenderer, string $expected)
+    public function testRender(\Throwable $exception, HtmlErrorRenderer $errorRenderer, string $expected): void
     {
         $this->assertStringMatchesFormat($expected, $errorRenderer->render($exception)->getAsString());
     }
@@ -55,7 +55,7 @@ class HtmlErrorRendererTest extends TestCase
     }
 
     #[DataProvider('provideFileLinkFormats')]
-    public function testFileLinkFormat(\ErrorException $exception, string $fileLinkFormat, bool $withSymfonyIde, string $expected)
+    public function testFileLinkFormat(\ErrorException $exception, string $fileLinkFormat, bool $withSymfonyIde, string $expected): void
     {
         if ($withSymfonyIde) {
             $_ENV['SYMFONY_IDE'] = $fileLinkFormat;
@@ -95,7 +95,7 @@ class HtmlErrorRendererTest extends TestCase
         ];
     }
 
-    public function testRendersStackWithoutBinaryStrings()
+    public function testRendersStackWithoutBinaryStrings(): void
     {
         // make sure method arguments are available in stack traces (see https://php.net/ini.core)
         ini_set('zend.exception_ignore_args', false);

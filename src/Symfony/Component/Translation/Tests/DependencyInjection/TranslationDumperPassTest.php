@@ -18,7 +18,7 @@ use Symfony\Component\Translation\DependencyInjection\TranslationDumperPass;
 
 class TranslationDumperPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $writerDefinition = $container->register('translation.writer');
@@ -31,7 +31,7 @@ class TranslationDumperPassTest extends TestCase
         $this->assertEquals([['addDumper', ['bar.alias', new Reference('foo.id')]]], $writerDefinition->getMethodCalls());
     }
 
-    public function testProcessNoDefinitionFound()
+    public function testProcessNoDefinitionFound(): void
     {
         $container = new ContainerBuilder();
 

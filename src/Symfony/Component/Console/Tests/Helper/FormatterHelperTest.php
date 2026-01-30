@@ -16,7 +16,7 @@ use Symfony\Component\Console\Helper\FormatterHelper;
 
 class FormatterHelperTest extends TestCase
 {
-    public function testFormatSection()
+    public function testFormatSection(): void
     {
         $formatter = new FormatterHelper();
 
@@ -27,7 +27,7 @@ class FormatterHelperTest extends TestCase
         );
     }
 
-    public function testFormatBlock()
+    public function testFormatBlock(): void
     {
         $formatter = new FormatterHelper();
 
@@ -53,7 +53,7 @@ class FormatterHelperTest extends TestCase
         );
     }
 
-    public function testFormatBlockWithDiacriticLetters()
+    public function testFormatBlockWithDiacriticLetters(): void
     {
         $formatter = new FormatterHelper();
 
@@ -66,7 +66,7 @@ class FormatterHelperTest extends TestCase
         );
     }
 
-    public function testFormatBlockWithDoubleWidthDiacriticLetters()
+    public function testFormatBlockWithDoubleWidthDiacriticLetters(): void
     {
         $formatter = new FormatterHelper();
         $this->assertEquals(
@@ -78,7 +78,7 @@ class FormatterHelperTest extends TestCase
         );
     }
 
-    public function testFormatBlockLGEscaping()
+    public function testFormatBlockLGEscaping(): void
     {
         $formatter = new FormatterHelper();
 
@@ -91,7 +91,7 @@ class FormatterHelperTest extends TestCase
         );
     }
 
-    public function testTruncatingWithShorterLengthThanMessageWithSuffix()
+    public function testTruncatingWithShorterLengthThanMessageWithSuffix(): void
     {
         $formatter = new FormatterHelper();
         $message = 'testing truncate';
@@ -102,7 +102,7 @@ class FormatterHelperTest extends TestCase
         $this->assertSame('zażółć gęślą...', $formatter->truncate('zażółć gęślą jaźń', 12));
     }
 
-    public function testTruncatingMessageWithCustomSuffix()
+    public function testTruncatingMessageWithCustomSuffix(): void
     {
         $formatter = new FormatterHelper();
         $message = 'testing truncate';
@@ -110,7 +110,7 @@ class FormatterHelperTest extends TestCase
         $this->assertSame('test!', $formatter->truncate($message, 4, '!'));
     }
 
-    public function testTruncatingWithLongerLengthThanMessageWithSuffix()
+    public function testTruncatingWithLongerLengthThanMessageWithSuffix(): void
     {
         $formatter = new FormatterHelper();
         $message = 'test';
@@ -118,7 +118,7 @@ class FormatterHelperTest extends TestCase
         $this->assertSame($message, $formatter->truncate($message, 10));
     }
 
-    public function testTruncatingWithNegativeLength()
+    public function testTruncatingWithNegativeLength(): void
     {
         $formatter = new FormatterHelper();
         $message = 'testing truncate';

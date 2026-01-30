@@ -27,7 +27,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 class ExpressionLanguageTest extends TestCase
 {
     #[DataProvider('provider')]
-    public function testIsAuthenticated($token, $expression, $result)
+    public function testIsAuthenticated($token, $expression, $result): void
     {
         $expressionLanguage = new ExpressionLanguage();
         $trustResolver = new AuthenticationTrustResolver();

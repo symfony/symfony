@@ -33,7 +33,7 @@ class UidNormalizerTest extends TestCase
         $this->normalizer = new UidNormalizer();
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsNormalization(Uuid::v1()));
         $this->assertTrue($this->normalizer->supportsNormalization(Uuid::v3(Uuid::v1(), 'foo')));
@@ -106,7 +106,7 @@ class UidNormalizerTest extends TestCase
     }
 
     #[DataProvider('normalizeProvider')]
-    public function testNormalize(string $expected, AbstractUid $uid, ?string $uidFormat)
+    public function testNormalize(string $expected, AbstractUid $uid, ?string $uidFormat): void
     {
         $this->assertSame($expected, $this->normalizer->normalize($uid, null, null !== $uidFormat ? [
             'uid_normalization_format' => $uidFormat,
@@ -127,33 +127,33 @@ class UidNormalizerTest extends TestCase
     }
 
     #[DataProvider('dataProvider')]
-    public function testSupportsDenormalization($uuidString, $class)
+    public function testSupportsDenormalization($uuidString, $class): void
     {
         $this->assertTrue($this->normalizer->supportsDenormalization($uuidString, $class));
     }
 
-    public function testSupportsDenormalizationForNonUid()
+    public function testSupportsDenormalizationForNonUid(): void
     {
         $this->assertFalse($this->normalizer->supportsDenormalization('foo', \stdClass::class));
     }
 
-    public function testSupportOurAbstractUid()
+    public function testSupportOurAbstractUid(): void
     {
         $this->assertFalse($this->normalizer->supportsDenormalization('1ea6ecef-eb9a-66fe-b62b-957b45f17e43', AbstractUid::class));
     }
 
-    public function testSupportCustomAbstractUid()
+    public function testSupportCustomAbstractUid(): void
     {
         $this->assertTrue($this->normalizer->supportsDenormalization('ccc', TestAbstractCustomUid::class));
     }
 
     #[DataProvider('dataProvider')]
-    public function testDenormalize($uuidString, $class)
+    public function testDenormalize($uuidString, $class): void
     {
         $this->assertEquals($class::fromString($uuidString), $this->normalizer->denormalize($uuidString, $class));
     }
 
-    public function testDenormalizeOurAbstractUid()
+    public function testDenormalizeOurAbstractUid(): void
     {
         $this->expectException(\Error::class);
         $this->expectExceptionMessage('Cannot call abstract method Symfony\Component\Uid\AbstractUid::fromString()');
@@ -161,7 +161,7 @@ class UidNormalizerTest extends TestCase
         $this->assertEquals(Uuid::fromString($uuidString = '1ea6ecef-eb9a-66fe-b62b-957b45f17e43'), $this->normalizer->denormalize($uuidString, AbstractUid::class));
     }
 
-    public function testDenormalizeCustomAbstractUid()
+    public function testDenormalizeCustomAbstractUid(): void
     {
         $this->expectException(\Error::class);
         $this->expectExceptionMessage('Cannot instantiate abstract class Symfony\Component\Serializer\Tests\Normalizer\TestAbstractCustomUid');
@@ -169,7 +169,7 @@ class UidNormalizerTest extends TestCase
         $this->assertEquals(Uuid::fromString($uuidString = '1ea6ecef-eb9a-66fe-b62b-957b45f17e43'), $this->normalizer->denormalize($uuidString, TestAbstractCustomUid::class));
     }
 
-    public function testNormalizeWithNormalizationFormatPassedInConstructor()
+    public function testNormalizeWithNormalizationFormatPassedInConstructor(): void
     {
         $uidNormalizer = new UidNormalizer([
             'uid_normalization_format' => 'rfc4122',
@@ -182,7 +182,7 @@ class UidNormalizerTest extends TestCase
         ]));
     }
 
-    public function testNormalizeWithNormalizationFormatNotValid()
+    public function testNormalizeWithNormalizationFormatNotValid(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The "ccc" format is not valid.');

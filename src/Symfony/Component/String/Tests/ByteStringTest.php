@@ -22,7 +22,7 @@ class ByteStringTest extends AbstractAsciiTestCase
         return new ByteString($string);
     }
 
-    public function testFromRandom()
+    public function testFromRandom(): void
     {
         $random = ByteString::fromRandom(32);
 
@@ -32,7 +32,7 @@ class ByteStringTest extends AbstractAsciiTestCase
         }
     }
 
-    public function testFromRandomWithSpecificChars()
+    public function testFromRandomWithSpecificChars(): void
     {
         $random = ByteString::fromRandom(32, 'abc');
 
@@ -42,7 +42,7 @@ class ByteStringTest extends AbstractAsciiTestCase
         }
     }
 
-    public function testFromRandoWithZeroLength()
+    public function testFromRandoWithZeroLength(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('A strictly positive length is expected, "0" given.');
@@ -50,7 +50,7 @@ class ByteStringTest extends AbstractAsciiTestCase
         self::assertSame('', ByteString::fromRandom(0));
     }
 
-    public function testFromRandomThrowsForNegativeLength()
+    public function testFromRandomThrowsForNegativeLength(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('A strictly positive length is expected, "-1" given.');
@@ -58,7 +58,7 @@ class ByteStringTest extends AbstractAsciiTestCase
         ByteString::fromRandom(-1);
     }
 
-    public function testFromRandomAlphabetMin()
+    public function testFromRandomAlphabetMin(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The length of the alphabet must in the [2^1, 2^56] range.');

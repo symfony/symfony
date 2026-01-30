@@ -28,7 +28,7 @@ trait CallbacksTestTrait
     abstract protected function getNormalizerForCallbacksWithPropertyTypeExtractor(): NormalizerInterface;
 
     #[DataProvider('provideNormalizeCallbacks')]
-    public function testNormalizeCallbacks($callbacks, $valueBar, $result)
+    public function testNormalizeCallbacks($callbacks, $valueBar, $result): void
     {
         $normalizer = $this->getNormalizerForCallbacks();
 
@@ -39,7 +39,7 @@ trait CallbacksTestTrait
     }
 
     #[DataProvider('provideNormalizeCallbacks')]
-    public function testNormalizeCallbacksWithTypedProperty($callbacks, $valueBar, $result)
+    public function testNormalizeCallbacksWithTypedProperty($callbacks, $valueBar, $result): void
     {
         $normalizer = $this->getNormalizerForCallbacksWithPropertyTypeExtractor();
 
@@ -50,7 +50,7 @@ trait CallbacksTestTrait
     }
 
     #[DataProvider('provideNormalizeCallbacks')]
-    public function testNormalizeCallbacksWithNoConstructorArgument($callbacks, $valueBar, $result)
+    public function testNormalizeCallbacksWithNoConstructorArgument($callbacks, $valueBar, $result): void
     {
         $normalizer = $this->getNormalizerForCallbacksWithPropertyTypeExtractor();
 
@@ -66,7 +66,7 @@ trait CallbacksTestTrait
     }
 
     #[DataProvider('provideDenormalizeCallbacks')]
-    public function testDenormalizeCallbacks($callbacks, $valueBar, $result)
+    public function testDenormalizeCallbacks($callbacks, $valueBar, $result): void
     {
         $normalizer = $this->getNormalizerForCallbacks();
 
@@ -76,7 +76,7 @@ trait CallbacksTestTrait
     }
 
     #[DataProvider('providerDenormalizeCallbacksWithTypedProperty')]
-    public function testDenormalizeCallbacksWithTypedProperty($callbacks, $valueBar, $result)
+    public function testDenormalizeCallbacksWithTypedProperty($callbacks, $valueBar, $result): void
     {
         $normalizer = $this->getNormalizerForCallbacksWithPropertyTypeExtractor();
 
@@ -86,7 +86,7 @@ trait CallbacksTestTrait
     }
 
     #[DataProvider('providerDenormalizeCallbacksWithTypedProperty')]
-    public function testDenormalizeCallbacksWithNoConstructorArgument($callbacks, $valueBar, $result)
+    public function testDenormalizeCallbacksWithNoConstructorArgument($callbacks, $valueBar, $result): void
     {
         $normalizer = $this->getNormalizerForCallbacksWithPropertyTypeExtractor();
 
@@ -102,7 +102,7 @@ trait CallbacksTestTrait
     }
 
     #[DataProvider('provideInvalidCallbacks')]
-    public function testUncallableCallbacks($callbacks)
+    public function testUncallableCallbacks($callbacks): void
     {
         $normalizer = $this->getNormalizerForCallbacks();
 
@@ -129,7 +129,7 @@ trait CallbacksTestTrait
             ],
             'Null an item' => [
                 [
-                    'bar' => static function ($value, $object, $attributeName, $format, $context) {
+                    'bar' => static function ($value, $object, $attributeName, $format, $context): void {
                         static::assertSame('baz', $value);
                         static::assertInstanceOf(CallbacksObject::class, $object);
                         static::assertSame('bar', $attributeName);
@@ -191,7 +191,7 @@ trait CallbacksTestTrait
             ],
             'Null an item' => [
                 [
-                    'bar' => static function ($value, $object, $attributeName, $format, $context) {
+                    'bar' => static function ($value, $object, $attributeName, $format, $context): void {
                         static::assertSame('baz', $value);
                         static::assertTrue(is_a($object, CallbacksObject::class, true));
                         static::assertSame('bar', $attributeName);
@@ -253,7 +253,7 @@ trait CallbacksTestTrait
             ],
             'Null an typed item' => [
                 [
-                    'foo' => static function ($value, $object, $attributeName, $format, $context) {
+                    'foo' => static function ($value, $object, $attributeName, $format, $context): void {
                         static::assertSame('fool', $value);
                         static::assertTrue(is_a($object, CallbacksObject::class, true));
                         static::assertSame('foo', $attributeName);

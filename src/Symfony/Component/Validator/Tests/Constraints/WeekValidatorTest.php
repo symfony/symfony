@@ -26,7 +26,7 @@ class WeekValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideWeekNumber')]
-    public function testWeekIsValidWeekNumber(string|\Stringable $value, bool $expectedViolation)
+    public function testWeekIsValidWeekNumber(string|\Stringable $value, bool $expectedViolation): void
     {
         $constraint = new Week();
         $this->validator->validate($value, $constraint);
@@ -51,7 +51,7 @@ class WeekValidatorTest extends ConstraintValidatorTestCase
         yield [new StringableValue('2024-W53'), true];
     }
 
-    public function testBounds()
+    public function testBounds(): void
     {
         $constraint = new Week(min: '2015-W10', max: '2016-W25');
 
@@ -62,7 +62,7 @@ class WeekValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testTooLow()
+    public function testTooLow(): void
     {
         $constraint = new Week(min: '2015-W10');
 
@@ -74,7 +74,7 @@ class WeekValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testTooHigh()
+    public function testTooHigh(): void
     {
         $constraint = new Week(max: '2016-W25');
 
@@ -86,7 +86,7 @@ class WeekValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testWithNewLine()
+    public function testWithNewLine(): void
     {
         $this->validator->validate("2015-W10\n", new Week());
 
@@ -96,7 +96,7 @@ class WeekValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideInvalidValues')]
-    public function testInvalidValues(string $value)
+    public function testInvalidValues(string $value): void
     {
         $this->validator->validate($value, new Week());
 
@@ -106,7 +106,7 @@ class WeekValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('provideInvalidTypes')]
-    public function testNonStringValues(mixed $value)
+    public function testNonStringValues(mixed $value): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessageMatches('/Expected argument of type "string", ".*" given/');

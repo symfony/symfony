@@ -20,7 +20,7 @@ class CollectionTypeValidatorExtensionTest extends BaseValidatorExtensionTestCas
         return $this->factory->create(CollectionType::class, null, $options);
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 

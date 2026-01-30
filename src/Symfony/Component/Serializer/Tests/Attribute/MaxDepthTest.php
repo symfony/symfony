@@ -23,14 +23,14 @@ class MaxDepthTest extends TestCase
 {
     #[TestWith([-4])]
     #[TestWith([0])]
-    public function testNotAnIntMaxDepthParameter(int $value)
+    public function testNotAnIntMaxDepthParameter(int $value): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Parameter given to "Symfony\Component\Serializer\Attribute\MaxDepth" must be a positive integer.');
         new MaxDepth($value);
     }
 
-    public function testMaxDepthParameters()
+    public function testMaxDepthParameters(): void
     {
         $maxDepth = new MaxDepth(3);
         $this->assertEquals(3, $maxDepth->maxDepth);

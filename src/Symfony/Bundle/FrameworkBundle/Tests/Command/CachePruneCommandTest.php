@@ -23,19 +23,19 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CachePruneCommandTest extends TestCase
 {
-    public function testCommandWithPools()
+    public function testCommandWithPools(): void
     {
         $tester = $this->getCommandTester($this->getKernel(), $this->getRewindableGenerator());
         $tester->execute([]);
     }
 
-    public function testCommandWithNoPools()
+    public function testCommandWithNoPools(): void
     {
         $tester = $this->getCommandTester($this->getKernel(), $this->getEmptyRewindableGenerator());
         $tester->execute([]);
     }
 
-    public function testCommandFailsOnPruneError()
+    public function testCommandFailsOnPruneError(): void
     {
         $failedPool = $this->createMock(PruneableInterface::class);
         $failedPool->expects($this->once())->method('prune')->willReturn(false);
@@ -51,7 +51,7 @@ class CachePruneCommandTest extends TestCase
         $this->assertStringContainsString('[ERROR] Cache pool "failed_pool" could not be pruned.', $tester->getDisplay());
     }
 
-    public function testCommandContinuesOnFailure()
+    public function testCommandContinuesOnFailure(): void
     {
         $failedPool = $this->createMock(PruneableInterface::class);
         $failedPool->expects($this->once())->method('prune')->willReturn(false);

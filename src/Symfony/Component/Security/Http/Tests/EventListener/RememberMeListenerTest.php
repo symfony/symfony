@@ -42,7 +42,7 @@ class RememberMeListenerTest extends TestCase
         $this->response = new Response();
     }
 
-    public function testSuccessfulLoginWithoutSupportingAuthenticator()
+    public function testSuccessfulLoginWithoutSupportingAuthenticator(): void
     {
         $this->rememberMeHandler->expects($this->never())->method('createRememberMeCookie');
 
@@ -50,7 +50,7 @@ class RememberMeListenerTest extends TestCase
         $this->listener->onSuccessfulLogin($event);
     }
 
-    public function testSuccessfulLoginWithRememberMeDisabled()
+    public function testSuccessfulLoginWithRememberMeDisabled(): void
     {
         $this->rememberMeHandler->expects($this->never())->method('createRememberMeCookie');
 
@@ -58,7 +58,7 @@ class RememberMeListenerTest extends TestCase
         $this->listener->onSuccessfulLogin($event);
     }
 
-    public function testCredentialsInvalid()
+    public function testCredentialsInvalid(): void
     {
         $this->rememberMeHandler->expects($this->once())->method('clearRememberMeCookie');
 

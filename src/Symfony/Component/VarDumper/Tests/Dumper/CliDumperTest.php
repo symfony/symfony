@@ -32,7 +32,7 @@ class CliDumperTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testGet()
+    public function testGet(): void
     {
         require __DIR__.'/../Fixtures/dumb-var.php';
 
@@ -118,7 +118,7 @@ class CliDumperTest extends TestCase
     }
 
     #[DataProvider('provideDumpWithCommaFlagTests')]
-    public function testDumpWithCommaFlag($expected, $flags)
+    public function testDumpWithCommaFlag($expected, $flags): void
     {
         $dumper = new CliDumper(null, null, $flags);
         $dumper->setColors(false);
@@ -135,7 +135,7 @@ class CliDumperTest extends TestCase
         $this->assertSame($expected, $dump);
     }
 
-    public function testDumpWithCommaFlagsAndExceptionCodeExcerpt()
+    public function testDumpWithCommaFlagsAndExceptionCodeExcerpt(): void
     {
         $dumper = new CliDumper(null, null, CliDumper::DUMP_TRAILING_COMMA);
         $dumper->setColors(false);
@@ -208,7 +208,7 @@ class CliDumperTest extends TestCase
         yield [$expected, CliDumper::DUMP_TRAILING_COMMA];
     }
 
-    public function testJsonCast()
+    public function testJsonCast(): void
     {
         $var = (array) json_decode('{"0":{},"1":null}');
         foreach ($var as &$v) {
@@ -229,7 +229,7 @@ class CliDumperTest extends TestCase
         );
     }
 
-    public function testObjectCast()
+    public function testObjectCast(): void
     {
         $var = (object) [1 => 1];
         $var->{1} = 2;
@@ -244,7 +244,7 @@ class CliDumperTest extends TestCase
         );
     }
 
-    public function testClosedResource()
+    public function testClosedResource(): void
     {
         $var = fopen(__FILE__, 'r');
         fclose($var);
@@ -268,7 +268,7 @@ class CliDumperTest extends TestCase
         );
     }
 
-    public function testFlags()
+    public function testFlags(): void
     {
         putenv('DUMP_LIGHT_ARRAY=1');
         putenv('DUMP_STRING_LENGTH=1');
@@ -299,7 +299,7 @@ class CliDumperTest extends TestCase
         putenv('DUMP_STRING_LENGTH=');
     }
 
-    public function testVirtualProperties()
+    public function testVirtualProperties(): void
     {
         $this->assertDumpEquals(<<<EODUMP
             Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty {
@@ -313,7 +313,7 @@ class CliDumperTest extends TestCase
         );
     }
 
-    public function testThrowingCaster()
+    public function testThrowingCaster(): void
     {
         $out = fopen('php://memory', 'r+');
 
@@ -375,7 +375,7 @@ class CliDumperTest extends TestCase
         );
     }
 
-    public function testRefsInProperties()
+    public function testRefsInProperties(): void
     {
         $var = (object) ['foo' => 'foo'];
         $var->bar = &$var->foo;
@@ -399,7 +399,7 @@ class CliDumperTest extends TestCase
         );
     }
 
-    public function testIncompleteClass()
+    public function testIncompleteClass(): void
     {
         $unserializeCallbackHandler = ini_set('unserialize_callback_func', null);
         $var = unserialize('O:8:"Foo\Buzz":0:{}');
@@ -443,14 +443,14 @@ class CliDumperTest extends TestCase
     }
 
     #[DataProvider('provideDumpArrayWithColor')]
-    public function testDumpArrayWithColor($value, $flags, $expectedOut)
+    public function testDumpArrayWithColor($value, $flags, $expectedOut): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Windows console does not support coloration');
         }
 
         $out = '';
-        $dumper = new CliDumper(static function ($line, $depth) use (&$out) {
+        $dumper = new CliDumper(static function ($line, $depth) use (&$out): void {
             if ($depth >= 0) {
                 $out .= str_repeat('  ', $depth).$line."\n";
             }
@@ -462,7 +462,7 @@ class CliDumperTest extends TestCase
         $this->assertSame($expectedOut, $out);
     }
 
-    public function testCollapse()
+    public function testCollapse(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('This test cannot be run on Windows.');
@@ -503,7 +503,7 @@ class CliDumperTest extends TestCase
         );
     }
 
-    public function testFileLinkFormat()
+    public function testFileLinkFormat(): void
     {
         $data = new Data([
             [

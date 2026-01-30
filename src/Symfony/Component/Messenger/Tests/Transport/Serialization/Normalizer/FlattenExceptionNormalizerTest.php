@@ -29,7 +29,7 @@ class FlattenExceptionNormalizerTest extends TestCase
         $this->normalizer = new FlattenExceptionNormalizer();
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsNormalization(new FlattenException(), null, $this->getMessengerContext()));
         $this->assertFalse($this->normalizer->supportsNormalization(new FlattenException()));
@@ -37,7 +37,7 @@ class FlattenExceptionNormalizerTest extends TestCase
     }
 
     #[DataProvider('provideFlattenException')]
-    public function testNormalize(FlattenException $exception)
+    public function testNormalize(FlattenException $exception): void
     {
         $normalized = $this->normalizer->normalize($exception, null, $this->getMessengerContext());
         $previous = null === $exception->getPrevious() ? null : $this->normalizer->normalize($exception->getPrevious());
@@ -68,14 +68,14 @@ class FlattenExceptionNormalizerTest extends TestCase
         ];
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsDenormalization(null, FlattenException::class));
         $this->assertTrue($this->normalizer->supportsDenormalization(null, FlattenException::class, null, $this->getMessengerContext()));
         $this->assertFalse($this->normalizer->supportsDenormalization(null, \stdClass::class));
     }
 
-    public function testDenormalizeValidData()
+    public function testDenormalizeValidData(): void
     {
         $normalized = [
             'message' => 'Something went foobar.',

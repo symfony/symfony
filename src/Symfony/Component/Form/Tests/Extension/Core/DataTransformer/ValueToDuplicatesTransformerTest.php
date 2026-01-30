@@ -24,7 +24,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
         $this->transformer = new ValueToDuplicatesTransformer(['a', 'b', 'c']);
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $output = [
             'a' => 'Foo',
@@ -35,7 +35,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
         $this->assertSame($output, $this->transformer->transform('Foo'));
     }
 
-    public function testTransformEmpty()
+    public function testTransformEmpty(): void
     {
         $output = [
             'a' => null,
@@ -46,7 +46,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
         $this->assertSame($output, $this->transformer->transform(null));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $input = [
             'a' => 'Foo',
@@ -57,7 +57,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
         $this->assertSame('Foo', $this->transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformCompletelyEmpty()
+    public function testReverseTransformCompletelyEmpty(): void
     {
         $input = [
             'a' => '',
@@ -68,7 +68,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
         $this->assertSame('', $this->transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformCompletelyNull()
+    public function testReverseTransformCompletelyNull(): void
     {
         $input = [
             'a' => null,
@@ -79,7 +79,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
         $this->assertNull($this->transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformEmptyArray()
+    public function testReverseTransformEmptyArray(): void
     {
         $input = [
             'a' => [],
@@ -90,7 +90,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
         $this->assertNull($this->transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformZeroString()
+    public function testReverseTransformZeroString(): void
     {
         $input = [
             'a' => '0',
@@ -101,7 +101,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
         $this->assertSame('0', $this->transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformPartiallyNull()
+    public function testReverseTransformPartiallyNull(): void
     {
         $this->expectException(TransformationFailedException::class);
         $input = [
@@ -113,7 +113,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
         $this->transformer->reverseTransform($input);
     }
 
-    public function testReverseTransformDifferences()
+    public function testReverseTransformDifferences(): void
     {
         $this->expectException(TransformationFailedException::class);
         $input = [
@@ -125,7 +125,7 @@ class ValueToDuplicatesTransformerTest extends TestCase
         $this->transformer->reverseTransform($input);
     }
 
-    public function testReverseTransformRequiresArray()
+    public function testReverseTransformRequiresArray(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->transformer->reverseTransform('12345');

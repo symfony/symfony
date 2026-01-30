@@ -31,7 +31,7 @@ class RedisTraitTest extends TestCase
     }
 
     #[DataProvider('provideCreateConnection')]
-    public function testCreateConnection(string $dsn, string $expectedClass)
+    public function testCreateConnection(string $dsn, string $expectedClass): void
     {
         if (!class_exists($expectedClass)) {
             self::markTestSkipped(\sprintf('The "%s" class is required.', $expectedClass));
@@ -48,7 +48,7 @@ class RedisTraitTest extends TestCase
         self::assertInstanceOf($expectedClass, $connection);
     }
 
-    public function testUrlDecodeParameters()
+    public function testUrlDecodeParameters(): void
     {
         if (!getenv('REDIS_AUTHENTICATED_HOST')) {
             self::markTestSkipped('REDIS_AUTHENTICATED_HOST env var is not defined.');
@@ -94,7 +94,7 @@ class RedisTraitTest extends TestCase
      * @see https://github.com/phpredis/phpredis/issues/1920
      */
     #[Group('integration')]
-    public function testPconnectSelectsCorrectDatabase()
+    public function testPconnectSelectsCorrectDatabase(): void
     {
         if (!\ini_get('redis.pconnect.pooling_enabled')) {
             self::markTestSkipped('The bug only occurs when pooling is enabled.');
@@ -136,7 +136,7 @@ class RedisTraitTest extends TestCase
     }
 
     #[DataProvider('provideDbIndexDsnParameter')]
-    public function testDbIndexDsnParameter(string $dsn, int $expectedDb)
+    public function testDbIndexDsnParameter(string $dsn, int $expectedDb): void
     {
         if (!getenv('REDIS_AUTHENTICATED_HOST')) {
             self::markTestSkipped('REDIS_AUTHENTICATED_HOST env var is not defined.');
@@ -180,7 +180,7 @@ class RedisTraitTest extends TestCase
     }
 
     #[DataProvider('provideInvalidDbIndexDsnParameter')]
-    public function testInvalidDbIndexDsnParameter(string $dsn)
+    public function testInvalidDbIndexDsnParameter(string $dsn): void
     {
         if (!getenv('REDIS_AUTHENTICATED_HOST')) {
             self::markTestSkipped('REDIS_AUTHENTICATED_HOST env var is not defined.');

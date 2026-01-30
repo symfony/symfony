@@ -31,7 +31,7 @@ class EarlyExpirationHandlerTest extends TestCase
     }
 
     #[Group('time-sensitive')]
-    public function testHandle()
+    public function testHandle(): void
     {
         $pool = new FilesystemAdapter();
         $item = $pool->getItem('foo');

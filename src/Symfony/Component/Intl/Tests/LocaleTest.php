@@ -42,12 +42,12 @@ class LocaleTest extends TestCase
     }
 
     #[DataProvider('provideGetFallbackTests')]
-    public function testGetFallback($expected, $locale)
+    public function testGetFallback($expected, $locale): void
     {
         $this->assertSame($expected, Locale::getFallback($locale));
     }
 
-    public function testNoDefaultFallback()
+    public function testNoDefaultFallback(): void
     {
         $prev = Locale::getDefaultFallback();
         Locale::setDefaultFallback(null);
@@ -59,7 +59,7 @@ class LocaleTest extends TestCase
         Locale::setDefaultFallback($prev);
     }
 
-    public function testDefaultRootFallback()
+    public function testDefaultRootFallback(): void
     {
         $prev = Locale::getDefaultFallback();
         Locale::setDefaultFallback('root');
@@ -72,7 +72,7 @@ class LocaleTest extends TestCase
     }
 
     #[RequiresFunction('locale_parse')]
-    public function testLongLocaleFallback()
+    public function testLongLocaleFallback(): void
     {
         $locale = 'LC_TYPE=fr_FR.UTF-8;LC_NUMERIC=C;LC_TIME=fr_FR.UTF-8;LC_COLLATE=fr_FR.UTF-8;'.
             'LC_MONETARY=fr_FR.UTF-8;LC_MESSAGES=fr_FR.UTF-8;LC_PAPER=fr_FR.UTF-8;LC_NAME=fr_FR.UTF-8;'.

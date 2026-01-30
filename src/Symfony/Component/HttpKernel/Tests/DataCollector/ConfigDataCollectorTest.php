@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class ConfigDataCollectorTest extends TestCase
 {
-    public function testCollect()
+    public function testCollect(): void
     {
         $kernel = new KernelForTest('test', true);
         $c = new ConfigDataCollector();
@@ -50,7 +50,7 @@ class ConfigDataCollectorTest extends TestCase
         $this->assertSame($eol, $c->getSymfonyEol());
     }
 
-    public function testCollectWithoutKernel()
+    public function testCollectWithoutKernel(): void
     {
         $c = new ConfigDataCollector();
         $c->collect(new Request(), new Response());

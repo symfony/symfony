@@ -16,7 +16,7 @@ use Symfony\Component\Mime\Encoder\QpContentEncoder;
 
 class QpContentEncoderTest extends TestCase
 {
-    public function testReplaceLastChar()
+    public function testReplaceLastChar(): void
     {
         $encoder = new QpContentEncoder();
 

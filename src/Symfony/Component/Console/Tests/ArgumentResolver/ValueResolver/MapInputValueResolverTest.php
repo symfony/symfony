@@ -27,7 +27,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class MapInputValueResolverTest extends TestCase
 {
-    public function testResolveMapInput()
+    public function testResolveMapInput(): void
     {
         $resolver = new MapInputValueResolver(new BuiltinTypeValueResolver(), new BackedEnumValueResolver(), new DateTimeValueResolver());
 
@@ -40,7 +40,7 @@ class MapInputValueResolverTest extends TestCase
             public function __invoke(
                 #[MapInput]
                 DummyInput $input,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -55,7 +55,7 @@ class MapInputValueResolverTest extends TestCase
         $this->assertSame('john@example.com', $result[0]->email);
     }
 
-    public function testDoesNotResolveWithoutAttribute()
+    public function testDoesNotResolveWithoutAttribute(): void
     {
         $resolver = new MapInputValueResolver(new BuiltinTypeValueResolver(), new BackedEnumValueResolver(), new DateTimeValueResolver());
 
@@ -73,7 +73,7 @@ class MapInputValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testDoesNotResolveBuiltinTypes()
+    public function testDoesNotResolveBuiltinTypes(): void
     {
         $resolver = new MapInputValueResolver(new BuiltinTypeValueResolver(), new BackedEnumValueResolver(), new DateTimeValueResolver());
 
@@ -91,7 +91,7 @@ class MapInputValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testResolvesDateTimeAndBackedEnum()
+    public function testResolvesDateTimeAndBackedEnum(): void
     {
         $resolver = new MapInputValueResolver(new BuiltinTypeValueResolver(), new BackedEnumValueResolver(), new DateTimeValueResolver());
 
@@ -107,7 +107,7 @@ class MapInputValueResolverTest extends TestCase
             public function __invoke(
                 #[MapInput]
                 DummyInputWithDateTimeAndEnum $input,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');

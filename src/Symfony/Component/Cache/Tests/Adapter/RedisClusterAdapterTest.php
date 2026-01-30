@@ -48,7 +48,7 @@ class RedisClusterAdapterTest extends AbstractRedisAdapterTestCase
     }
 
     #[DataProvider('provideFailedCreateConnection')]
-    public function testFailedCreateConnection(string $dsn)
+    public function testFailedCreateConnection(string $dsn): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Redis connection ');

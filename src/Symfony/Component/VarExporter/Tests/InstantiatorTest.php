@@ -19,7 +19,7 @@ use Symfony\Component\VarExporter\Instantiator;
 
 class InstantiatorTest extends TestCase
 {
-    public function testNotFoundClass()
+    public function testNotFoundClass(): void
     {
         $this->expectException(ClassNotFoundException::class);
         $this->expectExceptionMessage('Class "SomeNotExistingClass" not found.');
@@ -27,7 +27,7 @@ class InstantiatorTest extends TestCase
     }
 
     #[DataProvider('provideFailingInstantiation')]
-    public function testFailingInstantiation(string $class)
+    public function testFailingInstantiation(string $class): void
     {
         $this->expectException(NotInstantiableTypeException::class);
         $this->expectExceptionMessageMatches('/Type ".*" is not instantiable\./');
@@ -43,7 +43,7 @@ class InstantiatorTest extends TestCase
         yield ['SplFileInfo'];
     }
 
-    public function testInstantiate()
+    public function testInstantiate(): void
     {
         $this->assertEquals((object) ['p' => 123], Instantiator::instantiate('stdClass', ['p' => 123]));
         $this->assertEquals((object) ['p' => 123], Instantiator::instantiate('STDcLASS', ['p' => 123]));
@@ -72,7 +72,7 @@ class InstantiatorTest extends TestCase
         $this->assertSame([234], $e->getTrace());
     }
 
-    public function testPhpReferences()
+    public function testPhpReferences(): void
     {
         $properties = ['p1' => 1];
         $properties['p2'] = &$properties['p1'];

@@ -21,7 +21,7 @@ class MemcachedCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testCastMemcachedWithDefaultOptions()
+    public function testCastMemcachedWithDefaultOptions(): void
     {
         if (!class_exists(\Memcached::class)) {
             $this->markTestSkipped('Memcached not available');
@@ -51,7 +51,7 @@ class MemcachedCasterTest extends TestCase
         $this->assertDumpEquals($expected, $var);
     }
 
-    public function testCastMemcachedWithCustomOptions()
+    public function testCastMemcachedWithCustomOptions(): void
     {
         if (!class_exists(\Memcached::class)) {
             $this->markTestSkipped('Memcached not available');

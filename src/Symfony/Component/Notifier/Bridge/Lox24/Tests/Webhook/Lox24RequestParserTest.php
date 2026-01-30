@@ -30,7 +30,7 @@ class Lox24RequestParserTest extends TestCase
         $this->parser = new Lox24RequestParser();
     }
 
-    public function testMissingBasicPayloadStructure()
+    public function testMissingBasicPayloadStructure(): void
     {
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('The required fields "id", "data" are missing from the payload.');
@@ -39,7 +39,7 @@ class Lox24RequestParserTest extends TestCase
         $this->parser->parse($request, '');
     }
 
-    public function testSmsDeliveryMissingMsgId()
+    public function testSmsDeliveryMissingMsgId(): void
     {
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('The required field "id" is missing from the delivery event payload.');
@@ -52,7 +52,7 @@ class Lox24RequestParserTest extends TestCase
         $this->parser->parse($request, '');
     }
 
-    public function testSmsDeliveryMissingBothCodes()
+    public function testSmsDeliveryMissingBothCodes(): void
     {
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('The required field "status_code" or "dlr_code" is missing from the delivery event payload.');
@@ -65,7 +65,7 @@ class Lox24RequestParserTest extends TestCase
         $this->parser->parse($request, '');
     }
 
-    public function testSmsDeliveryStatusCode100()
+    public function testSmsDeliveryStatusCode100(): void
     {
         $payload = [
             'id' => 'webhook-id',
@@ -85,7 +85,7 @@ class Lox24RequestParserTest extends TestCase
         $this->assertSame($payload, $event->getPayload());
     }
 
-    public function testSmsDeliveryStatusCode0()
+    public function testSmsDeliveryStatusCode0(): void
     {
         $request = $this->getRequest([
             'id' => 'webhook-id',
@@ -100,7 +100,7 @@ class Lox24RequestParserTest extends TestCase
         $this->assertNull($event);
     }
 
-    public function testSmsDeliveryWithDlrCodeDelivered()
+    public function testSmsDeliveryWithDlrCodeDelivered(): void
     {
         $payload = [
             'id' => 'webhook-id',
@@ -121,7 +121,7 @@ class Lox24RequestParserTest extends TestCase
         $this->assertSame($payload, $event->getPayload());
     }
 
-    public function testSmsDeliveryWithDlrCodeFailed()
+    public function testSmsDeliveryWithDlrCodeFailed(): void
     {
         $payload = [
             'id' => 'webhook-id',
@@ -140,7 +140,7 @@ class Lox24RequestParserTest extends TestCase
         $this->assertSame(SmsEvent::FAILED, $event->getName());
     }
 
-    public function testSmsDeliveryWithDlrCodePending()
+    public function testSmsDeliveryWithDlrCodePending(): void
     {
         $request = $this->getRequest([
             'id' => 'webhook-id',
@@ -155,7 +155,7 @@ class Lox24RequestParserTest extends TestCase
         $this->assertNull($event);
     }
 
-    public function testSmsDeliveryDryrun()
+    public function testSmsDeliveryDryrun(): void
     {
         $payload = [
             'id' => 'webhook-id',
@@ -174,7 +174,7 @@ class Lox24RequestParserTest extends TestCase
         $this->assertSame(SmsEvent::DELIVERED, $event->getName());
     }
 
-    public function testMissingIdField()
+    public function testMissingIdField(): void
     {
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('The required fields "id" are missing from the payload.');
@@ -186,7 +186,7 @@ class Lox24RequestParserTest extends TestCase
         $this->parser->parse($request, '');
     }
 
-    public function testMissingNameField()
+    public function testMissingNameField(): void
     {
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('The required fields "name" are missing from the payload.');
@@ -198,7 +198,7 @@ class Lox24RequestParserTest extends TestCase
         $this->parser->parse($request, '');
     }
 
-    public function testMissingDataField()
+    public function testMissingDataField(): void
     {
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('The required fields "data" are missing from the payload.');
@@ -210,7 +210,7 @@ class Lox24RequestParserTest extends TestCase
         $this->parser->parse($request, '');
     }
 
-    public function testInvalidDataFieldNotArray()
+    public function testInvalidDataFieldNotArray(): void
     {
         $this->expectException(RejectWebhookException::class);
         $this->expectExceptionMessage('The "data" field must be an array.');
@@ -223,7 +223,7 @@ class Lox24RequestParserTest extends TestCase
         $this->parser->parse($request, '');
     }
 
-    public function testRemoteEventForUnknownEventType()
+    public function testRemoteEventForUnknownEventType(): void
     {
         $payload = [
             'id' => 'webhook-id',
@@ -240,7 +240,7 @@ class Lox24RequestParserTest extends TestCase
         $this->assertSame($payload, $event->getPayload());
     }
 
-    public function testSmsDeliveryStatusCodeFailed()
+    public function testSmsDeliveryStatusCodeFailed(): void
     {
         $payload = [
             'id' => 'webhook-id',
@@ -260,7 +260,7 @@ class Lox24RequestParserTest extends TestCase
         $this->assertSame($payload, $event->getPayload());
     }
 
-    public function testSmsDeliveryWithDlrCode0()
+    public function testSmsDeliveryWithDlrCode0(): void
     {
         $request = $this->getRequest([
             'id' => 'webhook-id',
@@ -275,7 +275,7 @@ class Lox24RequestParserTest extends TestCase
         $this->assertNull($event);
     }
 
-    public function testSmsDeliveryWithDlrCode4()
+    public function testSmsDeliveryWithDlrCode4(): void
     {
         $request = $this->getRequest([
             'id' => 'webhook-id',
@@ -290,7 +290,7 @@ class Lox24RequestParserTest extends TestCase
         $this->assertNull($event);
     }
 
-    public function testSmsDeliveryDlrCodePriorityOverStatusCode()
+    public function testSmsDeliveryDlrCodePriorityOverStatusCode(): void
     {
         $payload = [
             'id' => 'webhook-id',

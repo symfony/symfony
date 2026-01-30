@@ -16,20 +16,20 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 
 class RedeliveryStampTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $stamp = new RedeliveryStamp(10);
         $this->assertSame(10, $stamp->getRetryCount());
         $this->assertInstanceOf(\DateTimeInterface::class, $stamp->getRedeliveredAt());
     }
 
-    public function testSerialization()
+    public function testSerialization(): void
     {
         $stamp = new RedeliveryStamp(10, \DateTimeImmutable::createFromFormat(\DateTimeInterface::ISO8601, '2005-08-15T15:52:01+0000'));
         $this->assertSame('2005-08-15T15:52:01+0000', $stamp->getRedeliveredAt()->format(\DateTimeInterface::ISO8601));
     }
 
-    public function testRedeliveryAt()
+    public function testRedeliveryAt(): void
     {
         $redeliveredAt = new \DateTimeImmutable('+2minutes');
         $stamp = new RedeliveryStamp(10, $redeliveredAt);

@@ -19,7 +19,7 @@ use Symfony\Component\Cache\Marshaller\DeflateMarshaller;
 #[RequiresPhpExtension('zlib')]
 class DeflateMarshallerTest extends TestCase
 {
-    public function testMarshall()
+    public function testMarshall(): void
     {
         $defaultMarshaller = new DefaultMarshaller();
         $deflateMarshaller = new DeflateMarshaller($defaultMarshaller);
@@ -35,7 +35,7 @@ class DeflateMarshallerTest extends TestCase
         $this->assertSame($defaultResult, $deflateResult);
     }
 
-    public function testUnmarshall()
+    public function testUnmarshall(): void
     {
         $defaultMarshaller = new DefaultMarshaller();
         $deflateMarshaller = new DeflateMarshaller($defaultMarshaller);

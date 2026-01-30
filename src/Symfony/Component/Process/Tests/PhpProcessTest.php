@@ -18,7 +18,7 @@ use Symfony\Component\Process\PhpProcess;
 
 class PhpProcessTest extends TestCase
 {
-    public function testNonBlockingWorks()
+    public function testNonBlockingWorks(): void
     {
         $expected = 'hello world!';
         $process = new PhpProcess(<<<PHP
@@ -30,7 +30,7 @@ class PhpProcessTest extends TestCase
         $this->assertEquals($expected, $process->getOutput());
     }
 
-    public function testCommandLine()
+    public function testCommandLine(): void
     {
         $process = new PhpProcess(<<<'PHP'
             <?php echo phpversion().PHP_SAPI;
@@ -48,7 +48,7 @@ class PhpProcessTest extends TestCase
         $this->assertSame(\PHP_VERSION.\PHP_SAPI, $process->getOutput());
     }
 
-    public function testPassingPhpExplicitly()
+    public function testPassingPhpExplicitly(): void
     {
         $finder = new PhpExecutableFinder();
         $php = array_merge([$finder->find(false)], $finder->findArguments());
@@ -62,7 +62,7 @@ class PhpProcessTest extends TestCase
         $this->assertEquals($expected, $process->getOutput());
     }
 
-    public function testProcessCannotBeCreatedUsingFromShellCommandLine()
+    public function testProcessCannotBeCreatedUsingFromShellCommandLine(): void
     {
         static::expectException(LogicException::class);
         static::expectExceptionMessage('The "Symfony\Component\Process\PhpProcess::fromShellCommandline()" method cannot be called when using "Symfony\Component\Process\PhpProcess".');

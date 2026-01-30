@@ -32,21 +32,21 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->factory = new PropertyAccessDecorator(new DefaultChoiceListFactory());
     }
 
-    public function testCreateFromChoicesPropertyPath()
+    public function testCreateFromChoicesPropertyPath(): void
     {
         $object = (object) ['property' => 'value'];
 
         $this->assertSame(['value' => $object], $this->factory->createListFromChoices([$object], 'property')->getChoices());
     }
 
-    public function testCreateFromChoicesPropertyPathInstance()
+    public function testCreateFromChoicesPropertyPathInstance(): void
     {
         $object = (object) ['property' => 'value'];
 
         $this->assertSame(['value' => $object], $this->factory->createListFromChoices([$object], new PropertyPath('property'))->getChoices());
     }
 
-    public function testCreateFromChoicesFilterPropertyPath()
+    public function testCreateFromChoicesFilterPropertyPath(): void
     {
         $object1 = (object) ['property' => 'value 1', 'filter' => false];
         $object2 = (object) ['property' => 'value 2', 'filter' => true];
@@ -58,7 +58,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->assertSame(['value 2' => $object2], $this->factory->createListFromChoices($choices, 'property', 'filter')->getChoices());
     }
 
-    public function testCreateFromChoicesFilterPropertyPathInstance()
+    public function testCreateFromChoicesFilterPropertyPathInstance(): void
     {
         $object1 = (object) ['property' => 'value 1', 'filter' => false];
         $object2 = (object) ['property' => 'value 2', 'filter' => true];
@@ -73,7 +73,7 @@ class PropertyAccessDecoratorTest extends TestCase
         );
     }
 
-    public function testCreateFromLoaderPropertyPath()
+    public function testCreateFromLoaderPropertyPath(): void
     {
         $object = (object) ['property' => 'value'];
         $loader = new ArrayChoiceLoader([$object]);
@@ -81,7 +81,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->assertSame(['value' => $object], $this->factory->createListFromLoader($loader, 'property')->getChoices());
     }
 
-    public function testCreateFromLoaderFilterPropertyPath()
+    public function testCreateFromLoaderFilterPropertyPath(): void
     {
         $object1 = (object) ['property' => 'value 1', 'filter' => false];
         $object2 = (object) ['property' => 'value 2', 'filter' => true];
@@ -95,7 +95,7 @@ class PropertyAccessDecoratorTest extends TestCase
     }
 
     // https://github.com/symfony/symfony/issues/5494
-    public function testCreateFromChoicesAssumeNullIfValuePropertyPathUnreadable()
+    public function testCreateFromChoicesAssumeNullIfValuePropertyPathUnreadable(): void
     {
         $choices = [null];
 
@@ -103,14 +103,14 @@ class PropertyAccessDecoratorTest extends TestCase
     }
 
     // https://github.com/symfony/symfony/issues/5494
-    public function testCreateFromChoiceLoaderAssumeNullIfValuePropertyPathUnreadable()
+    public function testCreateFromChoiceLoaderAssumeNullIfValuePropertyPathUnreadable(): void
     {
         $loader = new ArrayChoiceLoader([null]);
 
         $this->assertSame(['' => null], $this->factory->createListFromLoader($loader, 'property')->getChoices());
     }
 
-    public function testCreateFromLoaderPropertyPathInstance()
+    public function testCreateFromLoaderPropertyPathInstance(): void
     {
         $object = (object) ['property' => 'value'];
         $loader = new ArrayChoiceLoader([$object]);
@@ -118,7 +118,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->assertSame(['value' => $object], $this->factory->createListFromLoader($loader, new PropertyPath('property'))->getChoices());
     }
 
-    public function testCreateViewPreferredChoicesAsPropertyPath()
+    public function testCreateViewPreferredChoicesAsPropertyPath(): void
     {
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
@@ -127,7 +127,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->assertEquals([new ChoiceView($object, '0', '0')], $this->factory->createView($list, 'preferred_choice')->preferredChoices);
     }
 
-    public function testCreateViewPreferredChoicesAsPropertyPathInstance()
+    public function testCreateViewPreferredChoicesAsPropertyPathInstance(): void
     {
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
@@ -137,7 +137,7 @@ class PropertyAccessDecoratorTest extends TestCase
     }
 
     // https://github.com/symfony/symfony/issues/5494
-    public function testCreateViewAssumeNullIfPreferredChoicesPropertyPathUnreadable()
+    public function testCreateViewAssumeNullIfPreferredChoicesPropertyPathUnreadable(): void
     {
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
@@ -146,7 +146,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->assertEquals([], $this->factory->createView($list, new PropertyPath('preferred_choice.property'))->preferredChoices);
     }
 
-    public function testCreateViewLabelsAsPropertyPath()
+    public function testCreateViewLabelsAsPropertyPath(): void
     {
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
@@ -154,7 +154,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->assertEquals([new ChoiceView($object, '0', 'foo')], $this->factory->createView($list, null, 'view_label')->choices);
     }
 
-    public function testCreateViewLabelsAsPropertyPathInstance()
+    public function testCreateViewLabelsAsPropertyPathInstance(): void
     {
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
@@ -162,7 +162,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->assertEquals([new ChoiceView($object, '0', 'foo')], $this->factory->createView($list, null, new PropertyPath('view_label'))->choices);
     }
 
-    public function testCreateViewIndicesAsPropertyPath()
+    public function testCreateViewIndicesAsPropertyPath(): void
     {
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
@@ -170,7 +170,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->assertEquals(['key' => new ChoiceView($object, '0', '0')], $this->factory->createView($list, null, null, 'view_index')->choices);
     }
 
-    public function testCreateViewIndicesAsPropertyPathInstance()
+    public function testCreateViewIndicesAsPropertyPathInstance(): void
     {
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
@@ -178,7 +178,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->assertEquals(['key' => new ChoiceView($object, '0', '0')], $this->factory->createView($list, null, null, new PropertyPath('view_index'))->choices);
     }
 
-    public function testCreateViewGroupsAsPropertyPath()
+    public function testCreateViewGroupsAsPropertyPath(): void
     {
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
@@ -186,7 +186,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->assertEquals(['bar' => new ChoiceGroupView('bar', [new ChoiceView($object, '0', '0')])], $this->factory->createView($list, null, null, null, 'view_group')->choices);
     }
 
-    public function testCreateViewGroupsAsPropertyPathInstance()
+    public function testCreateViewGroupsAsPropertyPathInstance(): void
     {
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
@@ -195,14 +195,14 @@ class PropertyAccessDecoratorTest extends TestCase
     }
 
     // https://github.com/symfony/symfony/issues/5494
-    public function testCreateViewAssumeNullIfGroupsPropertyPathUnreadable()
+    public function testCreateViewAssumeNullIfGroupsPropertyPathUnreadable(): void
     {
         $list = new ArrayChoiceList([]);
 
         $this->assertSame([], $this->factory->createView($list, null, null, null, 'group.name')->choices);
     }
 
-    public function testCreateViewAttrAsPropertyPath()
+    public function testCreateViewAttrAsPropertyPath(): void
     {
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);
@@ -210,7 +210,7 @@ class PropertyAccessDecoratorTest extends TestCase
         $this->assertEquals([new ChoiceView($object, '0', '0', ['baz' => 'foobar'])], $this->factory->createView($list, null, null, null, null, 'view_attribute')->choices);
     }
 
-    public function testCreateViewAttrAsPropertyPathInstance()
+    public function testCreateViewAttrAsPropertyPathInstance(): void
     {
         $object = (object) ['preferred_choice' => true, 'view_label' => 'foo', 'view_index' => 'key', 'view_group' => 'bar', 'view_attribute' => ['baz' => 'foobar']];
         $list = new ArrayChoiceList([$object]);

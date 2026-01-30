@@ -22,12 +22,12 @@ class ArrayUserProvider implements UserProviderInterface
     /** @var UserInterface[] */
     private array $users = [];
 
-    public function addUser(UserInterface $user)
+    public function addUser(UserInterface $user): void
     {
         $this->users[$user->getUserIdentifier()] = $user;
     }
 
-    public function setUser($username, UserInterface $user)
+    public function setUser($username, UserInterface $user): void
     {
         $this->users[$username] = $user;
     }

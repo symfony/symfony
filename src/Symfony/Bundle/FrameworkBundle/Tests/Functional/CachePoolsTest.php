@@ -22,14 +22,14 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CachePoolsTest extends AbstractWebTestCase
 {
-    public function testCachePools()
+    public function testCachePools(): void
     {
         $this->doTestCachePools([], AdapterInterface::class);
     }
 
     #[RequiresPhpExtension('redis')]
     #[Group('integration')]
-    public function testRedisCachePools()
+    public function testRedisCachePools(): void
     {
         $this->skipIfRedisUnavailable();
 
@@ -50,7 +50,7 @@ class CachePoolsTest extends AbstractWebTestCase
 
     #[RequiresPhpExtension('redis')]
     #[Group('integration')]
-    public function testRedisCustomCachePools()
+    public function testRedisCustomCachePools(): void
     {
         $this->skipIfRedisUnavailable();
 
@@ -64,7 +64,7 @@ class CachePoolsTest extends AbstractWebTestCase
         }
     }
 
-    private function doTestCachePools($options, $adapterClass)
+    private function doTestCachePools($options, $adapterClass): void
     {
         static::bootKernel($options);
         $container = static::getContainer();
@@ -113,7 +113,7 @@ class CachePoolsTest extends AbstractWebTestCase
         return parent::createKernel(['test_case' => 'CachePools'] + $options);
     }
 
-    private function skipIfRedisUnavailable()
+    private function skipIfRedisUnavailable(): void
     {
         try {
             (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));

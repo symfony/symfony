@@ -21,7 +21,7 @@ require __DIR__.'/autoload.php';
 return static function (Request $request, array $context) {
     echo class_exists(RequestRuntime::class, false) ? 'OK request runtime' : 'KO request runtime', "\n";
 
-    return new StreamedResponse(static function () use ($context) {
+    return new StreamedResponse(static function () use ($context): void {
         echo 'OK Request '.$context['SOME_VAR'], "\n";
         echo class_exists(ResponseRuntime::class, false) ? 'KO response runtime' : 'OK response runtime', "\n";
     });

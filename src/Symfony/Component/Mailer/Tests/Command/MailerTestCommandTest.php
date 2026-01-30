@@ -19,7 +19,7 @@ use Symfony\Component\Mime\Email;
 
 class MailerTestCommandTest extends TestCase
 {
-    public function testSendsEmail()
+    public function testSendsEmail(): void
     {
         $from = 'from@example.com';
         $to = 'to@example.com';
@@ -47,7 +47,7 @@ class MailerTestCommandTest extends TestCase
         ]);
     }
 
-    public function testUsesCustomTransport()
+    public function testUsesCustomTransport(): void
     {
         $transport = 'foobar';
 

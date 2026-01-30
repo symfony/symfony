@@ -41,7 +41,7 @@ class StreamerCacheWarmerTest extends TestCase
         }
     }
 
-    public function testWarmUp()
+    public function testWarmUp(): void
     {
         $this->cacheWarmer([
             ClassicDummy::class => ['object' => true, 'list' => true],

@@ -26,7 +26,7 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 class MessageGeneratorTest extends TestCase
 {
     #[DataProvider('messagesProvider')]
-    public function testGetMessagesFromSchedule(string $startTime, array $runs, array $schedule)
+    public function testGetMessagesFromSchedule(string $startTime, array $runs, array $schedule): void
     {
         $clock = new MockClock(self::makeDateTime($startTime));
 
@@ -50,7 +50,7 @@ class MessageGeneratorTest extends TestCase
     }
 
     #[DataProvider('messagesProvider')]
-    public function testGetMessagesFromScheduleProvider(string $startTime, array $runs, array $schedule)
+    public function testGetMessagesFromScheduleProvider(string $startTime, array $runs, array $schedule): void
     {
         $clock = new MockClock(self::makeDateTime($startTime));
 
@@ -85,7 +85,7 @@ class MessageGeneratorTest extends TestCase
         }
     }
 
-    public function testGetMessagesFromScheduleProviderWithRestart()
+    public function testGetMessagesFromScheduleProviderWithRestart(): void
     {
         $first = (object) ['id' => 'first'];
         $startTime = '22:12:00';
@@ -147,7 +147,7 @@ class MessageGeneratorTest extends TestCase
         $this->assertSame([$toAdd], iterator_to_array($scheduler->getMessages(), false));
     }
 
-    public function testYieldedContext()
+    public function testYieldedContext(): void
     {
         $clock = new MockClock(self::makeDateTime('22:12:00'));
 
@@ -175,7 +175,7 @@ class MessageGeneratorTest extends TestCase
         $this->assertEquals(self::makeDateTime('22:16:00'), $context->nextTriggerAt);
     }
 
-    public function testCheckpointSavedInBrokenLoop()
+    public function testCheckpointSavedInBrokenLoop(): void
     {
         $clock = new MockClock(self::makeDateTime('22:12:00'));
 
@@ -201,7 +201,7 @@ class MessageGeneratorTest extends TestCase
         $this->assertEquals(self::makeDateTime('22:13:00'), $checkpoint->time());
     }
 
-    public function testCheckpointSavedInBigBrokenLoop()
+    public function testCheckpointSavedInBigBrokenLoop(): void
     {
         $clock = new MockClock(self::makeDateTime('22:15:00'));
 
@@ -233,7 +233,7 @@ class MessageGeneratorTest extends TestCase
         $this->assertEquals(self::makeDateTime('22:23:00'), $checkpoint->time());
     }
 
-    public function testCheckpointSavedInBigBrokenLoopWithOnlyLastMissed()
+    public function testCheckpointSavedInBigBrokenLoopWithOnlyLastMissed(): void
     {
         $clock = new MockClock(self::makeDateTime('22:15:00'));
 

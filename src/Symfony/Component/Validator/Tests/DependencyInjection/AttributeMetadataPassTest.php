@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Exception\MappingException;
 
 class AttributeMetadataPassTest extends TestCase
 {
-    public function testProcessWithNoValidatorBuilder()
+    public function testProcessWithNoValidatorBuilder(): void
     {
         $container = new ContainerBuilder();
 
@@ -28,7 +28,7 @@ class AttributeMetadataPassTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testProcessWithValidatorBuilderButNoTaggedServices()
+    public function testProcessWithValidatorBuilderButNoTaggedServices(): void
     {
         $container = new ContainerBuilder();
         $container->register('validator.builder');
@@ -40,7 +40,7 @@ class AttributeMetadataPassTest extends TestCase
         $this->assertCount(0, $methodCalls);
     }
 
-    public function testProcessWithTaggedServices()
+    public function testProcessWithTaggedServices(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('user_entity.class', 'App\Entity\User');
@@ -72,7 +72,7 @@ class AttributeMetadataPassTest extends TestCase
         $this->assertEquals([$expectedClasses], $methodCalls[1][1]);
     }
 
-    public function testProcessWithForOptionAndMatchingMembers()
+    public function testProcessWithForOptionAndMatchingMembers(): void
     {
         $sourceClass = _AttrMeta_Source::class;
         $targetClass = _AttrMeta_Target::class;
@@ -91,7 +91,7 @@ class AttributeMetadataPassTest extends TestCase
         $this->assertSame([$targetClass => [$sourceClass]], $methodCalls[0][1][0]);
     }
 
-    public function testProcessWithForOptionAndMissingMemberThrows()
+    public function testProcessWithForOptionAndMissingMemberThrows(): void
     {
         $sourceClass = _AttrMeta_BadSource::class;
         $targetClass = _AttrMeta_Target::class;
@@ -111,7 +111,7 @@ class _AttrMeta_Source
 {
     public string $name;
 
-    public function getName()
+    public function getName(): void
     {
     }
 }
@@ -120,7 +120,7 @@ class _AttrMeta_Target
 {
     public string $name;
 
-    public function getName()
+    public function getName(): void
     {
     }
 }

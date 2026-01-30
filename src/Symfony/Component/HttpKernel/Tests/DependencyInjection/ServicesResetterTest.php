@@ -29,7 +29,7 @@ class ServicesResetterTest extends TestCase
         MultiResettableService::$resetSecondCounter = 0;
     }
 
-    public function testResetServices()
+    public function testResetServices(): void
     {
         $resetter = new ServicesResetter(new \ArrayIterator([
             'id1' => new ResettableService(),
@@ -49,7 +49,7 @@ class ServicesResetterTest extends TestCase
         $this->assertSame(1, MultiResettableService::$resetSecondCounter);
     }
 
-    public function testResetLazyServices()
+    public function testResetLazyServices(): void
     {
         $proxyCode = ProxyHelper::generateLazyProxy(new \ReflectionClass(LazyResettableService::class));
         eval('class LazyResettableServiceProxy'.$proxyCode);

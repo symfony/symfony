@@ -30,27 +30,27 @@ class IntlTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testIsExtensionLoadedChecksIfIntlExtensionIsLoaded()
+    public function testIsExtensionLoadedChecksIfIntlExtensionIsLoaded(): void
     {
         $this->assertTrue(Intl::isExtensionLoaded());
     }
 
-    public function testGetIcuVersionReadsTheVersionOfInstalledIcuLibrary()
+    public function testGetIcuVersionReadsTheVersionOfInstalledIcuLibrary(): void
     {
         $this->assertStringMatchesFormat('%d.%d', Intl::getIcuVersion());
     }
 
-    public function testGetIcuDataVersionReadsTheVersionOfInstalledIcuData()
+    public function testGetIcuDataVersionReadsTheVersionOfInstalledIcuData(): void
     {
         $this->assertStringMatchesFormat('%d.%d', Intl::getIcuDataVersion());
     }
 
-    public function testGetIcuStubVersionReadsTheVersionOfBundledStubs()
+    public function testGetIcuStubVersionReadsTheVersionOfBundledStubs(): void
     {
         $this->assertStringMatchesFormat('%d.%d', Intl::getIcuStubVersion());
     }
 
-    public function testGetDataDirectoryReturnsThePathToIcuData()
+    public function testGetDataDirectoryReturnsThePathToIcuData(): void
     {
         $this->assertDirectoryExists(Intl::getDataDirectory());
     }

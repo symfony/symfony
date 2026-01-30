@@ -18,7 +18,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 
 class DefaultValueResolverTest extends TestCase
 {
-    public function testResolveParameterWithDefaultValue()
+    public function testResolveParameterWithDefaultValue(): void
     {
         $resolver = new DefaultValueResolver();
         $input = new ArrayInput([]);
@@ -33,7 +33,7 @@ class DefaultValueResolverTest extends TestCase
         $this->assertSame(['default'], $result);
     }
 
-    public function testResolveNullableParameterWithoutDefaultValue()
+    public function testResolveNullableParameterWithoutDefaultValue(): void
     {
         $resolver = new DefaultValueResolver();
         $input = new ArrayInput([]);
@@ -48,7 +48,7 @@ class DefaultValueResolverTest extends TestCase
         $this->assertSame([null], $result);
     }
 
-    public function testResolveVariadicParameterReturnsEmpty()
+    public function testResolveVariadicParameterReturnsEmpty(): void
     {
         $resolver = new DefaultValueResolver();
         $input = new ArrayInput([]);
@@ -63,7 +63,7 @@ class DefaultValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testResolveRequiredParameterWithoutDefaultReturnsEmpty()
+    public function testResolveRequiredParameterWithoutDefaultReturnsEmpty(): void
     {
         $resolver = new DefaultValueResolver();
         $input = new ArrayInput([]);

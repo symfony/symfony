@@ -17,7 +17,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 class FileDumperTest extends TestCase
 {
-    public function testDump()
+    public function testDump(): void
     {
         $tempDir = sys_get_temp_dir();
 
@@ -32,7 +32,7 @@ class FileDumperTest extends TestCase
         @unlink($tempDir.'/messages.en.concrete');
     }
 
-    public function testDumpIntl()
+    public function testDumpIntl(): void
     {
         $tempDir = sys_get_temp_dir();
 
@@ -56,7 +56,7 @@ class FileDumperTest extends TestCase
         @unlink($tempDir.'/d2+intl-icu.en.concrete');
     }
 
-    public function testDumpCreatesNestedDirectoriesAndFile()
+    public function testDumpCreatesNestedDirectoriesAndFile(): void
     {
         $tempDir = sys_get_temp_dir();
         $translationsDir = $tempDir.'/test/translations';

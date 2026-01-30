@@ -17,7 +17,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class ProviderExceptionTest extends TestCase
 {
-    public function testExceptionWithDebugMessage()
+    public function testExceptionWithDebugMessage(): void
     {
         $mock = $this->createStub(ResponseInterface::class);
         $mock->method('getInfo')->willReturn('debug');
@@ -26,7 +26,7 @@ class ProviderExceptionTest extends TestCase
         $this->assertSame('debug', $exception->getDebug());
     }
 
-    public function testExceptionWithNullAsDebugMessage()
+    public function testExceptionWithNullAsDebugMessage(): void
     {
         $mock = $this->createStub(ResponseInterface::class);
         $mock->method('getInfo')->willReturn(null);

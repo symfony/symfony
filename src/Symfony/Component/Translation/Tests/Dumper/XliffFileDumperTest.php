@@ -17,7 +17,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 class XliffFileDumperTest extends TestCase
 {
-    public function testFormatCatalogue()
+    public function testFormatCatalogue(): void
     {
         $catalogue = new MessageCatalogue('en_US');
         $catalogue->add([
@@ -36,7 +36,7 @@ class XliffFileDumperTest extends TestCase
         );
     }
 
-    public function testFormatCatalogueXliff2()
+    public function testFormatCatalogueXliff2(): void
     {
         $catalogue = new MessageCatalogue('en_US');
         $catalogue->add([
@@ -55,7 +55,7 @@ class XliffFileDumperTest extends TestCase
         );
     }
 
-    public function testFormatIcuCatalogueXliff2()
+    public function testFormatIcuCatalogueXliff2(): void
     {
         $catalogue = new MessageCatalogue('en_US');
         $catalogue->add([
@@ -70,7 +70,7 @@ class XliffFileDumperTest extends TestCase
         );
     }
 
-    public function testFormatCatalogueWithCustomToolInfo()
+    public function testFormatCatalogueWithCustomToolInfo(): void
     {
         $options = [
             'default_locale' => 'en_US',
@@ -88,7 +88,7 @@ class XliffFileDumperTest extends TestCase
         );
     }
 
-    public function testFormatCatalogueWithTargetAttributesMetadata()
+    public function testFormatCatalogueWithTargetAttributesMetadata(): void
     {
         $catalogue = new MessageCatalogue('en_US');
         $catalogue->add([
@@ -104,7 +104,7 @@ class XliffFileDumperTest extends TestCase
         );
     }
 
-    public function testFormatCatalogueWithNotesMetadata()
+    public function testFormatCatalogueWithNotesMetadata(): void
     {
         $catalogue = new MessageCatalogue('en_US');
         $catalogue->add([
@@ -129,7 +129,7 @@ class XliffFileDumperTest extends TestCase
         );
     }
 
-    public function testDumpCatalogueWithXliffExtension()
+    public function testDumpCatalogueWithXliffExtension(): void
     {
         $catalogue = new MessageCatalogue('en_US');
         $catalogue->add([
@@ -148,7 +148,7 @@ class XliffFileDumperTest extends TestCase
         );
     }
 
-    public function testEmptyMetadataNotes()
+    public function testEmptyMetadataNotes(): void
     {
         $catalogue = new MessageCatalogue('en_US');
         $catalogue->add([
@@ -166,7 +166,7 @@ class XliffFileDumperTest extends TestCase
         );
     }
 
-    public function testFormatCatalogueXliff2WithSegmentAttributes()
+    public function testFormatCatalogueXliff2WithSegmentAttributes(): void
     {
         $catalogue = new MessageCatalogue('en_US');
         $catalogue->add([

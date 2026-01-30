@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
  */
 class LoginLinkAuthenticationTest extends AbstractWebTestCase
 {
-    public function testLoginLinkSuccess()
+    public function testLoginLinkSuccess(): void
     {
         $client = $this->createClient(['test_case' => 'LoginLink', 'root_config' => 'config.yml', 'debug' => true]);
 

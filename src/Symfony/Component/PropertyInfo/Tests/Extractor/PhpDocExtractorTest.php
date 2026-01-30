@@ -54,7 +54,7 @@ class PhpDocExtractorTest extends TestCase
         $this->extractor = new PhpDocExtractor();
     }
 
-    public function testGetDocBlock()
+    public function testGetDocBlock(): void
     {
         $docBlock = $this->extractor->getDocBlock(Dummy::class, 'g');
         $this->assertInstanceOf(DocBlock::class, $docBlock);
@@ -67,18 +67,18 @@ class PhpDocExtractorTest extends TestCase
         $this->assertNull($docBlock);
     }
 
-    public function testReturnNullOnEmptyDocBlock()
+    public function testReturnNullOnEmptyDocBlock(): void
     {
         $this->assertNull($this->extractor->getShortDescription(EmptyDocBlock::class, 'foo'));
     }
 
-    public function testParamTagTypeIsOmitted()
+    public function testParamTagTypeIsOmitted(): void
     {
         $this->assertNull($this->extractor->getType(OmittedParamTagTypeDocBlock::class, 'omittedType'));
     }
 
     #[DataProvider('typeProvider')]
-    public function testExtract(string $property, ?Type $type, ?string $shortDescription, ?string $longDescription)
+    public function testExtract(string $property, ?Type $type, ?string $shortDescription, ?string $longDescription): void
     {
         $this->assertEquals($type, $this->extractor->getType(Dummy::class, $property));
         $this->assertSame($shortDescription, $this->extractor->getShortDescription(Dummy::class, $property));
@@ -131,7 +131,7 @@ class PhpDocExtractorTest extends TestCase
     }
 
     #[DataProvider('invalidTypeProvider')]
-    public function testInvalid(string $property, ?string $shortDescription, ?string $longDescription)
+    public function testInvalid(string $property, ?string $shortDescription, ?string $longDescription): void
     {
         $this->assertNull($this->extractor->getType(InvalidDummy::class, $property));
         $this->assertSame($shortDescription, $this->extractor->getShortDescription(InvalidDummy::class, $property));
@@ -149,7 +149,7 @@ class PhpDocExtractorTest extends TestCase
     }
 
     #[DataProvider('typeWithNoPrefixesProvider')]
-    public function testExtractTypesWithNoPrefixes(string $property, ?Type $type)
+    public function testExtractTypesWithNoPrefixes(string $property, ?Type $type): void
     {
         $noPrefixExtractor = new PhpDocExtractor(null, [], [], []);
 
@@ -188,7 +188,7 @@ class PhpDocExtractorTest extends TestCase
     }
 
     #[DataProvider('provideCollectionTypes')]
-    public function testExtractCollection(string $property, ?Type $type)
+    public function testExtractCollection(string $property, ?Type $type): void
     {
         $this->testExtract($property, $type, null, null);
     }
@@ -206,7 +206,7 @@ class PhpDocExtractorTest extends TestCase
     }
 
     #[DataProvider('typeWithCustomPrefixesProvider')]
-    public function testExtractTypeWithCustomPrefixes(string $property, ?Type $type)
+    public function testExtractTypeWithCustomPrefixes(string $property, ?Type $type): void
     {
         $customExtractor = new PhpDocExtractor(null, ['add', 'remove'], ['is', 'can']);
 
@@ -250,7 +250,7 @@ class PhpDocExtractorTest extends TestCase
     }
 
     #[DataProvider('dockBlockFallbackTypesProvider')]
-    public function testDocBlockFallback(string $property, ?Type $type)
+    public function testDocBlockFallback(string $property, ?Type $type): void
     {
         $this->assertEquals($type, $this->extractor->getType(DockBlockFallback::class, $property));
     }
@@ -266,7 +266,7 @@ class PhpDocExtractorTest extends TestCase
     }
 
     #[DataProvider('propertiesDefinedByTraitsProvider')]
-    public function testPropertiesDefinedByTraits(string $property, ?Type $type)
+    public function testPropertiesDefinedByTraits(string $property, ?Type $type): void
     {
         $this->assertEquals($type, $this->extractor->getType(DummyUsingTrait::class, $property));
     }
@@ -285,7 +285,7 @@ class PhpDocExtractorTest extends TestCase
     }
 
     #[DataProvider('methodsDefinedByTraitsProvider')]
-    public function testMethodsDefinedByTraits(string $property, ?Type $type)
+    public function testMethodsDefinedByTraits(string $property, ?Type $type): void
     {
         $this->assertEquals($type, $this->extractor->getType(DummyUsingTrait::class, $property));
     }
@@ -307,7 +307,7 @@ class PhpDocExtractorTest extends TestCase
      * @param class-string $class
      */
     #[DataProvider('propertiesStaticTypeProvider')]
-    public function testPropertiesStaticType(string $class, string $property, ?Type $type)
+    public function testPropertiesStaticType(string $class, string $property, ?Type $type): void
     {
         $this->assertEquals($type, $this->extractor->getType($class, $property));
     }
@@ -325,7 +325,7 @@ class PhpDocExtractorTest extends TestCase
      * @param class-string $class
      */
     #[DataProvider('propertiesParentTypeProvider')]
-    public function testPropertiesParentType(string $class, string $property, ?Type $type)
+    public function testPropertiesParentType(string $class, string $property, ?Type $type): void
     {
         $this->assertEquals($type, $this->extractor->getType($class, $property));
     }
@@ -345,7 +345,7 @@ class PhpDocExtractorTest extends TestCase
      * @param class-string $expectedResolvedClass
      */
     #[DataProvider('selfDocBlockResolutionProvider')]
-    public function testSelfDocBlockResolvesToDeclaringClass(string $class, string $property, string $expectedResolvedClass)
+    public function testSelfDocBlockResolvesToDeclaringClass(string $class, string $property, string $expectedResolvedClass): void
     {
         $this->assertEquals(Type::object($expectedResolvedClass), $this->extractor->getType($class, $property));
     }
@@ -373,7 +373,7 @@ class PhpDocExtractorTest extends TestCase
     }
 
     #[DataProvider('inheritedPromotedPropertyWithConstructorOverrideProvider')]
-    public function testInheritedPromotedPropertyWithConstructorOverride(string $class, string $property, ?Type $expectedType)
+    public function testInheritedPromotedPropertyWithConstructorOverride(string $class, string $property, ?Type $expectedType): void
     {
         $this->assertEquals($expectedType, $this->extractor->getType($class, $property));
     }
@@ -390,18 +390,18 @@ class PhpDocExtractorTest extends TestCase
         yield 'child with constructor override' => [ChildWithConstructorOverride::class, 'items', $expectedItemsType];
     }
 
-    public function testUnknownPseudoType()
+    public function testUnknownPseudoType(): void
     {
         $this->assertEquals(Type::object('Symfony\\Component\\PropertyInfo\\Tests\\Fixtures\\unknownpseudo'), $this->extractor->getType(PseudoTypeDummy::class, 'unknownPseudoType'));
     }
 
-    public function testScalarPseudoType()
+    public function testScalarPseudoType(): void
     {
         $this->assertEquals(Type::object('scalar'), $this->extractor->getType(PseudoTypeDummy::class, 'scalarPseudoType'));
     }
 
     #[DataProvider('constructorTypesProvider')]
-    public function testExtractConstructorType(string $property, ?Type $type)
+    public function testExtractConstructorType(string $property, ?Type $type): void
     {
         $this->assertEquals($type, $this->extractor->getTypeFromConstructor(ConstructorDummy::class, $property));
     }
@@ -420,7 +420,7 @@ class PhpDocExtractorTest extends TestCase
     }
 
     #[DataProvider('pseudoTypeProvider')]
-    public function testPseudoType(string $property, ?Type $type)
+    public function testPseudoType(string $property, ?Type $type): void
     {
         $this->assertEquals($type, $this->extractor->getType(PseudoTypesDummy::class, $property));
     }
@@ -457,7 +457,7 @@ class PhpDocExtractorTest extends TestCase
     }
 
     #[DataProvider('promotedPropertyProvider')]
-    public function testExtractPromotedProperty(string $property, ?Type $type)
+    public function testExtractPromotedProperty(string $property, ?Type $type): void
     {
         $this->assertEquals($type, $this->extractor->getType(Php80Dummy::class, $property));
     }
@@ -471,7 +471,7 @@ class PhpDocExtractorTest extends TestCase
         yield ['promotedAndMutated', Type::string()];
     }
 
-    public function testSkipVoidNeverReturnTypeAccessors()
+    public function testSkipVoidNeverReturnTypeAccessors(): void
     {
         // Methods that return void or never should be skipped, so no types should be extracted
         $this->assertNull($this->extractor->getType(VoidNeverReturnTypeDummy::class, 'voidProperty'));
@@ -491,7 +491,7 @@ class OmittedParamTagTypeDocBlock
     /**
      * The type is omitted here to ensure that the extractor doesn't choke on missing types.
      */
-    public function setOmittedType(array $omittedTagType)
+    public function setOmittedType(array $omittedTagType): void
     {
     }
 }

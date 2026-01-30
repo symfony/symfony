@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class UniqueEntityTest extends TestCase
 {
-    public function testAttributeWithDefaultProperty()
+    public function testAttributeWithDefaultProperty(): void
     {
         $metadata = new ClassMetadata(UniqueEntityDummyOne::class);
         $loader = new AttributeLoader();
@@ -32,7 +32,7 @@ class UniqueEntityTest extends TestCase
         self::assertSame(['Default', 'UniqueEntityDummyOne'], $constraint->groups);
     }
 
-    public function testAttributeWithCustomizedService()
+    public function testAttributeWithCustomizedService(): void
     {
         $metadata = new ClassMetadata(UniqueEntityDummyTwo::class);
         $loader = new AttributeLoader();
@@ -47,7 +47,7 @@ class UniqueEntityTest extends TestCase
         self::assertSame('fetchDifferently', $constraint->repositoryMethod);
     }
 
-    public function testAttributeWithGroupsAndPaylod()
+    public function testAttributeWithGroupsAndPaylod(): void
     {
         $metadata = new ClassMetadata(UniqueEntityDummyThree::class);
         $loader = new AttributeLoader();

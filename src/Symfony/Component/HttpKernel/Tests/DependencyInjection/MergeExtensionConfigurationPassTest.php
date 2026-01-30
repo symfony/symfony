@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\AcmeFooBundle\AcmeFooBundle;
 
 class MergeExtensionConfigurationPassTest extends TestCase
 {
-    public function testAutoloadMainExtension()
+    public function testAutoloadMainExtension(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new LoadedExtension());
@@ -34,7 +34,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $this->assertTrue($container->hasDefinition('not_loaded.bar'));
     }
 
-    public function testFooBundle()
+    public function testFooBundle(): void
     {
         $bundle = new AcmeFooBundle();
 

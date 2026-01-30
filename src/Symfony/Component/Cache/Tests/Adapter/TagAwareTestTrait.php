@@ -21,7 +21,7 @@ use Symfony\Component\Cache\CacheItem;
  */
 trait TagAwareTestTrait
 {
-    public function testInvalidTag()
+    public function testInvalidTag(): void
     {
         $pool = $this->createCachePool();
         $item = $pool->getItem('foo');
@@ -31,7 +31,7 @@ trait TagAwareTestTrait
         $item->tag(':');
     }
 
-    public function testInvalidateTags()
+    public function testInvalidateTags(): void
     {
         $pool = $this->createCachePool();
 
@@ -68,7 +68,7 @@ trait TagAwareTestTrait
         $this->assertTrue($anotherPoolInstance->getItem('foo')->isHit());
     }
 
-    public function testInvalidateCommits()
+    public function testInvalidateCommits(): void
     {
         $pool = $this->createCachePool();
 
@@ -85,7 +85,7 @@ trait TagAwareTestTrait
         $this->assertTrue($foo->isHit());
     }
 
-    public function testTagsAreCleanedOnSave()
+    public function testTagsAreCleanedOnSave(): void
     {
         $pool = $this->createCachePool();
 
@@ -99,7 +99,7 @@ trait TagAwareTestTrait
         $this->assertTrue($pool->getItem('k')->isHit());
     }
 
-    public function testTagsAreCleanedOnDelete()
+    public function testTagsAreCleanedOnDelete(): void
     {
         $pool = $this->createCachePool();
 
@@ -113,7 +113,7 @@ trait TagAwareTestTrait
         $this->assertTrue($pool->getItem('k')->isHit());
     }
 
-    public function testTagItemExpiry()
+    public function testTagItemExpiry(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
@@ -134,7 +134,7 @@ trait TagAwareTestTrait
         $this->assertFalse($pool->getItem('foo')->isHit());
     }
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         $pool = $this->createCachePool();
 
@@ -147,7 +147,7 @@ trait TagAwareTestTrait
         $this->assertSame(['foo' => 'foo'], $i->getMetadata()[CacheItem::METADATA_TAGS]);
     }
 
-    public function testRefreshAfterExpires()
+    public function testRefreshAfterExpires(): void
     {
         $pool = $this->createCachePool();
         $pool->clear();
@@ -185,7 +185,7 @@ trait TagAwareTestTrait
         $this->assertTrue($cacheItem->isHit());
     }
 
-    public function testNamespacesAndTags()
+    public function testNamespacesAndTags(): void
     {
         $pool = $this->createCachePool();
         $pool->clear();

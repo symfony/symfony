@@ -29,7 +29,7 @@ class MarshallingSessionHandlerTest extends TestCase
         $this->handler = $this->createMock(AbstractSessionHandler::class);
     }
 
-    public function testOpen()
+    public function testOpen(): void
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class));
 
@@ -39,7 +39,7 @@ class MarshallingSessionHandlerTest extends TestCase
         $marshallingSessionHandler->open('path', 'name');
     }
 
-    public function testClose()
+    public function testClose(): void
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class));
 
@@ -48,7 +48,7 @@ class MarshallingSessionHandlerTest extends TestCase
         $this->assertTrue($marshallingSessionHandler->close());
     }
 
-    public function testDestroy()
+    public function testDestroy(): void
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class));
 
@@ -58,7 +58,7 @@ class MarshallingSessionHandlerTest extends TestCase
         $marshallingSessionHandler->destroy('session_id');
     }
 
-    public function testGc()
+    public function testGc(): void
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class));
 
@@ -68,7 +68,7 @@ class MarshallingSessionHandlerTest extends TestCase
         $marshallingSessionHandler->gc(4711);
     }
 
-    public function testRead()
+    public function testRead(): void
     {
         $marshaller = $this->createMock(MarshallerInterface::class);
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $marshaller);
@@ -83,7 +83,7 @@ class MarshallingSessionHandlerTest extends TestCase
         $this->assertEquals('unmarshalled_data', $result);
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $marshaller = $this->createMock(MarshallerInterface::class);
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $marshaller);
@@ -99,7 +99,7 @@ class MarshallingSessionHandlerTest extends TestCase
         $marshallingSessionHandler->write('session_id', 'data');
     }
 
-    public function testValidateId()
+    public function testValidateId(): void
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class));
 
@@ -109,7 +109,7 @@ class MarshallingSessionHandlerTest extends TestCase
         $marshallingSessionHandler->validateId('session_id');
     }
 
-    public function testUpdateTimestamp()
+    public function testUpdateTimestamp(): void
     {
         $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class));
 

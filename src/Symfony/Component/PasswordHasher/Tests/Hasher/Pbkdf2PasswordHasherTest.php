@@ -17,14 +17,14 @@ use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 
 class Pbkdf2PasswordHasherTest extends TestCase
 {
-    public function testVerify()
+    public function testVerify(): void
     {
         $hasher = new Pbkdf2PasswordHasher('sha256', false, 1, 40);
 
         $this->assertTrue($hasher->verify('c1232f10f62715fda06ae7c0a2037ca19b33cf103b727ba56d870c11f290a2ab106974c75607c8a3', 'password', ''));
     }
 
-    public function testHash()
+    public function testHash(): void
     {
         $hasher = new Pbkdf2PasswordHasher('sha256', false, 1, 40);
         $this->assertSame('c1232f10f62715fda06ae7c0a2037ca19b33cf103b727ba56d870c11f290a2ab106974c75607c8a3', $hasher->hash('password', ''));
@@ -36,7 +36,7 @@ class Pbkdf2PasswordHasherTest extends TestCase
         $this->assertSame('8bc2f9167a81cdcfad1235cd9047f1136271c1f978fcfcb35e22dbeafa4634f6fd2214218ed63ebb', $hasher->hash('password', ''));
     }
 
-    public function testHashAlgorithmDoesNotExist()
+    public function testHashAlgorithmDoesNotExist(): void
     {
         $hasher = new Pbkdf2PasswordHasher('foobar');
 
@@ -45,7 +45,7 @@ class Pbkdf2PasswordHasherTest extends TestCase
         $hasher->hash('password', '');
     }
 
-    public function testHashLength()
+    public function testHashLength(): void
     {
         $hasher = new Pbkdf2PasswordHasher('foobar');
 
@@ -54,7 +54,7 @@ class Pbkdf2PasswordHasherTest extends TestCase
         $hasher->hash(str_repeat('a', 5000), 'salt');
     }
 
-    public function testCheckPasswordLength()
+    public function testCheckPasswordLength(): void
     {
         $hasher = new Pbkdf2PasswordHasher('foobar');
 

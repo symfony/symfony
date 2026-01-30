@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 class GenericRetryStrategyTest extends TestCase
 {
     #[DataProvider('provideRetryable')]
-    public function testShouldRetry(string $method, int $code, ?TransportExceptionInterface $exception)
+    public function testShouldRetry(string $method, int $code, ?TransportExceptionInterface $exception): void
     {
         $strategy = new GenericRetryStrategy();
 
@@ -31,7 +31,7 @@ class GenericRetryStrategyTest extends TestCase
     }
 
     #[DataProvider('provideNotRetryable')]
-    public function testShouldNotRetry(string $method, int $code, ?TransportExceptionInterface $exception)
+    public function testShouldNotRetry(string $method, int $code, ?TransportExceptionInterface $exception): void
     {
         $strategy = new GenericRetryStrategy();
 
@@ -53,7 +53,7 @@ class GenericRetryStrategyTest extends TestCase
     }
 
     #[DataProvider('provideDelay')]
-    public function testGetDelay(int $delay, int $multiplier, int $maxDelay, int $previousRetries, int $expectedDelay)
+    public function testGetDelay(int $delay, int $multiplier, int $maxDelay, int $previousRetries, int $expectedDelay): void
     {
         $strategy = new GenericRetryStrategy([], $delay, $multiplier, $maxDelay, 0);
 
@@ -86,7 +86,7 @@ class GenericRetryStrategyTest extends TestCase
     }
 
     #[DataProvider('provideJitter')]
-    public function testJitter(float $multiplier, int $previousRetries)
+    public function testJitter(float $multiplier, int $previousRetries): void
     {
         $strategy = new GenericRetryStrategy([], 1000, $multiplier, 0, 1);
         $min = 2000;

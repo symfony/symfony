@@ -44,7 +44,7 @@ class AmqpExtIntegrationTest extends TestCase
         }
     }
 
-    public function testItSendsAndReceivesMessages()
+    public function testItSendsAndReceivesMessages(): void
     {
         $serializer = $this->createSerializer();
 
@@ -74,7 +74,7 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertSame([], iterator_to_array($receiver->get()));
     }
 
-    public function testItSendsAndReceivesMessagesThroughDefaultExchange()
+    public function testItSendsAndReceivesMessagesThroughDefaultExchange(): void
     {
         $serializer = $this->createSerializer();
 
@@ -104,7 +104,7 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertEmpty(iterator_to_array($receiver->get()));
     }
 
-    public function testRetryAndDelay()
+    public function testRetryAndDelay(): void
     {
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'));
         $connection->setup();
@@ -162,7 +162,7 @@ class AmqpExtIntegrationTest extends TestCase
         $receiver->ack($envelope);
     }
 
-    public function testRetryAffectsOnlyOriginalQueue()
+    public function testRetryAffectsOnlyOriginalQueue(): void
     {
         $connection = Connection::fromDsn(getenv('MESSENGER_AMQP_DSN'), [
             'exchange' => [
@@ -200,7 +200,7 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertArrayHasKey('A', $retriedEnvelopes);
     }
 
-    public function testItReceivesSignals()
+    public function testItReceivesSignals(): void
     {
         $serializer = $this->createSerializer();
 
@@ -254,7 +254,7 @@ class AmqpExtIntegrationTest extends TestCase
         );
     }
 
-    public function testItCountsMessagesInQueue()
+    public function testItCountsMessagesInQueue(): void
     {
         $serializer = $this->createSerializer();
 
@@ -272,7 +272,7 @@ class AmqpExtIntegrationTest extends TestCase
         $this->assertSame(3, $connection->countMessagesInQueues());
     }
 
-    private function waitForOutput(Process $process, string $output, $timeoutInSeconds = 10)
+    private function waitForOutput(Process $process, string $output, $timeoutInSeconds = 10): void
     {
         $timedOutTime = time() + $timeoutInSeconds;
 
@@ -294,7 +294,7 @@ class AmqpExtIntegrationTest extends TestCase
         );
     }
 
-    private function assertApproximateDuration($startTime, int $expectedDuration)
+    private function assertApproximateDuration($startTime, int $expectedDuration): void
     {
         $actualDuration = microtime(true) - $startTime;
 

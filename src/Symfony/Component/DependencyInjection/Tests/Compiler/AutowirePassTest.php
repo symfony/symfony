@@ -49,7 +49,7 @@ class AutowirePassTest extends TestCase
         ClassExistsMock::register(AutowirePass::class);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 
@@ -64,7 +64,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(Foo::class, (string) $container->getDefinition('bar')->getArgument(0));
     }
 
-    public function testProcessNotExistingActionParam()
+    public function testProcessNotExistingActionParam(): void
     {
         $container = new ContainerBuilder();
 
@@ -81,7 +81,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testProcessVariadic()
+    public function testProcessVariadic(): void
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class);
@@ -95,7 +95,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(Foo::class, (string) $container->getDefinition('fooVariadic')->getArgument(0));
     }
 
-    public function testProcessAutowireParent()
+    public function testProcessAutowireParent(): void
     {
         $container = new ContainerBuilder();
 
@@ -112,7 +112,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testProcessAutowireInterface()
+    public function testProcessAutowireInterface(): void
     {
         $container = new ContainerBuilder();
 
@@ -129,7 +129,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testCompleteExistingDefinition()
+    public function testCompleteExistingDefinition(): void
     {
         $container = new ContainerBuilder();
 
@@ -146,7 +146,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(DInterface::class, (string) $container->getDefinition('h')->getArgument(1));
     }
 
-    public function testCompleteExistingDefinitionWithNotDefinedArguments()
+    public function testCompleteExistingDefinitionWithNotDefinedArguments(): void
     {
         $container = new ContainerBuilder();
 
@@ -163,7 +163,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(DInterface::class, (string) $container->getDefinition('h')->getArgument(1));
     }
 
-    public function testPrivateConstructorThrowsAutowireException()
+    public function testPrivateConstructorThrowsAutowireException(): void
     {
         $container = new ContainerBuilder();
 
@@ -178,7 +178,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testTypeCollision()
+    public function testTypeCollision(): void
     {
         $container = new ContainerBuilder();
 
@@ -197,7 +197,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testTypeNotGuessable()
+    public function testTypeNotGuessable(): void
     {
         $container = new ContainerBuilder();
 
@@ -215,7 +215,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testTypeNotGuessableWithSubclass()
+    public function testTypeNotGuessableWithSubclass(): void
     {
         $container = new ContainerBuilder();
 
@@ -233,7 +233,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testTypeNotGuessableNoServicesFound()
+    public function testTypeNotGuessableNoServicesFound(): void
     {
         $container = new ContainerBuilder();
 
@@ -249,7 +249,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testTypeNotGuessableUnionType()
+    public function testTypeNotGuessableUnionType(): void
     {
         $container = new ContainerBuilder();
 
@@ -266,7 +266,7 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testGuessableUnionType()
+    public function testGuessableUnionType(): void
     {
         $container = new ContainerBuilder();
 
@@ -283,7 +283,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame('b', (string) $aDefinition->getArgument(0));
     }
 
-    public function testTypeNotGuessableIntersectionType()
+    public function testTypeNotGuessableIntersectionType(): void
     {
         $container = new ContainerBuilder();
 
@@ -300,7 +300,7 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testTypeNotGuessableCompositeType()
+    public function testTypeNotGuessableCompositeType(): void
     {
         $container = new ContainerBuilder();
 
@@ -317,7 +317,7 @@ class AutowirePassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testGuessableIntersectionType()
+    public function testGuessableIntersectionType(): void
     {
         $container = new ContainerBuilder();
 
@@ -335,7 +335,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame('b', (string) $aDefinition->getArgument(0));
     }
 
-    public function testTypeNotGuessableWithTypeSet()
+    public function testTypeNotGuessableWithTypeSet(): void
     {
         $container = new ContainerBuilder();
 
@@ -352,7 +352,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(Foo::class, (string) $container->getDefinition('a')->getArgument(0));
     }
 
-    public function testWithTypeSet()
+    public function testWithTypeSet(): void
     {
         $container = new ContainerBuilder();
 
@@ -369,7 +369,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(CollisionInterface::class, (string) $container->getDefinition('a')->getArgument(0));
     }
 
-    public function testServicesAreNotAutoCreated()
+    public function testServicesAreNotAutoCreated(): void
     {
         $container = new ContainerBuilder();
 
@@ -385,7 +385,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testResolveParameter()
+    public function testResolveParameter(): void
     {
         $container = new ContainerBuilder();
 
@@ -401,7 +401,7 @@ class AutowirePassTest extends TestCase
     }
 
     #[IgnoreDeprecations]
-    public function testOptionalParameter()
+    public function testOptionalParameter(): void
     {
         $container = new ContainerBuilder();
 
@@ -419,7 +419,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(Foo::class, $definition->getArgument(2));
     }
 
-    public function testParameterWithNullUnionIsSkipped()
+    public function testParameterWithNullUnionIsSkipped(): void
     {
         $container = new ContainerBuilder();
 
@@ -432,7 +432,7 @@ class AutowirePassTest extends TestCase
         $this->assertNull($definition->getArgument(0));
     }
 
-    public function testParameterWithNullableIntersectionIsSkipped()
+    public function testParameterWithNullableIntersectionIsSkipped(): void
     {
         $container = new ContainerBuilder();
 
@@ -445,7 +445,7 @@ class AutowirePassTest extends TestCase
         $this->assertNull($definition->getArgument(0));
     }
 
-    public function testParameterWithNullUnionIsAutowired()
+    public function testParameterWithNullUnionIsAutowired(): void
     {
         $container = new ContainerBuilder();
 
@@ -460,7 +460,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals(CollisionInterface::class, $definition->getArgument(0));
     }
 
-    public function testDontTriggerAutowiring()
+    public function testDontTriggerAutowiring(): void
     {
         $container = new ContainerBuilder();
 
@@ -473,7 +473,7 @@ class AutowirePassTest extends TestCase
         $this->assertCount(0, $container->getDefinition('bar')->getArguments());
     }
 
-    public function testClassNotFoundThrowsException()
+    public function testClassNotFoundThrowsException(): void
     {
         $container = new ContainerBuilder();
 
@@ -491,7 +491,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testParentClassNotFoundThrowsException()
+    public function testParentClassNotFoundThrowsException(): void
     {
         $container = new ContainerBuilder();
 
@@ -509,7 +509,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testParentClassNotFoundThrowsExceptionWithoutConfigComponent()
+    public function testParentClassNotFoundThrowsExceptionWithoutConfigComponent(): void
     {
         ClassExistsMock::withMockedClasses([
             ClassExistenceResource::class => false,
@@ -533,7 +533,7 @@ class AutowirePassTest extends TestCase
         ClassExistsMock::withMockedClasses([]);
     }
 
-    public function testDontUseAbstractServices()
+    public function testDontUseAbstractServices(): void
     {
         $container = new ContainerBuilder();
 
@@ -550,7 +550,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testSomeSpecificArgumentsAreSet()
+    public function testSomeSpecificArgumentsAreSet(): void
     {
         $container = new ContainerBuilder();
 
@@ -581,7 +581,7 @@ class AutowirePassTest extends TestCase
         );
     }
 
-    public function testScalarArgsCannotBeAutowired()
+    public function testScalarArgsCannotBeAutowired(): void
     {
         $container = new ContainerBuilder();
 
@@ -600,7 +600,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testUnionScalarArgsCannotBeAutowired()
+    public function testUnionScalarArgsCannotBeAutowired(): void
     {
         $container = new ContainerBuilder();
 
@@ -613,7 +613,7 @@ class AutowirePassTest extends TestCase
         (new AutowirePass())->process($container);
     }
 
-    public function testNoTypeArgsCannotBeAutowired()
+    public function testNoTypeArgsCannotBeAutowired(): void
     {
         $container = new ContainerBuilder();
 
@@ -631,7 +631,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testOptionalScalarArgsDontMessUpOrder()
+    public function testOptionalScalarArgsDontMessUpOrder(): void
     {
         $container = new ContainerBuilder();
 
@@ -655,7 +655,7 @@ class AutowirePassTest extends TestCase
         );
     }
 
-    public function testOptionalScalarArgsNotPassedIfLast()
+    public function testOptionalScalarArgsNotPassedIfLast(): void
     {
         $container = new ContainerBuilder();
 
@@ -677,7 +677,7 @@ class AutowirePassTest extends TestCase
         );
     }
 
-    public function testOptionalArgsNoRequiredForCoreClasses()
+    public function testOptionalArgsNoRequiredForCoreClasses(): void
     {
         $container = new ContainerBuilder();
 
@@ -694,7 +694,7 @@ class AutowirePassTest extends TestCase
         );
     }
 
-    public function testSetterInjectionWithAttribute()
+    public function testSetterInjectionWithAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class);
@@ -713,7 +713,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame(Foo::class, (string) $methodCalls[0][1][0]);
     }
 
-    public function testWithNonExistingSetterAndAutowiring()
+    public function testWithNonExistingSetterAndAutowiring(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass": method "setLogger()" does not exist.');
@@ -727,7 +727,7 @@ class AutowirePassTest extends TestCase
         (new AutowirePass())->process($container);
     }
 
-    public function testExplicitMethodInjectionAttribute()
+    public function testExplicitMethodInjectionAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register(Foo::class);
@@ -765,7 +765,7 @@ class AutowirePassTest extends TestCase
         ];
     }
 
-    public function testIgnoreServiceWithClassNotExisting()
+    public function testIgnoreServiceWithClassNotExisting(): void
     {
         $container = new ContainerBuilder();
 
@@ -782,7 +782,7 @@ class AutowirePassTest extends TestCase
         $this->assertTrue($container->hasDefinition('bar'));
     }
 
-    public function testSetterInjectionFromAttributeCollisionThrowsException()
+    public function testSetterInjectionFromAttributeCollisionThrowsException(): void
     {
         $container = new ContainerBuilder();
 
@@ -803,7 +803,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testInterfaceWithNoImplementationSuggestToWriteOne()
+    public function testInterfaceWithNoImplementationSuggestToWriteOne(): void
     {
         $container = new ContainerBuilder();
 
@@ -821,7 +821,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testProcessDoesNotTriggerDeprecations()
+    public function testProcessDoesNotTriggerDeprecations(): void
     {
         $container = new ContainerBuilder();
         $container->register('deprecated', 'Symfony\Component\DependencyInjection\Tests\Fixtures\DeprecatedClass')->setDeprecated('vendor/package', '1.1', '%service_id%');
@@ -841,7 +841,7 @@ class AutowirePassTest extends TestCase
         $this->assertTrue($container->hasDefinition('bar'));
     }
 
-    public function testEmptyStringIsKept()
+    public function testEmptyStringIsKept(): void
     {
         $container = new ContainerBuilder();
 
@@ -857,7 +857,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals([new TypedReference(A::class, A::class), '', new TypedReference(Lille::class, Lille::class)], $container->getDefinition('foo')->getArguments());
     }
 
-    public function testWithFactory()
+    public function testWithFactory(): void
     {
         $container = new ContainerBuilder();
 
@@ -873,7 +873,7 @@ class AutowirePassTest extends TestCase
     }
 
     #[DataProvider('provideNotWireableCalls')]
-    public function testNotWireableCalls($method, $expectedMsg)
+    public function testNotWireableCalls($method, $expectedMsg): void
     {
         $container = new ContainerBuilder();
 
@@ -907,7 +907,7 @@ class AutowirePassTest extends TestCase
         ];
     }
 
-    public function testSuggestRegisteredServicesWithSimilarCase()
+    public function testSuggestRegisteredServicesWithSimilarCase(): void
     {
         $container = new ContainerBuilder();
 
@@ -926,7 +926,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testByIdAlternative()
+    public function testByIdAlternative(): void
     {
         $container = new ContainerBuilder();
 
@@ -944,7 +944,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testExceptionWhenAliasExists()
+    public function testExceptionWhenAliasExists(): void
     {
         $container = new ContainerBuilder();
 
@@ -965,7 +965,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testExceptionWhenAliasDoesNotExist()
+    public function testExceptionWhenAliasDoesNotExist(): void
     {
         $container = new ContainerBuilder();
 
@@ -985,7 +985,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testAutowireDecorator()
+    public function testAutowireDecorator(): void
     {
         $container = new ContainerBuilder();
         $container->register(LoggerInterface::class, NullLogger::class);
@@ -1003,7 +1003,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame(Decorator::class.'.inner', (string) $definition->getArgument(1));
     }
 
-    public function testAutowireDecoratorChain()
+    public function testAutowireDecoratorChain(): void
     {
         $container = new ContainerBuilder();
         $container->register(LoggerInterface::class, NullLogger::class);
@@ -1026,7 +1026,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame(DecoratedDecorator::class.'.inner', (string) $definition->getArgument(0));
     }
 
-    public function testAutowireDecoratorRenamedId()
+    public function testAutowireDecoratorRenamedId(): void
     {
         $container = new ContainerBuilder();
         $container->register(LoggerInterface::class, NullLogger::class);
@@ -1044,7 +1044,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame('renamed', (string) $definition->getArgument(1));
     }
 
-    public function testDoNotAutowireDecoratorWhenSeveralArgumentOfTheType()
+    public function testDoNotAutowireDecoratorWhenSeveralArgumentOfTheType(): void
     {
         $container = new ContainerBuilder();
         $container->register(LoggerInterface::class, NullLogger::class);
@@ -1064,7 +1064,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testErroredServiceLocator()
+    public function testErroredServiceLocator(): void
     {
         $container = new ContainerBuilder();
         $container->register('some_locator', 'stdClass')
@@ -1076,7 +1076,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame(['Cannot autowire service "some_locator": it has type "Symfony\Component\DependencyInjection\Tests\Compiler\MissingClass" but this class was not found.'], $container->getDefinition('.errored.some_locator.'.MissingClass::class)->getErrors());
     }
 
-    public function testNamedArgumentAliasResolveCollisions()
+    public function testNamedArgumentAliasResolveCollisions(): void
     {
         $container = new ContainerBuilder();
 
@@ -1101,7 +1101,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition('setter_injection_collision')->getMethodCalls());
     }
 
-    public function testArgumentWithTarget()
+    public function testArgumentWithTarget(): void
     {
         $container = new ContainerBuilder();
 
@@ -1115,7 +1115,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame('.'.BarInterface::class.' $image.storage', (string) $container->getDefinition('with_target')->getArgument(0));
     }
 
-    public function testArgumentWithParsedTarget()
+    public function testArgumentWithParsedTarget(): void
     {
         $container = new ContainerBuilder();
 
@@ -1129,7 +1129,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame(BarInterface::class.' $imageStorage', (string) $container->getDefinition('with_target')->getArgument(0));
     }
 
-    public function testArgumentWithTypoTarget()
+    public function testArgumentWithTypoTarget(): void
     {
         $container = new ContainerBuilder();
 
@@ -1144,7 +1144,7 @@ class AutowirePassTest extends TestCase
         (new AutowirePass())->process($container);
     }
 
-    public function testArgumentWithTypoTargetAnonymous()
+    public function testArgumentWithTypoTargetAnonymous(): void
     {
         $container = new ContainerBuilder();
 
@@ -1159,7 +1159,7 @@ class AutowirePassTest extends TestCase
         (new AutowirePass())->process($container);
     }
 
-    public function testArgumentWithIdTarget()
+    public function testArgumentWithIdTarget(): void
     {
         $container = new ContainerBuilder();
 
@@ -1173,7 +1173,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame('image.storage', (string) $container->getDefinition('with_target')->getArgument(0));
     }
 
-    public function testDecorationWithServiceAndAliasedInterface()
+    public function testDecorationWithServiceAndAliasedInterface(): void
     {
         $container = new ContainerBuilder();
 
@@ -1192,7 +1192,7 @@ class AutowirePassTest extends TestCase
         static::assertInstanceOf(DecoratedDecorator::class, $container->get(DecoratorImpl::class));
     }
 
-    public function testAutowireWithNamedArgs()
+    public function testAutowireWithNamedArgs(): void
     {
         $container = new ContainerBuilder();
 
@@ -1207,7 +1207,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals([new TypedReference(A::class, A::class), 'abc'], $container->getDefinition('foo')->getArguments());
     }
 
-    public function testAutowireUnderscoreNamedArgument()
+    public function testAutowireUnderscoreNamedArgument(): void
     {
         $container = new ContainerBuilder();
 
@@ -1219,7 +1219,7 @@ class AutowirePassTest extends TestCase
         $this->assertInstanceOf(\DateTimeImmutable::class, $container->get('foo')->now_datetime);
     }
 
-    public function testAutowireDefaultValueParametersLike()
+    public function testAutowireDefaultValueParametersLike(): void
     {
         $container = new ContainerBuilder();
 
@@ -1232,7 +1232,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame('%%not%%one%%parameter%%here%%', $container->getDefinition('foo')->getArgument(0));
     }
 
-    public function testAutowireAttribute()
+    public function testAutowireAttribute(): void
     {
         $container = new ContainerBuilder();
 
@@ -1277,7 +1277,7 @@ class AutowirePassTest extends TestCase
         $this->assertNull($service->invalid);
     }
 
-    public function testAutowireAttributeNullFallbackTestRequired()
+    public function testAutowireAttributeNullFallbackTestRequired(): void
     {
         $container = new ContainerBuilder();
 
@@ -1291,7 +1291,7 @@ class AutowirePassTest extends TestCase
         (new AutowirePass())->process($container);
     }
 
-    public function testAutowireAttributeNullFallbackTestOptional()
+    public function testAutowireAttributeNullFallbackTestOptional(): void
     {
         $container = new ContainerBuilder();
 
@@ -1309,7 +1309,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame(['foo'], $definition->getArguments());
     }
 
-    public function testAsDecoratorAttribute()
+    public function testAsDecoratorAttribute(): void
     {
         $container = new ContainerBuilder();
 
@@ -1330,7 +1330,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame(2, $container->getDefinition(AsDecoratorBaz::class)->getArgument(0)->getInvalidBehavior());
     }
 
-    public function testMultipleAsDecoratorAttribute()
+    public function testMultipleAsDecoratorAttribute(): void
     {
         $container = new ContainerBuilder();
 
@@ -1352,7 +1352,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame($barDecoratorName.'.inner', (string) $container->getDefinition($barDecoratorName)->getArgument(1));
     }
 
-    public function testTypeSymbolExcluded()
+    public function testTypeSymbolExcluded(): void
     {
         $container = new ContainerBuilder();
 
@@ -1369,7 +1369,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testTypeNamespaceExcluded()
+    public function testTypeNamespaceExcluded(): void
     {
         $container = new ContainerBuilder();
 
@@ -1386,7 +1386,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testNestedAttributes()
+    public function testNestedAttributes(): void
     {
         $container = new ContainerBuilder();
 
@@ -1407,7 +1407,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition(AutowireNestedAttributes::class)->getArgument(0));
     }
 
-    public function testLazyServiceAttribute()
+    public function testLazyServiceAttribute(): void
     {
         $container = new ContainerBuilder();
         $container->register('a', A::class)->setAutowired(true);
@@ -1419,7 +1419,7 @@ class AutowirePassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition('foo')->getArgument(0));
     }
 
-    public function testLazyNotCompatibleWithAutowire()
+    public function testLazyNotCompatibleWithAutowire(): void
     {
         $container = new ContainerBuilder();
         $container->register('a', A::class)->setAutowired(true);
@@ -1432,7 +1432,7 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testAutowireAttributeWithEnvVar()
+    public function testAutowireAttributeWithEnvVar(): void
     {
         $container = new ContainerBuilder();
 
@@ -1446,7 +1446,7 @@ class AutowirePassTest extends TestCase
         $this->assertSame('%env(default::OPTIONAL)%', $container->resolveEnvPlaceholders($definition->getArguments()[1]));
     }
 
-    public function testLazyProxyForInterfaceWithFinalImplementation()
+    public function testLazyProxyForInterfaceWithFinalImplementation(): void
     {
         $container = new ContainerBuilder();
         $container->register('final_impl', FinalLazyProxyImplementation::class);
@@ -1467,7 +1467,7 @@ class AutowirePassTest extends TestCase
         $this->assertInstanceOf(FinalLazyProxyImplementation::class, $dep);
     }
 
-    public function testLazyProxyWithClassInheritance()
+    public function testLazyProxyWithClassInheritance(): void
     {
         $container = new ContainerBuilder();
         $container->register(BaseLazyProxyClass::class, ExtendedLazyProxyClass::class);
@@ -1487,7 +1487,7 @@ class AutowirePassTest extends TestCase
         $this->assertInstanceOf(ExtendedLazyProxyClass::class, $dep);
     }
 
-    public function testLazyProxyForDecoratedService()
+    public function testLazyProxyForDecoratedService(): void
     {
         $container = new ContainerBuilder();
 

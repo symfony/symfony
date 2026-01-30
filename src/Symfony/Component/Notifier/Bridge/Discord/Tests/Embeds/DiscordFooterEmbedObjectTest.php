@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Discord\Embeds\DiscordFooterEmbedObject;
 
 final class DiscordFooterEmbedObjectTest extends TestCase
 {
-    public function testCanBeInstantiated()
+    public function testCanBeInstantiated(): void
     {
         $author = (new DiscordFooterEmbedObject())
             ->text('foo')

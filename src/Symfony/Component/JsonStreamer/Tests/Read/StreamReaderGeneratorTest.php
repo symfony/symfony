@@ -55,7 +55,7 @@ class StreamReaderGeneratorTest extends TestCase
     }
 
     #[DataProvider('generatedStreamReaderDataProvider')]
-    public function testGeneratedStreamReader(string $fixture, Type $type, ?PropertyMetadataLoaderInterface $propertyMetadataLoader = null)
+    public function testGeneratedStreamReader(string $fixture, Type $type, ?PropertyMetadataLoaderInterface $propertyMetadataLoader = null): void
     {
         $propertyMetadataLoader ??= new GenericTypePropertyMetadataLoader(
             new DateTimeTypePropertyMetadataLoader(new AttributePropertyMetadataLoader(
@@ -131,7 +131,7 @@ class StreamReaderGeneratorTest extends TestCase
         yield ['object_with_union', Type::object(DummyWithUnionProperties::class)];
     }
 
-    public function testDoNotSupportIntersectionType()
+    public function testDoNotSupportIntersectionType(): void
     {
         $generator = new StreamReaderGenerator(new PropertyMetadataLoader(TypeResolver::create()), $this->streamReadersDir);
 
@@ -141,7 +141,7 @@ class StreamReaderGeneratorTest extends TestCase
         $generator->generate(Type::intersection(Type::object(\Traversable::class), Type::object(\Stringable::class)), false);
     }
 
-    public function testDoNotSupportEnumType()
+    public function testDoNotSupportEnumType(): void
     {
         $generator = new StreamReaderGenerator(new PropertyMetadataLoader(TypeResolver::create()), $this->streamReadersDir);
 
@@ -151,7 +151,7 @@ class StreamReaderGeneratorTest extends TestCase
         $generator->generate(Type::enum(DummyEnum::class), false);
     }
 
-    public function testCallPropertyMetadataLoaderWithProperContext()
+    public function testCallPropertyMetadataLoaderWithProperContext(): void
     {
         $type = Type::object(self::class);
 

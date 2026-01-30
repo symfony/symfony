@@ -44,7 +44,7 @@ class DkimSignerTest extends TestCase
         EOF;
 
     #[DataProvider('getSignData')]
-    public function testSign(int $time, string $bodyCanon, string $headerCanon, string $header)
+    public function testSign(int $time, string $bodyCanon, string $headerCanon, string $header): void
     {
         ClockMock::withClockMock($time);
 
@@ -90,7 +90,7 @@ class DkimSignerTest extends TestCase
         ];
     }
 
-    public function testSignWithUnsupportedAlgorithm()
+    public function testSignWithUnsupportedAlgorithm(): void
     {
         $message = $this->createStub(Message::class);
 
@@ -106,7 +106,7 @@ class DkimSignerTest extends TestCase
     }
 
     #[DataProvider('getCanonicalizeHeaderData')]
-    public function testCanonicalizeHeader(string $bodyCanon, string $canonBody, string $body, int $maxLength)
+    public function testCanonicalizeHeader(string $bodyCanon, string $canonBody, string $body, int $maxLength): void
     {
         $message = (new Email())
             ->from(new Address('fabien@testdkim.symfony.net', 'Fabién'))

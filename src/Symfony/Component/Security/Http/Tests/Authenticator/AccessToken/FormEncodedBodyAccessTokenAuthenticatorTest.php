@@ -35,7 +35,7 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
         $this->accessTokenHandler = new InMemoryAccessTokenHandler();
     }
 
-    public function testSupport()
+    public function testSupport(): void
     {
         $this->setUpAuthenticator();
         $request = new Request([], [], [], [], [], ['CONTENT_TYPE' => 'application/x-www-form-urlencoded']);
@@ -45,7 +45,7 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
         $this->assertNull($this->authenticator->supports($request));
     }
 
-    public function testSupportsWithCustomParameter()
+    public function testSupportsWithCustomParameter(): void
     {
         $this->setUpAuthenticator('protection-token');
         $request = new Request([], [], [], [], [], ['CONTENT_TYPE' => 'application/x-www-form-urlencoded']);
@@ -55,7 +55,7 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
         $this->assertNull($this->authenticator->supports($request));
     }
 
-    public function testAuthenticate()
+    public function testAuthenticate(): void
     {
         $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', new UserBadge('foo'));
         $this->setUpAuthenticator();
@@ -67,7 +67,7 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
         $this->assertInstanceOf(SelfValidatingPassport::class, $passport);
     }
 
-    public function testAuthenticateWithCustomParameter()
+    public function testAuthenticateWithCustomParameter(): void
     {
         $this->accessTokenHandler->add('VALID_ACCESS_TOKEN', new UserBadge('foo'));
         $this->setUpAuthenticator('protection-token');
@@ -80,7 +80,7 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideInvalidAuthenticateData')]
-    public function testAuthenticateInvalid(Request $request, string $errorMessage, string $exceptionType)
+    public function testAuthenticateInvalid(Request $request, string $errorMessage, string $exceptionType): void
     {
         $this->setUpAuthenticator();
 

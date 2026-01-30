@@ -21,7 +21,7 @@ use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 class ServiceMethodsSubscriberTraitTest extends TestCase
 {
-    public function testMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices()
+    public function testMethodsOnParentsAndChildrenAreIgnoredInGetSubscribedServices(): void
     {
         $expected = [
             TestService::class.'::aService' => Service2::class,
@@ -33,7 +33,7 @@ class ServiceMethodsSubscriberTraitTest extends TestCase
         $this->assertEquals($expected, ChildTestService::getSubscribedServices());
     }
 
-    public function testSetContainerIsCalledOnParent()
+    public function testSetContainerIsCalledOnParent(): void
     {
         $container = new class([]) implements ContainerInterface {
             use ServiceLocatorTrait;
@@ -42,7 +42,7 @@ class ServiceMethodsSubscriberTraitTest extends TestCase
         $this->assertSame($container, (new TestService())->setContainer($container));
     }
 
-    public function testParentNotCalledIfHasMagicCall()
+    public function testParentNotCalledIfHasMagicCall(): void
     {
         $container = new class([]) implements ContainerInterface {
             use ServiceLocatorTrait;
@@ -55,7 +55,7 @@ class ServiceMethodsSubscriberTraitTest extends TestCase
         $this->assertSame([], $service::getSubscribedServices());
     }
 
-    public function testParentNotCalledIfNoParent()
+    public function testParentNotCalledIfNoParent(): void
     {
         $container = new class([]) implements ContainerInterface {
             use ServiceLocatorTrait;
@@ -68,7 +68,7 @@ class ServiceMethodsSubscriberTraitTest extends TestCase
         $this->assertSame([], $service::getSubscribedServices());
     }
 
-    public function testSetContainerCalledFirstOnParent()
+    public function testSetContainerCalledFirstOnParent(): void
     {
         $container1 = new class([]) implements ContainerInterface {
             use ServiceLocatorTrait;
@@ -139,12 +139,12 @@ class ChildTestService extends TestService
 
 class ParentWithMagicCall
 {
-    public function __call($method, $args)
+    public function __call($method, $args): void
     {
         throw new \BadMethodCallException('Should not be called.');
     }
 
-    public static function __callStatic($method, $args)
+    public static function __callStatic($method, $args): void
     {
         throw new \BadMethodCallException('Should not be called.');
     }

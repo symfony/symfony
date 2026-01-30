@@ -16,7 +16,7 @@ use Symfony\Component\Yaml\Yaml;
 
 class YamlTest extends TestCase
 {
-    public function testParseAndDump()
+    public function testParseAndDump(): void
     {
         $data = ['lorem' => 'ipsum', 'dolor' => 'sit'];
         $yml = Yaml::dump($data);
@@ -24,14 +24,14 @@ class YamlTest extends TestCase
         $this->assertEquals($data, $parsed);
     }
 
-    public function testZeroIndentationThrowsException()
+    public function testZeroIndentationThrowsException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The indentation must be greater than zero');
         Yaml::dump(['lorem' => 'ipsum', 'dolor' => 'sit'], 2, 0);
     }
 
-    public function testNegativeIndentationThrowsException()
+    public function testNegativeIndentationThrowsException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The indentation must be greater than zero');

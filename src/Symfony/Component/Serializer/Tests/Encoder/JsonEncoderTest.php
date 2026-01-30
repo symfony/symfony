@@ -28,7 +28,7 @@ class JsonEncoderTest extends TestCase
         $this->serializer = new Serializer([new CustomNormalizer()], ['json' => new JsonEncoder()]);
     }
 
-    public function testEncodeScalar()
+    public function testEncodeScalar(): void
     {
         $obj = new \stdClass();
         $obj->foo = 'foo';
@@ -38,7 +38,7 @@ class JsonEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->encode($obj, 'json'));
     }
 
-    public function testComplexObject()
+    public function testComplexObject(): void
     {
         $obj = $this->getObject();
 
@@ -47,7 +47,7 @@ class JsonEncoderTest extends TestCase
         $this->assertEquals($expected, $this->encoder->encode($obj, 'json'));
     }
 
-    public function testOptions()
+    public function testOptions(): void
     {
         $context = ['json_encode_options' => \JSON_NUMERIC_CHECK];
 
@@ -66,7 +66,7 @@ class JsonEncoderTest extends TestCase
         $this->assertEquals($expected, $this->serializer->serialize($arr, 'json'), 'Context should not be persistent');
     }
 
-    public function testWithDefaultContext()
+    public function testWithDefaultContext(): void
     {
         $defaultContext = [
             'json_encode_options' => \JSON_UNESCAPED_UNICODE,
@@ -82,7 +82,7 @@ class JsonEncoderTest extends TestCase
         $this->assertEquals($data, $encoder->decode($json, 'json'));
     }
 
-    public function testEncodeNotUtf8WithoutPartialOnError()
+    public function testEncodeNotUtf8WithoutPartialOnError(): void
     {
         $arr = [
             'utf8' => 'Hello World!',
@@ -94,7 +94,7 @@ class JsonEncoderTest extends TestCase
         $this->encoder->encode($arr, 'json');
     }
 
-    public function testEncodeNotUtf8WithPartialOnError()
+    public function testEncodeNotUtf8WithPartialOnError(): void
     {
         $context = ['json_encode_options' => \JSON_PARTIAL_OUTPUT_ON_ERROR];
 
@@ -112,7 +112,7 @@ class JsonEncoderTest extends TestCase
         $this->assertEquals('0', $this->serializer->serialize(\NAN, 'json', $context));
     }
 
-    public function testDecodeFalseString()
+    public function testDecodeFalseString(): void
     {
         $result = $this->encoder->decode('false', 'json');
         $this->assertSame(\JSON_ERROR_NONE, json_last_error());

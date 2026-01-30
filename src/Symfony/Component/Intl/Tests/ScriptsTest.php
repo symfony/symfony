@@ -237,13 +237,13 @@ class ScriptsTest extends ResourceBundleTestCase
         'Zyyy',
     ];
 
-    public function testGetScriptCodes()
+    public function testGetScriptCodes(): void
     {
         $this->assertSame(self::$scripts, Scripts::getScriptCodes());
     }
 
     #[DataProvider('provideLocales')]
-    public function testGetNames($displayLocale)
+    public function testGetNames($displayLocale): void
     {
         if ('en' !== $displayLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -259,7 +259,7 @@ class ScriptsTest extends ResourceBundleTestCase
         $this->assertSame([], array_diff($scripts, self::$scripts));
     }
 
-    public function testGetNamesDefaultLocale()
+    public function testGetNamesDefaultLocale(): void
     {
         IntlTestHelper::requireFullIntl($this);
 
@@ -269,7 +269,7 @@ class ScriptsTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLocaleAliases')]
-    public function testGetNamesSupportsAliases($alias, $ofLocale)
+    public function testGetNamesSupportsAliases($alias, $ofLocale): void
     {
         if ('en' !== $ofLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -282,7 +282,7 @@ class ScriptsTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLocales')]
-    public function testGetName($displayLocale)
+    public function testGetName($displayLocale): void
     {
         if ('en' !== $displayLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -295,7 +295,7 @@ class ScriptsTest extends ResourceBundleTestCase
         }
     }
 
-    public function testGetNameDefaultLocale()
+    public function testGetNameDefaultLocale(): void
     {
         IntlTestHelper::requireFullIntl($this);
 
@@ -308,13 +308,13 @@ class ScriptsTest extends ResourceBundleTestCase
         }
     }
 
-    public function testGetNameWithInvalidScriptCode()
+    public function testGetNameWithInvalidScriptCode(): void
     {
         $this->expectException(MissingResourceException::class);
         Scripts::getName('foo');
     }
 
-    public function testExists()
+    public function testExists(): void
     {
         $this->assertTrue(Scripts::exists('Hans'));
         $this->assertFalse(Scripts::exists('Zzzz'));

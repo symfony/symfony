@@ -37,7 +37,7 @@ class WebProfilerExtensionTest extends TestCase
     private KernelInterface $kernel;
     private ?ContainerBuilder $container;
 
-    public static function assertSaneContainer(Container $container)
+    public static function assertSaneContainer(Container $container): void
     {
         $removedIds = $container->getRemovedIds();
         $errors = [];
@@ -89,7 +89,7 @@ class WebProfilerExtensionTest extends TestCase
     }
 
     #[DataProvider('getDebugModes')]
-    public function testDefaultConfig($debug)
+    public function testDefaultConfig($debug): void
     {
         $this->container->setParameter('kernel.debug', $debug);
 
@@ -111,7 +111,7 @@ class WebProfilerExtensionTest extends TestCase
     }
 
     #[DataProvider('getToolbarConfig')]
-    public function testToolbarConfig(bool $toolbarEnabled, bool $listenerInjected, bool $listenerEnabled)
+    public function testToolbarConfig(bool $toolbarEnabled, bool $listenerInjected, bool $listenerEnabled): void
     {
         $extension = new WebProfilerExtension();
         $extension->load([['toolbar' => $toolbarEnabled]], $this->container);
@@ -148,7 +148,7 @@ class WebProfilerExtensionTest extends TestCase
         bool $interceptRedirects,
         bool $listenerInjected,
         bool $listenerEnabled,
-    ) {
+    ): void {
         $extension = new WebProfilerExtension();
         $extension->load(
             [['toolbar' => $toolbarEnabled, 'intercept_redirects' => $interceptRedirects]],

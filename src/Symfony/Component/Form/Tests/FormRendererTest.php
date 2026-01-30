@@ -19,7 +19,7 @@ use Symfony\Component\Form\Tests\Fixtures\DummyFormRendererEngine;
 
 class FormRendererTest extends TestCase
 {
-    public function testHumanize()
+    public function testHumanize(): void
     {
         $renderer = new FormRenderer(new DummyFormRendererEngine());
 
@@ -27,7 +27,7 @@ class FormRendererTest extends TestCase
         $this->assertEquals('Is active', $renderer->humanize('isActive'));
     }
 
-    public function testRenderARenderedField()
+    public function testRenderARenderedField(): void
     {
         $this->expectException(BadMethodCallException::class);
         $this->expectExceptionMessage('Field "foo" has already been rendered, save the result of previous render call to a variable and output that instead.');

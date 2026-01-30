@@ -19,7 +19,7 @@ use Symfony\Component\Mime\Email;
 
 class MandrillSmtpTransportTest extends TestCase
 {
-    public function testTagAndMetadataHeaders()
+    public function testTagAndMetadataHeaders(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');

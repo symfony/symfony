@@ -49,7 +49,7 @@ class GuardListenerTest extends TestCase
         ];
     }
 
-    public function testWithNotSupportedEvent()
+    public function testWithNotSupportedEvent(): void
     {
         $event = $this->createEvent();
         $this->configureAuthenticationChecker(false);
@@ -60,7 +60,7 @@ class GuardListenerTest extends TestCase
         $this->assertFalse($event->isBlocked());
     }
 
-    public function testWithSecuritySupportedEventAndReject()
+    public function testWithSecuritySupportedEventAndReject(): void
     {
         $event = $this->createEvent();
         $this->configureAuthenticationChecker(true, false);
@@ -70,7 +70,7 @@ class GuardListenerTest extends TestCase
         $this->assertTrue($event->isBlocked());
     }
 
-    public function testWithSecuritySupportedEventAndAccept()
+    public function testWithSecuritySupportedEventAndAccept(): void
     {
         $event = $this->createEvent();
         $this->configureAuthenticationChecker(true, true);
@@ -80,7 +80,7 @@ class GuardListenerTest extends TestCase
         $this->assertFalse($event->isBlocked());
     }
 
-    public function testWithValidatorSupportedEventAndReject()
+    public function testWithValidatorSupportedEventAndReject(): void
     {
         $event = $this->createEvent();
         $this->configureValidator(true, false);
@@ -90,7 +90,7 @@ class GuardListenerTest extends TestCase
         $this->assertTrue($event->isBlocked());
     }
 
-    public function testWithValidatorSupportedEventAndAccept()
+    public function testWithValidatorSupportedEventAndAccept(): void
     {
         $event = $this->createEvent();
         $this->configureValidator(true, true);
@@ -100,7 +100,7 @@ class GuardListenerTest extends TestCase
         $this->assertFalse($event->isBlocked());
     }
 
-    public function testWithGuardExpressionWithNotSupportedTransition()
+    public function testWithGuardExpressionWithNotSupportedTransition(): void
     {
         $event = $this->createEvent();
         $this->configureValidator(false);
@@ -109,7 +109,7 @@ class GuardListenerTest extends TestCase
         $this->assertFalse($event->isBlocked());
     }
 
-    public function testWithGuardExpressionWithSupportedTransition()
+    public function testWithGuardExpressionWithSupportedTransition(): void
     {
         $event = $this->createEvent($this->configuration['test_expression'][1]->getTransition());
         $this->configureValidator(true, true);
@@ -118,7 +118,7 @@ class GuardListenerTest extends TestCase
         $this->assertFalse($event->isBlocked());
     }
 
-    public function testGuardExpressionBlocks()
+    public function testGuardExpressionBlocks(): void
     {
         $event = $this->createEvent($this->configuration['test_expression'][1]->getTransition());
         $this->configureValidator(true, false);
@@ -137,7 +137,7 @@ class GuardListenerTest extends TestCase
         return new GuardEvent($subject, new Marking($subject->getMarking() ?? []), $transition, $workflow);
     }
 
-    private function configureAuthenticationChecker($isUsed, $granted = true)
+    private function configureAuthenticationChecker($isUsed, $granted = true): void
     {
         $this->authenticationChecker ??= $this->createMock(AuthorizationCheckerInterface::class);
 

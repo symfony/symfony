@@ -19,7 +19,7 @@ use Symfony\Component\AssetMapper\MapperAwareAssetPackage;
 
 class MapperAwareAssetPackageTest extends TestCase
 {
-    public function testGetVersion()
+    public function testGetVersion(): void
     {
         $inner = $this->createMock(PackageInterface::class);
         $inner->expects($this->once())
@@ -33,7 +33,7 @@ class MapperAwareAssetPackageTest extends TestCase
     }
 
     #[DataProvider('getUrlTests')]
-    public function testGetUrl(string $path, string $expectedPathSentToInner)
+    public function testGetUrl(string $path, string $expectedPathSentToInner): void
     {
         $inner = $this->createMock(PackageInterface::class);
         $inner->expects($this->once())

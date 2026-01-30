@@ -26,14 +26,14 @@ class JsonDecodeTest extends TestCase
         $this->decode = new JsonDecode();
     }
 
-    public function testSupportsDecoding()
+    public function testSupportsDecoding(): void
     {
         $this->assertTrue($this->decode->supportsDecoding(JsonEncoder::FORMAT));
         $this->assertFalse($this->decode->supportsDecoding('foobar'));
     }
 
     #[DataProvider('decodeProvider')]
-    public function testDecode($toDecode, $expected, $context)
+    public function testDecode($toDecode, $expected, $context): void
     {
         $this->assertEquals(
             $expected,
@@ -53,7 +53,7 @@ class JsonDecodeTest extends TestCase
     }
 
     #[DataProvider('decodeProviderException')]
-    public function testDecodeWithException(string $value, string $expectedExceptionMessage, array $context)
+    public function testDecodeWithException(string $value, string $expectedExceptionMessage, array $context): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);

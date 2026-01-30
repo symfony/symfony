@@ -20,7 +20,7 @@ use Symfony\Component\Console\Tester\CommandCompletionTester;
 class SecretsRemoveCommandTest extends TestCase
 {
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(bool $withLocalVault, array $input, array $expectedSuggestions)
+    public function testComplete(bool $withLocalVault, array $input, array $expectedSuggestions): void
     {
         $vault = $this->createStub(AbstractVault::class);
         $vault->method('list')->willReturn(['SECRET' => null, 'OTHER_SECRET' => null]);

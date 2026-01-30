@@ -39,7 +39,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
 
 class ConnectionTest extends TestCase
 {
-    public function testGetAMessageWillChangeItsStatus()
+    public function testGetAMessageWillChangeItsStatus(): void
     {
         $queryBuilder = $this->getQueryBuilderStub();
         $driverConnection = $this->getDBALConnection();
@@ -75,7 +75,7 @@ class ConnectionTest extends TestCase
         $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelope['headers']);
     }
 
-    public function testGetWithNoPendingMessageWillReturnNull()
+    public function testGetWithNoPendingMessageWillReturnNull(): void
     {
         $queryBuilder = $this->getQueryBuilderStub();
         $driverConnection = $this->getDBALConnection(true);
@@ -104,7 +104,7 @@ class ConnectionTest extends TestCase
         $this->assertNull($doctrineEnvelope);
     }
 
-    public function testGetWithSkipLockedWithForUpdateMethod()
+    public function testGetWithSkipLockedWithForUpdateMethod(): void
     {
         $queryBuilder = $this->getQueryBuilderStub();
         $driverConnection = $this->getDBALConnection(true);
@@ -138,7 +138,7 @@ class ConnectionTest extends TestCase
         $this->assertNull($doctrineEnvelope);
     }
 
-    public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
+    public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage(): void
     {
         $this->expectException(TransportException::class);
         $driverConnection = $this->getDBALConnection();
@@ -148,7 +148,7 @@ class ConnectionTest extends TestCase
         $connection->ack('dummy_id');
     }
 
-    public function testItThrowsATransportExceptionIfItCannotRejectMessage()
+    public function testItThrowsATransportExceptionIfItCannotRejectMessage(): void
     {
         $this->expectException(TransportException::class);
         $driverConnection = $this->getDBALConnection();
@@ -158,7 +158,7 @@ class ConnectionTest extends TestCase
         $connection->reject('dummy_id');
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnection(true);
@@ -207,7 +207,7 @@ class ConnectionTest extends TestCase
         self::assertSame('1', $id);
     }
 
-    public function testSendLastInsertIdReturnsInteger()
+    public function testSendLastInsertIdReturnsInteger(): void
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnection(true);
@@ -256,7 +256,7 @@ class ConnectionTest extends TestCase
         self::assertSame('1', $id);
     }
 
-    public function testKeepalive()
+    public function testKeepalive(): void
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnection(true);
@@ -300,7 +300,7 @@ class ConnectionTest extends TestCase
         $connection->keepalive('1');
     }
 
-    public function testKeepaliveRollback()
+    public function testKeepaliveRollback(): void
     {
         $queryBuilder = $this->getQueryBuilderMock();
         $driverConnection = $this->getDBALConnection(true);
@@ -348,7 +348,7 @@ class ConnectionTest extends TestCase
         $connection->keepalive('1');
     }
 
-    public function testKeepaliveThrowsExceptionWhenRedeliverTimeoutIsLessThenInterval()
+    public function testKeepaliveThrowsExceptionWhenRedeliverTimeoutIsLessThenInterval(): void
     {
         $driverConnection = $this->getDBALConnection();
 
@@ -427,7 +427,7 @@ class ConnectionTest extends TestCase
     }
 
     #[DataProvider('buildConfigurationProvider')]
-    public function testBuildConfiguration(string $dsn, array $options, string $expectedConnection, string $expectedTableName, int $expectedRedeliverTimeout, string $expectedQueue, bool $expectedAutoSetup)
+    public function testBuildConfiguration(string $dsn, array $options, string $expectedConnection, string $expectedTableName, int $expectedRedeliverTimeout, string $expectedQueue, bool $expectedAutoSetup): void
     {
         $config = Connection::buildConfiguration($dsn, $options);
         $this->assertEquals($expectedConnection, $config['connection']);
@@ -510,21 +510,21 @@ class ConnectionTest extends TestCase
         ];
     }
 
-    public function testItThrowsAnExceptionIfAnExtraOptionsInDefined()
+    public function testItThrowsAnExceptionIfAnExtraOptionsInDefined(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown option found: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
         Connection::buildConfiguration('doctrine://default', ['new_option' => 'woops']);
     }
 
-    public function testItThrowsAnExceptionIfAnExtraOptionsInDefinedInDSN()
+    public function testItThrowsAnExceptionIfAnExtraOptionsInDefinedInDSN(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown option found in DSN: [new_option]. Allowed options are [table_name, queue_name, redeliver_timeout, auto_setup]');
         Connection::buildConfiguration('doctrine://default?new_option=woops');
     }
 
-    public function testFind()
+    public function testFind(): void
     {
         $queryBuilder = $this->getQueryBuilderStub();
         $driverConnection = $this->getDBALConnection();
@@ -559,7 +559,7 @@ class ConnectionTest extends TestCase
         $this->assertEquals(['type' => DummyMessage::class], $doctrineEnvelope['headers']);
     }
 
-    public function testFindAll()
+    public function testFindAll(): void
     {
         $queryBuilder = $this->getQueryBuilderStub();
         $driverConnection = $this->getDBALConnection();
@@ -611,7 +611,7 @@ class ConnectionTest extends TestCase
     }
 
     #[DataProvider('providePlatformSql')]
-    public function testGeneratedSql(AbstractPlatform $platform, string $expectedSql)
+    public function testGeneratedSql(AbstractPlatform $platform, string $expectedSql): void
     {
         $driverConnection = $this->createMock(DBALConnection::class);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
@@ -673,7 +673,7 @@ class ConnectionTest extends TestCase
         ];
     }
 
-    public function testConfigureSchema()
+    public function testConfigureSchema(): void
     {
         $driverConnection = $this->getDBALConnection();
         $schema = new Schema();
@@ -699,7 +699,7 @@ class ConnectionTest extends TestCase
         $this->assertTrue($hasCoveringIndex, 'Expected covering index on [queue_name, available_at, delivered_at, id] not found');
     }
 
-    public function testConfigureSchemaDifferentDbalConnection()
+    public function testConfigureSchemaDifferentDbalConnection(): void
     {
         $driverConnection = $this->getDBALConnection();
         $driverConnection2 = $this->getDBALConnection();
@@ -710,7 +710,7 @@ class ConnectionTest extends TestCase
         $this->assertFalse($schema->hasTable('messenger_messages'));
     }
 
-    public function testConfigureSchemaTableExists()
+    public function testConfigureSchemaTableExists(): void
     {
         $driverConnection = $this->getDBALConnection();
         $schema = new Schema();
@@ -723,7 +723,7 @@ class ConnectionTest extends TestCase
     }
 
     #[DataProvider('provideFindAllSqlGeneratedByPlatform')]
-    public function testFindAllSqlGenerated(AbstractPlatform $platform, string $expectedSql)
+    public function testFindAllSqlGenerated(AbstractPlatform $platform, string $expectedSql): void
     {
         $driverConnection = $this->createMock(DBALConnection::class);
         $driverConnection->method('getDatabasePlatform')->willReturn($platform);
@@ -766,7 +766,7 @@ class ConnectionTest extends TestCase
         ];
     }
 
-    public function testConfigureSchemaOracleSequenceNameSuffixed()
+    public function testConfigureSchemaOracleSequenceNameSuffixed(): void
     {
         $driverConnection = $this->createStub(DBALConnection::class);
         $driverConnection->method('getDatabasePlatform')->willReturn(new OraclePlatform());

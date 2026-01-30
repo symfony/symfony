@@ -27,7 +27,7 @@ class ValidateRequestListenerTest extends TestCase
         Request::setTrustedProxies([], -1);
     }
 
-    public function testListenerThrowsWhenMainRequestHasInconsistentClientIps()
+    public function testListenerThrowsWhenMainRequestHasInconsistentClientIps(): void
     {
         $this->expectException(ConflictingHeadersException::class);
         $dispatcher = new EventDispatcher();

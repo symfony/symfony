@@ -26,7 +26,7 @@ use Symfony\Component\Mime\RawMessage;
 class TransportTest extends TestCase
 {
     #[DataProvider('fromStringProvider')]
-    public function testFromString(string $dsn, TransportInterface $transport)
+    public function testFromString(string $dsn, TransportInterface $transport): void
     {
         $transportFactory = new Transport([new DummyTransportFactory()]);
 
@@ -65,7 +65,7 @@ class TransportTest extends TestCase
     }
 
     #[DataProvider('fromDsnProvider')]
-    public function testFromDsn(string $dsn, TransportInterface $transport)
+    public function testFromDsn(string $dsn, TransportInterface $transport): void
     {
         $this->assertEquals($transport, Transport::fromDsn($dsn));
     }
@@ -79,7 +79,7 @@ class TransportTest extends TestCase
     }
 
     #[DataProvider('fromWrongStringProvider')]
-    public function testFromWrongString(string $dsn, string $error)
+    public function testFromWrongString(string $dsn, string $error): void
     {
         $transportFactory = new Transport([new DummyTransportFactory()]);
 

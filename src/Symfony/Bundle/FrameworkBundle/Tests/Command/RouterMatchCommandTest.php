@@ -25,7 +25,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 class RouterMatchCommandTest extends TestCase
 {
-    public function testWithMatchPath()
+    public function testWithMatchPath(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['path_info' => '/foo', 'foo'], ['decorated' => false]);
@@ -34,7 +34,7 @@ class RouterMatchCommandTest extends TestCase
         $this->assertStringContainsString('Route Name   | foo', $tester->getDisplay());
     }
 
-    public function testWithNotMatchPath()
+    public function testWithNotMatchPath(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['path_info' => '/test', 'foo'], ['decorated' => false]);

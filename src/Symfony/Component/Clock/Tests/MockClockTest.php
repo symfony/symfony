@@ -17,7 +17,7 @@ use Symfony\Component\Clock\MockClock;
 
 class MockClockTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $clock = new MockClock();
         $this->assertSame('UTC', $clock->now()->getTimezone()->getName());
@@ -40,7 +40,7 @@ class MockClockTest extends TestCase
         $this->assertSame('2022-06-20 00:00:00', $clock->now()->format('Y-m-d H:i:s'));
     }
 
-    public function testNow()
+    public function testNow(): void
     {
         $before = new \DateTimeImmutable();
         $clock = new MockClock();
@@ -54,7 +54,7 @@ class MockClockTest extends TestCase
         $this->assertNotSame($clock->now(), $clock->now());
     }
 
-    public function testSleep()
+    public function testSleep(): void
     {
         $clock = new MockClock((new \DateTimeImmutable('2112-09-17 23:53:00.999Z'))->setTimezone(new \DateTimeZone('UTC')));
         $tz = $clock->now()->getTimezone()->getName();
@@ -78,7 +78,7 @@ class MockClockTest extends TestCase
     }
 
     #[DataProvider('provideValidModifyStrings')]
-    public function testModifyWithSpecificDateTime(string $modifiedNow, string $expectedNow)
+    public function testModifyWithSpecificDateTime(string $modifiedNow, string $expectedNow): void
     {
         $clock = new MockClock((new \DateTimeImmutable('2112-09-17 23:53:00.999Z'))->setTimezone(new \DateTimeZone('UTC')));
         $tz = $clock->now()->getTimezone()->getName();
@@ -96,7 +96,7 @@ class MockClockTest extends TestCase
     }
 
     #[DataProvider('provideInvalidModifyStrings')]
-    public function testModifyThrowsOnInvalidString(string $modifiedNow)
+    public function testModifyThrowsOnInvalidString(string $modifiedNow): void
     {
         $clock = new MockClock((new \DateTimeImmutable('2112-09-17 23:53:00.999Z'))->setTimezone(new \DateTimeZone('UTC')));
 
@@ -106,7 +106,7 @@ class MockClockTest extends TestCase
         $clock->modify($modifiedNow);
     }
 
-    public function testWithTimeZone()
+    public function testWithTimeZone(): void
     {
         $clock = new MockClock();
         $utcClock = $clock->withTimeZone('UTC');
@@ -115,7 +115,7 @@ class MockClockTest extends TestCase
         $this->assertSame('UTC', $utcClock->now()->getTimezone()->getName());
     }
 
-    public function testSleepWithNegativeValueDoesNothing()
+    public function testSleepWithNegativeValueDoesNothing(): void
     {
         $initialTime = new \DateTimeImmutable('2000-01-01 12:00:00 UTC');
 

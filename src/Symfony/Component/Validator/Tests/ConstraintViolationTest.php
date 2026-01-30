@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Tests\Fixtures\ToString;
 
 class ConstraintViolationTest extends TestCase
 {
-    public function testToStringHandlesArrays()
+    public function testToStringHandlesArrays(): void
     {
         $violation = new ConstraintViolation(
             'Array',
@@ -37,7 +37,7 @@ class ConstraintViolationTest extends TestCase
         $this->assertSame($expected, (string) $violation);
     }
 
-    public function testToStringHandlesArrayRoots()
+    public function testToStringHandlesArrayRoots(): void
     {
         $violation = new ConstraintViolation(
             '42 cannot be used here',
@@ -56,7 +56,7 @@ class ConstraintViolationTest extends TestCase
         $this->assertSame($expected, (string) $violation);
     }
 
-    public function testToStringHandlesCodes()
+    public function testToStringHandlesCodes(): void
     {
         $violation = new ConstraintViolation(
             '42 cannot be used here',
@@ -77,7 +77,7 @@ class ConstraintViolationTest extends TestCase
         $this->assertSame($expected, (string) $violation);
     }
 
-    public function testToStringOmitsEmptyCodes()
+    public function testToStringOmitsEmptyCodes(): void
     {
         $expected = <<<'EOF'
             Array.some_value:
@@ -111,7 +111,7 @@ class ConstraintViolationTest extends TestCase
         $this->assertSame($expected, (string) $violation);
     }
 
-    public function testMessageCanBeStringableObject()
+    public function testMessageCanBeStringableObject(): void
     {
         $message = new ToString();
         $violation = new ConstraintViolation(
@@ -131,7 +131,7 @@ class ConstraintViolationTest extends TestCase
         $this->assertSame($message, $violation->getMessage());
     }
 
-    public function testMessageCannotBeArray()
+    public function testMessageCannotBeArray(): void
     {
         $this->expectException(\TypeError::class);
         new ConstraintViolation(
@@ -144,7 +144,7 @@ class ConstraintViolationTest extends TestCase
         );
     }
 
-    public function testMessageObjectMustBeStringable()
+    public function testMessageObjectMustBeStringable(): void
     {
         $this->expectException(\TypeError::class);
         new ConstraintViolation(
@@ -157,7 +157,7 @@ class ConstraintViolationTest extends TestCase
         );
     }
 
-    public function testRetrievedPropertyPathIsAStringEvenIfNotSet()
+    public function testRetrievedPropertyPathIsAStringEvenIfNotSet(): void
     {
         self::assertSame(
             '',
@@ -172,7 +172,7 @@ class ConstraintViolationTest extends TestCase
         );
     }
 
-    public function testRetrievedMessageTemplateIsAStringEvenIfNotSet()
+    public function testRetrievedMessageTemplateIsAStringEvenIfNotSet(): void
     {
         self::assertSame(
             '',

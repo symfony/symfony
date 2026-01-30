@@ -18,7 +18,7 @@ use Symfony\Component\TypeInfo\Type;
 
 class ObjectNodeTest extends TestCase
 {
-    public function testWithAccessor()
+    public function testWithAccessor(): void
     {
         $object = new ObjectNode('$foo', Type::object(self::class), [
             new ScalarNode('$foo->property', Type::int()),

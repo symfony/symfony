@@ -40,7 +40,7 @@ class TranslatorTest extends TestCase
         $this->deleteTmpDir();
     }
 
-    protected function deleteTmpDir()
+    protected function deleteTmpDir(): void
     {
         if (!file_exists($dir = $this->tmpDir)) {
             return;
@@ -50,7 +50,7 @@ class TranslatorTest extends TestCase
         $fs->remove($dir);
     }
 
-    public function testTransWithoutCaching()
+    public function testTransWithoutCaching(): void
     {
         $translator = $this->getTranslator($this->getLoader());
         $translator->setLocale('fr');
@@ -67,7 +67,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
-    public function testTransWithCaching()
+    public function testTransWithCaching(): void
     {
         // prime the cache
         $translator = $this->getTranslator($this->getLoader(), ['cache_dir' => $this->tmpDir]);
@@ -101,7 +101,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('foobarbax (sr@latin)', $translator->trans('foobarbax'));
     }
 
-    public function testLoadResourcesWithoutCaching()
+    public function testLoadResourcesWithoutCaching(): void
     {
         $loader = new YamlFileLoader();
         $resourceFiles = [
@@ -116,14 +116,14 @@ class TranslatorTest extends TestCase
         $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
-    public function testGetDefaultLocale()
+    public function testGetDefaultLocale(): void
     {
         $translator = new Translator(new Container(), new MessageFormatter(), 'en');
 
         $this->assertSame('en', $translator->getLocale());
     }
 
-    public function testInvalidOptions()
+    public function testInvalidOptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The Translator does not support the following options: \'foo\'');
@@ -132,7 +132,7 @@ class TranslatorTest extends TestCase
     }
 
     #[DataProvider('getDebugModeAndCacheDirCombinations')]
-    public function testResourceFilesOptionLoadsBeforeOtherAddedResources($debug, $enableCache)
+    public function testResourceFilesOptionLoadsBeforeOtherAddedResources($debug, $enableCache): void
     {
         $someCatalogue = $this->getCatalogue('some_locale', []);
 
@@ -180,7 +180,7 @@ class TranslatorTest extends TestCase
         ];
     }
 
-    public function testCatalogResourcesAreAddedForScannedDirectories()
+    public function testCatalogResourcesAreAddedForScannedDirectories(): void
     {
         $loader = new YamlFileLoader();
         $resourceFiles = [
@@ -203,7 +203,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals(new FileExistenceResource('/tmp/I/sure/hope/this/does/not/exist'), $resources[2]);
     }
 
-    public function testCachedCatalogueIsReDumpedWhenScannedDirectoriesChange()
+    public function testCachedCatalogueIsReDumpedWhenScannedDirectoriesChange(): void
     {
         /** @var Translator $translator */
         $translator = $this->getTranslator(new YamlFileLoader(), [
@@ -317,7 +317,7 @@ class TranslatorTest extends TestCase
         return $translator;
     }
 
-    public function testWarmup()
+    public function testWarmup(): void
     {
         $loader = new YamlFileLoader();
         $resourceFiles = [
@@ -342,7 +342,7 @@ class TranslatorTest extends TestCase
         $this->assertEquals('répertoire', $translator->trans('folder'));
     }
 
-    public function testEnabledLocales()
+    public function testEnabledLocales(): void
     {
         $loader = new YamlFileLoader();
         $resourceFiles = [
@@ -367,7 +367,7 @@ class TranslatorTest extends TestCase
         $this->assertCount(1, glob($this->tmpDir.'/catalogue.*.*.php'), 'Only the "fr" catalogue is generated.');
     }
 
-    public function testLoadingTranslationFilesWithDotsInMessageDomain()
+    public function testLoadingTranslationFilesWithDotsInMessageDomain(): void
     {
         $loader = new YamlFileLoader();
         $resourceFiles = [

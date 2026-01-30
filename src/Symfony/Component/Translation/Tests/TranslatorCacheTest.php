@@ -35,7 +35,7 @@ class TranslatorCacheTest extends TestCase
         $this->deleteTmpDir();
     }
 
-    protected function deleteTmpDir()
+    protected function deleteTmpDir(): void
     {
         if (!file_exists($dir = $this->tmpDir)) {
             return;
@@ -56,7 +56,7 @@ class TranslatorCacheTest extends TestCase
     }
 
     #[DataProvider('runForDebugAndProduction')]
-    public function testThatACacheIsUsed($debug)
+    public function testThatACacheIsUsed($debug): void
     {
         if (!class_exists(\MessageFormatter::class)) {
             $this->markTestSkipped(\sprintf('Skipping test as the required "%s" class does not exist. Consider installing the "intl" PHP extension or the "symfony/polyfill-intl-messageformatter" package.', \MessageFormatter::class));
@@ -83,7 +83,7 @@ class TranslatorCacheTest extends TestCase
         $this->assertEquals('OK', $translator->trans($msgid.'+intl', [], 'messages+intl-icu'));
     }
 
-    public function testCatalogueIsReloadedWhenResourcesAreNoLongerFresh()
+    public function testCatalogueIsReloadedWhenResourcesAreNoLongerFresh(): void
     {
         /*
          * The testThatACacheIsUsed() test showed that we don't need the loader as long as the cache
@@ -125,7 +125,7 @@ class TranslatorCacheTest extends TestCase
     }
 
     #[DataProvider('runForDebugAndProduction')]
-    public function testDifferentTranslatorsForSameLocaleDoNotOverwriteEachOthersCache($debug)
+    public function testDifferentTranslatorsForSameLocaleDoNotOverwriteEachOthersCache($debug): void
     {
         /*
          * Similar to the previous test. After we used the second translator, make
@@ -155,7 +155,7 @@ class TranslatorCacheTest extends TestCase
         $this->assertEquals('OK', $translator->trans($msgid), '-> the cache was overwritten by another translator instance in '.($debug ? 'debug' : 'production'));
     }
 
-    public function testGeneratedCacheFilesAreOnlyBelongRequestedLocales()
+    public function testGeneratedCacheFilesAreOnlyBelongRequestedLocales(): void
     {
         $translator = new Translator('a', null, $this->tmpDir);
         $translator->setFallbackLocales(['b']);
@@ -166,7 +166,7 @@ class TranslatorCacheTest extends TestCase
         $this->assertCount(1, $cachedFiles);
     }
 
-    public function testDifferentCacheFilesAreUsedForDifferentSetsOfFallbackLocales()
+    public function testDifferentCacheFilesAreUsedForDifferentSetsOfFallbackLocales(): void
     {
         /*
          * Because the cache file contains a catalogue including all of its fallback
@@ -196,7 +196,7 @@ class TranslatorCacheTest extends TestCase
         $this->assertEquals('bar', $translator->trans('bar'));
     }
 
-    public function testPrimaryAndFallbackCataloguesContainTheSameMessagesRegardlessOfCaching()
+    public function testPrimaryAndFallbackCataloguesContainTheSameMessagesRegardlessOfCaching(): void
     {
         /*
          * As a safeguard against potential BC breaks, make sure that primary and fallback
@@ -247,7 +247,7 @@ class TranslatorCacheTest extends TestCase
         $this->assertTrue($fallback->defines('baz', 'messages+intl-icu'));
     }
 
-    public function testRefreshCacheWhenResourcesAreNoLongerFresh()
+    public function testRefreshCacheWhenResourcesAreNoLongerFresh(): void
     {
         $resource = $this->createStub(SelfCheckingResourceInterface::class);
         $loader = $this->createMock(LoaderInterface::class);
@@ -270,7 +270,7 @@ class TranslatorCacheTest extends TestCase
         $translator->trans('foo');
     }
 
-    public function testCachedCatalogueIsReDumpedWhenCacheVaryChange()
+    public function testCachedCatalogueIsReDumpedWhenCacheVaryChange(): void
     {
         $translator = new Translator('a', null, $this->tmpDir, false, []);
         $translator->addLoader('array', new ArrayLoader());
@@ -322,7 +322,7 @@ class StaleResource implements SelfCheckingResourceInterface
         return false;
     }
 
-    public function getResource()
+    public function getResource(): void
     {
     }
 

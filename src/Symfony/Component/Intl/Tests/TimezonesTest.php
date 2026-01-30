@@ -725,13 +725,13 @@ class TimezonesTest extends ResourceBundleTestCase
         'Etc/UTC',
     ];
 
-    public function testGetIds()
+    public function testGetIds(): void
     {
         $this->assertEquals(self::ZONES, Timezones::getIds());
     }
 
     #[DataProvider('provideLocales')]
-    public function testGetNames($displayLocale)
+    public function testGetNames($displayLocale): void
     {
         if ('en' !== $displayLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -745,7 +745,7 @@ class TimezonesTest extends ResourceBundleTestCase
         $this->assertSame([], array_diff($zones, self::ZONES));
     }
 
-    public function testGetNamesDefaultLocale()
+    public function testGetNamesDefaultLocale(): void
     {
         IntlTestHelper::requireFullIntl($this);
 
@@ -755,7 +755,7 @@ class TimezonesTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLocaleAliases')]
-    public function testGetNamesSupportsAliases($alias, $ofLocale)
+    public function testGetNamesSupportsAliases($alias, $ofLocale): void
     {
         if ('en' !== $ofLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -768,7 +768,7 @@ class TimezonesTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLocales')]
-    public function testGetName($displayLocale)
+    public function testGetName($displayLocale): void
     {
         if ('en' !== $displayLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -781,7 +781,7 @@ class TimezonesTest extends ResourceBundleTestCase
         }
     }
 
-    public function testGetNameDefaultLocale()
+    public function testGetNameDefaultLocale(): void
     {
         IntlTestHelper::requireFullIntl($this);
 
@@ -794,26 +794,26 @@ class TimezonesTest extends ResourceBundleTestCase
         }
     }
 
-    public function testGetNameWithInvalidTimezone()
+    public function testGetNameWithInvalidTimezone(): void
     {
         $this->expectException(MissingResourceException::class);
         Timezones::getName('foo');
     }
 
-    public function testGetNameWithAliasTimezone()
+    public function testGetNameWithAliasTimezone(): void
     {
         $this->expectException(MissingResourceException::class);
         Timezones::getName('US/Pacific'); // alias in icu (not compiled), name unavailable in php
     }
 
-    public function testExists()
+    public function testExists(): void
     {
         $this->assertTrue(Timezones::exists('Europe/Amsterdam'));
         $this->assertTrue(Timezones::exists('US/Pacific')); // alias in icu (not compiled), identifier available in php
         $this->assertFalse(Timezones::exists('Etc/Unknown'));
     }
 
-    public function testGetRawOffset()
+    public function testGetRawOffset(): void
     {
         // timezones free from DST changes to avoid time-based variance
         $this->assertSame(0, Timezones::getRawOffset('Etc/UTC'));
@@ -824,14 +824,14 @@ class TimezonesTest extends ResourceBundleTestCase
         Timezones::getRawOffset('US/Pacific');
     }
 
-    public function testGetRawOffsetWithUnknownTimezone()
+    public function testGetRawOffsetWithUnknownTimezone(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Unknown or bad timezone (foobar)');
         Timezones::getRawOffset('foobar');
     }
 
-    public function testGetGmtOffset()
+    public function testGetGmtOffset(): void
     {
         // timezones free from DST changes to avoid time-based variance
         $this->assertSame('GMT+00:00', Timezones::getGmtOffset('Etc/UTC'));
@@ -844,39 +844,39 @@ class TimezonesTest extends ResourceBundleTestCase
         $this->assertSame('GMT+5:45', Timezones::getGmtOffset('Asia/Katmandu', null, 'cs'));
     }
 
-    public function testGetCountryCode()
+    public function testGetCountryCode(): void
     {
         $this->assertSame('NL', Timezones::getCountryCode('Europe/Amsterdam'));
         $this->assertSame('US', Timezones::getCountryCode('America/New_York'));
     }
 
-    public function testForCountryCode()
+    public function testForCountryCode(): void
     {
         $this->assertSame(['Europe/Amsterdam'], Timezones::forCountryCode('NL'));
         $this->assertSame(['Europe/Berlin', 'Europe/Busingen'], Timezones::forCountryCode('DE'));
     }
 
-    public function testForCountryCodeWithUnknownCountry()
+    public function testForCountryCodeWithUnknownCountry(): void
     {
         $this->expectException(MissingResourceException::class);
         Timezones::forCountryCode('foobar');
     }
 
-    public function testForCountryCodeWithWrongCountryCode()
+    public function testForCountryCodeWithWrongCountryCode(): void
     {
         $this->expectException(MissingResourceException::class);
         $this->expectExceptionMessage('Country codes must be in uppercase, but "nl" was passed. Try with "NL" country code instead.');
         Timezones::forCountryCode('nl');
     }
 
-    public function testGetCountryCodeWithUnknownTimezone()
+    public function testGetCountryCodeWithUnknownTimezone(): void
     {
         $this->expectException(MissingResourceException::class);
         Timezones::getCountryCode('foobar');
     }
 
     #[DataProvider('provideTimezones')]
-    public function testGetGmtOffsetAvailability(string $timezone)
+    public function testGetGmtOffsetAvailability(string $timezone): void
     {
         try {
             new \DateTimeZone($timezone);
@@ -892,7 +892,7 @@ class TimezonesTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideTimezones')]
-    public function testGetCountryCodeAvailability(string $timezone)
+    public function testGetCountryCodeAvailability(string $timezone): void
     {
         try {
             // ensure each timezone identifier has a corresponding country code
@@ -914,7 +914,7 @@ class TimezonesTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideCountries')]
-    public function testForCountryCodeAvailability(string $country)
+    public function testForCountryCodeAvailability(string $country): void
     {
         // ensure each country code has a list of timezone identifiers (possibly empty)
         Timezones::forCountryCode($country);
@@ -927,7 +927,7 @@ class TimezonesTest extends ResourceBundleTestCase
         return self::COUNTRIES;
     }
 
-    public function testGetRawOffsetChangeTimeCountry()
+    public function testGetRawOffsetChangeTimeCountry(): void
     {
         $this->assertSame(7200, Timezones::getRawOffset('Europe/Paris', (new \DateTimeImmutable('2022-07-16 00:00:00+00:00'))->getTimestamp()));
         $this->assertSame(3600, Timezones::getRawOffset('Europe/Paris', (new \DateTimeImmutable('2022-02-16 00:00:00+00:00'))->getTimestamp()));

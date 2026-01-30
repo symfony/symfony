@@ -24,7 +24,7 @@ trait AttributesTestTrait
 
     abstract protected function getDenormalizerForAttributes(): DenormalizerInterface;
 
-    public function testAttributesNormalize()
+    public function testAttributesNormalize(): void
     {
         $normalizer = $this->getNormalizerForAttributes();
 
@@ -58,7 +58,7 @@ trait AttributesTestTrait
         );
     }
 
-    public function testAttributesContextDenormalize()
+    public function testAttributesContextDenormalize(): void
     {
         $normalizer = $this->getDenormalizerForAttributes();
 
@@ -79,7 +79,7 @@ trait AttributesTestTrait
             ], ObjectOuter::class, null, $context));
     }
 
-    public function testAttributesContextDenormalizeIgnoreExtraAttributes()
+    public function testAttributesContextDenormalizeIgnoreExtraAttributes(): void
     {
         $normalizer = $this->getDenormalizerForAttributes();
 
@@ -99,7 +99,7 @@ trait AttributesTestTrait
             ], ObjectOuter::class, null, $context));
     }
 
-    public function testAttributesContextDenormalizeExceptionExtraAttributes()
+    public function testAttributesContextDenormalizeExceptionExtraAttributes(): void
     {
         $normalizer = $this->getDenormalizerForAttributes();
 

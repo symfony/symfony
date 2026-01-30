@@ -20,7 +20,7 @@ class MoneyTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         return $this->factory->create(MoneyType::class, null, $options);
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 

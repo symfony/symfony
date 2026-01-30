@@ -27,7 +27,7 @@ class RedisCasterTest extends TestCase
     use VarDumperTestTrait;
 
     #[RequiresPhpExtension('redis')]
-    public function testNotConnected()
+    public function testNotConnected(): void
     {
         $redis = new \Redis();
 
@@ -42,7 +42,7 @@ class RedisCasterTest extends TestCase
 
     #[TestWith([\Redis::class])]
     #[TestWith([Relay::class])]
-    public function testConnected(string $class)
+    public function testConnected(string $class): void
     {
         if (!class_exists($class)) {
             self::markTestSkipped(\sprintf('"%s" class required', $class));

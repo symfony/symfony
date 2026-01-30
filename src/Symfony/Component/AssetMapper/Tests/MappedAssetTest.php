@@ -18,7 +18,7 @@ use Symfony\Component\AssetMapper\MappedAsset;
 
 class MappedAssetTest extends TestCase
 {
-    public function testGetLogicalPath()
+    public function testGetLogicalPath(): void
     {
         $asset = new MappedAsset('foo.css');
 
@@ -26,7 +26,7 @@ class MappedAssetTest extends TestCase
     }
 
     #[DataProvider('getExtensionTests')]
-    public function testGetExtension(string $filename, string $expectedExtension)
+    public function testGetExtension(string $filename, string $expectedExtension): void
     {
         $asset = new MappedAsset('anything', publicPathWithoutDigest: $filename);
 
@@ -40,7 +40,7 @@ class MappedAssetTest extends TestCase
         yield 'with_directory' => ['foo/bar.css', 'css'];
     }
 
-    public function testAddDependencies()
+    public function testAddDependencies(): void
     {
         $mainAsset = new MappedAsset('file.js');
 
@@ -52,7 +52,7 @@ class MappedAssetTest extends TestCase
         $this->assertSame(['/path/to/foo.js'], $mainAsset->getFileDependencies());
     }
 
-    public function testAddJavaScriptImports()
+    public function testAddJavaScriptImports(): void
     {
         $mainAsset = new MappedAsset('file.js');
 

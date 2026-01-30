@@ -26,14 +26,14 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         return new UniqueValidator();
     }
 
-    public function testExpectsUniqueConstraintCompatibleType()
+    public function testExpectsUniqueConstraintCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->validator->validate('', new Unique());
     }
 
     #[DataProvider('getValidValues')]
-    public function testValidValues($value)
+    public function testValidValues($value): void
     {
         $this->validator->validate($value, new Unique());
 
@@ -58,7 +58,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidValues')]
-    public function testInvalidValues($value, $expectedMessageParam)
+    public function testInvalidValues($value, $expectedMessageParam): void
     {
         $constraint = new Unique(message: 'myMessage');
         $this->validator->validate($value, $constraint);
@@ -83,7 +83,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testInvalidValueNamed()
+    public function testInvalidValueNamed(): void
     {
         $constraint = new Unique(message: 'myMessage');
         $this->validator->validate([1, 2, 3, 3], $constraint);
@@ -95,7 +95,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getCallback')]
-    public function testExpectsUniqueObjects($callback)
+    public function testExpectsUniqueObjects($callback): void
     {
         $object1 = new \stdClass();
         $object1->name = 'Foo';
@@ -117,7 +117,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getCallback')]
-    public function testExpectsNonUniqueObjects($callback)
+    public function testExpectsNonUniqueObjects($callback): void
     {
         $object1 = new \stdClass();
         $object1->name = 'Foo';
@@ -155,7 +155,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testExpectsInvalidNonStrictComparison()
+    public function testExpectsInvalidNonStrictComparison(): void
     {
         $this->validator->validate([1, '1', 1.0, '1.0'], new Unique(
             message: 'myMessage',
@@ -168,7 +168,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testExpectsValidNonStrictComparison()
+    public function testExpectsValidNonStrictComparison(): void
     {
         $callback = static fn ($item) => (int) $item;
 
@@ -177,7 +177,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testExpectsInvalidCaseInsensitiveComparison()
+    public function testExpectsInvalidCaseInsensitiveComparison(): void
     {
         $callback = static fn ($item) => mb_strtolower($item);
 
@@ -192,7 +192,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testExpectsValidCaseInsensitiveComparison()
+    public function testExpectsValidCaseInsensitiveComparison(): void
     {
         $callback = static fn ($item) => mb_strtolower($item);
 
@@ -201,7 +201,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testCollectionFieldsAreOptional()
+    public function testCollectionFieldsAreOptional(): void
     {
         $this->validator->validate([['value' => 5], ['id' => 1, 'value' => 6]], new Unique(fields: 'id'));
 
@@ -209,7 +209,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidFieldNames')]
-    public function testCollectionFieldNamesMustBeString(string $type, mixed $field)
+    public function testCollectionFieldNamesMustBeString(string $type, mixed $field): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->expectExceptionMessage(\sprintf('Expected argument of type "string", "%s" given', $type));
@@ -227,7 +227,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidCollectionValues')]
-    public function testInvalidCollectionValues(array $value, array $fields, string $expectedMessageParam)
+    public function testInvalidCollectionValues(array $value, array $fields, string $expectedMessageParam): void
     {
         $this->validator->validate($value, new Unique(
             message: 'myMessage',
@@ -269,7 +269,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testArrayOfObjectsUnique()
+    public function testArrayOfObjectsUnique(): void
     {
         $array = [
             new DummyClassOne(),
@@ -292,7 +292,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testErrorPath()
+    public function testErrorPath(): void
     {
         $array = [
             new DummyClassOne(),
@@ -320,7 +320,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testErrorPathWithIteratorAggregate()
+    public function testErrorPathWithIteratorAggregate(): void
     {
         $array = new \ArrayObject([
             new DummyClassOne(),
@@ -348,7 +348,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testErrorPathWithNonList()
+    public function testErrorPathWithNonList(): void
     {
         $array = [
             'a' => new DummyClassOne(),
@@ -376,7 +376,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testWithoutStopOnFirstError()
+    public function testWithoutStopOnFirstError(): void
     {
         $this->validator->validate(
             ['a1', 'a2', 'a1', 'a1', 'a2'],
@@ -402,7 +402,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testWithoutStopOnFirstErrorWithErrorPath()
+    public function testWithoutStopOnFirstErrorWithErrorPath(): void
     {
         $array = [
             new DummyClassOne(),

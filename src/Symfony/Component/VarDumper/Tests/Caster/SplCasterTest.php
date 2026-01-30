@@ -66,12 +66,12 @@ class SplCasterTest extends TestCase
     }
 
     #[DataProvider('getCastFileInfoTests')]
-    public function testCastFileInfo($file, $dump)
+    public function testCastFileInfo($file, $dump): void
     {
         $this->assertDumpMatchesFormat($dump, new \SplFileInfo($file));
     }
 
-    public function testCastFileObject()
+    public function testCastFileObject(): void
     {
         $var = new \SplFileObject(__FILE__);
         $var->setFlags(\SplFileObject::DROP_NEW_LINE | \SplFileObject::SKIP_EMPTY);
@@ -121,7 +121,7 @@ class SplCasterTest extends TestCase
     }
 
     #[DataProvider('provideCastSplDoublyLinkedList')]
-    public function testCastSplDoublyLinkedList($modeValue, $modeDump)
+    public function testCastSplDoublyLinkedList($modeValue, $modeDump): void
     {
         $var = new \SplDoublyLinkedList();
         $var->setIteratorMode($modeValue);
@@ -144,7 +144,7 @@ class SplCasterTest extends TestCase
         ];
     }
 
-    public function testCastObjectStorageIsntModified()
+    public function testCastObjectStorageIsntModified(): void
     {
         $var = new \SplObjectStorage();
         $var[new \stdClass()] = null;
@@ -155,7 +155,7 @@ class SplCasterTest extends TestCase
         $this->assertSame($current, $var->current());
     }
 
-    public function testCastObjectStorageDumpsInfo()
+    public function testCastObjectStorageDumpsInfo(): void
     {
         $var = new \SplObjectStorage();
         $var[new \stdClass()] = new \DateTimeImmutable();
@@ -163,7 +163,7 @@ class SplCasterTest extends TestCase
         $this->assertDumpMatchesFormat('%ADateTimeImmutable%A', $var);
     }
 
-    public function testCastArrayObject()
+    public function testCastArrayObject(): void
     {
         $var = new
             #[\AllowDynamicProperties]
@@ -184,7 +184,7 @@ class SplCasterTest extends TestCase
         $this->assertDumpEquals($expected, $var);
     }
 
-    public function testArrayIterator()
+    public function testArrayIterator(): void
     {
         $var = new MyArrayIterator([234]);
 
@@ -201,7 +201,7 @@ class SplCasterTest extends TestCase
         $this->assertDumpEquals($expected, $var);
     }
 
-    public function testBadSplFileInfo()
+    public function testBadSplFileInfo(): void
     {
         $var = new BadSplFileInfo();
 
@@ -213,7 +213,7 @@ class SplCasterTest extends TestCase
         $this->assertDumpEquals($expected, $var);
     }
 
-    public function testWeakMap()
+    public function testWeakMap(): void
     {
         $var = new \WeakMap();
         $obj = new \stdClass();

@@ -22,7 +22,7 @@ use Symfony\Component\CssSelector\Parser\Shortcut\HashParser;
 class HashParserTest extends TestCase
 {
     #[DataProvider('getParseTestData')]
-    public function testParse($source, $representation)
+    public function testParse($source, $representation): void
     {
         $parser = new HashParser();
         $selectors = $parser->parse($source);

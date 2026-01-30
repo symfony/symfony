@@ -35,7 +35,7 @@ class ConsoleSectionOutputTest extends TestCase
         unset($this->stream);
     }
 
-    public function testClearAll()
+    public function testClearAll(): void
     {
         $sections = [];
         $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
@@ -47,7 +47,7 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL.\sprintf("\x1b[%dA", 2)."\x1b[0J", stream_get_contents($output->getStream()));
     }
 
-    public function testClearNumberOfLines()
+    public function testClearNumberOfLines(): void
     {
         $sections = [];
         $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
@@ -59,7 +59,7 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals("Foo\nBar\nBaz\nFooBar".\PHP_EOL.\sprintf("\x1b[%dA", 2)."\x1b[0J", stream_get_contents($output->getStream()));
     }
 
-    public function testClearNumberOfLinesWithMultipleSections()
+    public function testClearNumberOfLinesWithMultipleSections(): void
     {
         $output = new StreamOutput($this->stream);
         $sections = [];
@@ -76,7 +76,7 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL."\x1b[1A\x1b[0J\e[1A\e[0J".'Baz'.\PHP_EOL.'Foo'.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
-    public function testClearPreservingEmptyLines()
+    public function testClearPreservingEmptyLines(): void
     {
         $output = new StreamOutput($this->stream);
         $sections = [];
@@ -92,7 +92,7 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals(\PHP_EOL.'foo'.\PHP_EOL."\x1b[1A\x1b[0J\x1b[1A\x1b[0J".'bar'.\PHP_EOL.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
-    public function testOverwrite()
+    public function testOverwrite(): void
     {
         $sections = [];
         $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
@@ -104,7 +104,7 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals('Foo'.\PHP_EOL."\x1b[1A\x1b[0JBar".\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
-    public function testMaxHeight()
+    public function testMaxHeight(): void
     {
         $expected = '';
         $sections = [];
@@ -134,7 +134,7 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals($expected, stream_get_contents($output->getStream()));
     }
 
-    public function testMaxHeightMultipleSections()
+    public function testMaxHeightMultipleSections(): void
     {
         $expected = '';
         $sections = [];
@@ -168,7 +168,7 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals(escapeshellcmd($expected), escapeshellcmd(stream_get_contents($this->stream)));
     }
 
-    public function testMaxHeightWithoutNewLine()
+    public function testMaxHeightWithoutNewLine(): void
     {
         $expected = '';
         $sections = [];
@@ -188,7 +188,7 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals($expected, stream_get_contents($output->getStream()));
     }
 
-    public function testOverwriteMultipleLines()
+    public function testOverwriteMultipleLines(): void
     {
         $sections = [];
         $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
@@ -200,7 +200,7 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL.'Baz'.\PHP_EOL.\sprintf("\x1b[%dA", 3)."\x1b[0J".'Bar'.\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
-    public function testAddingMultipleSections()
+    public function testAddingMultipleSections(): void
     {
         $sections = [];
         new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());
@@ -209,7 +209,7 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertCount(2, $sections);
     }
 
-    public function testMultipleSectionsOutput()
+    public function testMultipleSectionsOutput(): void
     {
         $output = new StreamOutput($this->stream);
         $sections = [];
@@ -226,7 +226,7 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertEquals('Foo'.\PHP_EOL.'Bar'.\PHP_EOL."\x1b[2A\x1b[0JBar".\PHP_EOL."\x1b[1A\x1b[0JBaz".\PHP_EOL.'Bar'.\PHP_EOL."\x1b[1A\x1b[0JFoobar".\PHP_EOL, stream_get_contents($output->getStream()));
     }
 
-    public function testMultipleSectionsOutputWithoutNewline()
+    public function testMultipleSectionsOutputWithoutNewline(): void
     {
         $expected = '';
         $output = new StreamOutput($this->stream);
@@ -257,7 +257,7 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertSame($expected, stream_get_contents($output->getStream()));
     }
 
-    public function testClearAfterOverwriteClearsCorrectNumberOfLines()
+    public function testClearAfterOverwriteClearsCorrectNumberOfLines(): void
     {
         $expected = '';
         $sections = [];
@@ -272,7 +272,7 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertSame($expected, stream_get_contents($output->getStream()));
     }
 
-    public function testClearSectionContainingQuestion()
+    public function testClearSectionContainingQuestion(): void
     {
         $inputStream = fopen('php://memory', 'r+', false);
         fwrite($inputStream, "Batman & Robin\n");
@@ -292,7 +292,7 @@ class ConsoleSectionOutputTest extends TestCase
         $this->assertSame('What\'s your favorite super hero?'.\PHP_EOL."\x1b[2A\x1b[0J", stream_get_contents($output->getStream()));
     }
 
-    public function testWriteWithoutNewLine()
+    public function testWriteWithoutNewLine(): void
     {
         $sections = [];
         $output = new ConsoleSectionOutput($this->stream, $sections, OutputInterface::VERBOSITY_NORMAL, true, new OutputFormatter());

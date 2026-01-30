@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class DecoratorServicePassTest extends TestCase
 {
-    public function testProcessWithoutAlias()
+    public function testProcessWithoutAlias(): void
     {
         $container = new ContainerBuilder();
         $fooDefinition = $container
@@ -61,7 +61,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertNull($barExtendedDefinition->getDecoratedService());
     }
 
-    public function testProcessWithAlias()
+    public function testProcessWithAlias(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -86,7 +86,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertNull($fooExtendedDefinition->getDecoratedService());
     }
 
-    public function testProcessWithPriority()
+    public function testProcessWithPriority(): void
     {
         $container = new ContainerBuilder();
         $fooDefinition = $container
@@ -127,7 +127,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertNull($quxDefinition->getDecoratedService());
     }
 
-    public function testProcessWithInvalidDecorated()
+    public function testProcessWithInvalidDecorated(): void
     {
         $container = new ContainerBuilder();
         $decoratorDefinition = $container
@@ -158,7 +158,7 @@ class DecoratorServicePassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcessNoInnerAliasWithInvalidDecorated()
+    public function testProcessNoInnerAliasWithInvalidDecorated(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -170,7 +170,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertFalse($container->hasAlias('decorator.inner'));
     }
 
-    public function testProcessWithInvalidDecoratedAndWrongBehavior()
+    public function testProcessWithInvalidDecoratedAndWrongBehavior(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -182,7 +182,7 @@ class DecoratorServicePassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcessMovesTagsFromDecoratedDefinitionToDecoratingDefinition()
+    public function testProcessMovesTagsFromDecoratedDefinitionToDecoratingDefinition(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -201,7 +201,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar'], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
     }
 
-    public function testProcessMovesTagsFromDecoratedDefinitionToDecoratingDefinitionMultipleTimes()
+    public function testProcessMovesTagsFromDecoratedDefinitionToDecoratingDefinitionMultipleTimes(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -224,7 +224,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'container.decorator' => [['id' => 'foo', 'inner' => 'deco1.inner']]], $container->getDefinition('deco2')->getTags());
     }
 
-    public function testProcessLeavesServiceLocatorTagOnOriginalDefinition()
+    public function testProcessLeavesServiceLocatorTagOnOriginalDefinition(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -243,7 +243,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar'], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
     }
 
-    public function testProcessLeavesServiceSubscriberTagOnOriginalDefinition()
+    public function testProcessLeavesServiceSubscriberTagOnOriginalDefinition(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -262,7 +262,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar'], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
     }
 
-    public function testProcessLeavesProxyTagOnOriginalDefinition()
+    public function testProcessLeavesProxyTagOnOriginalDefinition(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -281,7 +281,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEquals(['bar' => ['attr' => 'baz'], 'foobar' => ['attr' => 'bar'], 'container.decorator' => [['id' => 'foo', 'inner' => 'baz.inner']]], $container->getDefinition('baz')->getTags());
     }
 
-    public function testCannotDecorateSyntheticService()
+    public function testCannotDecorateSyntheticService(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -298,7 +298,7 @@ class DecoratorServicePassTest extends TestCase
         $this->process($container);
     }
 
-    public function testGenericInnerReference()
+    public function testGenericInnerReference(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo');
@@ -312,7 +312,7 @@ class DecoratorServicePassTest extends TestCase
         $this->assertEquals(['prop' => new Reference('bar.inner')], $container->getDefinition('bar')->getProperties());
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new DecoratorServicePass();
         $pass->process($container);

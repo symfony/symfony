@@ -18,7 +18,7 @@ use Symfony\Component\Translation\Util\XliffUtils;
 class TranslationFilesTest extends TestCase
 {
     #[DataProvider('provideTranslationFiles')]
-    public function testTranslationFileIsValid($filePath)
+    public function testTranslationFileIsValid($filePath): void
     {
         $document = new \DOMDocument();
         $document->loadXML(file_get_contents($filePath));
@@ -29,7 +29,7 @@ class TranslationFilesTest extends TestCase
     }
 
     #[DataProvider('provideTranslationFiles')]
-    public function testTranslationFileIsValidWithoutEntityLoader($filePath)
+    public function testTranslationFileIsValidWithoutEntityLoader($filePath): void
     {
         $document = new \DOMDocument();
         $document->loadXML(file_get_contents($filePath));
@@ -47,7 +47,7 @@ class TranslationFilesTest extends TestCase
         );
     }
 
-    public function testNorwegianAlias()
+    public function testNorwegianAlias(): void
     {
         $this->assertFileEquals(
             \dirname(__DIR__, 2).'/Resources/translations/security.nb.xlf',

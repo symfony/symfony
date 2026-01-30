@@ -47,7 +47,7 @@ final class TwilioTransportTest extends TransportTestCase
     }
 
     #[DataProvider('invalidFromProvider')]
-    public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from)
+    public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from): void
     {
         $transport = self::createTransport(null, $from);
 
@@ -58,7 +58,7 @@ final class TwilioTransportTest extends TransportTestCase
     }
 
     #[DataProvider('invalidFromProvider')]
-    public function testInvalidArgumentExceptionIsThrownIfSmsMessageFromIsInvalid(string $from)
+    public function testInvalidArgumentExceptionIsThrownIfSmsMessageFromIsInvalid(string $from): void
     {
         $transport = $this->createTransport();
 
@@ -80,7 +80,7 @@ final class TwilioTransportTest extends TransportTestCase
     }
 
     #[DataProvider('validFromProvider')]
-    public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from)
+    public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from): void
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
 

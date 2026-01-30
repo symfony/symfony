@@ -22,7 +22,7 @@ use Symfony\Component\Translation\Writer\TranslationWriter;
 
 class TranslationWriterTest extends TestCase
 {
-    public function testWrite()
+    public function testWrite(): void
     {
         $dumper = $this->createMock(DumperInterface::class);
         $dumper
@@ -34,7 +34,7 @@ class TranslationWriterTest extends TestCase
         $writer->write(new MessageCatalogue('en'), 'test');
     }
 
-    public function testGetFormats()
+    public function testGetFormats(): void
     {
         $writer = new TranslationWriter();
         $writer->addDumper('foo', new YamlFileDumper());
@@ -43,7 +43,7 @@ class TranslationWriterTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $writer->getFormats());
     }
 
-    public function testFormatIsNotSupported()
+    public function testFormatIsNotSupported(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('There is no dumper associated with format "foo".');
@@ -52,7 +52,7 @@ class TranslationWriterTest extends TestCase
         $writer->write(new MessageCatalogue('en'), 'foo');
     }
 
-    public function testUnwritableDirectory()
+    public function testUnwritableDirectory(): void
     {
         $writer = new TranslationWriter();
         $writer->addDumper('foo', new YamlFileDumper());

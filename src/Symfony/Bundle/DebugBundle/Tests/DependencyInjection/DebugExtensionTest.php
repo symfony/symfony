@@ -25,7 +25,7 @@ use Symfony\Component\VarDumper\Server\DumpServer;
 
 class DebugExtensionTest extends TestCase
 {
-    public function testLoadWithoutConfiguration()
+    public function testLoadWithoutConfiguration(): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new DebugExtension());
@@ -43,7 +43,7 @@ class DebugExtensionTest extends TestCase
         $this->assertSame($expectedTags, $container->getDefinition('data_collector.dump')->getTag('data_collector'));
     }
 
-    public function testUnsetClosureFileInfoShouldBeRegisteredInVarCloner()
+    public function testUnsetClosureFileInfoShouldBeRegisteredInVarCloner(): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new DebugExtension());
@@ -82,7 +82,7 @@ class DebugExtensionTest extends TestCase
     }
 
     #[DataProvider('provideServicesUsingDumpDestinationCreation')]
-    public function testServicesUsingDumpDestinationCreation(?string $dumpDestination, string $expectedHost, ?string $expectedOutput)
+    public function testServicesUsingDumpDestinationCreation(?string $dumpDestination, string $expectedHost, ?string $expectedOutput): void
     {
         $container = $this->createContainer();
         $container->registerExtension(new DebugExtension());
@@ -120,7 +120,7 @@ class DebugExtensionTest extends TestCase
         return $container;
     }
 
-    private function compileContainer(ContainerBuilder $container)
+    private function compileContainer(ContainerBuilder $container): void
     {
         $container->getCompilerPassConfig()->setOptimizationPasses([]);
         $container->getCompilerPassConfig()->setRemovingPasses([]);

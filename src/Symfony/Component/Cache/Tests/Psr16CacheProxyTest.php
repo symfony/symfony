@@ -42,7 +42,7 @@ class Psr16CacheProxyTest extends SimpleCacheTest
         return new Psr16Cache(new ProxyAdapter(new ArrayAdapter($defaultLifetime), 'my-namespace.'));
     }
 
-    public function testProxy()
+    public function testProxy(): void
     {
         $pool = new ArrayAdapter();
         $cache = new Psr16Cache(new ProxyAdapter($pool, 'my-namespace'));

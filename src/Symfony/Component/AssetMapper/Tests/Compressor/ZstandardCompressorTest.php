@@ -41,7 +41,7 @@ class ZstandardCompressorTest extends TestCase
         $this->filesystem?->remove(self::WRITABLE_ROOT);
     }
 
-    public function testCompress()
+    public function testCompress(): void
     {
         $this->filesystem->dumpFile(self::WRITABLE_ROOT.'/foo/bar.js', 'foobar');
 

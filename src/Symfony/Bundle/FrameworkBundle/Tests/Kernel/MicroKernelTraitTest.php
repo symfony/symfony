@@ -49,7 +49,7 @@ class MicroKernelTraitTest extends TestCase
     }
 
     #[BackupGlobals(true)]
-    public function testGetShareDirDisabledByEnv()
+    public function testGetShareDirDisabledByEnv(): void
     {
         $_SERVER['APP_SHARE_DIR'] = 'false';
 
@@ -62,7 +62,7 @@ class MicroKernelTraitTest extends TestCase
     }
 
     #[BackupGlobals(true)]
-    public function testGetShareDirCustomPathFromEnv()
+    public function testGetShareDirCustomPathFromEnv(): void
     {
         $_SERVER['APP_SHARE_DIR'] = sys_get_temp_dir();
 
@@ -77,7 +77,7 @@ class MicroKernelTraitTest extends TestCase
         $this->assertSame(realpath($expected), realpath($parameters['kernel.share_dir']));
     }
 
-    public function test()
+    public function test(): void
     {
         $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
         $kernel->boot();
@@ -90,7 +90,7 @@ class MicroKernelTraitTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $kernel->getContainer()->get('halloween'));
     }
 
-    public function testAsEventSubscriber()
+    public function testAsEventSubscriber(): void
     {
         $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
         $kernel->boot();
@@ -101,7 +101,7 @@ class MicroKernelTraitTest extends TestCase
         $this->assertSame('It\'s dangerous to go alone. Take this ⚔', $response->getContent());
     }
 
-    public function testRoutingRouteLoaderTagIsAdded()
+    public function testRoutingRouteLoaderTagIsAdded(): void
     {
         $frameworkExtension = $this->createMock(ExtensionInterface::class);
         $frameworkExtension
@@ -115,7 +115,7 @@ class MicroKernelTraitTest extends TestCase
         $this->assertTrue($container->getDefinition('kernel')->hasTag('routing.route_loader'));
     }
 
-    public function testFlexStyle()
+    public function testFlexStyle(): void
     {
         $kernel = $this->kernel = new FlexStyleMicroKernel('test', false);
         $kernel->boot();
@@ -136,7 +136,7 @@ class MicroKernelTraitTest extends TestCase
         $this->assertSame('easter', $response->getContent());
     }
 
-    public function testSecretLoadedFromExtension()
+    public function testSecretLoadedFromExtension(): void
     {
         $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
         $kernel->boot();
@@ -144,7 +144,7 @@ class MicroKernelTraitTest extends TestCase
         self::assertSame('$ecret', $kernel->getContainer()->getParameter('kernel.secret'));
     }
 
-    public function testAnonymousMicroKernel()
+    public function testAnonymousMicroKernel(): void
     {
         $kernel = $this->kernel = new class('anonymous_kernel') extends MinimalKernel {
             public function helloAction(): Response
@@ -170,7 +170,7 @@ class MicroKernelTraitTest extends TestCase
         $this->assertSame('Hello World!', $response->getContent());
     }
 
-    public function testSimpleKernel()
+    public function testSimpleKernel(): void
     {
         $kernel = $this->kernel = new SimpleKernel('simple_kernel');
         $kernel->boot();
@@ -181,7 +181,7 @@ class MicroKernelTraitTest extends TestCase
         $this->assertSame('Hello World!', $response->getContent());
     }
 
-    public function testKernelCommand()
+    public function testKernelCommand(): void
     {
         if (!property_exists(AsCommand::class, 'help')) {
             $this->markTestSkipped('Invokable command no available.');
@@ -198,7 +198,7 @@ class MicroKernelTraitTest extends TestCase
         $this->assertSame('Hello Kernel!', $output->fetch());
     }
 
-    public function testDefaultKernel()
+    public function testDefaultKernel(): void
     {
         $kernel = $this->kernel = new DefaultKernel('test', false);
         $kernel->boot();
@@ -211,7 +211,7 @@ class MicroKernelTraitTest extends TestCase
         $this->assertSame('OK', $response->getContent());
     }
 
-    public function testGetKernelParameters()
+    public function testGetKernelParameters(): void
     {
         $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
 
@@ -222,7 +222,7 @@ class MicroKernelTraitTest extends TestCase
         $this->assertSame(['Symfony\Bundle\FrameworkBundle\FrameworkBundle' => ['all' => true]], $parameters['.kernel.bundles_definition']);
     }
 
-    public function testGetKernelParametersWithBundlesFile()
+    public function testGetKernelParametersWithBundlesFile(): void
     {
         $kernel = $this->kernel = new ConcreteMicroKernel('test', false);
 
@@ -241,7 +241,7 @@ class MicroKernelTraitTest extends TestCase
         ], $parameters['.kernel.bundles_definition']);
     }
 
-    public function testRelativeEnvDirsAreResolvedFromProjectDir()
+    public function testRelativeEnvDirsAreResolvedFromProjectDir(): void
     {
         $_SERVER['APP_CACHE_DIR'] = 'var/custom-cache';
         $_SERVER['APP_BUILD_DIR'] = 'var/custom-build';

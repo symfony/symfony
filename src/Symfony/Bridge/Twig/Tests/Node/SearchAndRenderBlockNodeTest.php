@@ -25,7 +25,7 @@ use Twig\TwigFunction;
 
 class SearchAndRenderBlockNodeTest extends TestCase
 {
-    public function testCompileWidget()
+    public function testCompileWidget(): void
     {
         $arguments = new Nodes([
             new ContextVariable('form', 0),
@@ -44,7 +44,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
         );
     }
 
-    public function testCompileWidgetWithVariables()
+    public function testCompileWidgetWithVariables(): void
     {
         $arguments = new Nodes([
             new ContextVariable('form', 0),
@@ -67,7 +67,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
         );
     }
 
-    public function testCompileLabelWithLabel()
+    public function testCompileLabelWithLabel(): void
     {
         $arguments = new Nodes([
             new ContextVariable('form', 0),
@@ -87,7 +87,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
         );
     }
 
-    public function testCompileLabelWithNullLabel()
+    public function testCompileLabelWithNullLabel(): void
     {
         $arguments = new Nodes([
             new ContextVariable('form', 0),
@@ -109,7 +109,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
         );
     }
 
-    public function testCompileLabelWithEmptyStringLabel()
+    public function testCompileLabelWithEmptyStringLabel(): void
     {
         $arguments = new Nodes([
             new ContextVariable('form', 0),
@@ -131,7 +131,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
         );
     }
 
-    public function testCompileLabelWithDefaultLabel()
+    public function testCompileLabelWithDefaultLabel(): void
     {
         $arguments = new Nodes([
             new ContextVariable('form', 0),
@@ -150,7 +150,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
         );
     }
 
-    public function testCompileLabelWithAttributes()
+    public function testCompileLabelWithAttributes(): void
     {
         $arguments = new Nodes([
             new ContextVariable('form', 0),
@@ -177,7 +177,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
         );
     }
 
-    public function testCompileLabelWithLabelAndAttributes()
+    public function testCompileLabelWithLabelAndAttributes(): void
     {
         $arguments = new Nodes([
             new ContextVariable('form', 0),
@@ -203,7 +203,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
         );
     }
 
-    public function testCompileLabelWithLabelThatEvaluatesToNull()
+    public function testCompileLabelWithLabelThatEvaluatesToNull(): void
     {
         $conditional = new ConditionalTernary(
             // if
@@ -233,7 +233,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
         );
     }
 
-    public function testCompileLabelWithLabelThatEvaluatesToNullAndAttributes()
+    public function testCompileLabelWithLabelThatEvaluatesToNullAndAttributes(): void
     {
         $conditional = new ConditionalTernary(
             // if

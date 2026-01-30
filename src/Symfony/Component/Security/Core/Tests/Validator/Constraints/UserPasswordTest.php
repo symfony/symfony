@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class UserPasswordTest extends TestCase
 {
-    public function testValidatedByStandardValidator()
+    public function testValidatedByStandardValidator(): void
     {
         $constraint = new UserPassword();
 
@@ -27,7 +27,7 @@ class UserPasswordTest extends TestCase
     }
 
     #[DataProvider('provideServiceValidatedConstraints')]
-    public function testValidatedByService(UserPassword $constraint)
+    public function testValidatedByService(UserPassword $constraint): void
     {
         self::assertSame('my_service', $constraint->validatedBy());
     }
@@ -42,7 +42,7 @@ class UserPasswordTest extends TestCase
         yield 'attribute' => [$metadata->getPropertyMetadata('b')[0]->getConstraints()[0]];
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(UserPasswordDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));

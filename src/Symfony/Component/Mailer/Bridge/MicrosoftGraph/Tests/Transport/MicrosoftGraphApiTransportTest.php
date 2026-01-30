@@ -25,7 +25,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class MicrosoftGraphApiTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(MicrosoftGraphApiTransport $transport, string $expected)
+    public function testToString(MicrosoftGraphApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -40,7 +40,7 @@ class MicrosoftGraphApiTransportTest extends TestCase
         ];
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -93,7 +93,7 @@ class MicrosoftGraphApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testCcBcc()
+    public function testCcBcc(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -125,7 +125,7 @@ class MicrosoftGraphApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testHtmlBody()
+    public function testHtmlBody(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -151,7 +151,7 @@ class MicrosoftGraphApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testEmbeddedAttachment()
+    public function testEmbeddedAttachment(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -179,7 +179,7 @@ class MicrosoftGraphApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testRespectsNoSaveParameter()
+    public function testRespectsNoSaveParameter(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -203,7 +203,7 @@ class MicrosoftGraphApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -232,7 +232,7 @@ class MicrosoftGraphApiTransportTest extends TestCase
     }
 
     #[DataProvider('headersToByPassProvider')]
-    public function testHeadersToBypass(string $header, string $value)
+    public function testHeadersToBypass(string $header, string $value): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $message = json_decode($options['body'], true)['message'];
@@ -272,7 +272,7 @@ class MicrosoftGraphApiTransportTest extends TestCase
     }
 
     #[DataProvider('importanceProvider')]
-    public function testImportance(string $expected, int $priority)
+    public function testImportance(string $expected, int $priority): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options) use ($expected): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -306,7 +306,7 @@ class MicrosoftGraphApiTransportTest extends TestCase
         yield ['low', Email::PRIORITY_LOWEST];
     }
 
-    public function testNonSuccessCodeThrown()
+    public function testNonSuccessCodeThrown(): void
     {
         $client = new MockHttpClient(static fn (): ResponseInterface => new MockResponse('', ['http_code' => 503]));
 

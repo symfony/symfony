@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\IdentityMarshaller;
  */
 class IdentityMarshallerTest extends TestCase
 {
-    public function testMarshall()
+    public function testMarshall(): void
     {
         $marshaller = new IdentityMarshaller();
         $values = ['data' => 'string_data'];
@@ -30,7 +30,7 @@ class IdentityMarshallerTest extends TestCase
     }
 
     #[DataProvider('invalidMarshallDataProvider')]
-    public function testMarshallInvalidData($values)
+    public function testMarshallInvalidData($values): void
     {
         $marshaller = new IdentityMarshaller();
         $failed = [];
@@ -41,7 +41,7 @@ class IdentityMarshallerTest extends TestCase
         $marshaller->marshall($values, $failed);
     }
 
-    public function testUnmarshall()
+    public function testUnmarshall(): void
     {
         $marshaller = new IdentityMarshaller();
 

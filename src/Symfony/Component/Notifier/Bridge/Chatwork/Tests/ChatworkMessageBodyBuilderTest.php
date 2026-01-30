@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Chatwork\ChatworkMessageBodyBuilder;
 
 class ChatworkMessageBodyBuilderTest extends TestCase
 {
-    public function testSetTo()
+    public function testSetTo(): void
     {
         $builder = new ChatworkMessageBodyBuilder();
         $builder->to(['abc', 'def']);
@@ -26,7 +26,7 @@ class ChatworkMessageBodyBuilderTest extends TestCase
         $this->assertSame(['ghi'], $property->getValue($builder));
     }
 
-    public function testSetSelfUnread()
+    public function testSetSelfUnread(): void
     {
         $builder = new ChatworkMessageBodyBuilder();
         $builder->selfUnread(true);
@@ -34,7 +34,7 @@ class ChatworkMessageBodyBuilderTest extends TestCase
         $this->assertTrue($property->getValue($builder));
     }
 
-    public function testSetBody()
+    public function testSetBody(): void
     {
         $builder = new ChatworkMessageBodyBuilder();
         $builder->body('test body');
@@ -42,7 +42,7 @@ class ChatworkMessageBodyBuilderTest extends TestCase
         $this->assertEquals('test body', $property->getValue($builder));
     }
 
-    public function testGetMessageBody()
+    public function testGetMessageBody(): void
     {
         $builder = new ChatworkMessageBodyBuilder();
         $builder

@@ -32,7 +32,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class TypeFactoryTest extends TestCase
 {
-    public function testCreateBuiltin()
+    public function testCreateBuiltin(): void
     {
         $this->assertEquals(new BuiltinType(TypeIdentifier::INT), Type::builtin(TypeIdentifier::INT));
         $this->assertEquals(new BuiltinType(TypeIdentifier::INT), Type::builtin('int'));
@@ -50,7 +50,7 @@ class TypeFactoryTest extends TestCase
         $this->assertEquals(new BuiltinType(TypeIdentifier::NEVER), Type::never());
     }
 
-    public function testCreateArray()
+    public function testCreateArray(): void
     {
         $this->assertEquals(new CollectionType(new BuiltinType(TypeIdentifier::ARRAY)), Type::array());
 
@@ -118,7 +118,7 @@ class TypeFactoryTest extends TestCase
         );
     }
 
-    public function testCreateIterable()
+    public function testCreateIterable(): void
     {
         $this->assertEquals(new CollectionType(new BuiltinType(TypeIdentifier::ITERABLE)), Type::iterable());
 
@@ -141,13 +141,13 @@ class TypeFactoryTest extends TestCase
         );
     }
 
-    public function testCreateObject()
+    public function testCreateObject(): void
     {
         $this->assertEquals(new BuiltinType(TypeIdentifier::OBJECT), Type::object());
         $this->assertEquals(new ObjectType(self::class), Type::object(self::class));
     }
 
-    public function testCreateEnum()
+    public function testCreateEnum(): void
     {
         $this->assertEquals(new EnumType(DummyEnum::class), Type::enum(DummyEnum::class));
         $this->assertEquals(new BackedEnumType(DummyBackedEnum::class, new BuiltinType(TypeIdentifier::STRING)), Type::enum(DummyBackedEnum::class));
@@ -157,7 +157,7 @@ class TypeFactoryTest extends TestCase
         );
     }
 
-    public function testCreateGeneric()
+    public function testCreateGeneric(): void
     {
         $this->assertEquals(
             new GenericType(new ObjectType(self::class), new BuiltinType(TypeIdentifier::INT)),
@@ -165,27 +165,27 @@ class TypeFactoryTest extends TestCase
         );
     }
 
-    public function testCreateTemplate()
+    public function testCreateTemplate(): void
     {
         $this->assertEquals(new TemplateType('T', new BuiltinType(TypeIdentifier::INT)), Type::template('T', Type::int()));
         $this->assertEquals(new TemplateType('T', Type::mixed()), Type::template('T'));
     }
 
-    public function testCreateUnion()
+    public function testCreateUnion(): void
     {
         $this->assertEquals(new UnionType(new BuiltinType(TypeIdentifier::INT), new ObjectType(self::class)), Type::union(Type::int(), Type::object(self::class)));
         $this->assertEquals(new UnionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING)), Type::union(Type::int(), Type::string(), Type::int()));
         $this->assertEquals(new UnionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING)), Type::union(Type::int(), Type::union(Type::int(), Type::string())));
     }
 
-    public function testCreateIntersection()
+    public function testCreateIntersection(): void
     {
         $this->assertEquals(new IntersectionType(new ObjectType(\DateTime::class), new ObjectType(self::class)), Type::intersection(Type::object(\DateTime::class), Type::object(self::class)));
         $this->assertEquals(new IntersectionType(new ObjectType(\DateTime::class), new ObjectType(self::class)), Type::intersection(Type::object(\DateTime::class), Type::object(self::class), Type::object(self::class)));
         $this->assertEquals(new IntersectionType(new ObjectType(\DateTime::class), new ObjectType(self::class)), Type::intersection(Type::object(\DateTime::class), Type::intersection(Type::object(\DateTime::class), Type::object(self::class))));
     }
 
-    public function testCreateNullable()
+    public function testCreateNullable(): void
     {
         $this->assertEquals(new NullableType(new BuiltinType(TypeIdentifier::INT)), Type::nullable(Type::int()));
         $this->assertEquals(new NullableType(new BuiltinType(TypeIdentifier::INT)), Type::nullable(Type::nullable(Type::int())));
@@ -209,7 +209,7 @@ class TypeFactoryTest extends TestCase
         );
     }
 
-    public function testCreateArrayShape()
+    public function testCreateArrayShape(): void
     {
         $this->assertEquals(new ArrayShapeType(['foo' => ['type' => Type::bool(), 'optional' => true]]), Type::arrayShape(['foo' => ['type' => Type::bool(), 'optional' => true]]));
         $this->assertEquals(new ArrayShapeType(['foo' => ['type' => Type::bool(), 'optional' => false]]), Type::arrayShape(['foo' => Type::bool()]));
@@ -225,26 +225,26 @@ class TypeFactoryTest extends TestCase
         ), Type::arrayShape(['foo' => Type::bool()], extraKeyType: Type::string(), extraValueType: Type::bool()));
     }
 
-    public function testCreateArrayShapeWithCallableKey()
+    public function testCreateArrayShapeWithCallableKey(): void
     {
         $arrayShape = new ArrayShapeType(['substr' => ['type' => Type::string(), 'optional' => false]]);
         $this->assertEquals(Type::string(), $arrayShape->getCollectionKeyType());
     }
 
-    public function testCreateObjectShape()
+    public function testCreateObjectShape(): void
     {
         $this->assertEquals(new ObjectShapeType(['foo' => ['type' => Type::bool(), 'optional' => true]]), Type::objectShape(['foo' => ['type' => Type::bool(), 'optional' => true]]));
         $this->assertEquals(new ObjectShapeType(['foo' => ['type' => Type::bool(), 'optional' => false]]), Type::objectShape(['foo' => Type::bool()]));
         $this->assertEquals(new ObjectShapeType(['substr' => ['type' => Type::bool(), 'optional' => false]]), Type::objectShape(['substr' => Type::bool()]));
     }
 
-    public function testCreateArrayKey()
+    public function testCreateArrayKey(): void
     {
         $this->assertEquals(new UnionType(Type::int(), Type::string()), Type::arrayKey());
     }
 
     #[DataProvider('createFromValueProvider')]
-    public function testCreateFromValue(Type $expected, mixed $value)
+    public function testCreateFromValue(Type $expected, mixed $value): void
     {
         $this->assertEquals($expected, Type::fromValue($value));
     }

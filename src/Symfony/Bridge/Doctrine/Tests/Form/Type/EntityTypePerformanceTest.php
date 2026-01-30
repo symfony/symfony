@@ -84,7 +84,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
      * row contains the same entity field.
      */
     #[Group('benchmark')]
-    public function testCollapsedEntityField()
+    public function testCollapsedEntityField(): void
     {
         $this->setMaxRunningTime(1);
 
@@ -99,7 +99,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
     }
 
     #[Group('benchmark')]
-    public function testCollapsedEntityFieldWithChoices()
+    public function testCollapsedEntityFieldWithChoices(): void
     {
         $choices = $this->em->createQuery('SELECT c FROM '.self::ENTITY_CLASS.' c')->getResult();
         $this->setMaxRunningTime(1);
@@ -116,7 +116,7 @@ class EntityTypePerformanceTest extends FormPerformanceTestCase
     }
 
     #[Group('benchmark')]
-    public function testCollapsedEntityFieldWithPreferredChoices()
+    public function testCollapsedEntityFieldWithPreferredChoices(): void
     {
         $choices = $this->em->createQuery('SELECT c FROM '.self::ENTITY_CLASS.' c')->getResult();
         $this->setMaxRunningTime(1);

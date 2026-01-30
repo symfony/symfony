@@ -23,7 +23,7 @@ use Symfony\Component\Notifier\Transport\NullTransport;
  */
 final class NotifierTest extends TestCase
 {
-    public function testItThrowAnExplicitErrorIfAnSmsChannelDoesNotHaveRecipient()
+    public function testItThrowAnExplicitErrorIfAnSmsChannelDoesNotHaveRecipient(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The "sms" channel needs a Recipient.');

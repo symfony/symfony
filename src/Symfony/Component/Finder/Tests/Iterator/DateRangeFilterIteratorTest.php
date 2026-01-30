@@ -18,7 +18,7 @@ use Symfony\Component\Finder\Iterator\DateRangeFilterIterator;
 class DateRangeFilterIteratorTest extends RealIteratorTestCase
 {
     #[DataProvider('getAcceptData')]
-    public function testAccept($size, $expected)
+    public function testAccept($size, $expected): void
     {
         $files = self::$files;
         $files[] = static::toAbsolute('doesnotexist');

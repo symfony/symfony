@@ -24,27 +24,27 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
         return new DateTimeValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new DateTime());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new DateTime());
 
         $this->assertNoViolation();
     }
 
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new DateTime());
     }
 
-    public function testDateTimeWithDefaultFormat()
+    public function testDateTimeWithDefaultFormat(): void
     {
         $this->validator->validate('1995-05-10 19:33:00', new DateTime());
 
@@ -60,7 +60,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidDateTimes')]
-    public function testValidDateTimes($format, $dateTime)
+    public function testValidDateTimes($format, $dateTime): void
     {
         $constraint = new DateTime(format: $format);
 
@@ -81,7 +81,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidDateTimes')]
-    public function testInvalidDateTimes($format, $dateTime, $code)
+    public function testInvalidDateTimes($format, $dateTime, $code): void
     {
         $constraint = new DateTime(
             message: 'myMessage',
@@ -113,7 +113,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testInvalidDateTimeNamed()
+    public function testInvalidDateTimeNamed(): void
     {
         $constraint = new DateTime(message: 'myMessage', format: 'Y-m-d');
 
@@ -126,7 +126,7 @@ class DateTimeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testDateTimeWithTrailingData()
+    public function testDateTimeWithTrailingData(): void
     {
         $this->validator->validate('1995-05-10 00:00:00', new DateTime(format: 'Y-m-d+'));
         $this->assertNoViolation();

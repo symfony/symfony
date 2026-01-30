@@ -37,7 +37,7 @@ use Symfony\Component\Security\Http\Tests\Fixtures\IsGrantedAttributeMethodsCont
 
 class IsGrantedAttributeListenerTest extends TestCase
 {
-    public function testAttribute()
+    public function testAttribute(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->exactly(2))
@@ -72,7 +72,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testNothingHappensWithNoConfig()
+    public function testNothingHappensWithNoConfig(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->never())
@@ -90,7 +90,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedCalledCorrectly()
+    public function testIsGrantedCalledCorrectly(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())
@@ -110,7 +110,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedSubjectFromArguments()
+    public function testIsGrantedSubjectFromArguments(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())
@@ -132,7 +132,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedSubjectFromArgumentsWithArray()
+    public function testIsGrantedSubjectFromArgumentsWithArray(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())
@@ -157,7 +157,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedNullSubjectFromArguments()
+    public function testIsGrantedNullSubjectFromArguments(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())
@@ -177,7 +177,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedArrayWithNullValueSubjectFromArguments()
+    public function testIsGrantedArrayWithNullValueSubjectFromArguments(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())
@@ -200,7 +200,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testExceptionWhenMissingSubjectAttribute()
+    public function testExceptionWhenMissingSubjectAttribute(): void
     {
         $authChecker = $this->createStub(AuthorizationCheckerInterface::class);
 
@@ -220,7 +220,7 @@ class IsGrantedAttributeListenerTest extends TestCase
     }
 
     #[DataProvider('getAccessDeniedMessageTests')]
-    public function testAccessDeniedMessages(string|Expression $attribute, string|array|null $subject, string $method, int $numOfArguments, string $expectedMessage)
+    public function testAccessDeniedMessages(string|Expression $attribute, string|array|null $subject, string $method, int $numOfArguments, string $expectedMessage): void
     {
         $authChecker = new AuthorizationChecker(new TokenStorage(), new AccessDecisionManager((static function () use (&$authChecker) {
             yield new ExpressionVoter(new ExpressionLanguage(), null, $authChecker);
@@ -282,7 +282,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         yield [new Expression('user === subject["author"]'), ['author' => 'bar', 'alias' => 'bar'], 'withNestedExpressionInSubject', 2, 'Access Denied. Expression (user === subject["author"]) is false.'];
     }
 
-    public function testNotFoundHttpException()
+    public function testNotFoundHttpException(): void
     {
         $authChecker = $this->createStub(AuthorizationCheckerInterface::class);
         $authChecker
@@ -308,7 +308,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedWithExpressionInAttribute()
+    public function testIsGrantedWithExpressionInAttribute(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())
@@ -328,7 +328,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedWithExpressionInSubject()
+    public function testIsGrantedWithExpressionInSubject(): void
     {
         $request = new Request();
 
@@ -359,7 +359,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedWithNestedExpressionInSubject()
+    public function testIsGrantedWithNestedExpressionInSubject(): void
     {
         $request = new Request();
 
@@ -390,7 +390,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testIsGrantedWithRequestAsSubject()
+    public function testIsGrantedWithRequestAsSubject(): void
     {
         $request = new Request();
 
@@ -412,7 +412,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testHttpExceptionWithExceptionCode()
+    public function testHttpExceptionWithExceptionCode(): void
     {
         $authChecker = $this->createStub(AuthorizationCheckerInterface::class);
         $authChecker
@@ -440,7 +440,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testAccessDeniedExceptionWithExceptionCode()
+    public function testAccessDeniedExceptionWithExceptionCode(): void
     {
         $authChecker = $this->createStub(AuthorizationCheckerInterface::class);
         $authChecker
@@ -468,7 +468,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testThrowsAccessDeniedExceptionWhenMethodMatchesStringConstraint()
+    public function testThrowsAccessDeniedExceptionWhenMethodMatchesStringConstraint(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())->method('isGranted')->willReturn(false);
@@ -486,7 +486,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testThrowsAccessDeniedExceptionWhenMethodMatchesArrayConstraint()
+    public function testThrowsAccessDeniedExceptionWhenMethodMatchesArrayConstraint(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())->method('isGranted')->willReturn(false);
@@ -504,7 +504,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testSkipsAuthorizationWhenMethodDoesNotMatchArrayConstraint()
+    public function testSkipsAuthorizationWhenMethodDoesNotMatchArrayConstraint(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->never())->method('isGranted');
@@ -521,7 +521,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testSkipsAuthorizationWhenMethodDoesNotMatchStringConstraint()
+    public function testSkipsAuthorizationWhenMethodDoesNotMatchStringConstraint(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->never())->method('isGranted');
@@ -538,7 +538,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testFiltersOnlyIsGrantedAttributesUsingInstanceof()
+    public function testFiltersOnlyIsGrantedAttributesUsingInstanceof(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())
@@ -568,7 +568,7 @@ class IsGrantedAttributeListenerTest extends TestCase
         $listener->onKernelControllerArguments($event);
     }
 
-    public function testSupportsSubclassOfIsGrantedViaInstanceof()
+    public function testSupportsSubclassOfIsGrantedViaInstanceof(): void
     {
         $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $authChecker->expects($this->once())

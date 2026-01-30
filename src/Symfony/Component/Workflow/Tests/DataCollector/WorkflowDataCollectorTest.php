@@ -29,7 +29,7 @@ class WorkflowDataCollectorTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
-    public function test()
+    public function test(): void
     {
         $workflow1 = new Workflow($this->createComplexWorkflowDefinition(), name: 'workflow1');
         $workflow2 = new Workflow($this->createSimpleWorkflowDefinition(), name: 'workflow2');
@@ -86,7 +86,7 @@ class WorkflowDataCollectorTest extends TestCase
         $this->assertSame(['my_expression'], $listeners['transition0']['workflow.workflow2.guard.t1'][0]['guardExpressions']);
     }
 
-    public static function noop()
+    public static function noop(): void
     {
     }
 }

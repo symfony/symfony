@@ -24,7 +24,7 @@ use Twig\Loader\FilesystemLoader;
 
 class DebugCommandTest extends TestCase
 {
-    public function testDebugCommand()
+    public function testDebugCommand(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute([], ['decorated' => false]);
@@ -33,7 +33,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('Functions', trim($tester->getDisplay()));
     }
 
-    public function testFilterAndJsonFormatOptions()
+    public function testFilterAndJsonFormatOptions(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['--filter' => 'abs', '--format' => 'json'], ['decorated' => false]);
@@ -46,7 +46,7 @@ class DebugCommandTest extends TestCase
         $this->assertEquals($expected, json_decode($tester->getDisplay(true), true));
     }
 
-    public function testWarningsWrongBundleOverriding()
+    public function testWarningsWrongBundleOverriding(): void
     {
         $bundleMetadata = [
             'TwigBundle' => 'vendor/twig-bundle/',
@@ -66,7 +66,7 @@ class DebugCommandTest extends TestCase
         $this->assertEquals($expected, json_decode($tester->getDisplay(true), true));
     }
 
-    public function testMalformedTemplateName()
+    public function testMalformedTemplateName(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Malformed namespaced template name "@foo" (expecting "@namespace/template_name").');
@@ -74,7 +74,7 @@ class DebugCommandTest extends TestCase
     }
 
     #[DataProvider('getDebugTemplateNameTestData')]
-    public function testDebugTemplateName(array $input, string $output, array $paths)
+    public function testDebugTemplateName(array $input, string $output, array $paths): void
     {
         $tester = $this->createCommandTester($paths);
         $ret = $tester->execute($input, ['decorated' => false]);
@@ -247,7 +247,7 @@ class DebugCommandTest extends TestCase
         ];
     }
 
-    public function testDebugTemplateNameWithChainLoader()
+    public function testDebugTemplateNameWithChainLoader(): void
     {
         $tester = $this->createCommandTester(['templates/' => null], [], null, true);
         $ret = $tester->execute(['name' => 'base.html.twig'], ['decorated' => false]);
@@ -256,7 +256,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('[OK]', $tester->getDisplay());
     }
 
-    public function testWithGlobals()
+    public function testWithGlobals(): void
     {
         $message = '<error>foo</error>';
         $tester = $this->createCommandTester([], [], null, false, ['message' => $message]);
@@ -265,7 +265,7 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString(json_encode($message), $display);
     }
 
-    public function testWithGlobalsJson()
+    public function testWithGlobalsJson(): void
     {
         $globals = ['message' => '<error>foo</error>'];
         $tester = $this->createCommandTester([], [], null, false, $globals);
@@ -275,7 +275,7 @@ class DebugCommandTest extends TestCase
         $this->assertSame($globals, $display['globals']);
     }
 
-    public function testWithFilter()
+    public function testWithFilter(): void
     {
         $tester = $this->createCommandTester();
         $tester->execute(['--format' => 'json'], ['decorated' => false]);
@@ -288,7 +288,7 @@ class DebugCommandTest extends TestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $projectDir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $loader = new FilesystemLoader([], $projectDir);

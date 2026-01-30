@@ -44,7 +44,7 @@ final class BandwidthTransportTest extends TransportTestCase
     }
 
     #[DataProvider('invalidFromProvider')]
-    public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from)
+    public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from): void
     {
         $transport = $this->createTransport(null, $from);
 
@@ -55,7 +55,7 @@ final class BandwidthTransportTest extends TransportTestCase
     }
 
     #[DataProvider('validFromProvider')]
-    public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from)
+    public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from): void
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
         $client = new MockHttpClient(static function (string $method, string $url): ResponseInterface {

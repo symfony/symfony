@@ -29,7 +29,7 @@ class HttpClientDataCollectorTest extends TestCase
         TestHttpServer::start();
     }
 
-    public function testItCollectsRequestCount()
+    public function testItCollectsRequestCount(): void
     {
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
@@ -57,7 +57,7 @@ class HttpClientDataCollectorTest extends TestCase
         $this->assertSame(3, $sut->getRequestCount());
     }
 
-    public function testItCollectsErrorCount()
+    public function testItCollectsErrorCount(): void
     {
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
@@ -86,7 +86,7 @@ class HttpClientDataCollectorTest extends TestCase
         $this->assertSame(1, $sut->getErrorCount());
     }
 
-    public function testItCollectsErrorCountByClient()
+    public function testItCollectsErrorCountByClient(): void
     {
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
@@ -118,7 +118,7 @@ class HttpClientDataCollectorTest extends TestCase
         $this->assertSame(0, $collectedData['http_client3']['error_count']);
     }
 
-    public function testItCollectsTracesByClient()
+    public function testItCollectsTracesByClient(): void
     {
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
@@ -150,7 +150,7 @@ class HttpClientDataCollectorTest extends TestCase
         $this->assertCount(0, $collectedData['http_client3']['traces']);
     }
 
-    public function testItIsEmptyAfterReset()
+    public function testItIsEmptyAfterReset(): void
     {
         $httpClient1 = $this->httpClientThatHasTracedRequests([
             [
@@ -170,7 +170,7 @@ class HttpClientDataCollectorTest extends TestCase
     }
 
     #[DataProvider('provideCurlRequests')]
-    public function testItGeneratesCurlCommandsAsExpected(array $request, string $expectedCurlCommand)
+    public function testItGeneratesCurlCommandsAsExpected(array $request, string $expectedCurlCommand): void
     {
         $sut = new HttpClientDataCollector();
         $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([$request]));
@@ -344,7 +344,7 @@ class HttpClientDataCollectorTest extends TestCase
         }
     }
 
-    public function testItDoesNotFollowRedirectionsWhenGeneratingCurlCommands()
+    public function testItDoesNotFollowRedirectionsWhenGeneratingCurlCommands(): void
     {
         $sut = new HttpClientDataCollector();
         $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
@@ -371,7 +371,7 @@ class HttpClientDataCollectorTest extends TestCase
         );
     }
 
-    public function testItDoesNotGeneratesCurlCommandsForUnsupportedBodyType()
+    public function testItDoesNotGeneratesCurlCommandsForUnsupportedBodyType(): void
     {
         $sut = new HttpClientDataCollector();
         $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
@@ -390,7 +390,7 @@ class HttpClientDataCollectorTest extends TestCase
         self::assertNull($curlCommand);
     }
 
-    public function testItDoesGenerateCurlCommandsForBigData()
+    public function testItDoesGenerateCurlCommandsForBigData(): void
     {
         $sut = new HttpClientDataCollector();
         $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
@@ -409,7 +409,7 @@ class HttpClientDataCollectorTest extends TestCase
         self::assertNotNull($curlCommand);
     }
 
-    public function testItDoesNotGeneratesCurlCommandsForUploadedFiles()
+    public function testItDoesNotGeneratesCurlCommandsForUploadedFiles(): void
     {
         $sut = new HttpClientDataCollector();
         $sut->registerClient('http_client', $this->httpClientThatHasTracedRequests([
@@ -429,7 +429,7 @@ class HttpClientDataCollectorTest extends TestCase
     }
 
     #[RequiresPhpExtension('curl')]
-    public function testGeneratingCurlCommandForArraysWithResourcesAndUnreachableHost()
+    public function testGeneratingCurlCommandForArraysWithResourcesAndUnreachableHost(): void
     {
         $httpClient = new TraceableHttpClient(new CurlHttpClient());
         try {
@@ -460,7 +460,7 @@ class HttpClientDataCollectorTest extends TestCase
     }
 
     #[DataProvider('provideClientIsResetWhenExpectedCases')]
-    public function testClientIsResetWhenExpected(\Closure $request, bool $wasReset)
+    public function testClientIsResetWhenExpected(\Closure $request, bool $wasReset): void
     {
         $mockHttpClient = new class extends MockHttpClient {
             public bool $wasReset = false;
@@ -484,7 +484,7 @@ class HttpClientDataCollectorTest extends TestCase
     public static function provideClientIsResetWhenExpectedCases(): iterable
     {
         yield [
-            static function (TraceableHttpClient $traceableHttpClient) {
+            static function (TraceableHttpClient $traceableHttpClient): void {
                 $response = $traceableHttpClient->request('GET', 'http://localhost/');
                 $response->getContent();
             },

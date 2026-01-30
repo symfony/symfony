@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Loader\ContainerLoader;
 class ContainerLoaderTest extends TestCase
 {
     #[DataProvider('supportsProvider')]
-    public function testSupports(bool $expected, ?string $type = null)
+    public function testSupports(bool $expected, ?string $type = null): void
     {
         $this->assertSame($expected, (new ContainerLoader(new Container()))->supports('foo', $type));
     }

@@ -26,13 +26,13 @@ class TranslatableNormalizerTest extends TestCase
         $this->normalizer = new TranslatableNormalizer(new IdentityTranslator());
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsNormalization(new TestMessage()));
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $message = new TestMessage();
 
@@ -41,7 +41,7 @@ class TranslatableNormalizerTest extends TestCase
         $this->assertSame('key_en', $this->normalizer->normalize($message, context: ['translatable_normalization_locale' => 'en']));
     }
 
-    public function testNormalizeWithNormalizationLocalePassedInConstructor()
+    public function testNormalizeWithNormalizationLocalePassedInConstructor(): void
     {
         $normalizer = new TranslatableNormalizer(
             new IdentityTranslator(),

@@ -30,7 +30,7 @@ class Psr18ClientTest extends TestCase
     }
 
     #[RequiresFunction('ob_gzhandler')]
-    public function testSendRequest()
+    public function testSendRequest(): void
     {
         $factory = new Psr17Factory();
         $client = new Psr18Client(new NativeHttpClient(), $factory, $factory);
@@ -45,7 +45,7 @@ class Psr18ClientTest extends TestCase
         $this->assertSame('HTTP/1.1', $body['SERVER_PROTOCOL']);
     }
 
-    public function testPostRequest()
+    public function testPostRequest(): void
     {
         $factory = new Psr17Factory();
         $client = new Psr18Client(new NativeHttpClient(), $factory, $factory);
@@ -59,7 +59,7 @@ class Psr18ClientTest extends TestCase
         $this->assertSame(['foo' => '0123456789', 'REQUEST_METHOD' => 'POST'], $body);
     }
 
-    public function testNetworkException()
+    public function testNetworkException(): void
     {
         $factory = new Psr17Factory();
         $client = new Psr18Client(new NativeHttpClient(), $factory, $factory);
@@ -68,7 +68,7 @@ class Psr18ClientTest extends TestCase
         $client->sendRequest($factory->createRequest('GET', 'http://localhost:8058'));
     }
 
-    public function testRequestException()
+    public function testRequestException(): void
     {
         $factory = new Psr17Factory();
         $client = new Psr18Client(new NativeHttpClient(), $factory, $factory);
@@ -77,7 +77,7 @@ class Psr18ClientTest extends TestCase
         $client->sendRequest($factory->createRequest('BAD.METHOD', 'http://localhost:8057'));
     }
 
-    public function test404()
+    public function test404(): void
     {
         $factory = new Psr17Factory();
         $client = new Psr18Client(new NativeHttpClient());
@@ -86,7 +86,7 @@ class Psr18ClientTest extends TestCase
         $this->assertSame(404, $response->getStatusCode());
     }
 
-    public function testInvalidHeaderResponse()
+    public function testInvalidHeaderResponse(): void
     {
         $responseHeaders = [
             // space in header name not allowed in RFC 7230
@@ -104,7 +104,7 @@ class Psr18ClientTest extends TestCase
         $this->assertCount(1, $resultResponse->getHeaders());
     }
 
-    public function testResponseReasonPhrase()
+    public function testResponseReasonPhrase(): void
     {
         $responseHeaders = [
             'HTTP/1.1 103 Very Early Hints',
@@ -119,7 +119,7 @@ class Psr18ClientTest extends TestCase
         $this->assertSame('Very Early Hints', $resultResponse->getReasonPhrase());
     }
 
-    public function testAutoUpgradeHttpVersion()
+    public function testAutoUpgradeHttpVersion(): void
     {
         $clientWithoutOption = new Psr18Client(new MockHttpClient(static fn (string $method, string $url, array $options) => new MockResponse(json_encode([
             'SERVER_PROTOCOL' => 'HTTP/'.$options['http_version'] ?? '',

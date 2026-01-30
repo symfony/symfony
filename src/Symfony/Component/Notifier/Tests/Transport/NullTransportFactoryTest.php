@@ -34,14 +34,14 @@ class NullTransportFactoryTest extends TestCase
         );
     }
 
-    public function testCreateThrowsUnsupportedSchemeException()
+    public function testCreateThrowsUnsupportedSchemeException(): void
     {
         $this->expectException(UnsupportedSchemeException::class);
 
         $this->nullTransportFactory->create(new Dsn('foo://localhost'));
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $this->assertInstanceOf(
             NullTransport::class,

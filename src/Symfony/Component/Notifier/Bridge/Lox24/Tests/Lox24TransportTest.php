@@ -71,14 +71,14 @@ class Lox24TransportTest extends TransportTestCase
         yield [new PushMessage('subject', 'content')];
     }
 
-    public function testSupportWithNotSmsMessage()
+    public function testSupportWithNotSmsMessage(): void
     {
         $transport = new Lox24Transport('user', 'token', 'testFrom');
         $message = $this->createStub(MessageInterface::class);
         $this->assertFalse($transport->supports($message));
     }
 
-    public function testSupportWithNotLox24Options()
+    public function testSupportWithNotLox24Options(): void
     {
         $transport = new Lox24Transport('user', 'token', 'testFrom');
         $message = new SmsMessage('test', 'test');
@@ -87,7 +87,7 @@ class Lox24TransportTest extends TransportTestCase
         $this->assertFalse($transport->supports($message));
     }
 
-    public function testSendWithInvalidMessageType()
+    public function testSendWithInvalidMessageType(): void
     {
         $this->expectException(UnsupportedMessageTypeException::class);
         $transport = new Lox24Transport('user', 'token', 'testFrom');
@@ -95,7 +95,7 @@ class Lox24TransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testMessageFromNotEmpty()
+    public function testMessageFromNotEmpty(): void
     {
         $client = $this->mockHttpClient([
             'sender_id' => 'testFrom2',
@@ -111,7 +111,7 @@ class Lox24TransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testMessageFromEmpty()
+    public function testMessageFromEmpty(): void
     {
         $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
@@ -126,7 +126,7 @@ class Lox24TransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testMessageFromInvalid()
+    public function testMessageFromInvalid(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(
@@ -137,7 +137,7 @@ class Lox24TransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testOptionIsTextDeleted()
+    public function testOptionIsTextDeleted(): void
     {
         $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
@@ -156,7 +156,7 @@ class Lox24TransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testOptionDeliveryAtGreaterThanZero()
+    public function testOptionDeliveryAtGreaterThanZero(): void
     {
         $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
@@ -175,7 +175,7 @@ class Lox24TransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testOptionVoiceLanguageSpanish()
+    public function testOptionVoiceLanguageSpanish(): void
     {
         $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
@@ -197,7 +197,7 @@ class Lox24TransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testOptionVoiceLanguageAuto()
+    public function testOptionVoiceLanguageAuto(): void
     {
         $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
@@ -218,7 +218,7 @@ class Lox24TransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testOptionType()
+    public function testOptionType(): void
     {
         $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
@@ -238,7 +238,7 @@ class Lox24TransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testOptionCallbackData()
+    public function testOptionCallbackData(): void
     {
         $client = $this->mockHttpClient([
             'sender_id' => 'testFrom',
@@ -259,7 +259,7 @@ class Lox24TransportTest extends TransportTestCase
         $transport->send($message);
     }
 
-    public function testResponseStatusCodeNotEqual201()
+    public function testResponseStatusCodeNotEqual201(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage(

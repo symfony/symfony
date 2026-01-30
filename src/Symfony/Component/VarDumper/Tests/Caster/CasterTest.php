@@ -34,7 +34,7 @@ class CasterTest extends TestCase
     ];
 
     #[DataProvider('provideFilter')]
-    public function testFilter($filter, $expectedDiff, $listedProperties = null)
+    public function testFilter($filter, $expectedDiff, $listedProperties = null): void
     {
         if (null === $listedProperties) {
             $filteredArray = Caster::filter(self::$referenceArray, $filter);
@@ -150,7 +150,7 @@ class CasterTest extends TestCase
         ];
     }
 
-    public function testAnonymousClass()
+    public function testAnonymousClass(): void
     {
         $c = eval('return new class extends stdClass { private $foo = "foo"; };');
 
@@ -175,7 +175,7 @@ class CasterTest extends TestCase
         );
     }
 
-    public function testTypeErrorInDebugInfo()
+    public function testTypeErrorInDebugInfo(): void
     {
         $this->assertDumpMatchesFormat('class@anonymous {}', new class {
             public function __debugInfo(): array
@@ -185,7 +185,7 @@ class CasterTest extends TestCase
         });
     }
 
-    public function testClassHierarchy()
+    public function testClassHierarchy(): void
     {
         $this->assertDumpMatchesFormat(<<<'DUMP'
             Symfony\Component\VarDumper\Tests\Caster\B {

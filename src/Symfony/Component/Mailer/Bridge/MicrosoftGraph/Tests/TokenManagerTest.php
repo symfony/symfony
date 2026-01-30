@@ -23,7 +23,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class TokenManagerTest extends TestCase
 {
-    public function testTokenRetrieved()
+    public function testTokenRetrieved(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -43,7 +43,7 @@ class TokenManagerTest extends TestCase
         $manager->getToken();
     }
 
-    public function testTokenCached()
+    public function testTokenCached(): void
     {
         $counter = 0;
         $client = new MockHttpClient(static function () use (&$counter): ResponseInterface {
@@ -59,7 +59,7 @@ class TokenManagerTest extends TestCase
         $this->assertSame(1, $counter);
     }
 
-    public function testTokenExpired()
+    public function testTokenExpired(): void
     {
         $counter = 0;
         $client = new MockHttpClient(static function () use (&$counter): ResponseInterface {
@@ -79,7 +79,7 @@ class TokenManagerTest extends TestCase
         $this->assertSame(2, $counter);
     }
 
-    public function testNonSuccessCodeThrown()
+    public function testNonSuccessCodeThrown(): void
     {
         $client = new MockHttpClient(static fn (): ResponseInterface => new MockResponse('', ['http_code' => 503]));
 

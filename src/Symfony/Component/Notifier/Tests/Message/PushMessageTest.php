@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Notification\Notification;
  */
 class PushMessageTest extends TestCase
 {
-    public function testCanBeConstructed()
+    public function testCanBeConstructed(): void
     {
         $message = new PushMessage('Hello', 'World');
 
@@ -28,7 +28,7 @@ class PushMessageTest extends TestCase
         $this->assertSame('World', $message->getContent());
     }
 
-    public function testSetSubject()
+    public function testSetSubject(): void
     {
         $message = new PushMessage('Hello', 'World');
         $message->subject('dlrow olleH');
@@ -36,7 +36,7 @@ class PushMessageTest extends TestCase
         $this->assertSame('dlrow olleH', $message->getSubject());
     }
 
-    public function testSetContent()
+    public function testSetContent(): void
     {
         $message = new PushMessage('Hello', 'World');
         $message->content('dlrow olleH');
@@ -44,7 +44,7 @@ class PushMessageTest extends TestCase
         $this->assertSame('dlrow olleH', $message->getContent());
     }
 
-    public function testSetTransport()
+    public function testSetTransport(): void
     {
         $message = new PushMessage('Hello', 'World');
         $message->transport('next_one');
@@ -52,7 +52,7 @@ class PushMessageTest extends TestCase
         $this->assertSame('next_one', $message->getTransport());
     }
 
-    public function testCreateFromNotification()
+    public function testCreateFromNotification(): void
     {
         $notification = new Notification('Hello');
         $notification->content('World');

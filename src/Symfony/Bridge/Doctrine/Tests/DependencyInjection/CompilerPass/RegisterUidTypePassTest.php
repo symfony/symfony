@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class RegisterUidTypePassTest extends TestCase
 {
-    public function testRegistered()
+    public function testRegistered(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('doctrine.dbal.connection_factory.types', ['foo' => 'bar']);
@@ -33,7 +33,7 @@ class RegisterUidTypePassTest extends TestCase
         $this->assertSame($expected, $container->getParameter('doctrine.dbal.connection_factory.types'));
     }
 
-    public function testRegisteredDontFail()
+    public function testRegisteredDontFail(): void
     {
         $container = new ContainerBuilder();
         (new RegisterUidTypePass())->process($container);

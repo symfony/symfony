@@ -21,7 +21,7 @@ use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class DataCollectorTest extends TestCase
 {
-    public function testCloneVarStringWithScheme()
+    public function testCloneVarStringWithScheme(): void
     {
         $c = new CloneVarDataCollector('scheme://foo');
         $c->collect(new Request(), new Response());
@@ -30,7 +30,7 @@ class DataCollectorTest extends TestCase
         $this->assertEquals($cloner->cloneVar('scheme://foo'), $c->getData());
     }
 
-    public function testCloneVarExistingFilePath()
+    public function testCloneVarExistingFilePath(): void
     {
         $c = new CloneVarDataCollector([$filePath = tempnam(sys_get_temp_dir(), 'clone_var_data_collector_')]);
         $c->collect(new Request(), new Response());
@@ -38,7 +38,7 @@ class DataCollectorTest extends TestCase
         $this->assertSame($filePath, $c->getData()[0]);
     }
 
-    public function testClassPublicObjectProperty()
+    public function testClassPublicObjectProperty(): void
     {
         $parent = new WithPublicObjectProperty();
         $child = new WithPublicObjectProperty();
@@ -51,7 +51,7 @@ class DataCollectorTest extends TestCase
         $this->assertNotNull($c->getData()->parent);
     }
 
-    public function testClassPublicObjectPropertyAsReference()
+    public function testClassPublicObjectPropertyAsReference(): void
     {
         $parent = new WithPublicObjectProperty();
         $child = new WithPublicObjectProperty();
@@ -64,7 +64,7 @@ class DataCollectorTest extends TestCase
         $this->assertNotNull($c->getData()->parent);
     }
 
-    public function testClassUsePropertyInDestruct()
+    public function testClassUsePropertyInDestruct(): void
     {
         $parent = new UsePropertyInDestruct();
         $child = new UsePropertyInDestruct();
@@ -77,7 +77,7 @@ class DataCollectorTest extends TestCase
         $this->assertNotNull($c->getData()->parent);
     }
 
-    public function testClassUsePropertyAsReferenceInDestruct()
+    public function testClassUsePropertyAsReferenceInDestruct(): void
     {
         $parent = new UsePropertyInDestruct();
         $child = new UsePropertyInDestruct();

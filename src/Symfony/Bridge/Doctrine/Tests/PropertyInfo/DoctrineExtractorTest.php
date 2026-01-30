@@ -55,7 +55,7 @@ class DoctrineExtractorTest extends TestCase
         return new DoctrineExtractor($entityManager);
     }
 
-    public function testGetProperties()
+    public function testGetProperties(): void
     {
         // Fields
         $expected = [
@@ -94,7 +94,7 @@ class DoctrineExtractorTest extends TestCase
         );
     }
 
-    public function testTestGetPropertiesWithEmbedded()
+    public function testTestGetPropertiesWithEmbedded(): void
     {
         $this->assertEquals(
             [
@@ -105,12 +105,12 @@ class DoctrineExtractorTest extends TestCase
         );
     }
 
-    public function testGetPropertiesCatchException()
+    public function testGetPropertiesCatchException(): void
     {
         $this->assertNull($this->createExtractor()->getProperties('Not\Exist'));
     }
 
-    public function testGeneratedValueNotWritable()
+    public function testGeneratedValueNotWritable(): void
     {
         $extractor = $this->createExtractor();
         $this->assertFalse($extractor->isWritable(DoctrineGeneratedValue::class, 'id'));
@@ -119,7 +119,7 @@ class DoctrineExtractorTest extends TestCase
         $this->assertNull($extractor->isReadable(DoctrineGeneratedValue::class, 'foo'));
     }
 
-    public function testExtractWithEmbedded()
+    public function testExtractWithEmbedded(): void
     {
         $this->assertEquals(
             Type::object(DoctrineEmbeddable::class),
@@ -127,7 +127,7 @@ class DoctrineExtractorTest extends TestCase
         );
     }
 
-    public function testExtractEnum()
+    public function testExtractEnum(): void
     {
         $this->assertEquals(Type::enum(EnumString::class), $this->createExtractor()->getType(DoctrineEnum::class, 'enumString'));
         $this->assertEquals(Type::enum(EnumInt::class), $this->createExtractor()->getType(DoctrineEnum::class, 'enumInt'));
@@ -137,7 +137,7 @@ class DoctrineExtractorTest extends TestCase
     }
 
     #[DataProvider('typeProvider')]
-    public function testExtract(string $property, ?Type $type)
+    public function testExtract(string $property, ?Type $type): void
     {
         $this->assertEquals($type, $this->createExtractor()->getType(DoctrineDummy::class, $property, []));
     }
@@ -173,7 +173,7 @@ class DoctrineExtractorTest extends TestCase
         yield ['json', null];
     }
 
-    public function testGetTypeCatchException()
+    public function testGetTypeCatchException(): void
     {
         $this->assertNull($this->createExtractor()->getType('Not\Exist', 'baz'));
     }

@@ -30,7 +30,7 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 class DumpListenerTest extends TestCase
 {
-    public function testSubscribedEvents()
+    public function testSubscribedEvents(): void
     {
         $this->assertSame(
             [ConsoleEvents::COMMAND => ['configure', 1024]],
@@ -38,7 +38,7 @@ class DumpListenerTest extends TestCase
         );
     }
 
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $prevDumper = VarDumper::setHandler('var_dump');
         VarDumper::setHandler($prevDumper);
@@ -70,7 +70,7 @@ class DumpListenerTest extends TestCase
     #[TestWith([false, false, '+foo-+bar-', []])]
     #[TestWith([true, false, '+foo-+bar-', []])]
     #[TestWith([true, true, '', ['foo-', 'bar-']])]
-    public function testConfigureWithProfilerDumper(bool $hasOption, bool $option, string $expectedOutput, array $expectedData)
+    public function testConfigureWithProfilerDumper(bool $hasOption, bool $option, string $expectedOutput, array $expectedData): void
     {
         $prevDumper = VarDumper::setHandler('var_dump');
         VarDumper::setHandler($prevDumper);

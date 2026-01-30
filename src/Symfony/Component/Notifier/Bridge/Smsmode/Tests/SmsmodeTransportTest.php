@@ -43,7 +43,7 @@ final class SmsmodeTransportTest extends TransportTestCase
     }
 
     #[DataProvider('invalidFromProvider')]
-    public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from)
+    public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from): void
     {
         $transport = $this->createTransport(null, $from);
 
@@ -54,7 +54,7 @@ final class SmsmodeTransportTest extends TransportTestCase
     }
 
     #[DataProvider('validFromProvider')]
-    public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from)
+    public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from): void
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
 
@@ -72,7 +72,7 @@ final class SmsmodeTransportTest extends TransportTestCase
         self::assertSame('foo', $sentMessage->getMessageId());
     }
 
-    public function testHttpClientHasMandatoryHeaderAccept()
+    public function testHttpClientHasMandatoryHeaderAccept(): void
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
 

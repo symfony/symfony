@@ -26,7 +26,7 @@ use Symfony\Component\Uid\UuidV4;
 class UidValueResolverTest extends TestCase
 {
     #[DataProvider('provideSupports')]
-    public function testSupports(bool $expected, Request $request, ArgumentMetadata $argument)
+    public function testSupports(bool $expected, Request $request, ArgumentMetadata $argument): void
     {
         $this->assertCount((int) $expected, (new UidValueResolver())->resolve($request, $argument));
     }
@@ -47,7 +47,7 @@ class UidValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideResolveOK')]
-    public function testResolveOK(AbstractUid $expected, string $requestUid)
+    public function testResolveOK(AbstractUid $expected, string $requestUid): void
     {
         $this->assertEquals([$expected], (new UidValueResolver())->resolve(
             new Request([], [], ['id' => $requestUid]),
@@ -71,7 +71,7 @@ class UidValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideResolveKO')]
-    public function testResolveKO(string $requestUid, string $argumentType)
+    public function testResolveKO(string $requestUid, string $argumentType): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->expectExceptionMessage('The uid for the "id" parameter is invalid.');
@@ -92,7 +92,7 @@ class UidValueResolverTest extends TestCase
         ];
     }
 
-    public function testResolveAbstractClass()
+    public function testResolveAbstractClass(): void
     {
         $this->expectException(\Error::class);
         $this->expectExceptionMessage('Cannot instantiate abstract class Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\TestAbstractCustomUid');

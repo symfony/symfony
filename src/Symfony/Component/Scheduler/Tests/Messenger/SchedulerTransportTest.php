@@ -23,7 +23,7 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 class SchedulerTransportTest extends TestCase
 {
-    public function testGetFromIterator()
+    public function testGetFromIterator(): void
     {
         $messages = [
             (object) ['id' => 'first'],
@@ -49,7 +49,7 @@ class SchedulerTransportTest extends TestCase
         $this->assertSame([], $messages);
     }
 
-    public function testAddsStampToInnerRedispatchMessageEnvelope()
+    public function testAddsStampToInnerRedispatchMessageEnvelope(): void
     {
         $generator = $this->createStub(MessageGeneratorInterface::class);
         $generator->method('getMessages')->willReturnCallback(function (): \Generator {
@@ -64,7 +64,7 @@ class SchedulerTransportTest extends TestCase
         $this->assertSame('id', $stamp->messageContext->id);
     }
 
-    public function testAckIgnored()
+    public function testAckIgnored(): void
     {
         $transport = new SchedulerTransport($this->createStub(MessageGeneratorInterface::class));
 
@@ -72,7 +72,7 @@ class SchedulerTransportTest extends TestCase
         $transport->ack(new Envelope(new \stdClass()));
     }
 
-    public function testRejectException()
+    public function testRejectException(): void
     {
         $transport = new SchedulerTransport($this->createStub(MessageGeneratorInterface::class));
 
@@ -80,7 +80,7 @@ class SchedulerTransportTest extends TestCase
         $transport->reject(new Envelope(new \stdClass()));
     }
 
-    public function testSendException()
+    public function testSendException(): void
     {
         $transport = new SchedulerTransport($this->createStub(MessageGeneratorInterface::class));
 

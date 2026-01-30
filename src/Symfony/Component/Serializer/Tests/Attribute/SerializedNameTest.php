@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Exception\InvalidArgumentException;
  */
 class SerializedNameTest extends TestCase
 {
-    public function testNotAStringSerializedNameParameter()
+    public function testNotAStringSerializedNameParameter(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Parameter given to "Symfony\Component\Serializer\Attribute\SerializedName" must be a non-empty string.');
@@ -28,7 +28,7 @@ class SerializedNameTest extends TestCase
         new SerializedName('');
     }
 
-    public function testSerializedNameParameters()
+    public function testSerializedNameParameters(): void
     {
         $foo = new SerializedName('foo');
         $this->assertEquals('foo', $foo->serializedName);

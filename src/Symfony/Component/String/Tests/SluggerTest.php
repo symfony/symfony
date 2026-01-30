@@ -20,7 +20,7 @@ class SluggerTest extends TestCase
 {
     #[RequiresPhpExtension('intl')]
     #[DataProvider('provideSlug')]
-    public function testSlug(string $string, string $locale, string $expectedSlug)
+    public function testSlug(string $string, string $locale, string $expectedSlug): void
     {
         $slugger = new AsciiSlugger($locale);
 
@@ -42,7 +42,7 @@ class SluggerTest extends TestCase
         ];
     }
 
-    public function testSeparatorWithoutLocale()
+    public function testSeparatorWithoutLocale(): void
     {
         $slugger = new AsciiSlugger();
 
@@ -50,7 +50,7 @@ class SluggerTest extends TestCase
         $this->assertSame('hello_world', (string) $slugger->slug('hello world', '_'));
     }
 
-    public function testSlugCharReplacementLocaleConstruct()
+    public function testSlugCharReplacementLocaleConstruct(): void
     {
         $slugger = new AsciiSlugger('fr', ['fr' => ['&' => 'et', '@' => 'chez']]);
         $slug = (string) $slugger->slug('toi & moi avec cette adresse slug@test.fr', '_');
@@ -58,14 +58,14 @@ class SluggerTest extends TestCase
         $this->assertSame('toi_et_moi_avec_cette_adresse_slug_chez_test_fr', $slug);
     }
 
-    public function testSlugCharReplacementLocaleMethod()
+    public function testSlugCharReplacementLocaleMethod(): void
     {
         $slugger = new AsciiSlugger(null, ['es' => ['&' => 'y', '@' => 'en senal']]);
         $slug = (string) $slugger->slug('yo & tu a esta dirección slug@test.es', '_', 'es');
         $this->assertSame('yo_y_tu_a_esta_direccion_slug_en_senal_test_es', $slug);
     }
 
-    public function testSlugCharReplacementLocaleConstructWithoutSymbolsMap()
+    public function testSlugCharReplacementLocaleConstructWithoutSymbolsMap(): void
     {
         $slugger = new AsciiSlugger('en');
         $slug = (string) $slugger->slug('you & me with this address slug@test.uk', '_');
@@ -73,7 +73,7 @@ class SluggerTest extends TestCase
         $this->assertSame('you_and_me_with_this_address_slug_at_test_uk', $slug);
     }
 
-    public function testSlugCharReplacementParentLocaleConstructWithoutSymbolsMap()
+    public function testSlugCharReplacementParentLocaleConstructWithoutSymbolsMap(): void
     {
         $slugger = new AsciiSlugger('en_GB');
         $slug = (string) $slugger->slug('you & me with this address slug@test.uk', '_');
@@ -81,7 +81,7 @@ class SluggerTest extends TestCase
         $this->assertSame('you_and_me_with_this_address_slug_at_test_uk', $slug);
     }
 
-    public function testSlugCharReplacementParentLocaleConstruct()
+    public function testSlugCharReplacementParentLocaleConstruct(): void
     {
         $slugger = new AsciiSlugger('fr_FR', ['fr' => ['&' => 'et', '@' => 'chez']]);
         $slug = (string) $slugger->slug('toi & moi avec cette adresse slug@test.fr', '_');
@@ -89,14 +89,14 @@ class SluggerTest extends TestCase
         $this->assertSame('toi_et_moi_avec_cette_adresse_slug_chez_test_fr', $slug);
     }
 
-    public function testSlugCharReplacementParentLocaleMethod()
+    public function testSlugCharReplacementParentLocaleMethod(): void
     {
         $slugger = new AsciiSlugger(null, ['es' => ['&' => 'y', '@' => 'en senal']]);
         $slug = (string) $slugger->slug('yo & tu a esta dirección slug@test.es', '_', 'es_ES');
         $this->assertSame('yo_y_tu_a_esta_direccion_slug_en_senal_test_es', $slug);
     }
 
-    public function testSlugClosure()
+    public function testSlugClosure(): void
     {
         $slugger = new AsciiSlugger(null, function ($s, $locale) {
             $this->assertSame('foo', $locale);

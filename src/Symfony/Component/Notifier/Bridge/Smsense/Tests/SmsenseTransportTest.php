@@ -47,7 +47,7 @@ class SmsenseTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendSuccessfully()
+    public function testSendSuccessfully(): void
     {
         $response = new JsonMockResponse([
             'status' => 'created',
@@ -70,7 +70,7 @@ class SmsenseTransportTest extends TransportTestCase
     }
 
     #[DataProvider('errorProvider')]
-    public function testExceptionIsThrownWhenSendFailed(int $statusCode, string $content, string $expectedExceptionMessage)
+    public function testExceptionIsThrownWhenSendFailed(int $statusCode, string $content, string $expectedExceptionMessage): void
     {
         $client = new MockHttpClient(new MockResponse($content, ['http_code' => $statusCode]));
         $transport = $this->createTransport($client);

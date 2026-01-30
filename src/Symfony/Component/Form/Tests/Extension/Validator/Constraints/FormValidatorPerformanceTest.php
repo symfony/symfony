@@ -32,7 +32,7 @@ class FormValidatorPerformanceTest extends FormPerformanceTestCase
      * findClickedButton() used to have an exponential number of calls.
      */
     #[Group('benchmark')]
-    public function testValidationPerformance()
+    public function testValidationPerformance(): void
     {
         $this->setMaxRunningTime(1);
 

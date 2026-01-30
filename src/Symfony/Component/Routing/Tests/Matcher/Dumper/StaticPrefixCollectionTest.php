@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Route;
 class StaticPrefixCollectionTest extends TestCase
 {
     #[DataProvider('routeProvider')]
-    public function testGrouping(array $routes, $expected)
+    public function testGrouping(array $routes, $expected): void
     {
         $collection = new StaticPrefixCollection('/');
 

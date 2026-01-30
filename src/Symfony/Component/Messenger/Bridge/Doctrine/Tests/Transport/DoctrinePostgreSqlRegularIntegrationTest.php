@@ -32,7 +32,7 @@ class DoctrinePostgreSqlRegularIntegrationTest extends TestCase
     private \Doctrine\DBAL\Connection $driverConnection;
     private Connection $connection;
 
-    public function testSendAndGetWithAutoSetupEnabledAndNotSetupAlready()
+    public function testSendAndGetWithAutoSetupEnabledAndNotSetupAlready(): void
     {
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
 
@@ -43,7 +43,7 @@ class DoctrinePostgreSqlRegularIntegrationTest extends TestCase
         $this->assertNull($this->connection->get());
     }
 
-    public function testSendAndGetWithAutoSetupEnabledAndSetupAlready()
+    public function testSendAndGetWithAutoSetupEnabledAndSetupAlready(): void
     {
         $this->connection->setup();
 
@@ -56,7 +56,7 @@ class DoctrinePostgreSqlRegularIntegrationTest extends TestCase
         $this->assertNull($this->connection->get());
     }
 
-    public function testSendAndGetWithSkipLockedEnabled()
+    public function testSendAndGetWithSkipLockedEnabled(): void
     {
         $connection = new Connection(['table_name' => 'queue_table', 'skip_locked' => true], $this->driverConnection);
         $connection->setup();

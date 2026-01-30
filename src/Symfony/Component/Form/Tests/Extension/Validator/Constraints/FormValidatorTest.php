@@ -53,7 +53,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->constraint = new Form();
     }
 
-    public function testValidate()
+    public function testValidate(): void
     {
         $object = new \stdClass();
         $options = ['validation_groups' => ['group1', 'group2']];
@@ -67,7 +67,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateConstraints()
+    public function testValidateConstraints(): void
     {
         $object = new \stdClass();
         $constraint1 = new NotNull(groups: ['group1', 'group2']);
@@ -93,7 +93,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateChildIfValidConstraint()
+    public function testValidateChildIfValidConstraint(): void
     {
         $object = new \stdClass();
 
@@ -116,7 +116,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontValidateIfParentWithoutValidConstraint()
+    public function testDontValidateIfParentWithoutValidConstraint(): void
     {
         $object = new \stdClass();
 
@@ -140,7 +140,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testMissingConstraintIndex()
+    public function testMissingConstraintIndex(): void
     {
         $object = new \stdClass();
         $form = $this->getCompoundForm($object);
@@ -153,7 +153,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testValidateConstraintsOptionEvenIfNoValidConstraint()
+    public function testValidateConstraintsOptionEvenIfNoValidConstraint(): void
     {
         $object = new \stdClass();
         $constraint1 = new NotNull(groups: ['group1', 'group2']);
@@ -179,7 +179,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontValidateIfNoValidationGroups()
+    public function testDontValidateIfNoValidationGroups(): void
     {
         $object = new \stdClass();
 
@@ -203,7 +203,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontValidateConstraintsIfNoValidationGroups()
+    public function testDontValidateConstraintsIfNoValidationGroups(): void
     {
         $object = new \stdClass();
 
@@ -227,7 +227,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontValidateChildConstraintsIfCallableNoValidationGroups()
+    public function testDontValidateChildConstraintsIfCallableNoValidationGroups(): void
     {
         $formOptions = [
             'constraints' => [new Valid()],
@@ -251,7 +251,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontValidateIfNotSynchronized()
+    public function testDontValidateIfNotSynchronized(): void
     {
         $object = new \stdClass();
 
@@ -287,7 +287,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testAddInvalidErrorEvenIfNoValidationGroups()
+    public function testAddInvalidErrorEvenIfNoValidationGroups(): void
     {
         $object = new \stdClass();
 
@@ -324,7 +324,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testDontValidateConstraintsIfNotSynchronized()
+    public function testDontValidateConstraintsIfNotSynchronized(): void
     {
         $object = new \stdClass();
 
@@ -356,7 +356,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testTransformationFailedExceptionInvalidMessageIsUsed()
+    public function testTransformationFailedExceptionInvalidMessageIsUsed(): void
     {
         $object = new \stdClass();
 
@@ -368,7 +368,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->setData($object)
             ->addViewTransformer(new CallbackTransformer(
                 static fn ($data) => $data,
-                static function () {
+                static function (): void {
                     $failure = new TransformationFailedException();
                     $failure->setInvalidMessage('safe message to be used', ['{{ bar }}' => 'bar']);
 
@@ -397,7 +397,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         ;
     }
 
-    public function testHandleGroupSequenceValidationGroups()
+    public function testHandleGroupSequenceValidationGroups(): void
     {
         $object = new \stdClass();
         $options = ['validation_groups' => new GroupSequence(['group1', 'group2'])];
@@ -412,7 +412,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testHandleCallbackValidationGroups()
+    public function testHandleCallbackValidationGroups(): void
     {
         $object = new \stdClass();
         $options = ['validation_groups' => $this->getValidationGroups(...)];
@@ -426,7 +426,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontExecuteFunctionNames()
+    public function testDontExecuteFunctionNames(): void
     {
         $object = new \stdClass();
         $options = ['validation_groups' => 'header'];
@@ -440,7 +440,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testHandleClosureValidationGroups()
+    public function testHandleClosureValidationGroups(): void
     {
         $object = new \stdClass();
         $options = ['validation_groups' => static fn (FormInterface $form) => ['group1', 'group2']];
@@ -454,7 +454,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testUseValidationGroupOfClickedButton()
+    public function testUseValidationGroupOfClickedButton(): void
     {
         $object = new \stdClass();
 
@@ -481,7 +481,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontUseValidationGroupOfUnclickedButton()
+    public function testDontUseValidationGroupOfUnclickedButton(): void
     {
         $object = new \stdClass();
 
@@ -508,7 +508,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testUseInheritedValidationGroup()
+    public function testUseInheritedValidationGroup(): void
     {
         $object = new \stdClass();
 
@@ -529,7 +529,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testUseInheritedCallbackValidationGroup()
+    public function testUseInheritedCallbackValidationGroup(): void
     {
         $object = new \stdClass();
 
@@ -550,7 +550,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testUseInheritedClosureValidationGroup()
+    public function testUseInheritedClosureValidationGroup(): void
     {
         $object = new \stdClass();
 
@@ -573,7 +573,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testAppendPropertyPath()
+    public function testAppendPropertyPath(): void
     {
         $object = new \stdClass();
         $form = $this->getCompoundForm($object);
@@ -586,7 +586,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testDontWalkScalars()
+    public function testDontWalkScalars(): void
     {
         $form = $this->getBuilder()
             ->setData('scalar')
@@ -602,7 +602,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testViolationIfExtraData()
+    public function testViolationIfExtraData(): void
     {
         $form = $this->getBuilder('parent', null, ['extra_fields_message' => 'Extra!|Extras!'])
             ->setCompound(true)
@@ -627,7 +627,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testViolationFormatIfMultipleExtraFields()
+    public function testViolationFormatIfMultipleExtraFields(): void
     {
         $form = $this->getBuilder('parent', null, ['extra_fields_message' => 'Extra!|Extras!!'])
             ->setCompound(true)
@@ -652,7 +652,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testNoViolationIfAllowExtraData()
+    public function testNoViolationIfAllowExtraData(): void
     {
         $form = $this
             ->getBuilder('parent', null, ['allow_extra_fields' => true])
@@ -681,7 +681,7 @@ class FormValidatorTest extends ConstraintValidatorTestCase
         return ['group1', 'group2'];
     }
 
-    public function testCauseForNotAllowedExtraFieldsIsTheFormConstraint()
+    public function testCauseForNotAllowedExtraFieldsIsTheFormConstraint(): void
     {
         $form = $this
             ->getBuilder('form', null, ['constraints' => [new NotBlank(groups: ['foo'])]])

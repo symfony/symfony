@@ -18,7 +18,7 @@ use Symfony\Component\Mailer\Transport\Smtp\Stream\AbstractStream;
 class AbstractStreamTest extends TestCase
 {
     #[DataProvider('provideReplace')]
-    public function testReplace(string $expected, string $from, string $to, array $chunks)
+    public function testReplace(string $expected, string $from, string $to, array $chunks): void
     {
         $result = '';
         foreach (AbstractStream::replace($from, $to, $chunks) as $chunk) {

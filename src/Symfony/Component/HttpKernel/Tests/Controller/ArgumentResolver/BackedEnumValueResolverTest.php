@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
 class BackedEnumValueResolverTest extends TestCase
 {
     #[DataProvider('provideTestSupportsData')]
-    public function testSupports(Request $request, ArgumentMetadata $metadata, bool $expectedSupport)
+    public function testSupports(Request $request, ArgumentMetadata $metadata, bool $expectedSupport): void
     {
         $resolver = new BackedEnumValueResolver();
 
@@ -68,7 +68,7 @@ class BackedEnumValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideTestResolveData')]
-    public function testResolve(Request $request, ArgumentMetadata $metadata, $expected)
+    public function testResolve(Request $request, ArgumentMetadata $metadata, $expected): void
     {
         $resolver = new BackedEnumValueResolver();
         /** @var \Generator $results */
@@ -101,7 +101,7 @@ class BackedEnumValueResolverTest extends TestCase
         ];
     }
 
-    public function testResolveThrowsNotFoundOnInvalidValue()
+    public function testResolveThrowsNotFoundOnInvalidValue(): void
     {
         $resolver = new BackedEnumValueResolver();
         $request = self::createRequest(['suit' => 'foo']);
@@ -113,7 +113,7 @@ class BackedEnumValueResolverTest extends TestCase
         $resolver->resolve($request, $metadata);
     }
 
-    public function testResolveThrowsOnUnexpectedType()
+    public function testResolveThrowsOnUnexpectedType(): void
     {
         $resolver = new BackedEnumValueResolver();
         $request = self::createRequest(['suit' => false]);
@@ -125,7 +125,7 @@ class BackedEnumValueResolverTest extends TestCase
         $resolver->resolve($request, $metadata);
     }
 
-    public function testResolveThrowsOnTypeError()
+    public function testResolveThrowsOnTypeError(): void
     {
         $resolver = new BackedEnumValueResolver();
         $request = self::createRequest(['suit' => 'value']);

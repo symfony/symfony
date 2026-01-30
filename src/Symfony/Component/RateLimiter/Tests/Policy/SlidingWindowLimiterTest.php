@@ -31,7 +31,7 @@ class SlidingWindowLimiterTest extends TestCase
         ClockMock::register(RateLimit::class);
     }
 
-    public function testConsume()
+    public function testConsume(): void
     {
         $limiter = $this->createLimiter();
 
@@ -54,7 +54,7 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertSame(0, $rateLimit->getRemainingTokens());
     }
 
-    public function testWaitIntervalOnConsumeOverLimit()
+    public function testWaitIntervalOnConsumeOverLimit(): void
     {
         $limiter = $this->createLimiter();
 
@@ -69,7 +69,7 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertTrue($limiter->consume()->isAccepted());
     }
 
-    public function testReserve()
+    public function testReserve(): void
     {
         $limiter = $this->createLimiter();
         $limiter->consume(8);
@@ -81,7 +81,7 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertEquals(0, $limiter->reserve(10)->getWaitDuration());
     }
 
-    public function testPeekConsume()
+    public function testPeekConsume(): void
     {
         $limiter = $this->createLimiter();
 
@@ -109,7 +109,7 @@ class SlidingWindowLimiterTest extends TestCase
         );
     }
 
-    public function testNegativeConsume()
+    public function testNegativeConsume(): void
     {
         $limiter = $this->createLimiter();
 

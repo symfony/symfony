@@ -29,7 +29,7 @@ class GlobResourceTest extends TestCase
     #[TestWith(['/Resource'])]
     #[TestWith(['/**/Resource'])]
     #[TestWith(['/**/Resource/'])]
-    public function testIterator(string $pattern)
+    public function testIterator(string $pattern): void
     {
         $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $resource = new GlobResource($dir, $pattern, true);
@@ -42,7 +42,7 @@ class GlobResourceTest extends TestCase
         $this->assertSame($dir, $resource->getPrefix());
     }
 
-    public function testIteratorForExclusionDoesntIterateThroughSubfolders()
+    public function testIteratorForExclusionDoesntIterateThroughSubfolders(): void
     {
         $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $resource = new GlobResource($dir, \DIRECTORY_SEPARATOR.'Exclude', true, true);
@@ -54,7 +54,7 @@ class GlobResourceTest extends TestCase
         $this->assertCount(1, $paths);
     }
 
-    public function testIteratorSkipsFoldersForGivenExcludedPrefixes()
+    public function testIteratorSkipsFoldersForGivenExcludedPrefixes(): void
     {
         $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $resource = new GlobResource($dir, '/*Exclude*', true, false, [$dir.\DIRECTORY_SEPARATOR.'Exclude' => true]);
@@ -68,7 +68,7 @@ class GlobResourceTest extends TestCase
         $this->assertArrayNotHasKey($file, $paths);
     }
 
-    public function testIteratorSkipsSubfoldersForGivenExcludedPrefixes()
+    public function testIteratorSkipsSubfoldersForGivenExcludedPrefixes(): void
     {
         $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $resource = new GlobResource($dir, '/*Exclude/*', true, false, [$dir.\DIRECTORY_SEPARATOR.'Exclude' => true]);
@@ -82,7 +82,7 @@ class GlobResourceTest extends TestCase
         $this->assertArrayNotHasKey($file, $paths);
     }
 
-    public function testIteratorSkipsFoldersWithForwardSlashForGivenExcludedPrefixes()
+    public function testIteratorSkipsFoldersWithForwardSlashForGivenExcludedPrefixes(): void
     {
         $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $resource = new GlobResource($dir, '/*Exclude*', true, false, [$dir.'/Exclude' => true]);
@@ -96,7 +96,7 @@ class GlobResourceTest extends TestCase
         $this->assertArrayNotHasKey($file, $paths);
     }
 
-    public function testIsFreshNonRecursiveDetectsNewFile()
+    public function testIsFreshNonRecursiveDetectsNewFile(): void
     {
         $dir = \dirname(__DIR__).'/Fixtures';
         $resource = new GlobResource($dir, '/*', false);
@@ -116,7 +116,7 @@ class GlobResourceTest extends TestCase
         $this->assertTrue($resource->isFresh(0));
     }
 
-    public function testIsFreshNonRecursiveDetectsRemovedFile()
+    public function testIsFreshNonRecursiveDetectsRemovedFile(): void
     {
         $dir = \dirname(__DIR__).'/Fixtures';
         $resource = new GlobResource($dir, '/*', false);
@@ -132,7 +132,7 @@ class GlobResourceTest extends TestCase
         $this->assertFalse($resource->isFresh(0));
     }
 
-    public function testIsFreshRecursiveDetectsRemovedFile()
+    public function testIsFreshRecursiveDetectsRemovedFile(): void
     {
         $dir = \dirname(__DIR__).'/Fixtures';
         $resource = new GlobResource($dir, '/*', true);
@@ -150,7 +150,7 @@ class GlobResourceTest extends TestCase
         $this->assertTrue($resource->isFresh(0));
     }
 
-    public function testIsFreshRecursiveDetectsNewFile()
+    public function testIsFreshRecursiveDetectsNewFile(): void
     {
         $dir = \dirname(__DIR__).'/Fixtures';
         $resource = new GlobResource($dir, '/*', true);
@@ -161,7 +161,7 @@ class GlobResourceTest extends TestCase
         $this->assertFalse($resource->isFresh(0));
     }
 
-    public function testBraceFallback()
+    public function testBraceFallback(): void
     {
         $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $resource = new GlobResource($dir, '/*{/*/*.txt,.x{m,n}l}', true);
@@ -178,7 +178,7 @@ class GlobResourceTest extends TestCase
         $this->assertSame($expected, array_keys(iterator_to_array($resource)));
     }
 
-    public function testUnbalancedBraceFallback()
+    public function testUnbalancedBraceFallback(): void
     {
         $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $resource = new GlobResource($dir, '/*{/*/*.txt,.x{m,nl}', true);
@@ -189,7 +189,7 @@ class GlobResourceTest extends TestCase
         $this->assertSame([], array_keys(iterator_to_array($resource)));
     }
 
-    public function testSerializeUnserialize()
+    public function testSerializeUnserialize(): void
     {
         $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
         $resource = new GlobResource($dir, '/Resource', true);
@@ -201,7 +201,7 @@ class GlobResourceTest extends TestCase
         $this->assertEquals($p->getValue($resource), $p->getValue($newResource));
     }
 
-    public function testPhar()
+    public function testPhar(): void
     {
         $s = \DIRECTORY_SEPARATOR;
         $cwd = getcwd();
@@ -219,7 +219,7 @@ class GlobResourceTest extends TestCase
         }
     }
 
-    public function testFilePrefix()
+    public function testFilePrefix(): void
     {
         $resource = new GlobResource(__FILE__, '/**/', true);
         $files = array_keys(iterator_to_array($resource));

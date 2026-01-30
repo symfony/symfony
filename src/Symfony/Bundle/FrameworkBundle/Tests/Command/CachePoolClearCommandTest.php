@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 class CachePoolClearCommandTest extends TestCase
 {
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $application = new Application($this->getKernel());
         $application->addCommand(new CachePoolClearCommand(new Psr6CacheClearer(['foo' => new ArrayAdapter()]), ['foo']));

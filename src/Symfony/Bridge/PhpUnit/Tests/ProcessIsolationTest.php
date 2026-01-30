@@ -30,13 +30,13 @@ class ProcessIsolationTest extends TestCase
     /**
      * @expectedDeprecation Test abc
      */
-    public function testIsolation()
+    public function testIsolation(): void
     {
         @trigger_error('Test abc', \E_USER_DEPRECATED);
         $this->addToAssertionCount(1);
     }
 
-    public function testCallingOtherErrorHandler()
+    public function testCallingOtherErrorHandler(): void
     {
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Test that PHPUnit\'s error handler fires.');

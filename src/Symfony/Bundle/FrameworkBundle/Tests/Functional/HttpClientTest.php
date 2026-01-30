@@ -17,7 +17,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class HttpClientTest extends AbstractWebTestCase
 {
-    public function testHttpClientAssertions()
+    public function testHttpClientAssertions(): void
     {
         $client = $this->createClient(['test_case' => 'HttpClient', 'root_config' => 'config.yml', 'debug' => true]);
         $client->enableProfiler();
@@ -35,7 +35,7 @@ class HttpClientTest extends AbstractWebTestCase
         $this->assertHttpClientRequestCount(6, 'symfony.http_client');
     }
 
-    public function testHttpClientCanBeOverriddenInWebTestCase()
+    public function testHttpClientCanBeOverriddenInWebTestCase(): void
     {
         $browser = $this->createClient(['test_case' => 'HttpClient', 'root_config' => 'config.yml', 'debug' => true]);
         $mockedContent = 'Request Mocked successfully!';

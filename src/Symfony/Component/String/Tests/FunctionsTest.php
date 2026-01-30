@@ -24,7 +24,7 @@ use function Symfony\Component\String\u;
 final class FunctionsTest extends TestCase
 {
     #[DataProvider('provideSStrings')]
-    public function testS(AbstractString $expected, ?string $input)
+    public function testS(AbstractString $expected, ?string $input): void
     {
         $this->assertEquals($expected, s($input));
     }
@@ -42,7 +42,7 @@ final class FunctionsTest extends TestCase
     }
 
     #[DataProvider('provideUStrings')]
-    public function testU(UnicodeString $expected, ?string $input)
+    public function testU(UnicodeString $expected, ?string $input): void
     {
         $this->assertEquals($expected, u($input));
     }
@@ -58,7 +58,7 @@ final class FunctionsTest extends TestCase
     }
 
     #[DataProvider('provideBStrings')]
-    public function testB(ByteString $expected, ?string $input)
+    public function testB(ByteString $expected, ?string $input): void
     {
         $this->assertEquals($expected, b($input));
     }

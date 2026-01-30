@@ -18,7 +18,7 @@ use Symfony\Component\Workflow\Transition;
 
 class DefinitionTest extends TestCase
 {
-    public function testAddPlaces()
+    public function testAddPlaces(): void
     {
         $places = range('a', 'e');
         $definition = new Definition($places, []);
@@ -28,7 +28,7 @@ class DefinitionTest extends TestCase
         $this->assertEquals(['a'], $definition->getInitialPlaces());
     }
 
-    public function testSetInitialPlace()
+    public function testSetInitialPlace(): void
     {
         $places = range('a', 'e');
         $definition = new Definition($places, [], $places[3]);
@@ -36,7 +36,7 @@ class DefinitionTest extends TestCase
         $this->assertEquals([$places[3]], $definition->getInitialPlaces());
     }
 
-    public function testSetInitialPlaces()
+    public function testSetInitialPlaces(): void
     {
         $places = range('a', 'e');
         $definition = new Definition($places, [], ['a', 'e']);
@@ -44,14 +44,14 @@ class DefinitionTest extends TestCase
         $this->assertEquals(['a', 'e'], $definition->getInitialPlaces());
     }
 
-    public function testSetInitialPlaceAndPlaceIsNotDefined()
+    public function testSetInitialPlaceAndPlaceIsNotDefined(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Place "d" cannot be the initial place as it does not exist.');
         new Definition([], [], 'd');
     }
 
-    public function testAddTransition()
+    public function testAddTransition(): void
     {
         $places = range('a', 'b');
 
@@ -62,7 +62,7 @@ class DefinitionTest extends TestCase
         $this->assertSame($transition, $definition->getTransitions()[0]);
     }
 
-    public function testAddTransitionAndFromPlaceIsNotDefined()
+    public function testAddTransitionAndFromPlaceIsNotDefined(): void
     {
         $places = range('a', 'b');
 
@@ -70,7 +70,7 @@ class DefinitionTest extends TestCase
         $this->assertContains('c', $definition->getPlaces());
     }
 
-    public function testAddTransitionAndToPlaceIsNotDefined()
+    public function testAddTransitionAndToPlaceIsNotDefined(): void
     {
         $places = range('a', 'b');
 

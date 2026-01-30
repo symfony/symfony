@@ -45,7 +45,7 @@ final class FreeMobileTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSmsMessageWithFrom()
+    public function testSmsMessageWithFrom(): void
     {
         $transport = $this->createTransport();
 

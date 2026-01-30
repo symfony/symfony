@@ -30,7 +30,7 @@ class CursorTest extends TestCase
         unset($this->stream);
     }
 
-    public function testMoveUpOneLine()
+    public function testMoveUpOneLine(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -39,7 +39,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b[1A", $this->getOutputContent($output));
     }
 
-    public function testMoveUpMultipleLines()
+    public function testMoveUpMultipleLines(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -48,7 +48,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b[12A", $this->getOutputContent($output));
     }
 
-    public function testMoveDownOneLine()
+    public function testMoveDownOneLine(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -57,7 +57,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b[1B", $this->getOutputContent($output));
     }
 
-    public function testMoveDownMultipleLines()
+    public function testMoveDownMultipleLines(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -66,7 +66,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b[12B", $this->getOutputContent($output));
     }
 
-    public function testMoveLeftOneLine()
+    public function testMoveLeftOneLine(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -75,7 +75,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b[1D", $this->getOutputContent($output));
     }
 
-    public function testMoveLeftMultipleLines()
+    public function testMoveLeftMultipleLines(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -84,7 +84,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b[12D", $this->getOutputContent($output));
     }
 
-    public function testMoveRightOneLine()
+    public function testMoveRightOneLine(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -93,7 +93,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b[1C", $this->getOutputContent($output));
     }
 
-    public function testMoveRightMultipleLines()
+    public function testMoveRightMultipleLines(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -102,7 +102,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b[12C", $this->getOutputContent($output));
     }
 
-    public function testMoveToColumn()
+    public function testMoveToColumn(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -111,7 +111,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b[6G", $this->getOutputContent($output));
     }
 
-    public function testMoveToPosition()
+    public function testMoveToPosition(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -120,7 +120,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b[17;18H", $this->getOutputContent($output));
     }
 
-    public function testClearLine()
+    public function testClearLine(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -129,7 +129,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b[2K", $this->getOutputContent($output));
     }
 
-    public function testSavePosition()
+    public function testSavePosition(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -138,7 +138,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b7", $this->getOutputContent($output));
     }
 
-    public function testHide()
+    public function testHide(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -147,7 +147,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b[?25l", $this->getOutputContent($output));
     }
 
-    public function testShow()
+    public function testShow(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -156,7 +156,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b[?25h\x1b[?0c", $this->getOutputContent($output));
     }
 
-    public function testRestorePosition()
+    public function testRestorePosition(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -165,7 +165,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b8", $this->getOutputContent($output));
     }
 
-    public function testClearOutput()
+    public function testClearOutput(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 
@@ -174,7 +174,7 @@ class CursorTest extends TestCase
         $this->assertEquals("\x1b[0J", $this->getOutputContent($output));
     }
 
-    public function testGetCurrentPosition()
+    public function testGetCurrentPosition(): void
     {
         $cursor = new Cursor($output = $this->getOutputStream());
 

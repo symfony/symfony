@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\SchemeRequestMatcher;
 class SchemeRequestMatcherTest extends TestCase
 {
     #[DataProvider('getData')]
-    public function test(string $requestScheme, array|string $matcherScheme, bool $isMatch)
+    public function test(string $requestScheme, array|string $matcherScheme, bool $isMatch): void
     {
         $httpRequest = Request::create('');
         $httpsRequest = Request::create('', 'get', [], [], [], ['HTTPS' => 'on']);
@@ -39,7 +39,7 @@ class SchemeRequestMatcherTest extends TestCase
         }
     }
 
-    public function testAlwaysMatchesOnParamsHeaders()
+    public function testAlwaysMatchesOnParamsHeaders(): void
     {
         $matcher = new SchemeRequestMatcher([]);
         $request = Request::create('sftp://example.com');

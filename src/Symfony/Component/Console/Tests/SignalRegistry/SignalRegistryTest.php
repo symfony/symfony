@@ -29,12 +29,12 @@ class SignalRegistryTest extends TestCase
         pcntl_signal(\SIGALRM, \SIG_DFL);
     }
 
-    public function testOneCallbackForASignalSignalIsHandled()
+    public function testOneCallbackForASignalSignalIsHandled(): void
     {
         $signalRegistry = new SignalRegistry();
 
         $isHandled = false;
-        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled) {
+        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled): void {
             $isHandled = true;
         });
 
@@ -43,17 +43,17 @@ class SignalRegistryTest extends TestCase
         $this->assertTrue($isHandled);
     }
 
-    public function testTwoCallbacksForASignalBothCallbacksAreCalled()
+    public function testTwoCallbacksForASignalBothCallbacksAreCalled(): void
     {
         $signalRegistry = new SignalRegistry();
 
         $isHandled1 = false;
-        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled1) {
+        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled1): void {
             $isHandled1 = true;
         });
 
         $isHandled2 = false;
-        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled2) {
+        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled2): void {
             $isHandled2 = true;
         });
 
@@ -63,14 +63,14 @@ class SignalRegistryTest extends TestCase
         $this->assertTrue($isHandled2);
     }
 
-    public function testTwoSignalsSignalsAreHandled()
+    public function testTwoSignalsSignalsAreHandled(): void
     {
         $signalRegistry = new SignalRegistry();
 
         $isHandled1 = false;
         $isHandled2 = false;
 
-        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled1) {
+        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled1): void {
             $isHandled1 = true;
         });
 
@@ -79,7 +79,7 @@ class SignalRegistryTest extends TestCase
         $this->assertTrue($isHandled1);
         $this->assertFalse($isHandled2);
 
-        $signalRegistry->register(\SIGUSR2, static function () use (&$isHandled2) {
+        $signalRegistry->register(\SIGUSR2, static function () use (&$isHandled2): void {
             $isHandled2 = true;
         });
 
@@ -88,17 +88,17 @@ class SignalRegistryTest extends TestCase
         $this->assertTrue($isHandled2);
     }
 
-    public function testTwoCallbacksForASignalPreviousAndRegisteredCallbacksWereCalled()
+    public function testTwoCallbacksForASignalPreviousAndRegisteredCallbacksWereCalled(): void
     {
         $signalRegistry = new SignalRegistry();
 
         $isHandled1 = false;
-        pcntl_signal(\SIGUSR1, static function () use (&$isHandled1) {
+        pcntl_signal(\SIGUSR1, static function () use (&$isHandled1): void {
             $isHandled1 = true;
         });
 
         $isHandled2 = false;
-        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled2) {
+        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled2): void {
             $isHandled2 = true;
         });
 
@@ -108,19 +108,19 @@ class SignalRegistryTest extends TestCase
         $this->assertTrue($isHandled2);
     }
 
-    public function testTwoCallbacksForASignalPreviousCallbackFromAnotherRegistry()
+    public function testTwoCallbacksForASignalPreviousCallbackFromAnotherRegistry(): void
     {
         $signalRegistry1 = new SignalRegistry();
 
         $isHandled1 = false;
-        $signalRegistry1->register(\SIGUSR1, static function () use (&$isHandled1) {
+        $signalRegistry1->register(\SIGUSR1, static function () use (&$isHandled1): void {
             $isHandled1 = true;
         });
 
         $signalRegistry2 = new SignalRegistry();
 
         $isHandled2 = false;
-        $signalRegistry2->register(\SIGUSR1, static function () use (&$isHandled2) {
+        $signalRegistry2->register(\SIGUSR1, static function () use (&$isHandled2): void {
             $isHandled2 = true;
         });
 
@@ -130,14 +130,14 @@ class SignalRegistryTest extends TestCase
         $this->assertTrue($isHandled2);
     }
 
-    public function testPushPopIsolatesHandlers()
+    public function testPushPopIsolatesHandlers(): void
     {
         $registry = new SignalRegistry();
 
         $signal = \SIGUSR1;
 
-        $handler1 = static function () {};
-        $handler2 = static function () {};
+        $handler1 = static function (): void {};
+        $handler2 = static function (): void {};
 
         $registry->pushCurrentHandlers();
         $registry->register($signal, $handler1);
@@ -160,7 +160,7 @@ class SignalRegistryTest extends TestCase
         $this->assertCount(0, $this->getHandlersForSignal($registry, $signal));
     }
 
-    public function testRestoreOriginalOnEmptyAfterPop()
+    public function testRestoreOriginalOnEmptyAfterPop(): void
     {
         if (!\extension_loaded('pcntl')) {
             $this->markTestSkipped('PCNTL extension required');
@@ -172,7 +172,7 @@ class SignalRegistryTest extends TestCase
 
         $original = pcntl_signal_get_handler($signal);
 
-        $handler = static function () {};
+        $handler = static function (): void {};
 
         $registry->pushCurrentHandlers();
         $registry->register($signal, $handler);

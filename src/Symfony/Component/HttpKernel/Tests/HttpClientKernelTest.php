@@ -19,7 +19,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class HttpClientKernelTest extends TestCase
 {
-    public function testHandlePassesMaxRedirectsHttpClientOption()
+    public function testHandlePassesMaxRedirectsHttpClientOption(): void
     {
         $request = new Request();
         $request->attributes->set('http_client_options', ['max_redirects' => 50]);

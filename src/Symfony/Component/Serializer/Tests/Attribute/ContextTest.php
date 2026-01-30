@@ -30,7 +30,7 @@ class ContextTest extends TestCase
         $this->setUpVarDumper([], CliDumper::DUMP_LIGHT_ARRAY | CliDumper::DUMP_TRAILING_COMMA);
     }
 
-    public function testThrowsOnEmptyContext()
+    public function testThrowsOnEmptyContext(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('At least one of the "context", "normalizationContext", or "denormalizationContext" options must be provided as a non-empty array to "Symfony\Component\Serializer\Attribute\Context".');
@@ -38,7 +38,7 @@ class ContextTest extends TestCase
         new Context();
     }
 
-    public function testInvalidGroupOption()
+    public function testInvalidGroupOption(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('Parameter "groups" given to "%s" must be a string or an array of strings, "stdClass" given', Context::class));
@@ -46,7 +46,7 @@ class ContextTest extends TestCase
         new Context(context: ['foo' => 'bar'], groups: ['fine', new \stdClass()]);
     }
 
-    public function testAsFirstArg()
+    public function testAsFirstArg(): void
     {
         $context = new Context(['foo' => 'bar']);
 
@@ -56,7 +56,7 @@ class ContextTest extends TestCase
         self::assertSame([], $context->groups);
     }
 
-    public function testAsContextArg()
+    public function testAsContextArg(): void
     {
         $context = new Context(context: ['foo' => 'bar']);
 
@@ -67,7 +67,7 @@ class ContextTest extends TestCase
     }
 
     #[DataProvider('provideValidInputs')]
-    public function testValidInputs(callable $factory, string $expectedDump)
+    public function testValidInputs(callable $factory, string $expectedDump): void
     {
         $this->assertDumpEquals($expectedDump, $factory());
     }

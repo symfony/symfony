@@ -40,7 +40,7 @@ class TextBundleWriterTest extends TestCase
         $this->filesystem->remove($this->directory);
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $this->writer->write($this->directory, 'en', [
             'Entry1' => [
@@ -61,7 +61,7 @@ class TextBundleWriterTest extends TestCase
         $this->assertFileEquals(__DIR__.'/Fixtures/en.txt', $this->directory.'/en.txt');
     }
 
-    public function testWriteTraversable()
+    public function testWriteTraversable(): void
     {
         $this->writer->write($this->directory, 'en', new \ArrayIterator([
             'Entry1' => new \ArrayIterator([
@@ -82,7 +82,7 @@ class TextBundleWriterTest extends TestCase
         $this->assertFileEquals(__DIR__.'/Fixtures/en.txt', $this->directory.'/en.txt');
     }
 
-    public function testWriteNoFallback()
+    public function testWriteNoFallback(): void
     {
         $data = [
             'Entry' => 'Value',
@@ -93,7 +93,7 @@ class TextBundleWriterTest extends TestCase
         $this->assertFileEquals(__DIR__.'/Fixtures/en_nofallback.txt', $this->directory.'/en_nofallback.txt');
     }
 
-    public function testEscapeKeysIfNecessary()
+    public function testEscapeKeysIfNecessary(): void
     {
         $this->writer->write($this->directory, 'escaped', [
             // Keys with colons must be escaped, otherwise the part after the

@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 
 class ChildDefinitionTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -26,7 +26,7 @@ class ChildDefinitionTest extends TestCase
     }
 
     #[DataProvider('getPropertyTests')]
-    public function testSetProperty($property, $changeKey)
+    public function testSetProperty($property, $changeKey): void
     {
         $def = new ChildDefinition('foo');
 
@@ -49,7 +49,7 @@ class ChildDefinitionTest extends TestCase
         ];
     }
 
-    public function testSetPublic()
+    public function testSetPublic(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -59,7 +59,7 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame(['public' => true], $def->getChanges());
     }
 
-    public function testSetLazy()
+    public function testSetLazy(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -69,7 +69,7 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame(['lazy' => true], $def->getChanges());
     }
 
-    public function testSetAutowired()
+    public function testSetAutowired(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -79,7 +79,7 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame(['autowired' => true], $def->getChanges());
     }
 
-    public function testSetArgument()
+    public function testSetArgument(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -88,7 +88,7 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame(['index_0' => 'foo'], $def->getArguments());
     }
 
-    public function testReplaceArgumentShouldRequireIntegerIndex()
+    public function testReplaceArgumentShouldRequireIntegerIndex(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -97,7 +97,7 @@ class ChildDefinitionTest extends TestCase
         $def->replaceArgument('0', 'foo');
     }
 
-    public function testReplaceArgument()
+    public function testReplaceArgument(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -116,7 +116,7 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame([0 => 'foo', 1 => 'bar', 'index_1' => 'baz', '$bar' => 'val'], $def->getArguments());
     }
 
-    public function testGetArgumentShouldCheckBounds()
+    public function testGetArgumentShouldCheckBounds(): void
     {
         $def = new ChildDefinition('foo');
 
@@ -128,7 +128,7 @@ class ChildDefinitionTest extends TestCase
         $def->getArgument(1);
     }
 
-    public function testAutoconfigured()
+    public function testAutoconfigured(): void
     {
         $def = new ChildDefinition('foo');
         $def->setAutoconfigured(true);
@@ -136,7 +136,7 @@ class ChildDefinitionTest extends TestCase
         $this->assertTrue($def->isAutoconfigured());
     }
 
-    public function testInstanceofConditionals()
+    public function testInstanceofConditionals(): void
     {
         $conditionals = ['Foo' => new ChildDefinition('')];
         $def = new ChildDefinition('foo');

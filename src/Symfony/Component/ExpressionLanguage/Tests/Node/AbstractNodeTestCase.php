@@ -18,7 +18,7 @@ use Symfony\Component\ExpressionLanguage\Compiler;
 abstract class AbstractNodeTestCase extends TestCase
 {
     #[DataProvider('getEvaluateData')]
-    public function testEvaluate($expected, $node, $variables = [], $functions = [])
+    public function testEvaluate($expected, $node, $variables = [], $functions = []): void
     {
         $this->assertSame($expected, $node->evaluate($functions, $variables));
     }
@@ -26,7 +26,7 @@ abstract class AbstractNodeTestCase extends TestCase
     abstract public static function getEvaluateData();
 
     #[DataProvider('getCompileData')]
-    public function testCompile($expected, $node, $functions = [])
+    public function testCompile($expected, $node, $functions = []): void
     {
         $compiler = new Compiler($functions);
         $node->compile($compiler);
@@ -36,7 +36,7 @@ abstract class AbstractNodeTestCase extends TestCase
     abstract public static function getCompileData();
 
     #[DataProvider('getDumpData')]
-    public function testDump($expected, $node)
+    public function testDump($expected, $node): void
     {
         $this->assertSame($expected, $node->dump());
     }

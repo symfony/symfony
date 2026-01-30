@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Firebase\Notification\WebNotification;
 
 final class WebNotificationTest extends TestCase
 {
-    public function testWebNotificationOptions()
+    public function testWebNotificationOptions(): void
     {
         $notification = new WebNotification('device_token', [
             'title' => 'Test Title',
@@ -35,7 +35,7 @@ final class WebNotificationTest extends TestCase
         $this->assertSame('device_token', $notification->getRecipientId());
     }
 
-    public function testWebNotificationWithAllOptions()
+    public function testWebNotificationWithAllOptions(): void
     {
         $notification = (new WebNotification('device_token', []))
             ->title('New Title')
@@ -58,7 +58,7 @@ final class WebNotificationTest extends TestCase
         $this->assertSame($expected, $notification->toArray());
     }
 
-    public function testWebNotificationChaining()
+    public function testWebNotificationChaining(): void
     {
         $notification = new WebNotification('device_token', []);
 

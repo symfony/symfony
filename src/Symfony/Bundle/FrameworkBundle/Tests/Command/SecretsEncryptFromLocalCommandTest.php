@@ -39,7 +39,7 @@ class SecretsEncryptFromLocalCommandTest extends TestCase
         $this->fs->remove([$this->vaultDir, $this->localVaultDir]);
     }
 
-    public function testFailsWhenLocalVaultIsDisabled()
+    public function testFailsWhenLocalVaultIsDisabled(): void
     {
         $vault = $this->createStub(AbstractVault::class);
         $command = new SecretsEncryptFromLocalCommand($vault, null);
@@ -49,7 +49,7 @@ class SecretsEncryptFromLocalCommandTest extends TestCase
         $this->assertStringContainsString('The local vault is disabled.', $tester->getDisplay());
     }
 
-    public function testEncryptsLocalOverrides()
+    public function testEncryptsLocalOverrides(): void
     {
         $vault = new SodiumVault($this->vaultDir);
         $vault->generateKeys();
@@ -70,7 +70,7 @@ class SecretsEncryptFromLocalCommandTest extends TestCase
         $this->assertSame('local-value', $revealed);
     }
 
-    public function testDoesNotSealIfSameValue()
+    public function testDoesNotSealIfSameValue(): void
     {
         $vault = new SodiumVault($this->vaultDir);
         $vault->generateKeys();
@@ -91,7 +91,7 @@ class SecretsEncryptFromLocalCommandTest extends TestCase
         $this->assertSame('same-value', $revealed);
     }
 
-    public function testStillSucceedsIfLocalSecretIsMissing()
+    public function testStillSucceedsIfLocalSecretIsMissing(): void
     {
         $vault = new SodiumVault($this->vaultDir);
         $vault->generateKeys();

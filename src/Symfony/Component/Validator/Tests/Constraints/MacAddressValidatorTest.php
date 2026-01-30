@@ -28,34 +28,34 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
         return new MacAddressValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new MacAddress());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new MacAddress());
 
         $this->assertNoViolation();
     }
 
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new MacAddress());
     }
 
-    public function testInvalidValidatorType()
+    public function testInvalidValidatorType(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         new MacAddress(type: 666);
     }
 
     #[DataProvider('getValidMacs')]
-    public function testValidMac($mac)
+    public function testValidMac($mac): void
     {
         $this->validator->validate($mac, new MacAddress());
 
@@ -63,7 +63,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getNotValidMacs')]
-    public function testNotValidMac($mac)
+    public function testNotValidMac($mac): void
     {
         $this->validator->validate($mac, new MacAddress());
 
@@ -154,7 +154,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidLocalMulticastMacs')]
     #[DataProvider('getValidUniversalUnicastMacs')]
     #[DataProvider('getValidUniversalMulticastMacs')]
-    public function testValidAllNoBroadcastMacs($mac)
+    public function testValidAllNoBroadcastMacs($mac): void
     {
         $this->validator->validate($mac, new MacAddress(type: MacAddress::ALL_NO_BROADCAST));
 
@@ -162,7 +162,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidBroadcastMacs')]
-    public function testInvalidAllNoBroadcastMacs($mac)
+    public function testInvalidAllNoBroadcastMacs($mac): void
     {
         $constraint = new MacAddress('myMessage', type: MacAddress::ALL_NO_BROADCAST);
 
@@ -177,7 +177,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidLocalUnicastMacs')]
     #[DataProvider('getValidLocalMulticastMacs')]
     #[DataProvider('getValidBroadcastMacs')]
-    public function testValidLocalMacs($mac)
+    public function testValidLocalMacs($mac): void
     {
         $this->validator->validate($mac, new MacAddress(type: MacAddress::LOCAL_ALL));
 
@@ -186,7 +186,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
 
     #[DataProvider('getValidUniversalUnicastMacs')]
     #[DataProvider('getValidUniversalMulticastMacs')]
-    public function testInvalidLocalMacs($mac)
+    public function testInvalidLocalMacs($mac): void
     {
         $constraint = new MacAddress('myMessage', type: MacAddress::LOCAL_ALL);
 
@@ -200,7 +200,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
 
     #[DataProvider('getValidLocalUnicastMacs')]
     #[DataProvider('getValidLocalMulticastMacs')]
-    public function testValidLocalNoBroadcastMacs($mac)
+    public function testValidLocalNoBroadcastMacs($mac): void
     {
         $this->validator->validate($mac, new MacAddress(type: MacAddress::LOCAL_NO_BROADCAST));
 
@@ -210,7 +210,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidUniversalUnicastMacs')]
     #[DataProvider('getValidUniversalMulticastMacs')]
     #[DataProvider('getValidBroadcastMacs')]
-    public function testInvalidLocalNoBroadcastMacs($mac)
+    public function testInvalidLocalNoBroadcastMacs($mac): void
     {
         $constraint = new MacAddress('myMessage', type: MacAddress::LOCAL_NO_BROADCAST);
 
@@ -223,7 +223,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidLocalUnicastMacs')]
-    public function testValidLocalUnicastMacs($mac)
+    public function testValidLocalUnicastMacs($mac): void
     {
         $this->validator->validate($mac, new MacAddress(type: MacAddress::LOCAL_UNICAST));
 
@@ -233,7 +233,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidLocalMulticastMacs')]
     #[DataProvider('getValidUniversalUnicastMacs')]
     #[DataProvider('getValidUniversalMulticastMacs')]
-    public function testInvalidLocalUnicastMacs($mac)
+    public function testInvalidLocalUnicastMacs($mac): void
     {
         $constraint = new MacAddress('myMessage', type: MacAddress::LOCAL_UNICAST);
 
@@ -247,7 +247,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
 
     #[DataProvider('getValidLocalMulticastMacs')]
     #[DataProvider('getValidBroadcastMacs')]
-    public function testValidLocalMulticastMacs($mac)
+    public function testValidLocalMulticastMacs($mac): void
     {
         $this->validator->validate($mac, new MacAddress(type: MacAddress::LOCAL_MULTICAST));
 
@@ -257,7 +257,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidLocalUnicastMacs')]
     #[DataProvider('getValidUniversalUnicastMacs')]
     #[DataProvider('getValidUniversalMulticastMacs')]
-    public function testInvalidLocalMulticastMacs($mac)
+    public function testInvalidLocalMulticastMacs($mac): void
     {
         $constraint = new MacAddress('myMessage', type: MacAddress::LOCAL_MULTICAST);
 
@@ -270,7 +270,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidLocalMulticastMacs')]
-    public function testValidLocalMulticastNoBroadcastMacs($mac)
+    public function testValidLocalMulticastNoBroadcastMacs($mac): void
     {
         $this->validator->validate($mac, new MacAddress(type: MacAddress::LOCAL_MULTICAST_NO_BROADCAST));
 
@@ -281,7 +281,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidUniversalUnicastMacs')]
     #[DataProvider('getValidUniversalMulticastMacs')]
     #[DataProvider('getValidBroadcastMacs')]
-    public function testInvalidLocalMulticastNoBroadcastMacs($mac)
+    public function testInvalidLocalMulticastNoBroadcastMacs($mac): void
     {
         $constraint = new MacAddress('myMessage', type: MacAddress::LOCAL_MULTICAST_NO_BROADCAST);
 
@@ -295,7 +295,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
 
     #[DataProvider('getValidUniversalUnicastMacs')]
     #[DataProvider('getValidUniversalMulticastMacs')]
-    public function testValidUniversalMacs($mac)
+    public function testValidUniversalMacs($mac): void
     {
         $this->validator->validate($mac, new MacAddress(type: MacAddress::UNIVERSAL_ALL));
 
@@ -304,7 +304,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
 
     #[DataProvider('getValidLocalUnicastMacs')]
     #[DataProvider('getValidLocalMulticastMacs')]
-    public function testInvalidUniversalMacs($mac)
+    public function testInvalidUniversalMacs($mac): void
     {
         $constraint = new MacAddress('myMessage', type: MacAddress::UNIVERSAL_ALL);
 
@@ -317,7 +317,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidUniversalUnicastMacs')]
-    public function testValidUniversalUnicastMacs($mac)
+    public function testValidUniversalUnicastMacs($mac): void
     {
         $this->validator->validate($mac, new MacAddress(type: MacAddress::UNIVERSAL_UNICAST));
 
@@ -327,7 +327,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidLocalUnicastMacs')]
     #[DataProvider('getValidLocalMulticastMacs')]
     #[DataProvider('getValidUniversalMulticastMacs')]
-    public function testInvalidUniversalUnicastMacs($mac)
+    public function testInvalidUniversalUnicastMacs($mac): void
     {
         $constraint = new MacAddress('myMessage', type: MacAddress::UNIVERSAL_UNICAST);
 
@@ -340,7 +340,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidUniversalMulticastMacs')]
-    public function testValidUniversalMulticastMacs($mac)
+    public function testValidUniversalMulticastMacs($mac): void
     {
         $this->validator->validate($mac, new MacAddress(type: MacAddress::UNIVERSAL_MULTICAST));
 
@@ -350,7 +350,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidLocalUnicastMacs')]
     #[DataProvider('getValidLocalMulticastMacs')]
     #[DataProvider('getValidUniversalUnicastMacs')]
-    public function testInvalidUniversalMulticastMacs($mac)
+    public function testInvalidUniversalMulticastMacs($mac): void
     {
         $constraint = new MacAddress('myMessage', type: MacAddress::UNIVERSAL_MULTICAST);
 
@@ -364,7 +364,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
 
     #[DataProvider('getValidLocalUnicastMacs')]
     #[DataProvider('getValidUniversalUnicastMacs')]
-    public function testUnicastMacs($mac)
+    public function testUnicastMacs($mac): void
     {
         $this->validator->validate($mac, new MacAddress(type: MacAddress::UNICAST_ALL));
 
@@ -373,7 +373,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
 
     #[DataProvider('getValidLocalMulticastMacs')]
     #[DataProvider('getValidUniversalMulticastMacs')]
-    public function testInvalidUnicastMacs($mac)
+    public function testInvalidUnicastMacs($mac): void
     {
         $constraint = new MacAddress('myMessage', type: MacAddress::UNICAST_ALL);
 
@@ -388,7 +388,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidLocalMulticastMacs')]
     #[DataProvider('getValidUniversalMulticastMacs')]
     #[DataProvider('getValidBroadcastMacs')]
-    public function testMulticastMacs($mac)
+    public function testMulticastMacs($mac): void
     {
         $this->validator->validate($mac, new MacAddress(type: MacAddress::MULTICAST_ALL));
 
@@ -397,7 +397,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
 
     #[DataProvider('getValidLocalUnicastMacs')]
     #[DataProvider('getValidUniversalUnicastMacs')]
-    public function testInvalidMulticastMacs($mac)
+    public function testInvalidMulticastMacs($mac): void
     {
         $constraint = new MacAddress('myMessage', type: MacAddress::MULTICAST_ALL);
 
@@ -411,7 +411,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
 
     #[DataProvider('getValidLocalMulticastMacs')]
     #[DataProvider('getValidUniversalMulticastMacs')]
-    public function testMulticastNoBroadcastMacs($mac)
+    public function testMulticastNoBroadcastMacs($mac): void
     {
         $this->validator->validate($mac, new MacAddress(type: MacAddress::MULTICAST_NO_BROADCAST));
 
@@ -421,7 +421,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidLocalUnicastMacs')]
     #[DataProvider('getValidUniversalUnicastMacs')]
     #[DataProvider('getValidBroadcastMacs')]
-    public function testInvalidMulticastNoBroadcastMacs($mac)
+    public function testInvalidMulticastNoBroadcastMacs($mac): void
     {
         $constraint = new MacAddress('myMessage', type: MacAddress::MULTICAST_NO_BROADCAST);
 
@@ -434,7 +434,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidBroadcastMacs')]
-    public function testBroadcastMacs($mac)
+    public function testBroadcastMacs($mac): void
     {
         $this->validator->validate($mac, new MacAddress(type: MacAddress::BROADCAST));
 
@@ -445,7 +445,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidLocalMulticastMacs')]
     #[DataProvider('getValidUniversalUnicastMacs')]
     #[DataProvider('getValidUniversalMulticastMacs')]
-    public function testInvalidBroadcastMacs($mac)
+    public function testInvalidBroadcastMacs($mac): void
     {
         $constraint = new MacAddress('myMessage', type: MacAddress::BROADCAST);
 
@@ -458,7 +458,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidMacsWithWhitespaces')]
-    public function testValidMacsWithWhitespaces($mac)
+    public function testValidMacsWithWhitespaces($mac): void
     {
         $this->validator->validate($mac, new MacAddress(normalizer: 'trim'));
 
@@ -478,7 +478,7 @@ class MacAddressValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidMacs')]
-    public function testInvalidMacs($mac)
+    public function testInvalidMacs($mac): void
     {
         $constraint = new MacAddress('myMessage');
 

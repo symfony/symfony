@@ -29,31 +29,31 @@ class DateTimeNormalizerTest extends TestCase
         $this->normalizer = new DateTimeNormalizer();
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsNormalization(new \DateTime()));
         $this->assertTrue($this->normalizer->supportsNormalization(new \DateTimeImmutable()));
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $this->assertEquals('2016-01-01T00:00:00+00:00', $this->normalizer->normalize(new \DateTime('2016/01/01', new \DateTimeZone('UTC'))));
         $this->assertEquals('2016-01-01T00:00:00+00:00', $this->normalizer->normalize(new \DateTimeImmutable('2016/01/01', new \DateTimeZone('UTC'))));
     }
 
-    public function testNormalizeUsingFormatPassedInContext()
+    public function testNormalizeUsingFormatPassedInContext(): void
     {
         $this->assertEquals('2016', $this->normalizer->normalize(new \DateTimeImmutable('2016/01/01'), null, [DateTimeNormalizer::FORMAT_KEY => 'Y']));
     }
 
-    public function testNormalizeUsingFormatPassedInConstructor()
+    public function testNormalizeUsingFormatPassedInConstructor(): void
     {
         $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'y']);
         $this->assertEquals('16', $normalizer->normalize(new \DateTimeImmutable('2016/01/01', new \DateTimeZone('UTC'))));
     }
 
-    public function testNormalizeUsingTimeZonePassedInConstructor()
+    public function testNormalizeUsingTimeZonePassedInConstructor(): void
     {
         $normalizer = new DateTimeNormalizer([DateTimeNormalizer::TIMEZONE_KEY => new \DateTimeZone('Asia/Tokyo')]);
 
@@ -62,7 +62,7 @@ class DateTimeNormalizerTest extends TestCase
     }
 
     #[DataProvider('normalizeUsingTimeZonePassedInContextProvider')]
-    public function testNormalizeUsingTimeZonePassedInContext($expected, $input, $timezone)
+    public function testNormalizeUsingTimeZonePassedInContext($expected, $input, $timezone): void
     {
         $this->assertSame($expected, $this->normalizer->normalize($input, null, [
             DateTimeNormalizer::TIMEZONE_KEY => $timezone,
@@ -78,7 +78,7 @@ class DateTimeNormalizerTest extends TestCase
     }
 
     #[DataProvider('normalizeUsingTimeZonePassedInContextAndExpectedFormatWithMicrosecondsProvider')]
-    public function testNormalizeUsingTimeZonePassedInContextAndFormattedWithMicroseconds($expected, $expectedFormat, $input, $timezone)
+    public function testNormalizeUsingTimeZonePassedInContextAndFormattedWithMicroseconds($expected, $expectedFormat, $input, $timezone): void
     {
         $this->assertSame(
             $expected,
@@ -152,7 +152,7 @@ class DateTimeNormalizerTest extends TestCase
     }
 
     #[DataProvider('provideNormalizeUsingCastCases')]
-    public function testNormalizeUsingCastPassedInConstructor(\DateTimeInterface $value, string $format, ?string $cast, string|int|float $expectedResult)
+    public function testNormalizeUsingCastPassedInConstructor(\DateTimeInterface $value, string $format, ?string $cast, string|int|float $expectedResult): void
     {
         $normalizer = new DateTimeNormalizer([DateTimeNormalizer::CAST_KEY => $cast]);
 
@@ -160,7 +160,7 @@ class DateTimeNormalizerTest extends TestCase
     }
 
     #[DataProvider('provideNormalizeUsingCastCases')]
-    public function testNormalizeUsingCastPassedInContext(\DateTimeInterface $value, string $format, ?string $cast, string|int|float $expectedResult)
+    public function testNormalizeUsingCastPassedInContext(\DateTimeInterface $value, string $format, ?string $cast, string|int|float $expectedResult): void
     {
         $this->assertSame($this->normalizer->normalize($value, null, [DateTimeNormalizer::FORMAT_KEY => $format, DateTimeNormalizer::CAST_KEY => $cast]), $expectedResult);
     }
@@ -213,14 +213,14 @@ class DateTimeNormalizerTest extends TestCase
         ];
     }
 
-    public function testNormalizeInvalidObjectThrowsException()
+    public function testNormalizeInvalidObjectThrowsException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The object must implement the "\DateTimeInterface".');
         $this->normalizer->normalize(new \stdClass());
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsDenormalization('2016-01-01T00:00:00+00:00', \DateTimeInterface::class));
         $this->assertTrue($this->normalizer->supportsDenormalization('2016-01-01T00:00:00+00:00', \DateTime::class));
@@ -230,7 +230,7 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertFalse($this->normalizer->supportsDenormalization('foo', 'Bar'));
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $this->assertEquals(new \DateTimeImmutable('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeInterface::class));
         $this->assertEquals(new \DateTimeImmutable('2016/01/01', new \DateTimeZone('UTC')), $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeImmutable::class));
@@ -244,7 +244,7 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertEquals(new \DateTimeImmutable('2023-05-06T17:35:34.123400+0000', new \DateTimeZone('UTC')), $this->normalizer->denormalize(1683394534.1234, \DateTimeImmutable::class, null, [DateTimeNormalizer::FORMAT_KEY => 'U.u']));
     }
 
-    public function testDenormalizeUsingTimezonePassedInConstructor()
+    public function testDenormalizeUsingTimezonePassedInConstructor(): void
     {
         $timezone = new \DateTimeZone('Asia/Tokyo');
         $expected = new \DateTimeImmutable('2016/12/01 17:35:00', $timezone);
@@ -255,7 +255,7 @@ class DateTimeNormalizerTest extends TestCase
         ]));
     }
 
-    public function testDenormalizeUsingFormatPassedInContext()
+    public function testDenormalizeUsingFormatPassedInContext(): void
     {
         $this->assertEquals(new \DateTimeImmutable('2016/01/01'), $this->normalizer->denormalize('2016.01.01', \DateTimeInterface::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y.m.d|']));
         $this->assertEquals(new \DateTimeImmutable('2016/01/01'), $this->normalizer->denormalize('2016.01.01', \DateTimeImmutable::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y.m.d|']));
@@ -263,7 +263,7 @@ class DateTimeNormalizerTest extends TestCase
     }
 
     #[DataProvider('denormalizeUsingTimezonePassedInContextProvider')]
-    public function testDenormalizeUsingTimezonePassedInContext($input, $expected, $timezone, $format = null)
+    public function testDenormalizeUsingTimezonePassedInContext($input, $expected, $timezone, $format = null): void
     {
         $actual = $this->normalizer->denormalize($input, \DateTimeInterface::class, null, [
             DateTimeNormalizer::TIMEZONE_KEY => $timezone,
@@ -299,7 +299,7 @@ class DateTimeNormalizerTest extends TestCase
         ];
     }
 
-    public function testDenormalizeUsingPreserveContextTimezoneAndFormatPassedInConstructor()
+    public function testDenormalizeUsingPreserveContextTimezoneAndFormatPassedInConstructor(): void
     {
         $normalizer = new DateTimeNormalizer(
             [
@@ -312,7 +312,7 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertEquals(new \DateTimeZone('Asia/Tokyo'), $actual->getTimezone());
     }
 
-    public function testDenormalizeUsingPreserveContextTimezoneAndFormatPassedInContext()
+    public function testDenormalizeUsingPreserveContextTimezoneAndFormatPassedInContext(): void
     {
         $actual = $this->normalizer->denormalize(
             '2016-12-01T12:34:56+0000',
@@ -327,7 +327,7 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertEquals(new \DateTimeZone('Asia/Tokyo'), $actual->getTimezone());
     }
 
-    public function testDenormalizeUsingPreserveContextTimezoneWithoutFormat()
+    public function testDenormalizeUsingPreserveContextTimezoneWithoutFormat(): void
     {
         $actual = $this->normalizer->denormalize(
             '2016-12-01T12:34:56+0000',
@@ -341,7 +341,7 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertEquals(new \DateTimeZone('Asia/Tokyo'), $actual->getTimezone());
     }
 
-    public function testDenormalizeUsingPreserveContextShouldBeIgnoredWithoutTimezoneInContext()
+    public function testDenormalizeUsingPreserveContextShouldBeIgnoredWithoutTimezoneInContext(): void
     {
         $actual = $this->normalizer->denormalize(
             '2016-12-01T12:34:56+0000',
@@ -352,48 +352,48 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertEquals(new \DateTimeZone('+00:00'), $actual->getTimezone());
     }
 
-    public function testDenormalizeInvalidDataThrowsException()
+    public function testDenormalizeInvalidDataThrowsException(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->normalizer->denormalize('invalid date', \DateTimeInterface::class);
     }
 
-    public function testDenormalizeWrongTypeThrowsException()
+    public function testDenormalizeWrongTypeThrowsException(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.');
         $this->normalizer->denormalize(['date' => '2023-03-03 00:00:00.000000', 'timezone_type' => 1, 'timezone' => '+01:00'], \DateTimeInterface::class);
     }
 
-    public function testDenormalizeNullThrowsException()
+    public function testDenormalizeNullThrowsException(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.');
         $this->normalizer->denormalize(null, \DateTimeInterface::class);
     }
 
-    public function testDenormalizeEmptyStringThrowsException()
+    public function testDenormalizeEmptyStringThrowsException(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.');
         $this->normalizer->denormalize('', \DateTimeInterface::class);
     }
 
-    public function testDenormalizeStringWithSpacesOnlyThrowsAnException()
+    public function testDenormalizeStringWithSpacesOnlyThrowsAnException(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage('The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.');
         $this->normalizer->denormalize('  ', \DateTimeInterface::class);
     }
 
-    public function testDenormalizeDateTimeStringWithSpacesUsingFormatPassedInContextThrowsAnException()
+    public function testDenormalizeDateTimeStringWithSpacesUsingFormatPassedInContextThrowsAnException(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage("Parsing datetime string \"  2016.01.01  \" using format \"Y.m.d|\" resulted in 2 errors: \nat position 0: Unexpected data found.\nat position 12: Trailing data");
         $this->normalizer->denormalize('  2016.01.01  ', \DateTime::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y.m.d|']);
     }
 
-    public function testDenormalizeTimestampWithFormatInContext()
+    public function testDenormalizeTimestampWithFormatInContext(): void
     {
         $normalizer = new DateTimeNormalizer();
         $denormalizedDate = $normalizer->denormalize(1698202249, \DateTimeInterface::class, null, [DateTimeNormalizer::FORMAT_KEY => 'U']);
@@ -401,7 +401,7 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertSame('2023-10-25 02:50:49', $denormalizedDate->format('Y-m-d H:i:s'));
     }
 
-    public function testDenormalizeTimestampWithFormatInDefaultContext()
+    public function testDenormalizeTimestampWithFormatInDefaultContext(): void
     {
         $normalizer = new DateTimeNormalizer([DateTimeNormalizer::FORMAT_KEY => 'U']);
         $denormalizedDate = $normalizer->denormalize(1698202249, \DateTimeInterface::class);
@@ -409,7 +409,7 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertSame('2023-10-25 02:50:49', $denormalizedDate->format('Y-m-d H:i:s'));
     }
 
-    public function testDenormalizeDateTimeStringWithDefaultContextFormat()
+    public function testDenormalizeDateTimeStringWithDefaultContextFormat(): void
     {
         $format = 'd/m/Y';
         $string = '01/10/2018';
@@ -420,7 +420,7 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertSame('01/10/2018', $denormalizedDate->format($format));
     }
 
-    public function testDenormalizeDateTimeStringWithDefaultContextAllowsErrorFormat()
+    public function testDenormalizeDateTimeStringWithDefaultContextAllowsErrorFormat(): void
     {
         $format = 'd/m/Y'; // the default format
         $string = '2020-01-01'; // the value which is in the wrong format, but is accepted because of `new \DateTimeImmutable` in DateTimeNormalizer::denormalize
@@ -431,7 +431,7 @@ class DateTimeNormalizerTest extends TestCase
         $this->assertSame('2020-01-01', $denormalizedDate->format('Y-m-d'));
     }
 
-    public function testDenormalizeFormatMismatchThrowsException()
+    public function testDenormalizeFormatMismatchThrowsException(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->normalizer->denormalize('2016-01-01T00:00:00+00:00', \DateTimeInterface::class, null, [DateTimeNormalizer::FORMAT_KEY => 'Y-m-d|']);

@@ -16,7 +16,7 @@ use Symfony\Component\AssetMapper\ImportMap\JavaScriptImport;
 
 class JavaScriptImportTest extends TestCase
 {
-    public function testBasicConstruction()
+    public function testBasicConstruction(): void
     {
         $import = new JavaScriptImport('the-import', 'the-asset', '/path/to/the-asset', true, true);
 

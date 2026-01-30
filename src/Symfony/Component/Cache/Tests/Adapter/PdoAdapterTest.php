@@ -42,17 +42,17 @@ class PdoAdapterTest extends AdapterTestCase
         return new PdoAdapter('sqlite:'.self::$dbFile, 'ns', $defaultLifetime);
     }
 
-    public function testCreateConnectionReturnsStringWithLazyTrue()
+    public function testCreateConnectionReturnsStringWithLazyTrue(): void
     {
         self::assertSame('sqlite:'.self::$dbFile, AbstractAdapter::createConnection('sqlite:'.self::$dbFile));
     }
 
-    public function testCreateConnectionReturnsPDOWithLazyFalse()
+    public function testCreateConnectionReturnsPDOWithLazyFalse(): void
     {
         self::assertInstanceOf(\PDO::class, AbstractAdapter::createConnection('sqlite:'.self::$dbFile, ['lazy' => false]));
     }
 
-    public function testCleanupExpiredItems()
+    public function testCleanupExpiredItems(): void
     {
         $pdo = new \PDO('sqlite:'.self::$dbFile);
 
@@ -77,7 +77,7 @@ class PdoAdapterTest extends AdapterTestCase
     }
 
     #[DataProvider('provideDsnSQLite')]
-    public function testDsnWithSQLite(string $dsn, ?string $file = null)
+    public function testDsnWithSQLite(string $dsn, ?string $file = null): void
     {
         try {
             $pool = new PdoAdapter($dsn);
@@ -101,7 +101,7 @@ class PdoAdapterTest extends AdapterTestCase
 
     #[RequiresPhpExtension('pdo_pgsql')]
     #[Group('integration')]
-    public function testDsnWithPostgreSQL()
+    public function testDsnWithPostgreSQL(): void
     {
         if (!$host = getenv('POSTGRES_HOST')) {
             $this->markTestSkipped('Missing POSTGRES_HOST env variable');

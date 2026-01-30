@@ -19,7 +19,7 @@ use Symfony\Component\Translation\Loader\PhpFileLoader;
 
 class PhpFileLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new PhpFileLoader();
         $resource = __DIR__.'/../Fixtures/resources.php';
@@ -30,14 +30,14 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $this->expectException(NotFoundResourceException::class);
 
         (new PhpFileLoader())->load(__DIR__.'/../Fixtures/non-existing.php', 'en', 'domain1');
     }
 
-    public function testLoadThrowsAnExceptionIfFileNotLocal()
+    public function testLoadThrowsAnExceptionIfFileNotLocal(): void
     {
         $this->expectException(InvalidResourceException::class);
 

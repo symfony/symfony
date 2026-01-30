@@ -43,7 +43,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 
 class SecurityExtensionTest extends TestCase
 {
-    public function testInvalidCheckPath()
+    public function testInvalidCheckPath(): void
     {
         $container = $this->getRawContainer();
 
@@ -68,7 +68,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public function testFirewallWithInvalidUserProvider()
+    public function testFirewallWithInvalidUserProvider(): void
     {
         $container = $this->getRawContainer();
 
@@ -94,7 +94,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public function testDisableRoleHierarchyVoter()
+    public function testDisableRoleHierarchyVoter(): void
     {
         $container = $this->getRawContainer();
 
@@ -118,7 +118,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('security.access.role_hierarchy_voter'));
     }
 
-    public function testSwitchUserNotStatelessOnStatelessFirewall()
+    public function testSwitchUserNotStatelessOnStatelessFirewall(): void
     {
         $container = $this->getRawContainer();
 
@@ -141,7 +141,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertTrue($container->getDefinition('security.authentication.switchuser_listener.some_firewall')->getArgument(9));
     }
 
-    public function testRoleHierarchyDumpCommandIsRegisteredWithRoleHierarchy()
+    public function testRoleHierarchyDumpCommandIsRegisteredWithRoleHierarchy(): void
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -159,7 +159,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertTrue($container->hasDefinition('security.command.role_hierarchy_dump'));
     }
 
-    public function testPerListenerProvider()
+    public function testPerListenerProvider(): void
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -179,7 +179,7 @@ class SecurityExtensionTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testMissingProviderForListener()
+    public function testMissingProviderForListener(): void
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -202,7 +202,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public function testPerListenerProviderWithRememberMeAndAnonymous()
+    public function testPerListenerProviderWithRememberMeAndAnonymous(): void
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -223,7 +223,7 @@ class SecurityExtensionTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testRegisterRequestMatchersWithAllowIfExpression()
+    public function testRegisterRequestMatchersWithAllowIfExpression(): void
     {
         $container = $this->getRawContainer();
 
@@ -264,7 +264,7 @@ class SecurityExtensionTest extends TestCase
         );
     }
 
-    public function testRegisterAccessControlWithSpecifiedRequestMatcherService()
+    public function testRegisterAccessControlWithSpecifiedRequestMatcherService(): void
     {
         $container = $this->getRawContainer();
 
@@ -298,7 +298,7 @@ class SecurityExtensionTest extends TestCase
     }
 
     #[DataProvider('provideAdditionalRequestMatcherConstraints')]
-    public function testRegisterAccessControlWithRequestMatcherAndAdditionalOptionsThrowsInvalidException(array $additionalConstraints)
+    public function testRegisterAccessControlWithRequestMatcherAndAdditionalOptionsThrowsInvalidException(array $additionalConstraints): void
     {
         $container = $this->getRawContainer();
 
@@ -338,7 +338,7 @@ class SecurityExtensionTest extends TestCase
         yield 'Invalid configuration with route' => [['route' => 'foo_route']];
     }
 
-    public function testRegisterAccessControlWithSpecifiedAttributes()
+    public function testRegisterAccessControlWithSpecifiedAttributes(): void
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -373,7 +373,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('foo_route', $attributesRequestMatcher->getArgument(0)['_route']);
     }
 
-    public function testRegisterAccessControlWithSpecifiedRoute()
+    public function testRegisterAccessControlWithSpecifiedRoute(): void
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -408,7 +408,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('foo_route', $attributesRequestMatcher->getArgument(0)['_route']);
     }
 
-    public function testRegisterAccessControlWithSpecifiedAttributesThrowsException()
+    public function testRegisterAccessControlWithSpecifiedAttributesThrowsException(): void
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -432,7 +432,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public function testRemovesExpressionCacheWarmerDefinitionIfNoExpressions()
+    public function testRemovesExpressionCacheWarmerDefinitionIfNoExpressions(): void
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -451,7 +451,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->hasDefinition('security.cache_warmer.expression'));
     }
 
-    public function testRegisterTheUserProviderAlias()
+    public function testRegisterTheUserProviderAlias(): void
     {
         $container = $this->getRawContainer();
 
@@ -473,7 +473,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertTrue($container->hasAlias(UserProviderInterface::class));
     }
 
-    public function testDoNotRegisterTheUserProviderAliasWithMultipleProviders()
+    public function testDoNotRegisterTheUserProviderAliasWithMultipleProviders(): void
     {
         $container = $this->getRawContainer();
 
@@ -497,7 +497,7 @@ class SecurityExtensionTest extends TestCase
     }
 
     #[DataProvider('acceptableIpsProvider')]
-    public function testAcceptableAccessControlIps($ips)
+    public function testAcceptableAccessControlIps($ips): void
     {
         $container = $this->getRawContainer();
 
@@ -521,7 +521,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertTrue(true, 'Ip addresses is successfully consumed: '.(\is_string($ips) ? $ips : json_encode($ips)));
     }
 
-    public function testCustomRememberMeHandler()
+    public function testCustomRememberMeHandler(): void
     {
         $container = $this->getRawContainer();
 
@@ -541,7 +541,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals([['firewall' => 'default']], $handler->getTag('security.remember_me_handler'));
     }
 
-    public function testSecretRememberMeHasher()
+    public function testSecretRememberMeHasher(): void
     {
         $container = $this->getRawContainer();
 
@@ -591,7 +591,7 @@ class SecurityExtensionTest extends TestCase
         yield [['127.0.0.1/8', '127.0.0.2/16']];
     }
 
-    public function testSwitchUserWithSeveralDefinedProvidersButNoFirewallRootProviderConfigured()
+    public function testSwitchUserWithSeveralDefinedProvidersButNoFirewallRootProviderConfigured(): void
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -614,7 +614,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals(new Reference('security.user.provider.concrete.second'), $container->getDefinition('security.authentication.switchuser_listener.foobar')->getArgument(1));
     }
 
-    public function testInvalidAccessControlWithEmptyRow()
+    public function testInvalidAccessControlWithEmptyRow(): void
     {
         $container = $this->getRawContainer();
 
@@ -639,7 +639,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public function testValidAccessControlWithEmptyRow()
+    public function testValidAccessControlWithEmptyRow(): void
     {
         $container = $this->getRawContainer();
 
@@ -682,7 +682,7 @@ class SecurityExtensionTest extends TestCase
     }
 
     #[DataProvider('provideEntryPointRequiredData')]
-    public function testEntryPointRequired(array $firewall, string $messageRegex)
+    public function testEntryPointRequired(array $firewall, string $messageRegex): void
     {
         $container = $this->getRawContainer();
         $container->loadFromExtension('security', [
@@ -711,7 +711,7 @@ class SecurityExtensionTest extends TestCase
     }
 
     #[DataProvider('provideConfigureCustomAuthenticatorData')]
-    public function testConfigureCustomAuthenticator(array $firewall, array $expectedAuthenticators)
+    public function testConfigureCustomAuthenticator(array $firewall, array $expectedAuthenticators): void
     {
         $container = $this->getRawContainer();
         $container->register(TestAuthenticator::class);
@@ -743,7 +743,7 @@ class SecurityExtensionTest extends TestCase
         ];
     }
 
-    public function testCompilesWithoutSessionListenerWithStatelessFirewallWithAuthenticatorManager()
+    public function testCompilesWithoutSessionListenerWithStatelessFirewallWithAuthenticatorManager(): void
     {
         $container = $this->getRawContainer();
 
@@ -763,7 +763,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->has('security.listener.session.'.$firewallId));
     }
 
-    public function testCompilesWithSessionListenerWithStatefulllFirewallWithAuthenticatorManager()
+    public function testCompilesWithSessionListenerWithStatefulllFirewallWithAuthenticatorManager(): void
     {
         $container = $this->getRawContainer();
 
@@ -784,7 +784,7 @@ class SecurityExtensionTest extends TestCase
     }
 
     #[DataProvider('provideUserCheckerConfig')]
-    public function testUserCheckerWithAuthenticatorManager(array $config, string $expectedUserCheckerClass)
+    public function testUserCheckerWithAuthenticatorManager(array $config, string $expectedUserCheckerClass): void
     {
         $container = $this->getRawContainer();
         $container->register(TestUserChecker::class);
@@ -811,7 +811,7 @@ class SecurityExtensionTest extends TestCase
         yield [['user_checker' => TestUserChecker::class], TestUserChecker::class];
     }
 
-    public function testConfigureCustomFirewallListener()
+    public function testConfigureCustomFirewallListener(): void
     {
         $container = $this->getRawContainer();
         /** @var SecurityExtension $extension */
@@ -834,7 +834,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertContains('custom_firewall_listener_id', $firewallListeners);
     }
 
-    public function testClearSiteDataLogoutListenerEnabled()
+    public function testClearSiteDataLogoutListenerEnabled(): void
     {
         $container = $this->getRawContainer();
 
@@ -856,7 +856,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame(['*'], $listenerArgument);
     }
 
-    public function testClearSiteDataLogoutListenerDisabled()
+    public function testClearSiteDataLogoutListenerDisabled(): void
     {
         $container = $this->getRawContainer();
 
@@ -876,7 +876,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->has('security.logout.listener.clear_site_data.'.$firewallId));
     }
 
-    public function testNothingDoneWithEmptyConfiguration()
+    public function testNothingDoneWithEmptyConfiguration(): void
     {
         $container = $this->getRawContainer();
 
@@ -888,7 +888,7 @@ class SecurityExtensionTest extends TestCase
         $container->compile();
     }
 
-    public function testCustomHasherWithMigrateFrom()
+    public function testCustomHasherWithMigrateFrom(): void
     {
         $container = $this->getRawContainer();
 
@@ -922,7 +922,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($container->hasAlias(\sprintf('.%s $%s', PasswordHasherInterface::class, TestUserChecker::class)));
     }
 
-    public function testAuthenticatorsDecoration()
+    public function testAuthenticatorsDecoration(): void
     {
         $container = $this->getRawContainer();
         $container->setParameter('kernel.debug', true);

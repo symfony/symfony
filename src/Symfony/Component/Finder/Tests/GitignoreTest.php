@@ -22,7 +22,7 @@ class GitignoreTest extends TestCase
 {
     #[DataProvider('provider')]
     #[DataProvider('providerExtended')]
-    public function testToRegex(array $gitignoreLines, array $matchingCases, array $nonMatchingCases)
+    public function testToRegex(array $gitignoreLines, array $matchingCases, array $nonMatchingCases): void
     {
         $patterns = implode("\n", $gitignoreLines);
 
@@ -444,7 +444,7 @@ class GitignoreTest extends TestCase
     }
 
     #[DataProvider('provideNegatedPatternsCases')]
-    public function testToRegexMatchingNegatedPatterns(array $gitignoreLines, array $matchingCases, array $nonMatchingCases)
+    public function testToRegexMatchingNegatedPatterns(array $gitignoreLines, array $matchingCases, array $nonMatchingCases): void
     {
         $patterns = implode("\n", $gitignoreLines);
 

@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Termii\TermiiOptions;
 
 class TermiiOptionsTest extends TestCase
 {
-    public function testTermiiOptions()
+    public function testTermiiOptions(): void
     {
         $termiiOptions = (new TermiiOptions())
             ->type('test_type')

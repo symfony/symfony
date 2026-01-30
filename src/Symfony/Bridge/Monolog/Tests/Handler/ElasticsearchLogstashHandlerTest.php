@@ -22,7 +22,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 class ElasticsearchLogstashHandlerTest extends TestCase
 {
-    public function testHandle()
+    public function testHandle(): void
     {
         $callCount = 0;
         $responseFactory = function ($method, $url, $options) use (&$callCount) {
@@ -58,7 +58,7 @@ class ElasticsearchLogstashHandlerTest extends TestCase
         $this->assertSame(1, $callCount);
     }
 
-    public function testHandleWithElasticsearch8()
+    public function testHandleWithElasticsearch8(): void
     {
         $callCount = 0;
         $responseFactory = function ($method, $url, $options) use (&$callCount) {
@@ -94,7 +94,7 @@ class ElasticsearchLogstashHandlerTest extends TestCase
         $this->assertSame(1, $callCount);
     }
 
-    public function testHandleBatch()
+    public function testHandleBatch(): void
     {
         $callCount = 0;
         $responseFactory = function ($method, $url, $options) use (&$callCount) {

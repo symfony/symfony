@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 final class MailPaceApiTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(MailPaceApiTransport $transport, string $expected)
+    public function testToString(MailPaceApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -50,7 +50,7 @@ final class MailPaceApiTransportTest extends TestCase
         ];
     }
 
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
@@ -66,7 +66,7 @@ final class MailPaceApiTransportTest extends TestCase
         $this->assertEquals(['Name' => 'foo', 'Value' => 'bar'], $payload['Headers'][0]);
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -97,7 +97,7 @@ final class MailPaceApiTransportTest extends TestCase
         $this->assertSame('foobar', $message->getMessageId());
     }
 
-    public function testSendThrowsForErrorResponse()
+    public function testSendThrowsForErrorResponse(): void
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['error' => 'i\'m a teapot'], [
             'http_code' => 418,
@@ -116,7 +116,7 @@ final class MailPaceApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testSendThrowsForErrorsResponse()
+    public function testSendThrowsForErrorsResponse(): void
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse([
             'errors' => [
@@ -143,7 +143,7 @@ final class MailPaceApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testSendThrowsForInternalServerErrorResponse()
+    public function testSendThrowsForInternalServerErrorResponse(): void
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new MockResponse('', ['http_code' => 500]));
         $transport = new MailPaceApiTransport('KEY', $client);
@@ -160,7 +160,7 @@ final class MailPaceApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testTagAndMetadataHeaders()
+    public function testTagAndMetadataHeaders(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('password-reset'));

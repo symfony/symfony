@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class LogoutTest extends AbstractWebTestCase
 {
-    public function testCsrfTokensAreClearedOnLogout()
+    public function testCsrfTokensAreClearedOnLogout(): void
     {
         $client = $this->createClient(['test_case' => 'LogoutWithoutSessionInvalidation', 'root_config' => 'config.yml']);
         $client->disableReboot();
@@ -30,18 +30,18 @@ class LogoutTest extends AbstractWebTestCase
             '_password' => 'test',
         ]);
 
-        $this->callInRequestContext($client, static function () {
+        $this->callInRequestContext($client, static function (): void {
             static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
         });
 
         $client->request('GET', '/logout');
 
-        $this->callInRequestContext($client, function () {
+        $this->callInRequestContext($client, function (): void {
             $this->assertFalse(static::getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
         });
     }
 
-    public function testAccessControlDoesNotApplyOnLogout()
+    public function testAccessControlDoesNotApplyOnLogout(): void
     {
         $client = $this->createClient(['test_case' => 'Logout', 'root_config' => 'config_access.yml']);
 
@@ -51,7 +51,7 @@ class LogoutTest extends AbstractWebTestCase
         $this->assertRedirect($client->getResponse(), '/');
     }
 
-    public function testCookieClearingOnLogout()
+    public function testCookieClearingOnLogout(): void
     {
         $client = $this->createClient(['test_case' => 'Logout', 'root_config' => 'config_cookie_clearing.yml']);
 
@@ -65,7 +65,7 @@ class LogoutTest extends AbstractWebTestCase
         $this->assertNull($cookieJar->get('flavor'));
     }
 
-    public function testEnabledCsrf()
+    public function testEnabledCsrf(): void
     {
         $client = $this->createClient(['test_case' => 'Logout', 'root_config' => 'config_csrf_enabled.yml']);
 
@@ -82,7 +82,7 @@ class LogoutTest extends AbstractWebTestCase
     {
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
-        $wrappedCallable = static function (RequestEvent $event) use (&$callable) {
+        $wrappedCallable = static function (RequestEvent $event) use (&$callable): void {
             $callable();
             $event->setResponse(new Response(''));
             $event->stopPropagation();

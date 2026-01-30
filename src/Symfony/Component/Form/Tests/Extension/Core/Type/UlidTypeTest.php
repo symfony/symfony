@@ -18,7 +18,7 @@ final class UlidTypeTest extends BaseTypeTestCase
 {
     public const TESTED_TYPE = UlidType::class;
 
-    public function testPassUlidToView()
+    public function testPassUlidToView(): void
     {
         $ulid = '01D85PP1982GF6KTVFHQ7W78FB';
 
@@ -28,7 +28,7 @@ final class UlidTypeTest extends BaseTypeTestCase
         $this->assertSame($ulid, $form->createView()->vars['value']);
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = '', $expectedData = null)
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = '', $expectedData = null): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => $emptyData,

@@ -26,7 +26,7 @@ use Symfony\Component\Mime\Part\TextPart;
 class DkimSignedMessageListenerTest extends TestCase
 {
     #[RequiresPhpExtension('openssl')]
-    public function testDkimMessageSigningProcess()
+    public function testDkimMessageSigningProcess(): void
     {
         $signer = new DkimSigner(<<<KEY
             -----BEGIN RSA PRIVATE KEY-----

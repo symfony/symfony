@@ -31,7 +31,7 @@ class ProfilerListenerTest extends TestCase
     /**
      * Test a main and sub request with an exception and `onlyException` profiler option enabled.
      */
-    public function testKernelTerminate()
+    public function testKernelTerminate(): void
     {
         $profile = new Profile('token');
 
@@ -62,7 +62,7 @@ class ProfilerListenerTest extends TestCase
     }
 
     #[DataProvider('collectRequestProvider')]
-    public function testCollectParameter(Request $request, ?bool $enable)
+    public function testCollectParameter(Request $request, ?bool $enable): void
     {
         $profile = new Profile('token');
 

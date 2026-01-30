@@ -30,7 +30,7 @@ class ChoicesToValuesTransformerTest extends TestCase
         $this->transformerWithNull = new ChoicesToValuesTransformer($listWithNull);
     }
 
-    public function testTransform()
+    public function testTransform(): void
     {
         $in = ['', false, 'X'];
         $out = ['', '0', 'X'];
@@ -43,18 +43,18 @@ class ChoicesToValuesTransformerTest extends TestCase
         $this->assertSame($outWithNull, $this->transformerWithNull->transform($in));
     }
 
-    public function testTransformNull()
+    public function testTransformNull(): void
     {
         $this->assertSame([], $this->transformer->transform(null));
     }
 
-    public function testTransformExpectsArray()
+    public function testTransformExpectsArray(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->transformer->transform('foobar');
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         // values are expected to be valid choices and stay the same
         $in = ['', '0', 'X'];
@@ -68,13 +68,13 @@ class ChoicesToValuesTransformerTest extends TestCase
         $this->assertSame($out, $this->transformerWithNull->reverseTransform($inWithNull));
     }
 
-    public function testReverseTransformNull()
+    public function testReverseTransformNull(): void
     {
         $this->assertSame([], $this->transformer->reverseTransform(null));
         $this->assertSame([], $this->transformerWithNull->reverseTransform(null));
     }
 
-    public function testReverseTransformExpectsArray()
+    public function testReverseTransformExpectsArray(): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->transformer->reverseTransform('foobar');

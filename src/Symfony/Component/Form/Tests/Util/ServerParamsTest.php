@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class ServerParamsTest extends TestCase
 {
-    public function testGetContentLengthFromSuperglobals()
+    public function testGetContentLengthFromSuperglobals(): void
     {
         $serverParams = new ServerParams();
         $this->assertNull($serverParams->getContentLength());
@@ -31,7 +31,7 @@ class ServerParamsTest extends TestCase
         unset($_SERVER['CONTENT_LENGTH']);
     }
 
-    public function testGetContentLengthFromRequest()
+    public function testGetContentLengthFromRequest(): void
     {
         $request = Request::create('http://foo', 'GET', [], [], [], ['CONTENT_LENGTH' => 1024]);
         $requestStack = new RequestStack();
@@ -42,7 +42,7 @@ class ServerParamsTest extends TestCase
     }
 
     #[DataProvider('getGetPostMaxSizeTestData')]
-    public function testGetPostMaxSize($size, $bytes)
+    public function testGetPostMaxSize($size, $bytes): void
     {
         $serverParams = new DummyServerParams($size);
 

@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Primotexto\PrimotextoOptions;
 
 class PrimotextoOptionsTest extends TestCase
 {
-    public function testPrimotextoOptions()
+    public function testPrimotextoOptions(): void
     {
         $primotextoOptions = (new PrimotextoOptions())
             ->campaignDate(1714121739)

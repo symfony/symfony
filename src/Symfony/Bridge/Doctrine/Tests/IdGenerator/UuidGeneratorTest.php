@@ -21,7 +21,7 @@ use Symfony\Component\Uid\UuidV4;
 
 class UuidGeneratorTest extends TestCase
 {
-    public function testUuidCanBeGenerated()
+    public function testUuidCanBeGenerated(): void
     {
         $em = (new \ReflectionClass(EntityManager::class))->newInstanceWithoutConstructor();
         $generator = new UuidGenerator();
@@ -30,7 +30,7 @@ class UuidGeneratorTest extends TestCase
         $this->assertInstanceOf(Uuid::class, $uuid);
     }
 
-    public function testCustomUuidfactory()
+    public function testCustomUuidfactory(): void
     {
         $uuid = new UuidV4();
         $em = (new \ReflectionClass(EntityManager::class))->newInstanceWithoutConstructor();
@@ -43,7 +43,7 @@ class UuidGeneratorTest extends TestCase
         $this->assertSame($uuid, $generator->generateId($em, new Entity()));
     }
 
-    public function testUuidfactory()
+    public function testUuidfactory(): void
     {
         $em = (new \ReflectionClass(EntityManager::class))->newInstanceWithoutConstructor();
         $generator = new UuidGenerator();

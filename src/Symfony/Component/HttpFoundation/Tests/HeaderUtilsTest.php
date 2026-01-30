@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\HeaderUtils;
 class HeaderUtilsTest extends TestCase
 {
     #[DataProvider('provideHeaderToSplit')]
-    public function testSplit(array $expected, string $header, string $separator)
+    public function testSplit(array $expected, string $header, string $separator): void
     {
         $this->assertSame($expected, HeaderUtils::split($header, $separator));
     }
@@ -60,7 +60,7 @@ class HeaderUtilsTest extends TestCase
         ];
     }
 
-    public function testCombine()
+    public function testCombine(): void
     {
         $this->assertSame(['foo' => '123'], HeaderUtils::combine([['foo', '123']]));
         $this->assertSame(['foo' => true], HeaderUtils::combine([['foo']]));
@@ -68,7 +68,7 @@ class HeaderUtilsTest extends TestCase
         $this->assertSame(['foo' => '123', 'bar' => true], HeaderUtils::combine([['foo', '123'], ['bar']]));
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertSame('foo', HeaderUtils::toString(['foo' => true], ','));
         $this->assertSame('foo; bar', HeaderUtils::toString(['foo' => true, 'bar' => true], ';'));
@@ -77,7 +77,7 @@ class HeaderUtilsTest extends TestCase
         $this->assertSame('foo="1 2 3", bar', HeaderUtils::toString(['foo' => '1 2 3', 'bar' => true], ','));
     }
 
-    public function testQuote()
+    public function testQuote(): void
     {
         $this->assertSame('foo', HeaderUtils::quote('foo'));
         $this->assertSame('az09!#$%&\'*.^_`|~-', HeaderUtils::quote('az09!#$%&\'*.^_`|~-'));
@@ -87,7 +87,7 @@ class HeaderUtilsTest extends TestCase
         $this->assertSame('"foo \\\\ bar"', HeaderUtils::quote('foo \\ bar'));
     }
 
-    public function testUnquote()
+    public function testUnquote(): void
     {
         $this->assertEquals('foo', HeaderUtils::unquote('foo'));
         $this->assertEquals('az09!#$%&\'*.^_`|~-', HeaderUtils::unquote('az09!#$%&\'*.^_`|~-'));
@@ -98,14 +98,14 @@ class HeaderUtilsTest extends TestCase
         $this->assertEquals('foo \\ bar', HeaderUtils::unquote('"foo \\\\ bar"'));
     }
 
-    public function testMakeDispositionInvalidDisposition()
+    public function testMakeDispositionInvalidDisposition(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         HeaderUtils::makeDisposition('invalid', 'foo.html');
     }
 
     #[DataProvider('provideMakeDisposition')]
-    public function testMakeDisposition($disposition, $filename, $filenameFallback, $expected)
+    public function testMakeDisposition($disposition, $filename, $filenameFallback, $expected): void
     {
         $this->assertEquals($expected, HeaderUtils::makeDisposition($disposition, $filename, $filenameFallback));
     }
@@ -123,7 +123,7 @@ class HeaderUtilsTest extends TestCase
     }
 
     #[DataProvider('provideMakeDispositionFail')]
-    public function testMakeDispositionFail($disposition, $filename)
+    public function testMakeDispositionFail($disposition, $filename): void
     {
         $this->expectException(\InvalidArgumentException::class);
         HeaderUtils::makeDisposition($disposition, $filename);
@@ -142,7 +142,7 @@ class HeaderUtilsTest extends TestCase
     }
 
     #[DataProvider('provideParseQuery')]
-    public function testParseQuery(string $query, ?string $expected = null)
+    public function testParseQuery(string $query, ?string $expected = null): void
     {
         $this->assertSame($expected ?? $query, http_build_query(HeaderUtils::parseQuery($query), '', '&'));
     }
@@ -164,13 +164,13 @@ class HeaderUtilsTest extends TestCase
         ];
     }
 
-    public function testParseCookie()
+    public function testParseCookie(): void
     {
         $query = 'a.b=c; def%5Bg%5D=h';
         $this->assertSame($query, http_build_query(HeaderUtils::parseQuery($query, false, ';'), '', '; '));
     }
 
-    public function testParseQueryIgnoreBrackets()
+    public function testParseQueryIgnoreBrackets(): void
     {
         $this->assertSame(['a.b' => ['A', 'B']], HeaderUtils::parseQuery('a.b=A&a.b=B', true));
         $this->assertSame(['a.b[]' => ['A']], HeaderUtils::parseQuery('a.b[]=A', true));

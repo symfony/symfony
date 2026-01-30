@@ -20,14 +20,14 @@ use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition as BaseVa
 
 class NodeBuilderTest extends TestCase
 {
-    public function testThrowsAnExceptionWhenTryingToCreateANonRegisteredNodeType()
+    public function testThrowsAnExceptionWhenTryingToCreateANonRegisteredNodeType(): void
     {
         $this->expectException(\RuntimeException::class);
         $builder = new BaseNodeBuilder();
         $builder->node('', 'foobar');
     }
 
-    public function testThrowsAnExceptionWhenTheNodeClassIsNotFound()
+    public function testThrowsAnExceptionWhenTheNodeClassIsNotFound(): void
     {
         $this->expectException(\RuntimeException::class);
         $builder = new BaseNodeBuilder();
@@ -36,7 +36,7 @@ class NodeBuilderTest extends TestCase
             ->node('', 'noclasstype');
     }
 
-    public function testAddingANewNodeType()
+    public function testAddingANewNodeType(): void
     {
         $class = SomeNodeDefinition::class;
 
@@ -48,7 +48,7 @@ class NodeBuilderTest extends TestCase
         $this->assertInstanceOf($class, $node);
     }
 
-    public function testOverridingAnExistingNodeType()
+    public function testOverridingAnExistingNodeType(): void
     {
         $class = SomeNodeDefinition::class;
 
@@ -60,7 +60,7 @@ class NodeBuilderTest extends TestCase
         $this->assertInstanceOf($class, $node);
     }
 
-    public function testNodeTypesAreNotCaseSensitive()
+    public function testNodeTypesAreNotCaseSensitive(): void
     {
         $builder = new BaseNodeBuilder();
 
@@ -77,7 +77,7 @@ class NodeBuilderTest extends TestCase
         $this->assertInstanceOf($node1::class, $node2);
     }
 
-    public function testNumericNodeCreation()
+    public function testNumericNodeCreation(): void
     {
         $builder = new BaseNodeBuilder();
 
@@ -88,7 +88,7 @@ class NodeBuilderTest extends TestCase
         $this->assertInstanceOf(FloatNodeDefinition::class, $node);
     }
 
-    public function testStringNodeCreation()
+    public function testStringNodeCreation(): void
     {
         $builder = new BaseNodeBuilder();
 

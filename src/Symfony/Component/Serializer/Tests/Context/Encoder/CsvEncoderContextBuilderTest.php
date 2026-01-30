@@ -33,7 +33,7 @@ class CsvEncoderContextBuilderTest extends TestCase
      * @param array<string, mixed> $values
      */
     #[DataProvider('withersDataProvider')]
-    public function testWithers(array $values)
+    public function testWithers(array $values): void
     {
         $context = $this->contextBuilder
             ->withDelimiter($values[CsvEncoder::DELIMITER_KEY])
@@ -80,7 +80,7 @@ class CsvEncoderContextBuilderTest extends TestCase
         ]];
     }
 
-    public function testWithersWithoutValue()
+    public function testWithersWithoutValue(): void
     {
         $context = $this->contextBuilder
             ->withDelimiter(null)
@@ -107,13 +107,13 @@ class CsvEncoderContextBuilderTest extends TestCase
         ], $context);
     }
 
-    public function testCannotSetMultipleBytesAsDelimiter()
+    public function testCannotSetMultipleBytesAsDelimiter(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->contextBuilder->withDelimiter('ọ');
     }
 
-    public function testCannotSetMultipleBytesAsEnclosure()
+    public function testCannotSetMultipleBytesAsEnclosure(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->contextBuilder->withEnclosure('ọ');

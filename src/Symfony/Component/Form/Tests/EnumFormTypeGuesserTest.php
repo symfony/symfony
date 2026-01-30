@@ -25,7 +25,7 @@ use Symfony\Component\Form\Tests\Fixtures\EnumFormTypeGuesserCaseEnum;
 class EnumFormTypeGuesserTest extends TestCase
 {
     #[DataProvider('provideGuessTypeCases')]
-    public function testGuessType(?TypeGuess $expectedTypeGuess, string $class, string $property)
+    public function testGuessType(?TypeGuess $expectedTypeGuess, string $class, string $property): void
     {
         $typeGuesser = new EnumFormTypeGuesser();
 
@@ -35,7 +35,7 @@ class EnumFormTypeGuesserTest extends TestCase
     }
 
     #[DataProvider('provideGuessRequiredCases')]
-    public function testGuessRequired(?ValueGuess $expectedValueGuess, string $class, string $property)
+    public function testGuessRequired(?ValueGuess $expectedValueGuess, string $class, string $property): void
     {
         $typeGuesser = new EnumFormTypeGuesser();
 

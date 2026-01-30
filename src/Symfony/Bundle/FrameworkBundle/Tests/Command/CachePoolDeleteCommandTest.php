@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CachePoolDeleteCommandTest extends TestCase
 {
-    public function testCommandWithValidKey()
+    public function testCommandWithValidKey(): void
     {
         $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $cachePool->expects($this->once())
@@ -45,7 +45,7 @@ class CachePoolDeleteCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Cache item "bar" was successfully deleted.', $tester->getDisplay());
     }
 
-    public function testCommandWithInValidKey()
+    public function testCommandWithInValidKey(): void
     {
         $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $cachePool->expects($this->once())
@@ -63,7 +63,7 @@ class CachePoolDeleteCommandTest extends TestCase
         $this->assertStringContainsString('[NOTE] Cache item "bar" does not exist in cache pool "foo".', $tester->getDisplay());
     }
 
-    public function testCommandDeleteFailed()
+    public function testCommandDeleteFailed(): void
     {
         $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $cachePool->expects($this->once())
@@ -83,7 +83,7 @@ class CachePoolDeleteCommandTest extends TestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $application = new Application($this->getKernel());
         $application->addCommand(new CachePoolDeleteCommand(new Psr6CacheClearer(['foo' => new ArrayAdapter()]), ['foo']));

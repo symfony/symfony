@@ -27,7 +27,7 @@ use Symfony\Component\Form\Guess\ValueGuess;
 class DoctrineOrmTypeGuesserTest extends TestCase
 {
     #[DataProvider('requiredType')]
-    public function testTypeGuesser(string $type, $expected)
+    public function testTypeGuesser(string $type, $expected): void
     {
         $classMetadata = $this->createMock(ClassMetadata::class);
         $classMetadata->fieldMappings['field'] = true;
@@ -50,7 +50,7 @@ class DoctrineOrmTypeGuesserTest extends TestCase
         yield [Types::DATETIMETZ_MUTABLE, new TypeGuess('Symfony\Component\Form\Extension\Core\Type\DateTimeType', [], Guess::HIGH_CONFIDENCE)];
     }
 
-    public function testRequiredGuesserSimpleFieldNotNullable()
+    public function testRequiredGuesserSimpleFieldNotNullable(): void
     {
         $classMetadata = $this->createMock(ClassMetadata::class);
         $classMetadata->fieldMappings['field'] = true;
@@ -59,7 +59,7 @@ class DoctrineOrmTypeGuesserTest extends TestCase
         $this->assertEquals(new ValueGuess(true, Guess::HIGH_CONFIDENCE), $this->getGuesser($classMetadata)->guessRequired('TestEntity', 'field'));
     }
 
-    public function testRequiredGuesserSimpleFieldNullable()
+    public function testRequiredGuesserSimpleFieldNullable(): void
     {
         $classMetadata = $this->createMock(ClassMetadata::class);
         $classMetadata->fieldMappings['field'] = true;
@@ -68,7 +68,7 @@ class DoctrineOrmTypeGuesserTest extends TestCase
         $this->assertEquals(new ValueGuess(false, Guess::MEDIUM_CONFIDENCE), $this->getGuesser($classMetadata)->guessRequired('TestEntity', 'field'));
     }
 
-    public function testRequiredGuesserOneToOneNullable()
+    public function testRequiredGuesserOneToOneNullable(): void
     {
         $classMetadata = new ClassMetadata('Acme\Entity\Foo');
 
@@ -79,7 +79,7 @@ class DoctrineOrmTypeGuesserTest extends TestCase
         $this->assertEquals(new ValueGuess(false, Guess::HIGH_CONFIDENCE), $this->getGuesser($classMetadata)->guessRequired('TestEntity', 'field'));
     }
 
-    public function testRequiredGuesserOneToOneExplicitNullable()
+    public function testRequiredGuesserOneToOneExplicitNullable(): void
     {
         $classMetadata = new ClassMetadata('Acme\Entity\Foo');
 
@@ -92,7 +92,7 @@ class DoctrineOrmTypeGuesserTest extends TestCase
         $this->assertEquals(new ValueGuess(false, Guess::HIGH_CONFIDENCE), $this->getGuesser($classMetadata)->guessRequired('TestEntity', 'field'));
     }
 
-    public function testRequiredGuesserOneToOneNotNullable()
+    public function testRequiredGuesserOneToOneNotNullable(): void
     {
         $classMetadata = new ClassMetadata('Acme\Entity\Foo');
 
@@ -105,7 +105,7 @@ class DoctrineOrmTypeGuesserTest extends TestCase
         $this->assertEquals(new ValueGuess(true, Guess::HIGH_CONFIDENCE), $this->getGuesser($classMetadata)->guessRequired('TestEntity', 'field'));
     }
 
-    public function testRequiredGuesserOneToMany()
+    public function testRequiredGuesserOneToMany(): void
     {
         $classMetadata = $this->createMock(ClassMetadata::class);
         $classMetadata->expects($this->once())->method('isAssociationWithSingleJoinColumn')->with('field')->willReturn(false);

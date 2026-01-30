@@ -42,7 +42,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->exception = new AuthenticationException();
     }
 
-    public function testForward()
+    public function testForward(): void
     {
         $options = ['failure_forward' => true];
 
@@ -62,7 +62,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->assertSame($this->exception, $subRequest->attributes->get(SecurityRequestAttributes::AUTHENTICATION_ERROR));
     }
 
-    public function testRedirect()
+    public function testRedirect(): void
     {
         $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils(), [], new NullLogger());
         $result = $handler->onAuthenticationFailure($this->request, $this->exception);
@@ -70,7 +70,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->assertEquals(new RedirectResponse('https://localhost/login'), $result);
     }
 
-    public function testExceptionIsPersistedInSession()
+    public function testExceptionIsPersistedInSession(): void
     {
         $handler = new DefaultAuthenticationFailureHandler($this->createStub(HttpKernelInterface::class), new HttpUtils(), [], new NullLogger());
         $handler->onAuthenticationFailure($this->request, $this->exception);
@@ -79,7 +79,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->assertSame($this->exception, $this->session->get(SecurityRequestAttributes::AUTHENTICATION_ERROR));
     }
 
-    public function testExceptionIsNotPersistedInSessionOnStatelessRequest()
+    public function testExceptionIsNotPersistedInSessionOnStatelessRequest(): void
     {
         $this->request->attributes = new ParameterBag(['_stateless' => true]);
 
@@ -89,7 +89,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->assertFalse($this->session->has(SecurityRequestAttributes::AUTHENTICATION_ERROR));
     }
 
-    public function testExceptionIsPassedInRequestOnForward()
+    public function testExceptionIsPassedInRequestOnForward(): void
     {
         $options = ['failure_forward' => true];
 
@@ -107,7 +107,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->assertSame([], $this->session->all());
     }
 
-    public function testRedirectIsLogged()
+    public function testRedirectIsLogged(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger
@@ -119,7 +119,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }
 
-    public function testForwardIsLogged()
+    public function testForwardIsLogged(): void
     {
         $options = ['failure_forward' => true];
 
@@ -133,7 +133,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }
 
-    public function testFailurePathCanBeOverwritten()
+    public function testFailurePathCanBeOverwritten(): void
     {
         $options = ['failure_path' => '/auth/login'];
 
@@ -143,7 +143,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->assertEquals(new RedirectResponse('https://localhost/auth/login'), $result);
     }
 
-    public function testFailurePathCanBeOverwrittenWithRequest()
+    public function testFailurePathCanBeOverwrittenWithRequest(): void
     {
         $this->request->attributes->set('_failure_path', '/auth/login');
 
@@ -153,7 +153,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->assertEquals(new RedirectResponse('https://localhost/auth/login'), $result);
     }
 
-    public function testFailurePathCanBeOverwrittenWithNestedAttributeInRequest()
+    public function testFailurePathCanBeOverwrittenWithNestedAttributeInRequest(): void
     {
         $this->request->attributes->set('_failure_path', ['value' => '/auth/login']);
 
@@ -163,7 +163,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->assertEquals(new RedirectResponse('https://localhost/auth/login'), $result);
     }
 
-    public function testFailurePathParameterCanBeOverwritten()
+    public function testFailurePathParameterCanBeOverwritten(): void
     {
         $options = ['failure_path_parameter' => '_my_failure_path'];
 
@@ -175,7 +175,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $this->assertEquals(new RedirectResponse('https://localhost/auth/login'), $result);
     }
 
-    public function testFailurePathFromRequestWithInvalidUrl()
+    public function testFailurePathFromRequestWithInvalidUrl(): void
     {
         $options = ['failure_path_parameter' => '_my_failure_path'];
 
@@ -184,7 +184,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->exactly(2))
             ->method('debug')
-            ->willReturnCallback(function (...$args) {
+            ->willReturnCallback(function (...$args): void {
                 static $series = [
                     ['Ignoring query parameter "_my_failure_path": not a valid URL.', []],
                     ['Authentication failure, redirect triggered.', ['failure_path' => '/login']],
@@ -199,7 +199,7 @@ class DefaultAuthenticationFailureHandlerTest extends TestCase
         $handler->onAuthenticationFailure($this->request, $this->exception);
     }
 
-    public function testAbsoluteUrlRedirectionFromRequest()
+    public function testAbsoluteUrlRedirectionFromRequest(): void
     {
         $options = ['failure_path_parameter' => '_my_failure_path'];
 

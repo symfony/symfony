@@ -22,7 +22,7 @@ use Symfony\Component\CssSelector\Parser\Shortcut\ElementParser;
 class ElementParserTest extends TestCase
 {
     #[DataProvider('getParseTestData')]
-    public function testParse($source, $representation)
+    public function testParse($source, $representation): void
     {
         $parser = new ElementParser();
         $selectors = $parser->parse($source);

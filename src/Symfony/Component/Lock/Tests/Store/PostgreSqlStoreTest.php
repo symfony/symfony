@@ -47,7 +47,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
     }
 
     #[RequiresPhpExtension('pdo_sqlite')]
-    public function testInvalidDriver()
+    public function testInvalidDriver(): void
     {
         $store = new PostgreSqlStore('sqlite:/tmp/foo.db');
 
@@ -56,7 +56,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $store->exists(new Key('foo'));
     }
 
-    public function testSaveAfterConflict()
+    public function testSaveAfterConflict(): void
     {
         $store1 = $this->getStore();
         $store2 = $this->getStore();
@@ -83,7 +83,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $this->assertTrue($store2->exists($key));
     }
 
-    public function testWaitAndSaveAfterConflictReleasesLockFromInternalStore()
+    public function testWaitAndSaveAfterConflictReleasesLockFromInternalStore(): void
     {
         $store1 = $this->getStore();
         $postgresHost = $this->getPostgresHost();
@@ -121,7 +121,7 @@ class PostgreSqlStoreTest extends AbstractStoreTestCase
         $this->assertTrue($store2->exists($store2Key));
     }
 
-    public function testWaitAndSaveReadAfterConflictReleasesLockFromInternalStore()
+    public function testWaitAndSaveReadAfterConflictReleasesLockFromInternalStore(): void
     {
         $store1 = $this->getStore();
         $postgresHost = $this->getPostgresHost();

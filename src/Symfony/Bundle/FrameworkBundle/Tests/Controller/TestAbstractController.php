@@ -52,7 +52,7 @@ class TestAbstractController extends AbstractController
         return parent::setContainer($container);
     }
 
-    public function fooAction()
+    public function fooAction(): void
     {
     }
 }

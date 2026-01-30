@@ -19,7 +19,7 @@ use Symfony\Component\Mime\Part\TextPart;
 
 class FormDataPartTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $r = new \ReflectionProperty(TextPart::class, 'encoding');
 
@@ -47,7 +47,7 @@ class FormDataPartTest extends TestCase
         $this->assertEquals([$t, $b, $c], $f->getParts());
     }
 
-    public function testNestedArrayParts()
+    public function testNestedArrayParts(): void
     {
         $p1 = new TextPart('content', 'utf-8', 'plain', '8bit');
         $f = new FormDataPart([
@@ -184,7 +184,7 @@ class FormDataPartTest extends TestCase
         $this->assertEquals($parts, $f->getParts());
     }
 
-    public function testExceptionOnFormFieldsWithIntegerKeysAndMultipleValues()
+    public function testExceptionOnFormFieldsWithIntegerKeysAndMultipleValues(): void
     {
         $p1 = new TextPart('content', 'utf-8', 'plain', '8bit');
         $f = new FormDataPart([
@@ -199,7 +199,7 @@ class FormDataPartTest extends TestCase
         $f->getParts();
     }
 
-    public function testExceptionOnFormFieldsWithDisallowedTypesInsideArray()
+    public function testExceptionOnFormFieldsWithDisallowedTypesInsideArray(): void
     {
         $f = new FormDataPart([
             'foo' => [
@@ -215,13 +215,13 @@ class FormDataPartTest extends TestCase
         $f->getParts();
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $p = DataPart::fromPath($file = __DIR__.'/../../Fixtures/mimetypes/test.gif');
         $this->assertEquals(base64_encode(file_get_contents($file)), $p->bodyToString());
     }
 
-    public function testContentLineLength()
+    public function testContentLineLength(): void
     {
         $f = new FormDataPart([
             'foo' => new DataPart($foo = str_repeat('foo', 1000), 'foo.txt', 'text/plain'),
@@ -232,7 +232,7 @@ class FormDataPartTest extends TestCase
         $this->assertEquals($bar, $parts[1]->bodyToString());
     }
 
-    public function testBoundaryContentTypeHeader()
+    public function testBoundaryContentTypeHeader(): void
     {
         $f = new FormDataPart([
             'file' => new DataPart('data.csv', 'data.csv', 'text/csv'),
@@ -244,7 +244,7 @@ class FormDataPartTest extends TestCase
         );
     }
 
-    public function testGetPartsThrowsOnUnexpectedFieldType()
+    public function testGetPartsThrowsOnUnexpectedFieldType(): void
     {
         $dataPart = new FormDataPart(['foo' => new \stdClass()]);
 

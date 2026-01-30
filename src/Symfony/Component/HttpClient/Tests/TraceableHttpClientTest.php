@@ -29,7 +29,7 @@ class TraceableHttpClientTest extends TestCase
         TestHttpServer::start();
     }
 
-    public function testItTracesRequest()
+    public function testItTracesRequest(): void
     {
         $httpClient = $this->createStub(HttpClientInterface::class);
         $httpClient
@@ -75,7 +75,7 @@ class TraceableHttpClientTest extends TestCase
         ], $actualTracedRequest);
     }
 
-    public function testItCollectsInfoOnRealRequest()
+    public function testItCollectsInfoOnRealRequest(): void
     {
         $sut = new TraceableHttpClient(new MockHttpClient());
         $sut->request('GET', 'http://localhost:8057');
@@ -85,11 +85,11 @@ class TraceableHttpClientTest extends TestCase
         $this->assertSame('http://localhost:8057/', $actualTracedRequest['info']['url']);
     }
 
-    public function testItExecutesOnProgressOption()
+    public function testItExecutesOnProgressOption(): void
     {
         $sut = new TraceableHttpClient(new MockHttpClient());
         $foo = 0;
-        $sut->request('GET', 'http://localhost:8057', ['on_progress' => static function (int $dlNow, int $dlSize, array $info) use (&$foo) {
+        $sut->request('GET', 'http://localhost:8057', ['on_progress' => static function (int $dlNow, int $dlSize, array $info) use (&$foo): void {
             ++$foo;
         }]);
         $this->assertCount(1, $tracedRequests = $sut->getTracedRequests());
@@ -97,7 +97,7 @@ class TraceableHttpClientTest extends TestCase
         $this->assertGreaterThan(0, $foo);
     }
 
-    public function testItResetsTraces()
+    public function testItResetsTraces(): void
     {
         $sut = new TraceableHttpClient(new MockHttpClient());
         $sut->request('GET', 'https://example.com/foo/bar');
@@ -105,7 +105,7 @@ class TraceableHttpClientTest extends TestCase
         $this->assertCount(0, $sut->getTracedRequests());
     }
 
-    public function testStream()
+    public function testStream(): void
     {
         $sut = new TraceableHttpClient(new NativeHttpClient());
         $response = $sut->request('GET', 'http://localhost:8057/chunked');
@@ -118,7 +118,7 @@ class TraceableHttpClientTest extends TestCase
         $this->assertSame('Symfony is awesome!', implode('', $chunks));
     }
 
-    public function testToArrayChecksStatusCodeBeforeDecoding()
+    public function testToArrayChecksStatusCodeBeforeDecoding(): void
     {
         $this->expectException(ClientExceptionInterface::class);
 
@@ -128,7 +128,7 @@ class TraceableHttpClientTest extends TestCase
         $response->toArray();
     }
 
-    public function testStopwatch()
+    public function testStopwatch(): void
     {
         $sw = new Stopwatch(true);
         $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
@@ -145,7 +145,7 @@ class TraceableHttpClientTest extends TestCase
         $this->assertGreaterThan(0.0, $events['GET http://localhost:8057']->getDuration());
     }
 
-    public function testStopwatchError()
+    public function testStopwatchError(): void
     {
         $sw = new Stopwatch(true);
         $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
@@ -164,7 +164,7 @@ class TraceableHttpClientTest extends TestCase
         $this->assertCount(1, $events['GET http://localhost:8057/404']->getPeriods());
     }
 
-    public function testStopwatchStream()
+    public function testStopwatchStream(): void
     {
         $sw = new Stopwatch(true);
         $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
@@ -181,7 +181,7 @@ class TraceableHttpClientTest extends TestCase
         $this->assertGreaterThanOrEqual($chunkCount, \count($events['GET http://localhost:8057']->getPeriods()));
     }
 
-    public function testStopwatchStreamError()
+    public function testStopwatchStreamError(): void
     {
         $sw = new Stopwatch(true);
         $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
@@ -203,7 +203,7 @@ class TraceableHttpClientTest extends TestCase
         $this->assertGreaterThanOrEqual($chunkCount, \count($events['GET http://localhost:8057/404']->getPeriods()));
     }
 
-    public function testStopwatchDestruct()
+    public function testStopwatchDestruct(): void
     {
         $sw = new Stopwatch(true);
         $sut = new TraceableHttpClient(new NativeHttpClient(), $sw);
@@ -216,7 +216,7 @@ class TraceableHttpClientTest extends TestCase
         $this->assertGreaterThan(0.0, $events['GET http://localhost:8057']->getDuration());
     }
 
-    public function testWithOptions()
+    public function testWithOptions(): void
     {
         $sut = new TraceableHttpClient(new NativeHttpClient());
 

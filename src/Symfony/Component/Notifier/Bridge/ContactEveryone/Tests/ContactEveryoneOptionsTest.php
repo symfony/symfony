@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneOptions;
 
 class ContactEveryoneOptionsTest extends TestCase
 {
-    public function testContactEveryoneOptions()
+    public function testContactEveryoneOptions(): void
     {
         $contactEveryoneOptions = (new ContactEveryoneOptions())
             ->category('test_category')

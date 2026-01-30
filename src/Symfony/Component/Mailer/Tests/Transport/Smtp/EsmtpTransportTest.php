@@ -22,7 +22,7 @@ use Symfony\Component\Mime\Email;
 
 class EsmtpTransportTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $t = new EsmtpTransport();
         $this->assertEquals('smtp://localhost', (string) $t);
@@ -47,7 +47,7 @@ class EsmtpTransportTest extends TestCase
         $this->assertEquals('smtps://example.com:466', (string) $t);
     }
 
-    public function testExtensibility()
+    public function testExtensibility(): void
     {
         $stream = new DummyStream();
         $transport = new CustomEsmtpTransport(stream: $stream);
@@ -63,7 +63,7 @@ class EsmtpTransportTest extends TestCase
         $this->assertContains("RCPT TO:<recipient@example.org> NOTIFY=FAILURE\r\n", $stream->getCommands());
     }
 
-    public function testSmtpUtf8()
+    public function testSmtpUtf8(): void
     {
         $stream = new DummyStream();
         $transport = new SmtpUtf8EsmtpTransport(stream: $stream);
@@ -79,7 +79,7 @@ class EsmtpTransportTest extends TestCase
         $this->assertContains("RCPT TO:<dømi@xn--dmi-0na.fo>\r\n", $stream->getCommands());
     }
 
-    public function testMissingSmtpUtf8()
+    public function testMissingSmtpUtf8(): void
     {
         $stream = new DummyStream();
         $transport = new EsmtpTransport(stream: $stream);
@@ -94,7 +94,7 @@ class EsmtpTransportTest extends TestCase
         $transport->send($message);
     }
 
-    public function testSmtpUtf8FallbackToIDN()
+    public function testSmtpUtf8FallbackToIDN(): void
     {
         $stream = new DummyStream();
         $transport = new EsmtpTransport(stream: $stream);
@@ -110,7 +110,7 @@ class EsmtpTransportTest extends TestCase
         $this->assertContains("RCPT TO:<example@example.com>\r\n", $stream->getCommands());
     }
 
-    public function testConstructorWithDefaultAuthenticators()
+    public function testConstructorWithDefaultAuthenticators(): void
     {
         $stream = new DummyStream();
         $transport = new EsmtpTransport(stream: $stream);
@@ -161,7 +161,7 @@ class EsmtpTransportTest extends TestCase
         );
     }
 
-    public function testConstructorWithRedefinedAuthenticators()
+    public function testConstructorWithRedefinedAuthenticators(): void
     {
         $stream = new DummyStream();
         $transport = new EsmtpTransport(
@@ -207,7 +207,7 @@ class EsmtpTransportTest extends TestCase
         );
     }
 
-    public function testSetAuthenticators()
+    public function testSetAuthenticators(): void
     {
         $stream = new DummyStream();
         $transport = new EsmtpTransport(stream: $stream);
@@ -241,7 +241,7 @@ class EsmtpTransportTest extends TestCase
         );
     }
 
-    public function testConstructorWithEmptyAuthenticator()
+    public function testConstructorWithEmptyAuthenticator(): void
     {
         $stream = new DummyStream();
         $transport = new EsmtpTransport(stream: $stream);
@@ -263,7 +263,7 @@ class EsmtpTransportTest extends TestCase
         }
     }
 
-    public function testSocketTimeout()
+    public function testSocketTimeout(): void
     {
         $stream = new DummyStream();
         $transport = new EsmtpTransport(stream: $stream);
@@ -298,7 +298,7 @@ class EsmtpTransportTest extends TestCase
         );
     }
 
-    public function testRequireTls()
+    public function testRequireTls(): void
     {
         $stream = new DummyStream();
         $transport = new EsmtpTransport(stream: $stream);

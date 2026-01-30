@@ -46,7 +46,7 @@ final class UnifonicTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendFailedByStatusCode()
+    public function testSendFailedByStatusCode(): void
     {
         $client = new MockHttpClient(static fn (): ResponseInterface => new JsonMockResponse(info: [
             'http_code' => 400,
@@ -60,7 +60,7 @@ final class UnifonicTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('0611223344', 'Hello!'));
     }
 
-    public function testSendFailed()
+    public function testSendFailed(): void
     {
         $client = new MockHttpClient(static fn (): ResponseInterface => new JsonMockResponse([
             'success' => false,
@@ -76,7 +76,7 @@ final class UnifonicTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('0611223344', 'Hello!'));
     }
 
-    public function testSendSuccess()
+    public function testSendSuccess(): void
     {
         $client = new MockHttpClient(static fn (): ResponseInterface => new JsonMockResponse([
             'success' => true,

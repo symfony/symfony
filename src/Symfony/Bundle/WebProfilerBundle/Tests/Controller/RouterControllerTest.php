@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Route;
 
 class RouterControllerTest extends WebTestCase
 {
-    public function testFalseNegativeTrace()
+    public function testFalseNegativeTrace(): void
     {
         $path = '/foo/bar:123/baz';
 

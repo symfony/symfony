@@ -20,7 +20,7 @@ use Symfony\Component\Notifier\Bridge\Telegram\TelegramOptions;
 final class TelegramOptionsTest extends TestCase
 {
     #[DataProvider('validCacheTimeDataProvider')]
-    public function testAnswerCallbackQueryWithCacheTime(int $cacheTime)
+    public function testAnswerCallbackQueryWithCacheTime(int $cacheTime): void
     {
         $options = new TelegramOptions();
 
@@ -45,7 +45,7 @@ final class TelegramOptionsTest extends TestCase
     }
 
     #[DataProvider('invalidCacheTimeDataProvider')]
-    public function testAnswerCallbackQuery(int $cacheTime)
+    public function testAnswerCallbackQuery(int $cacheTime): void
     {
         $options = new TelegramOptions();
 
@@ -68,7 +68,7 @@ final class TelegramOptionsTest extends TestCase
         yield 'cache time equals -10' => [-10];
     }
 
-    public function testTelegramOptions()
+    public function testTelegramOptions(): void
     {
         $options = new TelegramOptions([
             'chat_id' => '123456',
@@ -83,7 +83,7 @@ final class TelegramOptionsTest extends TestCase
         $this->assertSame('123456', $options->getRecipientId());
     }
 
-    public function testTelegramOptionsWithAllMethods()
+    public function testTelegramOptionsWithAllMethods(): void
     {
         $options = (new TelegramOptions())
             ->chatId('123456')
@@ -104,14 +104,14 @@ final class TelegramOptionsTest extends TestCase
         $this->assertSame('123456', $options->getRecipientId());
     }
 
-    public function testParseModeConstants()
+    public function testParseModeConstants(): void
     {
         $this->assertSame('HTML', TelegramOptions::PARSE_MODE_HTML);
         $this->assertSame('Markdown', TelegramOptions::PARSE_MODE_MARKDOWN);
         $this->assertSame('MarkdownV2', TelegramOptions::PARSE_MODE_MARKDOWN_V2);
     }
 
-    public function testWithReplyMarkup()
+    public function testWithReplyMarkup(): void
     {
         $button1 = new InlineKeyboardButton('Button 1');
         $button1->url('https://example.com');
@@ -141,7 +141,7 @@ final class TelegramOptionsTest extends TestCase
         $this->assertSame($expected, $options->toArray());
     }
 
-    public function testOptionsChaining()
+    public function testOptionsChaining(): void
     {
         $options = new TelegramOptions();
 
@@ -158,7 +158,7 @@ final class TelegramOptionsTest extends TestCase
         ], $options->toArray());
     }
 
-    public function testEmptyOptions()
+    public function testEmptyOptions(): void
     {
         $options = new TelegramOptions();
 

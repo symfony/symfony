@@ -28,7 +28,7 @@ class MailjetApiTransportTest extends TestCase
     protected const PASSWORD = 'pa$s';
 
     #[DataProvider('getTransportData')]
-    public function testToString(MailjetApiTransport $transport, string $expected)
+    public function testToString(MailjetApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -51,7 +51,7 @@ class MailjetApiTransportTest extends TestCase
         ];
     }
 
-    public function testPayloadFormat()
+    public function testPayloadFormat(): void
     {
         $email = (new Email())
             ->subject('Sending email to mailjet API')
@@ -100,7 +100,7 @@ class MailjetApiTransportTest extends TestCase
         $this->assertEquals('Qux', $replyTo['Name']);
     }
 
-    public function testSendSuccess()
+    public function testSendSuccess(): void
     {
         $json = json_encode([
             'Messages' => [
@@ -135,7 +135,7 @@ class MailjetApiTransportTest extends TestCase
         $this->assertSame('576460756513665525', $sentMessage->getMessageId());
     }
 
-    public function testSendWithDecodingException()
+    public function testSendWithDecodingException(): void
     {
         $response = new MockResponse('cannot-be-decoded');
 
@@ -156,7 +156,7 @@ class MailjetApiTransportTest extends TestCase
         $transport->send($email);
     }
 
-    public function testSendWithTransportException()
+    public function testSendWithTransportException(): void
     {
         $response = new MockResponse('', ['error' => 'foo']);
 
@@ -177,7 +177,7 @@ class MailjetApiTransportTest extends TestCase
         $transport->send($email);
     }
 
-    public function testSendWithBadRequestResponse()
+    public function testSendWithBadRequestResponse(): void
     {
         $json = json_encode([
             'Messages' => [
@@ -215,7 +215,7 @@ class MailjetApiTransportTest extends TestCase
         $transport->send($email);
     }
 
-    public function testSendWithNoErrorMessageBadRequestResponse()
+    public function testSendWithNoErrorMessageBadRequestResponse(): void
     {
         $response = new MockResponse('response-content', ['http_code' => 400]);
 
@@ -237,7 +237,7 @@ class MailjetApiTransportTest extends TestCase
     }
 
     #[DataProvider('getMalformedResponse')]
-    public function testSendWithMalformedResponse(array $body)
+    public function testSendWithMalformedResponse(array $body): void
     {
         $json = json_encode($body);
 
@@ -281,7 +281,7 @@ class MailjetApiTransportTest extends TestCase
         ];
     }
 
-    public function testReplyTo()
+    public function testReplyTo(): void
     {
         $from = 'foo@example.com';
         $to = 'bar@example.com';
@@ -300,7 +300,7 @@ class MailjetApiTransportTest extends TestCase
         $method->invoke($transport, $email, $envelope);
     }
 
-    public function testHeaderToMessage()
+    public function testHeaderToMessage(): void
     {
         $email = (new Email())
             ->subject('Sending email to mailjet API')

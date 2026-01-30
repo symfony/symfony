@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler;
 
 class PdoSessionHandlerSchemaListenerTest extends TestCase
 {
-    public function testPostGenerateSchemaPdo()
+    public function testPostGenerateSchemaPdo(): void
     {
         $schema = new Schema();
         $dbalConnection = $this->createStub(Connection::class);
@@ -43,7 +43,7 @@ class PdoSessionHandlerSchemaListenerTest extends TestCase
     }
 
     #[RequiresPhpExtension('pdo_sqlite')]
-    public function testPostGenerateSchemaWithDifferentDatabaseDoesNotThrow()
+    public function testPostGenerateSchemaWithDifferentDatabaseDoesNotThrow(): void
     {
         $entityManager = DoctrineTestHelper::createTestEntityManager();
         $schema = new Schema();

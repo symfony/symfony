@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class EmptyAppTest extends TestCase
 {
-    public function testBootEmptyApp()
+    public function testBootEmptyApp(): void
     {
         $kernel = new EmptyAppKernel('test', true);
         $kernel->boot();
@@ -40,7 +40,7 @@ class EmptyAppTest extends TestCase
         $this->deleteTempDir();
     }
 
-    private function deleteTempDir()
+    private function deleteTempDir(): void
     {
         if (!file_exists($dir = sys_get_temp_dir().'/'.Kernel::VERSION.'/EmptyAppKernel')) {
             return;
@@ -60,7 +60,7 @@ class EmptyAppKernel extends Kernel
 
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
-        $loader->load(static function (ContainerBuilder $container) {
+        $loader->load(static function (ContainerBuilder $container): void {
             $container->register('error_renderer.html', HtmlErrorRenderer::class);
             $container->setAlias('error_renderer', 'error_renderer.html');
             $container->setParameter('debug.file_link_format', null);

@@ -18,7 +18,7 @@ use Symfony\Component\Console\Exception\CommandNotFoundException;
 
 class FactoryCommandLoaderTest extends TestCase
 {
-    public function testHas()
+    public function testHas(): void
     {
         $loader = new FactoryCommandLoader([
             'foo' => static fn () => new Command('foo'),
@@ -30,7 +30,7 @@ class FactoryCommandLoaderTest extends TestCase
         $this->assertFalse($loader->has('baz'));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $loader = new FactoryCommandLoader([
             'foo' => static fn () => new Command('foo'),
@@ -41,13 +41,13 @@ class FactoryCommandLoaderTest extends TestCase
         $this->assertInstanceOf(Command::class, $loader->get('bar'));
     }
 
-    public function testGetUnknownCommandThrows()
+    public function testGetUnknownCommandThrows(): void
     {
         $this->expectException(CommandNotFoundException::class);
         (new FactoryCommandLoader([]))->get('unknown');
     }
 
-    public function testGetCommandNames()
+    public function testGetCommandNames(): void
     {
         $loader = new FactoryCommandLoader([
             'foo' => static fn () => new Command('foo'),

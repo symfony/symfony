@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 
 class TaggedIteratorArgumentTest extends TestCase
 {
-    public function testWithTagOnly()
+    public function testWithTagOnly(): void
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo');
 
@@ -30,7 +30,7 @@ class TaggedIteratorArgumentTest extends TestCase
         $this->assertNull($taggedIteratorArgument->getDefaultPriorityMethod(false));
     }
 
-    public function testOnlyTagWithNeedsIndexes()
+    public function testOnlyTagWithNeedsIndexes(): void
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo', null, true);
 
@@ -40,7 +40,7 @@ class TaggedIteratorArgumentTest extends TestCase
         $this->assertSame('getDefaultFooPriority', $taggedIteratorArgument->getDefaultPriorityMethod(false));
     }
 
-    public function testOnlyTagWithNeedsIndexesAndDotTag()
+    public function testOnlyTagWithNeedsIndexesAndDotTag(): void
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo.bar', null, true);
 
@@ -50,7 +50,7 @@ class TaggedIteratorArgumentTest extends TestCase
         $this->assertSame('getDefaultBarPriority', $taggedIteratorArgument->getDefaultPriorityMethod(false));
     }
 
-    public function testOnlyTagWithNeedsIndexesAndDotsTag()
+    public function testOnlyTagWithNeedsIndexesAndDotsTag(): void
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo.bar.baz.qux', null, true);
 
@@ -63,7 +63,7 @@ class TaggedIteratorArgumentTest extends TestCase
     #[DataProvider('defaultIndexMethodProvider')]
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testDefaultIndexMethod(?string $indexAttribute, ?string $defaultIndexMethod, ?string $expectedDefaultIndexMethod)
+    public function testDefaultIndexMethod(?string $indexAttribute, ?string $defaultIndexMethod, ?string $expectedDefaultIndexMethod): void
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo', $indexAttribute, $defaultIndexMethod);
 
@@ -112,7 +112,7 @@ class TaggedIteratorArgumentTest extends TestCase
     #[DataProvider('defaultPriorityMethodProvider')]
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testDefaultPriorityIndexMethod(?string $indexAttribute, ?string $defaultPriorityMethod, ?string $expectedDefaultPriorityMethod)
+    public function testDefaultPriorityIndexMethod(?string $indexAttribute, ?string $defaultPriorityMethod, ?string $expectedDefaultPriorityMethod): void
     {
         $taggedIteratorArgument = new TaggedIteratorArgument('foo', $indexAttribute, null, false, $defaultPriorityMethod);
 

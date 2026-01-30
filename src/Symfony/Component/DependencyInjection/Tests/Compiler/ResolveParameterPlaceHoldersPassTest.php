@@ -31,49 +31,49 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
         $this->fooDefinition = $this->container->getDefinition('foo');
     }
 
-    public function testClassParametersShouldBeResolved()
+    public function testClassParametersShouldBeResolved(): void
     {
         $this->assertSame('Foo', $this->fooDefinition->getClass());
     }
 
-    public function testFactoryParametersShouldBeResolved()
+    public function testFactoryParametersShouldBeResolved(): void
     {
         $this->assertSame(['FooFactory', 'getFoo'], $this->fooDefinition->getFactory());
     }
 
-    public function testArgumentParametersShouldBeResolved()
+    public function testArgumentParametersShouldBeResolved(): void
     {
         $this->assertSame(['bar', ['bar' => 'baz']], $this->fooDefinition->getArguments());
     }
 
-    public function testMethodCallParametersShouldBeResolved()
+    public function testMethodCallParametersShouldBeResolved(): void
     {
         $this->assertSame([['foobar', ['bar', ['bar' => 'baz']]]], $this->fooDefinition->getMethodCalls());
     }
 
-    public function testPropertyParametersShouldBeResolved()
+    public function testPropertyParametersShouldBeResolved(): void
     {
         $this->assertSame(['bar' => 'baz'], $this->fooDefinition->getProperties());
     }
 
-    public function testFileParametersShouldBeResolved()
+    public function testFileParametersShouldBeResolved(): void
     {
         $this->assertSame('foo.php', $this->fooDefinition->getFile());
     }
 
-    public function testAliasParametersShouldBeResolved()
+    public function testAliasParametersShouldBeResolved(): void
     {
         $this->assertSame('foo', $this->container->getAlias('bar')->__toString());
     }
 
-    public function testBindingsShouldBeResolved()
+    public function testBindingsShouldBeResolved(): void
     {
         [$boundValue] = $this->container->getDefinition('foo')->getBindings()['$baz']->getValues();
 
         $this->assertSame($this->container->getParameterBag()->resolveValue('%env(BAZ)%'), $boundValue);
     }
 
-    public function testParameterNotFoundExceptionsIsThrown()
+    public function testParameterNotFoundExceptionsIsThrown(): void
     {
         $this->expectException(ParameterNotFoundException::class);
         $this->expectExceptionMessage('The service "baz_service_id" has a dependency on a non-existent parameter "non_existent_param".');
@@ -86,7 +86,7 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testParameterNotFoundExceptionsIsNotThrown()
+    public function testParameterNotFoundExceptionsIsNotThrown(): void
     {
         $container = new ContainerBuilder();
         $definition = $container->register('baz_service_id');
@@ -98,7 +98,7 @@ class ResolveParameterPlaceHoldersPassTest extends TestCase
         $this->assertCount(1, $definition->getErrors());
     }
 
-    public function testOnlyProxyTagIsResolved()
+    public function testOnlyProxyTagIsResolved(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('a_param', 'here_you_go');

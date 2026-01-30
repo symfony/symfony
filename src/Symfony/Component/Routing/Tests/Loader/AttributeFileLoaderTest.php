@@ -37,38 +37,38 @@ class AttributeFileLoaderTest extends TestCase
         $this->loader = new AttributeFileLoader(new FileLocator(), $this->classLoader);
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributedClasses/FooClass.php'));
         self::assertSame([FooClass::class], $this->classLoader->foundClasses);
     }
 
-    public function testLoadTraitWithClassConstant()
+    public function testLoadTraitWithClassConstant(): void
     {
         self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributedClasses/FooTrait.php'));
         self::assertSame([], $this->classLoader->foundClasses);
     }
 
-    public function testLoadFileWithoutStartTag()
+    public function testLoadFileWithoutStartTag(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Did you forget to add the "<?php" start tag at the beginning of the file?');
         $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/NoStartTagClass.php');
     }
 
-    public function testLoadVariadic()
+    public function testLoadVariadic(): void
     {
         self::assertCount(1, $this->loader->load(__DIR__.'/../Fixtures/OtherAnnotatedClasses/VariadicClass.php'));
         self::assertSame([VariadicClass::class], $this->classLoader->foundClasses);
     }
 
-    public function testLoadAbstractClass()
+    public function testLoadAbstractClass(): void
     {
         self::assertNull($this->loader->load(__DIR__.'/../Fixtures/AttributedClasses/AbstractClass.php'));
         self::assertSame([], $this->classLoader->foundClasses);
     }
 
-    public function testSupports()
+    public function testSupports(): void
     {
         $fixture = __DIR__.'/../Fixtures/annotated.php';
 
@@ -79,49 +79,49 @@ class AttributeFileLoaderTest extends TestCase
         $this->assertFalse($this->loader->supports($fixture, 'foo'), '->supports() checks the resource type if specified');
     }
 
-    public function testLoadAttributesClassAfterComma()
+    public function testLoadAttributesClassAfterComma(): void
     {
         self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamAfterCommaController.php'));
         self::assertSame([AttributesClassParamAfterCommaController::class], $this->classLoader->foundClasses);
     }
 
-    public function testLoadAttributesInlineClassAfterComma()
+    public function testLoadAttributesInlineClassAfterComma(): void
     {
         self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineAfterCommaController.php'));
         self::assertSame([AttributesClassParamInlineAfterCommaController::class], $this->classLoader->foundClasses);
     }
 
-    public function testLoadAttributesQuotedClassAfterComma()
+    public function testLoadAttributesQuotedClassAfterComma(): void
     {
         self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamQuotedAfterCommaController.php'));
         self::assertSame([AttributesClassParamQuotedAfterCommaController::class], $this->classLoader->foundClasses);
     }
 
-    public function testLoadAttributesInlineQuotedClassAfterComma()
+    public function testLoadAttributesInlineQuotedClassAfterComma(): void
     {
         self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineQuotedAfterCommaController.php'));
         self::assertSame([AttributesClassParamInlineQuotedAfterCommaController::class], $this->classLoader->foundClasses);
     }
 
-    public function testLoadAttributesClassAfterParenthesis()
+    public function testLoadAttributesClassAfterParenthesis(): void
     {
         self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamAfterParenthesisController.php'));
         self::assertSame([AttributesClassParamAfterParenthesisController::class], $this->classLoader->foundClasses);
     }
 
-    public function testLoadAttributesInlineClassAfterParenthesis()
+    public function testLoadAttributesInlineClassAfterParenthesis(): void
     {
         self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineAfterParenthesisController.php'));
         self::assertSame([AttributesClassParamInlineAfterParenthesisController::class], $this->classLoader->foundClasses);
     }
 
-    public function testLoadAttributesQuotedClassAfterParenthesis()
+    public function testLoadAttributesQuotedClassAfterParenthesis(): void
     {
         self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamQuotedAfterParenthesisController.php'));
         self::assertSame([AttributesClassParamQuotedAfterParenthesisController::class], $this->classLoader->foundClasses);
     }
 
-    public function testLoadAttributesInlineQuotedClassAfterParenthesis()
+    public function testLoadAttributesInlineQuotedClassAfterParenthesis(): void
     {
         self::assertCount(0, $this->loader->load(__DIR__.'/../Fixtures/AttributesFixtures/AttributesClassParamInlineQuotedAfterParenthesisController.php'));
         self::assertSame([AttributesClassParamInlineQuotedAfterParenthesisController::class], $this->classLoader->foundClasses);

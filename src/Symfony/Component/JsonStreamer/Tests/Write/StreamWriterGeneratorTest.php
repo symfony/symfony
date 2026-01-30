@@ -64,7 +64,7 @@ class StreamWriterGeneratorTest extends TestCase
     }
 
     #[DataProvider('generatedStreamWriterDataProvider')]
-    public function testGeneratedStreamWriter(string $fixture, Type $type, ?PropertyMetadataLoaderInterface $propertyMetadataLoader = null)
+    public function testGeneratedStreamWriter(string $fixture, Type $type, ?PropertyMetadataLoaderInterface $propertyMetadataLoader = null): void
     {
         $propertyMetadataLoader ??= new GenericTypePropertyMetadataLoader(
             new DateTimeTypePropertyMetadataLoader(new AttributePropertyMetadataLoader(
@@ -140,7 +140,7 @@ class StreamWriterGeneratorTest extends TestCase
         yield ['object_with_union', Type::object(DummyWithUnionProperties::class)];
     }
 
-    public function testDoNotSupportIntersectionType()
+    public function testDoNotSupportIntersectionType(): void
     {
         $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create()), $this->streamWritersDir);
 
@@ -150,7 +150,7 @@ class StreamWriterGeneratorTest extends TestCase
         $generator->generate(Type::intersection(Type::object(\Traversable::class), Type::object(\Stringable::class)));
     }
 
-    public function testDoNotSupportEnumType()
+    public function testDoNotSupportEnumType(): void
     {
         $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create()), $this->streamWritersDir);
 
@@ -160,7 +160,7 @@ class StreamWriterGeneratorTest extends TestCase
         $generator->generate(Type::enum(DummyEnum::class));
     }
 
-    public function testCallPropertyMetadataLoaderWithProperContext()
+    public function testCallPropertyMetadataLoaderWithProperContext(): void
     {
         $type = Type::object(self::class);
 

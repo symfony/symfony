@@ -24,7 +24,7 @@ trait GroupsTestTrait
 
     abstract protected function getDenormalizerForGroups(): DenormalizerInterface;
 
-    public function testGroupsNormalize()
+    public function testGroupsNormalize(): void
     {
         $normalizer = $this->getNormalizerForGroups();
 
@@ -51,7 +51,7 @@ trait GroupsTestTrait
         ], $normalizer->normalize($obj, null, ['groups' => ['a', 'c']]));
     }
 
-    public function testGroupsDenormalize()
+    public function testGroupsDenormalize(): void
     {
         $normalizer = $this->getDenormalizerForGroups();
 
@@ -79,7 +79,7 @@ trait GroupsTestTrait
         $this->assertEquals($obj, $denormalized);
     }
 
-    public function testNormalizeNoPropertyInGroup()
+    public function testNormalizeNoPropertyInGroup(): void
     {
         $normalizer = $this->getNormalizerForGroups();
 

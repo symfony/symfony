@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
  */
 class PsrResponseListenerTest extends TestCase
 {
-    public function testConvertsControllerResult()
+    public function testConvertsControllerResult(): void
     {
         $listener = new PsrResponseListener();
         $event = $this->createEventMock(new Response());
@@ -32,7 +32,7 @@ class PsrResponseListenerTest extends TestCase
         self::assertTrue($event->hasResponse());
     }
 
-    public function testDoesNotConvertControllerResult()
+    public function testDoesNotConvertControllerResult(): void
     {
         $listener = new PsrResponseListener();
         $event = $this->createEventMock([]);

@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 class SequentiallyTest extends TestCase
 {
-    public function testRejectNonConstraints()
+    public function testRejectNonConstraints(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The value "foo" is not an instance of Constraint in constraint "Symfony\Component\Validator\Constraints\Sequentially"');
@@ -28,7 +28,7 @@ class SequentiallyTest extends TestCase
         ]);
     }
 
-    public function testRejectValidConstraint()
+    public function testRejectValidConstraint(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The constraint Valid cannot be nested inside constraint "Symfony\Component\Validator\Constraints\Sequentially"');
@@ -37,7 +37,7 @@ class SequentiallyTest extends TestCase
         ]);
     }
 
-    public function testMissingConstraints()
+    public function testMissingConstraints(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage(\sprintf('The options "constraints" must be set for constraint "%s".', Sequentially::class));
@@ -45,7 +45,7 @@ class SequentiallyTest extends TestCase
         new Sequentially(null);
     }
 
-    public function testMissingConstraintsDoctrineStyle()
+    public function testMissingConstraintsDoctrineStyle(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage(\sprintf('The options "constraints" must be set for constraint "%s".', Sequentially::class));

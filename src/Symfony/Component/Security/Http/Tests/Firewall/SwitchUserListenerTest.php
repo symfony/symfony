@@ -52,20 +52,20 @@ class SwitchUserListenerTest extends TestCase
         $this->event = new RequestEvent($this->createStub(HttpKernelInterface::class), $this->request, HttpKernelInterface::MAIN_REQUEST);
     }
 
-    public function testFirewallNameIsRequired()
+    public function testFirewallNameIsRequired(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$firewallName must not be empty');
         new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, '', $this->accessDecisionManager);
     }
 
-    public function testEventIsIgnoredIfUsernameIsNotPassedWithTheRequest()
+    public function testEventIsIgnoredIfUsernameIsNotPassedWithTheRequest(): void
     {
         $listener = new SwitchUserListener($this->tokenStorage, $this->userProvider, $this->userChecker, 'provider123', $this->accessDecisionManager);
         $this->assertFalse($listener->supports($this->event->getRequest()));
     }
 
-    public function testExitUserThrowsAuthenticationExceptionIfNoCurrentToken()
+    public function testExitUserThrowsAuthenticationExceptionIfNoCurrentToken(): void
     {
         $this->tokenStorage->setToken(null);
         $this->request->query->set('_switch_user', '_exit');
@@ -77,7 +77,7 @@ class SwitchUserListenerTest extends TestCase
         $listener->authenticate($this->event);
     }
 
-    public function testExitUserThrowsAuthenticationExceptionIfOriginalTokenCannotBeFound()
+    public function testExitUserThrowsAuthenticationExceptionIfOriginalTokenCannotBeFound(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
 
@@ -92,7 +92,7 @@ class SwitchUserListenerTest extends TestCase
         $listener->authenticate($this->event);
     }
 
-    public function testExitUserUpdatesToken()
+    public function testExitUserUpdatesToken(): void
     {
         $originalToken = new UsernamePasswordToken(new InMemoryUser('username', '', []), 'key', []);
         $this->tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('username', '', ['ROLE_USER']), 'key', ['ROLE_USER'], $originalToken));
@@ -110,7 +110,7 @@ class SwitchUserListenerTest extends TestCase
         $this->assertSame($originalToken, $this->tokenStorage->getToken());
     }
 
-    public function testExitUserDoesNotRedirectToTargetRoute()
+    public function testExitUserDoesNotRedirectToTargetRoute(): void
     {
         $originalToken = new UsernamePasswordToken(new InMemoryUser('username', '', []), 'key', []);
         $this->tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('username', '', ['ROLE_USER']), 'key', ['ROLE_USER'], $originalToken));
@@ -125,7 +125,7 @@ class SwitchUserListenerTest extends TestCase
         $this->assertSame($this->request->getUri(), $this->event->getResponse()->getTargetUrl());
     }
 
-    public function testExitUserDispatchesEventWithRefreshedUser()
+    public function testExitUserDispatchesEventWithRefreshedUser(): void
     {
         $originalUser = new InMemoryUser('username', null);
         $refreshedUser = new InMemoryUser('username', null);
@@ -153,7 +153,7 @@ class SwitchUserListenerTest extends TestCase
         $listener->authenticate($this->event);
     }
 
-    public function testSwitchUserIsDisallowed()
+    public function testSwitchUserIsDisallowed(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
         $user = new InMemoryUser('username', 'password', []);
@@ -174,7 +174,7 @@ class SwitchUserListenerTest extends TestCase
         $listener->authenticate($this->event);
     }
 
-    public function testSwitchUserTurnsAuthenticationExceptionTo403()
+    public function testSwitchUserTurnsAuthenticationExceptionTo403(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_ALLOWED_TO_SWITCH']), 'key', ['ROLE_ALLOWED_TO_SWITCH']);
 
@@ -193,7 +193,7 @@ class SwitchUserListenerTest extends TestCase
         $listener->authenticate($this->event);
     }
 
-    public function testSwitchUser()
+    public function testSwitchUser(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
 
@@ -218,7 +218,7 @@ class SwitchUserListenerTest extends TestCase
         $this->assertInstanceOf(UsernamePasswordToken::class, $this->tokenStorage->getToken());
     }
 
-    public function testSwitchUserAlreadySwitched()
+    public function testSwitchUserAlreadySwitched(): void
     {
         $originalToken = new UsernamePasswordToken(new InMemoryUser('original', null, ['ROLE_FOO']), 'key', ['ROLE_FOO']);
         $alreadySwitchedToken = new SwitchUserToken(new InMemoryUser('switched_1', null, ['ROLE_BAR']), 'key', ['ROLE_BAR'], $originalToken);
@@ -252,7 +252,7 @@ class SwitchUserListenerTest extends TestCase
         $this->assertSame($originalToken, $tokenStorage->getToken()->getOriginalToken());
     }
 
-    public function testSwitchUserWorksWithFalsyUsernames()
+    public function testSwitchUserWorksWithFalsyUsernames(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('kuba', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
 
@@ -279,7 +279,7 @@ class SwitchUserListenerTest extends TestCase
         $this->assertInstanceOf(UsernamePasswordToken::class, $this->tokenStorage->getToken());
     }
 
-    public function testSwitchUserKeepsOtherQueryStringParameters()
+    public function testSwitchUserKeepsOtherQueryStringParameters(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
 
@@ -308,7 +308,7 @@ class SwitchUserListenerTest extends TestCase
         $this->assertInstanceOf(UsernamePasswordToken::class, $this->tokenStorage->getToken());
     }
 
-    public function testSwitchUserWithReplacedToken()
+    public function testSwitchUserWithReplacedToken(): void
     {
         $user = new InMemoryUser('username', 'password', []);
         $token = new UsernamePasswordToken($user, 'provider123', ['ROLE_FOO']);
@@ -347,7 +347,7 @@ class SwitchUserListenerTest extends TestCase
         $this->assertSame($replacedToken, $this->tokenStorage->getToken());
     }
 
-    public function testSwitchUserThrowsAuthenticationExceptionIfNoCurrentToken()
+    public function testSwitchUserThrowsAuthenticationExceptionIfNoCurrentToken(): void
     {
         $this->tokenStorage->setToken(null);
         $this->request->query->set('_switch_user', 'username');
@@ -359,7 +359,7 @@ class SwitchUserListenerTest extends TestCase
         $listener->authenticate($this->event);
     }
 
-    public function testSwitchUserStateless()
+    public function testSwitchUserStateless(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('username', '', ['ROLE_FOO']), 'key', ['ROLE_FOO']);
 
@@ -384,7 +384,7 @@ class SwitchUserListenerTest extends TestCase
         $this->assertFalse($this->event->hasResponse());
     }
 
-    public function testSwitchUserRefreshesOriginalToken()
+    public function testSwitchUserRefreshesOriginalToken(): void
     {
         $originalUser = new InMemoryUser('username', null);
         $refreshedOriginalUser = new InMemoryUser('username', null);

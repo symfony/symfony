@@ -45,7 +45,7 @@ class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
         );
     }
 
-    public function testMiddlewareCloseConnection()
+    public function testMiddlewareCloseConnection(): void
     {
         $this->connection->expects($this->once())
             ->method('close')
@@ -57,7 +57,7 @@ class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
         $this->middleware->handle($envelope, $this->getStackMock());
     }
 
-    public function testInvalidEntityManagerThrowsException()
+    public function testInvalidEntityManagerThrowsException(): void
     {
         $this->connection->expects($this->never())->method('getDatabasePlatform');
         $managerRegistry = $this->createStub(ManagerRegistry::class);
@@ -73,7 +73,7 @@ class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
         $middleware->handle(new Envelope(new \stdClass()), $this->getStackMock(false));
     }
 
-    public function testMiddlewareNotCloseInNonWorkerContext()
+    public function testMiddlewareNotCloseInNonWorkerContext(): void
     {
         $this->connection->expects($this->never())
             ->method('close')

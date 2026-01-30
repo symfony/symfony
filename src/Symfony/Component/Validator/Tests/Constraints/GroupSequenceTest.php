@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraints\GroupSequence;
  */
 class GroupSequenceTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $sequence = new GroupSequence(['Group 1', 'Group 2']);
 

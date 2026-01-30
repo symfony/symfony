@@ -20,7 +20,7 @@ use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 
 class PhpSerializerTest extends TestCase
 {
-    public function testEncodedIsDecodable()
+    public function testEncodedIsDecodable(): void
     {
         $serializer = $this->createPhpSerializer();
 
@@ -31,7 +31,7 @@ class PhpSerializerTest extends TestCase
         $this->assertEquals($envelope, $serializer->decode($encoded));
     }
 
-    public function testDecodingFailsWithMissingBodyKey()
+    public function testDecodingFailsWithMissingBodyKey(): void
     {
         $serializer = $this->createPhpSerializer();
 
@@ -41,7 +41,7 @@ class PhpSerializerTest extends TestCase
         $serializer->decode([]);
     }
 
-    public function testDecodingFailsWithBadFormat()
+    public function testDecodingFailsWithBadFormat(): void
     {
         $serializer = $this->createPhpSerializer();
 
@@ -53,7 +53,7 @@ class PhpSerializerTest extends TestCase
         ]);
     }
 
-    public function testDecodingFailsWithBadBase64Body()
+    public function testDecodingFailsWithBadBase64Body(): void
     {
         $serializer = $this->createPhpSerializer();
 
@@ -65,7 +65,7 @@ class PhpSerializerTest extends TestCase
         ]);
     }
 
-    public function testDecodingFailsWithBadClass()
+    public function testDecodingFailsWithBadClass(): void
     {
         $serializer = $this->createPhpSerializer();
 
@@ -77,7 +77,7 @@ class PhpSerializerTest extends TestCase
         ]);
     }
 
-    public function testDecodingFailsForPropertyTypeMismatch()
+    public function testDecodingFailsForPropertyTypeMismatch(): void
     {
         $serializer = $this->createPhpSerializer();
         $encodedEnvelope = $serializer->encode(new Envelope(new DummyMessage('true')));
@@ -90,7 +90,7 @@ class PhpSerializerTest extends TestCase
         $serializer->decode($encodedEnvelope);
     }
 
-    public function testEncodedSkipsNonEncodeableStamps()
+    public function testEncodedSkipsNonEncodeableStamps(): void
     {
         $serializer = $this->createPhpSerializer();
 
@@ -102,7 +102,7 @@ class PhpSerializerTest extends TestCase
         $this->assertStringNotContainsString('DummyPhpSerializerNonSendableStamp', $encoded['body']);
     }
 
-    public function testNonUtf8IsBase64Encoded()
+    public function testNonUtf8IsBase64Encoded(): void
     {
         $serializer = $this->createPhpSerializer();
 

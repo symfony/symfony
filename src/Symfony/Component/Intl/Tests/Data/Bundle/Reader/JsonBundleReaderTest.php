@@ -28,7 +28,7 @@ class JsonBundleReaderTest extends TestCase
         $this->reader = new JsonBundleReader();
     }
 
-    public function testReadReturnsArray()
+    public function testReadReturnsArray(): void
     {
         $data = $this->reader->read(__DIR__.'/Fixtures/json', 'en');
 
@@ -37,31 +37,31 @@ class JsonBundleReaderTest extends TestCase
         $this->assertArrayNotHasKey('ExistsNot', $data);
     }
 
-    public function testReadFailsIfNonExistingLocale()
+    public function testReadFailsIfNonExistingLocale(): void
     {
         $this->expectException(ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/json', 'foo');
     }
 
-    public function testReadFailsIfNonExistingDirectory()
+    public function testReadFailsIfNonExistingDirectory(): void
     {
         $this->expectException(RuntimeException::class);
         $this->reader->read(__DIR__.'/foo', 'en');
     }
 
-    public function testReadFailsIfNotAFile()
+    public function testReadFailsIfNotAFile(): void
     {
         $this->expectException(RuntimeException::class);
         $this->reader->read(__DIR__.'/Fixtures/NotAFile', 'en');
     }
 
-    public function testReadFailsIfInvalidJson()
+    public function testReadFailsIfInvalidJson(): void
     {
         $this->expectException(RuntimeException::class);
         $this->reader->read(__DIR__.'/Fixtures/json', 'en_Invalid');
     }
 
-    public function testReaderDoesNotBreakOutOfGivenPath()
+    public function testReaderDoesNotBreakOutOfGivenPath(): void
     {
         $this->expectException(ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/json', '../invalid_directory/en');

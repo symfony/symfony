@@ -19,7 +19,7 @@ use Symfony\Component\Translation\Loader\MoFileLoader;
 
 class MoFileLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new MoFileLoader();
         $resource = __DIR__.'/../Fixtures/resources.mo';
@@ -30,7 +30,7 @@ class MoFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
-    public function testLoadPlurals()
+    public function testLoadPlurals(): void
     {
         $loader = new MoFileLoader();
         $resource = __DIR__.'/../Fixtures/plurals.mo';
@@ -44,21 +44,21 @@ class MoFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $this->expectException(NotFoundResourceException::class);
 
         (new MoFileLoader())->load(__DIR__.'/../Fixtures/non-existing.mo', 'en', 'domain1');
     }
 
-    public function testLoadInvalidResource()
+    public function testLoadInvalidResource(): void
     {
         $this->expectException(InvalidResourceException::class);
 
         (new MoFileLoader())->load(__DIR__.'/../Fixtures/empty.mo', 'en', 'domain1');
     }
 
-    public function testLoadEmptyTranslation()
+    public function testLoadEmptyTranslation(): void
     {
         $loader = new MoFileLoader();
         $resource = __DIR__.'/../Fixtures/empty-translation.mo';

@@ -16,7 +16,7 @@ use Symfony\Component\Cache\LockRegistry;
 
 class LockRegistryTest extends TestCase
 {
-    public function testFiles()
+    public function testFiles(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('LockRegistry is disabled on Windows');

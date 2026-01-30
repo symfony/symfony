@@ -17,10 +17,10 @@ use Symfony\Component\HttpClient\Response\HttplugPromise;
 
 class HttplugPromiseTest extends TestCase
 {
-    public function testComplexNesting()
+    public function testComplexNesting(): void
     {
         $mkPromise = static function ($result): HttplugPromise {
-            $guzzlePromise = new Promise(static function () use (&$guzzlePromise, $result) {
+            $guzzlePromise = new Promise(static function () use (&$guzzlePromise, $result): void {
                 $guzzlePromise->resolve($result);
             });
 

@@ -23,44 +23,44 @@ use Symfony\Component\Mime\RawMessage;
 
 class EnvelopeTest extends TestCase
 {
-    public function testConstructorWithAddressSender()
+    public function testConstructorWithAddressSender(): void
     {
         $e = new Envelope(new Address('fabien@symfony.com'), [new Address('thomas@symfony.com')]);
         $this->assertEquals(new Address('fabien@symfony.com'), $e->getSender());
     }
 
-    public function testConstructorWithAddressSenderAndNonAsciiCharactersInLocalPartOfAddress()
+    public function testConstructorWithAddressSenderAndNonAsciiCharactersInLocalPartOfAddress(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid sender "fabièn@symfony.com": non-ASCII characters not supported in local-part of email.');
         new Envelope(new Address('fabièn@symfony.com'), [new Address('thomas@symfony.com')]);
     }
 
-    public function testConstructorWithNamedAddressSender()
+    public function testConstructorWithNamedAddressSender(): void
     {
         $e = new Envelope($sender = new Address('fabien@symfony.com', 'Fabien'), [new Address('thomas@symfony.com')]);
         $this->assertEquals($sender, $e->getSender());
     }
 
-    public function testConstructorWithAddressRecipients()
+    public function testConstructorWithAddressRecipients(): void
     {
         $e = new Envelope(new Address('fabien@symfony.com'), [new Address('thomas@symfony.com'), new Address('lucas@symfony.com', 'Lucas')]);
         $this->assertEquals([new Address('thomas@symfony.com'), new Address('lucas@symfony.com')], $e->getRecipients());
     }
 
-    public function testConstructorWithNoRecipients()
+    public function testConstructorWithNoRecipients(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new Envelope(new Address('fabien@symfony.com'), []);
     }
 
-    public function testConstructorWithWrongRecipients()
+    public function testConstructorWithWrongRecipients(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new Envelope(new Address('fabien@symfony.com'), ['lucas@symfony.com']);
     }
 
-    public function testSenderFromHeaders()
+    public function testSenderFromHeaders(): void
     {
         $headers = new Headers();
         $headers->addPathHeader('Return-Path', $return = new Address('return@symfony.com', 'return'));
@@ -81,7 +81,7 @@ class EnvelopeTest extends TestCase
         $this->assertEquals($from, $e->getSender());
     }
 
-    public function testSenderFromHeadersFailsWithNonAsciiCharactersInLocalPart()
+    public function testSenderFromHeadersFailsWithNonAsciiCharactersInLocalPart(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid sender "fabièn@symfony.com": non-ASCII characters not supported in local-part of email.');
@@ -89,7 +89,7 @@ class EnvelopeTest extends TestCase
         Envelope::create($message)->getSender();
     }
 
-    public function testSenderFromHeadersWithoutFrom()
+    public function testSenderFromHeadersWithoutFrom(): void
     {
         $headers = new Headers();
         $headers->addMailboxListHeader('To', ['to@symfony.com']);
@@ -98,7 +98,7 @@ class EnvelopeTest extends TestCase
         $this->assertEquals($from, $e->getSender());
     }
 
-    public function testSenderFromHeadersWithMultipleHeaders()
+    public function testSenderFromHeadersWithMultipleHeaders(): void
     {
         $headers = new Headers();
         $headers->addMailboxListHeader('From', [new Address('from@symfony.com', 'from'), 'some@symfony.com']);
@@ -116,7 +116,7 @@ class EnvelopeTest extends TestCase
         $this->assertEquals($return, $e->getSender());
     }
 
-    public function testRecipientsFromHeaders()
+    public function testRecipientsFromHeaders(): void
     {
         $headers = new Headers();
         $headers->addPathHeader('Return-Path', 'return@symfony.com');
@@ -127,7 +127,7 @@ class EnvelopeTest extends TestCase
         $this->assertEquals([new Address('to@symfony.com'), new Address('cc@symfony.com'), new Address('bcc@symfony.com')], $e->getRecipients());
     }
 
-    public function testUnicodeLocalparts()
+    public function testUnicodeLocalparts(): void
     {
         /* dømi means example and is reserved by the .fo registry */
         $i = new Address('info@dømi.fo');
@@ -140,7 +140,7 @@ class EnvelopeTest extends TestCase
         $this->assertTrue($e->anyAddressHasUnicodeLocalpart());
     }
 
-    public function testRecipientsFromHeadersWithNames()
+    public function testRecipientsFromHeadersWithNames(): void
     {
         $headers = new Headers();
         $headers->addPathHeader('Return-Path', 'return@symfony.com');
@@ -151,7 +151,7 @@ class EnvelopeTest extends TestCase
         $this->assertEquals([new Address('to@symfony.com', 'to'), new Address('cc@symfony.com', 'cc'), new Address('bcc@symfony.com', 'bcc')], $e->getRecipients());
     }
 
-    public function testFromRawMessages()
+    public function testFromRawMessages(): void
     {
         $this->expectException(LogicException::class);
 

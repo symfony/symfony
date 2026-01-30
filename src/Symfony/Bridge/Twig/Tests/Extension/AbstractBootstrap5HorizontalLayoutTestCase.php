@@ -26,7 +26,7 @@ use Symfony\Component\Form\FormError;
  */
 abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootstrap5LayoutTestCase
 {
-    public function testRow()
+    public function testRow(): void
     {
         $form = $this->factory->createNamed('')->add('name', TextType::class);
         $form->get('name')->addError(new FormError('[trans]Error![/trans]'));
@@ -53,7 +53,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testRowWithCustomClass()
+    public function testRowWithCustomClass(): void
     {
         $form = $this->factory->createNamed('')->add('name', TextType::class);
         $form->get('name')->addError(new FormError('[trans]Error![/trans]'));
@@ -84,7 +84,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testLabelOnForm()
+    public function testLabelOnForm(): void
     {
         $form = $this->factory->createNamed('name', DateType::class, null, ['widget' => 'choice']);
         $view = $form->createView();
@@ -99,7 +99,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testLabelDoesNotRenderFieldAttributes()
+    public function testLabelDoesNotRenderFieldAttributes(): void
     {
         $form = $this->factory->createNamed('name', TextType::class);
         $html = $this->renderLabel($form->createView(), null, [
@@ -116,7 +116,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testLabelWithCustomAttributesPassedDirectly()
+    public function testLabelWithCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', TextType::class);
         $html = $this->renderLabel($form->createView(), null, [
@@ -133,7 +133,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testLabelWithCustomTextAndCustomAttributesPassedDirectly()
+    public function testLabelWithCustomTextAndCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', TextType::class);
         $html = $this->renderLabel($form->createView(), 'Custom label', [
@@ -151,7 +151,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
+    public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
             'label' => 'Custom label',
@@ -171,7 +171,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testLabelHtmlDefaultIsFalse()
+    public function testLabelHtmlDefaultIsFalse(): void
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
             'label' => '<b>Bolded label</b>',
@@ -187,7 +187,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class col-form-label col-sm-2 required"]/b[.="Bolded label"]', 0);
     }
 
-    public function testLabelHtmlIsTrue()
+    public function testLabelHtmlIsTrue(): void
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
             'label' => '<b>Bolded label</b>',
@@ -204,7 +204,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class col-form-label col-sm-2 required"]/b[.="Bolded label"]');
     }
 
-    public function testLegendOnExpandedType()
+    public function testLegendOnExpandedType(): void
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, null, [
             'label' => 'Custom label',
@@ -223,7 +223,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testCheckboxRow()
+    public function testCheckboxRow(): void
     {
         $form = $this->factory->createNamed('name', CheckboxType::class);
         $view = $form->createView();
@@ -232,7 +232,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         $this->assertMatchesXpath($html, '/div[@class="mb-3 row"]/div[@class="col-sm-2" or @class="col-sm-10"]', 2);
     }
 
-    public function testCheckboxRowWithHelp()
+    public function testCheckboxRowWithHelp(): void
     {
         $form = $this->factory->createNamed('name', CheckboxType::class);
         $view = $form->createView();
@@ -254,7 +254,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testRadioRowWithHelp()
+    public function testRadioRowWithHelp(): void
     {
         $form = $this->factory->createNamed('name', RadioType::class, false);
         $html = $this->renderRow($form->createView(), ['label' => 'foo', 'help' => 'really helpful text']);
@@ -275,7 +275,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testFileWithGroup()
+    public function testFileWithGroup(): void
     {
         $form = $this->factory->createNamed('name', FileType::class);
         $html = $this->renderRow($form->createView(), [
@@ -314,7 +314,7 @@ abstract class AbstractBootstrap5HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testFloatingLabel()
+    public function testFloatingLabel(): void
     {
         $form = $this->factory->createNamed('name', TextType::class, null, [
             'attr' => [

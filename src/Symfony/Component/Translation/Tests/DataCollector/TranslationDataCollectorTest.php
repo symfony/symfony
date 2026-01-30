@@ -21,7 +21,7 @@ use Symfony\Component\Translation\Translator;
 
 class TranslationDataCollectorTest extends TestCase
 {
-    public function testCollectEmptyMessages()
+    public function testCollectEmptyMessages(): void
     {
         $dataCollector = new TranslationDataCollector(new DataCollectorTranslator(new Translator('en')));
         $dataCollector->lateCollect();
@@ -32,7 +32,7 @@ class TranslationDataCollectorTest extends TestCase
         $this->assertEquals([], $dataCollector->getMessages()->getValue());
     }
 
-    public function testCollect()
+    public function testCollect(): void
     {
         $expectedMessages = [
             [
@@ -95,7 +95,7 @@ class TranslationDataCollectorTest extends TestCase
         $this->assertEquals($expectedMessages, array_values($dataCollector->getMessages()->getValue(true)));
     }
 
-    public function testCollectAndReset()
+    public function testCollectAndReset(): void
     {
         $translator = new Translator('fr');
         $translator->setFallbackLocales(['en']);

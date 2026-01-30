@@ -16,7 +16,7 @@ use Symfony\Component\Config\ConfigCacheFactory;
 
 class ConfigCacheFactoryTest extends TestCase
 {
-    public function testCacheWithInvalidCallback()
+    public function testCacheWithInvalidCallback(): void
     {
         $cacheFactory = new ConfigCacheFactory(true);
 

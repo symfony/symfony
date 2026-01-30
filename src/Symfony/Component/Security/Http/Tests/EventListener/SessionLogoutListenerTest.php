@@ -19,7 +19,7 @@ use Symfony\Component\Security\Http\EventListener\SessionLogoutListener;
 
 class SessionLogoutListenerTest extends TestCase
 {
-    public function testOnLogoutIfHasNoSession()
+    public function testOnLogoutIfHasNoSession(): void
     {
         $request = $this->createMock(Request::class);
         $request->method('hasSession')->willReturn(false);
@@ -29,7 +29,7 @@ class SessionLogoutListenerTest extends TestCase
         $sessionLogoutListener->onLogout(new LogoutEvent($request, null));
     }
 
-    public function testOnLogoutIfHasSession()
+    public function testOnLogoutIfHasSession(): void
     {
         $session = $this->createMock(Session::class);
         $session->expects($this->once())->method('invalidate');

@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class ProfilerTest extends AbstractWebTestCase
 {
     #[DataProvider('getConfigs')]
-    public function testProfilerIsDisabled($insulate)
+    public function testProfilerIsDisabled($insulate): void
     {
         $client = $this->createClient(['test_case' => 'Profiler', 'root_config' => 'config.yml']);
         if ($insulate) {
@@ -37,7 +37,7 @@ class ProfilerTest extends AbstractWebTestCase
     }
 
     #[DataProvider('getConfigs')]
-    public function testProfilerCollectParameter($insulate)
+    public function testProfilerCollectParameter($insulate): void
     {
         $client = $this->createClient(['test_case' => 'ProfilerCollectParameter', 'root_config' => 'config.yml']);
         if ($insulate) {

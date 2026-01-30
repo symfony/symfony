@@ -21,7 +21,7 @@ use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
 class PropertyInfoPassTest extends TestCase
 {
     #[DataProvider('provideTags')]
-    public function testServicesAreOrderedAccordingToPriority($index, $tag)
+    public function testServicesAreOrderedAccordingToPriority($index, $tag): void
     {
         $container = new ContainerBuilder();
 
@@ -52,7 +52,7 @@ class PropertyInfoPassTest extends TestCase
         ];
     }
 
-    public function testReturningEmptyArrayWhenNoService()
+    public function testReturningEmptyArrayWhenNoService(): void
     {
         $container = new ContainerBuilder();
         $propertyInfoExtractorDefinition = $container->register('property_info')

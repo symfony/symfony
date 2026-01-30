@@ -21,7 +21,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class TraceableVoterTest extends TestCase
 {
-    public function testGetDecoratedVoterClass()
+    public function testGetDecoratedVoterClass(): void
     {
         $voter = $this->createStub(VoterInterface::class);
 
@@ -29,7 +29,7 @@ class TraceableVoterTest extends TestCase
         $this->assertSame($voter, $sut->getDecoratedVoter());
     }
 
-    public function testVote()
+    public function testVote(): void
     {
         $voter = $this->createMock(VoterInterface::class);
 
@@ -53,7 +53,7 @@ class TraceableVoterTest extends TestCase
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
     }
 
-    public function testSupportsAttributeOnCacheable()
+    public function testSupportsAttributeOnCacheable(): void
     {
         $voter = $this->createMock(CacheableVoterInterface::class);
         $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
@@ -69,7 +69,7 @@ class TraceableVoterTest extends TestCase
         $this->assertFalse($sut->supportsAttribute('foo'));
     }
 
-    public function testSupportsTypeOnCacheable()
+    public function testSupportsTypeOnCacheable(): void
     {
         $voter = $this->createMock(CacheableVoterInterface::class);
         $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
@@ -85,7 +85,7 @@ class TraceableVoterTest extends TestCase
         $this->assertFalse($sut->supportsType('foo'));
     }
 
-    public function testSupportsAttributeOnNonCacheable()
+    public function testSupportsAttributeOnNonCacheable(): void
     {
         $voter = $this->createStub(VoterInterface::class);
         $eventDispatcher = $this->createStub(EventDispatcherInterface::class);
@@ -95,7 +95,7 @@ class TraceableVoterTest extends TestCase
         $this->assertTrue($sut->supportsAttribute('foo'));
     }
 
-    public function testSupportsTypeOnNonCacheable()
+    public function testSupportsTypeOnNonCacheable(): void
     {
         $voter = $this->createStub(VoterInterface::class);
         $eventDispatcher = $this->createStub(EventDispatcherInterface::class);

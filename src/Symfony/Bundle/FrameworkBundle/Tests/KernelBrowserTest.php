@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class KernelBrowserTest extends AbstractWebTestCase
 {
-    public function testRebootKernelBetweenRequests()
+    public function testRebootKernelBetweenRequests(): void
     {
         $mock = $this->getKernelMock();
         $mock->expects($this->once())->method('shutdown');
@@ -28,7 +28,7 @@ class KernelBrowserTest extends AbstractWebTestCase
         $client->request('GET', '/');
     }
 
-    public function testDisabledRebootKernel()
+    public function testDisabledRebootKernel(): void
     {
         $mock = $this->getKernelMock();
         $mock->expects($this->never())->method('shutdown');
@@ -39,7 +39,7 @@ class KernelBrowserTest extends AbstractWebTestCase
         $client->request('GET', '/');
     }
 
-    public function testEnableRebootKernel()
+    public function testEnableRebootKernel(): void
     {
         $mock = $this->getKernelMock();
         $mock->expects($this->once())->method('shutdown');
@@ -52,7 +52,7 @@ class KernelBrowserTest extends AbstractWebTestCase
         $client->request('GET', '/');
     }
 
-    public function testRequestAfterKernelShutdownAndPerformedRequest()
+    public function testRequestAfterKernelShutdownAndPerformedRequest(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -62,7 +62,7 @@ class KernelBrowserTest extends AbstractWebTestCase
         $client->request('GET', '/');
     }
 
-    public function testGetProfileWithoutRequest()
+    public function testGetProfileWithoutRequest(): void
     {
         $browser = new KernelBrowser($this->createStub(KernelInterface::class));
 

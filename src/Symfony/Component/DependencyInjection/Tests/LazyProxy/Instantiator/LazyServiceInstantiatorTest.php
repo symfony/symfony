@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\AbstractSayClass;
 
 class LazyServiceInstantiatorTest extends TestCase
 {
-    public function testInstantiateAbstractClassProxy()
+    public function testInstantiateAbstractClassProxy(): void
     {
         $instantiator = new LazyServiceInstantiator();
         $instance = new class extends AbstractSayClass {

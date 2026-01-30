@@ -22,7 +22,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 class DebugProcessorTest extends TestCase
 {
-    public function testDatetimeFormat()
+    public function testDatetimeFormat(): void
     {
         $record = RecordFactory::create(datetime: new \DateTimeImmutable('2019-01-01T00:01:00+00:00'));
         $processor = new DebugProcessor();
@@ -33,7 +33,7 @@ class DebugProcessorTest extends TestCase
         self::assertSame(1546300860, $records[0]['timestamp']);
     }
 
-    public function testDatetimeRfc3339Format()
+    public function testDatetimeRfc3339Format(): void
     {
         $record = RecordFactory::create(datetime: new \DateTimeImmutable('2019-01-01T00:01:00+00:00'));
         $processor = new DebugProcessor();
@@ -44,7 +44,7 @@ class DebugProcessorTest extends TestCase
         self::assertSame('2019-01-01T00:01:00.000+00:00', $records[0]['timestamp_rfc3339']);
     }
 
-    public function testDebugProcessor()
+    public function testDebugProcessor(): void
     {
         $processor = new DebugProcessor();
         $processor(self::getRecord());
@@ -54,7 +54,7 @@ class DebugProcessorTest extends TestCase
         $this->assertSame(1, $processor->countErrors());
     }
 
-    public function testDebugProcessorWithoutLogs()
+    public function testDebugProcessorWithoutLogs(): void
     {
         $processor = new DebugProcessor();
 
@@ -62,7 +62,7 @@ class DebugProcessorTest extends TestCase
         $this->assertSame(0, $processor->countErrors());
     }
 
-    public function testWithRequestStack()
+    public function testWithRequestStack(): void
     {
         $stack = new RequestStack();
         $processor = new DebugProcessor($stack);
@@ -88,13 +88,13 @@ class DebugProcessorTest extends TestCase
         $this->assertSame(0, $processor->countErrors(new Request()));
     }
 
-    public function testInheritedClassCallGetLogsWithoutArgument()
+    public function testInheritedClassCallGetLogsWithoutArgument(): void
     {
         $debugProcessorChild = new ClassThatInheritDebugProcessor();
         $this->assertSame([], $debugProcessorChild->getLogs());
     }
 
-    public function testInheritedClassCallCountErrorsWithoutArgument()
+    public function testInheritedClassCallCountErrorsWithoutArgument(): void
     {
         $debugProcessorChild = new ClassThatInheritDebugProcessor();
         $this->assertEquals(0, $debugProcessorChild->countErrors());

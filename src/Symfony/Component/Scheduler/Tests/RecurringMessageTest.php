@@ -17,7 +17,7 @@ use Symfony\Component\Scheduler\RecurringMessage;
 
 class RecurringMessageTest extends TestCase
 {
-    public function testCanCreateHashedCronMessage()
+    public function testCanCreateHashedCronMessage(): void
     {
         $object = new DummyStringableMessage();
 
@@ -25,14 +25,14 @@ class RecurringMessageTest extends TestCase
         $this->assertSame('30 0 * * 3', (string) RecurringMessage::cron('#weekly', $object)->getTrigger());
     }
 
-    public function testHashedCronContextIsRequiredIfMessageIsNotStringable()
+    public function testHashedCronContextIsRequiredIfMessageIsNotStringable(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         RecurringMessage::cron('#midnight', new \stdClass());
     }
 
-    public function testUniqueId()
+    public function testUniqueId(): void
     {
         $message1 = RecurringMessage::cron('* * * * *', new \stdClass());
         $message2 = RecurringMessage::cron('* 5 * * *', new \stdClass());

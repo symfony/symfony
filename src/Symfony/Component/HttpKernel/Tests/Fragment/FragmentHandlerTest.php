@@ -29,14 +29,14 @@ class FragmentHandlerTest extends TestCase
         $this->requestStack->push(Request::create('/'));
     }
 
-    public function testRenderWhenRendererDoesNotExist()
+    public function testRenderWhenRendererDoesNotExist(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $handler = new FragmentHandler($this->requestStack);
         $handler->render('/', 'foo');
     }
 
-    public function testRenderWithUnknownRenderer()
+    public function testRenderWithUnknownRenderer(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $handler = $this->getHandler(new Response('foo'));
@@ -44,7 +44,7 @@ class FragmentHandlerTest extends TestCase
         $handler->render('/', 'bar');
     }
 
-    public function testDeliverWithUnsuccessfulResponse()
+    public function testDeliverWithUnsuccessfulResponse(): void
     {
         $handler = $this->getHandler(new Response('foo', 404));
         try {
@@ -62,7 +62,7 @@ class FragmentHandlerTest extends TestCase
         }
     }
 
-    public function testRender()
+    public function testRender(): void
     {
         $expectedRequest = Request::create('/');
         $handler = $this->getHandler(

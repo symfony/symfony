@@ -29,7 +29,7 @@ class SequentiallyValidatorTest extends ConstraintValidatorTestCase
         return new SequentiallyValidator();
     }
 
-    public function testWalkThroughConstraints()
+    public function testWalkThroughConstraints(): void
     {
         $constraints = [
             new Type('number'),
@@ -46,7 +46,7 @@ class SequentiallyValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testStopsAtFirstConstraintWithViolations()
+    public function testStopsAtFirstConstraintWithViolations(): void
     {
         $constraints = [
             new Type('string'),
@@ -64,7 +64,7 @@ class SequentiallyValidatorTest extends ConstraintValidatorTestCase
         $this->assertCount(1, $this->context->getViolations());
     }
 
-    public function testNestedConstraintsAreNotExecutedWhenGroupDoesNotMatch()
+    public function testNestedConstraintsAreNotExecutedWhenGroupDoesNotMatch(): void
     {
         $validator = Validation::createValidator();
 

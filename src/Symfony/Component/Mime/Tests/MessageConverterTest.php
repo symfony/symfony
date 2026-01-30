@@ -19,7 +19,7 @@ use Symfony\Component\Mime\Part\DataPart;
 
 class MessageConverterTest extends TestCase
 {
-    public function testToEmail()
+    public function testToEmail(): void
     {
         $file = file_get_contents(__DIR__.'/Fixtures/mimetypes/test.gif');
         $email = (new Email())->from('fabien@symfony.com')->to('you@example.com');
@@ -65,7 +65,7 @@ class MessageConverterTest extends TestCase
         );
     }
 
-    private function assertConversion(Email $expected)
+    private function assertConversion(Email $expected): void
     {
         $r = new \ReflectionMethod($expected, 'generateBody');
 

@@ -17,7 +17,7 @@ use Symfony\Component\Notifier\Bridge\Slack\Block\SlackSectionBlock;
 
 final class SlackSectionBlockTest extends TestCase
 {
-    public function testCanBeInstantiated()
+    public function testCanBeInstantiated(): void
     {
         $section = new SlackSectionBlock();
         $section->text('section text');
@@ -58,7 +58,7 @@ final class SlackSectionBlockTest extends TestCase
         ], $section->toArray());
     }
 
-    public function testThrowsWhenFieldsLimitReached()
+    public function testThrowsWhenFieldsLimitReached(): void
     {
         $section = new SlackSectionBlock();
         for ($i = 0; $i < 10; ++$i) {

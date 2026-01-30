@@ -22,20 +22,20 @@ use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
  */
 class NativePasswordHasherTest extends TestCase
 {
-    public function testCostBelowRange()
+    public function testCostBelowRange(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new NativePasswordHasher(null, null, 3);
     }
 
-    public function testCostAboveRange()
+    public function testCostAboveRange(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new NativePasswordHasher(null, null, 32);
     }
 
     #[DataProvider('validRangeData')]
-    public function testCostInRange($cost)
+    public function testCostInRange($cost): void
     {
         $this->assertInstanceOf(NativePasswordHasher::class, new NativePasswordHasher(null, null, $cost));
     }
@@ -43,12 +43,12 @@ class NativePasswordHasherTest extends TestCase
     public static function validRangeData()
     {
         $costs = range(4, 31);
-        array_walk($costs, static function (&$cost) { $cost = [$cost]; });
+        array_walk($costs, static function (&$cost): void { $cost = [$cost]; });
 
         return $costs;
     }
 
-    public function testValidation()
+    public function testValidation(): void
     {
         $hasher = new NativePasswordHasher();
         $result = $hasher->hash('password', null);
@@ -57,7 +57,7 @@ class NativePasswordHasherTest extends TestCase
         $this->assertFalse($hasher->verify($result, ''));
     }
 
-    public function testNonArgonValidation()
+    public function testNonArgonValidation(): void
     {
         $hasher = new NativePasswordHasher();
         $this->assertTrue($hasher->verify('$5$abcdefgh$ZLdkj8mkc2XVSrPVjskDAgZPGjtj1VGVaa1aUkrMTU/', 'password'));
@@ -66,7 +66,7 @@ class NativePasswordHasherTest extends TestCase
         $this->assertFalse($hasher->verify('$6$abcdefgh$yVfUwsw5T.JApa8POvClA1pQ5peiq97DUNyXCZN5IrF.BMSkiaLQ5kvpuEm/VQ1Tvh/KV2TcaWh8qinoW5dhA1', 'anotherPassword'));
     }
 
-    public function testConfiguredAlgorithm()
+    public function testConfiguredAlgorithm(): void
     {
         $hasher = new NativePasswordHasher(null, null, null, \PASSWORD_BCRYPT);
         $result = $hasher->hash('password');
@@ -74,7 +74,7 @@ class NativePasswordHasherTest extends TestCase
         $this->assertStringStartsWith('$2', $result);
     }
 
-    public function testDefaultAlgorithm()
+    public function testDefaultAlgorithm(): void
     {
         $hasher = new NativePasswordHasher();
         $result = $hasher->hash('password');
@@ -82,7 +82,7 @@ class NativePasswordHasherTest extends TestCase
         $this->assertStringStartsWith('$2', $result);
     }
 
-    public function testConfiguredAlgorithmWithLegacyConstValue()
+    public function testConfiguredAlgorithmWithLegacyConstValue(): void
     {
         $hasher = new NativePasswordHasher(null, null, null, '1');
         $result = $hasher->hash('password');
@@ -90,7 +90,7 @@ class NativePasswordHasherTest extends TestCase
         $this->assertStringStartsWith('$2', $result);
     }
 
-    public function testBcryptWithLongPassword()
+    public function testBcryptWithLongPassword(): void
     {
         $hasher = new NativePasswordHasher(null, null, 4, \PASSWORD_BCRYPT);
         $plainPassword = str_repeat('a', 100);
@@ -99,7 +99,7 @@ class NativePasswordHasherTest extends TestCase
         $this->assertTrue($hasher->verify($hasher->hash($plainPassword), $plainPassword));
     }
 
-    public function testPasswordNulByteGracefullyHandled()
+    public function testPasswordNulByteGracefullyHandled(): void
     {
         $hasher = new NativePasswordHasher(null, null, 4, \PASSWORD_BCRYPT);
         $plainPassword = "a\0b";
@@ -107,7 +107,7 @@ class NativePasswordHasherTest extends TestCase
         $this->assertTrue($hasher->verify($hasher->hash($plainPassword), $plainPassword));
     }
 
-    public function testNeedsRehash()
+    public function testNeedsRehash(): void
     {
         $hasher = new NativePasswordHasher(4, 11000, 4);
 
@@ -120,7 +120,7 @@ class NativePasswordHasherTest extends TestCase
         $this->assertTrue($hasher->needsRehash($hash));
     }
 
-    public function testLowOpsLimitsThrows()
+    public function testLowOpsLimitsThrows(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/\$opsLimit must be (\d+) or greater\./');
@@ -128,7 +128,7 @@ class NativePasswordHasherTest extends TestCase
         new NativePasswordHasher(2);
     }
 
-    public function testLowMemLimitThrows()
+    public function testLowMemLimitThrows(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/\$memLimit must be (\d+)(.?) or greater\./');
@@ -138,7 +138,7 @@ class NativePasswordHasherTest extends TestCase
 
     #[TestWithJson('[1]')]
     #[TestWithJson('[40]')]
-    public function testInvalidCostThrows(int $cost)
+    public function testInvalidCostThrows(int $cost): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/\$cost must be in the range of (\d+)-(\d+)\./');
@@ -146,7 +146,7 @@ class NativePasswordHasherTest extends TestCase
         new NativePasswordHasher(4, 11000, $cost);
     }
 
-    public function testHashTooLongPasswordThrows()
+    public function testHashTooLongPasswordThrows(): void
     {
         $this->expectException(InvalidPasswordException::class);
 

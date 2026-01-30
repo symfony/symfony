@@ -19,7 +19,7 @@ use Symfony\Component\String\Slugger\AsciiSlugger;
 class AsciiSluggerTest extends TestCase
 {
     #[DataProvider('provideSlugTests')]
-    public function testSlug(string $expected, string $string, string $separator = '-', ?string $locale = null)
+    public function testSlug(string $expected, string $string, string $separator = '-', ?string $locale = null): void
     {
         $slugger = new AsciiSlugger();
 
@@ -49,7 +49,7 @@ class AsciiSluggerTest extends TestCase
 
     #[RequiresPhpExtension('intl')]
     #[DataProvider('provideSlugEmojiTests')]
-    public function testSlugEmoji(string $expected, string $string, ?string $locale, string|bool $emoji = true)
+    public function testSlugEmoji(string $expected, string $string, ?string $locale, string|bool $emoji = true): void
     {
         $slugger = new AsciiSlugger();
         $slugger = $slugger->withEmoji($emoji);
@@ -105,7 +105,7 @@ class AsciiSluggerTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testSlugEmojiWithSetLocale()
+    public function testSlugEmojiWithSetLocale(): void
     {
         if (!setlocale(\LC_ALL, 'C.UTF-8')) {
             $this->markTestSkipped('Unable to switch to the "C.UTF-8" locale.');

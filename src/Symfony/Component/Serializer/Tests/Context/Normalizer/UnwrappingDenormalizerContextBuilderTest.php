@@ -33,7 +33,7 @@ class UnwrappingDenormalizerContextBuilderTest extends TestCase
      * @param array<string, mixed> $values
      */
     #[DataProvider('withersDataProvider')]
-    public function testWithers(array $values)
+    public function testWithers(array $values): void
     {
         $context = $this->contextBuilder
             ->withUnwrapPath($values[UnwrappingDenormalizer::UNWRAP_PATH])
@@ -56,7 +56,7 @@ class UnwrappingDenormalizerContextBuilderTest extends TestCase
         ]];
     }
 
-    public function testCannotSetInvalidPropertyPath()
+    public function testCannotSetInvalidPropertyPath(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->contextBuilder->withUnwrapPath('invalid path...');

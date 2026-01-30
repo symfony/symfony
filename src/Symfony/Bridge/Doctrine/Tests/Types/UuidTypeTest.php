@@ -44,7 +44,7 @@ final class UuidTypeTest extends TestCase
         $this->type = Type::getType('uuid');
     }
 
-    public function testUuidConvertsToDatabaseValue()
+    public function testUuidConvertsToDatabaseValue(): void
     {
         $uuid = Uuid::fromString(self::DUMMY_UUID);
 
@@ -54,7 +54,7 @@ final class UuidTypeTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testUuidInterfaceConvertsToNativeUidDatabaseValue()
+    public function testUuidInterfaceConvertsToNativeUidDatabaseValue(): void
     {
         $uuid = $this->createMock(AbstractUid::class);
 
@@ -68,7 +68,7 @@ final class UuidTypeTest extends TestCase
         $this->assertEquals('foo', $actual);
     }
 
-    public function testUuidInterfaceConvertsToBinaryDatabaseValue()
+    public function testUuidInterfaceConvertsToBinaryDatabaseValue(): void
     {
         $uuid = $this->createMock(AbstractUid::class);
 
@@ -82,26 +82,26 @@ final class UuidTypeTest extends TestCase
         $this->assertEquals('foo', $actual);
     }
 
-    public function testUuidStringConvertsToDatabaseValue()
+    public function testUuidStringConvertsToDatabaseValue(): void
     {
         $actual = $this->type->convertToDatabaseValue(self::DUMMY_UUID, new PostgreSQLPlatform());
 
         $this->assertEquals(self::DUMMY_UUID, $actual);
     }
 
-    public function testNotSupportedTypeConversionForDatabaseValue()
+    public function testNotSupportedTypeConversionForDatabaseValue(): void
     {
         $this->expectException(ConversionException::class);
 
         $this->type->convertToDatabaseValue(new \stdClass(), new SQLitePlatform());
     }
 
-    public function testNullConversionForDatabaseValue()
+    public function testNullConversionForDatabaseValue(): void
     {
         $this->assertNull($this->type->convertToDatabaseValue(null, new SQLitePlatform()));
     }
 
-    public function testUuidInterfaceConvertsToPHPValue()
+    public function testUuidInterfaceConvertsToPHPValue(): void
     {
         $uuid = $this->createStub(AbstractUid::class);
         $actual = $this->type->convertToPHPValue($uuid, new SQLitePlatform());
@@ -109,7 +109,7 @@ final class UuidTypeTest extends TestCase
         $this->assertSame($uuid, $actual);
     }
 
-    public function testUuidConvertsToPHPValue()
+    public function testUuidConvertsToPHPValue(): void
     {
         $uuid = $this->type->convertToPHPValue(self::DUMMY_UUID, new SQLitePlatform());
 
@@ -117,32 +117,32 @@ final class UuidTypeTest extends TestCase
         $this->assertEquals(self::DUMMY_UUID, $uuid->__toString());
     }
 
-    public function testInvalidUuidConversionForPHPValue()
+    public function testInvalidUuidConversionForPHPValue(): void
     {
         $this->expectException(ConversionException::class);
 
         $this->type->convertToPHPValue('abcdefg', new SQLitePlatform());
     }
 
-    public function testNullConversionForPHPValue()
+    public function testNullConversionForPHPValue(): void
     {
         $this->assertNull($this->type->convertToPHPValue(null, new SQLitePlatform()));
     }
 
-    public function testReturnValueIfUuidForPHPValue()
+    public function testReturnValueIfUuidForPHPValue(): void
     {
         $uuid = Uuid::v4();
 
         $this->assertSame($uuid, $this->type->convertToPHPValue($uuid, new SQLitePlatform()));
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('uuid', $this->type->getName());
     }
 
     #[DataProvider('provideSqlDeclarations')]
-    public function testGetGuidTypeDeclarationSQL(AbstractPlatform $platform, string $expectedDeclaration)
+    public function testGetGuidTypeDeclarationSQL(AbstractPlatform $platform, string $expectedDeclaration): void
     {
         $this->assertEquals($expectedDeclaration, $this->type->getSqlDeclaration(['length' => 36], $platform));
     }
@@ -155,7 +155,7 @@ final class UuidTypeTest extends TestCase
         yield [new MariaDBPlatform(), 'BINARY(16)'];
     }
 
-    public function testRequiresSQLCommentHint()
+    public function testRequiresSQLCommentHint(): void
     {
         $this->assertTrue($this->type->requiresSQLCommentHint(new SQLitePlatform()));
     }

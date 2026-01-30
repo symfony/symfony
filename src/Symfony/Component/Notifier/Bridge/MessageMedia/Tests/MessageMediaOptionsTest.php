@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaOptions;
 
 class MessageMediaOptionsTest extends TestCase
 {
-    public function testMessageMediaOptions()
+    public function testMessageMediaOptions(): void
     {
         $messageMediaOptions = (new MessageMediaOptions())->
             media(['test_media'])

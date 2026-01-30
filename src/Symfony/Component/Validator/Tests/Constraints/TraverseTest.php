@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Mapping\TraversalStrategy;
 
 class TraverseTest extends TestCase
 {
-    public function testPositiveAttributes()
+    public function testPositiveAttributes(): void
     {
         $metadata = new ClassMetadata(TraverseDummy::class);
         $loader = new AttributeLoader();
@@ -27,7 +27,7 @@ class TraverseTest extends TestCase
         self::assertSame(TraversalStrategy::TRAVERSE, $metadata->getTraversalStrategy());
     }
 
-    public function testNegativeAttribute()
+    public function testNegativeAttribute(): void
     {
         $metadata = new ClassMetadata(DoNotTraverseMe::class);
         $loader = new AttributeLoader();

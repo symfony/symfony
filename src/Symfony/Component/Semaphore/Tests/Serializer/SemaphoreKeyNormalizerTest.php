@@ -18,7 +18,7 @@ use Symfony\Component\Semaphore\Store\RedisStore;
 
 class SemaphoreKeyNormalizerTest extends TestCase
 {
-    public function testNormalizeAndDenormalize()
+    public function testNormalizeAndDenormalize(): void
     {
         $key = new Key(__METHOD__, 5, 2);
         $key->setState(RedisStore::class, base64_encode(random_bytes(32)));

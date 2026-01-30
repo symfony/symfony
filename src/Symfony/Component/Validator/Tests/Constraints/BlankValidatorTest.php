@@ -23,14 +23,14 @@ class BlankValidatorTest extends ConstraintValidatorTestCase
         return new BlankValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Blank());
 
         $this->assertNoViolation();
     }
 
-    public function testBlankIsValid()
+    public function testBlankIsValid(): void
     {
         $this->validator->validate('', new Blank());
 
@@ -38,7 +38,7 @@ class BlankValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidValues')]
-    public function testInvalidValues($value, $valueAsString)
+    public function testInvalidValues($value, $valueAsString): void
     {
         $constraint = new Blank(
             message: 'myMessage',

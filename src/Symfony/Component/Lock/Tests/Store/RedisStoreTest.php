@@ -42,7 +42,7 @@ class RedisStoreTest extends AbstractRedisStoreTestCase
         return $redis;
     }
 
-    public function testInvalidTtl()
+    public function testInvalidTtl(): void
     {
         $this->expectException(InvalidTtlException::class);
         new RedisStore($this->getRedisConnection(), -1);

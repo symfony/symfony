@@ -42,7 +42,7 @@ class PercentTypeTest extends TypeTestCase
         }
     }
 
-    public function testSubmitWithRoundingMode()
+    public function testSubmitWithRoundingMode(): void
     {
         $form = $this->factory->create(self::TESTED_TYPE, null, [
             'scale' => 2,
@@ -54,7 +54,7 @@ class PercentTypeTest extends TypeTestCase
         $this->assertEquals(0.0124, $form->getData());
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = '10', $expectedData = 0.1)
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = '10', $expectedData = 0.1): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'empty_data' => $emptyData,
@@ -67,7 +67,7 @@ class PercentTypeTest extends TypeTestCase
         $this->assertSame($expectedData, $form->getData());
     }
 
-    public function testHtml5EnablesSpecificFormatting()
+    public function testHtml5EnablesSpecificFormatting(): void
     {
         \Locale::setDefault('de_CH');
 
@@ -83,7 +83,7 @@ class PercentTypeTest extends TypeTestCase
         $this->assertSame('number', $form->createView()->vars['type']);
     }
 
-    public function testSubmitWithoutRoundingMode()
+    public function testSubmitWithoutRoundingMode(): void
     {
         $form = $this->factory->create(self::TESTED_TYPE, null, [
             'scale' => 2,

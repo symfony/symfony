@@ -53,7 +53,7 @@ final class MessageMediaTransportTest extends TransportTestCase
      * @throws TransportExceptionInterface
      */
     #[DataProvider('exceptionIsThrownWhenHttpSendFailedProvider')]
-    public function testExceptionIsThrownWhenHttpSendFailed(int $statusCode, string $content, string $expectedExceptionMessage)
+    public function testExceptionIsThrownWhenHttpSendFailed(int $statusCode, string $content, string $expectedExceptionMessage): void
     {
         $client = new MockHttpClient(new MockResponse($content, ['http_code' => $statusCode]));
 

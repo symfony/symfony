@@ -32,7 +32,7 @@ class HttpBasicAuthenticatorTest extends TestCase
         $this->authenticator = new HttpBasicAuthenticator('test', $this->userProvider);
     }
 
-    public function testExtractCredentialsAndUserFromRequest()
+    public function testExtractCredentialsAndUserFromRequest(): void
     {
         $request = new Request([], [], [], [], [], [
             'PHP_AUTH_USER' => 'TheUsername',
@@ -48,7 +48,7 @@ class HttpBasicAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideMissingHttpBasicServerParameters')]
-    public function testHttpBasicServerParametersMissing(array $serverParameters)
+    public function testHttpBasicServerParametersMissing(array $serverParameters): void
     {
         $request = new Request([], [], [], [], [], $serverParameters);
 
@@ -63,7 +63,7 @@ class HttpBasicAuthenticatorTest extends TestCase
         ];
     }
 
-    public function testUpgradePassword()
+    public function testUpgradePassword(): void
     {
         $request = new Request([], [], [], [], [], [
             'PHP_AUTH_USER' => 'TheUsername',

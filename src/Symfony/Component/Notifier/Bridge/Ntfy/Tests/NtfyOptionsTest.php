@@ -19,7 +19,7 @@ use Symfony\Component\Notifier\Bridge\Ntfy\NtfyOptions;
  */
 class NtfyOptionsTest extends TestCase
 {
-    public function testNtfyOptions()
+    public function testNtfyOptions(): void
     {
         $delay = (new \DateTime())->add(new \DateInterval('PT1M'));
         $ntfyOptions = (new NtfyOptions())

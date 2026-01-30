@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TreeStyleTest extends TestCase
 {
-    public function testDefaultStyle()
+    public function testDefaultStyle(): void
     {
         $output = new BufferedOutput();
         $tree = self::createTree($output);
@@ -46,7 +46,7 @@ class TreeStyleTest extends TestCase
         );
     }
 
-    public function testBoxStyle()
+    public function testBoxStyle(): void
     {
         $output = new BufferedOutput();
         $this->createTree($output, TreeStyle::box())->render();
@@ -70,7 +70,7 @@ class TreeStyleTest extends TestCase
         );
     }
 
-    public function testBoxDoubleStyle()
+    public function testBoxDoubleStyle(): void
     {
         $output = new BufferedOutput();
         $this->createTree($output, TreeStyle::boxDouble())->render();
@@ -94,7 +94,7 @@ class TreeStyleTest extends TestCase
         );
     }
 
-    public function testCompactStyle()
+    public function testCompactStyle(): void
     {
         $output = new BufferedOutput();
         $this->createTree($output, TreeStyle::compact())->render();
@@ -118,7 +118,7 @@ class TreeStyleTest extends TestCase
         );
     }
 
-    public function testLightStyle()
+    public function testLightStyle(): void
     {
         $output = new BufferedOutput();
         $this->createTree($output, TreeStyle::light())->render();
@@ -142,7 +142,7 @@ class TreeStyleTest extends TestCase
         );
     }
 
-    public function testMinimalStyle()
+    public function testMinimalStyle(): void
     {
         $output = new BufferedOutput();
         $this->createTree($output, TreeStyle::minimal())->render();
@@ -166,7 +166,7 @@ class TreeStyleTest extends TestCase
         );
     }
 
-    public function testRoundedStyle()
+    public function testRoundedStyle(): void
     {
         $output = new BufferedOutput();
         $this->createTree($output, TreeStyle::rounded())->render();
@@ -190,7 +190,7 @@ class TreeStyleTest extends TestCase
         );
     }
 
-    public function testCustomPrefix()
+    public function testCustomPrefix(): void
     {
         $style = new TreeStyle('A ', 'B ', 'C ', 'D ', 'E ', 'F ');
         $output = new BufferedOutput();

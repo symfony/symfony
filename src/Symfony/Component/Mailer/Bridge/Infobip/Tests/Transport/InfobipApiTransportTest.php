@@ -58,12 +58,12 @@ class InfobipApiTransportTest extends TestCase
         unset($this->response, $this->httpClient, $this->transport);
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertSame('infobip+api://99999.api.infobip.com', (string) $this->transport);
     }
 
-    public function testInfobipShouldBeCalledWithTheRightMethodAndUrlAndHeaders()
+    public function testInfobipShouldBeCalledWithTheRightMethodAndUrlAndHeaders(): void
     {
         $email = $this->basicValidEmail();
 
@@ -80,7 +80,7 @@ class InfobipApiTransportTest extends TestCase
         $this->assertStringMatchesFormat('Content-Length: %d', $options['headers'][3]);
     }
 
-    public function testSendMinimalEmailShouldCalledInfobipWithTheRightParameters()
+    public function testSendMinimalEmailShouldCalledInfobipWithTheRightParameters(): void
     {
         $email = (new Email())
             ->subject('Subject of the email')
@@ -124,7 +124,7 @@ class InfobipApiTransportTest extends TestCase
         );
     }
 
-    public function testSendFullEmailShouldCalledInfobipWithTheRightParameters()
+    public function testSendFullEmailShouldCalledInfobipWithTheRightParameters(): void
     {
         $email = (new Email())
             ->subject('Subject of the email')
@@ -203,7 +203,7 @@ class InfobipApiTransportTest extends TestCase
         );
     }
 
-    public function testSendEmailWithAttachmentsShouldCalledInfobipWithTheRightParameters()
+    public function testSendEmailWithAttachmentsShouldCalledInfobipWithTheRightParameters(): void
     {
         $email = $this->basicValidEmail()
             ->text('foobar')
@@ -241,7 +241,7 @@ class InfobipApiTransportTest extends TestCase
         );
     }
 
-    public function testSendEmailWithHeadersShouldCalledInfobipWithTheRightParameters()
+    public function testSendEmailWithHeadersShouldCalledInfobipWithTheRightParameters(): void
     {
         $email = $this->basicValidEmail();
         $email->getHeaders()
@@ -321,7 +321,7 @@ class InfobipApiTransportTest extends TestCase
         );
     }
 
-    public function testSendMinimalEmailWithSuccess()
+    public function testSendMinimalEmailWithSuccess(): void
     {
         $email = (new Email())
             ->subject('Subject of the email')
@@ -350,7 +350,7 @@ class InfobipApiTransportTest extends TestCase
         );
     }
 
-    public function testSendFullEmailWithSuccess()
+    public function testSendFullEmailWithSuccess(): void
     {
         $email = (new Email())
             ->subject('Subject of the email')
@@ -397,7 +397,7 @@ class InfobipApiTransportTest extends TestCase
         $this->assertEquals([new Address('bcc@example.com')], $sentMessage->getOriginalMessage()->getBcc());
     }
 
-    public function testSendEmailWithAttachmentsWithSuccess()
+    public function testSendEmailWithAttachmentsWithSuccess(): void
     {
         $email = $this->basicValidEmail()
             ->text('foobar')
@@ -437,7 +437,7 @@ class InfobipApiTransportTest extends TestCase
         );
     }
 
-    public function testSendEmailWithHeadersWithSuccess()
+    public function testSendEmailWithHeadersWithSuccess(): void
     {
         $email = $this->basicValidEmail();
         $email->getHeaders()
@@ -472,7 +472,7 @@ class InfobipApiTransportTest extends TestCase
         );
     }
 
-    public function testSentMessageShouldCaptureInfobipMessageId()
+    public function testSentMessageShouldCaptureInfobipMessageId(): void
     {
         $this->response = new MockResponse('{"messages": [{"messageId": "somexternalMessageId0"}]}');
         $email = $this->basicValidEmail();
@@ -482,7 +482,7 @@ class InfobipApiTransportTest extends TestCase
         $this->assertSame('somexternalMessageId0', $sentMessage->getMessageId());
     }
 
-    public function testInfobipResponseShouldNotBeEmpty()
+    public function testInfobipResponseShouldNotBeEmpty(): void
     {
         $this->response = new MockResponse();
         $email = $this->basicValidEmail();
@@ -493,7 +493,7 @@ class InfobipApiTransportTest extends TestCase
         $this->transport->send($email);
     }
 
-    public function testInfobipResponseShouldBeStatusCode200()
+    public function testInfobipResponseShouldBeStatusCode200(): void
     {
         $this->response = new MockResponse('{"requestError": {"serviceException": {"messageId": "string","text": "string"}}}', ['http_code' => 400]);
         $email = $this->basicValidEmail();
@@ -504,7 +504,7 @@ class InfobipApiTransportTest extends TestCase
         $this->transport->send($email);
     }
 
-    public function testInfobipHttpConnectionFailed()
+    public function testInfobipHttpConnectionFailed(): void
     {
         $this->response = new MockResponse('', ['error' => 'Test error']);
         $email = $this->basicValidEmail();

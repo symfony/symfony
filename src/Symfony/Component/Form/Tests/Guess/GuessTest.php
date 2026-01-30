@@ -20,7 +20,7 @@ class TestGuess extends Guess
 
 class GuessTest extends TestCase
 {
-    public function testGetBestGuessReturnsGuessWithHighestConfidence()
+    public function testGetBestGuessReturnsGuessWithHighestConfidence(): void
     {
         $guess1 = new TestGuess(Guess::MEDIUM_CONFIDENCE);
         $guess2 = new TestGuess(Guess::LOW_CONFIDENCE);
@@ -29,7 +29,7 @@ class GuessTest extends TestCase
         $this->assertSame($guess3, Guess::getBestGuess([$guess1, $guess2, $guess3]));
     }
 
-    public function testGuessExpectsValidConfidence()
+    public function testGuessExpectsValidConfidence(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new TestGuess(5);

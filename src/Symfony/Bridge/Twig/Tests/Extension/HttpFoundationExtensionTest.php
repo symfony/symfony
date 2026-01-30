@@ -22,7 +22,7 @@ use Symfony\Component\Routing\RequestContext;
 class HttpFoundationExtensionTest extends TestCase
 {
     #[DataProvider('getGenerateAbsoluteUrlData')]
-    public function testGenerateAbsoluteUrl($expected, $path, $pathinfo)
+    public function testGenerateAbsoluteUrl($expected, $path, $pathinfo): void
     {
         $stack = new RequestStack();
         $stack->push(Request::create($pathinfo));
@@ -55,7 +55,7 @@ class HttpFoundationExtensionTest extends TestCase
     }
 
     #[DataProvider('getGenerateAbsoluteUrlRequestContextData')]
-    public function testGenerateAbsoluteUrlWithRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
+    public function testGenerateAbsoluteUrlWithRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected): void
     {
         $requestContext = new RequestContext($baseUrl, 'GET', $host, $scheme, $httpPort, $httpsPort, $path);
         $extension = new HttpFoundationExtension(new UrlHelper(new RequestStack(), $requestContext));
@@ -64,7 +64,7 @@ class HttpFoundationExtensionTest extends TestCase
     }
 
     #[DataProvider('getGenerateAbsoluteUrlRequestContextData')]
-    public function testGenerateAbsoluteUrlWithoutRequestAndRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
+    public function testGenerateAbsoluteUrlWithoutRequestAndRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected): void
     {
         $extension = new HttpFoundationExtension(new UrlHelper(new RequestStack()));
 
@@ -85,7 +85,7 @@ class HttpFoundationExtensionTest extends TestCase
         ];
     }
 
-    public function testGenerateAbsoluteUrlWithScriptFileName()
+    public function testGenerateAbsoluteUrlWithScriptFileName(): void
     {
         $request = Request::create('http://localhost/app/web/app_dev.php');
         $request->server->set('SCRIPT_FILENAME', '/var/www/app/web/app_dev.php');
@@ -101,7 +101,7 @@ class HttpFoundationExtensionTest extends TestCase
     }
 
     #[DataProvider('getGenerateRelativePathData')]
-    public function testGenerateRelativePath($expected, $path, $pathinfo)
+    public function testGenerateRelativePath($expected, $path, $pathinfo): void
     {
         $stack = new RequestStack();
         $stack->push(Request::create($pathinfo));

@@ -19,7 +19,7 @@ use Symfony\Component\Cache\Adapter\TraceableTagAwareAdapter;
 #[Group('time-sensitive')]
 class TraceableTagAwareAdapterTest extends TraceableAdapterTest
 {
-    public function testInvalidateTags()
+    public function testInvalidateTags(): void
     {
         $pool = new TraceableTagAwareAdapter(new TagAwareAdapter(new FilesystemAdapter()));
         $pool->invalidateTags(['foo']);

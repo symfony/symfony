@@ -20,7 +20,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class CompiledUrlMatcherTest extends UrlMatcherTest
 {
-    public function testStaticHostIsCaseInsensitive()
+    public function testStaticHostIsCaseInsensitive(): void
     {
         $collection = new RouteCollection();
         $collection->add('static_host_route', new Route('/test', [], [], [], 'API.example.com'));

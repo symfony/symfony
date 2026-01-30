@@ -30,14 +30,14 @@ abstract class BaseValidatorExtensionTestCase extends TypeTestCase
         parent::setUp();
     }
 
-    public function testValidationGroupNullByDefault()
+    public function testValidationGroupNullByDefault(): void
     {
         $form = $this->createForm();
 
         $this->assertNull($form->getConfig()->getOption('validation_groups'));
     }
 
-    public function testValidationGroupsTransformedToArray()
+    public function testValidationGroupsTransformedToArray(): void
     {
         $form = $this->createForm([
             'validation_groups' => 'group',
@@ -46,7 +46,7 @@ abstract class BaseValidatorExtensionTestCase extends TypeTestCase
         $this->assertEquals(['group'], $form->getConfig()->getOption('validation_groups'));
     }
 
-    public function testValidationGroupsCanBeSetToArray()
+    public function testValidationGroupsCanBeSetToArray(): void
     {
         $form = $this->createForm([
             'validation_groups' => ['group1', 'group2'],
@@ -55,7 +55,7 @@ abstract class BaseValidatorExtensionTestCase extends TypeTestCase
         $this->assertEquals(['group1', 'group2'], $form->getConfig()->getOption('validation_groups'));
     }
 
-    public function testValidationGroupsCanBeSetToFalse()
+    public function testValidationGroupsCanBeSetToFalse(): void
     {
         $form = $this->createForm([
             'validation_groups' => false,
@@ -64,7 +64,7 @@ abstract class BaseValidatorExtensionTestCase extends TypeTestCase
         $this->assertEquals([], $form->getConfig()->getOption('validation_groups'));
     }
 
-    public function testValidationGroupsCanBeSetToCallback()
+    public function testValidationGroupsCanBeSetToCallback(): void
     {
         $form = $this->createForm([
             'validation_groups' => $this->testValidationGroupsCanBeSetToCallback(...),
@@ -73,16 +73,16 @@ abstract class BaseValidatorExtensionTestCase extends TypeTestCase
         $this->assertIsCallable($form->getConfig()->getOption('validation_groups'));
     }
 
-    public function testValidationGroupsCanBeSetToClosure()
+    public function testValidationGroupsCanBeSetToClosure(): void
     {
         $form = $this->createForm([
-            'validation_groups' => static function (FormInterface $form) { },
+            'validation_groups' => static function (FormInterface $form): void { },
         ]);
 
         $this->assertIsCallable($form->getConfig()->getOption('validation_groups'));
     }
 
-    public function testValidationGroupsCanBeSetToGroupSequence()
+    public function testValidationGroupsCanBeSetToGroupSequence(): void
     {
         $form = $this->createForm([
             'validation_groups' => new GroupSequence(['group1', 'group2']),

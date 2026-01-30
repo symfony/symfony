@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\FooController;
 class RouteTest extends TestCase
 {
     #[DataProvider('getValidParameters')]
-    public function testLoadFromAttribute(string $methodName, string $property, mixed $expectedReturn)
+    public function testLoadFromAttribute(string $methodName, string $property, mixed $expectedReturn): void
     {
         $route = (new \ReflectionMethod(FooController::class, $methodName))->getAttributes(Route::class)[0]->newInstance();
 

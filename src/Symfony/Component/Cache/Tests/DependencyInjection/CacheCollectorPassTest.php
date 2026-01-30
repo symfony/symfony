@@ -27,7 +27,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CacheCollectorPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -73,7 +73,7 @@ class CacheCollectorPassTest extends TestCase
         $this->assertEquals([new Reference('fs.recorder_inner'), 'setCallbackWrapper'], $innerFs->getMethodCalls()[0][1][0]->getArgument(2)->getFactory());
     }
 
-    public function testProcessCacheObjectsAreDecorated()
+    public function testProcessCacheObjectsAreDecorated(): void
     {
         $container = new ContainerBuilder();
         $collector = $container->register('data_collector.cache', CacheDataCollector::class);

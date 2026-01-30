@@ -29,19 +29,19 @@ use Symfony\Component\Security\Csrf\SameOriginCsrfTokenManager;
 
 class SameOriginCsrfTokenManagerTest extends TestCase
 {
-    public function testInvalidCookieName()
+    public function testInvalidCookieName(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new SameOriginCsrfTokenManager(new RequestStack(), new NullLogger(), null, [], SameOriginCsrfTokenManager::CHECK_NO_HEADER, '');
     }
 
-    public function testInvalidCookieNameCharacters()
+    public function testInvalidCookieNameCharacters(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new SameOriginCsrfTokenManager(new RequestStack(), new NullLogger(), null, [], SameOriginCsrfTokenManager::CHECK_NO_HEADER, 'invalid name!');
     }
 
-    public function testGetToken()
+    public function testGetToken(): void
     {
         $csrfTokenManager = new SameOriginCsrfTokenManager(new RequestStack(), new NullLogger());
         $tokenId = 'test_token';
@@ -51,7 +51,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertSame($tokenId, $token->getId());
     }
 
-    public function testNoRequest()
+    public function testNoRequest(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $csrfTokenManager = new SameOriginCsrfTokenManager(new RequestStack(), $logger);
@@ -61,7 +61,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertFalse($csrfTokenManager->isTokenValid($token));
     }
 
-    public function testInvalidTokenLength()
+    public function testInvalidTokenLength(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $request = new Request();
@@ -75,7 +75,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertFalse($csrfTokenManager->isTokenValid($token));
     }
 
-    public function testInvalidOrigin()
+    public function testInvalidOrigin(): void
     {
         $request = new Request();
         $request->headers->set('Origin', 'http://malicious.com');
@@ -90,7 +90,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertFalse($csrfTokenManager->isTokenValid($token));
     }
 
-    public function testValidOrigin()
+    public function testValidOrigin(): void
     {
         $request = new Request();
         $request->headers->set('Origin', $request->getSchemeAndHttpHost());
@@ -107,7 +107,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertSame(1 | (1 << 8), $request->attributes->get('csrf-token'));
     }
 
-    public function testValidRefererInvalidOrigin()
+    public function testValidRefererInvalidOrigin(): void
     {
         $request = new Request();
         $request->headers->set('Origin', 'http://localhost:1234');
@@ -124,7 +124,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertSame(1 | (1 << 8), $request->attributes->get('csrf-token'));
     }
 
-    public function testSecFetchSiteSameOrigin()
+    public function testSecFetchSiteSameOrigin(): void
     {
         $request = new Request();
         $request->headers->set('Sec-Fetch-Site', 'same-origin');
@@ -140,7 +140,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertSame(1 | (1 << 8), $request->attributes->get('csrf-token'));
     }
 
-    public function testSecFetchSiteCrossSite()
+    public function testSecFetchSiteCrossSite(): void
     {
         $request = new Request();
         $request->headers->set('Sec-Fetch-Site', 'cross-site');
@@ -155,7 +155,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertFalse($csrfTokenManager->isTokenValid($token));
     }
 
-    public function testValidOriginAfterDoubleSubmit()
+    public function testValidOriginAfterDoubleSubmit(): void
     {
         $session = new Session(new MockArraySessionStorage('sess'));
         $request = new Request();
@@ -174,7 +174,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertFalse($csrfTokenManager->isTokenValid($token));
     }
 
-    public function testMissingPreviousOrigin()
+    public function testMissingPreviousOrigin(): void
     {
         $session = new Session(new MockArraySessionStorage('sess'));
         $request = new Request();
@@ -193,7 +193,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertFalse($csrfTokenManager->isTokenValid($token));
     }
 
-    public function testValidDoubleSubmit()
+    public function testValidDoubleSubmit(): void
     {
         $request = new Request();
         $request->cookies->set('csrf-token_'.str_repeat('a', 24), 'csrf-token');
@@ -209,7 +209,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertSame(2 << 8, $request->attributes->get('csrf-token'));
     }
 
-    public function testCheckOnlyHeader()
+    public function testCheckOnlyHeader(): void
     {
         $request = new Request();
         $tokenValue = str_repeat('a', 24);
@@ -232,7 +232,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
     #[TestWith([0])]
     #[TestWith([1])]
     #[TestWith([2])]
-    public function testValidOriginMissingDoubleSubmit(int $checkHeader)
+    public function testValidOriginMissingDoubleSubmit(int $checkHeader): void
     {
         $request = new Request();
         $tokenValue = str_repeat('a', 24);
@@ -248,7 +248,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
         $this->assertTrue($csrfTokenManager->isTokenValid($token));
     }
 
-    public function testMissingEverything()
+    public function testMissingEverything(): void
     {
         $request = new Request();
         $requestStack = new RequestStack();
@@ -264,7 +264,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testClearCookies()
+    public function testClearCookies(): void
     {
         $csrfTokenManager = new SameOriginCsrfTokenManager(new RequestStack(), new NullLogger());
 
@@ -278,7 +278,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testPersistStrategyWithStartedSession()
+    public function testPersistStrategyWithStartedSession(): void
     {
         $session = new Session(new MockArraySessionStorage());
         $session->start();
@@ -295,7 +295,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testPersistStrategyWithSessionNotStarted()
+    public function testPersistStrategyWithSessionNotStarted(): void
     {
         $session = new Session(new MockArraySessionStorage());
 
@@ -311,7 +311,7 @@ class SameOriginCsrfTokenManagerTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testOnKernelResponse()
+    public function testOnKernelResponse(): void
     {
         $csrfTokenManager = new SameOriginCsrfTokenManager(new RequestStack(), new NullLogger());
 

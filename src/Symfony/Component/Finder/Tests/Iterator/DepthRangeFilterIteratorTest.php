@@ -17,7 +17,7 @@ use Symfony\Component\Finder\Iterator\DepthRangeFilterIterator;
 class DepthRangeFilterIteratorTest extends RealIteratorTestCase
 {
     #[DataProvider('getAcceptData')]
-    public function testAccept($minDepth, $maxDepth, $expected)
+    public function testAccept($minDepth, $maxDepth, $expected): void
     {
         $inner = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->toAbsolute(), \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST);
 

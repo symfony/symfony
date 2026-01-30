@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class EarlyExpirationMessageTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $pool = new ArrayAdapter();
         $item = $pool->getItem('foo');
@@ -58,7 +58,7 @@ class EarlyExpirationMessageTest extends TestCase
         $this->assertSame($computationService, $msg->findCallback($reverseContainer));
     }
 
-    public function testCreateWithNonAnonymousClosureBoundToInstance()
+    public function testCreateWithNonAnonymousClosureBoundToInstance(): void
     {
         $pool = new ArrayAdapter();
         $item = $pool->getItem('foo');
@@ -96,7 +96,7 @@ class EarlyExpirationMessageTest extends TestCase
         $this->assertSame('cache_pool', $msg->getPool());
     }
 
-    public function testCreateWithAnonymousClosure()
+    public function testCreateWithAnonymousClosure(): void
     {
         $pool = new ArrayAdapter();
         $item = $pool->getItem('foo');

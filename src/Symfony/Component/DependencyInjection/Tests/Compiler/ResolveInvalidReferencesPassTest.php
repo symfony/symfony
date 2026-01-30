@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ResolveInvalidReferencesPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $def = $container
@@ -40,7 +40,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->assertCount(0, $def->getMethodCalls());
     }
 
-    public function testProcessIgnoreInvalidArgumentInCollectionArgument()
+    public function testProcessIgnoreInvalidArgumentInCollectionArgument(): void
     {
         $container = new ContainerBuilder();
         $container->register('baz');
@@ -61,7 +61,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->assertSame([$baz, null], $arguments[0]);
     }
 
-    public function testProcessKeepMethodCallOnInvalidArgumentInCollectionArgument()
+    public function testProcessKeepMethodCallOnInvalidArgumentInCollectionArgument(): void
     {
         $container = new ContainerBuilder();
         $container->register('baz');
@@ -83,7 +83,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->assertSame([$baz, null], $calls[0][1][0]);
     }
 
-    public function testProcessIgnoreNonExistentServices()
+    public function testProcessIgnoreNonExistentServices(): void
     {
         $container = new ContainerBuilder();
         $def = $container
@@ -97,7 +97,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->assertEquals('bar', (string) $arguments[0]);
     }
 
-    public function testProcessRemovesPropertiesOnInvalid()
+    public function testProcessRemovesPropertiesOnInvalid(): void
     {
         $container = new ContainerBuilder();
         $def = $container
@@ -110,7 +110,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->assertEquals([], $def->getProperties());
     }
 
-    public function testProcessRemovesArgumentsOnInvalid()
+    public function testProcessRemovesArgumentsOnInvalid(): void
     {
         $container = new ContainerBuilder();
         $def = $container
@@ -128,7 +128,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->assertSame([[[]]], $def->getArguments());
     }
 
-    public function testProcessSetDecoratedAsNullOnInvalid()
+    public function testProcessSetDecoratedAsNullOnInvalid(): void
     {
         $container = new ContainerBuilder();
         $decoratorDefinition = $container
@@ -145,7 +145,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->assertSame([null], $decoratorDefinition->getArguments());
     }
 
-    public function testProcessSetOnlyDecoratedAsNullOnInvalid()
+    public function testProcessSetOnlyDecoratedAsNullOnInvalid(): void
     {
         $container = new ContainerBuilder();
         $unknownArgument = new Reference('unknown_argument');
@@ -165,7 +165,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->assertEquals($unknownArgument, $decoratorDefinition->getArguments()[1]);
     }
 
-    public function testProcessExcludedServiceAndNullOnInvalid()
+    public function testProcessExcludedServiceAndNullOnInvalid(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', \stdClass::class)->addTag('container.excluded');
@@ -176,7 +176,7 @@ class ResolveInvalidReferencesPassTest extends TestCase
         $this->assertSame([null], $container->getDefinition('bar')->getArguments());
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new ResolveInvalidReferencesPass();
         $pass->process($container);

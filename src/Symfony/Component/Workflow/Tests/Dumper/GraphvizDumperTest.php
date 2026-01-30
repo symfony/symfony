@@ -22,7 +22,7 @@ class GraphvizDumperTest extends TestCase
     use WorkflowBuilderTrait;
 
     #[DataProvider('provideWorkflowDefinitionWithoutMarking')]
-    public function testDumpWithoutMarking($definition, $expected, $withMetadata)
+    public function testDumpWithoutMarking($definition, $expected, $withMetadata): void
     {
         $dump = (new GraphvizDumper())->dump($definition, null, ['with-metadata' => $withMetadata]);
 
@@ -30,7 +30,7 @@ class GraphvizDumperTest extends TestCase
     }
 
     #[DataProvider('provideWorkflowDefinitionWithMarking')]
-    public function testDumpWithMarking($definition, $marking, $expected, $withMetadata)
+    public function testDumpWithMarking($definition, $marking, $expected, $withMetadata): void
     {
         $dump = (new GraphvizDumper())->dump($definition, $marking, ['with-metadata' => $withMetadata]);
 

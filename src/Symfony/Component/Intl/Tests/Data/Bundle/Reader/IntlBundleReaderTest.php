@@ -30,7 +30,7 @@ class IntlBundleReaderTest extends TestCase
         $this->reader = new IntlBundleReader();
     }
 
-    public function testReadReturnsArrayAccess()
+    public function testReadReturnsArrayAccess(): void
     {
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'ro');
 
@@ -39,7 +39,7 @@ class IntlBundleReaderTest extends TestCase
         $this->assertArrayNotHasKey('ExistsNot', $data);
     }
 
-    public function testReadFollowsAlias()
+    public function testReadFollowsAlias(): void
     {
         // "alias" = "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'alias');
@@ -49,7 +49,7 @@ class IntlBundleReaderTest extends TestCase
         $this->assertArrayNotHasKey('ExistsNot', $data);
     }
 
-    public function testReadDoesNotFollowFallback()
+    public function testReadDoesNotFollowFallback(): void
     {
         // "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'ro_MD');
@@ -61,7 +61,7 @@ class IntlBundleReaderTest extends TestCase
         $this->assertArrayNotHasKey('ExistsNot', $data);
     }
 
-    public function testReadDoesNotFollowFallbackAlias()
+    public function testReadDoesNotFollowFallbackAlias(): void
     {
         // "mo" = "ro_MD" -> "ro"
         $data = $this->reader->read(__DIR__.'/Fixtures/res', 'mo');
@@ -73,19 +73,19 @@ class IntlBundleReaderTest extends TestCase
         $this->assertArrayNotHasKey('ExistsNot', $data);
     }
 
-    public function testReadFailsIfNonExistingLocale()
+    public function testReadFailsIfNonExistingLocale(): void
     {
         $this->expectException(ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/res', 'foo');
     }
 
-    public function testReadFailsIfNonExistingFallbackLocale()
+    public function testReadFailsIfNonExistingFallbackLocale(): void
     {
         $this->expectException(ResourceBundleNotFoundException::class);
         $this->reader->read(__DIR__.'/Fixtures/res', 'ro_AT');
     }
 
-    public function testReadFailsIfNonExistingDirectory()
+    public function testReadFailsIfNonExistingDirectory(): void
     {
         $this->expectException(RuntimeException::class);
         $this->reader->read(__DIR__.'/foo', 'ro');

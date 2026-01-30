@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\InvokeAddInCommandAc
 
 final class InvokeAddInCommandActionTest extends TestCase
 {
-    public function testName()
+    public function testName(): void
     {
         $action = (new InvokeAddInCommandAction())
             ->name($value = 'My name');
@@ -24,7 +24,7 @@ final class InvokeAddInCommandActionTest extends TestCase
         $this->assertSame($value, $action->toArray()['name']);
     }
 
-    public function testAddInId()
+    public function testAddInId(): void
     {
         $action = (new InvokeAddInCommandAction())
             ->addInId($value = '1234');
@@ -32,7 +32,7 @@ final class InvokeAddInCommandActionTest extends TestCase
         $this->assertSame($value, $action->toArray()['addInId']);
     }
 
-    public function testDesktopCommandId()
+    public function testDesktopCommandId(): void
     {
         $action = (new InvokeAddInCommandAction())
             ->desktopCommandId($value = '324');
@@ -40,7 +40,7 @@ final class InvokeAddInCommandActionTest extends TestCase
         $this->assertSame($value, $action->toArray()['desktopCommandId']);
     }
 
-    public function testInitializationContext()
+    public function testInitializationContext(): void
     {
         $value = [
             'foo' => 'bar',
@@ -52,7 +52,7 @@ final class InvokeAddInCommandActionTest extends TestCase
         $this->assertSame($value, $action->toArray()['initializationContext']);
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $this->assertSame(
             [

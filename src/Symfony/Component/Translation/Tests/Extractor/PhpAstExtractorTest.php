@@ -24,7 +24,7 @@ final class PhpAstExtractorTest extends TestCase
     public const OTHER_DOMAIN = 'not_messages';
 
     #[DataProvider('resourcesProvider')]
-    public function testExtraction(iterable|string $resource)
+    public function testExtraction(iterable|string $resource): void
     {
         $extractor = new PhpAstExtractor([
             new TransMethodVisitor(),
@@ -183,7 +183,7 @@ final class PhpAstExtractorTest extends TestCase
         $this->assertEquals(['sources' => [$filename.':37']], $catalogue->getMetadata('other-domain-test-no-params-short-array', 'not_messages'));
     }
 
-    public function testExtractionFromIndentedHeredocNowdoc()
+    public function testExtractionFromIndentedHeredocNowdoc(): void
     {
         $catalogue = new MessageCatalogue('en');
 

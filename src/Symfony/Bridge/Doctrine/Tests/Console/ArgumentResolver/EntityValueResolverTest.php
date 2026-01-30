@@ -35,7 +35,7 @@ class EntityValueResolverTest extends TestCase
         }
     }
 
-    public function testResolveWithoutArgumentAttribute()
+    public function testResolveWithoutArgumentAttribute(): void
     {
         $manager = $this->createStub(ObjectManager::class);
         $registry = $this->createRegistry($manager);
@@ -51,7 +51,7 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([], iterator_to_array($resolver->resolve('entity', $input, $member)));
     }
 
-    public function testResolveWithoutManager()
+    public function testResolveWithoutManager(): void
     {
         $registry = $this->createRegistry(null);
         $resolver = new EntityValueResolver($registry);
@@ -65,7 +65,7 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([], iterator_to_array($resolver->resolve('entity', $input, $member)));
     }
 
-    public function testResolveWithNoIdAndDataOptional()
+    public function testResolveWithNoIdAndDataOptional(): void
     {
         $manager = $this->createStub(ObjectManager::class);
         $registry = $this->createRegistry($manager);
@@ -83,7 +83,7 @@ class EntityValueResolverTest extends TestCase
         iterator_to_array($resolver->resolve('entity', $input, $member));
     }
 
-    public function testResolveById()
+    public function testResolveById(): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
@@ -109,7 +109,7 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([$object], iterator_to_array($resolver->resolve('entity', $input, $member)));
     }
 
-    public function testResolveByIdWithCustomName()
+    public function testResolveByIdWithCustomName(): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
@@ -135,7 +135,7 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([$object], iterator_to_array($resolver->resolve('entity', $input, $member)));
     }
 
-    public function testResolveByMapping()
+    public function testResolveByMapping(): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
@@ -161,7 +161,7 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([$object], iterator_to_array($resolver->resolve('entity', $input, $member)));
     }
 
-    public function testResolveNotFoundThrowsException()
+    public function testResolveNotFoundThrowsException(): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
@@ -190,7 +190,7 @@ class EntityValueResolverTest extends TestCase
         iterator_to_array($resolver->resolve('entity', $input, $member));
     }
 
-    public function testResolveNotFoundReturnsNullWhenNullable()
+    public function testResolveNotFoundReturnsNullWhenNullable(): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
@@ -216,7 +216,7 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([null], iterator_to_array($resolver->resolve('entity', $input, $member)));
     }
 
-    public function testResolveWithExpression()
+    public function testResolveWithExpression(): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
@@ -250,7 +250,7 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([$object], iterator_to_array($resolver->resolve('entity', $input, $member)));
     }
 
-    public function testResolveWithStripNull()
+    public function testResolveWithStripNull(): void
     {
         $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
@@ -273,7 +273,7 @@ class EntityValueResolverTest extends TestCase
         iterator_to_array($resolver->resolve('entity', $input, $member));
     }
 
-    public function testAlreadyResolved()
+    public function testAlreadyResolved(): void
     {
         $manager = $this->createStub(ObjectManager::class);
         $registry = $this->createRegistry($manager);

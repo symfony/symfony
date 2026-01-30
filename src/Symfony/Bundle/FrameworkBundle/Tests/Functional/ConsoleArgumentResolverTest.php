@@ -33,7 +33,7 @@ class ConsoleArgumentResolverTest extends AbstractWebTestCase
         static::bootKernel(['test_case' => 'ConsoleArgumentResolver', 'root_config' => 'config.yml']);
     }
 
-    public function testCustomArgumentResolver()
+    public function testCustomArgumentResolver(): void
     {
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
@@ -60,7 +60,7 @@ class ConsoleArgumentResolverTest extends AbstractWebTestCase
         $this->assertStringContainsString('CustomOption: option:xml', $output);
     }
 
-    public function testAdvancedFeatures()
+    public function testAdvancedFeatures(): void
     {
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);
@@ -81,7 +81,7 @@ class ConsoleArgumentResolverTest extends AbstractWebTestCase
         $this->assertStringContainsString('Name: test-advanced', $output);
     }
 
-    public function testValueResolverAutoconfiguration()
+    public function testValueResolverAutoconfiguration(): void
     {
         $application = new Application(static::$kernel);
         $application->setAutoExit(false);

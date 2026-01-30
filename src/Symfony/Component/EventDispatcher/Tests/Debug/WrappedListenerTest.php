@@ -22,7 +22,7 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
 class WrappedListenerTest extends TestCase
 {
     #[DataProvider('provideListenersToDescribe')]
-    public function testListenerDescription($listener, $expected)
+    public function testListenerDescription($listener, $expected): void
     {
         $wrappedListener = new WrappedListener($listener, null, new Stopwatch(), new EventDispatcher());
 
@@ -37,15 +37,15 @@ class WrappedListenerTest extends TestCase
             [['Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'],
             [['Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'invalidMethod'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::invalidMethod'],
             ['var_dump', 'var_dump'],
-            [static function () {}, 'closure'],
+            [static function (): void {}, 'closure'],
             [\Closure::fromCallable([new FooListener(), 'listen']), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'],
             [\Closure::fromCallable(['Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic']), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'],
-            [\Closure::fromCallable(static function () {}), 'closure'],
+            [\Closure::fromCallable(static function (): void {}), 'closure'],
             [[#[\Closure(name: FooListener::class)] static fn () => new FooListener(), 'listen'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'],
         ];
     }
 
-    public function testStopwatchEventIsStoppedWhenListenerThrows()
+    public function testStopwatchEventIsStoppedWhenListenerThrows(): void
     {
         $stopwatchEvent = $this->createMock(StopwatchEvent::class);
         $stopwatchEvent->expects(self::once())->method('isStarted')->willReturn(true);
@@ -67,15 +67,15 @@ class WrappedListenerTest extends TestCase
 
 class FooListener
 {
-    public function listen()
+    public function listen(): void
     {
     }
 
-    public function __invoke()
+    public function __invoke(): void
     {
     }
 
-    public static function listenStatic()
+    public static function listenStatic(): void
     {
     }
 }

@@ -24,7 +24,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 class PasswordHasherFactoryTest extends TestCase
 {
-    public function testGetHasherWithMessageDigestHasher()
+    public function testGetHasherWithMessageDigestHasher(): void
     {
         $factory = new PasswordHasherFactory([PasswordAuthenticatedUserInterface::class => [
             'class' => MessageDigestPasswordHasher::class,
@@ -37,7 +37,7 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertEquals($expectedHasher->hash('foo', 'moo'), $hasher->hash('foo', 'moo'));
     }
 
-    public function testGetHasherWithService()
+    public function testGetHasherWithService(): void
     {
         $factory = new PasswordHasherFactory([
             PasswordAuthenticatedUserInterface::class => new MessageDigestPasswordHasher('sha1'),
@@ -48,7 +48,7 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }
 
-    public function testGetHasherWithInstance()
+    public function testGetHasherWithInstance(): void
     {
         $factory = new PasswordHasherFactory([
             PasswordAuthenticatedUserInterface::class => ['instance' => new MessageDigestPasswordHasher('sha1')],
@@ -59,7 +59,7 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }
 
-    public function testGetHasherWithClassName()
+    public function testGetHasherWithClassName(): void
     {
         $factory = new PasswordHasherFactory([
             PasswordAuthenticatedUserInterface::class => new MessageDigestPasswordHasher('sha1'),
@@ -70,7 +70,7 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }
 
-    public function testGetHasherConfiguredForConcreteClassWithService()
+    public function testGetHasherConfiguredForConcreteClassWithService(): void
     {
         $factory = new PasswordHasherFactory([
             'Symfony\Component\Security\Core\User\InMemoryUser' => new MessageDigestPasswordHasher('sha1'),
@@ -81,7 +81,7 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }
 
-    public function testGetHasherConfiguredForConcreteClassWithClassName()
+    public function testGetHasherConfiguredForConcreteClassWithClassName(): void
     {
         $factory = new PasswordHasherFactory([
             'Symfony\Component\PasswordHasher\Tests\Hasher\SomeUser' => new MessageDigestPasswordHasher('sha1'),
@@ -92,7 +92,7 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }
 
-    public function testGetHasherConfiguredWithAuto()
+    public function testGetHasherConfiguredWithAuto(): void
     {
         $factory = new PasswordHasherFactory([
             'auto' => ['algorithm' => 'auto'],
@@ -102,7 +102,7 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertInstanceOf(PasswordHasherInterface::class, $hasher);
     }
 
-    public function testGetNamedHasherForHasherAware()
+    public function testGetNamedHasherForHasherAware(): void
     {
         $factory = new PasswordHasherFactory([
             HasherAwareUser::class => new MessageDigestPasswordHasher('sha256'),
@@ -114,7 +114,7 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }
 
-    public function testGetNullNamedHasherForHasherAware()
+    public function testGetNullNamedHasherForHasherAware(): void
     {
         $factory = new PasswordHasherFactory([
             HasherAwareUser::class => new MessageDigestPasswordHasher('sha1'),
@@ -128,7 +128,7 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }
 
-    public function testGetInvalidNamedHasherForHasherAware()
+    public function testGetInvalidNamedHasherForHasherAware(): void
     {
         $factory = new PasswordHasherFactory([
             HasherAwareUser::class => new MessageDigestPasswordHasher('sha1'),
@@ -143,7 +143,7 @@ class PasswordHasherFactoryTest extends TestCase
         $factory->getPasswordHasher($user);
     }
 
-    public function testGetHasherForHasherAwareWithClassName()
+    public function testGetHasherForHasherAwareWithClassName(): void
     {
         $factory = new PasswordHasherFactory([
             HasherAwareUser::class => new MessageDigestPasswordHasher('sha1'),
@@ -155,7 +155,7 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }
 
-    public function testMigrateFrom()
+    public function testMigrateFrom(): void
     {
         if (!SodiumPasswordHasher::isSupported()) {
             $this->markTestSkipped('Sodium is not available');
@@ -175,7 +175,7 @@ class PasswordHasherFactoryTest extends TestCase
         $this->assertStringStartsWith(\SODIUM_CRYPTO_PWHASH_STRPREFIX, $hasher->hash('foo', null));
     }
 
-    public function testMissingClass()
+    public function testMissingClass(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('"class" must be set in {"arguments":[]}');
@@ -183,7 +183,7 @@ class PasswordHasherFactoryTest extends TestCase
         (new PasswordHasherFactory([SomeUser::class => ['arguments' => []]]))->getPasswordHasher(SomeUser::class);
     }
 
-    public function testMissingArguments()
+    public function testMissingArguments(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('"arguments" must be set in {"class":"stdClass"}');
@@ -191,7 +191,7 @@ class PasswordHasherFactoryTest extends TestCase
         (new PasswordHasherFactory([SomeUser::class => ['class' => \stdClass::class]]))->getPasswordHasher(SomeUser::class);
     }
 
-    public function testDefaultMigratingHashers()
+    public function testDefaultMigratingHashers(): void
     {
         $this->assertInstanceOf(
             MigratingPasswordHasher::class,
@@ -213,7 +213,7 @@ class PasswordHasherFactoryTest extends TestCase
         );
     }
 
-    public function testMigrateFromWithCustomInstance()
+    public function testMigrateFromWithCustomInstance(): void
     {
         if (!SodiumPasswordHasher::isSupported()) {
             $this->markTestSkipped('Sodium is not available');

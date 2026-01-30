@@ -40,7 +40,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTestCase
         return $adapter;
     }
 
-    public function testCreateHostConnection()
+    public function testCreateHostConnection(): void
     {
         $redis = RedisAdapter::createConnection('redis:?host[h1]&host[h2]&host[/foo:]');
         $this->assertInstanceOf(\RedisArray::class, $redis);
@@ -50,7 +50,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTestCase
         $this->doTestCreateConnection(getenv('REDIS_HOST'));
     }
 
-    public function testCreateSocketConnection()
+    public function testCreateSocketConnection(): void
     {
         if (!getenv('REDIS_SOCKET') || !file_exists(getenv('REDIS_SOCKET'))) {
             $this->markTestSkipped('Redis socket not found');
@@ -59,7 +59,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTestCase
         $this->doTestCreateConnection(getenv('REDIS_SOCKET'));
     }
 
-    private function doTestCreateConnection(string $uri)
+    private function doTestCreateConnection(string $uri): void
     {
         $redis = RedisAdapter::createConnection('redis://'.$uri);
         $this->assertInstanceOf(\Redis::class, $redis);
@@ -82,7 +82,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTestCase
         $this->assertEquals(5, $redis->getReadTimeout());
     }
 
-    public function testCreateTlsConnection()
+    public function testCreateTlsConnection(): void
     {
         $redis = RedisAdapter::createConnection('rediss:?host[h1]&host[h2]&host[/foo:]');
         $this->assertInstanceOf(\RedisArray::class, $redis);
@@ -96,7 +96,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTestCase
     }
 
     #[DataProvider('provideFailedCreateConnection')]
-    public function testFailedCreateConnection(string $dsn)
+    public function testFailedCreateConnection(string $dsn): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Redis connection ');
@@ -114,7 +114,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTestCase
     }
 
     #[DataProvider('provideInvalidCreateConnection')]
-    public function testInvalidCreateConnection(string $dsn)
+    public function testInvalidCreateConnection(string $dsn): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid Redis DSN');
@@ -130,7 +130,7 @@ class RedisAdapterTest extends AbstractRedisAdapterTestCase
         ];
     }
 
-    public function testAclUserPasswordAuth()
+    public function testAclUserPasswordAuth(): void
     {
         $redis = RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST'));
 

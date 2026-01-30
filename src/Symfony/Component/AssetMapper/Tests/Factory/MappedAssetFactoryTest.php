@@ -30,7 +30,7 @@ class MappedAssetFactoryTest extends TestCase
 
     private AssetMapperInterface $assetMapper;
 
-    public function testCreateMappedAsset()
+    public function testCreateMappedAsset(): void
     {
         $factory = $this->createFactory();
 
@@ -40,7 +40,7 @@ class MappedAssetFactoryTest extends TestCase
         $this->assertSame('/final-assets/file2.js', $asset->publicPathWithoutDigest);
     }
 
-    public function testCreateMappedAssetRespectsPreDigestedPaths()
+    public function testCreateMappedAssetRespectsPreDigestedPaths(): void
     {
         $assetMapper = $this->createFactory();
         $asset = $assetMapper->createMappedAsset('already-abcdefVWXYZ0123456789.digested.css', self::FIXTURES_DIR.'/dir2/already-abcdefVWXYZ0123456789.digested.css');
@@ -50,7 +50,7 @@ class MappedAssetFactoryTest extends TestCase
         $this->assertSame('/final-assets/already-abcdefVWXYZ0123456789.digested.css', $asset->publicPathWithoutDigest);
     }
 
-    public function testCreateMappedAssetWithContentThatChanged()
+    public function testCreateMappedAssetWithContentThatChanged(): void
     {
         $file1Compiler = new class implements AssetCompilerInterface {
             public function supports(MappedAsset $asset): bool
@@ -75,7 +75,7 @@ class MappedAssetFactoryTest extends TestCase
         $this->assertSame($expected, $asset->content);
     }
 
-    public function testCreateMappedAssetWithContentThatDoesNotChange()
+    public function testCreateMappedAssetWithContentThatDoesNotChange(): void
     {
         $assetMapper = $this->createFactory();
         $asset = $assetMapper->createMappedAsset('file1.css', self::FIXTURES_DIR.'/dir1/file1.css');
@@ -83,7 +83,7 @@ class MappedAssetFactoryTest extends TestCase
         $this->assertNull($asset->content);
     }
 
-    public function testCreateMappedAssetWithContentErrorsOnCircularReferences()
+    public function testCreateMappedAssetWithContentErrorsOnCircularReferences(): void
     {
         $factory = $this->createFactory();
 
@@ -92,7 +92,7 @@ class MappedAssetFactoryTest extends TestCase
         $factory->createMappedAsset('circular1.css', self::FIXTURES_DIR.'/circular_dir/circular1.css');
     }
 
-    public function testCreateMappedAssetWithDigest()
+    public function testCreateMappedAssetWithDigest(): void
     {
         $file6Compiler = new class implements AssetCompilerInterface {
             public function supports(MappedAsset $asset): bool
@@ -123,7 +123,7 @@ class MappedAssetFactoryTest extends TestCase
         $this->assertSame('7e4f24ebddd4ab2a3bcf0d89270b9f30', $asset->digest);
     }
 
-    public function testCreateMappedAssetWithPredigested()
+    public function testCreateMappedAssetWithPredigested(): void
     {
         $assetMapper = $this->createFactory();
         $asset = $assetMapper->createMappedAsset('already-abcdefVWXYZ0123456789.digested.css', self::FIXTURES_DIR.'/dir2/already-abcdefVWXYZ0123456789.digested.css');
@@ -131,7 +131,7 @@ class MappedAssetFactoryTest extends TestCase
         $this->assertTrue($asset->isPredigested);
     }
 
-    public function testCreateMappedAssetInVendor()
+    public function testCreateMappedAssetInVendor(): void
     {
         $assetMapper = $this->createFactory();
         $asset = $assetMapper->createMappedAsset('lodash.js', self::VENDOR_FIXTURES_DIR.'/lodash/lodash.index.js');
@@ -139,7 +139,7 @@ class MappedAssetFactoryTest extends TestCase
         $this->assertTrue($asset->isVendor);
     }
 
-    public function testCreateMappedAssetInMissingVendor()
+    public function testCreateMappedAssetInMissingVendor(): void
     {
         $assetMapper = $this->createFactory(null, '/this-path-does-not-exist/');
         $asset = $assetMapper->createMappedAsset('lodash.js', self::VENDOR_FIXTURES_DIR.'/lodash/lodash.index.js');

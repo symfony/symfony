@@ -32,7 +32,7 @@ class CrawlerTest extends TestCase
         return new Crawler($node, $uri, $baseHref);
     }
 
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $crawler = $this->createCrawler();
         $this->assertCount(0, $crawler, '__construct() returns an empty crawler');
@@ -44,21 +44,21 @@ class CrawlerTest extends TestCase
         $this->assertCount(1, $crawler, '__construct() takes a node as a first argument');
     }
 
-    public function testGetUri()
+    public function testGetUri(): void
     {
         $uri = 'http://symfony.com';
         $crawler = $this->createCrawler(null, $uri);
         $this->assertEquals($uri, $crawler->getUri());
     }
 
-    public function testGetBaseHref()
+    public function testGetBaseHref(): void
     {
         $baseHref = 'http://symfony.com';
         $crawler = $this->createCrawler(null, null, $baseHref);
         $this->assertEquals($baseHref, $crawler->getBaseHref());
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $crawler = $this->createCrawler();
         $crawler->add($this->createDomDocument());
@@ -85,7 +85,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals('Foo', $crawler->filterXPath('//body')->text(), '->add() adds nodes from a string');
     }
 
-    public function testAddMultipleDocumentNode()
+    public function testAddMultipleDocumentNode(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Attaching DOM nodes from multiple documents in the same crawler is forbidden.');
@@ -93,7 +93,7 @@ class CrawlerTest extends TestCase
         $crawler->addHtmlContent($this->getDoctype().'<html><div class="foo"></html>', 'UTF-8');
     }
 
-    public function testAddHtmlContent()
+    public function testAddHtmlContent(): void
     {
         $crawler = $this->createCrawler();
         $crawler->addHtmlContent($this->getDoctype().'<html><div class="foo"></html>', 'UTF-8');
@@ -101,7 +101,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addHtmlContent() adds nodes from an HTML string');
     }
 
-    public function testAddHtmlContentWithBaseTag()
+    public function testAddHtmlContentWithBaseTag(): void
     {
         $crawler = $this->createCrawler();
         $crawler->addHtmlContent($this->getDoctype().'<html><head><base href="http://symfony.com"></head><a href="/contact"></a></html>', 'UTF-8');
@@ -111,7 +111,7 @@ class CrawlerTest extends TestCase
     }
 
     #[RequiresPhpExtension('mbstring')]
-    public function testAddHtmlContentCharset()
+    public function testAddHtmlContentCharset(): void
     {
         $crawler = $this->createCrawler();
         $crawler->addHtmlContent($this->getDoctype().'<html><div class="foo">Tiếng Việt</html>', 'UTF-8');
@@ -119,7 +119,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals('Tiếng Việt', $crawler->filterXPath('//div')->text());
     }
 
-    public function testAddHtmlContentInvalidBaseTag()
+    public function testAddHtmlContentInvalidBaseTag(): void
     {
         $crawler = $this->createCrawler(null, 'http://symfony.com');
         $crawler->addHtmlContent($this->getDoctype().'<html><head><base target="_top"></head><a href="/contact"></a></html>', 'UTF-8');
@@ -128,7 +128,7 @@ class CrawlerTest extends TestCase
     }
 
     #[RequiresPhpExtension('mbstring')]
-    public function testAddHtmlContentCharsetGbk()
+    public function testAddHtmlContentCharsetGbk(): void
     {
         $crawler = $this->createCrawler();
         // gbk encode of <html><p>中文</p></html>
@@ -137,7 +137,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals('中文', $crawler->filterXPath('//p')->text());
     }
 
-    public function testAddXmlContent()
+    public function testAddXmlContent(): void
     {
         $crawler = $this->createCrawler();
         $crawler->addXmlContent($this->getDoctype().'<html><div class="foo"></div></html>', 'UTF-8');
@@ -145,7 +145,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addXmlContent() adds nodes from an XML string');
     }
 
-    public function testAddXmlContentCharset()
+    public function testAddXmlContentCharset(): void
     {
         $crawler = $this->createCrawler();
         $crawler->addXmlContent($this->getDoctype().'<html><div class="foo">Tiếng Việt</div></html>', 'UTF-8');
@@ -153,7 +153,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals('Tiếng Việt', $crawler->filterXPath('//div')->text());
     }
 
-    public function testAddContent()
+    public function testAddContent(): void
     {
         $crawler = $this->createCrawler();
         $crawler->addContent($this->getDoctype().'<html><div class="foo"></html>', 'text/html; charset=UTF-8');
@@ -193,14 +193,14 @@ class CrawlerTest extends TestCase
     }
 
     #[RequiresPhpExtension('iconv')]
-    public function testAddContentNonUtf8()
+    public function testAddContentNonUtf8(): void
     {
         $crawler = $this->createCrawler();
         $crawler->addContent(iconv('UTF-8', 'SJIS', $this->getDoctype().'<html><head><meta charset="Shift_JIS"></head><body>日本語</body></html>'));
         $this->assertEquals('日本語', $crawler->filterXPath('//body')->text(), '->addContent() can recognize "Shift_JIS" in html5 meta charset tag');
     }
 
-    public function testAddDocument()
+    public function testAddDocument(): void
     {
         $crawler = $this->createCrawler();
         $crawler->addDocument($this->createDomDocument());
@@ -208,7 +208,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addDocument() adds nodes from a \DOMDocument');
     }
 
-    public function testAddNodeList()
+    public function testAddNodeList(): void
     {
         $crawler = $this->createCrawler();
         $crawler->addNodeList($this->createNodeList());
@@ -216,7 +216,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNodeList() adds nodes from a \DOMNodeList');
     }
 
-    public function testAddNodes()
+    public function testAddNodes(): void
     {
         $list = [];
         foreach ($this->createNodeList() as $node) {
@@ -229,7 +229,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNodes() adds nodes from an array of nodes');
     }
 
-    public function testAddNode()
+    public function testAddNode(): void
     {
         $crawler = $this->createCrawler();
         $crawler->addNode($this->createNodeList()->item(0));
@@ -237,7 +237,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from a \DOMNode');
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $doc = $this->createDomDocument();
         $node = $doc->createElement('test');
@@ -247,7 +247,7 @@ class CrawlerTest extends TestCase
         $this->assertCount(0, $crawler, '->clear() removes all the nodes from the crawler');
     }
 
-    public function testEq()
+    public function testEq(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li');
         $this->assertNotSame($crawler, $crawler->eq(0), '->eq() returns a new instance of a crawler');
@@ -257,21 +257,21 @@ class CrawlerTest extends TestCase
         $this->assertCount(0, $crawler->eq(100), '->eq() returns an empty crawler if the nth node does not exist');
     }
 
-    public function testNormalizeWhiteSpace()
+    public function testNormalizeWhiteSpace(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//p');
         $this->assertSame('Elsa <3', $crawler->text(null, true), '->text(null, true) returns the text with normalized whitespace');
         $this->assertNotSame('Elsa <3', $crawler->text(null, false));
     }
 
-    public function testEach()
+    public function testEach(): void
     {
         $data = $this->createTestCrawler()->filterXPath('//ul[1]/li')->each(static fn ($node, $i) => $i.'-'.$node->text());
 
         $this->assertEquals(['0-One', '1-Two', '2-Three'], $data, '->each() executes an anonymous function on each node of the list');
     }
 
-    public function testIteration()
+    public function testIteration(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li');
 
@@ -279,7 +279,7 @@ class CrawlerTest extends TestCase
         $this->assertContainsOnlyInstancesOf('DOMElement', iterator_to_array($crawler), 'Iterating a Crawler gives DOMElement instances');
     }
 
-    public function testSlice()
+    public function testSlice(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
         $this->assertNotSame($crawler->slice(), $crawler, '->slice() returns a new instance of a crawler');
@@ -289,7 +289,7 @@ class CrawlerTest extends TestCase
         $this->assertCount(1, $crawler->slice(1, 1), '->slice() slices the nodes in the list');
     }
 
-    public function testReduce()
+    public function testReduce(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
         $nodes = $crawler->reduce(static fn ($node, $i) => 1 !== $i);
@@ -299,7 +299,7 @@ class CrawlerTest extends TestCase
         $this->assertCount(2, $nodes, '->reduce() filters the nodes in the list');
     }
 
-    public function testAttr()
+    public function testAttr(): void
     {
         $this->assertEquals('first', $this->createTestCrawler()->filterXPath('//li')->attr('class'), '->attr() returns the attribute of the first element of the node list');
 
@@ -314,7 +314,7 @@ class CrawlerTest extends TestCase
         $this->assertSame('my value', $this->createTestCrawler()->filterXPath('//li')->attr('attr-not-exists', 'my value'));
     }
 
-    public function testMissingAttrValueIsNull()
+    public function testMissingAttrValueIsNull(): void
     {
         $crawler = $this->createCrawler();
         $crawler->addContent($this->getDoctype().'<html><div non-empty-attr="sample value" empty-attr=""></div></html>', 'text/html; charset=UTF-8');
@@ -325,7 +325,7 @@ class CrawlerTest extends TestCase
         $this->assertNull($div->attr('missing-attr'), '->attr() reads missing attributes correctly');
     }
 
-    public function testNodeName()
+    public function testNodeName(): void
     {
         $this->assertEquals('li', $this->createTestCrawler()->filterXPath('//li')->nodeName(), '->nodeName() returns the node name of the first element of the node list');
 
@@ -337,7 +337,7 @@ class CrawlerTest extends TestCase
         }
     }
 
-    public function testText()
+    public function testText(): void
     {
         $this->assertEquals('One', $this->createTestCrawler()->filterXPath('//li')->text(), '->text() returns the node value of the first element of the node list');
 
@@ -399,7 +399,7 @@ class CrawlerTest extends TestCase
         string $expectedText,
         string $expectedInnerText,
         string $expectedInnerTextNormalizeWhitespaceFalse,
-    ) {
+    ): void {
         self::assertCount(1, $crawler = $this->createTestCrawler()->filterXPath($xPathQuery));
 
         self::assertSame($expectedText, $crawler->text());
@@ -407,7 +407,7 @@ class CrawlerTest extends TestCase
         self::assertSame($expectedInnerTextNormalizeWhitespaceFalse, $crawler->innerText(false));
     }
 
-    public function testHtml()
+    public function testHtml(): void
     {
         $this->assertEquals('<img alt="Bar">', $this->createTestCrawler()->filterXPath('//a[5]')->html());
         $this->assertEquals('<input type="text" value="TextValue" name="TextName"><input type="submit" value="FooValue" name="FooName" id="FooId"><input type="button" value="BarValue" name="BarName" id="BarId"><button value="ButtonValue" name="ButtonName" id="ButtonId"><input type="submit" value="FooBarValue" name="FooBarName" form="FooFormId"><input type="text" value="FooTextValue" name="FooTextName" form="FooFormId"><input type="image" alt="ImageAlt" form="FooFormId"></button>', trim(preg_replace('~>\s+<~', '><', $this->createTestCrawler()->filterXPath('//form[@id="FooFormId"]')->html())));
@@ -422,14 +422,14 @@ class CrawlerTest extends TestCase
         $this->assertSame('my value', $this->createTestCrawler(null)->filterXPath('//ol')->html('my value'));
     }
 
-    public function testEmojis()
+    public function testEmojis(): void
     {
         $crawler = $this->createCrawler('<head></head><body><p>Hey 👋</p></body>');
 
         $this->assertSame('<head></head><body><p>Hey 👋</p></body>', $crawler->html());
     }
 
-    public function testExtract()
+    public function testExtract(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
 
@@ -442,7 +442,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals([['One', 'li'], ['Two', 'li'], ['Three', 'li']], $crawler->extract(['_text', '_name']), '->extract() returns an array of extracted data from the node list');
     }
 
-    public function testFilterXpathComplexQueries()
+    public function testFilterXpathComplexQueries(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//body');
 
@@ -465,7 +465,7 @@ class CrawlerTest extends TestCase
         $this->assertCount(1, $crawler->filterXPath("//a[./@href][((./@id = 'Klausi|Claudiu' or normalize-space(string(.)) = 'Klausi|Claudiu' or ./@title = 'Klausi|Claudiu' or ./@rel = 'Klausi|Claudiu') or .//img[./@alt = 'Klausi|Claudiu'])]"));
     }
 
-    public function testFilterXPath()
+    public function testFilterXPath(): void
     {
         $crawler = $this->createTestCrawler();
         $this->assertNotSame($crawler, $crawler->filterXPath('//li'), '->filterXPath() returns a new instance of a crawler');
@@ -478,20 +478,20 @@ class CrawlerTest extends TestCase
         $this->assertCount(3, $crawler->filterXPath('//body')->filterXPath('//button')->ancestors(), '->filterXpath() preserves ancestors when chained');
     }
 
-    public function testFilterRemovesDuplicates()
+    public function testFilterRemovesDuplicates(): void
     {
         $crawler = $this->createTestCrawler()->filter('html, body')->filter('li');
         $this->assertCount(6, $crawler, 'The crawler removes duplicates when filtering.');
     }
 
-    public function testFilterXPathWithDefaultNamespace()
+    public function testFilterXPathWithDefaultNamespace(): void
     {
         $crawler = $this->createTestXmlCrawler()->filterXPath('//default:entry/default:id');
         $this->assertCount(1, $crawler, '->filterXPath() automatically registers a namespace');
         $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
     }
 
-    public function testFilterXPathWithCustomDefaultNamespace()
+    public function testFilterXPathWithCustomDefaultNamespace(): void
     {
         $crawler = $this->createTestXmlCrawler();
         $crawler->setDefaultNamespacePrefix('x');
@@ -501,20 +501,20 @@ class CrawlerTest extends TestCase
         $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
     }
 
-    public function testFilterXPathWithNamespace()
+    public function testFilterXPathWithNamespace(): void
     {
         $crawler = $this->createTestXmlCrawler()->filterXPath('//yt:accessControl');
         $this->assertCount(2, $crawler, '->filterXPath() automatically registers a namespace');
     }
 
-    public function testFilterXPathWithMultipleNamespaces()
+    public function testFilterXPathWithMultipleNamespaces(): void
     {
         $crawler = $this->createTestXmlCrawler()->filterXPath('//media:group/yt:aspectRatio');
         $this->assertCount(1, $crawler, '->filterXPath() automatically registers multiple namespaces');
         $this->assertSame('widescreen', $crawler->text());
     }
 
-    public function testFilterXPathWithManuallyRegisteredNamespace()
+    public function testFilterXPathWithManuallyRegisteredNamespace(): void
     {
         $crawler = $this->createTestXmlCrawler();
         $crawler->registerNamespace('m', 'http://search.yahoo.com/mrss/');
@@ -524,7 +524,7 @@ class CrawlerTest extends TestCase
         $this->assertSame('widescreen', $crawler->text());
     }
 
-    public function testFilterXPathWithAnUrl()
+    public function testFilterXPathWithAnUrl(): void
     {
         $crawler = $this->createTestXmlCrawler();
 
@@ -533,7 +533,7 @@ class CrawlerTest extends TestCase
         $this->assertSame('Music', $crawler->text());
     }
 
-    public function testCaseSentivity()
+    public function testCaseSentivity(): void
     {
         $crawler = $this->createTestXmlCrawler();
 
@@ -543,7 +543,7 @@ class CrawlerTest extends TestCase
         $this->assertSame('CaseSensitiveTag', $crawler->nodeName());
     }
 
-    public function testFilterXPathWithFakeRoot()
+    public function testFilterXPathWithFakeRoot(): void
     {
         $crawler = $this->createTestCrawler();
         $this->assertCount(0, $crawler->filterXPath('.'), '->filterXPath() returns an empty result if the XPath references the fake root node');
@@ -551,89 +551,89 @@ class CrawlerTest extends TestCase
         $this->assertCount(0, $crawler->filterXPath('self::_root'), '->filterXPath() returns an empty result if the XPath references the fake root node');
     }
 
-    public function testFilterXPathWithAncestorAxis()
+    public function testFilterXPathWithAncestorAxis(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//form');
 
         $this->assertCount(0, $crawler->filterXPath('ancestor::*'), 'The fake root node has no ancestor nodes');
     }
 
-    public function testFilterXPathWithAncestorOrSelfAxis()
+    public function testFilterXPathWithAncestorOrSelfAxis(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//form');
 
         $this->assertCount(0, $crawler->filterXPath('ancestor-or-self::*'), 'The fake root node has no ancestor nodes');
     }
 
-    public function testFilterXPathWithAttributeAxis()
+    public function testFilterXPathWithAttributeAxis(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//form');
 
         $this->assertCount(0, $crawler->filterXPath('attribute::*'), 'The fake root node has no attribute nodes');
     }
 
-    public function testFilterXPathWithAttributeAxisAfterElementAxis()
+    public function testFilterXPathWithAttributeAxisAfterElementAxis(): void
     {
         $this->assertCount(3, $this->createTestCrawler()->filterXPath('//form/button/attribute::*'), '->filterXPath() handles attribute axes properly when they are preceded by an element filtering axis');
     }
 
-    public function testFilterXPathWithChildAxis()
+    public function testFilterXPathWithChildAxis(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//div[@id="parent"]');
 
         $this->assertCount(1, $crawler->filterXPath('child::div'), 'A child selection finds only the current div');
     }
 
-    public function testFilterXPathWithFollowingAxis()
+    public function testFilterXPathWithFollowingAxis(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//a');
 
         $this->assertCount(0, $crawler->filterXPath('following::div'), 'The fake root node has no following nodes');
     }
 
-    public function testFilterXPathWithFollowingSiblingAxis()
+    public function testFilterXPathWithFollowingSiblingAxis(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//a');
 
         $this->assertCount(0, $crawler->filterXPath('following-sibling::div'), 'The fake root node has no following nodes');
     }
 
-    public function testFilterXPathWithNamespaceAxis()
+    public function testFilterXPathWithNamespaceAxis(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//button');
 
         $this->assertCount(0, $crawler->filterXPath('namespace::*'), 'The fake root node has no namespace nodes');
     }
 
-    public function testFilterXPathWithNamespaceAxisAfterElementAxis()
+    public function testFilterXPathWithNamespaceAxisAfterElementAxis(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//div[@id="parent"]/namespace::*');
 
         $this->assertCount(0, $crawler->filterXPath('namespace::*'), 'Namespace axes cannot be requested');
     }
 
-    public function testFilterXPathWithParentAxis()
+    public function testFilterXPathWithParentAxis(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//button');
 
         $this->assertCount(0, $crawler->filterXPath('parent::*'), 'The fake root node has no parent nodes');
     }
 
-    public function testFilterXPathWithPrecedingAxis()
+    public function testFilterXPathWithPrecedingAxis(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//form');
 
         $this->assertCount(0, $crawler->filterXPath('preceding::*'), 'The fake root node has no preceding nodes');
     }
 
-    public function testFilterXPathWithPrecedingSiblingAxis()
+    public function testFilterXPathWithPrecedingSiblingAxis(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//form');
 
         $this->assertCount(0, $crawler->filterXPath('preceding-sibling::*'), 'The fake root node has no preceding nodes');
     }
 
-    public function testFilterXPathWithSelfAxes()
+    public function testFilterXPathWithSelfAxes(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//a');
 
@@ -642,7 +642,7 @@ class CrawlerTest extends TestCase
         $this->assertCount(10, $crawler->filterXPath('self::*/a'));
     }
 
-    public function testFilter()
+    public function testFilter(): void
     {
         $crawler = $this->createTestCrawler();
         $this->assertNotSame($crawler, $crawler->filter('li'), '->filter() returns a new instance of a crawler');
@@ -653,27 +653,27 @@ class CrawlerTest extends TestCase
         $this->assertCount(6, $crawler->filter('li'), '->filter() filters the node list with the CSS selector');
     }
 
-    public function testFilterWithDefaultNamespace()
+    public function testFilterWithDefaultNamespace(): void
     {
         $crawler = $this->createTestXmlCrawler()->filter('default|entry default|id');
         $this->assertCount(1, $crawler, '->filter() automatically registers namespaces');
         $this->assertSame('tag:youtube.com,2008:video:kgZRZmEc9j4', $crawler->text());
     }
 
-    public function testFilterWithNamespace()
+    public function testFilterWithNamespace(): void
     {
         $crawler = $this->createTestXmlCrawler()->filter('yt|accessControl');
         $this->assertCount(2, $crawler, '->filter() automatically registers namespaces');
     }
 
-    public function testFilterWithMultipleNamespaces()
+    public function testFilterWithMultipleNamespaces(): void
     {
         $crawler = $this->createTestXmlCrawler()->filter('media|group yt|aspectRatio');
         $this->assertCount(1, $crawler, '->filter() automatically registers namespaces');
         $this->assertSame('widescreen', $crawler->text());
     }
 
-    public function testFilterWithDefaultNamespaceOnly()
+    public function testFilterWithDefaultNamespaceOnly(): void
     {
         $crawler = $this->createCrawler('<?xml version="1.0" encoding="UTF-8"?>
             <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -695,7 +695,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals(2, $crawler->filter('url')->count());
     }
 
-    public function testSelectLink()
+    public function testSelectLink(): void
     {
         $crawler = $this->createTestCrawler();
         $this->assertNotSame($crawler, $crawler->selectLink('Foo'), '->selectLink() returns a new instance of a crawler');
@@ -714,7 +714,7 @@ class CrawlerTest extends TestCase
         $this->assertCount(4, $crawler->selectLink('Bar'), '->selectLink() selects links by the node values');
     }
 
-    public function testSelectImage()
+    public function testSelectImage(): void
     {
         $crawler = $this->createTestCrawler();
         $this->assertNotSame($crawler, $crawler->selectImage('Bar'), '->selectImage() returns a new instance of a crawler');
@@ -725,7 +725,7 @@ class CrawlerTest extends TestCase
         $this->assertCount(1, $crawler->selectImage('\' Fabien"s Bar'), '->selectImage() selects images by alt attribute');
     }
 
-    public function testSelectButton()
+    public function testSelectButton(): void
     {
         $crawler = $this->createTestCrawler();
         $this->assertNotSame($crawler, $crawler->selectButton('FooValue'), '->selectButton() returns a new instance of a crawler');
@@ -750,7 +750,7 @@ class CrawlerTest extends TestCase
         $this->assertCount(1, $crawler->selectButton('FooBarName'), '->selectButton() selects buttons with form attribute too');
     }
 
-    public function testSelectButtonWithSingleQuotesInNameAttribute()
+    public function testSelectButtonWithSingleQuotesInNameAttribute(): void
     {
         $html = <<<'HTML'
             <html lang="en">
@@ -770,7 +770,7 @@ class CrawlerTest extends TestCase
         $this->assertCount(1, $crawler->selectButton('Click \'Here\''));
     }
 
-    public function testSelectButtonWithDoubleQuotesInNameAttribute()
+    public function testSelectButtonWithDoubleQuotesInNameAttribute(): void
     {
         $html = <<<'HTML'
             <html lang="en">
@@ -790,7 +790,7 @@ class CrawlerTest extends TestCase
         $this->assertCount(1, $crawler->selectButton('Click "Here"'));
     }
 
-    public function testLink()
+    public function testLink(): void
     {
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectLink('Foo');
         $this->assertInstanceOf(Link::class, $crawler->link(), '->link() returns a Link instance');
@@ -808,7 +808,7 @@ class CrawlerTest extends TestCase
         }
     }
 
-    public function testInvalidLink()
+    public function testInvalidLink(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The selected node should be instance of DOMElement');
@@ -816,7 +816,7 @@ class CrawlerTest extends TestCase
         $crawler->filterXPath('//li/text()')->link();
     }
 
-    public function testInvalidLinks()
+    public function testInvalidLinks(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The selected node should be instance of DOMElement');
@@ -824,7 +824,7 @@ class CrawlerTest extends TestCase
         $crawler->filterXPath('//li/text()')->link();
     }
 
-    public function testImage()
+    public function testImage(): void
     {
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectImage('Bar');
         $this->assertInstanceOf(Image::class, $crawler->image(), '->image() returns an Image instance');
@@ -837,7 +837,7 @@ class CrawlerTest extends TestCase
         }
     }
 
-    public function testSelectLinkAndLinkFiltered()
+    public function testSelectLinkAndLinkFiltered(): void
     {
         $html = <<<'HTML'
             <html lang="en">
@@ -867,14 +867,14 @@ class CrawlerTest extends TestCase
         $this->assertCount(1, $crawler->selectButton('Submit')->selectButton('Submit'));
     }
 
-    public function testChaining()
+    public function testChaining(): void
     {
         $crawler = $this->createCrawler($this->getDoctype().'<div name="a"><div name="b"><div name="c"></div></div></div>');
 
         $this->assertEquals('a', $crawler->filterXPath('//div')->filterXPath('div')->filterXPath('div')->attr('name'));
     }
 
-    public function testLinks()
+    public function testLinks(): void
     {
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectLink('Foo');
         $this->assertIsArray($crawler->links(), '->links() returns an array');
@@ -886,7 +886,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals([], $this->createTestCrawler()->filterXPath('//ol')->links(), '->links() returns an empty array if the node selection is empty');
     }
 
-    public function testImages()
+    public function testImages(): void
     {
         $crawler = $this->createTestCrawler('http://example.com/bar/')->selectImage('Bar');
         $this->assertIsArray($crawler->images(), '->images() returns an array');
@@ -898,7 +898,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals([], $this->createTestCrawler()->filterXPath('//ol')->links(), '->links() returns an empty array if the node selection is empty');
     }
 
-    public function testForm()
+    public function testForm(): void
     {
         $testCrawler = $this->createTestCrawler('http://example.com/bar/');
         $crawler = $testCrawler->selectButton('FooValue');
@@ -920,7 +920,7 @@ class CrawlerTest extends TestCase
         }
     }
 
-    public function testInvalidForm()
+    public function testInvalidForm(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The selected node should be instance of DOMElement');
@@ -928,7 +928,7 @@ class CrawlerTest extends TestCase
         $crawler->filterXPath('//li/text()')->form();
     }
 
-    public function testLast()
+    public function testLast(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
         $this->assertNotSame($crawler, $crawler->last(), '->last() returns a new instance of a crawler');
@@ -937,7 +937,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals('Three', $crawler->last()->text());
     }
 
-    public function testFirst()
+    public function testFirst(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li');
         $this->assertNotSame($crawler, $crawler->first(), '->first() returns a new instance of a crawler');
@@ -946,7 +946,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals('One', $crawler->first()->text());
     }
 
-    public function testSiblings()
+    public function testSiblings(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li')->eq(1);
         $this->assertNotSame($crawler, $crawler->siblings(), '->siblings() returns a new instance of a crawler');
@@ -984,7 +984,7 @@ class CrawlerTest extends TestCase
     }
 
     #[DataProvider('provideMatchTests')]
-    public function testMatch(string $mainNodeSelector, bool $expected, string $selector)
+    public function testMatch(string $mainNodeSelector, bool $expected, string $selector): void
     {
         $html = <<<'HTML'
             <html lang="en">
@@ -1003,7 +1003,7 @@ class CrawlerTest extends TestCase
         $this->assertSame($expected, $node->matches($selector));
     }
 
-    public function testClosest()
+    public function testClosest(): void
     {
         $html = <<<'HTML'
             <html lang="en">
@@ -1046,7 +1046,7 @@ class CrawlerTest extends TestCase
         $this->assertNull($notFound);
     }
 
-    public function testClosestWithOrphanedNode()
+    public function testClosestWithOrphanedNode(): void
     {
         $html = <<<'HTML'
             <html lang="en">
@@ -1069,7 +1069,7 @@ class CrawlerTest extends TestCase
         $this->assertNull($body);
     }
 
-    public function testOuterHtml()
+    public function testOuterHtml(): void
     {
         $html = <<<'HTML'
             <html lang="en">
@@ -1092,7 +1092,7 @@ class CrawlerTest extends TestCase
         $this->assertSame($expected, $output);
     }
 
-    public function testNextAll()
+    public function testNextAll(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li')->eq(1);
         $this->assertNotSame($crawler, $crawler->nextAll(), '->nextAll() returns a new instance of a crawler');
@@ -1110,7 +1110,7 @@ class CrawlerTest extends TestCase
         }
     }
 
-    public function testPreviousAll()
+    public function testPreviousAll(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li')->eq(2);
         $this->assertNotSame($crawler, $crawler->previousAll(), '->previousAll() returns a new instance of a crawler');
@@ -1128,7 +1128,7 @@ class CrawlerTest extends TestCase
         }
     }
 
-    public function testChildren()
+    public function testChildren(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul');
         $this->assertNotSame($crawler, $crawler->children(), '->children() returns a new instance of a crawler');
@@ -1156,7 +1156,7 @@ class CrawlerTest extends TestCase
         }
     }
 
-    public function testFilteredChildren()
+    public function testFilteredChildren(): void
     {
         $html = <<<'HTML'
             <html lang="en">
@@ -1186,7 +1186,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals(1, $foo->children('.ipsum')->count());
     }
 
-    public function testAncestors()
+    public function testAncestors(): void
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li[1]');
 
@@ -1200,7 +1200,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals(0, $this->createTestCrawler()->filterXPath('//html')->ancestors()->count());
     }
 
-    public function testAncestorsThrowsIfNodeListIsEmpty()
+    public function testAncestorsThrowsIfNodeListIsEmpty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -1208,7 +1208,7 @@ class CrawlerTest extends TestCase
     }
 
     #[DataProvider('getBaseTagData')]
-    public function testBaseTag($baseValue, $linkValue, $expectedUri, $currentUri = null, $description = '')
+    public function testBaseTag($baseValue, $linkValue, $expectedUri, $currentUri = null, $description = ''): void
     {
         $crawler = $this->createCrawler($this->getDoctype().'<html><base href="'.$baseValue.'"><a href="'.$linkValue.'"></a></html>', $currentUri);
         $this->assertEquals($expectedUri, $crawler->filterXPath('//a')->link()->getUri(), $description);
@@ -1226,7 +1226,7 @@ class CrawlerTest extends TestCase
     }
 
     #[DataProvider('getBaseTagWithFormData')]
-    public function testBaseTagWithForm($baseValue, $actionValue, $expectedUri, $currentUri = null, $description = null)
+    public function testBaseTagWithForm($baseValue, $actionValue, $expectedUri, $currentUri = null, $description = null): void
     {
         $crawler = $this->createCrawler($this->getDoctype().'<html><base href="'.$baseValue.'"><form method="post" action="'.$actionValue.'"><button type="submit" name="submit"/></form></html>', $currentUri);
         $this->assertEquals($expectedUri, $crawler->filterXPath('//button')->form()->getUri(), $description);
@@ -1245,14 +1245,14 @@ class CrawlerTest extends TestCase
         ];
     }
 
-    public function testCountOfNestedElements()
+    public function testCountOfNestedElements(): void
     {
         $crawler = $this->createCrawler('<html><body><ul><li>List item 1<ul><li>Sublist item 1</li><li>Sublist item 2</ul></li></ul></body></html>');
 
         $this->assertCount(1, $crawler->filter('li:contains("List item 1")'));
     }
 
-    public function testEvaluateReturnsTypedResultOfXPathExpressionOnADocumentSubset()
+    public function testEvaluateReturnsTypedResultOfXPathExpressionOnADocumentSubset(): void
     {
         $crawler = $this->createTestCrawler();
 
@@ -1261,7 +1261,7 @@ class CrawlerTest extends TestCase
         $this->assertSame(['Text', 'Foo', 'Bar'], $result);
     }
 
-    public function testEvaluateReturnsTypedResultOfNamespacedXPathExpressionOnADocumentSubset()
+    public function testEvaluateReturnsTypedResultOfNamespacedXPathExpressionOnADocumentSubset(): void
     {
         $crawler = $this->createTestXmlCrawler();
 
@@ -1270,7 +1270,7 @@ class CrawlerTest extends TestCase
         $this->assertSame(['comment', 'videoRespond'], $result);
     }
 
-    public function testEvaluateReturnsTypedResultOfNamespacedXPathExpression()
+    public function testEvaluateReturnsTypedResultOfNamespacedXPathExpression(): void
     {
         $crawler = $this->createTestXmlCrawler();
         $crawler->registerNamespace('youtube', 'http://gdata.youtube.com/schemas/2007');
@@ -1280,7 +1280,7 @@ class CrawlerTest extends TestCase
         $this->assertSame(['comment'], $result);
     }
 
-    public function testEvaluateReturnsACrawlerIfXPathExpressionEvaluatesToANode()
+    public function testEvaluateReturnsACrawlerIfXPathExpressionEvaluatesToANode(): void
     {
         $crawler = $this->createTestCrawler()->evaluate('//form/input[1]');
 
@@ -1289,13 +1289,13 @@ class CrawlerTest extends TestCase
         $this->assertSame('input', $crawler->first()->nodeName());
     }
 
-    public function testEvaluateThrowsAnExceptionIfDocumentIsEmpty()
+    public function testEvaluateThrowsAnExceptionIfDocumentIsEmpty(): void
     {
         $this->expectException(\LogicException::class);
         $this->createCrawler()->evaluate('//form/input[1]');
     }
 
-    public function testAddHtmlContentUnsupportedCharset()
+    public function testAddHtmlContentUnsupportedCharset(): void
     {
         $crawler = $this->createCrawler();
         $crawler->addHtmlContent($this->getDoctype().file_get_contents(__DIR__.'/Fixtures/windows-1250.html'), 'Windows-1250');
@@ -1303,7 +1303,7 @@ class CrawlerTest extends TestCase
         $this->assertEquals('Žťčýů', $crawler->filterXPath('//p')->text());
     }
 
-    public function testAddXmlContentWithErrors()
+    public function testAddXmlContentWithErrors(): void
     {
         $internalErrors = libxml_use_internal_errors(true);
 
@@ -1327,7 +1327,7 @@ class CrawlerTest extends TestCase
         libxml_use_internal_errors($internalErrors);
     }
 
-    public function testAddHtml5()
+    public function testAddHtml5(): void
     {
         // Ensure a bug specific to the DOM extension is fixed (see https://github.com/symfony/symfony/issues/28596)
         $crawler = $this->createCrawler();
@@ -1336,7 +1336,7 @@ class CrawlerTest extends TestCase
     }
 
     #[DataProvider('html5Provider')]
-    public function testHtml5ParserParseContentStartingWithValidHeading(string $content)
+    public function testHtml5ParserParseContentStartingWithValidHeading(string $content): void
     {
         $crawler = $this->createCrawler();
         $crawler->addHtmlContent($content);
@@ -1360,14 +1360,14 @@ class CrawlerTest extends TestCase
         yield 'All together' => [$BOM.'  <!--c-->'.$html];
     }
 
-    public function testHtml5MalformedContent()
+    public function testHtml5MalformedContent(): void
     {
         $crawler = $this->createCrawler();
         $crawler->addHtmlContent('<script&>');
         self::assertEquals('<head></head><body></body>', $crawler->html());
     }
 
-    public function testAlpineJs()
+    public function testAlpineJs(): void
     {
         $crawler = $this->createCrawler();
         $crawler->addHtmlContent(file_get_contents(__DIR__.'/Fixtures/alpine-js.html'));
@@ -1376,7 +1376,7 @@ class CrawlerTest extends TestCase
         $this->assertCount(3, $crawler->filterXPath('//div'));
     }
 
-    public function testInvalidCharset()
+    public function testInvalidCharset(): void
     {
         $email = "Content-Type: text/html; charset=foobar\n\n<!DOCTYPE html><html><body>One Two Three</body></html>";
         $crawler = $this->createCrawler($email);

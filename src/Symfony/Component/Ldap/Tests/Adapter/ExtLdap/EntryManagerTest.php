@@ -21,7 +21,7 @@ use Symfony\Component\Ldap\Exception\NotBoundException;
 
 class EntryManagerTest extends TestCase
 {
-    public function testMove()
+    public function testMove(): void
     {
         $this->expectException(LdapException::class);
         $this->expectExceptionMessage('Entry "$$$$$$" malformed, could not parse RDN.');
@@ -31,7 +31,7 @@ class EntryManagerTest extends TestCase
         $entryManager->move($entry, 'a');
     }
 
-    public function testGetResources()
+    public function testGetResources(): void
     {
         $this->expectException(NotBoundException::class);
         $this->expectExceptionMessage('Query execution is not possible without binding the connection first.');
@@ -49,7 +49,7 @@ class EntryManagerTest extends TestCase
      * @see https://tools.ietf.org/html/rfc4514#section-3
      */
     #[DataProvider('moveWithRFC4514DistinguishedNameProvider')]
-    public function testMoveWithRFC4514DistinguishedName(string $dn, string $expectedRdn)
+    public function testMoveWithRFC4514DistinguishedName(string $dn, string $expectedRdn): void
     {
         $entry = new Entry($dn);
         $entryManager = new EntryManager(new Connection());

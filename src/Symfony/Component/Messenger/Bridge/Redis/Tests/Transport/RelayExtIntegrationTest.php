@@ -25,37 +25,37 @@ class RelayExtIntegrationTest extends RedisExtIntegrationTest
         return new Relay();
     }
 
-    public function testConnectionSendAndGetDelayed()
+    public function testConnectionSendAndGetDelayed(): void
     {
         self::markTestSkipped('This test doesn\'t work with relay.');
     }
 
-    public function testConnectionSendDelayedMessagesWithSameContent()
+    public function testConnectionSendDelayedMessagesWithSameContent(): void
     {
         self::markTestSkipped('This test doesn\'t work with relay.');
     }
 
-    public function testLazy()
+    public function testLazy(): void
     {
         self::markTestSkipped('This test doesn\'t work with relay.');
     }
 
-    public function testDbIndex()
+    public function testDbIndex(): void
     {
         self::markTestSkipped('This test doesn\'t work with relay.');
     }
 
-    public function testGetNonBlocking()
+    public function testGetNonBlocking(): void
     {
         self::markTestSkipped('This test doesn\'t work with relay.');
     }
 
-    public function testGetAfterReject()
+    public function testGetAfterReject(): void
     {
         self::markTestSkipped('This test doesn\'t work with relay.');
     }
 
-    public function testJsonError()
+    public function testJsonError(): void
     {
         self::markTestSkipped('This test doesn\'t work with relay.');
     }

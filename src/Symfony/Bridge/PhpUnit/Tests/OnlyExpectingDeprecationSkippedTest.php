@@ -31,7 +31,7 @@ final class OnlyExpectingDeprecationSkippedTest extends TestCase
      * @expectedDeprecation unreachable
      */
     #[Group('legacy')]
-    public function testExpectingOnlyDeprecations()
+    public function testExpectingOnlyDeprecations(): void
     {
         $this->fail('should never be ran.');
     }

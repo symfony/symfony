@@ -44,7 +44,7 @@ final class MatrixTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testUnsupportedRecipients()
+    public function testUnsupportedRecipients(): void
     {
         $transport = self::createTransport();
         $this->expectException(LogicException::class);
@@ -52,7 +52,7 @@ final class MatrixTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('Hello!', new MatrixOptions(['recipient_id' => '+testchannelalias:matrix.io'])));
     }
 
-    public function testUnsupportedMsgType()
+    public function testUnsupportedMsgType(): void
     {
         $transport = self::createTransport();
         $this->expectException(LogicException::class);

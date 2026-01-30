@@ -33,7 +33,7 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class SerializerPassTest extends TestCase
 {
-    public function testThrowExceptionWhenNoNormalizers()
+    public function testThrowExceptionWhenNoNormalizers(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -47,7 +47,7 @@ class SerializerPassTest extends TestCase
         $serializerPass->process($container);
     }
 
-    public function testThrowExceptionWhenNoEncoders()
+    public function testThrowExceptionWhenNoEncoders(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -64,7 +64,7 @@ class SerializerPassTest extends TestCase
         $serializerPass->process($container);
     }
 
-    public function testServicesAreOrderedAccordingToPriority()
+    public function testServicesAreOrderedAccordingToPriority(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -86,7 +86,7 @@ class SerializerPassTest extends TestCase
         $this->assertEquals($expected, $definition->getArgument(1));
     }
 
-    public function testBindSerializerDefaultContext()
+    public function testBindSerializerDefaultContext(): void
     {
         $context = ['enable_max_depth' => true];
 
@@ -109,7 +109,7 @@ class SerializerPassTest extends TestCase
     #[TestWith([['.serializer.circular_reference_handler' => 'foo'], ['circular_reference_handler' => 'foo']])]
     #[TestWith([['.serializer.max_depth_handler' => 'bar'], ['max_depth_handler' => 'bar']])]
     #[TestWith([['serializer.default_context' => ['enable_max_depth' => true], '.serializer.circular_reference_handler' => 'foo', '.serializer.max_depth_handler' => 'bar'], ['enable_max_depth' => true, 'circular_reference_handler' => 'foo', 'max_depth_handler' => 'bar']])]
-    public function testBindObjectNormalizerDefaultContext(array $parameters, array $context)
+    public function testBindObjectNormalizerDefaultContext(array $parameters, array $context): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -128,7 +128,7 @@ class SerializerPassTest extends TestCase
         $this->assertEquals($bindings['array $defaultContext'], new BoundArgument($context, false));
     }
 
-    public function testNormalizersAndEncodersAreDecoratedAndOrderedWhenCollectingData()
+    public function testNormalizersAndEncodersAreDecoratedAndOrderedWhenCollectingData(): void
     {
         $container = new ContainerBuilder();
 
@@ -162,7 +162,7 @@ class SerializerPassTest extends TestCase
         array $encoderTagAttributes,
         array $expectedNormalizerTags,
         array $expectedEncoderTags,
-    ) {
+    ): void {
         $container = new ContainerBuilder();
 
         $container->setParameter('kernel.debug', false);
@@ -248,7 +248,7 @@ class SerializerPassTest extends TestCase
         array $encoderTagAttributes,
         array $expectedNormalizerTags,
         array $expectedEncoderTags,
-    ) {
+    ): void {
         $container = new ContainerBuilder();
 
         $container->setParameter('kernel.debug', false);
@@ -343,7 +343,7 @@ class SerializerPassTest extends TestCase
         ];
     }
 
-    public function testMultipleNamedSerializerTagsAreResolvedCorrectly()
+    public function testMultipleNamedSerializerTagsAreResolvedCorrectly(): void
     {
         $container = new ContainerBuilder();
 
@@ -378,7 +378,7 @@ class SerializerPassTest extends TestCase
     }
 
     #[DataProvider('provideEmptyTagsData')]
-    public function testEmptyTagsAreIgnoredWhenNonEmptyArePresent(array $tagAttributesList, array $expectedDefaultTags, array $expectedApiTags)
+    public function testEmptyTagsAreIgnoredWhenNonEmptyArePresent(array $tagAttributesList, array $expectedDefaultTags, array $expectedApiTags): void
     {
         $container = new ContainerBuilder();
 
@@ -428,7 +428,7 @@ class SerializerPassTest extends TestCase
         ];
     }
 
-    public function testThrowExceptionWhenNoNormalizersForNamedSerializers()
+    public function testThrowExceptionWhenNoNormalizersForNamedSerializers(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -448,7 +448,7 @@ class SerializerPassTest extends TestCase
         $serializerPass->process($container);
     }
 
-    public function testThrowExceptionWhenNoEncodersForNamedSerializers()
+    public function testThrowExceptionWhenNoEncodersForNamedSerializers(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -470,7 +470,7 @@ class SerializerPassTest extends TestCase
 
     #[TestWith([null])]
     #[TestWith(['some.converter'])]
-    public function testChildNameConverterIsNotBuiltWhenExpected(?string $nameConverter)
+    public function testChildNameConverterIsNotBuiltWhenExpected(?string $nameConverter): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -496,7 +496,7 @@ class SerializerPassTest extends TestCase
         string $nameConverterIdExists,
         string $nameConverterIdDoesNotExist,
         array $nameConverterArguments,
-    ) {
+    ): void {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
         $container->setParameter('.serializer.name_converter', $defaultSerializerNameConverter);
@@ -531,7 +531,7 @@ class SerializerPassTest extends TestCase
         ?string $defaultSerializerNameConverter,
         array $namedSerializerConfig,
         string $nameConverterId,
-    ) {
+    ): void {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
         $container->setParameter('serializer.default_context', $defaultSerializerDefaultContext);
@@ -581,7 +581,7 @@ class SerializerPassTest extends TestCase
         ];
     }
 
-    public function testServicesAreOrderedAccordingToPriorityForNamedSerializers()
+    public function testServicesAreOrderedAccordingToPriorityForNamedSerializers(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -618,7 +618,7 @@ class SerializerPassTest extends TestCase
         $this->assertEquals($expected, $definition->getArgument(1));
     }
 
-    public function testBindSerializerDefaultContextToNamedSerializers()
+    public function testBindSerializerDefaultContextToNamedSerializers(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -651,7 +651,7 @@ class SerializerPassTest extends TestCase
     #[TestWith([[], ['.serializer.circular_reference_handler' => 'foo'], ['circular_reference_handler' => 'foo']])]
     #[TestWith([[], ['.serializer.max_depth_handler' => 'bar'], ['max_depth_handler' => 'bar']])]
     #[TestWith([['enable_max_depth' => true], ['.serializer.circular_reference_handler' => 'foo', '.serializer.max_depth_handler' => 'bar'], ['enable_max_depth' => true, 'circular_reference_handler' => 'foo', 'max_depth_handler' => 'bar']])]
-    public function testBindNamedSerializerObjectNormalizerDefaultContext(array $defaultContext, array $parameters, array $context)
+    public function testBindNamedSerializerObjectNormalizerDefaultContext(array $defaultContext, array $parameters, array $context): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -675,7 +675,7 @@ class SerializerPassTest extends TestCase
         $this->assertEquals($bindings['array $defaultContext'], new BoundArgument($context, false));
     }
 
-    public function testNamedSerializersAreRegistered()
+    public function testNamedSerializersAreRegistered(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -701,7 +701,7 @@ class SerializerPassTest extends TestCase
         $this->assertTrue($container->hasAlias(\sprintf('%s $api2Denormalizer', DenormalizerInterface::class)));
     }
 
-    public function testNormalizersAndEncodersAreDecoratedAndOrderedWhenCollectingDataForNamedSerializers()
+    public function testNormalizersAndEncodersAreDecoratedAndOrderedWhenCollectingDataForNamedSerializers(): void
     {
         $container = new ContainerBuilder();
 

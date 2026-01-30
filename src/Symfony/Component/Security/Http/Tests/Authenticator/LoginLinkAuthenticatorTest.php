@@ -41,7 +41,7 @@ class LoginLinkAuthenticatorTest extends TestCase
     }
 
     #[DataProvider('provideSupportData')]
-    public function testSupport(array $options, $request, bool $supported)
+    public function testSupport(array $options, $request, bool $supported): void
     {
         $this->setUpAuthenticator($options);
 
@@ -56,7 +56,7 @@ class LoginLinkAuthenticatorTest extends TestCase
         yield [['check_route' => '/validate_link', 'check_post_only' => true], Request::create('/validate_link?hash=abc123', 'POST'), true];
     }
 
-    public function testSuccessfulAuthenticate()
+    public function testSuccessfulAuthenticate(): void
     {
         $request = Request::create('/login/link/check?stuff=1&user=weaverryan');
         $user = new InMemoryUser('John', 'password');
@@ -74,7 +74,7 @@ class LoginLinkAuthenticatorTest extends TestCase
         $this->assertSame('weaverryan', $userBadge->getUserIdentifier());
     }
 
-    public function testUnsuccessfulAuthenticate()
+    public function testUnsuccessfulAuthenticate(): void
     {
         $this->setUpAuthenticator();
 
@@ -93,7 +93,7 @@ class LoginLinkAuthenticatorTest extends TestCase
         $passport->getBadge(UserBadge::class)->getUser();
     }
 
-    public function testMissingUser()
+    public function testMissingUser(): void
     {
         $this->setUpAuthenticator();
 
@@ -107,7 +107,7 @@ class LoginLinkAuthenticatorTest extends TestCase
         (new LoginLinkAuthenticator($loginLinkHandler, new HttpUtils(), $this->successHandler, $this->failureHandler, []))->authenticate($request);
     }
 
-    public function testPassportBadges()
+    public function testPassportBadges(): void
     {
         $this->setUpAuthenticator();
 
@@ -118,7 +118,7 @@ class LoginLinkAuthenticatorTest extends TestCase
         $this->assertTrue($passport->hasBadge(RememberMeBadge::class));
     }
 
-    private function setUpAuthenticator(array $options = [])
+    private function setUpAuthenticator(array $options = []): void
     {
         $this->authenticator = new LoginLinkAuthenticator($this->loginLinkHandler, new HttpUtils(), $this->successHandler, $this->failureHandler, $options);
     }

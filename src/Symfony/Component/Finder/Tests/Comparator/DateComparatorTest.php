@@ -17,7 +17,7 @@ use Symfony\Component\Finder\Comparator\DateComparator;
 
 class DateComparatorTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         try {
             new DateComparator('foobar');
@@ -35,7 +35,7 @@ class DateComparatorTest extends TestCase
     }
 
     #[DataProvider('getTestData')]
-    public function testTest($test, $match, $noMatch)
+    public function testTest($test, $match, $noMatch): void
     {
         $c = new DateComparator($test);
 

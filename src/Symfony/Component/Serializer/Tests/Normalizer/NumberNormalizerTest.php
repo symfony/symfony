@@ -29,7 +29,7 @@ class NumberNormalizerTest extends TestCase
     }
 
     #[DataProvider('supportsNormalizationProvider')]
-    public function testSupportsNormalization(mixed $data, bool $expected)
+    public function testSupportsNormalization(mixed $data, bool $expected): void
     {
         $this->assertSame($expected, $this->normalizer->supportsNormalization($data));
     }
@@ -53,7 +53,7 @@ class NumberNormalizerTest extends TestCase
 
     #[RequiresPhpExtension('bcmath')]
     #[DataProvider('normalizeGoodBcMathNumberValueProvider')]
-    public function testNormalizeBcMathNumber(Number $data, string $expected)
+    public function testNormalizeBcMathNumber(Number $data, string $expected): void
     {
         $this->assertSame($expected, $this->normalizer->normalize($data));
     }
@@ -69,7 +69,7 @@ class NumberNormalizerTest extends TestCase
 
     #[RequiresPhpExtension('gmp')]
     #[DataProvider('normalizeGoodGmpValueProvider')]
-    public function testNormalizeGmp(\GMP $data, string $expected)
+    public function testNormalizeGmp(\GMP $data, string $expected): void
     {
         $this->assertSame($expected, $this->normalizer->normalize($data));
     }
@@ -83,7 +83,7 @@ class NumberNormalizerTest extends TestCase
     }
 
     #[DataProvider('normalizeBadValueProvider')]
-    public function testNormalizeBadValueThrows(mixed $data)
+    public function testNormalizeBadValueThrows(mixed $data): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The data must be an instance of "BcMath\Number" or "GMP".');
@@ -99,25 +99,25 @@ class NumberNormalizerTest extends TestCase
     }
 
     #[RequiresPhpExtension('bcmath')]
-    public function testSupportsBcMathNumberDenormalization()
+    public function testSupportsBcMathNumberDenormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsDenormalization(null, Number::class));
     }
 
     #[RequiresPhpExtension('gmp')]
-    public function testSupportsGmpDenormalization()
+    public function testSupportsGmpDenormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsDenormalization(null, \GMP::class));
     }
 
-    public function testDoesNotSupportOtherValuesDenormalization()
+    public function testDoesNotSupportOtherValuesDenormalization(): void
     {
         $this->assertFalse($this->normalizer->supportsDenormalization(null, \stdClass::class));
     }
 
     #[RequiresPhpExtension('bcmath')]
     #[DataProvider('denormalizeGoodBcMathNumberValueProvider')]
-    public function testDenormalizeBcMathNumber(string|int $data, string $type, Number $expected)
+    public function testDenormalizeBcMathNumber(string|int $data, string $type, Number $expected): void
     {
         $this->assertEquals($expected, $this->normalizer->denormalize($data, $type));
     }
@@ -133,7 +133,7 @@ class NumberNormalizerTest extends TestCase
 
     #[RequiresPhpExtension('gmp')]
     #[DataProvider('denormalizeGoodGmpValueProvider')]
-    public function testDenormalizeGmp(string|int $data, string $type, \GMP $expected)
+    public function testDenormalizeGmp(string|int $data, string $type, \GMP $expected): void
     {
         $this->assertEquals($expected, $this->normalizer->denormalize($data, $type));
     }
@@ -148,7 +148,7 @@ class NumberNormalizerTest extends TestCase
 
     #[RequiresPhpExtension('bcmath')]
     #[DataProvider('denormalizeBadBcMathNumberValueProvider')]
-    public function testDenormalizeBadBcMathNumberValueThrows(mixed $data, string $type, string $expectedException, string $expectedExceptionMessage)
+    public function testDenormalizeBadBcMathNumberValueThrows(mixed $data, string $type, string $expectedException, string $expectedExceptionMessage): void
     {
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedExceptionMessage);
@@ -168,7 +168,7 @@ class NumberNormalizerTest extends TestCase
 
     #[RequiresPhpExtension('gmp')]
     #[DataProvider('denormalizeBadGmpValueProvider')]
-    public function testDenormalizeBadGmpValueThrows(mixed $data, string $type, string $expectedException, string $expectedExceptionMessage)
+    public function testDenormalizeBadGmpValueThrows(mixed $data, string $type, string $expectedException, string $expectedExceptionMessage): void
     {
         $this->expectException($expectedException);
         $this->expectExceptionMessage($expectedExceptionMessage);
@@ -187,7 +187,7 @@ class NumberNormalizerTest extends TestCase
         yield 'GMP, float' => [1.23, \GMP::class, NotNormalizableValueException::class, $stringOrIntExpectedMessage];
     }
 
-    public function testDenormalizeBadValueThrows()
+    public function testDenormalizeBadValueThrows(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only "BcMath\Number" and "GMP" types are supported.');

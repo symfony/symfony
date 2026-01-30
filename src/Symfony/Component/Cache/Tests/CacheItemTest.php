@@ -20,13 +20,13 @@ use Symfony\Component\Cache\Tests\Fixtures\StringableTag;
 
 class CacheItemTest extends TestCase
 {
-    public function testValidKey()
+    public function testValidKey(): void
     {
         $this->assertSame('foo', CacheItem::validateKey('foo'));
     }
 
     #[DataProvider('provideInvalidKey')]
-    public function testInvalidKey($key)
+    public function testInvalidKey($key): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cache key');
@@ -54,7 +54,7 @@ class CacheItemTest extends TestCase
         ];
     }
 
-    public function testTag()
+    public function testTag(): void
     {
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'isTaggable');
@@ -65,13 +65,13 @@ class CacheItemTest extends TestCase
         $this->assertSame($item, $item->tag(new StringableTag('qux')));
         $this->assertSame($item, $item->tag([new StringableTag('quux'), new StringableTag('quuux')]));
 
-        (\Closure::bind(function () use ($item) {
+        (\Closure::bind(function () use ($item): void {
             $this->assertSame(['foo' => 'foo', 'bar' => 'bar', 'baz' => 'baz', 'qux' => 'qux', 'quux' => 'quux', 'quuux' => 'quuux'], $item->newMetadata[CacheItem::METADATA_TAGS]);
         }, $this, CacheItem::class))();
     }
 
     #[DataProvider('provideInvalidKey')]
-    public function testInvalidTag($tag)
+    public function testInvalidTag($tag): void
     {
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'isTaggable');
@@ -83,7 +83,7 @@ class CacheItemTest extends TestCase
         $item->tag($tag);
     }
 
-    public function testNonTaggableItem()
+    public function testNonTaggableItem(): void
     {
         $item = new CacheItem();
         $r = new \ReflectionProperty($item, 'key');

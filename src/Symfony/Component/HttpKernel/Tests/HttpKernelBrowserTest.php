@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\TestClient;
 #[Group('time-sensitive')]
 class HttpKernelBrowserTest extends TestCase
 {
-    public function testDoRequest()
+    public function testDoRequest(): void
     {
         $client = new HttpKernelBrowser(new TestHttpKernel());
 
@@ -44,7 +44,7 @@ class HttpKernelBrowserTest extends TestCase
         $this->assertEquals('http://www.example.com/?parameter='.urlencode('http://example.com'), $client->getRequest()->getUri(), '->doRequest() uses the request handler to make the request');
     }
 
-    public function testGetScript()
+    public function testGetScript(): void
     {
         $client = new TestClient(new TestHttpKernel());
         $client->insulate();
@@ -53,7 +53,7 @@ class HttpKernelBrowserTest extends TestCase
         $this->assertEquals('Request: /', $client->getResponse()->getContent(), '->getScript() returns a script that uses the request handler to make the request');
     }
 
-    public function testFilterResponseConvertsCookies()
+    public function testFilterResponseConvertsCookies(): void
     {
         $client = new HttpKernelBrowser(new TestHttpKernel());
 
@@ -73,14 +73,14 @@ class HttpKernelBrowserTest extends TestCase
         $this->assertSame([(string) $cookie1, (string) $cookie2], $domResponse->getHeader('Set-Cookie', false));
     }
 
-    public function testFilterResponseSupportsStreamedResponses()
+    public function testFilterResponseSupportsStreamedResponses(): void
     {
         $client = new HttpKernelBrowser(new TestHttpKernel());
 
         $r = new \ReflectionObject($client);
         $m = $r->getMethod('filterResponse');
 
-        $response = new StreamedResponse(static function () {
+        $response = new StreamedResponse(static function (): void {
             echo 'foo';
         });
 
@@ -88,7 +88,7 @@ class HttpKernelBrowserTest extends TestCase
         $this->assertEquals('foo', $domResponse->getContent());
     }
 
-    public function testFilterResponseSupportsStreamedResponsesWithChunks()
+    public function testFilterResponseSupportsStreamedResponsesWithChunks(): void
     {
         $client = new HttpKernelBrowser(new TestHttpKernel());
 
@@ -101,7 +101,7 @@ class HttpKernelBrowserTest extends TestCase
         $this->assertEquals('foo', $domResponse->getContent());
     }
 
-    public function testUploadedFile()
+    public function testUploadedFile(): void
     {
         $source = tempnam(sys_get_temp_dir(), 'source');
         file_put_contents($source, '1');
@@ -137,7 +137,7 @@ class HttpKernelBrowserTest extends TestCase
         unlink($target);
     }
 
-    public function testUploadedFileWhenNoFileSelected()
+    public function testUploadedFileWhenNoFileSelected(): void
     {
         $kernel = new TestHttpKernel();
         $client = new HttpKernelBrowser($kernel);
@@ -152,7 +152,7 @@ class HttpKernelBrowserTest extends TestCase
         $this->assertNull($files['foo']);
     }
 
-    public function testUploadedFileWhenSizeExceedsUploadMaxFileSize()
+    public function testUploadedFileWhenSizeExceedsUploadMaxFileSize(): void
     {
         if (UploadedFile::getMaxFilesize() > \PHP_INT_MAX) {
             $this->markTestSkipped('Requires PHP_INT_MAX to be greater than "upload_max_filesize" and "post_max_size" ini settings');
@@ -196,7 +196,7 @@ class HttpKernelBrowserTest extends TestCase
         unlink($source);
     }
 
-    public function testAcceptHeaderNotSet()
+    public function testAcceptHeaderNotSet(): void
     {
         $client = new HttpKernelBrowser(new TestHttpKernel());
 

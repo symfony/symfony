@@ -17,7 +17,7 @@ use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 
 class PlaintextPasswordHasherTest extends TestCase
 {
-    public function testVerify()
+    public function testVerify(): void
     {
         $hasher = new PlaintextPasswordHasher();
 
@@ -32,14 +32,14 @@ class PlaintextPasswordHasherTest extends TestCase
         $this->assertTrue($hasher->verify('FOO', 'foo', ''));
     }
 
-    public function testHash()
+    public function testHash(): void
     {
         $hasher = new PlaintextPasswordHasher();
 
         $this->assertSame('foo', $hasher->hash('foo', ''));
     }
 
-    public function testHashLength()
+    public function testHashLength(): void
     {
         $this->expectException(InvalidPasswordException::class);
         $hasher = new PlaintextPasswordHasher();
@@ -47,14 +47,14 @@ class PlaintextPasswordHasherTest extends TestCase
         $hasher->hash(str_repeat('a', 5000), 'salt');
     }
 
-    public function testCheckPasswordLength()
+    public function testCheckPasswordLength(): void
     {
         $hasher = new PlaintextPasswordHasher();
 
         $this->assertFalse($hasher->verify('encoded', str_repeat('a', 5000), 'salt'));
     }
 
-    public function testUsingBracketInSaltThrows()
+    public function testUsingBracketInSaltThrows(): void
     {
         $hasher = new PlaintextPasswordHasher();
 

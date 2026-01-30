@@ -13,7 +13,7 @@ namespace Symfony\Bridge\Twig\Tests\Extension;
 
 abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootstrap3LayoutTestCase
 {
-    public function testLabelOnForm()
+    public function testLabelOnForm(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType', null, ['widget' => 'choice']);
         $view = $form->createView();
@@ -28,7 +28,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testLabelDoesNotRenderFieldAttributes()
+    public function testLabelDoesNotRenderFieldAttributes(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), null, [
@@ -45,7 +45,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testLabelWithCustomAttributesPassedDirectly()
+    public function testLabelWithCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), null, [
@@ -62,7 +62,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testLabelWithCustomTextAndCustomAttributesPassedDirectly()
+    public function testLabelWithCustomTextAndCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), 'Custom label', [
@@ -80,7 +80,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
+    public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'label' => 'Custom label',
@@ -100,7 +100,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
         );
     }
 
-    public function testLabelHtmlDefaultIsFalse()
+    public function testLabelHtmlDefaultIsFalse(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'label' => '<b>Bolded label</b>',
@@ -116,7 +116,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class col-sm-2 control-label required"]/b[.="Bolded label"]', 0);
     }
 
-    public function testLabelHtmlIsTrue()
+    public function testLabelHtmlIsTrue(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'label' => '<b>Bolded label</b>',
@@ -133,7 +133,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class col-sm-2 control-label required"]/b[.="Bolded label"]');
     }
 
-    public function testStartTag()
+    public function testStartTag(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
@@ -145,7 +145,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
         $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="form-horizontal">', $html);
     }
 
-    public function testStartTagWithOverriddenVars()
+    public function testStartTagWithOverriddenVars(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'put',
@@ -160,7 +160,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
         $this->assertSame('<form name="form" method="post" action="http://foo.com/directory" class="form-horizontal">', $html);
     }
 
-    public function testStartTagForMultipartForm()
+    public function testStartTagForMultipartForm(): void
     {
         $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
@@ -174,7 +174,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
         $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="form-horizontal" enctype="multipart/form-data">', $html);
     }
 
-    public function testStartTagWithExtraAttributes()
+    public function testStartTagWithExtraAttributes(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
@@ -188,7 +188,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
         $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar form-horizontal">', $html);
     }
 
-    public function testCheckboxRow()
+    public function testCheckboxRow(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType');
         $view = $form->createView();
@@ -197,7 +197,7 @@ abstract class AbstractBootstrap3HorizontalLayoutTestCase extends AbstractBootst
         $this->assertMatchesXpath($html, '/div[@class="form-group"]/div[@class="col-sm-2" or @class="col-sm-10"]', 2);
     }
 
-    public function testCheckboxRowWithHelp()
+    public function testCheckboxRowWithHelp(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType');
         $html = $this->renderRow($form->createView(), ['label' => 'foo', 'help' => 'really helpful text']);

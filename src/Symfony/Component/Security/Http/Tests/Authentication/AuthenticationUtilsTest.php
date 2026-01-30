@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 class AuthenticationUtilsTest extends TestCase
 {
-    public function testLastAuthenticationErrorWhenRequestHasAttribute()
+    public function testLastAuthenticationErrorWhenRequestHasAttribute(): void
     {
         $authenticationError = new AuthenticationException();
         $request = Request::create('/');
@@ -35,7 +35,7 @@ class AuthenticationUtilsTest extends TestCase
         $this->assertSame($authenticationError, $utils->getLastAuthenticationError());
     }
 
-    public function testLastAuthenticationErrorInSession()
+    public function testLastAuthenticationErrorInSession(): void
     {
         $authenticationError = new AuthenticationException();
 
@@ -53,7 +53,7 @@ class AuthenticationUtilsTest extends TestCase
         $this->assertFalse($session->has(SecurityRequestAttributes::AUTHENTICATION_ERROR));
     }
 
-    public function testLastAuthenticationErrorInSessionWithoutClearing()
+    public function testLastAuthenticationErrorInSessionWithoutClearing(): void
     {
         $authenticationError = new AuthenticationException();
 
@@ -71,7 +71,7 @@ class AuthenticationUtilsTest extends TestCase
         $this->assertTrue($session->has(SecurityRequestAttributes::AUTHENTICATION_ERROR));
     }
 
-    public function testLastUserNameIsDefinedButNull()
+    public function testLastUserNameIsDefinedButNull(): void
     {
         $request = Request::create('/');
         $request->attributes->set(SecurityRequestAttributes::LAST_USERNAME, null);
@@ -83,7 +83,7 @@ class AuthenticationUtilsTest extends TestCase
         $this->assertSame('', $utils->getLastUsername());
     }
 
-    public function testLastUserNameIsDefined()
+    public function testLastUserNameIsDefined(): void
     {
         $request = Request::create('/');
         $request->attributes->set(SecurityRequestAttributes::LAST_USERNAME, 'user');
@@ -95,7 +95,7 @@ class AuthenticationUtilsTest extends TestCase
         $this->assertSame('user', $utils->getLastUsername());
     }
 
-    public function testLastUserNameIsDefinedInSessionButNull()
+    public function testLastUserNameIsDefinedInSessionButNull(): void
     {
         $request = Request::create('/');
 
@@ -110,7 +110,7 @@ class AuthenticationUtilsTest extends TestCase
         $this->assertSame('', $utils->getLastUsername());
     }
 
-    public function testLastUserNameIsDefinedInSession()
+    public function testLastUserNameIsDefinedInSession(): void
     {
         $request = Request::create('/');
 

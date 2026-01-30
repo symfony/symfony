@@ -26,13 +26,13 @@ use Twig\TwigFunction;
 
 class BodyRendererTest extends TestCase
 {
-    public function testRenderTextOnly()
+    public function testRenderTextOnly(): void
     {
         $email = $this->prepareEmail('Text', null);
         $this->assertEquals('Text', $email->getBody()->bodyToString());
     }
 
-    public function testRenderHtmlOnlyWithDefaultConverter()
+    public function testRenderHtmlOnlyWithDefaultConverter(): void
     {
         $html = '<head><meta charset="utf-8"></head><b>HTML</b><style>css</style>';
         $email = $this->prepareEmail(null, $html, [], new DefaultHtmlToTextConverter());
@@ -42,7 +42,7 @@ class BodyRendererTest extends TestCase
         $this->assertEquals(str_replace(['=', "\n"], ['=3D', "\r\n"], $html), $body->getParts()[1]->bodyToString());
     }
 
-    public function testRenderHtmlOnlyWithLeagueConverter()
+    public function testRenderHtmlOnlyWithLeagueConverter(): void
     {
         $html = '<head><meta charset="utf-8"></head><b>HTML</b><style>css</style>';
         $email = $this->prepareEmail(null, $html);
@@ -52,7 +52,7 @@ class BodyRendererTest extends TestCase
         $this->assertEquals(str_replace(['=', "\n"], ['=3D', "\r\n"], $html), $body->getParts()[1]->bodyToString());
     }
 
-    public function testRenderMultiLineHtmlOnly()
+    public function testRenderMultiLineHtmlOnly(): void
     {
         $html = <<<HTML
             <head>
@@ -69,7 +69,7 @@ class BodyRendererTest extends TestCase
         $this->assertEquals(str_replace(['=', "\n"], ['=3D', "\r\n"], $html), $body->getParts()[1]->bodyToString());
     }
 
-    public function testRenderHtmlOnlyWithTextSet()
+    public function testRenderHtmlOnlyWithTextSet(): void
     {
         $email = $this->prepareEmail(null, '<b>HTML</b>');
         $email->text('Text');
@@ -79,7 +79,7 @@ class BodyRendererTest extends TestCase
         $this->assertEquals('<b>HTML</b>', $body->getParts()[1]->bodyToString());
     }
 
-    public function testRenderTextAndHtml()
+    public function testRenderTextAndHtml(): void
     {
         $email = $this->prepareEmail('Text', '<b>HTML</b>');
         $body = $email->getBody();
@@ -88,13 +88,13 @@ class BodyRendererTest extends TestCase
         $this->assertEquals('<b>HTML</b>', $body->getParts()[1]->bodyToString());
     }
 
-    public function testRenderWithContextReservedEmailEntry()
+    public function testRenderWithContextReservedEmailEntry(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->prepareEmail('Text', '', ['email' => 'reserved!']);
     }
 
-    public function testRenderedOnce()
+    public function testRenderedOnce(): void
     {
         $twig = new Environment(new ArrayLoader([
             'text' => 'Text',
@@ -119,7 +119,7 @@ class BodyRendererTest extends TestCase
         $this->assertEquals('reset', $email->getTextBody());
     }
 
-    public function testRenderedOnceUnserializableContext()
+    public function testRenderedOnceUnserializableContext(): void
     {
         $twig = new Environment(new ArrayLoader([
             'text' => 'Text',
@@ -139,7 +139,7 @@ class BodyRendererTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testRenderWithLocale()
+    public function testRenderWithLocale(): void
     {
         $localeSwitcher = new LocaleSwitcher('en', []);
         $email = $this->prepareEmail(null, 'Locale: {{ locale_switcher_locale() }}', [], new DefaultHtmlToTextConverter(), $localeSwitcher, 'fr');

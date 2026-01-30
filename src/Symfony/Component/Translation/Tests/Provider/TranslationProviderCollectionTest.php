@@ -17,12 +17,12 @@ use Symfony\Component\Translation\Provider\TranslationProviderCollection;
 
 class TranslationProviderCollectionTest extends TestCase
 {
-    public function testKeys()
+    public function testKeys(): void
     {
         $this->assertSame(['foo', 'baz'], $this->createProviderCollection()->keys());
     }
 
-    public function testKeysWithGenerator()
+    public function testKeysWithGenerator(): void
     {
         $this->assertSame(['foo', 'baz'], (new TranslationProviderCollection(
             (static function () {
@@ -33,17 +33,17 @@ class TranslationProviderCollectionTest extends TestCase
         ))->keys());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertSame('[foo,baz]', (string) $this->createProviderCollection());
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $this->assertTrue($this->createProviderCollection()->has('foo'));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $provider = new NullProvider();
 
@@ -53,7 +53,7 @@ class TranslationProviderCollectionTest extends TestCase
         ]))->get('foo'));
     }
 
-    public function testGetThrowsException()
+    public function testGetThrowsException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Provider "invalid" not found. Available: "[foo,baz]".');

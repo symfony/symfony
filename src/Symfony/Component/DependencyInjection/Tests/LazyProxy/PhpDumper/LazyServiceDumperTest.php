@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\ReadOnlyClass;
 
 class LazyServiceDumperTest extends TestCase
 {
-    public function testProxyInterface()
+    public function testProxyInterface(): void
     {
         $dumper = new LazyServiceDumper();
         $definition = (new Definition(ContainerInterface::class))->setLazy(true);
@@ -30,7 +30,7 @@ class LazyServiceDumperTest extends TestCase
         $this->assertStringContainsString('function get(', $dumper->getProxyCode($definition));
     }
 
-    public function testFinalClassInterface()
+    public function testFinalClassInterface(): void
     {
         $dumper = new LazyServiceDumper();
         $definition = (new Definition(TestContainer::class))
@@ -41,7 +41,7 @@ class LazyServiceDumperTest extends TestCase
         $this->assertStringContainsString('function get(', $dumper->getProxyCode($definition));
     }
 
-    public function testAbstractClass()
+    public function testAbstractClass(): void
     {
         $dumper = new LazyServiceDumper();
         $definition = (new Definition(AbstractSayClass::class))
@@ -51,7 +51,7 @@ class LazyServiceDumperTest extends TestCase
         $this->assertNotSame(AbstractSayClass::class, $dumper->getProxyClass($definition, false));
     }
 
-    public function testInvalidClass()
+    public function testInvalidClass(): void
     {
         $dumper = new LazyServiceDumper();
         $definition = (new Definition(\stdClass::class))
@@ -65,7 +65,7 @@ class LazyServiceDumperTest extends TestCase
         $dumper->getProxyCode($definition);
     }
 
-    public function testReadonlyClass()
+    public function testReadonlyClass(): void
     {
         $dumper = new LazyServiceDumper();
         $definition = (new Definition(ReadOnlyClass::class))->setLazy(true);

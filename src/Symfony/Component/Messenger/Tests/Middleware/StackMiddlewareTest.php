@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
 
 class StackMiddlewareTest extends TestCase
 {
-    public function testClone()
+    public function testClone(): void
     {
         $middleware1 = $this->createMock(MiddlewareInterface::class);
         $middleware1

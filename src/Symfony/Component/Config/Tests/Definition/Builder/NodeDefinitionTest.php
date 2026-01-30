@@ -23,7 +23,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 
 class NodeDefinitionTest extends TestCase
 {
-    public function testSetPathSeparatorChangesChildren()
+    public function testSetPathSeparatorChangesChildren(): void
     {
         $parentNode = new ArrayNodeDefinition('name');
         $childNode = $this->createMock(NodeDefinition::class);
@@ -42,7 +42,7 @@ class NodeDefinitionTest extends TestCase
         $parentNode->setPathSeparator('/');
     }
 
-    public function testDocUrl()
+    public function testDocUrl(): void
     {
         $node = new ArrayNodeDefinition('node');
         $node->docUrl('https://example.com/doc/{package}/{version:major}.{version:minor}', 'phpunit/phpunit');
@@ -53,7 +53,7 @@ class NodeDefinitionTest extends TestCase
         $this->assertMatchesRegularExpression('~^https://example.com/doc/phpunit/phpunit/\d+\.\d+$~', $p->getValue($node)['docUrl']);
     }
 
-    public function testDocUrlWithoutPackage()
+    public function testDocUrlWithoutPackage(): void
     {
         $node = new ArrayNodeDefinition('node');
         $node->docUrl('https://example.com/doc/empty{version:major}.empty{version:minor}');
@@ -64,7 +64,7 @@ class NodeDefinitionTest extends TestCase
         $this->assertSame('https://example.com/doc/empty.empty', $p->getValue($node)['docUrl']);
     }
 
-    public function testUnknownPackageThrowsException()
+    public function testUnknownPackageThrowsException(): void
     {
         $node = new ArrayNodeDefinition('node');
 
@@ -75,7 +75,7 @@ class NodeDefinitionTest extends TestCase
     }
 
     #[DataProvider('provideDefinitionClassesAndDefaultValues')]
-    public function testIncoherentRequiredAndDefaultValue(string $class, mixed $defaultValue)
+    public function testIncoherentRequiredAndDefaultValue(string $class, mixed $defaultValue): void
     {
         $node = new $class('foo');
         self::assertInstanceOf(NodeDefinition::class, $node);
@@ -87,7 +87,7 @@ class NodeDefinitionTest extends TestCase
     }
 
     #[DataProvider('provideDefinitionClassesAndDefaultValues')]
-    public function testIncoherentDefaultValueAndRequired(string $class, mixed $defaultValue)
+    public function testIncoherentDefaultValueAndRequired(string $class, mixed $defaultValue): void
     {
         $node = new $class('foo');
         self::assertInstanceOf(NodeDefinition::class, $node);

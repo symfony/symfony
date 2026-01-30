@@ -21,13 +21,13 @@ use Symfony\Component\HttpKernel\HttpCache\Ssi;
 
 class SsiFragmentRendererTest extends TestCase
 {
-    public function testRenderFallbackToInlineStrategyIfSsiNotSupported()
+    public function testRenderFallbackToInlineStrategyIfSsiNotSupported(): void
     {
         $strategy = new SsiFragmentRenderer(new Ssi(), $this->getInlineStrategy(true));
         $strategy->render('/', Request::create('/'));
     }
 
-    public function testRender()
+    public function testRender(): void
     {
         $strategy = new SsiFragmentRenderer(new Ssi(), $this->getInlineStrategy());
 
@@ -39,7 +39,7 @@ class SsiFragmentRendererTest extends TestCase
         $this->assertEquals('<!--#include virtual="/" -->', $strategy->render('/', $request, ['comment' => 'This is a comment'])->getContent(), 'Strategy options should not impact the ssi include tag');
     }
 
-    public function testRenderControllerReference()
+    public function testRenderControllerReference(): void
     {
         $signer = new UriSigner('foo');
         $strategy = new SsiFragmentRenderer(new Ssi(), $this->getInlineStrategy(), $signer);
@@ -57,7 +57,7 @@ class SsiFragmentRendererTest extends TestCase
         );
     }
 
-    public function testRenderControllerReferenceWithAbsoluteUri()
+    public function testRenderControllerReferenceWithAbsoluteUri(): void
     {
         $signer = new UriSigner('foo');
         $strategy = new SsiFragmentRenderer(new Ssi(), $this->getInlineStrategy(), $signer);
@@ -75,7 +75,7 @@ class SsiFragmentRendererTest extends TestCase
         );
     }
 
-    public function testRenderControllerReferenceWithoutSignerThrowsException()
+    public function testRenderControllerReferenceWithoutSignerThrowsException(): void
     {
         $this->expectException(\LogicException::class);
         $strategy = new SsiFragmentRenderer(new Ssi(), $this->getInlineStrategy());
@@ -87,7 +87,7 @@ class SsiFragmentRendererTest extends TestCase
         $strategy->render(new ControllerReference('main_controller'), $request);
     }
 
-    public function testRenderAltControllerReferenceWithoutSignerThrowsException()
+    public function testRenderAltControllerReferenceWithoutSignerThrowsException(): void
     {
         $this->expectException(\LogicException::class);
         $strategy = new SsiFragmentRenderer(new Ssi(), $this->getInlineStrategy());

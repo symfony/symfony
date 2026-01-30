@@ -19,7 +19,7 @@ use Symfony\Component\HtmlSanitizer\Reference\W3CReference;
  */
 class W3CReferenceTest extends TestCase
 {
-    public function testElements()
+    public function testElements(): void
     {
         $referenceElements = array_values(array_merge(array_keys(W3CReference::HEAD_ELEMENTS), array_keys(W3CReference::BODY_ELEMENTS)));
         sort($referenceElements);
@@ -30,7 +30,7 @@ class W3CReferenceTest extends TestCase
         );
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $this->assertSame(
             $this->getResourceData(__DIR__.'/../Fixtures/baseline-attribute-allow-list.json'),

@@ -28,7 +28,7 @@ class HttpBrowserTest extends AbstractBrowserTest
     }
 
     #[DataProvider('validContentTypes')]
-    public function testRequestHeaders(array $requestArguments, array $expectedArguments)
+    public function testRequestHeaders(array $requestArguments, array $expectedArguments): void
     {
         $client = $this->createMock(HttpClientInterface::class);
         $client
@@ -86,7 +86,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         ];
     }
 
-    public function testMultiPartRequestWithSingleFile()
+    public function testMultiPartRequestWithSingleFile(): void
     {
         $client = $this->createMock(HttpClientInterface::class);
         $client
@@ -111,7 +111,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         $browser->request('POST', 'http://example.com/', ['foo' => ['bar' => 'foo2']], ['foo' => ['file' => ['tmp_name' => $path, 'name' => 'foo']]]);
     }
 
-    public function testMultiPartRequestWithNormalFlatArray()
+    public function testMultiPartRequestWithNormalFlatArray(): void
     {
         $client = $this->createMock(HttpClientInterface::class);
         $this->expectClientToSendRequestWithFiles($client, ['file1_content', 'file2_content']);
@@ -123,7 +123,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         ]);
     }
 
-    public function testMultiPartRequestWithNormalNestedArray()
+    public function testMultiPartRequestWithNormalNestedArray(): void
     {
         $client = $this->createMock(HttpClientInterface::class);
         $this->expectClientToSendRequestWithFiles($client, ['file1_content', 'file2_content']);
@@ -139,7 +139,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         ]);
     }
 
-    public function testMultiPartRequestWithBracketedArray()
+    public function testMultiPartRequestWithBracketedArray(): void
     {
         $client = $this->createMock(HttpClientInterface::class);
         $this->expectClientToSendRequestWithFiles($client, ['file1_content', 'file2_content']);
@@ -151,7 +151,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         ]);
     }
 
-    public function testMultiPartRequestWithInvalidItem()
+    public function testMultiPartRequestWithInvalidItem(): void
     {
         $client = $this->createMock(HttpClientInterface::class);
         $this->expectClientToSendRequestWithFiles($client, ['file1_content']);
@@ -163,7 +163,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         ]);
     }
 
-    public function testMultiPartRequestWithAdditionalParameters()
+    public function testMultiPartRequestWithAdditionalParameters(): void
     {
         $client = $this->createMock(HttpClientInterface::class);
         $this->expectClientToSendRequestWithFiles($client, ['file1_content', 'baz']);
@@ -174,7 +174,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         ]);
     }
 
-    public function testMultiPartRequestWithAdditionalParametersOfTheSameName()
+    public function testMultiPartRequestWithAdditionalParametersOfTheSameName(): void
     {
         $client = $this->createMock(HttpClientInterface::class);
         $this->expectClientToNotSendRequestWithFiles($client, ['baz']);
@@ -186,7 +186,7 @@ class HttpBrowserTest extends AbstractBrowserTest
     }
 
     #[DataProvider('forwardSlashesRequestPathProvider')]
-    public function testMultipleForwardSlashesRequestPath(string $requestPath)
+    public function testMultipleForwardSlashesRequestPath(string $requestPath): void
     {
         $client = $this->createMock(HttpClientInterface::class);
         $client
@@ -207,7 +207,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         ];
     }
 
-    public function testEmptyUpload()
+    public function testEmptyUpload(): void
     {
         $client = new MockHttpClient(function ($method, $url, $options) {
             $this->assertSame('POST', $method);
@@ -254,7 +254,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         ];
     }
 
-    protected function expectClientToSendRequestWithFiles(HttpClientInterface $client, $fileContents)
+    protected function expectClientToSendRequestWithFiles(HttpClientInterface $client, $fileContents): void
     {
         $client
             ->expects($this->once())
@@ -272,7 +272,7 @@ class HttpBrowserTest extends AbstractBrowserTest
             ->willReturn($this->createStub(ResponseInterface::class));
     }
 
-    protected function expectClientToNotSendRequestWithFiles(HttpClientInterface $client, $fileContents)
+    protected function expectClientToNotSendRequestWithFiles(HttpClientInterface $client, $fileContents): void
     {
         $client
             ->expects($this->once())

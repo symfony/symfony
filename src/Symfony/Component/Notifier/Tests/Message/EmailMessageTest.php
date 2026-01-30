@@ -21,7 +21,7 @@ use Symfony\Component\Notifier\Recipient\Recipient;
  */
 class EmailMessageTest extends TestCase
 {
-    public function testEnsureNonEmptyEmailOnCreationFromNotification()
+    public function testEnsureNonEmptyEmailOnCreationFromNotification(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('"Symfony\Component\Notifier\Message\EmailMessage" needs an email, it cannot be empty.');

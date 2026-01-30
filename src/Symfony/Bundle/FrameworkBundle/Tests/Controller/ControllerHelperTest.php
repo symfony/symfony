@@ -24,14 +24,14 @@ class ControllerHelperTest extends AbstractControllerTest
             {
             }
 
-            public function setContainer(ContainerInterface $container)
+            public function setContainer(ContainerInterface $container): void
             {
                 parent::__construct($container);
             }
         };
     }
 
-    public function testSync()
+    public function testSync(): void
     {
         $r = new \ReflectionClass(ControllerHelper::class);
         $m = $r->getMethod('getSubscribedServices');

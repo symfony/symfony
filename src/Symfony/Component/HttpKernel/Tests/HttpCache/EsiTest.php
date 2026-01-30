@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\HttpCache\HttpCache;
 
 class EsiTest extends TestCase
 {
-    public function testHasSurrogateEsiCapability()
+    public function testHasSurrogateEsiCapability(): void
     {
         $esi = new Esi();
 
@@ -35,7 +35,7 @@ class EsiTest extends TestCase
         $this->assertFalse($esi->hasSurrogateCapability($request));
     }
 
-    public function testAddSurrogateEsiCapability()
+    public function testAddSurrogateEsiCapability(): void
     {
         $esi = new Esi();
 
@@ -47,7 +47,7 @@ class EsiTest extends TestCase
         $this->assertEquals('symfony="ESI/1.0", symfony="ESI/1.0"', $request->headers->get('Surrogate-Capability'));
     }
 
-    public function testAddSurrogateControl()
+    public function testAddSurrogateControl(): void
     {
         $esi = new Esi();
 
@@ -60,7 +60,7 @@ class EsiTest extends TestCase
         $this->assertEquals('', $response->headers->get('Surrogate-Control'));
     }
 
-    public function testNeedsEsiParsing()
+    public function testNeedsEsiParsing(): void
     {
         $esi = new Esi();
 
@@ -72,7 +72,7 @@ class EsiTest extends TestCase
         $this->assertFalse($esi->needsParsing($response));
     }
 
-    public function testRenderIncludeTag()
+    public function testRenderIncludeTag(): void
     {
         $esi = new Esi();
 
@@ -82,7 +82,7 @@ class EsiTest extends TestCase
         $this->assertEquals('<esi:comment text="some comment" />'."\n".'<esi:include src="/" onerror="continue" alt="/alt" />', $esi->renderIncludeTag('/', '/alt', true, 'some comment'));
     }
 
-    public function testProcessDoesNothingIfContentTypeIsNotHtml()
+    public function testProcessDoesNothingIfContentTypeIsNotHtml(): void
     {
         $esi = new Esi();
 
@@ -94,7 +94,7 @@ class EsiTest extends TestCase
         $this->assertFalse($response->headers->has('x-body-eval'));
     }
 
-    public function testMultilineEsiRemoveTagsAreRemoved()
+    public function testMultilineEsiRemoveTagsAreRemoved(): void
     {
         $esi = new Esi();
 
@@ -105,7 +105,7 @@ class EsiTest extends TestCase
         $this->assertEquals(' Keep this And this', substr($response->getContent(), 24, -24));
     }
 
-    public function testCommentTagsAreRemoved()
+    public function testCommentTagsAreRemoved(): void
     {
         $esi = new Esi();
 
@@ -116,7 +116,7 @@ class EsiTest extends TestCase
         $this->assertEquals(' Keep this', substr($response->getContent(), 24, -24));
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $esi = new Esi();
 
@@ -147,7 +147,7 @@ class EsiTest extends TestCase
         $this->assertSame(['', 'foo ', "...\n\n\n", ''], $content);
     }
 
-    public function testProcessEscapesPhpTags()
+    public function testProcessEscapesPhpTags(): void
     {
         $esi = new Esi();
 
@@ -159,7 +159,7 @@ class EsiTest extends TestCase
         $this->assertSame(['', '<?php <? <% <script language=php>', ''], $content);
     }
 
-    public function testProcessWhenNoSrcInAnEsi()
+    public function testProcessWhenNoSrcInAnEsi(): void
     {
         $this->expectException(\RuntimeException::class);
         $esi = new Esi();
@@ -169,7 +169,7 @@ class EsiTest extends TestCase
         $this->assertSame($response, $esi->process($request, $response));
     }
 
-    public function testProcessRemoveSurrogateControlHeader()
+    public function testProcessRemoveSurrogateControlHeader(): void
     {
         $esi = new Esi();
 
@@ -190,14 +190,14 @@ class EsiTest extends TestCase
         $this->assertEquals('no-store', $response->headers->get('surrogate-control'));
     }
 
-    public function testHandle()
+    public function testHandle(): void
     {
         $esi = new Esi();
         $cache = $this->getCache(Request::create('/'), new Response('foo'));
         $this->assertEquals('foo', $esi->handle($cache, '/', '/alt', true));
     }
 
-    public function testHandleWhenResponseIsNot200()
+    public function testHandleWhenResponseIsNot200(): void
     {
         $this->expectException(\RuntimeException::class);
         $esi = new Esi();
@@ -207,7 +207,7 @@ class EsiTest extends TestCase
         $esi->handle($cache, '/', '/alt', false);
     }
 
-    public function testHandleWhenResponseIsNot200AndErrorsAreIgnored()
+    public function testHandleWhenResponseIsNot200AndErrorsAreIgnored(): void
     {
         $esi = new Esi();
         $response = new Response('foo');
@@ -216,7 +216,7 @@ class EsiTest extends TestCase
         $this->assertEquals('', $esi->handle($cache, '/', '/alt', true));
     }
 
-    public function testHandleWhenResponseIsNot200AndAltIsPresent()
+    public function testHandleWhenResponseIsNot200AndAltIsPresent(): void
     {
         $esi = new Esi();
         $response1 = new Response('foo');
@@ -226,7 +226,7 @@ class EsiTest extends TestCase
         $this->assertEquals('bar', $esi->handle($cache, '/', '/alt', false));
     }
 
-    public function testHandleWhenResponseIsNotModified()
+    public function testHandleWhenResponseIsNotModified(): void
     {
         $esi = new Esi();
         $response = new Response('');

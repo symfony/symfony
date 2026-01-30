@@ -30,7 +30,7 @@ use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class RetryableHttpClientTest extends TestCase
 {
-    public function testRetryOnError()
+    public function testRetryOnError(): void
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
@@ -46,7 +46,7 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame(200, $response->getStatusCode());
     }
 
-    public function testRetryRespectStrategy()
+    public function testRetryRespectStrategy(): void
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
@@ -64,7 +64,7 @@ class RetryableHttpClientTest extends TestCase
         $response->getHeaders();
     }
 
-    public function testRetryWithBody()
+    public function testRetryWithBody(): void
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
@@ -86,7 +86,7 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame('def', $response->getContent());
     }
 
-    public function testRetryWithBodyKeepContent()
+    public function testRetryWithBodyKeepContent(): void
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
@@ -111,7 +111,7 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame('my bad', $response->getContent(false));
     }
 
-    public function testRetryWithBodyInvalid()
+    public function testRetryWithBodyInvalid(): void
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
@@ -133,7 +133,7 @@ class RetryableHttpClientTest extends TestCase
         $response->getHeaders();
     }
 
-    public function testStreamNoRetry()
+    public function testStreamNoRetry(): void
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
@@ -152,7 +152,7 @@ class RetryableHttpClientTest extends TestCase
         }
     }
 
-    public function testRetryWithDnsIssue()
+    public function testRetryWithDnsIssue(): void
     {
         $client = new RetryableHttpClient(
             new NativeHttpClient(),
@@ -177,7 +177,7 @@ class RetryableHttpClientTest extends TestCase
         $this->assertSame('Try #1 after 0ms: Could not resolve host "does.not.exists".', $logger->logs[0]);
     }
 
-    public function testCancelOnTimeout()
+    public function testCancelOnTimeout(): void
     {
         $client = HttpClient::create();
 
@@ -195,7 +195,7 @@ class RetryableHttpClientTest extends TestCase
         }
     }
 
-    public function testRetryWithDelay()
+    public function testRetryWithDelay(): void
     {
         $retryAfter = '0.46';
 
@@ -233,7 +233,7 @@ class RetryableHttpClientTest extends TestCase
         $this->assertSame((int) ($retryAfter * 1000), $delay);
     }
 
-    public function testRetryOnErrorAssertContent()
+    public function testRetryOnErrorAssertContent(): void
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
@@ -251,7 +251,7 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame('Test out content', $response->getContent(), 'Content should be buffered');
     }
 
-    public function testRetryOnTimeout()
+    public function testRetryOnTimeout(): void
     {
         $client = HttpClient::create();
 
@@ -284,7 +284,7 @@ class RetryableHttpClientTest extends TestCase
         $this->assertTrue($strategy->isCalled, 'The HTTP retry strategy should be called');
     }
 
-    public function testRetryWithMultipleBaseUris()
+    public function testRetryWithMultipleBaseUris(): void
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
@@ -306,7 +306,7 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame('http://example.com/b/foo-bar', $response->getInfo('url'));
     }
 
-    public function testMultipleBaseUrisAsOptions()
+    public function testMultipleBaseUrisAsOptions(): void
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
@@ -330,7 +330,7 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame('http://example.com/b/foo-bar', $response->getInfo('url'));
     }
 
-    public function testRetryWithMultipleBaseUrisShufflesNestedArray()
+    public function testRetryWithMultipleBaseUrisShufflesNestedArray(): void
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
@@ -356,7 +356,7 @@ class RetryableHttpClientTest extends TestCase
         self::assertMatchesRegularExpression('#^http://example.com/(b|c)/foo-bar$#', $response->getInfo('url'));
     }
 
-    public function testRetryWithMultipleBaseUrisPreservesNonNestedOrder()
+    public function testRetryWithMultipleBaseUrisPreservesNonNestedOrder(): void
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
@@ -384,7 +384,7 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame('http://example.com/d/foo-bar', $response->getInfo('url'));
     }
 
-    public function testMaxRetriesOption()
+    public function testMaxRetriesOption(): void
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
@@ -403,7 +403,7 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame(502, $response->getStatusCode());
     }
 
-    public function testMaxRetriesWithOptions()
+    public function testMaxRetriesWithOptions(): void
     {
         $client = new RetryableHttpClient(
             new MockHttpClient([
@@ -425,7 +425,7 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame(504, $response->getStatusCode());
     }
 
-    public function testRetryOnTimeoutWithAsyncDecorator()
+    public function testRetryOnTimeoutWithAsyncDecorator(): void
     {
         $client = HttpClient::create();
 
@@ -468,7 +468,7 @@ class RetryableHttpClientTest extends TestCase
         $this->assertTrue($strategy->isCalled, 'The HTTP retry strategy should be called');
     }
 
-    public function testRetryOnErrorWithAsyncDecorator()
+    public function testRetryOnErrorWithAsyncDecorator(): void
     {
         $client = new MockHttpClient([
             new MockResponse('', ['http_code' => 500]),
@@ -492,7 +492,7 @@ class RetryableHttpClientTest extends TestCase
         self::assertSame('OK', $response->getContent());
     }
 
-    public function testRetryOnTimeoutWithMultipleAsyncDecorators()
+    public function testRetryOnTimeoutWithMultipleAsyncDecorators(): void
     {
         $client = HttpClient::create();
 
@@ -545,7 +545,7 @@ class RetryableHttpClientTest extends TestCase
         $this->assertTrue($strategy->isCalled, 'The HTTP retry strategy should be called with multiple decorators');
     }
 
-    public function testRetryActuallyRetriesWithAsyncDecorator()
+    public function testRetryActuallyRetriesWithAsyncDecorator(): void
     {
         $client = HttpClient::create();
 

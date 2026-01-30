@@ -18,7 +18,7 @@ use Symfony\Component\Clock\MonotonicClock;
 #[Group('time-sensitive')]
 class MonotonicClockTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $clock = new MonotonicClock('UTC');
         $this->assertSame('UTC', $clock->now()->getTimezone()->getName());
@@ -31,7 +31,7 @@ class MonotonicClockTest extends TestCase
         $this->assertSame($tz, $clock->now()->getTimezone()->getName());
     }
 
-    public function testNow()
+    public function testNow(): void
     {
         $clock = new MonotonicClock();
         $before = microtime(true);
@@ -44,7 +44,7 @@ class MonotonicClockTest extends TestCase
         $this->assertLessThan($after, (float) $now->format('U.u'));
     }
 
-    public function testSleep()
+    public function testSleep(): void
     {
         $clock = new MonotonicClock();
         $tz = $clock->now()->getTimezone()->getName();
@@ -61,7 +61,7 @@ class MonotonicClockTest extends TestCase
         $this->assertSame($tz, $clock->now()->getTimezone()->getName());
     }
 
-    public function testWithTimeZone()
+    public function testWithTimeZone(): void
     {
         $clock = new MonotonicClock();
         $utcClock = $clock->withTimeZone('UTC');

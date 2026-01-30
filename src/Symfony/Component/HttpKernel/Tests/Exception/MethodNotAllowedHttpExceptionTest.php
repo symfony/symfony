@@ -17,13 +17,13 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class MethodNotAllowedHttpExceptionTest extends HttpExceptionTest
 {
-    public function testHeadersDefault()
+    public function testHeadersDefault(): void
     {
         $exception = new MethodNotAllowedHttpException(['GET', 'PUT']);
         $this->assertSame(['Allow' => 'GET, PUT'], $exception->getHeaders());
     }
 
-    public function testWithHeaderConstruct()
+    public function testWithHeaderConstruct(): void
     {
         $headers = [
             'Cache-Control' => 'public, s-maxage=1200',
@@ -37,7 +37,7 @@ class MethodNotAllowedHttpExceptionTest extends HttpExceptionTest
     }
 
     #[DataProvider('headerDataProvider')]
-    public function testHeadersSetter($headers)
+    public function testHeadersSetter($headers): void
     {
         $exception = new MethodNotAllowedHttpException(['GET']);
         $exception->setHeaders($headers);

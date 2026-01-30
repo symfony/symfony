@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Stamp\DelayStamp;
  */
 class DelayStampTest extends TestCase
 {
-    public function testDelayFor()
+    public function testDelayFor(): void
     {
         $stamp = DelayStamp::delayFor(\DateInterval::createFromDateString('30 seconds'));
         $this->assertSame(30000, $stamp->getDelay());
@@ -32,7 +32,7 @@ class DelayStampTest extends TestCase
         $this->assertSame(-5000, $stamp->getDelay());
     }
 
-    public function testDelayUntil()
+    public function testDelayUntil(): void
     {
         $stamp = DelayStamp::delayUntil(new \DateTimeImmutable('+30 seconds'));
         $this->assertSame(30000, $stamp->getDelay());

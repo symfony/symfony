@@ -22,7 +22,7 @@ class ConstraintValidatorTest extends TestCase
     use IcuCompatibilityTrait;
 
     #[DataProvider('formatValueProvider')]
-    public function testFormatValue(string $expected, mixed $value, int $format = 0)
+    public function testFormatValue(string $expected, mixed $value, int $format = 0): void
     {
         \Locale::setDefault('en');
 

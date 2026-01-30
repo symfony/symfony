@@ -21,7 +21,7 @@ class FileBinaryMimeTypeGuesserTest extends AbstractMimeTypeGuesserTestCase
         return new FileBinaryMimeTypeGuesser();
     }
 
-    public function testGuessWithDuplicatedFileType()
+    public function testGuessWithDuplicatedFileType(): void
     {
         $this->markTestSkipped('Result varies depending on the OS');
     }

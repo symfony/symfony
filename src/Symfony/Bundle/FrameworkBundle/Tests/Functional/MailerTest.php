@@ -22,11 +22,11 @@ use Symfony\Component\Mime\Email;
 
 class MailerTest extends AbstractWebTestCase
 {
-    public function testEnvelopeListener()
+    public function testEnvelopeListener(): void
     {
         self::bootKernel(['test_case' => 'Mailer']);
 
-        $onDoSend = function (SentMessage $message) {
+        $onDoSend = function (SentMessage $message): void {
             $envelope = $message->getEnvelope();
 
             $this->assertEquals(
@@ -72,7 +72,7 @@ class MailerTest extends AbstractWebTestCase
         $mailer->send($message);
     }
 
-    public function testMailerAssertions()
+    public function testMailerAssertions(): void
     {
         $client = $this->createClient(['test_case' => 'Mailer', 'root_config' => 'config.yml', 'debug' => true]);
         $client->request('GET', '/send_email');

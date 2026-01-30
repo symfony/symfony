@@ -31,7 +31,7 @@ class Psr16AdapterTest extends AdapterTestCase
         return new Psr16Adapter(new Psr16Cache(new FilesystemAdapter()), '', $defaultLifetime);
     }
 
-    public function testValidCacheKeyWithNamespace()
+    public function testValidCacheKeyWithNamespace(): void
     {
         $cache = new Psr16Adapter(new Psr16Cache(new ArrayAdapter()), 'some_namespace', 0);
         $item = $cache->getItem('my_key');

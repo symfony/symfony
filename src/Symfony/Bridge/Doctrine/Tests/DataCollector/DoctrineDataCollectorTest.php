@@ -34,7 +34,7 @@ class DoctrineDataCollectorTest extends TestCase
         ClockMock::withClockMock(1500000000);
     }
 
-    public function testCollectConnections()
+    public function testCollectConnections(): void
     {
         $c = $this->createCollector([]);
         $c->collect(new Request(), new Response());
@@ -42,7 +42,7 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertEquals(['default' => 'doctrine.dbal.default_connection'], $c->getConnections());
     }
 
-    public function testCollectManagers()
+    public function testCollectManagers(): void
     {
         $c = $this->createCollector([]);
         $c->collect(new Request(), new Response());
@@ -50,7 +50,7 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertEquals(['default' => 'doctrine.orm.default_entity_manager'], $c->getManagers());
     }
 
-    public function testCollectQueryCount()
+    public function testCollectQueryCount(): void
     {
         $c = $this->createCollector([]);
         $c->collect(new Request(), new Response());
@@ -66,7 +66,7 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertEquals(1, $c->getQueryCount());
     }
 
-    public function testCollectTime()
+    public function testCollectTime(): void
     {
         $c = $this->createCollector([]);
         $c->collect(new Request(), new Response());
@@ -91,7 +91,7 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertEquals(3, $c->getTime());
     }
 
-    public function testCollectTimeWithFloatExecutionMS()
+    public function testCollectTimeWithFloatExecutionMS(): void
     {
         $queries = [
             ['sql' => 'SELECT * FROM table1', 'params' => [], 'types' => [], 'executionMS' => 0.23],
@@ -121,7 +121,7 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertEqualsWithDelta(0.54, $c->getTime(), .01);
     }
 
-    public function testCollectQueryWithNoTypes()
+    public function testCollectQueryWithNoTypes(): void
     {
         $queries = [
             ['sql' => 'SET sql_mode=(SELECT REPLACE(@@sql_mode, \'ONLY_FULL_GROUP_BY\', \'\'))', 'params' => [], 'types' => null, 'executionMS' => 1],
@@ -134,7 +134,7 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertSame([], $collectedQueries['default'][0]['types']);
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $queries = [
             ['sql' => 'SELECT * FROM table1', 'params' => [], 'types' => [], 'executionMS' => 1],
@@ -150,7 +150,7 @@ class DoctrineDataCollectorTest extends TestCase
     }
 
     #[DataProvider('paramProvider')]
-    public function testCollectQueries($param, $types, $expected)
+    public function testCollectQueries($param, $types, $expected): void
     {
         $queries = [
             ['sql' => 'SELECT * FROM table1 WHERE field1 = ?1', 'params' => [$param], 'types' => $types, 'executionMS' => 1],
@@ -177,7 +177,7 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertTrue($collectedQueries['default'][0]['runnable']);
     }
 
-    public function testCollectQueryWithNoParams()
+    public function testCollectQueryWithNoParams(): void
     {
         $queries = [
             ['sql' => 'SELECT * FROM table1', 'params' => [], 'types' => [], 'executionMS' => 1],
@@ -199,7 +199,7 @@ class DoctrineDataCollectorTest extends TestCase
     }
 
     #[DataProvider('paramProvider')]
-    public function testSerialization($param, array $types, $expected)
+    public function testSerialization($param, array $types, $expected): void
     {
         $queries = [
             ['sql' => 'SELECT * FROM table1 WHERE field1 = ?1', 'params' => [$param], 'types' => $types, 'executionMS' => 1],

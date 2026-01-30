@@ -18,7 +18,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class DebugAssetsMapperCommandTest extends TestCase
 {
-    public function testCommandDumpsInformation()
+    public function testCommandDumpsInformation(): void
     {
         $application = new Application(new AssetMapperTestAppKernel('test', true));
 
@@ -32,7 +32,7 @@ class DebugAssetsMapperCommandTest extends TestCase
         $this->assertStringContainsString('dir2'.\DIRECTORY_SEPARATOR.'subdir'.\DIRECTORY_SEPARATOR.'file6.js', $tester->getDisplay());
     }
 
-    public function testCommandFiltersName()
+    public function testCommandFiltersName(): void
     {
         $application = new Application(new AssetMapperTestAppKernel('test', true));
         $command = $application->find('debug:asset-map');
@@ -49,7 +49,7 @@ class DebugAssetsMapperCommandTest extends TestCase
         $this->assertStringContainsString('lodash', $tester->getDisplay());
     }
 
-    public function testCommandFiltersExtension()
+    public function testCommandFiltersExtension(): void
     {
         $application = new Application(new AssetMapperTestAppKernel('test', true));
         $command = $application->find('debug:asset-map');
@@ -63,7 +63,7 @@ class DebugAssetsMapperCommandTest extends TestCase
         $this->assertStringContainsString('file3.css', $tester->getDisplay());
     }
 
-    public function testCommandFiltersVendor()
+    public function testCommandFiltersVendor(): void
     {
         $application = new Application(new AssetMapperTestAppKernel('test', true));
         $command = $application->find('debug:asset-map');

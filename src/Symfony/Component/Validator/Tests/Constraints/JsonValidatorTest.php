@@ -24,7 +24,7 @@ class JsonValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidValues')]
-    public function testJsonIsValid($value)
+    public function testJsonIsValid($value): void
     {
         $this->validator->validate($value, new Json());
 
@@ -32,7 +32,7 @@ class JsonValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidValues')]
-    public function testInvalidValues($value)
+    public function testInvalidValues($value): void
     {
         $constraint = new Json(message: 'myMessageTest');
 

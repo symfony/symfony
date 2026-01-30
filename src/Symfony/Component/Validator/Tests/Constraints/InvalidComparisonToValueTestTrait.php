@@ -17,7 +17,7 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 trait InvalidComparisonToValueTestTrait
 {
     #[DataProvider('provideAllInvalidComparisons')]
-    public function testInvalidComparisonToValue($dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType)
+    public function testInvalidComparisonToValue($dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType): void
     {
         // Conversion of dates to string differs between ICU versions
         // Make sure we have the correct version loaded
@@ -38,7 +38,7 @@ trait InvalidComparisonToValueTestTrait
             ->assertRaised();
     }
 
-    public function testInvalidComparisonToPropertyPathAddsPathAsParameter()
+    public function testInvalidComparisonToPropertyPathAddsPathAsParameter(): void
     {
         [$dirtyValue, $dirtyValueAsString, $comparedValue, $comparedValueString, $comparedValueType] = current($this->provideAllInvalidComparisons());
 

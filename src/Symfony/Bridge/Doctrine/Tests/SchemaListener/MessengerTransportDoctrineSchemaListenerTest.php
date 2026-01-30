@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 class MessengerTransportDoctrineSchemaListenerTest extends TestCase
 {
-    public function testPostGenerateSchema()
+    public function testPostGenerateSchema(): void
     {
         $schema = new Schema();
         $dbalConnection = $this->createStub(Connection::class);

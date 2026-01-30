@@ -37,7 +37,7 @@ class ImportMapConfigReaderTest extends TestCase
         $this->filesystem->remove(__DIR__.'/../Fixtures/importmap_config_reader');
     }
 
-    public function testGetEntriesAndWriteEntries()
+    public function testGetEntriesAndWriteEntries(): void
     {
         $importMap = <<<EOF
             <?php
@@ -106,7 +106,7 @@ class ImportMapConfigReaderTest extends TestCase
     }
 
     #[DataProvider('getPathToFilesystemPathTests')]
-    public function testConvertPathToFilesystemPath(string $path, string $expectedPath)
+    public function testConvertPathToFilesystemPath(string $path, string $expectedPath): void
     {
         $configReader = new ImportMapConfigReader(realpath(__DIR__.'/../Fixtures/importmap.php'), new RemotePackageStorage(sys_get_temp_dir()));
         // normalize path separators for comparison
@@ -128,7 +128,7 @@ class ImportMapConfigReaderTest extends TestCase
     }
 
     #[DataProvider('getFilesystemPathToPathTests')]
-    public function testConvertFilesystemPathToPath(string $path, ?string $expectedPath)
+    public function testConvertFilesystemPathToPath(string $path, ?string $expectedPath): void
     {
         $configReader = new ImportMapConfigReader(__DIR__.'/../Fixtures/importmap.php', new RemotePackageStorage(sys_get_temp_dir()));
         $this->assertSame($expectedPath, $configReader->convertFilesystemPathToPath($path));
@@ -147,7 +147,7 @@ class ImportMapConfigReaderTest extends TestCase
         ];
     }
 
-    public function testFindRootImportMapEntry()
+    public function testFindRootImportMapEntry(): void
     {
         $configReader = new ImportMapConfigReader(__DIR__.'/../Fixtures/importmap.php', new RemotePackageStorage(sys_get_temp_dir()));
         $entry = $configReader->findRootImportMapEntry('file2');

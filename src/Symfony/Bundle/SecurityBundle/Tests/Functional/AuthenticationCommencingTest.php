@@ -13,7 +13,7 @@ namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
 class AuthenticationCommencingTest extends AbstractWebTestCase
 {
-    public function testAuthenticationIsCommencingIfAccessDeniedExceptionIsWrapped()
+    public function testAuthenticationIsCommencingIfAccessDeniedExceptionIsWrapped(): void
     {
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']);
 

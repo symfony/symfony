@@ -40,7 +40,7 @@ class AbstractSessionHandlerTest extends TestCase
     }
 
     #[DataProvider('provideSession')]
-    public function testSession($fixture)
+    public function testSession($fixture): void
     {
         $context = ['http' => ['header' => "Cookie: sid=123abc\r\n"]];
         $context = stream_context_create($context);

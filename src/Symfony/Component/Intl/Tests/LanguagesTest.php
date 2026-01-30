@@ -1702,13 +1702,13 @@ class LanguagesTest extends ResourceBundleTestCase
         'zul' => 'zu',
     ];
 
-    public function testGetLanguageCodes()
+    public function testGetLanguageCodes(): void
     {
         $this->assertEquals(self::LANGUAGES, Languages::getLanguageCodes());
     }
 
     #[DataProvider('provideLocales')]
-    public function testGetNames($displayLocale)
+    public function testGetNames($displayLocale): void
     {
         if ('en' !== $displayLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -1729,7 +1729,7 @@ class LanguagesTest extends ResourceBundleTestCase
         }
     }
 
-    public function testGetNamesDefaultLocale()
+    public function testGetNamesDefaultLocale(): void
     {
         IntlTestHelper::requireFullIntl($this);
 
@@ -1739,7 +1739,7 @@ class LanguagesTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLocaleAliases')]
-    public function testGetNamesSupportsAliases($alias, $ofLocale)
+    public function testGetNamesSupportsAliases($alias, $ofLocale): void
     {
         if ('en' !== $ofLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -1752,7 +1752,7 @@ class LanguagesTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLocales')]
-    public function testGetName($displayLocale)
+    public function testGetName($displayLocale): void
     {
         if ('en' !== $displayLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -1765,14 +1765,14 @@ class LanguagesTest extends ResourceBundleTestCase
         }
     }
 
-    public function testLocalizedGetName()
+    public function testLocalizedGetName(): void
     {
         $this->assertSame('Australian English', Languages::getName('en_AU', 'en'));
         $this->assertSame('Australian English', Languages::getName('en_AU_Zzzz', 'en'));
         $this->assertSame('English', Languages::getName('en_ZZ', 'en'));
     }
 
-    public function testGetNameDefaultLocale()
+    public function testGetNameDefaultLocale(): void
     {
         IntlTestHelper::requireFullIntl($this);
 
@@ -1794,7 +1794,7 @@ class LanguagesTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLanguagesWithAlpha3Equivalent')]
-    public function testGetAlpha3Code($language)
+    public function testGetAlpha3Code($language): void
     {
         $this->assertSame(self::ALPHA2_TO_ALPHA3[$language], Languages::getAlpha3Code($language));
     }
@@ -1808,25 +1808,25 @@ class LanguagesTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLanguagesWithoutAlpha3Equivalent')]
-    public function testGetAlpha3CodeFailsIfNoAlpha3Equivalent($language)
+    public function testGetAlpha3CodeFailsIfNoAlpha3Equivalent($language): void
     {
         $this->expectException(MissingResourceException::class);
         Languages::getAlpha3Code($language);
     }
 
-    public function testGetNameWithInvalidLanguageCode()
+    public function testGetNameWithInvalidLanguageCode(): void
     {
         $this->expectException(MissingResourceException::class);
         Languages::getName('foo');
     }
 
-    public function testExists()
+    public function testExists(): void
     {
         $this->assertTrue(Languages::exists('nl'));
         $this->assertFalse(Languages::exists('zxx'));
     }
 
-    public function testGetAlpha3Codes()
+    public function testGetAlpha3Codes(): void
     {
         $this->assertSame(self::ALPHA3_CODES, Languages::getAlpha3Codes());
     }
@@ -1840,7 +1840,7 @@ class LanguagesTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLanguagesWithAlpha2Equivalent')]
-    public function testGetAlpha2Code($language)
+    public function testGetAlpha2Code($language): void
     {
         $this->assertSame(self::ALPHA3_TO_ALPHA2[$language], Languages::getAlpha2Code($language));
     }
@@ -1854,13 +1854,13 @@ class LanguagesTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLanguagesWithoutAlpha2Equivalent')]
-    public function testGetAlpha2CodeFailsIfNoAlpha2Equivalent($language)
+    public function testGetAlpha2CodeFailsIfNoAlpha2Equivalent($language): void
     {
         $this->expectException(MissingResourceException::class);
         Languages::getAlpha2Code($language);
     }
 
-    public function testAlpha3CodeExists()
+    public function testAlpha3CodeExists(): void
     {
         $this->assertTrue(Languages::alpha3CodeExists('nob'));
         $this->assertTrue(Languages::alpha3CodeExists('nld'));
@@ -1874,7 +1874,7 @@ class LanguagesTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLocales')]
-    public function testGetAlpha3Name($displayLocale)
+    public function testGetAlpha3Name($displayLocale): void
     {
         if ('en' !== $displayLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -1887,7 +1887,7 @@ class LanguagesTest extends ResourceBundleTestCase
         }
     }
 
-    public function testGetAlpha3NameWithInvalidLanguageCode()
+    public function testGetAlpha3NameWithInvalidLanguageCode(): void
     {
         $this->expectException(MissingResourceException::class);
 
@@ -1895,7 +1895,7 @@ class LanguagesTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLocales')]
-    public function testGetAlpha3Names($displayLocale)
+    public function testGetAlpha3Names($displayLocale): void
     {
         if ('en' !== $displayLocale) {
             IntlTestHelper::requireFullIntl($this);

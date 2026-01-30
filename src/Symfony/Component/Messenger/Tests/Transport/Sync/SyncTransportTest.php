@@ -19,7 +19,7 @@ use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 
 class SyncTransportTest extends TestCase
 {
-    public function testSend()
+    public function testSend(): void
     {
         $bus = $this->createMock(MessageBusInterface::class);
         $bus->expects($this->once())

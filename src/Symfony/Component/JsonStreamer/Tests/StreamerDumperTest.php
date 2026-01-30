@@ -43,7 +43,7 @@ class StreamerDumperTest extends TestCase
         }
     }
 
-    public function testDumpWithConfigCache()
+    public function testDumpWithConfigCache(): void
     {
         $path = $this->cacheDir.'/streamer.php';
 
@@ -57,7 +57,7 @@ class StreamerDumperTest extends TestCase
         $this->assertStringEqualsFile($path, 'CONTENT');
     }
 
-    public function testDumpWithoutConfigCache()
+    public function testDumpWithoutConfigCache(): void
     {
         $path = $this->cacheDir.'/streamer.php';
 
@@ -72,7 +72,7 @@ class StreamerDumperTest extends TestCase
      * @param list<class-string> $expectedClassNames
      */
     #[DataProvider('getCacheResourcesDataProvider')]
-    public function testGetCacheResources(Type $type, array $expectedClassNames)
+    public function testGetCacheResources(Type $type, array $expectedClassNames): void
     {
         $path = $this->cacheDir.'/streamer.php';
 

@@ -20,7 +20,7 @@ use Symfony\Component\HttpKernel\Debug\ErrorHandlerConfigurator;
 
 class ErrorHandlerConfiguratorTest extends TestCase
 {
-    public function testConfigure()
+    public function testConfigure(): void
     {
         $logger = new NullLogger();
         $configurator = new ErrorHandlerConfigurator($logger);
@@ -35,7 +35,7 @@ class ErrorHandlerConfiguratorTest extends TestCase
     }
 
     #[DataProvider('provideLevelsAssignedToLoggers')]
-    public function testLevelsAssignedToLoggers(bool $hasLogger, bool $hasDeprecationLogger, array|int $levels, array|int|null $expectedLoggerLevels, array|int|null $expectedDeprecationLoggerLevels)
+    public function testLevelsAssignedToLoggers(bool $hasLogger, bool $hasDeprecationLogger, array|int $levels, array|int|null $expectedLoggerLevels, array|int|null $expectedDeprecationLoggerLevels): void
     {
         $handler = $this->createMock(ErrorHandler::class);
 
@@ -60,7 +60,7 @@ class ErrorHandlerConfiguratorTest extends TestCase
         $handler
             ->expects($this->exactly(\count($expectedCalls)))
             ->method('setDefaultLogger')
-            ->willReturnCallback(function (...$args) use (&$expectedCalls) {
+            ->willReturnCallback(function (...$args) use (&$expectedCalls): void {
                 $this->assertSame(array_shift($expectedCalls), $args);
             })
         ;

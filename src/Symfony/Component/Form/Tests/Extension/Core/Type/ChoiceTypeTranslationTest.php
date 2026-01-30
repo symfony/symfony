@@ -46,7 +46,7 @@ class ChoiceTypeTranslationTest extends TypeTestCase
         return array_merge(parent::getExtensions(), [new CoreExtension(null, null, $translator)]);
     }
 
-    public function testInvalidMessageAwarenessForMultiple()
+    public function testInvalidMessageAwarenessForMultiple(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'multiple' => true,
@@ -62,7 +62,7 @@ class ChoiceTypeTranslationTest extends TypeTestCase
         );
     }
 
-    public function testInvalidMessageAwarenessForMultipleWithoutScalarOrArrayViewData()
+    public function testInvalidMessageAwarenessForMultipleWithoutScalarOrArrayViewData(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'multiple' => true,

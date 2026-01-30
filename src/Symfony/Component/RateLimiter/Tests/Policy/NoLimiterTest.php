@@ -18,13 +18,13 @@ use Symfony\Component\RateLimiter\Reservation;
 
 class NoLimiterTest extends TestCase
 {
-    public function testConsume()
+    public function testConsume(): void
     {
         $limiter = new NoLimiter();
         $this->assertInstanceOf(RateLimit::class, $limiter->consume());
     }
 
-    public function testReserve()
+    public function testReserve(): void
     {
         $limiter = new NoLimiter();
         $this->assertInstanceOf(Reservation::class, $limiter->reserve());

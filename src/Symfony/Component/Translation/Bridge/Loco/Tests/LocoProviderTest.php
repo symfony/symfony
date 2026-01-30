@@ -69,7 +69,7 @@ class LocoProviderTest extends ProviderTestCase
         ];
     }
 
-    public function testCompleteWriteProcess()
+    public function testCompleteWriteProcess(): void
     {
         $expectedAuthHeader = 'Authorization: Loco API_KEY';
 
@@ -254,7 +254,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testWriteCreateAssetServerError()
+    public function testWriteCreateAssetServerError(): void
     {
         $expectedAuthHeader = 'Authorization: Loco API_KEY';
 
@@ -291,7 +291,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testWriteCreateTagServerError()
+    public function testWriteCreateTagServerError(): void
     {
         $expectedAuthHeader = 'Authorization: Loco API_KEY';
 
@@ -343,7 +343,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testWriteTagAssetsServerError()
+    public function testWriteTagAssetsServerError(): void
     {
         $expectedAuthHeader = 'Authorization: Loco API_KEY';
 
@@ -403,7 +403,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testWriteTagAssetsServerErrorWithComma()
+    public function testWriteTagAssetsServerErrorWithComma(): void
     {
         $expectedAuthHeader = 'Authorization: Loco API_KEY';
 
@@ -463,7 +463,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testWriteCreateLocaleServerError()
+    public function testWriteCreateLocaleServerError(): void
     {
         $expectedAuthHeader = 'Authorization: Loco API_KEY';
 
@@ -537,7 +537,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testWriteGetAssetsIdsServerError()
+    public function testWriteGetAssetsIdsServerError(): void
     {
         $expectedAuthHeader = 'Authorization: Loco API_KEY';
 
@@ -614,7 +614,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testWriteTranslateAssetsServerError()
+    public function testWriteTranslateAssetsServerError(): void
     {
         $expectedAuthHeader = 'Authorization: Loco API_KEY';
 
@@ -700,7 +700,7 @@ class LocoProviderTest extends ProviderTestCase
     }
 
     #[DataProvider('getResponsesForOneLocaleAndOneDomain')]
-    public function testReadForOneLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag)
+    public function testReadForOneLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag): void
     {
         $this->loader = $this->createMock(LoaderInterface::class);
         $this->loader->expects($this->once())
@@ -723,7 +723,7 @@ class LocoProviderTest extends ProviderTestCase
     }
 
     #[DataProvider('getResponsesForManyLocalesAndManyDomains')]
-    public function testReadForManyLocalesAndManyDomains(array $locales, array $domains, array $responseContents, TranslatorBag $expectedTranslatorBag)
+    public function testReadForManyLocalesAndManyDomains(array $locales, array $domains, array $responseContents, TranslatorBag $expectedTranslatorBag): void
     {
         $responses = [];
         $consecutiveLoadArguments = [];
@@ -762,7 +762,7 @@ class LocoProviderTest extends ProviderTestCase
     }
 
     #[DataProvider('getResponsesForReadWithLastModified')]
-    public function testReadWithLastModified(array $locales, array $domains, array $responseContents, array $lastModifieds, TranslatorBag $expectedTranslatorBag)
+    public function testReadWithLastModified(array $locales, array $domains, array $responseContents, array $lastModifieds, TranslatorBag $expectedTranslatorBag): void
     {
         $responses = [];
         $consecutiveLoadArguments = [];
@@ -840,7 +840,7 @@ class LocoProviderTest extends ProviderTestCase
         $this->assertEquals($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
     }
 
-    public function testDeleteProcess()
+    public function testDeleteProcess(): void
     {
         $translatorBag = new TranslatorBag();
         $translatorBag->addCatalogue(new MessageCatalogue('en', [
@@ -890,7 +890,7 @@ class LocoProviderTest extends ProviderTestCase
         $provider->delete($translatorBag);
     }
 
-    public function testDeleteServerError()
+    public function testDeleteServerError(): void
     {
         $translatorBag = new TranslatorBag();
         $translatorBag->addCatalogue(new MessageCatalogue('en', [
@@ -1150,7 +1150,7 @@ class LocoProviderTest extends ProviderTestCase
         }
     }
 
-    public function testReadForAllDomains()
+    public function testReadForAllDomains(): void
     {
         $this->loader = $this->createMock(LoaderInterface::class);
         $this->loader->expects($this->once())
@@ -1176,7 +1176,7 @@ class LocoProviderTest extends ProviderTestCase
         $this->translatorBag = $provider->read(['*'], ['fr']);
     }
 
-    public function testReadWithRestrictToStatus()
+    public function testReadWithRestrictToStatus(): void
     {
         $this->loader = $this->createMock(LoaderInterface::class);
         $this->loader

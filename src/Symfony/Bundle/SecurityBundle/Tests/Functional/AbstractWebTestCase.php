@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 abstract class AbstractWebTestCase extends BaseWebTestCase
 {
-    public static function assertRedirect($response, $location)
+    public static function assertRedirect($response, $location): void
     {
         self::assertTrue($response->isRedirect(), "Response is not a redirect, got:\n".(($p = strpos($response, '-->')) ? substr($response, 0, $p + 3) : $response));
         self::assertEquals('http://localhost'.$location, $response->headers->get('Location'));
@@ -34,7 +34,7 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
         static::deleteTmpDir();
     }
 
-    protected static function deleteTmpDir()
+    protected static function deleteTmpDir(): void
     {
         if (!file_exists($dir = sys_get_temp_dir().'/'.static::getVarDir())) {
             return;

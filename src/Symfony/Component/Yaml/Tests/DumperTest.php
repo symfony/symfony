@@ -56,7 +56,7 @@ class DumperTest extends TestCase
         $this->array = null;
     }
 
-    public function testIndentationInConstructor()
+    public function testIndentationInConstructor(): void
     {
         $dumper = new Dumper(7);
         $expected = <<<'EOF'
@@ -84,7 +84,7 @@ class DumperTest extends TestCase
         $this->assertSameData($this->array, $this->parser->parse($expected));
     }
 
-    public function testSpecifications()
+    public function testSpecifications(): void
     {
         $files = $this->parser->parse(file_get_contents($this->path.'/index.yml'));
         foreach ($files as $file) {
@@ -112,7 +112,7 @@ class DumperTest extends TestCase
         }
     }
 
-    public function testInlineLevel()
+    public function testInlineLevel(): void
     {
         $expected = <<<'EOF'
             { '': bar, foo: '#bar', "foo'bar": {  }, bar: [1, foo, { a: A }], foobar: { foo: bar, bar: [1, foo], foobar: { foo: bar, bar: [1, foo] } } }
@@ -197,27 +197,27 @@ class DumperTest extends TestCase
         $this->assertSameData($this->array, $this->parser->parse($expected));
     }
 
-    public function testObjectSupportEnabled()
+    public function testObjectSupportEnabled(): void
     {
         $dump = $this->dumper->dump(['foo' => new A(), 'bar' => 1], 0, 0, Yaml::DUMP_OBJECT);
 
         $this->assertSame('{ foo: !php/object \'O:30:"Symfony\Component\Yaml\Tests\A":1:{s:1:"a";s:3:"foo";}\', bar: 1 }', $dump, '->dump() is able to dump objects');
     }
 
-    public function testObjectSupportDisabledButNoExceptions()
+    public function testObjectSupportDisabledButNoExceptions(): void
     {
         $dump = $this->dumper->dump(['foo' => new A(), 'bar' => 1]);
 
         $this->assertSame('{ foo: null, bar: 1 }', $dump, '->dump() does not dump objects when disabled');
     }
 
-    public function testObjectSupportDisabledWithExceptions()
+    public function testObjectSupportDisabledWithExceptions(): void
     {
         $this->expectException(DumpException::class);
         $this->dumper->dump(['foo' => new A(), 'bar' => 1], 0, 0, Yaml::DUMP_EXCEPTION_ON_INVALID_TYPE);
     }
 
-    public function testDumpWithMultipleNullFlagsFormatsThrows()
+    public function testDumpWithMultipleNullFlagsFormatsThrows(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The Yaml::DUMP_NULL_AS_EMPTY and Yaml::DUMP_NULL_AS_TILDE flags cannot be used together.');
@@ -225,14 +225,14 @@ class DumperTest extends TestCase
         $this->dumper->dump(['foo' => 'bar'], 0, 0, Yaml::DUMP_NULL_AS_EMPTY | Yaml::DUMP_NULL_AS_TILDE);
     }
 
-    public function testDumpNullAsEmptyInExpandedMapping()
+    public function testDumpNullAsEmptyInExpandedMapping(): void
     {
         $expected = "qux:\n    foo: bar\n    baz: \n";
 
         $this->assertSame($expected, $this->dumper->dump(['qux' => ['foo' => 'bar', 'baz' => null]], 2, flags: Yaml::DUMP_NULL_AS_EMPTY));
     }
 
-    public function testDumpNullAsEmptyWithObject()
+    public function testDumpNullAsEmptyWithObject(): void
     {
         $class = new \stdClass();
         $class->foo = 'bar';
@@ -241,41 +241,41 @@ class DumperTest extends TestCase
         $this->assertSame("foo: bar\nbaz: \n", $this->dumper->dump($class, 2, flags: Yaml::DUMP_NULL_AS_EMPTY | Yaml::DUMP_OBJECT_AS_MAP));
     }
 
-    public function testDumpNullAsEmptyDumpsWhenInInlineMapping()
+    public function testDumpNullAsEmptyDumpsWhenInInlineMapping(): void
     {
         $expected = "foo: \nqux: { foo: bar, baz:  }\n";
 
         $this->assertSame($expected, $this->dumper->dump(['foo' => null, 'qux' => ['foo' => 'bar', 'baz' => null]], 1, flags: Yaml::DUMP_NULL_AS_EMPTY));
     }
 
-    public function testDumpNullAsEmptyDumpsNestedMaps()
+    public function testDumpNullAsEmptyDumpsNestedMaps(): void
     {
         $expected = "foo: \nqux:\n    foo: bar\n    baz: \n";
 
         $this->assertSame($expected, $this->dumper->dump(['foo' => null, 'qux' => ['foo' => 'bar', 'baz' => null]], 10, flags: Yaml::DUMP_NULL_AS_EMPTY));
     }
 
-    public function testDumpNullAsEmptyInExpandedSequence()
+    public function testDumpNullAsEmptyInExpandedSequence(): void
     {
         $expected = "qux:\n    - foo\n    - \n    - bar\n";
 
         $this->assertSame($expected, $this->dumper->dump(['qux' => ['foo', null, 'bar']], 2, flags: Yaml::DUMP_NULL_AS_EMPTY));
     }
 
-    public function testDumpNullAsEmptyWhenInInlineSequence()
+    public function testDumpNullAsEmptyWhenInInlineSequence(): void
     {
         $expected = "foo: \nqux: [foo, , bar]\n";
 
         $this->assertSame($expected, $this->dumper->dump(['foo' => null, 'qux' => ['foo', null, 'bar']], 1, flags: Yaml::DUMP_NULL_AS_EMPTY));
     }
 
-    public function testDumpNullAsEmptyAtRoot()
+    public function testDumpNullAsEmptyAtRoot(): void
     {
         $this->assertSame('null', $this->dumper->dump(null, 2, flags: Yaml::DUMP_NULL_AS_EMPTY));
     }
 
     #[DataProvider('getEscapeSequences')]
-    public function testEscapedEscapeSequencesInQuotedScalar($input, $expected)
+    public function testEscapedEscapeSequencesInQuotedScalar($input, $expected): void
     {
         $this->assertSame($expected, $this->dumper->dump($input));
         $this->assertSameData($input, $this->parser->parse($expected));
@@ -307,7 +307,7 @@ class DumperTest extends TestCase
         ];
     }
 
-    public function testBinaryDataIsDumpedBase64Encoded()
+    public function testBinaryDataIsDumpedBase64Encoded(): void
     {
         $binaryData = file_get_contents(__DIR__.'/Fixtures/arrow.gif');
         $expected = '{ data: !!binary '.base64_encode($binaryData).' }';
@@ -315,14 +315,14 @@ class DumperTest extends TestCase
         $this->assertSame($expected, $this->dumper->dump(['data' => $binaryData]));
     }
 
-    public function testNonUtf8DataIsDumpedBase64Encoded()
+    public function testNonUtf8DataIsDumpedBase64Encoded(): void
     {
         // "für" (ISO-8859-1 encoded)
         $this->assertSame('!!binary ZsM/cg==', $this->dumper->dump("f\xc3\x3fr"));
     }
 
     #[DataProvider('objectAsMapProvider')]
-    public function testDumpObjectAsMap($object, $expected)
+    public function testDumpObjectAsMap($object, $expected): void
     {
         $yaml = $this->dumper->dump($object, 0, 0, Yaml::DUMP_OBJECT_AS_MAP);
 
@@ -358,7 +358,7 @@ class DumperTest extends TestCase
         return $tests;
     }
 
-    public function testDumpingArrayObjectInstancesRespectsInlineLevel()
+    public function testDumpingArrayObjectInstancesRespectsInlineLevel(): void
     {
         $deep = new \ArrayObject(['deep1' => 'd', 'deep2' => 'e']);
         $inner = new \ArrayObject(['inner1' => 'b', 'inner2' => 'c', 'inner3' => $deep]);
@@ -377,7 +377,7 @@ class DumperTest extends TestCase
         $this->assertSame($expected, $yaml);
     }
 
-    public function testDumpingArrayObjectInstancesWithNumericKeysInlined()
+    public function testDumpingArrayObjectInstancesWithNumericKeysInlined(): void
     {
         $deep = new \ArrayObject(['d', 'e']);
         $inner = new \ArrayObject(['b', 'c', $deep]);
@@ -390,7 +390,7 @@ class DumperTest extends TestCase
         $this->assertSame($expected, $yaml);
     }
 
-    public function testDumpingArrayObjectInstancesWithNumericKeysRespectsInlineLevel()
+    public function testDumpingArrayObjectInstancesWithNumericKeysRespectsInlineLevel(): void
     {
         $deep = new \ArrayObject(['d', 'e']);
         $inner = new \ArrayObject(['b', 'c', $deep]);
@@ -407,17 +407,17 @@ class DumperTest extends TestCase
         $this->assertSame($expected, $yaml);
     }
 
-    public function testDumpEmptyArrayObjectInstanceAsMap()
+    public function testDumpEmptyArrayObjectInstanceAsMap(): void
     {
         $this->assertSame('{  }', $this->dumper->dump(new \ArrayObject(), 2, 0, Yaml::DUMP_OBJECT_AS_MAP));
     }
 
-    public function testDumpEmptyStdClassInstanceAsMap()
+    public function testDumpEmptyStdClassInstanceAsMap(): void
     {
         $this->assertSame('{  }', $this->dumper->dump(new \stdClass(), 2, 0, Yaml::DUMP_OBJECT_AS_MAP));
     }
 
-    public function testDumpingStdClassInstancesRespectsInlineLevel()
+    public function testDumpingStdClassInstancesRespectsInlineLevel(): void
     {
         $deep = new \stdClass();
         $deep->deep1 = 'd';
@@ -446,7 +446,7 @@ class DumperTest extends TestCase
         $this->assertSameData($outer, $this->parser->parse($yaml, Yaml::PARSE_OBJECT_FOR_MAP));
     }
 
-    public function testDumpingTaggedValueSequenceRespectsInlineLevel()
+    public function testDumpingTaggedValueSequenceRespectsInlineLevel(): void
     {
         $data = [
             new TaggedValue('user', [
@@ -472,7 +472,7 @@ class DumperTest extends TestCase
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
-    public function testDumpingTaggedValueTopLevelScalar()
+    public function testDumpingTaggedValueTopLevelScalar(): void
     {
         $data = new TaggedValue('user', 'jane');
 
@@ -483,7 +483,7 @@ class DumperTest extends TestCase
         $this->assertSameData($data, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
     }
 
-    public function testDumpingTaggedValueTopLevelAssocInline()
+    public function testDumpingTaggedValueTopLevelAssocInline(): void
     {
         $data = new TaggedValue('user', ['name' => 'jane']);
 
@@ -494,7 +494,7 @@ class DumperTest extends TestCase
         $this->assertSameData($data, $this->parser->parse($yaml, Yaml::PARSE_CUSTOM_TAGS));
     }
 
-    public function testDumpingTaggedValueTopLevelAssoc()
+    public function testDumpingTaggedValueTopLevelAssoc(): void
     {
         $data = new TaggedValue('user', ['name' => 'jane']);
 
@@ -507,14 +507,14 @@ class DumperTest extends TestCase
         $this->assertSame($expected, $yaml);
     }
 
-    public function testDumpingTaggedValueTopLevelMultiLine()
+    public function testDumpingTaggedValueTopLevelMultiLine(): void
     {
         $data = new TaggedValue('text', "a\nb\n");
 
         $this->assertSame("!text |\n    a\n    b\n    ", $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK));
     }
 
-    public function testDumpingTaggedValueSpecialCharsInTag()
+    public function testDumpingTaggedValueSpecialCharsInTag(): void
     {
         // @todo Validate the tag name in the TaggedValue constructor.
         $data = new TaggedValue('a b @ c', 5);
@@ -525,7 +525,7 @@ class DumperTest extends TestCase
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
-    public function testDumpingTaggedValueSequenceWithInlinedTagValues()
+    public function testDumpingTaggedValueSequenceWithInlinedTagValues(): void
     {
         $data = [
             new TaggedValue('user', [
@@ -550,7 +550,7 @@ class DumperTest extends TestCase
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
-    public function testDumpingTaggedValueMapRespectsInlineLevel()
+    public function testDumpingTaggedValueMapRespectsInlineLevel(): void
     {
         $data = [
             'user1' => new TaggedValue('user', [
@@ -578,7 +578,7 @@ class DumperTest extends TestCase
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
-    public function testDumpingTaggedValueMapWithInlinedTagValues()
+    public function testDumpingTaggedValueMapWithInlinedTagValues(): void
     {
         $data = [
             'user1' => new TaggedValue('user', [
@@ -601,7 +601,7 @@ class DumperTest extends TestCase
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
-    public function testDumpingNotInlinedScalarTaggedValue()
+    public function testDumpingNotInlinedScalarTaggedValue(): void
     {
         $data = [
             'user1' => new TaggedValue('user', 'jane'),
@@ -617,7 +617,7 @@ class DumperTest extends TestCase
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
-    public function testDumpingNotInlinedNullTaggedValue()
+    public function testDumpingNotInlinedNullTaggedValue(): void
     {
         $data = [
             'foo' => new TaggedValue('bar', null),
@@ -631,7 +631,7 @@ class DumperTest extends TestCase
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS | Yaml::PARSE_CONSTANT));
     }
 
-    public function testDumpingMultiLineStringAsScalarBlockTaggedValue()
+    public function testDumpingMultiLineStringAsScalarBlockTaggedValue(): void
     {
         $data = [
             'foo' => new TaggedValue('bar', "foo\nline with trailing spaces:\n  \nbar\ninteger like line:\n123456789\nempty line:\n\nbaz"),
@@ -651,7 +651,7 @@ class DumperTest extends TestCase
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
-    public function testDumpingTaggedMultiLineInList()
+    public function testDumpingTaggedMultiLineInList(): void
     {
         $data = [
             new TaggedValue('bar', "a\nb"),
@@ -666,7 +666,7 @@ class DumperTest extends TestCase
         $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS);
     }
 
-    public function testDumpingTaggedMultiLineTrailingNewlinesInMap()
+    public function testDumpingTaggedMultiLineTrailingNewlinesInMap(): void
     {
         $data = [
             'foo' => new TaggedValue('bar', "a\nb\n\n\n"),
@@ -682,7 +682,7 @@ class DumperTest extends TestCase
             $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
-    public function testDumpingTaggedMultiLineTrailingNewlinesInList()
+    public function testDumpingTaggedMultiLineTrailingNewlinesInList(): void
     {
         $data = [
             new TaggedValue('bar', "a\nb\n\n\n"),
@@ -697,7 +697,7 @@ class DumperTest extends TestCase
         $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS);
     }
 
-    public function testDumpingInlinedMultiLineIfRnBreakLineInTaggedValue()
+    public function testDumpingInlinedMultiLineIfRnBreakLineInTaggedValue(): void
     {
         $data = [
             'data' => [
@@ -714,7 +714,7 @@ class DumperTest extends TestCase
         $this->assertSameData($data, $this->parser->parse($expected, Yaml::PARSE_CUSTOM_TAGS));
     }
 
-    public function testDumpMultiLineStringAsScalarBlock()
+    public function testDumpMultiLineStringAsScalarBlock(): void
     {
         $data = [
             'data' => [
@@ -749,7 +749,7 @@ class DumperTest extends TestCase
         $this->assertSame($data, $this->parser->parse($yml));
     }
 
-    public function testDumpMultiLineStringAsScalarBlockWhenFirstLineHasLeadingSpace()
+    public function testDumpMultiLineStringAsScalarBlockWhenFirstLineHasLeadingSpace(): void
     {
         $data = [
             'data' => [
@@ -764,7 +764,7 @@ class DumperTest extends TestCase
         $this->assertSame($data, $this->parser->parse($yml));
     }
 
-    public function testDumpMultiLineStringAsScalarBlockWhenFirstLineIsEmptyAndSecondLineHasLeadingSpace()
+    public function testDumpMultiLineStringAsScalarBlockWhenFirstLineIsEmptyAndSecondLineHasLeadingSpace(): void
     {
         $data = [
             'data' => [
@@ -779,7 +779,7 @@ class DumperTest extends TestCase
         $this->assertSame($data, $this->parser->parse($yml));
     }
 
-    public function testDumpMultiLineStringAsScalarBlockWhenFirstLineHasOnlySpaces()
+    public function testDumpMultiLineStringAsScalarBlockWhenFirstLineHasOnlySpaces(): void
     {
         $data = [
             'data' => [
@@ -800,7 +800,7 @@ class DumperTest extends TestCase
         $this->assertSame($expectedData, $this->parser->parse($yml));
     }
 
-    public function testCarriageReturnFollowedByNewlineIsMaintainedWhenDumpingAsMultiLineLiteralBlock()
+    public function testCarriageReturnFollowedByNewlineIsMaintainedWhenDumpingAsMultiLineLiteralBlock(): void
     {
         $data = ["a\r\nb\nc"];
         $expected = "- \"a\\r\\nb\\nc\"\n";
@@ -808,7 +808,7 @@ class DumperTest extends TestCase
         $this->assertSame($data, $this->parser->parse($expected));
     }
 
-    public function testCarriageReturnNotFollowedByNewlineIsPreservedWhenDumpingAsMultiLineLiteralBlock()
+    public function testCarriageReturnNotFollowedByNewlineIsPreservedWhenDumpingAsMultiLineLiteralBlock(): void
     {
         $data = [
             'parent' => [
@@ -824,7 +824,7 @@ class DumperTest extends TestCase
         $this->assertSame($data, $this->parser->parse($expected));
     }
 
-    public function testNoExtraTrailingNewlineWhenDumpingAsMultiLineLiteralBlock()
+    public function testNoExtraTrailingNewlineWhenDumpingAsMultiLineLiteralBlock(): void
     {
         $data = [
             "a\nb",
@@ -836,7 +836,7 @@ class DumperTest extends TestCase
         $this->assertSame($data, $this->parser->parse($yaml));
     }
 
-    public function testTopLevelMultiLineStringLiteral()
+    public function testTopLevelMultiLineStringLiteral(): void
     {
         $data = "a\nb\n";
         $yaml = $this->dumper->dump($data, 2, 0, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
@@ -844,7 +844,7 @@ class DumperTest extends TestCase
         $this->assertSame($data, $this->parser->parse($yaml));
     }
 
-    public function testDumpTrailingNewlineInMultiLineLiteralBlocks()
+    public function testDumpTrailingNewlineInMultiLineLiteralBlocks(): void
     {
         $data = [
             'clip 1' => "one\ntwo\n",
@@ -888,27 +888,27 @@ class DumperTest extends TestCase
         $this->assertSame($data, $this->parser->parse($yaml));
     }
 
-    public function testZeroIndentationThrowsException()
+    public function testZeroIndentationThrowsException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The indentation must be greater than zero');
         new Dumper(0);
     }
 
-    public function testNegativeIndentationThrowsException()
+    public function testNegativeIndentationThrowsException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The indentation must be greater than zero');
         new Dumper(-4);
     }
 
-    public function testDumpNullAsTilde()
+    public function testDumpNullAsTilde(): void
     {
         $this->assertSame('{ foo: ~ }', $this->dumper->dump(['foo' => null], 0, 0, Yaml::DUMP_NULL_AS_TILDE));
     }
 
     #[DataProvider('getForceQuotesOnValuesData')]
-    public function testCanForceQuotesOnValues(array $input, string $expected)
+    public function testCanForceQuotesOnValues(array $input, string $expected): void
     {
         $this->assertSame($expected, $this->dumper->dump($input, 0, 0, Yaml::DUMP_FORCE_DOUBLE_QUOTES_ON_VALUES));
     }
@@ -987,7 +987,7 @@ class DumperTest extends TestCase
     }
 
     #[DataProvider('getNumericKeyData')]
-    public function testDumpInlineNumericKeyAsString(array $input, bool $inline, int $flags, string $expected)
+    public function testDumpInlineNumericKeyAsString(array $input, bool $inline, int $flags, string $expected): void
     {
         $this->assertSame($expected, $this->dumper->dump($input, $inline ? 0 : 4, 0, $flags));
     }
@@ -1074,7 +1074,7 @@ class DumperTest extends TestCase
         ];
     }
 
-    public function testDumpIdeographicSpaces()
+    public function testDumpIdeographicSpaces(): void
     {
         $expected = <<<YAML
             alone: '　'
@@ -1090,7 +1090,7 @@ class DumperTest extends TestCase
     }
 
     #[DataProvider('getDateTimeData')]
-    public function testDumpDateTime(array $input, string $expected)
+    public function testDumpDateTime(array $input, string $expected): void
     {
         $this->assertSame($expected, rtrim($this->dumper->dump($input, 1)));
     }
@@ -1294,7 +1294,7 @@ class DumperTest extends TestCase
     }
 
     #[DataProvider('getDumpCompactNestedMapping')]
-    public function testDumpCompactNestedMapping(array $data, string $expected, int $indentation, int $inline = 10)
+    public function testDumpCompactNestedMapping(array $data, string $expected, int $indentation, int $inline = 10): void
     {
         $dumper = new Dumper($indentation);
         $actual = $dumper->dump($data, $inline, 0, Yaml::DUMP_COMPACT_NESTED_MAPPING);
@@ -1302,7 +1302,7 @@ class DumperTest extends TestCase
         $this->assertSameData($data, $this->parser->parse($actual));
     }
 
-    private function assertSameData($expected, $actual)
+    private function assertSameData($expected, $actual): void
     {
         $this->assertEquals($expected, $actual);
         $this->assertSame(

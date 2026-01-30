@@ -18,7 +18,7 @@ use Symfony\Component\Process\Messenger\RunProcessMessageHandler;
 
 class RunProcessMessageHandlerTest extends TestCase
 {
-    public function testRunSuccessfulProcess()
+    public function testRunSuccessfulProcess(): void
     {
         $context = (new RunProcessMessageHandler())(new RunProcessMessage(['ls'], cwd: __DIR__));
 
@@ -27,7 +27,7 @@ class RunProcessMessageHandlerTest extends TestCase
         $this->assertStringContainsString(basename(__FILE__), $context->output);
     }
 
-    public function testRunFailedProcess()
+    public function testRunFailedProcess(): void
     {
         try {
             (new RunProcessMessageHandler())(new RunProcessMessage(['invalid']));
@@ -45,7 +45,7 @@ class RunProcessMessageHandlerTest extends TestCase
         $this->fail('Exception not thrown');
     }
 
-    public function testRunSuccessfulProcessFromShellCommandline()
+    public function testRunSuccessfulProcessFromShellCommandline(): void
     {
         $context = (new RunProcessMessageHandler())(RunProcessMessage::fromShellCommandline('ls | grep Test', cwd: __DIR__));
 
@@ -54,7 +54,7 @@ class RunProcessMessageHandlerTest extends TestCase
         $this->assertStringContainsString(basename(__FILE__), $context->output);
     }
 
-    public function testRunFailedProcessFromShellCommandline()
+    public function testRunFailedProcessFromShellCommandline(): void
     {
         try {
             (new RunProcessMessageHandler())(RunProcessMessage::fromShellCommandline('invalid'));

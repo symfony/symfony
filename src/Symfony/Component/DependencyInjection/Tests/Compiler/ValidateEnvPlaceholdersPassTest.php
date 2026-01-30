@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 
 class ValidateEnvPlaceholdersPassTest extends TestCase
 {
-    public function testEnvsAreValidatedInConfig()
+    public function testEnvsAreValidatedInConfig(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('env(NULLED)', null);
@@ -44,7 +44,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testDefaultEnvIsValidatedInConfig()
+    public function testDefaultEnvIsValidatedInConfig(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid configuration for path "env_extension.string_node": "fail" is not a valid string');
@@ -58,7 +58,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->doProcess($container);
     }
 
-    public function testDefaultEnvWithoutPrefixIsValidatedInConfig()
+    public function testDefaultEnvWithoutPrefixIsValidatedInConfig(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The default value of an env() parameter must be a string or null, but "float" given to "env(FLOATISH)".');
@@ -73,7 +73,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->doProcess($container);
     }
 
-    public function testDefaultProcessorWithScalarNode()
+    public function testDefaultProcessorWithScalarNode(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('parameter_int', 12134);
@@ -87,7 +87,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testDefaultProcessorAndAnotherProcessorWithScalarNode()
+    public function testDefaultProcessorAndAnotherProcessorWithScalarNode(): void
     {
         $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessageMatches('/^Invalid type for path "env_extension\.scalar_node"\. Expected one of "bool", "int", "float", "string", but got one of "int", "array"\.$/');
@@ -103,7 +103,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->doProcess($container);
     }
 
-    public function testEnvsAreValidatedInConfigWithInvalidPlaceholder()
+    public function testEnvsAreValidatedInConfigWithInvalidPlaceholder(): void
     {
         $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessage('Invalid type for path "env_extension.bool_node". Expected "bool", but got one of "bool", "int", "float", "string", "array".');
@@ -118,7 +118,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testInvalidEnvInConfig()
+    public function testInvalidEnvInConfig(): void
     {
         $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessage('Invalid type for path "env_extension.int_node". Expected "int", but got "array".');
@@ -131,7 +131,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->doProcess($container);
     }
 
-    public function testNulledEnvInConfig()
+    public function testNulledEnvInConfig(): void
     {
         $this->expectException(InvalidTypeException::class);
         $this->expectExceptionMessageMatches('/^Invalid type for path "env_extension\.int_node"\. Expected "?int"?, but got (NULL|"null")\.$/');
@@ -145,7 +145,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->doProcess($container);
     }
 
-    public function testValidateEnvOnMerge()
+    public function testValidateEnvOnMerge(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -170,7 +170,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testConcatenatedEnvInConfig()
+    public function testConcatenatedEnvInConfig(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -183,7 +183,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame(['scalar_node' => $expected], $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testSurroundedEnvInConfig()
+    public function testSurroundedEnvInConfig(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -196,7 +196,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame(['scalar_node' => $expected], $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testEnvIsIncompatibleWithArrayNode()
+    public function testEnvIsIncompatibleWithArrayNode(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('A dynamic value is not compatible with a "Symfony\Component\Config\Definition\ArrayNode" node type at path "env_extension.simple_array_node".');
@@ -209,7 +209,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->doProcess($container);
     }
 
-    public function testNormalizedEnvIsCompatibleWithArrayNode()
+    public function testNormalizedEnvIsCompatibleWithArrayNode(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -222,7 +222,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame(['array_node' => ['child_node' => $expected]], $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testEnvIsNotUnset()
+    public function testEnvIsNotUnset(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -235,7 +235,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testEmptyEnvWhichCannotBeEmptyForScalarNode()
+    public function testEmptyEnvWhichCannotBeEmptyForScalarNode(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -248,7 +248,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testEmptyEnvWhichCannotBeEmptyForScalarNodeWithValidation()
+    public function testEmptyEnvWhichCannotBeEmptyForScalarNodeWithValidation(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The path "env_extension.scalar_node_not_empty_validated" cannot contain an environment variable when empty values are not allowed by definition and are validated.');
@@ -262,7 +262,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->doProcess($container);
     }
 
-    public function testPartialEnvWhichCannotBeEmptyForScalarNode()
+    public function testPartialEnvWhichCannotBeEmptyForScalarNode(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -275,7 +275,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testEnvWithVariableNode()
+    public function testEnvWithVariableNode(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension($ext = new EnvExtension());
@@ -288,7 +288,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
     }
 
-    public function testEmptyConfigFromMoreThanOneSource()
+    public function testEmptyConfigFromMoreThanOneSource(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new EnvExtension(new ConfigurationWithArrayNodeRequiringOneElement()));
@@ -299,7 +299,7 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testDiscardedEnvInConfig()
+    public function testDiscardedEnvInConfig(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('env(BOOLISH)', '1');

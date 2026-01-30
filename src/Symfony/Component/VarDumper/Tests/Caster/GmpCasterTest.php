@@ -22,7 +22,7 @@ class GmpCasterTest extends TestCase
     use VarDumperTestTrait;
 
     #[RequiresPhpExtension('gmp')]
-    public function testCastGmp()
+    public function testCastGmp(): void
     {
         $gmpString = gmp_init('1234');
         $gmpOctal = gmp_init(0o10);

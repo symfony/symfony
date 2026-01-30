@@ -36,14 +36,14 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->generator = new LogoutUrlGenerator($requestStack, null, $this->tokenStorage);
     }
 
-    public function testGetLogoutPath()
+    public function testGetLogoutPath(): void
     {
         $this->generator->registerListener('secured_area', '/logout', null, null);
 
         $this->assertSame('/logout', $this->generator->getLogoutPath('secured_area'));
     }
 
-    public function testGetLogoutPathWithoutLogoutListenerRegisteredForKeyThrowsException()
+    public function testGetLogoutPathWithoutLogoutListenerRegisteredForKeyThrowsException(): void
     {
         $this->generator->registerListener('secured_area', '/logout', null, null, null);
 
@@ -53,7 +53,7 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->generator->getLogoutPath('unregistered_key');
     }
 
-    public function testGuessFromToken()
+    public function testGuessFromToken(): void
     {
         $this->tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('user', 'password'), 'secured_area'));
         $this->generator->registerListener('secured_area', '/logout', null, null);
@@ -61,7 +61,7 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->assertSame('/logout', $this->generator->getLogoutPath());
     }
 
-    public function testGuessFromCurrentFirewallKey()
+    public function testGuessFromCurrentFirewallKey(): void
     {
         $this->generator->registerListener('secured_area', '/logout', null, null);
         $this->generator->setCurrentFirewall('secured_area');
@@ -69,7 +69,7 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->assertSame('/logout', $this->generator->getLogoutPath());
     }
 
-    public function testGuessFromCurrentFirewallContext()
+    public function testGuessFromCurrentFirewallContext(): void
     {
         $this->generator->registerListener('secured_area', '/logout', null, null, null, 'secured');
         $this->generator->setCurrentFirewall('admin', 'secured');
@@ -77,7 +77,7 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->assertSame('/logout', $this->generator->getLogoutPath());
     }
 
-    public function testGuessFromTokenWithoutFirewallNameFallbacksToCurrentFirewall()
+    public function testGuessFromTokenWithoutFirewallNameFallbacksToCurrentFirewall(): void
     {
         $this->tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('username', 'password'), 'provider'));
         $this->generator->registerListener('secured_area', '/logout', null, null);
@@ -86,7 +86,7 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->assertSame('/logout', $this->generator->getLogoutPath());
     }
 
-    public function testUnableToGuessWithoutCurrentFirewallThrowsException()
+    public function testUnableToGuessWithoutCurrentFirewallThrowsException(): void
     {
         $this->generator->registerListener('secured_area', '/logout', null, null);
 
@@ -96,7 +96,7 @@ class LogoutUrlGeneratorTest extends TestCase
         $this->generator->getLogoutPath();
     }
 
-    public function testUnableToGuessWithCurrentFirewallThrowsException()
+    public function testUnableToGuessWithCurrentFirewallThrowsException(): void
     {
         $this->generator->registerListener('secured_area', '/logout', null, null);
         $this->generator->setCurrentFirewall('admin');

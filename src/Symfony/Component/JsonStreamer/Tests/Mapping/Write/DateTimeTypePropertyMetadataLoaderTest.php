@@ -19,7 +19,7 @@ use Symfony\Component\TypeInfo\Type;
 
 class DateTimeTypePropertyMetadataLoaderTest extends TestCase
 {
-    public function testAddDateTimeToStringValueTransformer()
+    public function testAddDateTimeToStringValueTransformer(): void
     {
         $loader = new DateTimeTypePropertyMetadataLoader(self::propertyMetadataLoader([
             'dateTime' => new PropertyMetadata('dateTime', Type::object(\DateTimeImmutable::class)),

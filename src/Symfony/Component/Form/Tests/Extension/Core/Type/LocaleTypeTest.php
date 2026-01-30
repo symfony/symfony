@@ -27,7 +27,7 @@ class LocaleTypeTest extends BaseTypeTestCase
         parent::setUp();
     }
 
-    public function testLocalesAreSelectable()
+    public function testLocalesAreSelectable(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE)
             ->createView()->vars['choices'];
@@ -38,7 +38,7 @@ class LocaleTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testChoiceTranslationLocaleOption()
+    public function testChoiceTranslationLocaleOption(): void
     {
         $choices = $this->factory
             ->create(static::TESTED_TYPE, null, [
@@ -52,12 +52,12 @@ class LocaleTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('zh_Hant_TW', 'zh_Hant_TW', 'китайська (традиційна, Тайвань)'), $choices);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'en', $expectedData = 'en')
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'en', $expectedData = 'en'): void
     {
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
     }

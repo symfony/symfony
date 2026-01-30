@@ -18,7 +18,7 @@ use Symfony\Component\RateLimiter\Policy\Rate;
 class RateTest extends TestCase
 {
     #[DataProvider('provideRate')]
-    public function testFromString(Rate $rate)
+    public function testFromString(Rate $rate): void
     {
         $this->assertEquals($rate, Rate::fromString((string) $rate));
     }

@@ -20,13 +20,13 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class CollectionTypeTest extends TestCase
 {
-    public function testCannotCreateInvalidBuiltinType()
+    public function testCannotCreateInvalidBuiltinType(): void
     {
         $this->expectException(InvalidArgumentException::class);
         new CollectionType(Type::int());
     }
 
-    public function testCanOnlyConstructListWithIntKeyType()
+    public function testCanOnlyConstructListWithIntKeyType(): void
     {
         new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::int(), Type::bool()), isList: true);
         $this->addToAssertionCount(1);
@@ -35,7 +35,7 @@ class CollectionTypeTest extends TestCase
         new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::bool()), isList: true);
     }
 
-    public function testIsList()
+    public function testIsList(): void
     {
         $type = new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::bool()));
         $this->assertFalse($type->isList());
@@ -44,7 +44,7 @@ class CollectionTypeTest extends TestCase
         $this->assertTrue($type->isList());
     }
 
-    public function testGetCollectionKeyType()
+    public function testGetCollectionKeyType(): void
     {
         $type = new CollectionType(Type::builtin(TypeIdentifier::ARRAY));
         $this->assertEquals(Type::arrayKey(), $type->getCollectionKeyType());
@@ -56,7 +56,7 @@ class CollectionTypeTest extends TestCase
         $this->assertEquals(Type::string(), $type->getCollectionKeyType());
     }
 
-    public function testGetCollectionValueType()
+    public function testGetCollectionValueType(): void
     {
         $type = new CollectionType(Type::builtin(TypeIdentifier::ARRAY));
         $this->assertEquals(Type::mixed(), $type->getCollectionValueType());
@@ -68,7 +68,7 @@ class CollectionTypeTest extends TestCase
         $this->assertEquals(Type::bool(), $type->getCollectionValueType());
     }
 
-    public function testWrappedTypeIsSatisfiedBy()
+    public function testWrappedTypeIsSatisfiedBy(): void
     {
         $type = new CollectionType(Type::builtin(TypeIdentifier::ARRAY));
         $this->assertTrue($type->wrappedTypeIsSatisfiedBy(static fn (Type $t): bool => 'array' === (string) $t));
@@ -77,7 +77,7 @@ class CollectionTypeTest extends TestCase
         $this->assertFalse($type->wrappedTypeIsSatisfiedBy(static fn (Type $t): bool => 'array' === (string) $t));
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $type = new CollectionType(Type::builtin(TypeIdentifier::ITERABLE));
         $this->assertEquals('iterable', (string) $type);
@@ -92,7 +92,7 @@ class CollectionTypeTest extends TestCase
         $this->assertEquals('list<bool>', (string) $type);
     }
 
-    public function testAccepts()
+    public function testAccepts(): void
     {
         $type = new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ARRAY), Type::string(), Type::bool()));
 
@@ -126,7 +126,7 @@ class CollectionTypeTest extends TestCase
         $this->assertFalse($type->accepts(new \ArrayObject([0 => true, 1 => 'string'])));
     }
 
-    public function testCannotCreateIterableList()
+    public function testCannotCreateIterableList(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot create a "Symfony\Component\TypeInfo\Type\CollectionType" as list when type is not "array".');
@@ -134,7 +134,7 @@ class CollectionTypeTest extends TestCase
         new CollectionType(Type::generic(Type::builtin(TypeIdentifier::ITERABLE), Type::bool()), isList: true);
     }
 
-    public function testMergeCollectionValueTypes()
+    public function testMergeCollectionValueTypes(): void
     {
         $this->assertEquals(Type::int(), CollectionType::mergeCollectionValueTypes([Type::int()]));
         $this->assertEquals(Type::union(Type::int(), Type::string()), CollectionType::mergeCollectionValueTypes([Type::int(), Type::string()]));
@@ -148,7 +148,7 @@ class CollectionTypeTest extends TestCase
         $this->assertEquals(Type::object(), CollectionType::mergeCollectionValueTypes([Type::object(\Stringable::class), Type::object()]));
     }
 
-    public function testCannotMergeEmptyCollectionValueTypes()
+    public function testCannotMergeEmptyCollectionValueTypes(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The $types cannot be empty.');

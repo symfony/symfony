@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class AzureApiTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(AzureApiTransport $transport, string $expected)
+    public function testToString(AzureApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -41,7 +41,7 @@ class AzureApiTransportTest extends TestCase
         ];
     }
 
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
@@ -56,7 +56,7 @@ class AzureApiTransportTest extends TestCase
         $this->assertEquals('bar', $payload['headers']['foo']);
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -101,7 +101,7 @@ class AzureApiTransportTest extends TestCase
         $this->assertSame('foobar', $message->getMessageId());
     }
 
-    public function testTagAndMetadataHeaders()
+    public function testTagAndMetadataHeaders(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('category-one'));
@@ -125,7 +125,7 @@ class AzureApiTransportTest extends TestCase
         $this->assertSame('12345', $payload['headers']['X-Metadata-Client-ID']);
     }
 
-    public function testItDoesNotAllowToAddResourceNameWithDot()
+    public function testItDoesNotAllowToAddResourceNameWithDot(): void
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Resource name must not end with a dot "."');

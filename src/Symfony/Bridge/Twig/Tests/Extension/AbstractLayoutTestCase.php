@@ -63,7 +63,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         }
     }
 
-    protected function assertWidgetMatchesXpath(FormView $view, array $vars, $xpath)
+    protected function assertWidgetMatchesXpath(FormView $view, array $vars, $xpath): void
     {
         // include ampersands everywhere to validate escaping
         $html = $this->renderWidget($view, array_merge([
@@ -84,7 +84,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertMatchesXpath($html, $xpath);
     }
 
-    public function testLabel()
+    public function testLabel(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $view = $form->createView();
@@ -99,7 +99,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelWithoutTranslation()
+    public function testLabelWithoutTranslation(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'translation_domain' => false,
@@ -113,7 +113,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelOnForm()
+    public function testLabelOnForm(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType', null, ['widget' => 'choice']);
         $view = $form->createView();
@@ -128,7 +128,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelWithCustomTextPassedAsOption()
+    public function testLabelWithCustomTextPassedAsOption(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'label' => 'Custom label',
@@ -143,7 +143,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelWithCustomTextPassedDirectly()
+    public function testLabelWithCustomTextPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), 'Custom label');
@@ -156,7 +156,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelWithCustomTextPassedAsOptionAndDirectly()
+    public function testLabelWithCustomTextPassedAsOptionAndDirectly(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'label' => 'Custom label',
@@ -171,7 +171,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelDoesNotRenderFieldAttributes()
+    public function testLabelDoesNotRenderFieldAttributes(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), null, [
@@ -188,7 +188,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelWithCustomAttributesPassedDirectly()
+    public function testLabelWithCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), null, [
@@ -205,7 +205,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelWithCustomTextAndCustomAttributesPassedDirectly()
+    public function testLabelWithCustomTextAndCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), 'Custom label', [
@@ -224,7 +224,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     }
 
     // https://github.com/symfony/symfony/issues/5029
-    public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly()
+    public function testLabelWithCustomTextAsOptionAndCustomAttributesPassedDirectly(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'label' => 'Custom label',
@@ -244,7 +244,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelFormatName()
+    public function testLabelFormatName(): void
     {
         $form = $this->factory->createNamedBuilder('myform')
             ->add('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType')
@@ -260,7 +260,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelFormatId()
+    public function testLabelFormatId(): void
     {
         $form = $this->factory->createNamedBuilder('myform')
             ->add('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType')
@@ -276,7 +276,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelFormatAsFormOption()
+    public function testLabelFormatAsFormOption(): void
     {
         $options = ['label_format' => 'form.%name%'];
 
@@ -294,7 +294,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelFormatOverriddenOption()
+    public function testLabelFormatOverriddenOption(): void
     {
         $options = ['label_format' => 'form.%name%'];
 
@@ -312,7 +312,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelWithoutTranslationOnButton()
+    public function testLabelWithoutTranslationOnButton(): void
     {
         $form = $this->factory->createNamedBuilder('myform', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'translation_domain' => false,
@@ -331,7 +331,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelFormatOnButton()
+    public function testLabelFormatOnButton(): void
     {
         $form = $this->factory->createNamedBuilder('myform')
             ->add('mybutton', 'Symfony\Component\Form\Extension\Core\Type\ButtonType')
@@ -348,7 +348,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelFormatOnButtonId()
+    public function testLabelFormatOnButtonId(): void
     {
         $form = $this->factory->createNamedBuilder('myform')
             ->add('mybutton', 'Symfony\Component\Form\Extension\Core\Type\ButtonType')
@@ -365,7 +365,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testHelp()
+    public function testHelp(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help text test!',
@@ -382,7 +382,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testHelpNotSet()
+    public function testHelpNotSet(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $view = $form->createView();
@@ -391,7 +391,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertMatchesXpath($html, '/p', 0);
     }
 
-    public function testHelpSetLinkFromWidget()
+    public function testHelpSetLinkFromWidget(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help text test!',
@@ -409,7 +409,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testHelpNotSetNotLinkedFromWidget()
+    public function testHelpNotSetNotLinkedFromWidget(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $view = $form->createView();
@@ -425,7 +425,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testErrors()
+    public function testErrors(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $form->addError(new FormError('[trans]Error 1[/trans]'));
@@ -444,7 +444,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testOverrideWidgetBlock()
+    public function testOverrideWidgetBlock(): void
     {
         // see custom_widgets.html.twig
         $form = $this->factory->createNamed('text_id', 'Symfony\Component\Form\Extension\Core\Type\TextType');
@@ -462,7 +462,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testCheckedCheckbox()
+    public function testCheckedCheckbox(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType', true);
 
@@ -476,7 +476,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testUncheckedCheckbox()
+    public function testUncheckedCheckbox(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType', false);
 
@@ -489,7 +489,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testCheckboxWithValue()
+    public function testCheckboxWithValue(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CheckboxType', false, [
             'value' => 'foo&bar',
@@ -504,7 +504,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoice()
+    public function testSingleChoice(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -537,7 +537,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSelectWithSizeBiggerThanOneCanBeRequired()
+    public function testSelectWithSizeBiggerThanOneCanBeRequired(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
             'choices' => ['a', 'b'],
@@ -556,7 +556,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceWithoutTranslation()
+    public function testSingleChoiceWithoutTranslation(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -578,7 +578,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceWithPlaceholderWithoutTranslation()
+    public function testSingleChoiceWithPlaceholderWithoutTranslation(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -603,7 +603,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceAttributes()
+    public function testSingleChoiceAttributes(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -625,7 +625,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceAttributesWithMainAttributes()
+    public function testSingleChoiceAttributesWithMainAttributes(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -648,7 +648,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleExpandedChoiceAttributesWithMainAttributes()
+    public function testSingleExpandedChoiceAttributesWithMainAttributes(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -672,7 +672,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceWithPreferred()
+    public function testSingleChoiceWithPreferred(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -696,7 +696,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceWithPreferredAndNoSeparator()
+    public function testSingleChoiceWithPreferredAndNoSeparator(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -719,7 +719,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceWithPreferredAndBlankSeparator()
+    public function testSingleChoiceWithPreferredAndBlankSeparator(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -743,7 +743,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testChoiceWithOnlyPreferred()
+    public function testChoiceWithOnlyPreferred(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -759,7 +759,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceNonRequired()
+    public function testSingleChoiceNonRequired(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -782,7 +782,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceNonRequiredNoneSelected()
+    public function testSingleChoiceNonRequiredNoneSelected(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', null, [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -805,7 +805,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceNonRequiredWithPlaceholder()
+    public function testSingleChoiceNonRequiredWithPlaceholder(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -829,7 +829,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceRequiredWithPlaceholder()
+    public function testSingleChoiceRequiredWithPlaceholder(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -856,7 +856,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceRequiredWithPlaceholderViaView()
+    public function testSingleChoiceRequiredWithPlaceholderViaView(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -882,7 +882,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceGrouped()
+    public function testSingleChoiceGrouped(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => [
@@ -912,7 +912,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testMultipleChoice()
+    public function testMultipleChoice(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -935,7 +935,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testMultipleChoiceAttributes()
+    public function testMultipleChoiceAttributes(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -959,7 +959,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testMultipleChoiceSkipsPlaceholder()
+    public function testMultipleChoiceSkipsPlaceholder(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -981,7 +981,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testMultipleChoiceNonRequired()
+    public function testMultipleChoiceNonRequired(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -1003,7 +1003,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceExpanded()
+    public function testSingleChoiceExpanded(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -1025,7 +1025,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceExpandedWithoutTranslation()
+    public function testSingleChoiceExpandedWithoutTranslation(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -1049,7 +1049,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceExpandedAttributes()
+    public function testSingleChoiceExpandedAttributes(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -1072,7 +1072,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceExpandedWithPlaceholder()
+    public function testSingleChoiceExpandedWithPlaceholder(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -1098,7 +1098,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceExpandedWithPlaceholderWithoutTranslation()
+    public function testSingleChoiceExpandedWithPlaceholderWithoutTranslation(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
@@ -1125,7 +1125,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSingleChoiceExpandedWithBooleanValue()
+    public function testSingleChoiceExpandedWithBooleanValue(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', true, [
             'choices' => ['Choice&A' => '1', 'Choice&B' => '0'],
@@ -1147,7 +1147,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testMultipleChoiceExpanded()
+    public function testMultipleChoiceExpanded(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', ['&a', '&c'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'],
@@ -1172,7 +1172,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testMultipleChoiceExpandedWithoutTranslation()
+    public function testMultipleChoiceExpandedWithoutTranslation(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', ['&a', '&c'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'],
@@ -1198,7 +1198,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testMultipleChoiceExpandedAttributes()
+    public function testMultipleChoiceExpandedAttributes(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', ['&a', '&c'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'],
@@ -1224,7 +1224,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testCountry()
+    public function testCountry(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CountryType', 'AT');
 
@@ -1237,7 +1237,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testCountryWithPlaceholder()
+    public function testCountryWithPlaceholder(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\CountryType', 'AT', [
             'placeholder' => 'Select&Country',
@@ -1254,7 +1254,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testDateTime()
+    public function testDateTime(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', date('Y').'-02-03 04:05:06', [
             'input' => 'string',
@@ -1294,7 +1294,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testDateTimeWithPlaceholderGlobal()
+    public function testDateTimeWithPlaceholderGlobal(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', null, [
             'input' => 'string',
@@ -1335,7 +1335,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testDateTimeWithHourAndMinute()
+    public function testDateTimeWithHourAndMinute(): void
     {
         $data = ['year' => date('Y'), 'month' => '2', 'day' => '3', 'hour' => '4', 'minute' => '5'];
 
@@ -1377,7 +1377,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testDateTimeWithSeconds()
+    public function testDateTimeWithSeconds(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', date('Y').'-02-03 04:05:06', [
             'input' => 'string',
@@ -1420,7 +1420,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testDateTimeSingleText()
+    public function testDateTimeSingleText(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', '2011-02-03 04:05:06', [
             'input' => 'string',
@@ -1446,7 +1446,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testDateTimeWithWidgetSingleText()
+    public function testDateTimeWithWidgetSingleText(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateTimeType', '2011-02-03 04:05:06', [
             'input' => 'string',
@@ -1464,7 +1464,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testDateChoice()
+    public function testDateChoice(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType', date('Y').'-02-03', [
             'input' => 'string',
@@ -1489,7 +1489,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testDateChoiceWithPlaceholderGlobal()
+    public function testDateChoiceWithPlaceholderGlobal(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType', null, [
             'input' => 'string',
@@ -1516,7 +1516,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testDateChoiceWithPlaceholderOnYear()
+    public function testDateChoiceWithPlaceholderOnYear(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType', null, [
             'input' => 'string',
@@ -1543,7 +1543,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testDateText()
+    public function testDateText(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType', '2011-02-03', [
             'input' => 'string',
@@ -1571,7 +1571,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testDateSingleText()
+    public function testDateSingleText(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\DateType', '2011-02-03', [
             'input' => 'string',
@@ -1587,7 +1587,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testDateErrorBubbling()
+    public function testDateErrorBubbling(): void
     {
         $form = $this->factory->createNamedBuilder('form', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add('date', 'Symfony\Component\Form\Extension\Core\Type\DateType', ['widget' => 'choice'])
@@ -1599,7 +1599,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertNotEmpty($this->renderErrors($view['date']));
     }
 
-    public function testBirthDay()
+    public function testBirthDay(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\BirthdayType', '2000-02-03', [
             'input' => 'string',
@@ -1624,7 +1624,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testBirthDayWithPlaceholder()
+    public function testBirthDayWithPlaceholder(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\BirthdayType', '1950-01-01', [
             'input' => 'string',
@@ -1654,7 +1654,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testEmail()
+    public function testEmail(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType', 'foo&bar');
 
@@ -1668,7 +1668,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testEmailWithMaxLength()
+    public function testEmailWithMaxLength(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\EmailType', 'foo&bar', [
             'attr' => ['maxlength' => 123],
@@ -1684,7 +1684,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testFile()
+    public function testFile(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\FileType');
 
@@ -1695,7 +1695,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testHidden()
+    public function testHidden(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\HiddenType', 'foo&bar');
 
@@ -1708,7 +1708,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testDisabled()
+    public function testDisabled(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'disabled' => true,
@@ -1723,7 +1723,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testInteger()
+    public function testInteger(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\IntegerType', 123);
 
@@ -1736,7 +1736,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testIntegerTypeWithGroupingRendersAsTextInput()
+    public function testIntegerTypeWithGroupingRendersAsTextInput(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\IntegerType', 123, [
             'grouping' => true,
@@ -1751,7 +1751,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLanguage()
+    public function testLanguage(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\LanguageType', 'de');
 
@@ -1764,7 +1764,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLocale()
+    public function testLocale(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\LocaleType', 'de_AT');
 
@@ -1777,7 +1777,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testMoney()
+    public function testMoney(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\MoneyType', 1234.56, [
             'currency' => 'EUR',
@@ -1793,7 +1793,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testNumber()
+    public function testNumber(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\NumberType', 1234.56);
 
@@ -1806,7 +1806,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testRenderNumberWithHtml5NumberType()
+    public function testRenderNumberWithHtml5NumberType(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\NumberType', 1234.56, [
             'html5' => true,
@@ -1822,7 +1822,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testRenderNumberWithHtml5NumberTypeAndStepAttribute()
+    public function testRenderNumberWithHtml5NumberTypeAndStepAttribute(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\NumberType', 1234.56, [
             'html5' => true,
@@ -1839,7 +1839,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testPassword()
+    public function testPassword(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', 'foo&bar');
 
@@ -1851,7 +1851,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testPasswordSubmittedWithNotAlwaysEmpty()
+    public function testPasswordSubmittedWithNotAlwaysEmpty(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', null, [
             'always_empty' => false,
@@ -1867,7 +1867,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testPasswordWithMaxLength()
+    public function testPasswordWithMaxLength(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PasswordType', 'foo&bar', [
             'attr' => ['maxlength' => 123],
@@ -1882,7 +1882,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testPercent()
+    public function testPercent(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\PercentType', 0.1, ['rounding_mode' => \NumberFormatter::ROUND_CEILING]);
 
@@ -1896,7 +1896,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testPercentNoSymbol()
+    public function testPercentNoSymbol(): void
     {
         $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => false, 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), [],
@@ -1909,7 +1909,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testPercentCustomSymbol()
+    public function testPercentCustomSymbol(): void
     {
         $form = $this->factory->createNamed('name', PercentType::class, 0.1, ['symbol' => '‱', 'rounding_mode' => \NumberFormatter::ROUND_CEILING]);
         $this->assertWidgetMatchesXpath($form->createView(), [],
@@ -1922,7 +1922,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testCheckedRadio()
+    public function testCheckedRadio(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RadioType', true);
 
@@ -1936,7 +1936,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testUncheckedRadio()
+    public function testUncheckedRadio(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RadioType', false);
 
@@ -1949,7 +1949,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testRadioWithValue()
+    public function testRadioWithValue(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RadioType', false, [
             'value' => 'foo&bar',
@@ -1964,7 +1964,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testRange()
+    public function testRange(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RangeType', 42, ['attr' => ['min' => 5]]);
 
@@ -1978,7 +1978,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testRangeWithMinMaxValues()
+    public function testRangeWithMinMaxValues(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\RangeType', 42, ['attr' => ['min' => 5, 'max' => 57]]);
 
@@ -1993,7 +1993,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testTextarea()
+    public function testTextarea(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextareaType', 'foo&bar', [
             'attr' => ['pattern' => 'foo'],
@@ -2008,7 +2008,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testText()
+    public function testText(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'foo&bar');
 
@@ -2022,7 +2022,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testTextWithMaxLength()
+    public function testTextWithMaxLength(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'foo&bar', [
             'attr' => ['maxlength' => 123],
@@ -2038,7 +2038,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSearch()
+    public function testSearch(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\SearchType', 'foo&bar');
 
@@ -2052,7 +2052,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testTime()
+    public function testTime(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TimeType', '04:05:06', [
             'input' => 'string',
@@ -2077,7 +2077,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testTimeWithSeconds()
+    public function testTimeWithSeconds(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TimeType', '04:05:06', [
             'input' => 'string',
@@ -2109,7 +2109,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testTimeText()
+    public function testTimeText(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TimeType', '04:05:06', [
             'input' => 'string',
@@ -2139,7 +2139,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testTimeSingleText()
+    public function testTimeSingleText(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TimeType', '04:05:06', [
             'input' => 'string',
@@ -2156,7 +2156,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testTimeWithPlaceholderGlobal()
+    public function testTimeWithPlaceholderGlobal(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TimeType', null, [
             'input' => 'string',
@@ -2182,7 +2182,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testTimeWithPlaceholderOnYear()
+    public function testTimeWithPlaceholderOnYear(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TimeType', null, [
             'input' => 'string',
@@ -2208,7 +2208,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testTimeErrorBubbling()
+    public function testTimeErrorBubbling(): void
     {
         $form = $this->factory->createNamedBuilder('form', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add('time', 'Symfony\Component\Form\Extension\Core\Type\TimeType', ['widget' => 'choice'])
@@ -2220,7 +2220,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertNotEmpty($this->renderErrors($view['time']));
     }
 
-    public function testTimezone()
+    public function testTimezone(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TimezoneType', 'Europe/Vienna');
 
@@ -2234,7 +2234,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testTimezoneWithPlaceholder()
+    public function testTimezoneWithPlaceholder(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TimezoneType', null, [
             'placeholder' => 'Select&Timezone',
@@ -2249,7 +2249,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testUrlWithDefaultProtocol()
+    public function testUrlWithDefaultProtocol(): void
     {
         $url = 'http://www.example.com?foo1=bar1&foo2=bar2';
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, ['default_protocol' => 'http']);
@@ -2264,7 +2264,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testUrlWithoutDefaultProtocol()
+    public function testUrlWithoutDefaultProtocol(): void
     {
         $url = 'http://www.example.com?foo1=bar1&foo2=bar2';
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\UrlType', $url, ['default_protocol' => null]);
@@ -2278,7 +2278,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testCollectionPrototype()
+    public function testCollectionPrototype(): void
     {
         $form = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType', ['items' => ['one', 'two', 'three']])
             ->add('items', 'Symfony\Component\Form\Extension\Core\Type\CollectionType', ['allow_add' => true])
@@ -2294,7 +2294,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testEmptyRootFormName()
+    public function testEmptyRootFormName(): void
     {
         $form = $this->factory->createNamedBuilder('', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add('child', 'Symfony\Component\Form\Extension\Core\Type\TextType')
@@ -2306,7 +2306,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
              //input[@type="text"][@id="child"][@name="child"]', 2);
     }
 
-    public function testButton()
+    public function testButton(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType');
 
@@ -2315,14 +2315,14 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testButtonLabelIsEmpty()
+    public function testButtonLabelIsEmpty(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType');
 
         $this->assertSame('', $this->renderLabel($form->createView()));
     }
 
-    public function testButtonlabelWithoutTranslation()
+    public function testButtonlabelWithoutTranslation(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', null, [
             'translation_domain' => false,
@@ -2333,7 +2333,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testSubmit()
+    public function testSubmit(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\SubmitType');
 
@@ -2342,7 +2342,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ResetType');
 
@@ -2351,7 +2351,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testStartTag()
+    public function testStartTag(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
@@ -2363,7 +2363,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertSame('<form name="form" method="get" action="http://example.com/directory">', $html);
     }
 
-    public function testStartTagForPutRequest()
+    public function testStartTagForPutRequest(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'put',
@@ -2380,7 +2380,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testStartTagWithOverriddenVars()
+    public function testStartTagWithOverriddenVars(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'put',
@@ -2395,7 +2395,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertSame('<form name="form" method="post" action="http://foo.com/directory">', $html);
     }
 
-    public function testStartTagForMultipartForm()
+    public function testStartTagForMultipartForm(): void
     {
         $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
@@ -2409,7 +2409,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertSame('<form name="form" method="get" action="http://example.com/directory" enctype="multipart/form-data">', $html);
     }
 
-    public function testStartTagWithExtraAttributes()
+    public function testStartTagWithExtraAttributes(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
@@ -2423,7 +2423,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar">', $html);
     }
 
-    public function testWidgetAttributes()
+    public function testWidgetAttributes(): void
     {
         $form = $this->factory->createNamed('text', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'value', [
             'required' => true,
@@ -2437,7 +2437,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertSame('<input type="text" id="text" name="text" disabled="disabled" required="required" readonly="readonly" maxlength="10" pattern="\d+" class="foobar" data-foo="bar" value="value" />', $html);
     }
 
-    public function testWidgetAttributeNameRepeatedIfTrue()
+    public function testWidgetAttributeNameRepeatedIfTrue(): void
     {
         $form = $this->factory->createNamed('text', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'value', [
             'attr' => ['foo' => true],
@@ -2449,7 +2449,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertSame('<input type="text" id="text" name="text" required="required" foo="foo" value="value" />', $html);
     }
 
-    public function testWidgetAttributeHiddenIfFalse()
+    public function testWidgetAttributeHiddenIfFalse(): void
     {
         $form = $this->factory->createNamed('text', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'value', [
             'attr' => ['foo' => false],
@@ -2460,7 +2460,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertStringNotContainsString('foo="', $html);
     }
 
-    public function testButtonAttributes()
+    public function testButtonAttributes(): void
     {
         $form = $this->factory->createNamed('button', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', null, [
             'disabled' => true,
@@ -2473,7 +2473,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertSame('<button type="button" id="button" name="button" disabled="disabled" class="foobar" data-foo="bar">[trans]Button[/trans]</button>', $html);
     }
 
-    public function testButtonAttributeNameRepeatedIfTrue()
+    public function testButtonAttributeNameRepeatedIfTrue(): void
     {
         $form = $this->factory->createNamed('button', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', null, [
             'attr' => ['foo' => true],
@@ -2485,7 +2485,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertSame('<button type="button" id="button" name="button" foo="foo">[trans]Button[/trans]</button>', $html);
     }
 
-    public function testButtonAttributeHiddenIfFalse()
+    public function testButtonAttributeHiddenIfFalse(): void
     {
         $form = $this->factory->createNamed('button', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', null, [
             'attr' => ['foo' => false],
@@ -2496,7 +2496,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertStringNotContainsString('foo="', $html);
     }
 
-    public function testTextareaWithWhitespaceOnlyContentRetainsValue()
+    public function testTextareaWithWhitespaceOnlyContentRetainsValue(): void
     {
         $form = $this->factory->createNamed('textarea', 'Symfony\Component\Form\Extension\Core\Type\TextareaType', '  ');
 
@@ -2505,7 +2505,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertStringContainsString('>  </textarea>', $html);
     }
 
-    public function testTextareaWithWhitespaceOnlyContentRetainsValueWhenRenderingForm()
+    public function testTextareaWithWhitespaceOnlyContentRetainsValueWhenRenderingForm(): void
     {
         $form = $this->factory->createBuilder('Symfony\Component\Form\Extension\Core\Type\FormType', ['textarea' => '  '])
             ->add('textarea', 'Symfony\Component\Form\Extension\Core\Type\TextareaType')
@@ -2516,7 +2516,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertStringContainsString('>  </textarea>', $html);
     }
 
-    public function testWidgetContainerAttributeHiddenIfFalse()
+    public function testWidgetContainerAttributeHiddenIfFalse(): void
     {
         $form = $this->factory->createNamed('form', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'attr' => ['foo' => false],
@@ -2528,7 +2528,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertStringNotContainsString('foo="', $html);
     }
 
-    public function testTranslatedAttributes()
+    public function testTranslatedAttributes(): void
     {
         $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType')
             ->add('firstName', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['attr' => ['title' => 'Foo']])
@@ -2542,7 +2542,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertMatchesXpath($html, '/form//input[@placeholder="[trans]Bar[/trans]"]');
     }
 
-    public function testAttributesNotTranslatedWhenTranslationDomainIsFalse()
+    public function testAttributesNotTranslatedWhenTranslationDomainIsFalse(): void
     {
         $view = $this->factory->createNamedBuilder('name', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'translation_domain' => false,
@@ -2558,7 +2558,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertMatchesXpath($html, '/form//input[@placeholder="Bar"]');
     }
 
-    public function testTel()
+    public function testTel(): void
     {
         $tel = '0102030405';
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TelType', $tel);
@@ -2572,7 +2572,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testColor()
+    public function testColor(): void
     {
         $color = '#0000ff';
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ColorType', $color);
@@ -2586,7 +2586,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelWithTranslationParameters()
+    public function testLabelWithTranslationParameters(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
         $html = $this->renderLabel($form->createView(), 'Address is %address%', [
@@ -2603,7 +2603,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testHelpWithTranslationParameters()
+    public function testHelpWithTranslationParameters(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'for company %company%',
@@ -2621,7 +2621,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testLabelWithTranslatableMessage()
+    public function testLabelWithTranslatableMessage(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'label' => new TranslatableMessage('foo'),
@@ -2636,7 +2636,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testHelpWithTranslatableMessage()
+    public function testHelpWithTranslatableMessage(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => new TranslatableMessage('foo'),
@@ -2651,7 +2651,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testHelpWithTranslatableInterface()
+    public function testHelpWithTranslatableInterface(): void
     {
         $message = new class implements TranslatableInterface {
             public function trans(TranslatorInterface $translator, ?string $locale = null): string
@@ -2673,7 +2673,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testAttributesWithTranslationParameters()
+    public function testAttributesWithTranslationParameters(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'attr' => [
@@ -2694,7 +2694,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testButtonWithTranslationParameters()
+    public function testButtonWithTranslationParameters(): void
     {
         $form = $this->factory->createNamedBuilder('myform')
             ->add('mybutton', 'Symfony\Component\Form\Extension\Core\Type\ButtonType', [
@@ -2715,7 +2715,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
     }
 
     #[DataProvider('submitFormNoValidateProvider')]
-    public function testSubmitFormNoValidate(bool $validate)
+    public function testSubmitFormNoValidate(bool $validate): void
     {
         $form = $this->factory->create(SubmitType::class, null, [
             'validate' => $validate,
@@ -2744,7 +2744,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         ];
     }
 
-    public function testWeekSingleText()
+    public function testWeekSingleText(): void
     {
         $form = $this->factory->createNamed('holidays', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '1970-W01', [
             'input' => 'string',
@@ -2761,7 +2761,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testWeekSingleTextNoHtml5()
+    public function testWeekSingleTextNoHtml5(): void
     {
         $form = $this->factory->createNamed('holidays', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '1970-W01', [
             'input' => 'string',
@@ -2779,7 +2779,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testWeekChoices()
+    public function testWeekChoices(): void
     {
         $data = ['year' => (int) date('Y'), 'week' => 1];
 
@@ -2803,7 +2803,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         );
     }
 
-    public function testWeekText()
+    public function testWeekText(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\WeekType', '2000-W01', [
             'input' => 'string',

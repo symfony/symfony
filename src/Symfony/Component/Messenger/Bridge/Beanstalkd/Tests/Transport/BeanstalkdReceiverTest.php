@@ -30,7 +30,7 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
 final class BeanstalkdReceiverTest extends TestCase
 {
-    public function testItReturnsTheDecodedMessageToTheHandler()
+    public function testItReturnsTheDecodedMessageToTheHandler(): void
     {
         $serializer = $this->createSerializer();
 
@@ -61,7 +61,7 @@ final class BeanstalkdReceiverTest extends TestCase
         $this->assertSame('1', $transportMessageIdStamp->getId());
     }
 
-    public function testItReturnsEmptyArrayIfThereAreNoMessages()
+    public function testItReturnsEmptyArrayIfThereAreNoMessages(): void
     {
         $serializer = $this->createSerializer();
 
@@ -74,7 +74,7 @@ final class BeanstalkdReceiverTest extends TestCase
         $this->assertCount(0, $actualEnvelopes);
     }
 
-    public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException()
+    public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException(): void
     {
         $this->expectException(MessageDecodingFailedException::class);
 
@@ -92,7 +92,7 @@ final class BeanstalkdReceiverTest extends TestCase
     }
 
     #[DataProvider('provideRejectCases')]
-    public function testReject(array $stamps, ?int $priority, bool $forceDelete)
+    public function testReject(array $stamps, ?int $priority, bool $forceDelete): void
     {
         $serializer = $this->createSerializer();
 
@@ -118,7 +118,7 @@ final class BeanstalkdReceiverTest extends TestCase
         yield 'With sent for retry false' => [[new SentForRetryStamp(false)], null, false];
     }
 
-    public function testKeepalive()
+    public function testKeepalive(): void
     {
         $serializer = $this->createSerializer();
 

@@ -33,7 +33,7 @@ class AbstractObjectNormalizerContextBuilderTest extends TestCase
      * @param array<string, mixed> $values
      */
     #[DataProvider('withersDataProvider')]
-    public function testWithers(array $values)
+    public function testWithers(array $values): void
     {
         $context = $this->contextBuilder
             ->withEnableMaxDepth($values[AbstractObjectNormalizer::ENABLE_MAX_DEPTH])
@@ -81,7 +81,7 @@ class AbstractObjectNormalizerContextBuilderTest extends TestCase
     }
 
     #[DataProvider('validateDepthKeyPatternDataProvider')]
-    public function testValidateDepthKeyPattern(string $pattern, bool $expectException)
+    public function testValidateDepthKeyPattern(string $pattern, bool $expectException): void
     {
         $exception = null;
 

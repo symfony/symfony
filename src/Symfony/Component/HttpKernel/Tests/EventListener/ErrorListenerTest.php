@@ -39,7 +39,7 @@ use Symfony\Component\HttpKernel\Tests\Logger;
 #[Group('time-sensitive')]
 class ErrorListenerTest extends TestCase
 {
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $logger = new TestLogger();
         $l = new ErrorListener('foo', $logger);
@@ -52,7 +52,7 @@ class ErrorListenerTest extends TestCase
     }
 
     #[DataProvider('provider')]
-    public function testHandleWithoutLogger($event, $event2)
+    public function testHandleWithoutLogger($event, $event2): void
     {
         $initialErrorLog = ini_set('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
 
@@ -77,7 +77,7 @@ class ErrorListenerTest extends TestCase
     }
 
     #[DataProvider('provider')]
-    public function testHandleWithLogger($event, $event2)
+    public function testHandleWithLogger($event, $event2): void
     {
         $logger = new TestLogger();
 
@@ -104,7 +104,7 @@ class ErrorListenerTest extends TestCase
         $this->assertStringStartsWith('Exception thrown when handling an exception (RuntimeException: bar at ErrorListenerTest.php line', $logs[2]);
     }
 
-    public function testHandleWithLoggerAndCustomConfiguration()
+    public function testHandleWithLoggerAndCustomConfiguration(): void
     {
         $request = new Request();
         $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new \RuntimeException('bar'));
@@ -125,7 +125,7 @@ class ErrorListenerTest extends TestCase
         $this->assertCount(1, $logger->getLogsForLevel('warning'));
     }
 
-    public function testHandleWithLogLevelAttribute()
+    public function testHandleWithLogLevelAttribute(): void
     {
         $request = new Request();
         $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new ChildOfWarningWithLogLevelAttribute());
@@ -140,7 +140,7 @@ class ErrorListenerTest extends TestCase
         $this->assertCount(1, $logger->getLogsForLevel('warning'));
     }
 
-    public function testHandleWithLogChannel()
+    public function testHandleWithLogChannel(): void
     {
         $request = new Request();
         $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new \RuntimeException('bar'));
@@ -169,7 +169,7 @@ class ErrorListenerTest extends TestCase
         $this->assertCount(1, $channelLoger->getLogsForLevel('warning'));
     }
 
-    public function testHandleWithLoggerChannelNotUsed()
+    public function testHandleWithLoggerChannelNotUsed(): void
     {
         $request = new Request();
         $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new \RuntimeException('bar'));
@@ -197,7 +197,7 @@ class ErrorListenerTest extends TestCase
         $this->assertCount(0, $channelLoger->getLogsForLevel('critical'));
     }
 
-    public function testHandleClassImplementingInterfaceWithLogLevelAttribute()
+    public function testHandleClassImplementingInterfaceWithLogLevelAttribute(): void
     {
         $request = new Request();
         $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new ImplementingInterfaceWithLogLevelAttribute());
@@ -212,7 +212,7 @@ class ErrorListenerTest extends TestCase
         $this->assertCount(1, $logger->getLogsForLevel('warning'));
     }
 
-    public function testHandleWithLogLevelAttributeAndCustomConfiguration()
+    public function testHandleWithLogLevelAttributeAndCustomConfiguration(): void
     {
         $request = new Request();
         $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new WarningWithLogLevelAttribute());
@@ -232,7 +232,7 @@ class ErrorListenerTest extends TestCase
     }
 
     #[DataProvider('exceptionWithAttributeProvider')]
-    public function testHandleHttpAttribute(\Throwable $exception, int $expectedStatusCode, array $expectedHeaders)
+    public function testHandleHttpAttribute(\Throwable $exception, int $expectedStatusCode, array $expectedHeaders): void
     {
         $request = new Request();
         $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $exception);
@@ -243,7 +243,7 @@ class ErrorListenerTest extends TestCase
         $this->assertEquals(new Response('foo', $expectedStatusCode, $expectedHeaders), $event->getResponse());
     }
 
-    public function testHandleCustomConfigurationAndHttpAttribute()
+    public function testHandleCustomConfigurationAndHttpAttribute(): void
     {
         $request = new Request();
         $event = new ExceptionEvent(new TestKernel(), $request, HttpKernelInterface::MAIN_REQUEST, new WithGeneralAttribute());
@@ -275,7 +275,7 @@ class ErrorListenerTest extends TestCase
         ];
     }
 
-    public function testSubRequestFormat()
+    public function testSubRequestFormat(): void
     {
         $listener = new ErrorListener('foo', new NullLogger());
 
@@ -292,7 +292,7 @@ class ErrorListenerTest extends TestCase
         $this->assertEquals('xml', $response->getContent());
     }
 
-    public function testCSPHeaderIsRemoved()
+    public function testCSPHeaderIsRemoved(): void
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->createMock(HttpKernelInterface::class);
@@ -315,7 +315,7 @@ class ErrorListenerTest extends TestCase
         $this->assertFalse($response->headers->has('content-security-policy'), 'CSP header has been removed');
     }
 
-    public function testTerminating()
+    public function testTerminating(): void
     {
         $listener = new ErrorListener('foo', new NullLogger());
 
@@ -329,7 +329,7 @@ class ErrorListenerTest extends TestCase
     }
 
     #[DataProvider('controllerProvider')]
-    public function testOnControllerArguments(callable $controller)
+    public function testOnControllerArguments(callable $controller): void
     {
         $listener = new ErrorListener($controller, new NullLogger(), true);
 

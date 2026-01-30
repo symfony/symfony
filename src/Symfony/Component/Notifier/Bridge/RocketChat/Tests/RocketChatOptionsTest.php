@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\RocketChat\RocketChatOptions;
 
 final class RocketChatOptionsTest extends TestCase
 {
-    public function testRocketChatOptions()
+    public function testRocketChatOptions(): void
     {
         $options = new RocketChatOptions([
             'title' => 'Test Title',
@@ -35,7 +35,7 @@ final class RocketChatOptionsTest extends TestCase
         $this->assertNull($options->getRecipientId());
     }
 
-    public function testRocketChatOptionsWithChannel()
+    public function testRocketChatOptionsWithChannel(): void
     {
         $options = (new RocketChatOptions())
             ->channel('#general');
@@ -45,7 +45,7 @@ final class RocketChatOptionsTest extends TestCase
         $this->assertSame('#general', $options->getRecipientId());
     }
 
-    public function testRocketChatOptionsWithPersonalMessage()
+    public function testRocketChatOptionsWithPersonalMessage(): void
     {
         $options = (new RocketChatOptions())
             ->channel('@username');
@@ -53,7 +53,7 @@ final class RocketChatOptionsTest extends TestCase
         $this->assertSame('@username', $options->getRecipientId());
     }
 
-    public function testRocketChatOptionsWithComplexAttachments()
+    public function testRocketChatOptionsWithComplexAttachments(): void
     {
         $attachments = [
             'title' => 'Rocket.Chat',
@@ -82,7 +82,7 @@ final class RocketChatOptionsTest extends TestCase
         ], $options->toArray());
     }
 
-    public function testRocketChatOptionsChaining()
+    public function testRocketChatOptionsChaining(): void
     {
         $options = new RocketChatOptions();
 
@@ -92,7 +92,7 @@ final class RocketChatOptionsTest extends TestCase
         $this->assertSame('#tech', $options->getRecipientId());
     }
 
-    public function testEmptyAttachments()
+    public function testEmptyAttachments(): void
     {
         $options = new RocketChatOptions();
 

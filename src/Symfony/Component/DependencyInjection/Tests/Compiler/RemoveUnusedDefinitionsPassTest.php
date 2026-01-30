@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class RemoveUnusedDefinitionsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -42,7 +42,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertTrue($container->hasDefinition('moo'));
     }
 
-    public function testProcessRemovesUnusedDefinitionsRecursively()
+    public function testProcessRemovesUnusedDefinitionsRecursively(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -59,7 +59,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('bar'));
     }
 
-    public function testProcessWorksWithInlinedDefinitions()
+    public function testProcessWorksWithInlinedDefinitions(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -77,7 +77,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertTrue($container->hasDefinition('bar'));
     }
 
-    public function testProcessWontRemovePrivateFactory()
+    public function testProcessWontRemovePrivateFactory(): void
     {
         $container = new ContainerBuilder();
 
@@ -104,7 +104,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertTrue($container->hasDefinition('foobar'));
     }
 
-    public function testProcessConsiderEnvVariablesAsUsedEvenInPrivateServices()
+    public function testProcessConsiderEnvVariablesAsUsedEvenInPrivateServices(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('env(FOOBAR)', 'test');
@@ -125,7 +125,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertSame(1, $envCounters['FOOBAR']);
     }
 
-    public function testProcessDoesNotErrorOnServicesThatDoNotHaveDefinitions()
+    public function testProcessDoesNotErrorOnServicesThatDoNotHaveDefinitions(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -140,7 +140,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('not.defined'));
     }
 
-    public function testProcessWorksWithClosureErrorsInDefinitions()
+    public function testProcessWorksWithClosureErrorsInDefinitions(): void
     {
         $definition = new Definition();
         $definition->addError(static fn () => 'foo bar');
@@ -155,7 +155,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('foo'));
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         (new RemoveUnusedDefinitionsPass())->process($container);
     }

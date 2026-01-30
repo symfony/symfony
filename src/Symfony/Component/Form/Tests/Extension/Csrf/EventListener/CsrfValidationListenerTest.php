@@ -47,7 +47,7 @@ class CsrfValidationListenerTest extends TestCase
     }
 
     // https://github.com/symfony/symfony/pull/5838
-    public function testStringFormData()
+    public function testStringFormData(): void
     {
         $data = 'XP4HUzmHPi';
         $event = new FormEvent($this->form, $data);
@@ -59,7 +59,7 @@ class CsrfValidationListenerTest extends TestCase
         $this->assertSame($data, $event->getData());
     }
 
-    public function testArrayCsrfToken()
+    public function testArrayCsrfToken(): void
     {
         $event = new FormEvent($this->form, ['csrf' => []]);
 
@@ -70,7 +70,7 @@ class CsrfValidationListenerTest extends TestCase
         $this->assertGreaterThan(0, \count($this->form->getErrors()));
     }
 
-    public function testMaxPostSizeExceeded()
+    public function testMaxPostSizeExceeded(): void
     {
         $event = new FormEvent($this->form, ['csrf' => 'token']);
         $validation = new CsrfValidationListener('csrf', $this->tokenManager, 'unknown', 'Error message', null, null, new ServerParamsPostMaxSizeExceeded());

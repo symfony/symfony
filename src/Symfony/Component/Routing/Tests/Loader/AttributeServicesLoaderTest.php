@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Tests\Fixtures\TraceableAttributeClassLoader;
 
 class AttributeServicesLoaderTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $loader = new AttributeServicesLoader();
 
@@ -30,7 +30,7 @@ class AttributeServicesLoaderTest extends TestCase
         $this->assertTrue($loader->supports('routing.controllers'));
     }
 
-    public function testDelegatesToAttributeLoaderAndMergesCollections()
+    public function testDelegatesToAttributeLoaderAndMergesCollections(): void
     {
         $attributeLoader = new TraceableAttributeClassLoader();
 

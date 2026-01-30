@@ -40,7 +40,7 @@ class HttpFoundationFactoryTest extends TestCase
         $this->tmpDir = sys_get_temp_dir();
     }
 
-    public function testCreateRequest()
+    public function testCreateRequest(): void
     {
         $stdClass = new \stdClass();
         $serverRequest = new ServerRequest(
@@ -85,7 +85,7 @@ class HttpFoundationFactoryTest extends TestCase
         $this->assertEquals(['a', 'b'], $symfonyRequest->headers->all('X-data'));
     }
 
-    public function testCreateRequestWithStreamedBody()
+    public function testCreateRequestWithStreamedBody(): void
     {
         $serverRequest = new ServerRequest(
             '1.1',
@@ -106,7 +106,7 @@ class HttpFoundationFactoryTest extends TestCase
         $this->assertEquals('The body', $symfonyRequest->getContent());
     }
 
-    public function testCreateRequestWithNullParsedBody()
+    public function testCreateRequestWithNullParsedBody(): void
     {
         $serverRequest = new ServerRequest(
             '1.1',
@@ -126,7 +126,7 @@ class HttpFoundationFactoryTest extends TestCase
         $this->assertCount(0, $this->factory->createRequest($serverRequest)->request);
     }
 
-    public function testCreateRequestWithObjectParsedBody()
+    public function testCreateRequestWithObjectParsedBody(): void
     {
         $serverRequest = new ServerRequest(
             '1.1',
@@ -146,7 +146,7 @@ class HttpFoundationFactoryTest extends TestCase
         $this->assertCount(0, $this->factory->createRequest($serverRequest)->request);
     }
 
-    public function testCreateRequestWithUri()
+    public function testCreateRequestWithUri(): void
     {
         $serverRequest = new ServerRequest(
             '1.1',
@@ -166,7 +166,7 @@ class HttpFoundationFactoryTest extends TestCase
         $this->assertEquals('/about/kevin', $this->factory->createRequest($serverRequest)->getPathInfo());
     }
 
-    public function testCreateUploadedFile()
+    public function testCreateUploadedFile(): void
     {
         $uploadedFile = $this->createUploadedFile('An uploaded file.', \UPLOAD_ERR_OK, 'myfile.txt', 'text/plain');
         $symfonyUploadedFile = $this->callCreateUploadedFile($uploadedFile);
@@ -183,7 +183,7 @@ class HttpFoundationFactoryTest extends TestCase
         $this->assertEquals('An uploaded file.', file_get_contents($this->tmpDir.'/'.$filename));
     }
 
-    public function testCreateUploadedFileWithError()
+    public function testCreateUploadedFileWithError(): void
     {
         $uploadedFile = $this->createUploadedFile('Error.', \UPLOAD_ERR_CANT_WRITE, 'e', 'text/plain');
         $symfonyUploadedFile = $this->callCreateUploadedFile($uploadedFile);
@@ -212,7 +212,7 @@ class HttpFoundationFactoryTest extends TestCase
         return $createUploadedFile->invokeArgs($this->factory, [$uploadedFile]);
     }
 
-    public function testCreateResponse()
+    public function testCreateResponse(): void
     {
         $response = new Response(
             '1.0',

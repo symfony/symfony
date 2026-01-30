@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class ApiAttributesTest extends AbstractWebTestCase
 {
     #[DataProvider('mapQueryStringProvider')]
-    public function testMapQueryString(string $uri, array $query, string $expectedResponse, int $expectedStatusCode)
+    public function testMapQueryString(string $uri, array $query, string $expectedResponse, int $expectedStatusCode): void
     {
         $client = self::createClient(['test_case' => 'ApiAttributesTest']);
 
@@ -214,7 +214,7 @@ class ApiAttributesTest extends AbstractWebTestCase
     }
 
     #[DataProvider('mapRequestPayloadProvider')]
-    public function testMapRequestPayload(string $uri, string $format, array $parameters, ?string $content, callable $responseAssertion, int $expectedStatusCode)
+    public function testMapRequestPayload(string $uri, string $format, array $parameters, ?string $content, callable $responseAssertion, int $expectedStatusCode): void
     {
         $client = self::createClient(['test_case' => 'ApiAttributesTest']);
 
@@ -247,7 +247,7 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'parameters' => [],
             'content' => '',
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertSame('', $response);
             },
             'expectedStatusCode' => 204,
@@ -263,7 +263,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     "approved": false
                 }
                 JSON,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJsonStringEqualsJsonString(<<<'JSON'
                     {
                         "comment": "Hello everyone!",
@@ -286,7 +286,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     <approved>true</approved>
                 </request>
                 XML,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertXmlStringEqualsXmlString(<<<'XML'
                     <response>
                         <comment>Hello everyone!</comment>
@@ -304,7 +304,7 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'parameters' => ['comment' => 'Hello everyone!', 'approved' => '0'],
             'content' => null,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJsonStringEqualsJsonString(<<<'JSON'
                     {
                         "comment": "Hello everyone!",
@@ -327,7 +327,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     "approved": false,
                 }
                 JSON,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJsonStringEqualsJsonString(<<<'JSON'
                     {
                         "type": "https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
@@ -347,7 +347,7 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'dummy',
             'parameters' => [],
             'content' => 'Hello',
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertStringContainsString('415 Unsupported Media Type', $response);
             },
             'expectedStatusCode' => 415,
@@ -363,7 +363,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     "approved": "string instead of bool"
                 }
                 JSON,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJsonStringEqualsJsonString(<<<'JSON'
                     {
                         "type": "https:\/\/symfony.com\/errors\/validation",
@@ -398,7 +398,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     "approved": true
                 }
                 JSON,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJson($response);
 
                 $json = json_decode($response, true);
@@ -425,7 +425,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     <approved>false</approved>
                 </request>
                 XML,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 $crawler = new Crawler($response);
 
                 self::assertSame('https://symfony.com/errors/validation', $crawler->filterXPath('response/type')->text());
@@ -443,7 +443,7 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'parameters' => ['comment' => '', 'approved' => '1'],
             'content' => null,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJson($response);
 
                 $json = json_decode($response, true);
@@ -465,7 +465,7 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'parameters' => [],
             'content' => '',
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJsonStringEqualsJsonString(<<<'JSON'
                     {
                         "comment": "Hello everyone!",
@@ -488,7 +488,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     "approved": false
                 }
                 JSON,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJsonStringEqualsJsonString(<<<'JSON'
                     {
                         "comment": "Hello everyone!",
@@ -511,7 +511,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     <approved>true</approved>
                 </request>
                 XML,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertXmlStringEqualsXmlString(<<<'XML'
                     <response>
                         <comment>Hello everyone!</comment>
@@ -529,7 +529,7 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'parameters' => ['comment' => 'Hello everyone!', 'approved' => '0'],
             'content' => null,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJsonStringEqualsJsonString(<<<'JSON'
                     {
                         "comment": "Hello everyone!",
@@ -552,7 +552,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     "approved": false,
                 }
                 JSON,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJsonStringEqualsJsonString(<<<'JSON'
                     {
                         "type": "https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
@@ -572,7 +572,7 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'dummy',
             'parameters' => [],
             'content' => 'Hello',
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertStringContainsString('415 Unsupported Media Type', $response);
             },
             'expectedStatusCode' => 415,
@@ -588,7 +588,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     "approved": "string instead of bool"
                 }
                 JSON,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJson($response);
 
                 $json = json_decode($response, true);
@@ -614,7 +614,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     "approved": true
                 }
                 JSON,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJson($response);
 
                 $json = json_decode($response, true);
@@ -641,7 +641,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     <approved>false</approved>
                 </request>
                 XML,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 $crawler = new Crawler($response);
 
                 self::assertSame('https://symfony.com/errors/validation', $crawler->filterXPath('response/type')->text());
@@ -659,7 +659,7 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'parameters' => ['comment' => '', 'approved' => '1'],
             'content' => null,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJson($response);
 
                 $json = json_decode($response, true);
@@ -681,7 +681,7 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'parameters' => [],
             'content' => '',
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJsonStringEqualsJsonString(<<<'JSON'
                     {
                       "type":"https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
@@ -706,7 +706,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     "approved": false
                 }
                 JSON,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJsonStringEqualsJsonString(<<<'JSON'
                     {
                         "comment": "Hello everyone!",
@@ -729,7 +729,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     <approved>true</approved>
                 </request>
                 XML,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertXmlStringEqualsXmlString(<<<'XML'
                     <response>
                         <comment>Hello everyone!</comment>
@@ -747,7 +747,7 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'parameters' => ['comment' => 'Hello everyone!', 'approved' => '0'],
             'content' => null,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJsonStringEqualsJsonString(<<<'JSON'
                     {
                         "comment": "Hello everyone!",
@@ -770,7 +770,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     "approved": false,
                 }
                 JSON,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJsonStringEqualsJsonString(<<<'JSON'
                     {
                         "type": "https:\/\/tools.ietf.org\/html\/rfc2616#section-10",
@@ -790,7 +790,7 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'dummy',
             'parameters' => [],
             'content' => 'Hello',
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertStringContainsString('415 Unsupported Media Type', $response);
             },
             'expectedStatusCode' => 415,
@@ -806,7 +806,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     "approved": "string instead of bool"
                 }
                 JSON,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJson($response);
 
                 $json = json_decode($response, true);
@@ -832,7 +832,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     "approved": true
                 }
                 JSON,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJson($response);
 
                 $json = json_decode($response, true);
@@ -859,7 +859,7 @@ class ApiAttributesTest extends AbstractWebTestCase
                     <approved>false</approved>
                 </request>
                 XML,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 $crawler = new Crawler($response);
 
                 self::assertSame('https://symfony.com/errors/validation', $crawler->filterXPath('response/type')->text());
@@ -877,7 +877,7 @@ class ApiAttributesTest extends AbstractWebTestCase
             'format' => 'json',
             'parameters' => ['comment' => '', 'approved' => '1'],
             'content' => null,
-            'responseAssertion' => static function (string $response) {
+            'responseAssertion' => static function (string $response): void {
                 self::assertJson($response);
 
                 $json = json_decode($response, true);

@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Firebase\Notification\IOSNotification;
 
 final class IOSNotificationTest extends TestCase
 {
-    public function testIOSNotificationOptions()
+    public function testIOSNotificationOptions(): void
     {
         $notification = new IOSNotification('device_token', [
             'title' => 'Test Title',
@@ -35,7 +35,7 @@ final class IOSNotificationTest extends TestCase
         $this->assertSame('device_token', $notification->getRecipientId());
     }
 
-    public function testIOSNotificationWithAllOptions()
+    public function testIOSNotificationWithAllOptions(): void
     {
         $notification = (new IOSNotification('device_token', []))
             ->title('New Title')
@@ -70,7 +70,7 @@ final class IOSNotificationTest extends TestCase
         $this->assertSame($expected, $notification->toArray());
     }
 
-    public function testIOSNotificationChaining()
+    public function testIOSNotificationChaining(): void
     {
         $notification = new IOSNotification('device_token', []);
 

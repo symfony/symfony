@@ -31,7 +31,7 @@ class FileTypeTest extends BaseTypeTestCase
     }
 
     // https://github.com/symfony/symfony/pull/5028
-    public function testSetData()
+    public function testSetData(): void
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE)->getForm();
         $data = new File(__DIR__.'/../../../Fixtures/foo', false);
@@ -43,7 +43,7 @@ class FileTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('requestHandlerProvider')]
-    public function testSubmit(RequestHandlerInterface $requestHandler)
+    public function testSubmit(RequestHandlerInterface $requestHandler): void
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE)->setRequestHandler($requestHandler)->getForm();
         $data = $this->createUploadedFile($requestHandler, __DIR__.'/../../../Fixtures/foo', 'foo.jpg');
@@ -54,7 +54,7 @@ class FileTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('requestHandlerProvider')]
-    public function testSetDataMultiple(RequestHandlerInterface $requestHandler)
+    public function testSetDataMultiple(RequestHandlerInterface $requestHandler): void
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE, null, [
             'multiple' => true,
@@ -70,7 +70,7 @@ class FileTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('requestHandlerProvider')]
-    public function testSubmitMultiple(RequestHandlerInterface $requestHandler)
+    public function testSubmitMultiple(RequestHandlerInterface $requestHandler): void
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE, null, [
             'multiple' => true,
@@ -90,7 +90,7 @@ class FileTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('requestHandlerProvider')]
-    public function testDontPassValueToView(RequestHandlerInterface $requestHandler)
+    public function testDontPassValueToView(RequestHandlerInterface $requestHandler): void
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE)->setRequestHandler($requestHandler)->getForm();
         $form->submit([
@@ -100,7 +100,7 @@ class FileTypeTest extends BaseTypeTestCase
         $this->assertEquals('', $form->createView()->vars['value']);
     }
 
-    public function testPassMultipartFalseToView()
+    public function testPassMultipartFalseToView(): void
     {
         $view = $this->factory->create(static::TESTED_TYPE)
             ->createView();
@@ -108,12 +108,12 @@ class FileTypeTest extends BaseTypeTestCase
         $this->assertTrue($view->vars['multipart']);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    public function testSubmitNullWhenMultiple()
+    public function testSubmitNullWhenMultiple(): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'multiple' => true,
@@ -127,7 +127,7 @@ class FileTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('requestHandlerProvider')]
-    public function testSubmittedFilePathsAreDropped(RequestHandlerInterface $requestHandler)
+    public function testSubmittedFilePathsAreDropped(RequestHandlerInterface $requestHandler): void
     {
         $form = $this->factory->createBuilder(static::TESTED_TYPE)->setRequestHandler($requestHandler)->getForm();
         $form->submit('file:///etc/passwd');
@@ -138,7 +138,7 @@ class FileTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('requestHandlerProvider')]
-    public function testMultipleSubmittedFilePathsAreDropped(RequestHandlerInterface $requestHandler)
+    public function testMultipleSubmittedFilePathsAreDropped(RequestHandlerInterface $requestHandler): void
     {
         $form = $this->factory
             ->createBuilder(static::TESTED_TYPE, null, [
@@ -156,7 +156,7 @@ class FileTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('requestHandlerProvider')]
-    public function testSubmitNonArrayValueWhenMultiple(RequestHandlerInterface $requestHandler)
+    public function testSubmitNonArrayValueWhenMultiple(RequestHandlerInterface $requestHandler): void
     {
         $form = $this->factory
             ->createBuilder(static::TESTED_TYPE, null, [
@@ -180,7 +180,7 @@ class FileTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('uploadFileErrorCodes')]
-    public function testFailedFileUploadIsTurnedIntoFormErrorUsingHttpFoundationRequestHandler($errorCode, $expectedErrorMessage)
+    public function testFailedFileUploadIsTurnedIntoFormErrorUsingHttpFoundationRequestHandler($errorCode, $expectedErrorMessage): void
     {
         $requestHandler = new HttpFoundationRequestHandler();
         $form = $this->factory
@@ -198,7 +198,7 @@ class FileTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('uploadFileErrorCodes')]
-    public function testFailedFileUploadIsTurnedIntoFormErrorUsingNativeRequestHandler($errorCode, $expectedErrorMessage)
+    public function testFailedFileUploadIsTurnedIntoFormErrorUsingNativeRequestHandler($errorCode, $expectedErrorMessage): void
     {
         $form = $this->factory
             ->createBuilder(static::TESTED_TYPE)
@@ -221,7 +221,7 @@ class FileTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('uploadFileErrorCodes')]
-    public function testMultipleSubmittedFailedFileUploadsAreTurnedIntoFormErrorUsingHttpFoundationRequestHandler($errorCode, $expectedErrorMessage)
+    public function testMultipleSubmittedFailedFileUploadsAreTurnedIntoFormErrorUsingHttpFoundationRequestHandler($errorCode, $expectedErrorMessage): void
     {
         $requestHandler = new HttpFoundationRequestHandler();
         $form = $this->factory
@@ -246,7 +246,7 @@ class FileTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('uploadFileErrorCodes')]
-    public function testMultipleSubmittedFailedFileUploadsAreTurnedIntoFormErrorUsingNativeRequestHandler($errorCode, $expectedErrorMessage)
+    public function testMultipleSubmittedFailedFileUploadsAreTurnedIntoFormErrorUsingNativeRequestHandler($errorCode, $expectedErrorMessage): void
     {
         $form = $this->factory
             ->createBuilder(static::TESTED_TYPE, null, [

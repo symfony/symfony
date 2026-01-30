@@ -24,7 +24,7 @@ use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class UsageTrackingTokenStorageTest extends TestCase
 {
-    public function testGetSetToken()
+    public function testGetSetToken(): void
     {
         $tokenStorage = new TokenStorage();
         $session = new Session();
@@ -53,7 +53,7 @@ class UsageTrackingTokenStorageTest extends TestCase
         $this->assertSame(1, $session->getUsageIndex());
     }
 
-    public function testWithoutMainRequest()
+    public function testWithoutMainRequest(): void
     {
         $locator = new class(['request_stack' => static fn () => new RequestStack()]) implements ContainerInterface {
             use ServiceLocatorTrait;

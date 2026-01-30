@@ -35,7 +35,7 @@ final class OneSignalTransportTest extends TransportTestCase
         return new OneSignalTransport('9fb175f0-0b32-4e99-ae97-bd228b9eb246', 'api_key', $recipientId, $client ?? new MockHttpClient());
     }
 
-    public function testCanSetCustomHost()
+    public function testCanSetCustomHost(): void
     {
         $transport = self::createTransport();
 
@@ -44,7 +44,7 @@ final class OneSignalTransportTest extends TransportTestCase
         $this->assertSame(\sprintf('onesignal://9fb175f0-0b32-4e99-ae97-bd228b9eb246@%s', $customHost), (string) $transport);
     }
 
-    public function testCanSetCustomHostAndPort()
+    public function testCanSetCustomHostAndPort(): void
     {
         $transport = self::createTransport();
 
@@ -73,7 +73,7 @@ final class OneSignalTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendThrowsWithoutRecipient()
+    public function testSendThrowsWithoutRecipient(): void
     {
         $transport = self::createTransport();
 
@@ -83,7 +83,7 @@ final class OneSignalTransportTest extends TransportTestCase
         $transport->send(new PushMessage('Hello', 'World'));
     }
 
-    public function testSendWithErrorResponseThrows()
+    public function testSendWithErrorResponseThrows(): void
     {
         $client = new MockHttpClient(new JsonMockResponse(['errors' => ['Message Notifications must have English language content']], ['http_code' => 400]));
 
@@ -95,7 +95,7 @@ final class OneSignalTransportTest extends TransportTestCase
         $transport->send(new PushMessage('Hello', 'World'));
     }
 
-    public function testSendWithErrorResponseThrowsWhenAllUnsubscribed()
+    public function testSendWithErrorResponseThrowsWhenAllUnsubscribed(): void
     {
         $client = new MockHttpClient(new JsonMockResponse(['id' => '', 'recipients' => 0, 'errors' => ['All included players are not subscribed']]));
 
@@ -107,7 +107,7 @@ final class OneSignalTransportTest extends TransportTestCase
         $transport->send(new PushMessage('Hello', 'World'));
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $expectedBody = json_encode(['app_id' => '9fb175f0-0b32-4e99-ae97-bd228b9eb246', 'headings' => ['en' => 'Hello'], 'contents' => ['en' => 'World'], 'include_subscription_ids' => ['ea345989-d273-4f21-a33b-0c006efc5edb']]);
 
@@ -124,7 +124,7 @@ final class OneSignalTransportTest extends TransportTestCase
         $this->assertSame('b98881cc-1e94-4366-bbd9-db8f3429292b', $sentMessage->getMessageId());
     }
 
-    public function testSendExternalIds()
+    public function testSendExternalIds(): void
     {
         $expectedBody = json_encode(['app_id' => '9fb175f0-0b32-4e99-ae97-bd228b9eb246', 'headings' => ['en' => 'Hello'], 'contents' => ['en' => 'World'], 'include_aliases' => ['external_id' => ['ea345989-d273-4f21-a33b-0c006efc5edb']], 'target_channel' => 'push']);
 

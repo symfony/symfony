@@ -31,7 +31,7 @@ use Symfony\Component\Config\Tests\Fixtures\StringBackedTestEnum;
 class ArrayShapeGeneratorTest extends TestCase
 {
     #[DataProvider('provideNodes')]
-    public function testPhpDocHandlesNodeTypes(NodeInterface $node, string $expected)
+    public function testPhpDocHandlesNodeTypes(NodeInterface $node, string $expected): void
     {
         $arrayNode = new ArrayNode('root');
         $arrayNode->addChild($node);
@@ -70,7 +70,7 @@ class ArrayShapeGeneratorTest extends TestCase
         yield [new FloatNode('node', min: 1.1, max: 10.1), 'float'];
     }
 
-    public function testPrototypedArrayNodePhpDoc()
+    public function testPrototypedArrayNodePhpDoc(): void
     {
         $prototype = new PrototypedArrayNode('proto');
         $prototype->setPrototype(new StringNode('child'));
@@ -83,7 +83,7 @@ class ArrayShapeGeneratorTest extends TestCase
         $this->assertStringContainsString($expected, ArrayShapeGenerator::generate($root));
     }
 
-    public function testPrototypedArrayNodePhpDocWithKeyAttribute()
+    public function testPrototypedArrayNodePhpDocWithKeyAttribute(): void
     {
         $prototype = new PrototypedArrayNode('proto');
         $prototype->setPrototype(new StringNode('child'));
@@ -97,7 +97,7 @@ class ArrayShapeGeneratorTest extends TestCase
         $this->assertStringContainsString($expected, ArrayShapeGenerator::generate($root));
     }
 
-    public function testPhpDocHandlesRequiredNode()
+    public function testPhpDocHandlesRequiredNode(): void
     {
         $child = new BooleanNode('node');
         $child->setRequired(true);
@@ -110,7 +110,7 @@ class ArrayShapeGeneratorTest extends TestCase
         $this->assertStringContainsString($expected, ArrayShapeGenerator::generate($root));
     }
 
-    public function testPhpDocHandleAdditionalDocumentation()
+    public function testPhpDocHandleAdditionalDocumentation(): void
     {
         $child = new BooleanNode('node');
         $child->setDeprecated('vendor/package', '1.0', 'The "%path%" option is deprecated.');
@@ -123,7 +123,7 @@ class ArrayShapeGeneratorTest extends TestCase
         $this->assertStringContainsString('node?: bool|\Symfony\Component\Config\Loader\ParamConfigurator, // Deprecated: The "node" option is deprecated. // This is a boolean node. // Default: true', ArrayShapeGenerator::generate($root));
     }
 
-    public function testPhpDocHandleMultilineDoc()
+    public function testPhpDocHandleMultilineDoc(): void
     {
         $child = new BooleanNode('node');
         $child->setDeprecated('vendor/package', '1.0', 'The "%path%" option is deprecated.');
@@ -136,14 +136,14 @@ class ArrayShapeGeneratorTest extends TestCase
         $this->assertStringContainsString('node?: bool|\Symfony\Component\Config\Loader\ParamConfigurator, // Deprecated: The "node" option is deprecated. // This is a boolean node. Set to true to enable it. Set to false to disable it. // Default: true', ArrayShapeGenerator::generate($root));
     }
 
-    public function testPhpDocShapeSingleLevel()
+    public function testPhpDocShapeSingleLevel(): void
     {
         $root = new ArrayNode('root');
 
         $this->assertStringMatchesFormat('array<%s>', ArrayShapeGenerator::generate($root));
     }
 
-    public function testPhpDocShapeMultiLevel()
+    public function testPhpDocShapeMultiLevel(): void
     {
         $root = new ArrayNode('root');
         $child = new ArrayNode('child');
@@ -152,7 +152,7 @@ class ArrayShapeGeneratorTest extends TestCase
         $this->assertStringMatchesFormat('array{%Achild?: array<%s>,%A}', ArrayShapeGenerator::generate($root));
     }
 
-    public function testCanBeEnabled()
+    public function testCanBeEnabled(): void
     {
         $root = new ArrayNodeDefinition('root');
         $root->canBeEnabled();
@@ -164,7 +164,7 @@ class ArrayShapeGeneratorTest extends TestCase
             CODE, ArrayShapeGenerator::generate($root->getNode()));
     }
 
-    public function testCanBeDisabled()
+    public function testCanBeDisabled(): void
     {
         $root = new ArrayNodeDefinition('root');
         $root->canBeDisabled();
@@ -177,7 +177,7 @@ class ArrayShapeGeneratorTest extends TestCase
     }
 
     #[DataProvider('provideQuotedNodes')]
-    public function testPhpdocQuoteNodeName(NodeInterface $node, string $expected)
+    public function testPhpdocQuoteNodeName(NodeInterface $node, string $expected): void
     {
         $arrayNode = new ArrayNode('root');
         $arrayNode->addChild($node);

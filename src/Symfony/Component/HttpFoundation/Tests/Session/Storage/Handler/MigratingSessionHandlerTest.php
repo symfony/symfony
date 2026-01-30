@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MigratingSessionHan
 
 class MigratingSessionHandlerTest extends TestCase
 {
-    public function testInstanceOf()
+    public function testInstanceOf(): void
     {
         $dualHandler = new MigratingSessionHandler($this->createStub(\SessionHandlerInterface::class), $this->createStub(\SessionHandlerInterface::class));
 
@@ -24,7 +24,7 @@ class MigratingSessionHandlerTest extends TestCase
         $this->assertInstanceOf(\SessionUpdateTimestampHandlerInterface::class, $dualHandler);
     }
 
-    public function testClose()
+    public function testClose(): void
     {
         $currentHandler = $this->createMock(\SessionHandlerInterface::class);
         $currentHandler->expects($this->once())
@@ -42,7 +42,7 @@ class MigratingSessionHandlerTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testDestroy()
+    public function testDestroy(): void
     {
         $currentHandler = $this->createMock(\SessionHandlerInterface::class);
         $writeOnlyHandler = $this->createMock(\SessionHandlerInterface::class);
@@ -66,7 +66,7 @@ class MigratingSessionHandlerTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testGc()
+    public function testGc(): void
     {
         $maxlifetime = 357;
 
@@ -86,7 +86,7 @@ class MigratingSessionHandlerTest extends TestCase
         $this->assertSame(1, $dualHandler->gc($maxlifetime));
     }
 
-    public function testOpen()
+    public function testOpen(): void
     {
         $savePath = '/path/to/save/location';
         $sessionName = 'xyz';
@@ -109,7 +109,7 @@ class MigratingSessionHandlerTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testRead()
+    public function testRead(): void
     {
         $sessionId = 'xyz';
         $readValue = 'something';
@@ -131,7 +131,7 @@ class MigratingSessionHandlerTest extends TestCase
         $this->assertSame($readValue, $result);
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $sessionId = 'xyz';
         $data = 'my-serialized-data';
@@ -154,7 +154,7 @@ class MigratingSessionHandlerTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testValidateId()
+    public function testValidateId(): void
     {
         $sessionId = 'xyz';
         $readValue = 'something';
@@ -176,7 +176,7 @@ class MigratingSessionHandlerTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testUpdateTimestamp()
+    public function testUpdateTimestamp(): void
     {
         $sessionId = 'xyz';
         $data = 'my-serialized-data';

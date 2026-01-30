@@ -47,7 +47,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
-    public function testPullNewXlf12Messages()
+    public function testPullNewXlf12Messages(): void
     {
         $arrayLoader = new ArrayLoader();
         $filenameEn = $this->createFile();
@@ -169,7 +169,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
         );
     }
 
-    public function testPullNewXlf20Messages()
+    public function testPullNewXlf20Messages(): void
     {
         $arrayLoader = new ArrayLoader();
         $filenameEn = $this->createFile(['note' => 'NOTE'], 'en', 'messages.%locale%.xlf', 'xlf20');
@@ -245,7 +245,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
         );
     }
 
-    public function testPullNewYamlMessagesAsInlined()
+    public function testPullNewYamlMessagesAsInlined(): void
     {
         $arrayLoader = new ArrayLoader();
         $filenameEn = $this->createYamlFile(['note' => 'NOTE'], 'en', 'messages.%locale%.yml');
@@ -293,7 +293,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
         );
     }
 
-    public function testPullNewYamlMessagesAsTree()
+    public function testPullNewYamlMessagesAsTree(): void
     {
         $arrayLoader = new ArrayLoader();
         $filenameEn = $this->createYamlFile(['note' => 'NOTE'], 'en', 'messages.%locale%.yml');
@@ -343,7 +343,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
         );
     }
 
-    public function testPullForceMessages()
+    public function testPullForceMessages(): void
     {
         $arrayLoader = new ArrayLoader();
         $filenameMessagesEn = $this->createFile(['note' => 'NOTE'], 'en');
@@ -477,7 +477,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testPullForceIntlIcuMessages()
+    public function testPullForceIntlIcuMessages(): void
     {
         $arrayLoader = new ArrayLoader();
         $filenameEn = $this->createFile(['note' => 'NOTE'], 'en', 'messages+intl-icu.%locale%.xlf');
@@ -556,7 +556,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
         );
     }
 
-    public function testPullMessagesWithDefaultLocale()
+    public function testPullMessagesWithDefaultLocale(): void
     {
         $arrayLoader = new ArrayLoader();
         $filenameFr = $this->createFile(['note' => 'NOTE'], 'fr');
@@ -634,7 +634,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
         );
     }
 
-    public function testPullMessagesMultipleDomains()
+    public function testPullMessagesMultipleDomains(): void
     {
         $arrayLoader = new ArrayLoader();
         $filenameMessages = $this->createFile(['note' => 'NOTE']);
@@ -714,7 +714,7 @@ class TranslationPullCommandTest extends TranslationProviderTestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $application = new Application();
         $application->addCommand($this->createCommand($this->createStub(ProviderInterface::class), ['en', 'fr', 'it'], ['messages', 'validators'], 'en', ['loco', 'crowdin', 'lokalise']));

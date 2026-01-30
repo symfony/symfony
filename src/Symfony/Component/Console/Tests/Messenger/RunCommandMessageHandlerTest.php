@@ -30,7 +30,7 @@ use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
  */
 final class RunCommandMessageHandlerTest extends TestCase
 {
-    public function testExecutesCommand()
+    public function testExecutesCommand(): void
     {
         $handler = new RunCommandMessageHandler($this->createApplicationWithCommand());
         $context = $handler(new RunCommandMessage('test:command'));
@@ -39,7 +39,7 @@ final class RunCommandMessageHandlerTest extends TestCase
         $this->assertStringContainsString('some message', $context->output);
     }
 
-    public function testExecutesCommandThatThrowsException()
+    public function testExecutesCommandThatThrowsException(): void
     {
         $handler = new RunCommandMessageHandler($this->createApplicationWithCommand());
 
@@ -57,7 +57,7 @@ final class RunCommandMessageHandlerTest extends TestCase
         $this->fail('Exception not thrown.');
     }
 
-    public function testExecutesCommandThatCatchesThrownException()
+    public function testExecutesCommandThatCatchesThrownException(): void
     {
         $handler = new RunCommandMessageHandler($this->createApplicationWithCommand());
         $context = $handler(new RunCommandMessage('test:command --throw -v', throwOnFailure: false, catchExceptions: true));
@@ -67,7 +67,7 @@ final class RunCommandMessageHandlerTest extends TestCase
         $this->assertStringContainsString('exception message', $context->output);
     }
 
-    public function testThrowOnNonSuccess()
+    public function testThrowOnNonSuccess(): void
     {
         $handler = new RunCommandMessageHandler($this->createApplicationWithCommand());
 
@@ -85,7 +85,7 @@ final class RunCommandMessageHandlerTest extends TestCase
         $this->fail('Exception not thrown.');
     }
 
-    public function testExecutesCommandThatThrownUnrecoverableException()
+    public function testExecutesCommandThatThrownUnrecoverableException(): void
     {
         $handler = new RunCommandMessageHandler($this->createApplicationWithCommand());
 
@@ -101,7 +101,7 @@ final class RunCommandMessageHandlerTest extends TestCase
         $this->fail('Exception not thrown.');
     }
 
-    public function testExecutesCommandThatThrownRecoverableException()
+    public function testExecutesCommandThatThrownRecoverableException(): void
     {
         $handler = new RunCommandMessageHandler($this->createApplicationWithCommand());
 

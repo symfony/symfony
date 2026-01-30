@@ -57,30 +57,30 @@ class CommandTesterTest extends TestCase
         $this->tester->execute(['foo' => 'bar'], ['interactive' => false, 'decorated' => false, 'verbosity' => Output::VERBOSITY_VERBOSE]);
     }
 
-    public function testExecute()
+    public function testExecute(): void
     {
         $this->assertFalse($this->tester->getInput()->isInteractive(), '->execute() takes an interactive option');
         $this->assertFalse($this->tester->getOutput()->isDecorated(), '->execute() takes a decorated option');
         $this->assertEquals(Output::VERBOSITY_VERBOSE, $this->tester->getOutput()->getVerbosity(), '->execute() takes a verbosity option');
     }
 
-    public function testGetInput()
+    public function testGetInput(): void
     {
         $this->assertEquals('bar', $this->tester->getInput()->getArgument('foo'), '->getInput() returns the current input instance');
     }
 
-    public function testGetOutput()
+    public function testGetOutput(): void
     {
         rewind($this->tester->getOutput()->getStream());
         $this->assertEquals('foo'.\PHP_EOL, stream_get_contents($this->tester->getOutput()->getStream()), '->getOutput() returns the current output instance');
     }
 
-    public function testGetDisplay()
+    public function testGetDisplay(): void
     {
         $this->assertEquals('foo'.\PHP_EOL, $this->tester->getDisplay(), '->getDisplay() returns the display of the last execution');
     }
 
-    public function testGetDisplayWithoutCallingExecuteBefore()
+    public function testGetDisplayWithoutCallingExecuteBefore(): void
     {
         $tester = new CommandTester(new Command());
 
@@ -90,12 +90,12 @@ class CommandTesterTest extends TestCase
         $tester->getDisplay();
     }
 
-    public function testGetStatusCode()
+    public function testGetStatusCode(): void
     {
         $this->tester->assertCommandIsSuccessful('->getStatusCode() returns the status code');
     }
 
-    public function testGetStatusCodeWithoutCallingExecuteBefore()
+    public function testGetStatusCodeWithoutCallingExecuteBefore(): void
     {
         $tester = new CommandTester(new Command());
 
@@ -105,7 +105,7 @@ class CommandTesterTest extends TestCase
         $tester->getStatusCode();
     }
 
-    public function testCommandFromApplication()
+    public function testCommandFromApplication(): void
     {
         $application = new Application();
         $application->setAutoExit(false);
@@ -125,7 +125,7 @@ class CommandTesterTest extends TestCase
         $this->assertEquals(0, $tester->execute([]));
     }
 
-    public function testCommandWithInputs()
+    public function testCommandWithInputs(): void
     {
         $questions = [
             'What\'s your name?',
@@ -152,7 +152,7 @@ class CommandTesterTest extends TestCase
         $this->assertEquals(implode('', $questions), $tester->getDisplay(true));
     }
 
-    public function testCommandWithMultilineInputs()
+    public function testCommandWithMultilineInputs(): void
     {
         $question = 'What is your address?';
 
@@ -178,7 +178,7 @@ class CommandTesterTest extends TestCase
         $this->assertSame($question.$address.$address.\PHP_EOL, $tester->getDisplay());
     }
 
-    public function testCommandWithDefaultInputs()
+    public function testCommandWithDefaultInputs(): void
     {
         $questions = [
             'What\'s your name?',
@@ -205,7 +205,7 @@ class CommandTesterTest extends TestCase
         $this->assertEquals(implode('', $questions), $tester->getDisplay(true));
     }
 
-    public function testCommandWithWrongInputsNumber()
+    public function testCommandWithWrongInputsNumber(): void
     {
         $questions = [
             'What\'s your name?',
@@ -234,7 +234,7 @@ class CommandTesterTest extends TestCase
         $tester->execute([]);
     }
 
-    public function testCommandWithQuestionsButNoInputs()
+    public function testCommandWithQuestionsButNoInputs(): void
     {
         $questions = [
             'What\'s your name?',
@@ -262,7 +262,7 @@ class CommandTesterTest extends TestCase
         $tester->execute([]);
     }
 
-    public function testSymfonyStyleCommandWithInputs()
+    public function testSymfonyStyleCommandWithInputs(): void
     {
         $questions = [
             'What\'s your name?',
@@ -287,7 +287,7 @@ class CommandTesterTest extends TestCase
         $tester->assertCommandIsSuccessful();
     }
 
-    public function testErrorOutput()
+    public function testErrorOutput(): void
     {
         $command = new Command('foo');
         $command->addArgument('command');
@@ -307,7 +307,7 @@ class CommandTesterTest extends TestCase
         $this->assertSame('foo', $tester->getErrorOutput());
     }
 
-    public function testAInvokableCommand()
+    public function testAInvokableCommand(): void
     {
         $command = new InvokableTestCommand();
 
@@ -317,7 +317,7 @@ class CommandTesterTest extends TestCase
         $tester->assertCommandIsSuccessful();
     }
 
-    public function testAInvokableExtendedCommand()
+    public function testAInvokableExtendedCommand(): void
     {
         $command = new InvokableExtendingCommandTestCommand();
 
@@ -327,7 +327,7 @@ class CommandTesterTest extends TestCase
         $tester->assertCommandIsSuccessful();
     }
 
-    public function testCallableMethodCommands()
+    public function testCallableMethodCommands(): void
     {
         $command = new MethodBasedTestCommand();
 
@@ -347,7 +347,7 @@ class CommandTesterTest extends TestCase
         $this->assertSame('cmd2', $tester->getDisplay());
     }
 
-    public function testInvokableDefinitionWithInputAttribute()
+    public function testInvokableDefinitionWithInputAttribute(): void
     {
         $application = new Application();
         $application->addCommand(new InvokableWithInputTestCommand());
@@ -378,7 +378,7 @@ class CommandTesterTest extends TestCase
         self::assertStringMatchesFormat($expectedOutput, $bufferedOutput->fetch());
     }
 
-    public function testMethodBasedCommandWithApplication()
+    public function testMethodBasedCommandWithApplication(): void
     {
         $command = new MethodBasedTestCommand();
 
@@ -403,7 +403,7 @@ class CommandTesterTest extends TestCase
     }
 
     #[DataProvider('getInvokableWithInputData')]
-    public function testInvokableWithInputAttribute(array $input, string $output)
+    public function testInvokableWithInputAttribute(array $input, string $output): void
     {
         $command = new InvokableWithInputTestCommand();
 
@@ -518,7 +518,7 @@ class CommandTesterTest extends TestCase
         ];
     }
 
-    public function testInvokableWithInteractiveQuestionParameter()
+    public function testInvokableWithInteractiveQuestionParameter(): void
     {
         $tester = new CommandTester(new InvokableWithInteractiveAttributesTestCommand());
         $tester->setInputs(['arg1-value', 'arg2-value', 'arg3-value', 'arg6-value', 'arg7-value', 'yes', 'arg9-v1', 'arg9-v2', '', 'arg4-value', 'arg5-value']);
@@ -545,7 +545,7 @@ class CommandTesterTest extends TestCase
         self::assertStringContainsString('Arg5: arg5-value', $tester->getDisplay());
     }
 
-    public function testInvokableWithInteractiveHiddenQuestionParameter()
+    public function testInvokableWithInteractiveHiddenQuestionParameter(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $this->markTestSkipped('Cannot test hidden questions on Windows');
@@ -560,7 +560,7 @@ class CommandTesterTest extends TestCase
         self::assertStringContainsString('Arg1: arg1-value', $tester->getDisplay());
     }
 
-    public function testInvokableWithInteractiveChoiceAttribute()
+    public function testInvokableWithInteractiveChoiceAttribute(): void
     {
         $tester = new CommandTester(new InvokableWithInteractiveChoiceAttributeTestCommand());
         $tester->setInputs(['green', '', 'active', 'auth,cache']);
@@ -577,7 +577,7 @@ class CommandTesterTest extends TestCase
         self::assertStringContainsString('Features: auth,cache', $tester->getDisplay());
     }
 
-    public function testInvokableWithInteractiveChoiceAttributeNonDefaultValues()
+    public function testInvokableWithInteractiveChoiceAttributeNonDefaultValues(): void
     {
         $tester = new CommandTester(new InvokableWithInteractiveChoiceAttributeTestCommand());
         $tester->setInputs(['blue', 'large', 'pending', 'api']);
@@ -590,7 +590,7 @@ class CommandTesterTest extends TestCase
         self::assertStringContainsString('Features: api', $tester->getDisplay());
     }
 
-    public function testInvokableWithInteractiveChoiceAttributeInvalidThenValid()
+    public function testInvokableWithInteractiveChoiceAttributeInvalidThenValid(): void
     {
         $tester = new CommandTester(new InvokableWithInteractiveChoiceAttributeTestCommand());
         // First input 'yellow' is invalid, then 'red' is valid
@@ -602,7 +602,7 @@ class CommandTesterTest extends TestCase
         self::assertStringContainsString('Color: red', $tester->getDisplay());
     }
 
-    public function testInvokableWithInteractiveChoiceAttributeInvalidEnumValue()
+    public function testInvokableWithInteractiveChoiceAttributeInvalidEnumValue(): void
     {
         $tester = new CommandTester(new InvokableWithInteractiveChoiceAttributeTestCommand());
         // 'unknown' is not a valid enum value, then 'inactive' is valid
@@ -614,7 +614,7 @@ class CommandTesterTest extends TestCase
         self::assertStringContainsString('Status: inactive', $tester->getDisplay());
     }
 
-    public function testInvokableWithInteractiveChoiceAttributeInvalidChoiceNumber()
+    public function testInvokableWithInteractiveChoiceAttributeInvalidChoiceNumber(): void
     {
         $tester = new CommandTester(new InvokableWithInteractiveChoiceAttributeTestCommand());
         // '5' is not a valid choice number, then '1' (inactive) is valid
@@ -626,7 +626,7 @@ class CommandTesterTest extends TestCase
         self::assertStringContainsString('Status: inactive', $tester->getDisplay());
     }
 
-    public function testChoiceWithoutChoicesAndWithoutEnumThrowsException()
+    public function testChoiceWithoutChoicesAndWithoutEnumThrowsException(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('requires either explicit choices or a BackedEnum type');

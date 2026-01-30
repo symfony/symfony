@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class ResendApiTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(ResendApiTransport $transport, string $expected)
+    public function testToString(ResendApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -51,7 +51,7 @@ class ResendApiTransportTest extends TestCase
         ];
     }
 
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $params = ['param1' => 'foo', 'param2' => 'bar'];
         $json = json_encode(['custom_header_1' => 'custom_value_1']);
@@ -81,7 +81,7 @@ class ResendApiTransportTest extends TestCase
         $this->assertEquals('bar', $payload['headers']['foo']);
     }
 
-    public function testSendThrowsForErrorResponse()
+    public function testSendThrowsForErrorResponse(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -107,7 +107,7 @@ class ResendApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -142,7 +142,7 @@ class ResendApiTransportTest extends TestCase
      * IDN (internationalized domain names) like kältetechnik-xyz.de need to be transformed to ACE
      * (ASCII Compatible Encoding) e.g.xn--kltetechnik-xyz-0kb.de, otherwise resend api answers with 400 http code.
      */
-    public function testSendForIdnDomains()
+    public function testSendForIdnDomains(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);

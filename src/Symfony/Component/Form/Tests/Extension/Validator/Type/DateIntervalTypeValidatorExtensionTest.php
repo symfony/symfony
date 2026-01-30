@@ -20,7 +20,7 @@ class DateIntervalTypeValidatorExtensionTest extends BaseValidatorExtensionTestC
         return $this->factory->create(DateIntervalType::class, null, $options);
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 

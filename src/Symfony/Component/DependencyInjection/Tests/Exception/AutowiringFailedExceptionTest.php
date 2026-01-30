@@ -16,7 +16,7 @@ use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 
 final class AutowiringFailedExceptionTest extends TestCase
 {
-    public function testGetMessageCallbackWhenMessageIsNotANotClosure()
+    public function testGetMessageCallbackWhenMessageIsNotANotClosure(): void
     {
         $exception = new AutowiringFailedException(
             'App\DummyService',
@@ -26,12 +26,12 @@ final class AutowiringFailedExceptionTest extends TestCase
         self::assertNull($exception->getMessageCallback());
     }
 
-    public function testLazyness()
+    public function testLazyness(): void
     {
         $counter = 0;
         $exception = new AutowiringFailedException(
             'App\DummyService',
-            static function () use (&$counter) {
+            static function () use (&$counter): void {
                 ++$counter;
 
                 throw new \Exception('boo');

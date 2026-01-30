@@ -19,7 +19,7 @@ use Symfony\Component\Config\Definition\Exception\InvalidDefinitionException;
 
 class NumericNodeDefinitionTest extends TestCase
 {
-    public function testIncoherentMinAssertion()
+    public function testIncoherentMinAssertion(): void
     {
         $node = new IntegerNodeDefinition('foo');
 
@@ -29,7 +29,7 @@ class NumericNodeDefinitionTest extends TestCase
         $node->max(3)->min(4);
     }
 
-    public function testIncoherentMaxAssertion()
+    public function testIncoherentMaxAssertion(): void
     {
         $node = new IntegerNodeDefinition('foo');
 
@@ -39,7 +39,7 @@ class NumericNodeDefinitionTest extends TestCase
         $node->min(3)->max(2);
     }
 
-    public function testIntegerMinAssertion()
+    public function testIntegerMinAssertion(): void
     {
         $node = new IntegerNodeDefinition('foo');
 
@@ -49,7 +49,7 @@ class NumericNodeDefinitionTest extends TestCase
         $node->min(5)->getNode()->finalize(4);
     }
 
-    public function testIntegerMaxAssertion()
+    public function testIntegerMaxAssertion(): void
     {
         $node = new IntegerNodeDefinition('foo');
 
@@ -59,14 +59,14 @@ class NumericNodeDefinitionTest extends TestCase
         $node->max(3)->getNode()->finalize(4);
     }
 
-    public function testIntegerValidMinMaxAssertion()
+    public function testIntegerValidMinMaxAssertion(): void
     {
         $node = new IntegerNodeDefinition('foo');
         $node = $node->min(3)->max(7)->getNode();
         $this->assertEquals(4, $node->finalize(4));
     }
 
-    public function testFloatMinAssertion()
+    public function testFloatMinAssertion(): void
     {
         $node = new FloatNodeDefinition('foo');
 
@@ -76,7 +76,7 @@ class NumericNodeDefinitionTest extends TestCase
         $node->min(5E2)->getNode()->finalize(4e2);
     }
 
-    public function testFloatMaxAssertion()
+    public function testFloatMaxAssertion(): void
     {
         $node = new FloatNodeDefinition('foo');
 
@@ -86,14 +86,14 @@ class NumericNodeDefinitionTest extends TestCase
         $node->max(0.3)->getNode()->finalize(4.3);
     }
 
-    public function testFloatValidMinMaxAssertion()
+    public function testFloatValidMinMaxAssertion(): void
     {
         $node = new FloatNodeDefinition('foo');
         $node = $node->min(3.0)->max(7e2)->getNode();
         $this->assertEquals(4.5, $node->finalize(4.5));
     }
 
-    public function testCannotBeEmptyThrowsAnException()
+    public function testCannotBeEmptyThrowsAnException(): void
     {
         $node = new IntegerNodeDefinition('foo');
 

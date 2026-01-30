@@ -42,7 +42,7 @@ class TypeContextFactoryTest extends TestCase
         $this->typeContextFactory = new TypeContextFactory(new StringTypeResolver());
     }
 
-    public function testCollectClassNames()
+    public function testCollectClassNames(): void
     {
         $typeContext = $this->typeContextFactory->createFromClassName(Dummy::class, AbstractDummy::class);
         $this->assertSame(Dummy::class, $typeContext->calledClassName);
@@ -65,14 +65,14 @@ class TypeContextFactoryTest extends TestCase
         $this->assertSame(Dummy::class, $typeContext->declaringClassName);
     }
 
-    public function testCacheResultWhenToStringTypeResolver()
+    public function testCacheResultWhenToStringTypeResolver(): void
     {
         $typeContext = $this->typeContextFactory->createFromClassName(Dummy::class, AbstractDummy::class);
         $cachedtypeContext = $this->typeContextFactory->createFromClassName(Dummy::class, AbstractDummy::class);
         $this->assertSame($typeContext, $cachedtypeContext);
     }
 
-    public function testCollectNamespace()
+    public function testCollectNamespace(): void
     {
         $namespace = 'Symfony\\Component\\TypeInfo\\Tests\\Fixtures';
 
@@ -84,7 +84,7 @@ class TypeContextFactoryTest extends TestCase
         $this->assertEquals($namespace, $this->typeContextFactory->createFromReflection(new \ReflectionParameter([Dummy::class, 'setId'], 'id'))->namespace);
     }
 
-    public function testCollectUses()
+    public function testCollectUses(): void
     {
         $this->assertSame([], $this->typeContextFactory->createFromClassName(Dummy::class)->uses);
 
@@ -102,7 +102,7 @@ class TypeContextFactoryTest extends TestCase
         $this->assertEquals($uses, $this->typeContextFactory->createFromReflection(new \ReflectionParameter([DummyWithUses::class, 'setCreatedAt'], 'createdAt'))->uses);
     }
 
-    public function testCollectUsesWindowsLineEndings()
+    public function testCollectUsesWindowsLineEndings(): void
     {
         self::assertSame(\count(file(__DIR__.'/../Fixtures/DummyWithUsesWindowsLineEndings.php')), substr_count(file_get_contents(__DIR__.'/../Fixtures/DummyWithUsesWindowsLineEndings.php'), "\r\n"));
 
@@ -120,7 +120,7 @@ class TypeContextFactoryTest extends TestCase
         $this->assertEquals($uses, $this->typeContextFactory->createFromReflection(new \ReflectionParameter([DummyWithUsesWindowsLineEndings::class, 'setCreatedAt'], 'createdAt'))->uses);
     }
 
-    public function testCollectTemplates()
+    public function testCollectTemplates(): void
     {
         $this->assertEquals([], $this->typeContextFactory->createFromClassName(Dummy::class)->templates);
         $this->assertEquals([
@@ -159,7 +159,7 @@ class TypeContextFactoryTest extends TestCase
         ], $this->typeContextFactory->createFromReflection(new \ReflectionClass(DummyWithTemplateAndParentInDifferentNs::class))->templates);
     }
 
-    public function testDoNotCollectTemplatesWhenToStringTypeResolver()
+    public function testDoNotCollectTemplatesWhenToStringTypeResolver(): void
     {
         $typeContextFactory = new TypeContextFactory();
 
@@ -171,7 +171,7 @@ class TypeContextFactoryTest extends TestCase
      * @param class-string        $className
      */
     #[DataProvider('collectTypeAliasesDataProvider')]
-    public function testCollectTypeAliases(array $expectedTypeAliases, string $className)
+    public function testCollectTypeAliases(array $expectedTypeAliases, string $className): void
     {
         $this->assertEquals($expectedTypeAliases, $this->typeContextFactory->createFromClassName($className)->typeAliases);
     }
@@ -218,7 +218,7 @@ class TypeContextFactoryTest extends TestCase
         yield [['AliasWithTemplate' => Type::template('T')], DummyWithTemplateTypeAlias::class];
     }
 
-    public function testCollectTypeAliasesWithExtraTypeAliases()
+    public function testCollectTypeAliasesWithExtraTypeAliases(): void
     {
         $typeContextFactory = new TypeContextFactory(new StringTypeResolver(), [
             'Custom' => Type::int(),
@@ -243,14 +243,14 @@ class TypeContextFactoryTest extends TestCase
         ], $typeContextFactory->createFromClassName(DummyWithTypeAliases::class)->typeAliases);
     }
 
-    public function testDoNotCollectTypeAliasesWhenToStringTypeResolver()
+    public function testDoNotCollectTypeAliasesWhenToStringTypeResolver(): void
     {
         $typeContextFactory = new TypeContextFactory();
 
         $this->assertEquals([], $typeContextFactory->createFromClassName(DummyWithTypeAliases::class)->typeAliases);
     }
 
-    public function testThrowWhenImportingInvalidAlias()
+    public function testThrowWhenImportingInvalidAlias(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage(\sprintf('Cannot find any "Invalid" type alias in "%s".', DummyWithTypeAliases::class));
@@ -258,7 +258,7 @@ class TypeContextFactoryTest extends TestCase
         $this->typeContextFactory->createFromClassName(DummyWithInvalidTypeAliasImport::class);
     }
 
-    public function testThrowWhenCannotResolveTypeAlias()
+    public function testThrowWhenCannotResolveTypeAlias(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot resolve "Invalid" type alias.');
@@ -266,7 +266,7 @@ class TypeContextFactoryTest extends TestCase
         $this->typeContextFactory->createFromClassName(DummyWithInvalidTypeAlias::class);
     }
 
-    public function testThrowWhenTypeAliasNotImportedFromValidClassName()
+    public function testThrowWhenTypeAliasNotImportedFromValidClassName(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Type alias "Invalid" is not imported from a valid class name.');
@@ -274,7 +274,7 @@ class TypeContextFactoryTest extends TestCase
         $this->typeContextFactory->createFromClassName(DummyWithTypeAliasImportedFromInvalidClassName::class);
     }
 
-    public function testThrowWhenImportingRecursiveTypeAliases()
+    public function testThrowWhenImportingRecursiveTypeAliases(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Cannot resolve "Bar" type alias.');

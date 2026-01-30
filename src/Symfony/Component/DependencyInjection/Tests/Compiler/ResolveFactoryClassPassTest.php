@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ResolveFactoryClassPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 
@@ -34,7 +34,7 @@ class ResolveFactoryClassPassTest extends TestCase
         $this->assertSame(['Foo\Bar', 'create'], $factory->getFactory());
     }
 
-    public function testInlinedDefinitionFactoryIsProcessed()
+    public function testInlinedDefinitionFactoryIsProcessed(): void
     {
         $container = new ContainerBuilder();
 
@@ -57,7 +57,7 @@ class ResolveFactoryClassPassTest extends TestCase
     }
 
     #[DataProvider('provideFulfilledFactories')]
-    public function testIgnoresFulfilledFactories($factory)
+    public function testIgnoresFulfilledFactories($factory): void
     {
         $container = new ContainerBuilder();
         $definition = new Definition();
@@ -71,7 +71,7 @@ class ResolveFactoryClassPassTest extends TestCase
         $this->assertSame($factory, $container->getDefinition('factory')->getFactory());
     }
 
-    public function testNotAnyClassThrowsException()
+    public function testNotAnyClassThrowsException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The "factory" service is defined to be created by a factory, but is missing the factory class. Did you forget to define the factory or service class?');

@@ -17,12 +17,12 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class BuiltinTypeTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $this->assertSame('int', (string) new BuiltinType(TypeIdentifier::INT));
     }
 
-    public function testIsIdentifiedBy()
+    public function testIsIdentifiedBy(): void
     {
         $this->assertFalse((new BuiltinType(TypeIdentifier::INT))->isIdentifiedBy(TypeIdentifier::ARRAY));
         $this->assertTrue((new BuiltinType(TypeIdentifier::INT))->isIdentifiedBy(TypeIdentifier::INT));
@@ -33,14 +33,14 @@ class BuiltinTypeTest extends TestCase
         $this->assertTrue((new BuiltinType(TypeIdentifier::INT))->isIdentifiedBy('string', 'int'));
     }
 
-    public function testIsNullable()
+    public function testIsNullable(): void
     {
         $this->assertTrue((new BuiltinType(TypeIdentifier::NULL))->isNullable());
         $this->assertTrue((new BuiltinType(TypeIdentifier::MIXED))->isNullable());
         $this->assertFalse((new BuiltinType(TypeIdentifier::INT))->isNullable());
     }
 
-    public function testAccepts()
+    public function testAccepts(): void
     {
         $this->assertFalse((new BuiltinType(TypeIdentifier::ARRAY))->accepts('string'));
         $this->assertTrue((new BuiltinType(TypeIdentifier::ARRAY))->accepts([]));

@@ -23,7 +23,7 @@ trait IgnoredAttributesTestTrait
 
     abstract protected function getDenormalizerForIgnoredAttributes(): DenormalizerInterface;
 
-    public function testIgnoredAttributesNormalize()
+    public function testIgnoredAttributesNormalize(): void
     {
         $normalizer = $this->getNormalizerForIgnoredAttributes();
 
@@ -58,7 +58,7 @@ trait IgnoredAttributesTestTrait
         );
     }
 
-    public function testIgnoredAttributesContextDenormalize()
+    public function testIgnoredAttributesContextDenormalize(): void
     {
         $normalizer = $this->getDenormalizerForIgnoredAttributes();
 
@@ -74,7 +74,7 @@ trait IgnoredAttributesTestTrait
             ], ObjectOuter::class, null, $context));
     }
 
-    public function testIgnoredAttributesContextDenormalizeInherit()
+    public function testIgnoredAttributesContextDenormalizeInherit(): void
     {
         $normalizer = $this->getDenormalizerForIgnoredAttributes();
 

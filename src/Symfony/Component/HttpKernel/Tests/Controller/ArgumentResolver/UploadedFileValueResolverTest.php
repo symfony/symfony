@@ -30,7 +30,7 @@ class UploadedFileValueResolverTest extends TestCase
     private const FIXTURES_BASE_PATH = __DIR__.'/../../Fixtures/Controller/ArgumentResolver/UploadedFile';
 
     #[DataProvider('provideContext')]
-    public function testDefaults(RequestPayloadValueResolver $resolver, Request $request)
+    public function testDefaults(RequestPayloadValueResolver $resolver, Request $request): void
     {
         $attribute = new MapUploadedFile();
         $argument = new ArgumentMetadata(
@@ -44,7 +44,7 @@ class UploadedFileValueResolverTest extends TestCase
         );
         $event = new ControllerArgumentsEvent(
             $this->createStub(HttpKernelInterface::class),
-            static function () {},
+            static function (): void {},
             $resolver->resolve($request, $argument),
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -60,7 +60,7 @@ class UploadedFileValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
-    public function testEmpty(RequestPayloadValueResolver $resolver, Request $request)
+    public function testEmpty(RequestPayloadValueResolver $resolver, Request $request): void
     {
         $attribute = new MapUploadedFile();
         $argument = new ArgumentMetadata(
@@ -74,7 +74,7 @@ class UploadedFileValueResolverTest extends TestCase
         );
         $event = new ControllerArgumentsEvent(
             $this->createStub(HttpKernelInterface::class),
-            static function () {},
+            static function (): void {},
             $resolver->resolve($request, $argument),
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -86,7 +86,7 @@ class UploadedFileValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
-    public function testEmptyArrayArgument(RequestPayloadValueResolver $resolver, Request $request)
+    public function testEmptyArrayArgument(RequestPayloadValueResolver $resolver, Request $request): void
     {
         $attribute = new MapUploadedFile();
         $argument = new ArgumentMetadata(
@@ -100,7 +100,7 @@ class UploadedFileValueResolverTest extends TestCase
         );
         $event = new ControllerArgumentsEvent(
             $this->createStub(HttpKernelInterface::class),
-            static function () {},
+            static function (): void {},
             $resolver->resolve($request, $argument),
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -113,7 +113,7 @@ class UploadedFileValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
-    public function testCustomName(RequestPayloadValueResolver $resolver, Request $request)
+    public function testCustomName(RequestPayloadValueResolver $resolver, Request $request): void
     {
         $attribute = new MapUploadedFile(name: 'bar');
         $argument = new ArgumentMetadata(
@@ -127,7 +127,7 @@ class UploadedFileValueResolverTest extends TestCase
         );
         $event = new ControllerArgumentsEvent(
             $this->createStub(HttpKernelInterface::class),
-            static function () {},
+            static function (): void {},
             $resolver->resolve($request, $argument),
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -143,7 +143,7 @@ class UploadedFileValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
-    public function testConstraintsWithoutViolation(RequestPayloadValueResolver $resolver, Request $request)
+    public function testConstraintsWithoutViolation(RequestPayloadValueResolver $resolver, Request $request): void
     {
         $attribute = new MapUploadedFile(constraints: new Assert\File(maxSize: 100));
         $argument = new ArgumentMetadata(
@@ -157,7 +157,7 @@ class UploadedFileValueResolverTest extends TestCase
         );
         $event = new ControllerArgumentsEvent(
             $this->createStub(HttpKernelInterface::class),
-            static function () {},
+            static function (): void {},
             $resolver->resolve($request, $argument),
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -173,7 +173,7 @@ class UploadedFileValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
-    public function testConstraintsWithViolation(RequestPayloadValueResolver $resolver, Request $request)
+    public function testConstraintsWithViolation(RequestPayloadValueResolver $resolver, Request $request): void
     {
         $attribute = new MapUploadedFile(constraints: new Assert\File(maxSize: 50));
         $argument = new ArgumentMetadata(
@@ -187,7 +187,7 @@ class UploadedFileValueResolverTest extends TestCase
         );
         $event = new ControllerArgumentsEvent(
             $this->createStub(HttpKernelInterface::class),
-            static function () {},
+            static function (): void {},
             $resolver->resolve($request, $argument),
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -200,7 +200,7 @@ class UploadedFileValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
-    public function testMultipleFilesArray(RequestPayloadValueResolver $resolver, Request $request)
+    public function testMultipleFilesArray(RequestPayloadValueResolver $resolver, Request $request): void
     {
         $attribute = new MapUploadedFile();
         $argument = new ArgumentMetadata(
@@ -214,7 +214,7 @@ class UploadedFileValueResolverTest extends TestCase
         );
         $event = new ControllerArgumentsEvent(
             $this->createStub(HttpKernelInterface::class),
-            static function () {},
+            static function (): void {},
             $resolver->resolve($request, $argument),
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -232,7 +232,7 @@ class UploadedFileValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
-    public function testMultipleFilesArrayConstraints(RequestPayloadValueResolver $resolver, Request $request)
+    public function testMultipleFilesArrayConstraints(RequestPayloadValueResolver $resolver, Request $request): void
     {
         $attribute = new MapUploadedFile(constraints: new Assert\File(maxSize: 50));
         $argument = new ArgumentMetadata(
@@ -246,7 +246,7 @@ class UploadedFileValueResolverTest extends TestCase
         );
         $event = new ControllerArgumentsEvent(
             $this->createStub(HttpKernelInterface::class),
-            static function () {},
+            static function (): void {},
             $resolver->resolve($request, $argument),
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -259,7 +259,7 @@ class UploadedFileValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
-    public function testMultipleFilesVariadic(RequestPayloadValueResolver $resolver, Request $request)
+    public function testMultipleFilesVariadic(RequestPayloadValueResolver $resolver, Request $request): void
     {
         $attribute = new MapUploadedFile();
         $argument = new ArgumentMetadata(
@@ -273,7 +273,7 @@ class UploadedFileValueResolverTest extends TestCase
         );
         $event = new ControllerArgumentsEvent(
             $this->createStub(HttpKernelInterface::class),
-            static function () {},
+            static function (): void {},
             $resolver->resolve($request, $argument),
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -291,7 +291,7 @@ class UploadedFileValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
-    public function testMultipleFilesVariadicConstraints(RequestPayloadValueResolver $resolver, Request $request)
+    public function testMultipleFilesVariadicConstraints(RequestPayloadValueResolver $resolver, Request $request): void
     {
         $attribute = new MapUploadedFile(constraints: new Assert\File(maxSize: 50));
         $argument = new ArgumentMetadata(
@@ -305,7 +305,7 @@ class UploadedFileValueResolverTest extends TestCase
         );
         $event = new ControllerArgumentsEvent(
             $this->createStub(HttpKernelInterface::class),
-            static function () {},
+            static function (): void {},
             $resolver->resolve($request, $argument),
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -318,7 +318,7 @@ class UploadedFileValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
-    public function testShouldAllowEmptyWhenNullable(RequestPayloadValueResolver $resolver, Request $request)
+    public function testShouldAllowEmptyWhenNullable(RequestPayloadValueResolver $resolver, Request $request): void
     {
         $attribute = new MapUploadedFile();
         $argument = new ArgumentMetadata(
@@ -334,7 +334,7 @@ class UploadedFileValueResolverTest extends TestCase
         $httpKernel = $this->createStub(HttpKernelInterface::class);
         $event = new ControllerArgumentsEvent(
             $httpKernel,
-            static function () {},
+            static function (): void {},
             $resolver->resolve($request, $argument),
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -346,7 +346,7 @@ class UploadedFileValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
-    public function testShouldAllowEmptyWhenNullableArray(RequestPayloadValueResolver $resolver, Request $request)
+    public function testShouldAllowEmptyWhenNullableArray(RequestPayloadValueResolver $resolver, Request $request): void
     {
         $attribute = new MapUploadedFile();
         $argument = new ArgumentMetadata(
@@ -362,7 +362,7 @@ class UploadedFileValueResolverTest extends TestCase
         $httpKernel = $this->createStub(HttpKernelInterface::class);
         $event = new ControllerArgumentsEvent(
             $httpKernel,
-            static function () {},
+            static function (): void {},
             $resolver->resolve($request, $argument),
             $request,
             HttpKernelInterface::MAIN_REQUEST
@@ -374,7 +374,7 @@ class UploadedFileValueResolverTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
-    public function testShouldAllowEmptyWhenHasDefaultValue(RequestPayloadValueResolver $resolver, Request $request)
+    public function testShouldAllowEmptyWhenHasDefaultValue(RequestPayloadValueResolver $resolver, Request $request): void
     {
         $attribute = new MapUploadedFile();
         $argument = new ArgumentMetadata(
@@ -390,7 +390,7 @@ class UploadedFileValueResolverTest extends TestCase
         $httpKernel = $this->createStub(HttpKernelInterface::class);
         $event = new ControllerArgumentsEvent(
             $httpKernel,
-            static function () {},
+            static function (): void {},
             $resolver->resolve($request, $argument),
             $request,
             HttpKernelInterface::MAIN_REQUEST

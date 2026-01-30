@@ -16,7 +16,7 @@ namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer\Traits;
  */
 trait DateTimeEqualsTrait
 {
-    public static function assertDateTimeEquals($expected, $actual)
+    public static function assertDateTimeEquals($expected, $actual): void
     {
         if ($expected instanceof \DateTimeInterface && $actual instanceof \DateTimeInterface) {
             $expected = $expected->format('c');

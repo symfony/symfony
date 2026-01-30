@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\TypedReference;
 
 class AutowireLocatorTest extends TestCase
 {
-    public function testSimpleLocator()
+    public function testSimpleLocator(): void
     {
         $locator = new AutowireLocator(['foo', 'bar']);
 
@@ -29,7 +29,7 @@ class AutowireLocatorTest extends TestCase
         );
     }
 
-    public function testComplexLocator()
+    public function testComplexLocator(): void
     {
         $locator = new AutowireLocator([
             '?qux',
@@ -47,7 +47,7 @@ class AutowireLocatorTest extends TestCase
         );
     }
 
-    public function testInvalidTypeLocator()
+    public function testInvalidTypeLocator(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('"bool" is not a PHP type for key "stdClass".');

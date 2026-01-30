@@ -20,7 +20,7 @@ class TelTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         return $this->factory->create(TelType::class, null, $options);
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 

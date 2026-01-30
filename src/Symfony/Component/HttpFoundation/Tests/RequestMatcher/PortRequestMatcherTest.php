@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\PortRequestMatcher;
 class PortRequestMatcherTest extends TestCase
 {
     #[DataProvider('getData')]
-    public function test(int $port, bool $expected)
+    public function test(int $port, bool $expected): void
     {
         $matcher = new PortRequestMatcher($port);
         $request = Request::create('', 'get', [], [], [], ['HTTP_HOST' => null, 'SERVER_PORT' => 8000]);

@@ -29,7 +29,7 @@ class XliffLintCommandTest extends TestCase
 {
     private array $files;
 
-    public function testLintCorrectFile()
+    public function testLintCorrectFile(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile();
@@ -43,7 +43,7 @@ class XliffLintCommandTest extends TestCase
         $this->assertStringContainsString('OK', trim($tester->getDisplay()));
     }
 
-    public function testLintCorrectFiles()
+    public function testLintCorrectFiles(): void
     {
         $tester = $this->createCommandTester();
         $filename1 = $this->createFile();
@@ -59,7 +59,7 @@ class XliffLintCommandTest extends TestCase
     }
 
     #[DataProvider('provideStrictFilenames')]
-    public function testStrictFilenames($requireStrictFileNames, $fileNamePattern, $targetLanguage, $mustFail)
+    public function testStrictFilenames($requireStrictFileNames, $fileNamePattern, $targetLanguage, $mustFail): void
     {
         $tester = $this->createCommandTester($requireStrictFileNames);
         $filename = $this->createFile('note', $targetLanguage, $fileNamePattern);
@@ -73,7 +73,7 @@ class XliffLintCommandTest extends TestCase
         $this->assertStringContainsString($mustFail ? '[WARNING] 0 XLIFF files have valid syntax and 1 contain errors.' : '[OK] All 1 XLIFF files contain valid syntax.', $tester->getDisplay());
     }
 
-    public function testLintIncorrectXmlSyntax()
+    public function testLintIncorrectXmlSyntax(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('note <target>');
@@ -84,7 +84,7 @@ class XliffLintCommandTest extends TestCase
         $this->assertStringContainsString('Opening and ending tag mismatch: target line 6 and source', trim($tester->getDisplay()));
     }
 
-    public function testLintIncorrectTargetLanguage()
+    public function testLintIncorrectTargetLanguage(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('note', 'es');
@@ -95,7 +95,7 @@ class XliffLintCommandTest extends TestCase
         $this->assertStringContainsString('There is a mismatch between the language included in the file name ("messages.en.xlf") and the "es" value used in the "target-language" attribute of the file.', trim($tester->getDisplay()));
     }
 
-    public function testLintTargetLanguageIsCaseInsensitive()
+    public function testLintTargetLanguageIsCaseInsensitive(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('note', 'zh-cn', 'messages.zh_CN.xlf');
@@ -106,7 +106,7 @@ class XliffLintCommandTest extends TestCase
         $this->assertStringContainsString('[OK] All 1 XLIFF files contain valid syntax.', trim($tester->getDisplay()));
     }
 
-    public function testLintSucceedsWhenLocaleInFileAndInTargetLanguageNameUsesDashesInsteadOfUnderscores()
+    public function testLintSucceedsWhenLocaleInFileAndInTargetLanguageNameUsesDashesInsteadOfUnderscores(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('note', 'en-GB', 'messages.en-GB.xlf');
@@ -117,7 +117,7 @@ class XliffLintCommandTest extends TestCase
         $this->assertStringContainsString('[OK] All 1 XLIFF files contain valid syntax.', trim($tester->getDisplay()));
     }
 
-    public function testLintFileNotReadable()
+    public function testLintFileNotReadable(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile();
@@ -128,7 +128,7 @@ class XliffLintCommandTest extends TestCase
         $tester->execute(['filename' => $filename], ['decorated' => false]);
     }
 
-    public function testGetHelp()
+    public function testGetHelp(): void
     {
         $command = new XliffLintCommand();
         $expected = <<<EOF
@@ -144,7 +144,7 @@ class XliffLintCommandTest extends TestCase
         $this->assertStringContainsString($expected, $command->getHelp());
     }
 
-    public function testLintIncorrectFileWithGithubFormat()
+    public function testLintIncorrectFileWithGithubFormat(): void
     {
         $filename = $this->createFile('note <target>');
         $tester = $this->createCommandTester();
@@ -153,7 +153,7 @@ class XliffLintCommandTest extends TestCase
         self::assertStringMatchesFormat('%A::error file=%s,line=6,col=47::Opening and ending tag mismatch: target line 6 and source%A', trim($tester->getDisplay()));
     }
 
-    public function testLintAutodetectsGithubActionEnvironment()
+    public function testLintAutodetectsGithubActionEnvironment(): void
     {
         $prev = getenv('GITHUB_ACTIONS');
         putenv('GITHUB_ACTIONS');
@@ -171,7 +171,7 @@ class XliffLintCommandTest extends TestCase
         }
     }
 
-    public function testPassingClosureAndCallableToConstructor()
+    public function testPassingClosureAndCallableToConstructor(): void
     {
         $command = new XliffLintCommand('translation:xliff:lint',
             $this->testPassingClosureAndCallableToConstructor(...),
@@ -253,7 +253,7 @@ class XliffLintCommandTest extends TestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $tester = new CommandCompletionTester($this->createCommand());
 

@@ -21,7 +21,7 @@ use Symfony\Component\Config\Loader\LoaderResolverInterface;
 
 class LoaderTest extends TestCase
 {
-    public function testGetSetResolver()
+    public function testGetSetResolver(): void
     {
         $resolver = new LoaderResolver([]);
 
@@ -31,7 +31,7 @@ class LoaderTest extends TestCase
         $this->assertSame($resolver, $loader->getResolver(), '->setResolver() sets the resolver loader');
     }
 
-    public function testGetResolverWithoutSetResolver()
+    public function testGetResolverWithoutSetResolver(): void
     {
         $this->expectException(LogicException::class);
 
@@ -39,7 +39,7 @@ class LoaderTest extends TestCase
         $loader->getResolver();
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $resolvedLoader = $this->createStub(LoaderInterface::class);
 
@@ -56,7 +56,7 @@ class LoaderTest extends TestCase
         $this->assertSame($resolvedLoader, $loader->resolve('foo.xml'), '->resolve() finds a loader');
     }
 
-    public function testResolveWithoutSetResolver()
+    public function testResolveWithoutSetResolver(): void
     {
         $this->expectException(LoaderLoadException::class);
 
@@ -64,7 +64,7 @@ class LoaderTest extends TestCase
         $loader->resolve('foo.xml');
     }
 
-    public function testResolveWhenResolverCannotFindLoader()
+    public function testResolveWhenResolverCannotFindLoader(): void
     {
         $resolver = $this->createMock(LoaderResolverInterface::class);
         $resolver->expects($this->once())
@@ -80,7 +80,7 @@ class LoaderTest extends TestCase
         $loader->resolve('FOOBAR');
     }
 
-    public function testImport()
+    public function testImport(): void
     {
         $resolvedLoader = $this->createMock(LoaderInterface::class);
         $resolvedLoader->expects($this->once())
@@ -100,7 +100,7 @@ class LoaderTest extends TestCase
         $this->assertEquals('yes', $loader->import('foo'));
     }
 
-    public function testImportWithType()
+    public function testImportWithType(): void
     {
         $resolvedLoader = $this->createMock(LoaderInterface::class);
         $resolvedLoader->expects($this->once())
@@ -132,7 +132,7 @@ class ProjectLoader1 extends Loader
         return \is_string($resource) && 'foo' === pathinfo($resource, \PATHINFO_EXTENSION);
     }
 
-    public function getType()
+    public function getType(): void
     {
     }
 }

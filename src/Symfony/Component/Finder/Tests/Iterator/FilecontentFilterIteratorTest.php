@@ -16,21 +16,21 @@ use Symfony\Component\Finder\Iterator\FilecontentFilterIterator;
 
 class FilecontentFilterIteratorTest extends IteratorTestCase
 {
-    public function testAccept()
+    public function testAccept(): void
     {
         $inner = new MockFileListIterator(['test.txt']);
         $iterator = new FilecontentFilterIterator($inner, [], []);
         $this->assertIterator(['test.txt'], $iterator);
     }
 
-    public function testDirectory()
+    public function testDirectory(): void
     {
         $inner = new MockFileListIterator(['directory']);
         $iterator = new FilecontentFilterIterator($inner, ['directory'], []);
         $this->assertIterator([], $iterator);
     }
 
-    public function testUnreadableFile()
+    public function testUnreadableFile(): void
     {
         $inner = new MockFileListIterator(['file r-']);
         $iterator = new FilecontentFilterIterator($inner, ['file r-'], []);
@@ -38,7 +38,7 @@ class FilecontentFilterIteratorTest extends IteratorTestCase
     }
 
     #[DataProvider('getTestFilterData')]
-    public function testFilter(\Iterator $inner, array $matchPatterns, array $noMatchPatterns, array $resultArray)
+    public function testFilter(\Iterator $inner, array $matchPatterns, array $noMatchPatterns, array $resultArray): void
     {
         $iterator = new FilecontentFilterIterator($inner, $matchPatterns, $noMatchPatterns);
         $this->assertIterator($resultArray, $iterator);

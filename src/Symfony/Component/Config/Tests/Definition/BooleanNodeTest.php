@@ -19,20 +19,20 @@ use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 class BooleanNodeTest extends TestCase
 {
     #[DataProvider('getValidValues')]
-    public function testNormalize(bool $value)
+    public function testNormalize(bool $value): void
     {
         $node = new BooleanNode('test');
         $this->assertSame($value, $node->normalize($value));
     }
 
-    public function testNullValueOnNullable()
+    public function testNullValueOnNullable(): void
     {
         $node = new BooleanNode('test', null, '.', true);
 
         $this->assertNull($node->normalize(null));
     }
 
-    public function testNullValueOnNotNullable()
+    public function testNullValueOnNotNullable(): void
     {
         $node = new BooleanNode('test', null, '.', false);
 
@@ -42,7 +42,7 @@ class BooleanNodeTest extends TestCase
         $this->assertNull($node->normalize(null));
     }
 
-    public function testInvalidValueOnNullable()
+    public function testInvalidValueOnNullable(): void
     {
         $node = new BooleanNode('test', null, '.', true);
 
@@ -53,7 +53,7 @@ class BooleanNodeTest extends TestCase
     }
 
     #[DataProvider('getValidValues')]
-    public function testValidNonEmptyValues(bool $value)
+    public function testValidNonEmptyValues(bool $value): void
     {
         $node = new BooleanNode('test');
         $node->setAllowEmptyValue(false);
@@ -70,7 +70,7 @@ class BooleanNodeTest extends TestCase
     }
 
     #[DataProvider('getInvalidValues')]
-    public function testNormalizeThrowsExceptionOnInvalidValues($value)
+    public function testNormalizeThrowsExceptionOnInvalidValues($value): void
     {
         $node = new BooleanNode('test');
 

@@ -21,21 +21,21 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
  */
 class NullOutputFormatterTest extends TestCase
 {
-    public function testFormat()
+    public function testFormat(): void
     {
         $formatter = new NullOutputFormatter();
 
         $this->assertNull($formatter->format('this message will be destroyed'));
     }
 
-    public function testGetStyle()
+    public function testGetStyle(): void
     {
         $formatter = new NullOutputFormatter();
         $this->assertInstanceof(NullOutputFormatterStyle::class, $style = $formatter->getStyle('null'));
         $this->assertSame($style, $formatter->getStyle('null'));
     }
 
-    public function testSetStyle()
+    public function testSetStyle(): void
     {
         $formatter = new NullOutputFormatter();
         $style = new OutputFormatterStyle();
@@ -43,19 +43,19 @@ class NullOutputFormatterTest extends TestCase
         $this->assertNotSame($style, $formatter->getStyle('null'));
     }
 
-    public function testHasStyle()
+    public function testHasStyle(): void
     {
         $formatter = new NullOutputFormatter();
         $this->assertFalse($formatter->hasStyle('null'));
     }
 
-    public function testIsDecorated()
+    public function testIsDecorated(): void
     {
         $formatter = new NullOutputFormatter();
         $this->assertFalse($formatter->isDecorated());
     }
 
-    public function testSetDecorated()
+    public function testSetDecorated(): void
     {
         $formatter = new NullOutputFormatter();
         $formatter->setDecorated(true);

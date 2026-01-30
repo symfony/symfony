@@ -68,13 +68,13 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         return new DoctrineDbalStore(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $config));
     }
 
-    public function testAbortAfterExpiration()
+    public function testAbortAfterExpiration(): void
     {
         $this->markTestSkipped('Pdo expects a TTL greater than 1 sec. Simulating a slow network is too hard');
     }
 
     #[DataProvider('provideDsnWithSQLite')]
-    public function testDsnWithSQLite(string $dsn, ?string $file = null)
+    public function testDsnWithSQLite(string $dsn, ?string $file = null): void
     {
         $key = new Key(__METHOD__);
 
@@ -100,7 +100,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
 
     #[RequiresPhpExtension('pdo_pgsql')]
     #[Group('integration')]
-    public function testDsnWithPostgreSQL()
+    public function testDsnWithPostgreSQL(): void
     {
         if (!$host = getenv('POSTGRES_HOST')) {
             $this->markTestSkipped('Missing POSTGRES_HOST env variable');
@@ -123,7 +123,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
      * @param class-string<AbstractPlatform>
      */
     #[DataProvider('providePlatforms')]
-    public function testCreatesTableInTransaction(string $platform)
+    public function testCreatesTableInTransaction(string $platform): void
     {
         $conn = $this->createMock(Connection::class);
 
@@ -172,7 +172,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         yield [SQLServerPlatform::class];
     }
 
-    public function testTableCreationInTransactionNotSupported()
+    public function testTableCreationInTransactionNotSupported(): void
     {
         $conn = $this->createMock(Connection::class);
 
@@ -213,7 +213,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $store->save($key);
     }
 
-    public function testCreatesTableOutsideTransaction()
+    public function testCreatesTableOutsideTransaction(): void
     {
         $conn = $this->createMock(Connection::class);
 
@@ -255,7 +255,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $store->save($key);
     }
 
-    public function testConfigureSchemaDifferentDatabase()
+    public function testConfigureSchemaDifferentDatabase(): void
     {
         $conn = $this->createStub(Connection::class);
         $someFunction = static fn () => false;
@@ -266,7 +266,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $this->assertFalse($schema->hasTable('lock_keys'));
     }
 
-    public function testConfigureSchemaSameDatabase()
+    public function testConfigureSchemaSameDatabase(): void
     {
         $conn = $this->createStub(Connection::class);
         $someFunction = static fn () => true;
@@ -277,7 +277,7 @@ class DoctrineDbalStoreTest extends AbstractStoreTestCase
         $this->assertTrue($schema->hasTable('lock_keys'));
     }
 
-    public function testConfigureSchemaTableExists()
+    public function testConfigureSchemaTableExists(): void
     {
         $conn = $this->createStub(Connection::class);
         $schema = new Schema();

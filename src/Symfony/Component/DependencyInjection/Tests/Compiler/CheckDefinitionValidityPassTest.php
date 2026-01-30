@@ -20,7 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 
 class CheckDefinitionValidityPassTest extends TestCase
 {
-    public function testProcessDetectsSyntheticNonPublicDefinitions()
+    public function testProcessDetectsSyntheticNonPublicDefinitions(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(true)->setPublic(false);
@@ -30,7 +30,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass()
+    public function testProcessDetectsNonSyntheticNonAbstractDefinitionWithoutClass(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->setSynthetic(false)->setAbstract(false);
@@ -40,7 +40,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcessAcceptsServiceLocatorWithoutClass()
+    public function testProcessAcceptsServiceLocatorWithoutClass(): void
     {
         $container = new ContainerBuilder();
         $container->register('a')->addTag('container.service_locator');
@@ -50,7 +50,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessDetectsFactoryWithoutClass()
+    public function testProcessDetectsFactoryWithoutClass(): void
     {
         $container = new ContainerBuilder();
 
@@ -63,7 +63,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->register('a', 'class');
@@ -75,7 +75,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testValidTags()
+    public function testValidTags(): void
     {
         $container = new ContainerBuilder();
         $container->register('a', 'class')->addTag('foo', ['bar' => 'baz']);
@@ -91,7 +91,7 @@ class CheckDefinitionValidityPassTest extends TestCase
     }
 
     #[DataProvider('provideInvalidTags')]
-    public function testInvalidTags(string $name, array $attributes, string $message)
+    public function testInvalidTags(string $name, array $attributes, string $message): void
     {
         $this->expectExceptionMessage($message);
         $container = new ContainerBuilder();
@@ -122,7 +122,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         ];
     }
 
-    public function testDynamicPublicServiceName()
+    public function testDynamicPublicServiceName(): void
     {
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
@@ -133,7 +133,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testDynamicPublicAliasName()
+    public function testDynamicPublicAliasName(): void
     {
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
@@ -144,7 +144,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->process($container);
     }
 
-    public function testDynamicPrivateName()
+    public function testDynamicPrivateName(): void
     {
         $container = new ContainerBuilder();
         $env = $container->getParameterBag()->get('env(BAR)');
@@ -156,7 +156,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessSkipsDefinitionsWithErrors()
+    public function testProcessSkipsDefinitionsWithErrors(): void
     {
         $container = new ContainerBuilder();
         $definition = $container->register('a')->setSynthetic(true)->setPublic(false);
@@ -168,7 +168,7 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    protected function process(ContainerBuilder $container)
+    protected function process(ContainerBuilder $container): void
     {
         $pass = new CheckDefinitionValidityPass();
         $pass->process($container);

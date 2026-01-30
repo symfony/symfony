@@ -33,7 +33,7 @@ class ClosureVoterTest extends TestCase
         );
     }
 
-    public function testEmptyAttributeAbstains()
+    public function testEmptyAttributeAbstains(): void
     {
         $this->assertSame(VoterInterface::ACCESS_ABSTAIN, $this->voter->vote(
             new NullToken(),
@@ -42,7 +42,7 @@ class ClosureVoterTest extends TestCase
         );
     }
 
-    public function testClosureReturningFalseDeniesAccess()
+    public function testClosureReturningFalseDeniesAccess(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('john', 'password'), 'main', []);
 
@@ -53,7 +53,7 @@ class ClosureVoterTest extends TestCase
         ));
     }
 
-    public function testClosureReturningTrueGrantsAccess()
+    public function testClosureReturningTrueGrantsAccess(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('john', 'password'), 'main', []);
 
@@ -64,7 +64,7 @@ class ClosureVoterTest extends TestCase
         ));
     }
 
-    public function testArgumentsContent()
+    public function testArgumentsContent(): void
     {
         $token = new UsernamePasswordToken(new InMemoryUser('john', 'password'), 'main', ['MY_ROLE', 'ANOTHER_ROLE']);
 

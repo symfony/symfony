@@ -17,7 +17,7 @@ use Symfony\Component\Finder\Iterator\PathFilterIterator;
 class PathFilterIteratorTest extends IteratorTestCase
 {
     #[DataProvider('getTestFilterData')]
-    public function testFilter(\Iterator $inner, array $matchPatterns, array $noMatchPatterns, array $resultArray)
+    public function testFilter(\Iterator $inner, array $matchPatterns, array $noMatchPatterns, array $resultArray): void
     {
         $iterator = new PathFilterIterator($inner, $matchPatterns, $noMatchPatterns);
         $this->assertIterator($resultArray, $iterator);

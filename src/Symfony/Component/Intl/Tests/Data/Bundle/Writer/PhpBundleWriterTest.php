@@ -39,7 +39,7 @@ class PhpBundleWriterTest extends TestCase
         $this->filesystem->remove($this->directory);
     }
 
-    public function testWrite()
+    public function testWrite(): void
     {
         $this->writer->write($this->directory, 'en', [
             'Entry1' => [
@@ -58,7 +58,7 @@ class PhpBundleWriterTest extends TestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testWriteResourceBundle()
+    public function testWriteResourceBundle(): void
     {
         $bundle = new \ResourceBundle('rb', __DIR__.'/Fixtures', false);
 

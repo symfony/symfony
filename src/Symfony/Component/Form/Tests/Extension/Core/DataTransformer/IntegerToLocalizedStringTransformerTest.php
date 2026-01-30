@@ -84,14 +84,14 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     }
 
     #[DataProvider('transformWithRoundingProvider')]
-    public function testTransformWithRounding($input, $output, $roundingMode)
+    public function testTransformWithRounding($input, $output, $roundingMode): void
     {
         $transformer = new IntegerToLocalizedStringTransformer(null, $roundingMode);
 
         $this->assertEquals($output, $transformer->transform($input));
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         // Since we test against "de_AT", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
@@ -104,14 +104,14 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         $this->assertEquals(12345, $transformer->reverseTransform('12345'));
     }
 
-    public function testReverseTransformEmpty()
+    public function testReverseTransformEmpty(): void
     {
         $transformer = new IntegerToLocalizedStringTransformer();
 
         $this->assertNull($transformer->reverseTransform(''));
     }
 
-    public function testReverseTransformWithGrouping()
+    public function testReverseTransformWithGrouping(): void
     {
         // Since we test against "de_DE", we need the full implementation
         IntlTestHelper::requireFullIntl($this);
@@ -178,14 +178,14 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     }
 
     #[DataProvider('reverseTransformWithRoundingProvider')]
-    public function testReverseTransformWithRounding($input, $output, $roundingMode)
+    public function testReverseTransformWithRounding($input, $output, $roundingMode): void
     {
         $transformer = new IntegerToLocalizedStringTransformer(null, $roundingMode);
 
         $this->assertEquals($output, $transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformExpectsString()
+    public function testReverseTransformExpectsString(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new IntegerToLocalizedStringTransformer();
@@ -193,7 +193,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform(1);
     }
 
-    public function testReverseTransformExpectsValidNumber()
+    public function testReverseTransformExpectsValidNumber(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new IntegerToLocalizedStringTransformer();
@@ -202,7 +202,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
     }
 
     #[DataProvider('floatNumberProvider')]
-    public function testReverseTransformExpectsInteger($number, $locale)
+    public function testReverseTransformExpectsInteger($number, $locale): void
     {
         $this->expectException(TransformationFailedException::class);
         IntlTestHelper::requireFullIntl($this);
@@ -222,7 +222,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         ];
     }
 
-    public function testReverseTransformDisallowsNaN()
+    public function testReverseTransformDisallowsNaN(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new IntegerToLocalizedStringTransformer();
@@ -230,7 +230,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform('NaN');
     }
 
-    public function testReverseTransformDisallowsNaN2()
+    public function testReverseTransformDisallowsNaN2(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new IntegerToLocalizedStringTransformer();
@@ -238,7 +238,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform('nan');
     }
 
-    public function testReverseTransformDisallowsInfinity()
+    public function testReverseTransformDisallowsInfinity(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new IntegerToLocalizedStringTransformer();
@@ -246,7 +246,7 @@ class IntegerToLocalizedStringTransformerTest extends TestCase
         $transformer->reverseTransform('∞');
     }
 
-    public function testReverseTransformDisallowsNegativeInfinity()
+    public function testReverseTransformDisallowsNegativeInfinity(): void
     {
         $this->expectException(TransformationFailedException::class);
         $transformer = new IntegerToLocalizedStringTransformer();

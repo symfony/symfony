@@ -19,7 +19,7 @@ use Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedMethodErrorEnhancer;
 class UndefinedMethodErrorEnhancerTest extends TestCase
 {
     #[DataProvider('provideUndefinedMethodData')]
-    public function testEnhance(string $originalMessage, string $enhancedMessage)
+    public function testEnhance(string $originalMessage, string $enhancedMessage): void
     {
         $enhancer = new UndefinedMethodErrorEnhancer();
 

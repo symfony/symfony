@@ -19,7 +19,7 @@ use Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedFunctionErrorEnhancer;
 class UndefinedFunctionErrorEnhancerTest extends TestCase
 {
     #[DataProvider('provideUndefinedFunctionData')]
-    public function testEnhance(string $originalMessage, string $enhancedMessage)
+    public function testEnhance(string $originalMessage, string $enhancedMessage): void
     {
         $enhancer = new UndefinedFunctionErrorEnhancer();
 
@@ -56,6 +56,6 @@ class UndefinedFunctionErrorEnhancerTest extends TestCase
     }
 }
 
-function test_namespaced_function()
+function test_namespaced_function(): void
 {
 }

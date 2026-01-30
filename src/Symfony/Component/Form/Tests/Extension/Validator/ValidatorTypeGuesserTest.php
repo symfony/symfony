@@ -62,7 +62,7 @@ class ValidatorTypeGuesserTest extends TestCase
     }
 
     #[DataProvider('guessTypeProvider')]
-    public function testGuessType(Constraint $constraint, TypeGuess $guess)
+    public function testGuessType(Constraint $constraint, TypeGuess $guess): void
     {
         $this->metadata->addPropertyConstraint(self::TEST_PROPERTY, $constraint);
 
@@ -101,7 +101,7 @@ class ValidatorTypeGuesserTest extends TestCase
     }
 
     #[DataProvider('guessRequiredProvider')]
-    public function testGuessRequired($constraint, $guess)
+    public function testGuessRequired($constraint, $guess): void
     {
         // add distracting constraint
         $this->metadata->addPropertyConstraint(self::TEST_PROPERTY, new Email());
@@ -112,12 +112,12 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->assertEquals($guess, $this->guesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
-    public function testGuessRequiredReturnsFalseForUnmappedProperties()
+    public function testGuessRequiredReturnsFalseForUnmappedProperties(): void
     {
         $this->assertEquals(new ValueGuess(false, Guess::LOW_CONFIDENCE), $this->guesser->guessRequired(self::TEST_CLASS, self::TEST_PROPERTY));
     }
 
-    public function testGuessMaxLengthForConstraintWithMaxValue()
+    public function testGuessMaxLengthForConstraintWithMaxValue(): void
     {
         $constraint = new Length(max: '2');
 
@@ -127,7 +127,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->assertEquals(Guess::HIGH_CONFIDENCE, $result->getConfidence());
     }
 
-    public function testGuessMaxLengthForConstraintWithMinValue()
+    public function testGuessMaxLengthForConstraintWithMinValue(): void
     {
         $constraint = new Length(min: '2');
 
@@ -135,7 +135,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testGuessMimeTypesForConstraintWithMimeTypesValue()
+    public function testGuessMimeTypesForConstraintWithMimeTypesValue(): void
     {
         $mimeTypes = ['image/png', 'image/jpeg'];
         $constraint = new File(mimeTypes: $mimeTypes);
@@ -146,7 +146,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->assertEquals(implode(',', $mimeTypes), $typeGuess->getOptions()['attr']['accept']);
     }
 
-    public function testGuessMimeTypesForConstraintWithoutMimeTypesValue()
+    public function testGuessMimeTypesForConstraintWithoutMimeTypesValue(): void
     {
         $constraint = new File();
         $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
@@ -154,7 +154,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->assertArrayNotHasKey('attr', $typeGuess->getOptions());
     }
 
-    public function testGuessMimeTypesForConstraintWithMimeTypesStringValue()
+    public function testGuessMimeTypesForConstraintWithMimeTypesStringValue(): void
     {
         $constraint = new File(mimeTypes: 'image/*');
         $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
@@ -164,7 +164,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->assertEquals('image/*', $typeGuess->getOptions()['attr']['accept']);
     }
 
-    public function testGuessMimeTypesForConstraintWithMimeTypesEmptyStringValue()
+    public function testGuessMimeTypesForConstraintWithMimeTypesEmptyStringValue(): void
     {
         $constraint = new File(mimeTypes: '');
         $typeGuess = $this->guesser->guessTypeForConstraint($constraint);
@@ -183,7 +183,7 @@ class ValidatorTypeGuesserTest extends TestCase
     }
 
     #[DataProvider('maxLengthTypeProvider')]
-    public function testGuessMaxLengthForConstraintWithType($type)
+    public function testGuessMaxLengthForConstraintWithType($type): void
     {
         $constraint = new Type($type);
 

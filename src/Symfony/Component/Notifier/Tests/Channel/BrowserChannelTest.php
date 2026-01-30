@@ -36,7 +36,7 @@ class BrowserChannelTest extends TestCase
         FlashMessageImportanceMapperInterface $mapper,
         string $importance,
         string $expectedFlashMessageType,
-    ) {
+    ): void {
         $session = new Session(new MockArraySessionStorage(), null, new FlashBag());
         $browserChannel = $this->buildBrowserChannel($session, $mapper);
         $notification = new Notification();
@@ -48,7 +48,7 @@ class BrowserChannelTest extends TestCase
         $this->assertEquals($expectedFlashMessageType, array_key_first($session->getFlashBag()->all()));
     }
 
-    public function testUnknownImportanceMappingIsReported()
+    public function testUnknownImportanceMappingIsReported(): void
     {
         $session = new Session(new MockArraySessionStorage(), null, new FlashBag());
         $browserChannel = $this->buildBrowserChannel($session, new DefaultFlashMessageImportanceMapper());

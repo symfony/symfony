@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 
 class FrozenParameterBagTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $parameters = [
             'foo' => 'foo',
@@ -27,35 +27,35 @@ class FrozenParameterBagTest extends TestCase
         $this->assertEquals($parameters, $bag->all(), '__construct() takes an array of parameters as its first argument');
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $this->expectException(\LogicException::class);
         $bag = new FrozenParameterBag([]);
         $bag->clear();
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $this->expectException(\LogicException::class);
         $bag = new FrozenParameterBag([]);
         $bag->set('foo', 'bar');
     }
 
-    public function testAdd()
+    public function testAdd(): void
     {
         $this->expectException(\LogicException::class);
         $bag = new FrozenParameterBag([]);
         $bag->add([]);
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $this->expectException(\LogicException::class);
         $bag = new FrozenParameterBag(['foo' => 'bar']);
         $bag->remove('foo');
     }
 
-    public function testDeprecate()
+    public function testDeprecate(): void
     {
         $this->expectException(\LogicException::class);
         $bag = new FrozenParameterBag(['foo' => 'bar']);
@@ -66,7 +66,7 @@ class FrozenParameterBagTest extends TestCase
      * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
     #[IgnoreDeprecations]
-    public function testGetDeprecated()
+    public function testGetDeprecated(): void
     {
         $bag = new FrozenParameterBag(
             ['foo' => 'bar'],

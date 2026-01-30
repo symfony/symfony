@@ -20,7 +20,7 @@ class StringNodeTest extends TestCase
 {
     #[TestWith([''])]
     #[TestWith(['valid string'])]
-    public function testNormalize(string $value)
+    public function testNormalize(string $value): void
     {
         $node = new StringNode('test');
         $this->assertSame($value, $node->normalize($value));
@@ -35,7 +35,7 @@ class StringNodeTest extends TestCase
     #[TestWith([0.1])]
     #[TestWith([[]])]
     #[TestWith([['foo' => 'bar']])]
-    public function testNormalizeThrowsExceptionOnInvalidValues($value)
+    public function testNormalizeThrowsExceptionOnInvalidValues($value): void
     {
         $node = new StringNode('test');
 

@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\AllMySms\AllMySmsOptions;
 
 class AllMySmsOptionsTest extends TestCase
 {
-    public function testAllMySmsOptions()
+    public function testAllMySmsOptions(): void
     {
         $allMySmsOptions = (new AllMySmsOptions())
             ->alerting(1)

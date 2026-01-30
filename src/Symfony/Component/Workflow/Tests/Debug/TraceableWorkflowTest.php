@@ -40,7 +40,7 @@ class TraceableWorkflowTest extends TestCase
     }
 
     #[DataProvider('provideFunctionNames')]
-    public function testCallsInner(string $function, array $args, mixed $returnValue)
+    public function testCallsInner(string $function, array $args, mixed $returnValue): void
     {
         $this->innerWorkflow->expects($this->once())
             ->method($function)
@@ -56,7 +56,7 @@ class TraceableWorkflowTest extends TestCase
         $this->assertSame($returnValue, $calls[0]['return']);
     }
 
-    public function testCallsInnerCatchesException()
+    public function testCallsInnerCatchesException(): void
     {
         $exception = new \Exception('foo');
         $this->innerWorkflow->expects($this->once())

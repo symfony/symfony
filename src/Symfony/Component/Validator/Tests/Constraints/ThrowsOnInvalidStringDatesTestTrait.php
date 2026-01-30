@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 trait ThrowsOnInvalidStringDatesTestTrait
 {
     #[DataProvider('throwsOnInvalidStringDatesProvider')]
-    public function testThrowsOnInvalidStringDates(AbstractComparison $constraint, $expectedMessage, $value)
+    public function testThrowsOnInvalidStringDates(AbstractComparison $constraint, $expectedMessage, $value): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage($expectedMessage);

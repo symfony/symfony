@@ -18,13 +18,13 @@ class ParameterizedHeaderTest extends TestCase
 {
     private string $lang = 'en-us';
 
-    public function testValueIsReturnedVerbatim()
+    public function testValueIsReturnedVerbatim(): void
     {
         $header = new ParameterizedHeader('Content-Type', 'text/plain');
         $this->assertEquals('text/plain', $header->getValue());
     }
 
-    public function testParametersAreAppended()
+    public function testParametersAreAppended(): void
     {
         /* -- RFC 2045, 5.1
         parameter := attribute "=" value
@@ -50,28 +50,28 @@ class ParameterizedHeaderTest extends TestCase
         $this->assertEquals('text/plain; charset=utf-8', $header->getBodyAsString());
     }
 
-    public function testSpaceInParamResultsInQuotedString()
+    public function testSpaceInParamResultsInQuotedString(): void
     {
         $header = new ParameterizedHeader('Content-Type', 'attachment');
         $header->setParameters(['filename' => 'my file.txt']);
         $this->assertEquals('attachment; filename="my file.txt"', $header->getBodyAsString());
     }
 
-    public function testFormDataResultsInQuotedString()
+    public function testFormDataResultsInQuotedString(): void
     {
         $header = new ParameterizedHeader('Content-Disposition', 'form-data');
         $header->setParameters(['filename' => 'file.txt']);
         $this->assertEquals('form-data; filename="file.txt"', $header->getBodyAsString());
     }
 
-    public function testFormDataUtf8()
+    public function testFormDataUtf8(): void
     {
         $header = new ParameterizedHeader('Content-Disposition', 'form-data');
         $header->setParameters(['filename' => "déjà%\"\n\r.txt"]);
         $this->assertEquals('form-data; filename="déjà%%22%0A%0D.txt"', $header->getBodyAsString());
     }
 
-    public function testLongParamsAreBrokenIntoMultipleAttributeStrings()
+    public function testLongParamsAreBrokenIntoMultipleAttributeStrings(): void
     {
         /* -- RFC 2231, 3.
         The asterisk character ("*") followed
@@ -113,7 +113,7 @@ class ParameterizedHeaderTest extends TestCase
         );
     }
 
-    public function testEncodedParamDataIncludesCharsetAndLanguage()
+    public function testEncodedParamDataIncludesCharsetAndLanguage(): void
     {
         /* -- RFC 2231, 4.
         Asterisks ("*") are reused to provide the indicator that language and
@@ -151,7 +151,7 @@ class ParameterizedHeaderTest extends TestCase
         );
     }
 
-    public function testMultipleEncodedParamLinesAreFormattedCorrectly()
+    public function testMultipleEncodedParamLinesAreFormattedCorrectly(): void
     {
         /* -- RFC 2231, 4.1.
         Character set and language information may be combined with the
@@ -196,14 +196,14 @@ class ParameterizedHeaderTest extends TestCase
         );
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $header = new ParameterizedHeader('Content-Type', 'text/html');
         $header->setParameters(['charset' => 'utf-8']);
         $this->assertEquals('Content-Type: text/html; charset=utf-8', $header->toString());
     }
 
-    public function testValueCanBeEncodedIfNonAscii()
+    public function testValueCanBeEncodedIfNonAscii(): void
     {
         $value = 'fo'.pack('C', 0x8F).'bar';
         $header = new ParameterizedHeader('X-Foo', $value);
@@ -212,7 +212,7 @@ class ParameterizedHeaderTest extends TestCase
         $this->assertEquals('X-Foo: =?'.$header->getCharset().'?Q?fo=8Fbar?=; lookslike=foobar', $header->toString());
     }
 
-    public function testValueAndParamCanBeEncodedIfNonAscii()
+    public function testValueAndParamCanBeEncodedIfNonAscii(): void
     {
         $value = 'fo'.pack('C', 0x8F).'bar';
         $header = new ParameterizedHeader('X-Foo', $value);
@@ -221,7 +221,7 @@ class ParameterizedHeaderTest extends TestCase
         $this->assertEquals('X-Foo: =?'.$header->getCharset().'?Q?fo=8Fbar?=; says*='.$header->getCharset()."''fo%8Fbar", $header->toString());
     }
 
-    public function testParamsAreEncodedIfNonAscii()
+    public function testParamsAreEncodedIfNonAscii(): void
     {
         $value = 'fo'.pack('C', 0x8F).'bar';
         $header = new ParameterizedHeader('X-Foo', 'bar');
@@ -230,7 +230,7 @@ class ParameterizedHeaderTest extends TestCase
         $this->assertEquals('X-Foo: bar; says*='.$header->getCharset()."''fo%8Fbar", $header->toString());
     }
 
-    public function testParamsAreEncodedWithLegacyEncodingEnabled()
+    public function testParamsAreEncodedWithLegacyEncodingEnabled(): void
     {
         $value = 'fo'.pack('C', 0x8F).'bar';
         $header = new ParameterizedHeader('Content-Type', 'bar');
@@ -239,7 +239,7 @@ class ParameterizedHeaderTest extends TestCase
         $this->assertEquals('Content-Type: bar; says="=?'.$header->getCharset().'?Q?fo=8Fbar?="', $header->toString());
     }
 
-    public function testLanguageInformationAppearsInEncodedWords()
+    public function testLanguageInformationAppearsInEncodedWords(): void
     {
         /* -- RFC 2231, 5.
         5.  Language specification in Encoded Words
@@ -278,20 +278,20 @@ class ParameterizedHeaderTest extends TestCase
         $this->assertEquals('X-Foo: =?'.$header->getCharset().'*en?Q?fo=8Fbar?=; says*='.$header->getCharset()."'en'fo%8Fbar", $header->toString());
     }
 
-    public function testSetBody()
+    public function testSetBody(): void
     {
         $header = new ParameterizedHeader('Content-Type', 'text/html');
         $header->setBody('text/plain');
         $this->assertEquals('text/plain', $header->getValue());
     }
 
-    public function testGetBody()
+    public function testGetBody(): void
     {
         $header = new ParameterizedHeader('Content-Type', 'text/plain');
         $this->assertEquals('text/plain', $header->getBody());
     }
 
-    public function testSetParameter()
+    public function testSetParameter(): void
     {
         $header = new ParameterizedHeader('Content-Type', 'text/html');
         $header->setParameters(['charset' => 'utf-8', 'delsp' => 'yes']);
@@ -299,7 +299,7 @@ class ParameterizedHeaderTest extends TestCase
         $this->assertEquals(['charset' => 'utf-8', 'delsp' => 'no'], $header->getParameters());
     }
 
-    public function testGetParameter()
+    public function testGetParameter(): void
     {
         $header = new ParameterizedHeader('Content-Type', 'text/html');
         $header->setParameters(['charset' => 'utf-8', 'delsp' => 'yes']);

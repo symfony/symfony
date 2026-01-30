@@ -25,7 +25,7 @@ use Symfony\Component\Security\Core\Tests\Fixtures\DummyVoter;
 class TraceableAccessDecisionManagerTest extends TestCase
 {
     #[DataProvider('provideObjectsAndLogs')]
-    public function testDecideLog(array $expectedLog, array $attributes, $object, array $voterVotes, bool $result)
+    public function testDecideLog(array $expectedLog, array $attributes, $object, array $voterVotes, bool $result): void
     {
         $token = new NullToken();
         $admMock = $this->createMock(AccessDecisionManagerInterface::class);
@@ -175,7 +175,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
     /**
      * Tests decision log returned when a voter call decide method of AccessDecisionManager.
      */
-    public function testAccessDecisionManagerCalledByVoter()
+    public function testAccessDecisionManagerCalledByVoter(): void
     {
         $voter1 = $this->createStub(VoterInterface::class);
 
@@ -257,7 +257,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
         ], $sut->getDecisionLog());
     }
 
-    public function testCustomAccessDecisionManagerReturnsEmptyStrategy()
+    public function testCustomAccessDecisionManagerReturnsEmptyStrategy(): void
     {
         $admMock = $this->createStub(AccessDecisionManagerInterface::class);
 
@@ -266,7 +266,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
         $this->assertEquals('-', $adm->getStrategy());
     }
 
-    public function testThrowsExceptionWhenMultipleAttributesNotAllowed()
+    public function testThrowsExceptionWhenMultipleAttributesNotAllowed(): void
     {
         $accessDecisionManager = new AccessDecisionManager();
         $traceableAccessDecisionManager = new TraceableAccessDecisionManager($accessDecisionManager);
@@ -276,7 +276,7 @@ class TraceableAccessDecisionManagerTest extends TestCase
     }
 
     #[DataProvider('allowMultipleAttributesProvider')]
-    public function testAllowMultipleAttributes(array $attributes, bool $allowMultipleAttributes)
+    public function testAllowMultipleAttributes(array $attributes, bool $allowMultipleAttributes): void
     {
         $accessDecisionManager = new AccessDecisionManager();
         $traceableAccessDecisionManager = new TraceableAccessDecisionManager($accessDecisionManager);

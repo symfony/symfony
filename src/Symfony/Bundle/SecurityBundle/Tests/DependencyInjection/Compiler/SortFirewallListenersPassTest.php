@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Firewall\FirewallListenerInterface;
 
 class SortFirewallListenersPassTest extends TestCase
 {
-    public function testSortFirewallListeners()
+    public function testSortFirewallListeners(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('security.firewalls', ['main']);

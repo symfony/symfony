@@ -28,7 +28,7 @@ class GitRepositoryTest extends TestCase
 
     #[Before]
     #[After]
-    protected function cleanup()
+    protected function cleanup(): void
     {
         $this->targetDir = sys_get_temp_dir().'/GitRepositoryTest/source';
 
@@ -36,7 +36,7 @@ class GitRepositoryTest extends TestCase
         $fs->remove($this->targetDir);
     }
 
-    public function testItThrowsAnExceptionIfInitialisedWithNonGitDirectory()
+    public function testItThrowsAnExceptionIfInitialisedWithNonGitDirectory(): void
     {
         $this->expectException(RuntimeException::class);
 
@@ -45,7 +45,7 @@ class GitRepositoryTest extends TestCase
         new GitRepository($this->targetDir);
     }
 
-    public function testItClonesTheRepository()
+    public function testItClonesTheRepository(): void
     {
         $git = GitRepository::download(self::REPO_URL, $this->targetDir);
 
@@ -60,7 +60,7 @@ class GitRepositoryTest extends TestCase
         $this->assertStringMatchesFormat('v3%s', $git->getLastTag(static fn ($tag) => str_starts_with($tag, 'v3')));
     }
 
-    public function testItCheckoutsToTheLastTag()
+    public function testItCheckoutsToTheLastTag(): void
     {
         $git = GitRepository::download(self::REPO_URL, $this->targetDir);
         $lastCommitHash = $git->getLastCommitHash();

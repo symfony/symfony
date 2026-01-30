@@ -17,7 +17,7 @@ use Symfony\Component\DomCrawler\Image;
 
 class ImageTest extends TestCase
 {
-    public function testConstructorWithANonImgTag()
+    public function testConstructorWithANonImgTag(): void
     {
         $this->expectException(\LogicException::class);
         $dom = new \DOMDocument();
@@ -26,7 +26,7 @@ class ImageTest extends TestCase
         new Image($dom->getElementsByTagName('div')->item(0), 'http://www.example.com/');
     }
 
-    public function testBaseUriIsOptionalWhenImageUrlIsAbsolute()
+    public function testBaseUriIsOptionalWhenImageUrlIsAbsolute(): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML('<html><img alt="foo" src="https://example.com/foo" /></html>');
@@ -35,7 +35,7 @@ class ImageTest extends TestCase
         $this->assertSame('https://example.com/foo', $image->getUri());
     }
 
-    public function testAbsoluteBaseUriIsMandatoryWhenImageUrlIsRelative()
+    public function testAbsoluteBaseUriIsMandatoryWhenImageUrlIsRelative(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $dom = new \DOMDocument();
@@ -46,7 +46,7 @@ class ImageTest extends TestCase
     }
 
     #[DataProvider('getGetUriTests')]
-    public function testGetUri($url, $currentUri, $expected)
+    public function testGetUri($url, $currentUri, $expected): void
     {
         $dom = new \DOMDocument();
         $dom->loadHTML(\sprintf('<html><img alt="foo" src="%s" /></html>', $url));

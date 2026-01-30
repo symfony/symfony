@@ -24,7 +24,7 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
 
 class RouterContextMiddlewareTest extends MiddlewareTestCase
 {
-    public function testMiddlewareStoreContext()
+    public function testMiddlewareStoreContext(): void
     {
         $context = new RequestContext('/', 'GET', 'symfony.com');
 
@@ -43,7 +43,7 @@ class RouterContextMiddlewareTest extends MiddlewareTestCase
         $this->assertSame('symfony.com', $stamp->getHost());
     }
 
-    public function testMiddlewareRestoreContext()
+    public function testMiddlewareRestoreContext(): void
     {
         $router = $this->createMock(RequestContextAwareInterface::class);
         $context = new RequestContext('', 'POST', 'github.com');

@@ -38,7 +38,7 @@ class HttpExceptionTraitTest extends TestCase
     }
 
     #[DataProvider('provideParseError')]
-    public function testParseError(string $mimeType, string $json, string $expectedMessage)
+    public function testParseError(string $mimeType, string $json, string $expectedMessage): void
     {
         $response = $this->createStub(ResponseInterface::class);
         $response

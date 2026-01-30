@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class SecurityRoutingIntegrationTest extends AbstractWebTestCase
 {
     #[DataProvider('provideConfigs')]
-    public function testRoutingErrorIsNotExposedForProtectedResourceWhenAnonymous(array $options)
+    public function testRoutingErrorIsNotExposedForProtectedResourceWhenAnonymous(array $options): void
     {
         $client = $this->createClient($options);
         $client->request('GET', '/protected_resource');
@@ -25,7 +25,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideConfigs')]
-    public function testRoutingErrorIsExposedWhenNotProtected(array $options)
+    public function testRoutingErrorIsExposedWhenNotProtected(array $options): void
     {
         $client = $this->createClient($options);
         $client->request('GET', '/unprotected_resource');
@@ -34,7 +34,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideConfigs')]
-    public function testRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights(array $options)
+    public function testRoutingErrorIsNotExposedForProtectedResourceWhenLoggedInWithInsufficientRights(array $options): void
     {
         $client = $this->createClient($options);
 
@@ -49,7 +49,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideConfigs')]
-    public function testSecurityConfigurationForSingleIPAddress(array $options)
+    public function testSecurityConfigurationForSingleIPAddress(array $options): void
     {
         $allowedClient = $this->createClient($options, ['REMOTE_ADDR' => '10.10.10.10']);
 
@@ -62,7 +62,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideConfigs')]
-    public function testSecurityConfigurationForMultipleIPAddresses(array $options)
+    public function testSecurityConfigurationForMultipleIPAddresses(array $options): void
     {
         $allowedClientA = $this->createClient($options, ['REMOTE_ADDR' => '1.1.1.1']);
 
@@ -89,7 +89,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideConfigs')]
-    public function testSecurityConfigurationForExpression(array $options)
+    public function testSecurityConfigurationForExpression(array $options): void
     {
         $allowedClient = $this->createClient($options, ['HTTP_USER_AGENT' => 'Firefox 1.0']);
         $this->assertAllowed($allowedClient, '/protected-via-expression');
@@ -110,7 +110,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertAllowed($allowedClient, '/protected-via-expression');
     }
 
-    public function testInvalidIpsInAccessControl()
+    public function testInvalidIpsInAccessControl(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The given value "256.357.458.559" in the "security.access_control" config option is not a valid IP address.');
@@ -118,7 +118,7 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'invalid_ip_access_control.yml']);
     }
 
-    public function testPublicHomepage()
+    public function testPublicHomepage(): void
     {
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'base_config.yml']);
         $client->request('GET', '/en/');
@@ -128,13 +128,13 @@ class SecurityRoutingIntegrationTest extends AbstractWebTestCase
         $this->assertSame(0, self::getContainer()->get('request_tracker_subscriber')->getLastRequest()->getSession()->getUsageIndex());
     }
 
-    private function assertAllowed($client, $path)
+    private function assertAllowed($client, $path): void
     {
         $client->request('GET', $path);
         $this->assertEquals(404, $client->getResponse()->getStatusCode());
     }
 
-    private function assertRestricted($client, $path)
+    private function assertRestricted($client, $path): void
     {
         $client->request('GET', $path);
         $this->assertEquals(302, $client->getResponse()->getStatusCode());

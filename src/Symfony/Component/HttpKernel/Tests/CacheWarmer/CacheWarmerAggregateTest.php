@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
 class CacheWarmerAggregateTest extends TestCase
 {
-    public function testInjectWarmersUsingConstructor()
+    public function testInjectWarmersUsingConstructor(): void
     {
         $warmer = $this->createMock(CacheWarmerInterface::class);
         $warmer
@@ -28,7 +28,7 @@ class CacheWarmerAggregateTest extends TestCase
         $aggregate->warmUp(__DIR__);
     }
 
-    public function testWarmupDoesCallWarmupOnOptionalWarmersWhenEnableOptionalWarmersIsEnabled()
+    public function testWarmupDoesCallWarmupOnOptionalWarmersWhenEnableOptionalWarmersIsEnabled(): void
     {
         $warmer = $this->createMock(CacheWarmerInterface::class);
         $warmer
@@ -43,7 +43,7 @@ class CacheWarmerAggregateTest extends TestCase
         $aggregate->warmUp(__DIR__);
     }
 
-    public function testWarmupDoesNotCallWarmupOnOptionalWarmersWhenEnableOptionalWarmersIsNotEnabled()
+    public function testWarmupDoesNotCallWarmupOnOptionalWarmersWhenEnableOptionalWarmersIsNotEnabled(): void
     {
         $warmer = $this->createMock(CacheWarmerInterface::class);
         $warmer
@@ -58,7 +58,7 @@ class CacheWarmerAggregateTest extends TestCase
         $aggregate->warmUp(__DIR__);
     }
 
-    public function testWarmupReturnsFilesOrClasses()
+    public function testWarmupReturnsFilesOrClasses(): void
     {
         $warmer = $this->createMock(CacheWarmerInterface::class);
         $warmer
@@ -75,7 +75,7 @@ class CacheWarmerAggregateTest extends TestCase
         $this->assertSame([__CLASS__, __FILE__], $aggregate->warmUp(__DIR__));
     }
 
-    public function testWarmupChecksInvalidFiles()
+    public function testWarmupChecksInvalidFiles(): void
     {
         $warmer = $this->createMock(CacheWarmerInterface::class);
         $warmer
@@ -93,7 +93,7 @@ class CacheWarmerAggregateTest extends TestCase
         $aggregate->warmUp(__DIR__);
     }
 
-    public function testWarmupPassBuildDir()
+    public function testWarmupPassBuildDir(): void
     {
         $warmer = $this->createMock(CacheWarmerInterface::class);
         $warmer
@@ -106,7 +106,7 @@ class CacheWarmerAggregateTest extends TestCase
         $aggregate->warmUp('cache_dir', 'build_dir');
     }
 
-    public function testWarmupOnOptionalWarmerPassBuildDir()
+    public function testWarmupOnOptionalWarmerPassBuildDir(): void
     {
         $warmer = $this->createMock(CacheWarmerInterface::class);
         $warmer
@@ -123,7 +123,7 @@ class CacheWarmerAggregateTest extends TestCase
         $aggregate->warmUp('cache_dir', 'build_dir');
     }
 
-    public function testWarmupWhenDebugDisplaysWarmupDuration()
+    public function testWarmupWhenDebugDisplaysWarmupDuration(): void
     {
         $warmer = $this->createMock(CacheWarmerInterface::class);
         $io = $this->createMock(SymfonyStyle::class);
@@ -148,7 +148,7 @@ class CacheWarmerAggregateTest extends TestCase
         $aggregate->warmUp(__DIR__, null, $io);
     }
 
-    public function testWarmupWhenNotDebugDoesntDisplayWarmupDuration()
+    public function testWarmupWhenNotDebugDoesntDisplayWarmupDuration(): void
     {
         $warmer = $this->createMock(CacheWarmerInterface::class);
         $io = $this->createMock(SymfonyStyle::class);

@@ -32,7 +32,7 @@ class StringSanitizerTest extends TestCase
     }
 
     #[DataProvider('provideHtmlLower')]
-    public function testHtmlLower(string $input, string $expected)
+    public function testHtmlLower(string $input, string $expected): void
     {
         $this->assertSame($expected, StringSanitizer::htmlLower($input));
     }
@@ -66,7 +66,7 @@ class StringSanitizerTest extends TestCase
     }
 
     #[DataProvider('provideEncodeHtmlEntites')]
-    public function testEncodeHtmlEntites(string $input, string $expected)
+    public function testEncodeHtmlEntites(string $input, string $expected): void
     {
         $this->assertSame($expected, StringSanitizer::encodeHtmlEntities($input));
     }

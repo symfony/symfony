@@ -26,7 +26,7 @@ use Symfony\Component\Console\Output\NullOutput;
 
 class ErrorListenerTest extends TestCase
 {
-    public function testOnConsoleError()
+    public function testOnConsoleError(): void
     {
         $error = new \TypeError('An error occurred');
 
@@ -41,7 +41,7 @@ class ErrorListenerTest extends TestCase
         $listener->onConsoleError(new ConsoleErrorEvent(new ArgvInput(['console.php', 'test:run', '--foo=baz', 'buzz']), new NullOutput(), $error, new Command('test:run')));
     }
 
-    public function testOnConsoleErrorWithNoCommandAndNoInputString()
+    public function testOnConsoleErrorWithNoCommandAndNoInputString(): void
     {
         $error = new \RuntimeException('An error occurred');
 
@@ -56,7 +56,7 @@ class ErrorListenerTest extends TestCase
         $listener->onConsoleError(new ConsoleErrorEvent(new NonStringInput(), new NullOutput(), $error));
     }
 
-    public function testOnConsoleTerminateForNonZeroExitCodeWritesToLog()
+    public function testOnConsoleTerminateForNonZeroExitCodeWritesToLog(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger
@@ -69,7 +69,7 @@ class ErrorListenerTest extends TestCase
         $listener->onConsoleTerminate($this->getConsoleTerminateEvent(new ArgvInput(['console.php', 'test:run']), 255));
     }
 
-    public function testOnConsoleTerminateForZeroExitCodeDoesNotWriteToLog()
+    public function testOnConsoleTerminateForZeroExitCodeDoesNotWriteToLog(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger
@@ -81,7 +81,7 @@ class ErrorListenerTest extends TestCase
         $listener->onConsoleTerminate($this->getConsoleTerminateEvent(new ArgvInput(['console.php', 'test:run']), 0));
     }
 
-    public function testGetSubscribedEvents()
+    public function testGetSubscribedEvents(): void
     {
         $this->assertSame(
             [
@@ -92,7 +92,7 @@ class ErrorListenerTest extends TestCase
         );
     }
 
-    public function testAllKindsOfInputCanBeLogged()
+    public function testAllKindsOfInputCanBeLogged(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $logger

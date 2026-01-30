@@ -31,7 +31,7 @@ use Symfony\Component\DependencyInjection\TypedReference;
 
 class PriorityTaggedServiceTraitTest extends TestCase
 {
-    public function testThatCacheWarmersAreProcessedInPriorityOrder()
+    public function testThatCacheWarmersAreProcessedInPriorityOrder(): void
     {
         $services = [
             'my_service1' => ['my_custom_tag' => ['priority' => 100]],
@@ -92,14 +92,14 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertEquals($expected, $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
     }
 
-    public function testWithEmptyArray()
+    public function testWithEmptyArray(): void
     {
         $container = new ContainerBuilder();
         $priorityTaggedServiceTraitImplementation = new PriorityTaggedServiceTraitImplementation();
         $this->assertEquals([], $priorityTaggedServiceTraitImplementation->test('my_custom_tag', $container));
     }
 
-    public function testOnlyTheFirstNonIndexedTagIsListed()
+    public function testOnlyTheFirstNonIndexedTagIsListed(): void
     {
         $container = new ContainerBuilder();
         $container->register('service1')->addTag('my_custom_tag');
@@ -119,7 +119,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testOnlyTheIndexedTagsAreListed()
+    public function testOnlyTheIndexedTagsAreListed(): void
     {
         $container = new ContainerBuilder();
         $container->register('service1')->addTag('my_custom_tag', ['foo' => 'bar']);
@@ -147,7 +147,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTheIndexedTagsByDefaultIndexMethod()
+    public function testTheIndexedTagsByDefaultIndexMethod(): void
     {
         $container = new ContainerBuilder();
         $container->register('service1', FooTagClass::class)->addTag('my_custom_tag');
@@ -181,7 +181,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
     #[DataProvider('provideInvalidDefaultMethods')]
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTheIndexedTagsByDefaultIndexMethodFailure(string $defaultIndexMethod, ?string $indexAttribute, string $expectedExceptionMessage)
+    public function testTheIndexedTagsByDefaultIndexMethodFailure(string $defaultIndexMethod, ?string $indexAttribute, string $expectedExceptionMessage): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage($expectedExceptionMessage);
@@ -208,7 +208,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedItemAttributes()
+    public function testTaggedItemAttributes(): void
     {
         $container = new ContainerBuilder();
         $container->register('service1', FooTagClass::class)->addTag('my_custom_tag');
@@ -252,7 +252,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testResolveIndexedTags()
+    public function testResolveIndexedTags(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('custom_param_service1', 'bar');
@@ -282,7 +282,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testAttributesAreMergedWithTags()
+    public function testAttributesAreMergedWithTags(): void
     {
         $container = new ContainerBuilder();
         $definition = $container->register('service_attr_first', MultiTagHelloNamedService::class);
@@ -309,7 +309,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testAttributesAreFallbacks()
+    public function testAttributesAreFallbacks(): void
     {
         $container = new ContainerBuilder();
         $definition = $container->register('service_attr_first', MultiTagHelloNamedService::class);
@@ -328,7 +328,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedIteratorWithDefaultNameMethod()
+    public function testTaggedIteratorWithDefaultNameMethod(): void
     {
         $container = new ContainerBuilder();
         $container->register('service', ClassWithDefaultNameMethod::class)->addTag('my_custom_tag');
@@ -342,7 +342,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testIndexedIteratorUsesTagAttributeOverDefaultMethod()
+    public function testIndexedIteratorUsesTagAttributeOverDefaultMethod(): void
     {
         $container = new ContainerBuilder();
         $container->register('service.a', ServiceWithStaticGetType::class)
@@ -361,7 +361,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testIndexedIteratorUsesDefaultMethodAsFallback()
+    public function testIndexedIteratorUsesDefaultMethodAsFallback(): void
     {
         $container = new ContainerBuilder();
         $container->register('service.a', ServiceWithStaticGetType::class)
@@ -379,7 +379,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testIndexedIteratorUsesTagIndexAndDefaultPriorityMethod()
+    public function testIndexedIteratorUsesTagIndexAndDefaultPriorityMethod(): void
     {
         $container = new ContainerBuilder();
 
@@ -402,7 +402,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedLocatorWithProvidedIndexAttributeAndNonStaticDefaultIndexMethod()
+    public function testTaggedLocatorWithProvidedIndexAttributeAndNonStaticDefaultIndexMethod(): void
     {
         $container = new ContainerBuilder();
         $container->register('service', NonStaticDefaultIndexClass::class)
@@ -417,7 +417,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testTaggedLocatorWithoutIndexAttributeAndNonStaticDefaultIndexMethod()
+    public function testTaggedLocatorWithoutIndexAttributeAndNonStaticDefaultIndexMethod(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('Either method "%s::getType()" should be static or tag "my_custom_tag" on service "service" is missing attribute "type".', NonStaticDefaultIndexClass::class));
@@ -432,7 +432,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $priorityTaggedServiceTraitImplementation->test($tag, $container);
     }
 
-    public function testMergingAsTaggedItemWithEmptyTagAndNonStaticBusinessMethod()
+    public function testMergingAsTaggedItemWithEmptyTagAndNonStaticBusinessMethod(): void
     {
         $container = new ContainerBuilder();
         $container->register('service', AsTaggedItemClassWithBusinessMethod::class)
@@ -450,7 +450,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testPriorityFallbackWithoutIndexAndStaticPriorityMethod()
+    public function testPriorityFallbackWithoutIndexAndStaticPriorityMethod(): void
     {
         $container = new ContainerBuilder();
         $container->register('service', StaticPriorityClass::class)
@@ -465,7 +465,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
 
     #[IgnoreDeprecations]
     #[Group('legacy')]
-    public function testMultiTagsWithMixedAttributesAndNonStaticDefault()
+    public function testMultiTagsWithMixedAttributesAndNonStaticDefault(): void
     {
         $container = new ContainerBuilder();
         $container->register('service', MultiTagNonStaticClass::class)
@@ -481,7 +481,7 @@ class PriorityTaggedServiceTraitTest extends TestCase
         $this->assertArrayHasKey('default', $services);
     }
 
-    public function testTagAttributesAreNotAList()
+    public function testTagAttributesAreNotAList(): void
     {
         $container = new ContainerBuilder();
         $container->register('service1')->setTags([

@@ -16,7 +16,7 @@ use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 
 class SentToFailureTransportStampTest extends TestCase
 {
-    public function testGetOriginalReceiverName()
+    public function testGetOriginalReceiverName(): void
     {
         $stamp = new SentToFailureTransportStamp('original_receiver');
         $this->assertSame('original_receiver', $stamp->getOriginalReceiverName());

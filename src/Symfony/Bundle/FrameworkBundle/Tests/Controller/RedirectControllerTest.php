@@ -25,7 +25,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 class RedirectControllerTest extends TestCase
 {
-    public function testEmptyRoute()
+    public function testEmptyRoute(): void
     {
         $request = new Request();
         $controller = new RedirectController();
@@ -62,7 +62,7 @@ class RedirectControllerTest extends TestCase
     }
 
     #[DataProvider('provider')]
-    public function testRoute($permanent, $keepRequestMethod, $keepQueryParams, $ignoreAttributes, $expectedCode, $expectedAttributes)
+    public function testRoute($permanent, $keepRequestMethod, $keepQueryParams, $ignoreAttributes, $expectedCode, $expectedAttributes): void
     {
         $request = new Request();
 
@@ -116,7 +116,7 @@ class RedirectControllerTest extends TestCase
         ];
     }
 
-    public function testEmptyPath()
+    public function testEmptyPath(): void
     {
         $request = new Request();
         $controller = new RedirectController();
@@ -152,7 +152,7 @@ class RedirectControllerTest extends TestCase
         }
     }
 
-    public function testFullURL()
+    public function testFullURL(): void
     {
         $request = new Request();
         $controller = new RedirectController();
@@ -167,7 +167,7 @@ class RedirectControllerTest extends TestCase
         $this->assertEquals(302, $returnResponse->getStatusCode());
     }
 
-    public function testFullURLWithMethodKeep()
+    public function testFullURLWithMethodKeep(): void
     {
         $request = new Request();
         $controller = new RedirectController();
@@ -182,7 +182,7 @@ class RedirectControllerTest extends TestCase
         $this->assertEquals(307, $returnResponse->getStatusCode());
     }
 
-    public function testProtocolRelative()
+    public function testProtocolRelative(): void
     {
         $request = new Request();
         $controller = new RedirectController();
@@ -196,7 +196,7 @@ class RedirectControllerTest extends TestCase
         $this->assertSame(302, $returnResponse->getStatusCode());
     }
 
-    public function testUrlRedirectDefaultPorts()
+    public function testUrlRedirectDefaultPorts(): void
     {
         $host = 'www.example.com';
         $baseUrl = '/base';
@@ -255,7 +255,7 @@ class RedirectControllerTest extends TestCase
     }
 
     #[DataProvider('urlRedirectProvider')]
-    public function testUrlRedirect($scheme, $httpPort, $httpsPort, $requestScheme, $requestPort, $expectedPort)
+    public function testUrlRedirect($scheme, $httpPort, $httpsPort, $requestScheme, $requestPort, $expectedPort): void
     {
         $host = 'www.example.com';
         $baseUrl = '/base';
@@ -285,7 +285,7 @@ class RedirectControllerTest extends TestCase
     }
 
     #[DataProvider('pathQueryParamsProvider')]
-    public function testPathQueryParams($expectedUrl, $path, $queryString)
+    public function testPathQueryParams($expectedUrl, $path, $queryString): void
     {
         $scheme = 'http';
         $host = 'www.example.com';
@@ -304,7 +304,7 @@ class RedirectControllerTest extends TestCase
         $this->assertRedirectUrl($returnValue, $expectedUrl);
     }
 
-    public function testRedirectWithQuery()
+    public function testRedirectWithQuery(): void
     {
         $scheme = 'http';
         $host = 'www.example.com';
@@ -326,7 +326,7 @@ class RedirectControllerTest extends TestCase
         $this->assertRedirectUrl($controller($request), '/test?b.se=zaza&base2=zaza&f[%2525][%26][%3D][p.c]=d');
     }
 
-    public function testRedirectWithQueryWithRouteParamsOveriding()
+    public function testRedirectWithQueryWithRouteParamsOveriding(): void
     {
         $scheme = 'http';
         $host = 'www.example.com';
@@ -345,7 +345,7 @@ class RedirectControllerTest extends TestCase
         $this->assertRedirectUrl($controller($request), '/test?b.se=zouzou');
     }
 
-    public function testMissingPathOrRouteParameter()
+    public function testMissingPathOrRouteParameter(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The parameter "path" or "route" is required to configure the redirect action in "_redirect" routing configuration.');
@@ -353,7 +353,7 @@ class RedirectControllerTest extends TestCase
         (new RedirectController())(new Request([], [], ['_route' => '_redirect']));
     }
 
-    public function testAmbiguousPathAndRouteParameter()
+    public function testAmbiguousPathAndRouteParameter(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Ambiguous redirection settings, use the "path" or "route" parameter, not both: "/foo" and "bar" found respectively in "_redirect" routing configuration.');
@@ -384,7 +384,7 @@ class RedirectControllerTest extends TestCase
         return new RedirectController(null, $httpPort, $httpsPort);
     }
 
-    private function assertRedirectUrl(Response $returnResponse, $expectedUrl)
+    private function assertRedirectUrl(Response $returnResponse, $expectedUrl): void
     {
         $this->assertTrue($returnResponse->isRedirect($expectedUrl), "Expected: $expectedUrl\nGot:      ".$returnResponse->headers->get('Location'));
     }

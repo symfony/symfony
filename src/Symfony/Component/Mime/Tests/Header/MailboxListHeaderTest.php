@@ -19,67 +19,67 @@ class MailboxListHeaderTest extends TestCase
 {
     // RFC 2822, 3.6.2 for all tests
 
-    public function testMailboxIsSetForAddress()
+    public function testMailboxIsSetForAddress(): void
     {
         $header = new MailboxListHeader('From', [new Address('chris@swiftmailer.org')]);
         $this->assertEquals(['chris@swiftmailer.org'], $header->getAddressStrings());
     }
 
-    public function testMailboxIsRenderedForNameAddress()
+    public function testMailboxIsRenderedForNameAddress(): void
     {
         $header = new MailboxListHeader('From', [new Address('chris@swiftmailer.org', 'Chris Corbyn')]);
         $this->assertEquals(['Chris Corbyn <chris@swiftmailer.org>'], $header->getAddressStrings());
     }
 
-    public function testAddressCanBeReturnedForAddress()
+    public function testAddressCanBeReturnedForAddress(): void
     {
         $header = new MailboxListHeader('From', $addresses = [new Address('chris@swiftmailer.org')]);
         $this->assertEquals($addresses, $header->getAddresses());
     }
 
-    public function testQuotesInNameAreQuoted()
+    public function testQuotesInNameAreQuoted(): void
     {
         $header = new MailboxListHeader('From', [new Address('chris@swiftmailer.org', 'Chris Corbyn, "DHE"')]);
         $this->assertEquals(['"Chris Corbyn, \"DHE\"" <chris@swiftmailer.org>'], $header->getAddressStrings());
     }
 
-    public function testEscapeCharsInNameAreQuoted()
+    public function testEscapeCharsInNameAreQuoted(): void
     {
         $header = new MailboxListHeader('From', [new Address('chris@swiftmailer.org', 'Chris Corbyn, \\escaped\\')]);
         $this->assertEquals(['"Chris Corbyn, \\\\escaped\\\\" <chris@swiftmailer.org>'], $header->getAddressStrings());
     }
 
-    public function testParenthesesInNameAreQuoted()
+    public function testParenthesesInNameAreQuoted(): void
     {
         $header = new MailboxListHeader('From', [new Address('j.doe@example.com', 'J Doe (ACME)')]);
         $this->assertEquals(['"J Doe (ACME)" <j.doe@example.com>'], $header->getAddressStrings());
     }
 
-    public function testUtf8CharsInDomainAreIdnEncoded()
+    public function testUtf8CharsInDomainAreIdnEncoded(): void
     {
         $header = new MailboxListHeader('From', [new Address('chris@swïftmailer.org', 'Chris Corbyn')]);
         $this->assertEquals(['Chris Corbyn <chris@xn--swftmailer-78a.org>'], $header->getAddressStrings());
     }
 
-    public function testUtf8CharsInLocalPart()
+    public function testUtf8CharsInLocalPart(): void
     {
         $header = new MailboxListHeader('From', [new Address('chrïs@swiftmailer.org', 'Chris Corbyn')]);
         $this->assertSame(['Chris Corbyn <chrïs@swiftmailer.org>'], $header->getAddressStrings());
     }
 
-    public function testGetMailboxesReturnsNameValuePairs()
+    public function testGetMailboxesReturnsNameValuePairs(): void
     {
         $header = new MailboxListHeader('From', $addresses = [new Address('chris@swiftmailer.org', 'Chris Corbyn, DHE')]);
         $this->assertEquals($addresses, $header->getAddresses());
     }
 
-    public function testMultipleAddressesAsMailboxStrings()
+    public function testMultipleAddressesAsMailboxStrings(): void
     {
         $header = new MailboxListHeader('From', [new Address('chris@swiftmailer.org'), new Address('mark@swiftmailer.org')]);
         $this->assertEquals(['chris@swiftmailer.org', 'mark@swiftmailer.org'], $header->getAddressStrings());
     }
 
-    public function testNameIsEncodedIfNonAscii()
+    public function testNameIsEncodedIfNonAscii(): void
     {
         $name = 'C'.pack('C', 0x8F).'rbyn';
         $header = new MailboxListHeader('From', [new Address('chris@swiftmailer.org', 'Chris '.$name)]);
@@ -88,7 +88,7 @@ class MailboxListHeaderTest extends TestCase
         $this->assertEquals('Chris =?'.$header->getCharset().'?Q?C=8Frbyn?= <chris@swiftmailer.org>', array_shift($addresses));
     }
 
-    public function testEncodingLineLengthCalculations()
+    public function testEncodingLineLengthCalculations(): void
     {
         /* -- RFC 2047, 2.
         An 'encoded-word' may not be more than 75 characters long, including
@@ -102,32 +102,32 @@ class MailboxListHeaderTest extends TestCase
         $this->assertEquals('Chris =?'.$header->getCharset().'?Q?C=8Frbyn?= <chris@swiftmailer.org>', array_shift($addresses));
     }
 
-    public function testGetValueReturnsMailboxStringValue()
+    public function testGetValueReturnsMailboxStringValue(): void
     {
         $header = new MailboxListHeader('From', [new Address('chris@swiftmailer.org', 'Chris Corbyn')]);
         $this->assertEquals('Chris Corbyn <chris@swiftmailer.org>', $header->getBodyAsString());
     }
 
-    public function testGetValueReturnsMailboxStringValueForMultipleMailboxes()
+    public function testGetValueReturnsMailboxStringValueForMultipleMailboxes(): void
     {
         $header = new MailboxListHeader('From', [new Address('chris@swiftmailer.org', 'Chris Corbyn'), new Address('mark@swiftmailer.org', 'Mark Corbyn')]);
         $this->assertEquals('Chris Corbyn <chris@swiftmailer.org>, Mark Corbyn <mark@swiftmailer.org>', $header->getBodyAsString());
     }
 
-    public function testSetBody()
+    public function testSetBody(): void
     {
         $header = new MailboxListHeader('From', []);
         $header->setBody($addresses = [new Address('chris@swiftmailer.org')]);
         $this->assertEquals($addresses, $header->getAddresses());
     }
 
-    public function testGetBody()
+    public function testGetBody(): void
     {
         $header = new MailboxListHeader('From', $addresses = [new Address('chris@swiftmailer.org')]);
         $this->assertEquals($addresses, $header->getBody());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $header = new MailboxListHeader('From', [new Address('chris@example.org', 'Chris Corbyn'), new Address('mark@example.org', 'Mark Corbyn')]);
         $this->assertEquals('From: Chris Corbyn <chris@example.org>, Mark Corbyn <mark@example.org>', $header->toString());

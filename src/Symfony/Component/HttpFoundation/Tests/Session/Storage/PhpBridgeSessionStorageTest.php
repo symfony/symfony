@@ -63,7 +63,7 @@ class PhpBridgeSessionStorageTest extends TestCase
         return $storage;
     }
 
-    public function testPhpSession()
+    public function testPhpSession(): void
     {
         $storage = $this->getStorage();
 
@@ -82,7 +82,7 @@ class PhpBridgeSessionStorageTest extends TestCase
         $this->assertArrayHasKey($key, $_SESSION);
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $storage = $this->getStorage();
         session_start();

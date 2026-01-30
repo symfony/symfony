@@ -18,7 +18,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class TemplateTypeTest extends TestCase
 {
-    public function testAccepts()
+    public function testAccepts(): void
     {
         $this->assertFalse((new TemplateType('T', new BuiltinType(TypeIdentifier::BOOL)))->accepts('string'));
         $this->assertTrue((new TemplateType('T', new BuiltinType(TypeIdentifier::BOOL)))->accepts(true));

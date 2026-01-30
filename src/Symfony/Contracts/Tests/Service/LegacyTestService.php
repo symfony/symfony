@@ -75,12 +75,12 @@ class LegacyChildTestService extends LegacyTestService
 
 class LegacyParentWithMagicCall
 {
-    public function __call($method, $args)
+    public function __call($method, $args): void
     {
         throw new \BadMethodCallException('Should not be called.');
     }
 
-    public static function __callStatic($method, $args)
+    public static function __callStatic($method, $args): void
     {
         throw new \BadMethodCallException('Should not be called.');
     }

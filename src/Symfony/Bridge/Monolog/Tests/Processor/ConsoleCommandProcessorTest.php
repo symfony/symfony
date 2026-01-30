@@ -25,7 +25,7 @@ class ConsoleCommandProcessorTest extends TestCase
     private const TEST_OPTIONS = ['test' => 'option'];
     private const TEST_NAME = 'some:test';
 
-    public function testProcessor()
+    public function testProcessor(): void
     {
         $processor = new ConsoleCommandProcessor();
         $processor->addCommandData($this->getConsoleEvent());
@@ -39,7 +39,7 @@ class ConsoleCommandProcessorTest extends TestCase
         );
     }
 
-    public function testProcessorWithOptions()
+    public function testProcessorWithOptions(): void
     {
         $processor = new ConsoleCommandProcessor(true, true);
         $processor->addCommandData($this->getConsoleEvent());
@@ -53,7 +53,7 @@ class ConsoleCommandProcessorTest extends TestCase
         );
     }
 
-    public function testProcessorDoesNothingWhenNotInConsole()
+    public function testProcessorDoesNothingWhenNotInConsole(): void
     {
         $processor = new ConsoleCommandProcessor(true, true);
 

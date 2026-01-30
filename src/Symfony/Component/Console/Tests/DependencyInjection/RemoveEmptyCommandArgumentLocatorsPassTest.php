@@ -21,7 +21,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class RemoveEmptyCommandArgumentLocatorsPassTest extends TestCase
 {
-    public function testProcessWithoutServiceResolver()
+    public function testProcessWithoutServiceResolver(): void
     {
         $container = new ContainerBuilder();
         $pass = new RemoveEmptyCommandArgumentLocatorsPass();
@@ -31,7 +31,7 @@ class RemoveEmptyCommandArgumentLocatorsPassTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testProcessWithNullArgument()
+    public function testProcessWithNullArgument(): void
     {
         $container = new ContainerBuilder();
         $container->register('console.argument_resolver.service')->addArgument(null);
@@ -42,7 +42,7 @@ class RemoveEmptyCommandArgumentLocatorsPassTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testProcessRemovesEmptyLocators()
+    public function testProcessRemovesEmptyLocators(): void
     {
         $container = new ContainerBuilder();
 
@@ -71,7 +71,7 @@ class RemoveEmptyCommandArgumentLocatorsPassTest extends TestCase
         $this->assertArrayHasKey('non-empty:command', $commands);
     }
 
-    public function testProcessWithFactory()
+    public function testProcessWithFactory(): void
     {
         $container = new ContainerBuilder();
 
@@ -103,7 +103,7 @@ class RemoveEmptyCommandArgumentLocatorsPassTest extends TestCase
         $this->assertArrayNotHasKey('empty:command', $commands);
     }
 
-    public function testProcessPreservesNonEmptyLocators()
+    public function testProcessPreservesNonEmptyLocators(): void
     {
         $container = new ContainerBuilder();
 

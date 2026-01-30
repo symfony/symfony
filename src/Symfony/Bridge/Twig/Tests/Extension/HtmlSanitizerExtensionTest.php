@@ -20,7 +20,7 @@ use Twig\Loader\ArrayLoader;
 
 class HtmlSanitizerExtensionTest extends TestCase
 {
-    public function testSanitizeHtml()
+    public function testSanitizeHtml(): void
     {
         $loader = new ArrayLoader([
             'foo' => '{{ "foobar"|sanitize_html }}',

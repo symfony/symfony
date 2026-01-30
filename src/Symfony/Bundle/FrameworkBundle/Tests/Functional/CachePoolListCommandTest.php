@@ -24,7 +24,7 @@ class CachePoolListCommandTest extends AbstractWebTestCase
         static::bootKernel(['test_case' => 'CachePools', 'root_config' => 'config.yml']);
     }
 
-    public function testListPools()
+    public function testListPools(): void
     {
         $tester = $this->createCommandTester(['cache.app', 'cache.system']);
         $tester->execute([]);
@@ -34,7 +34,7 @@ class CachePoolListCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('cache.system', $tester->getDisplay());
     }
 
-    public function testEmptyList()
+    public function testEmptyList(): void
     {
         $tester = $this->createCommandTester([]);
         $tester->execute([]);

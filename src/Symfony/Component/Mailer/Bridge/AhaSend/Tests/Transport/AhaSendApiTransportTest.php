@@ -28,7 +28,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class AhaSendApiTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(AhaSendApiTransport $transport, string $expected)
+    public function testToString(AhaSendApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -51,7 +51,7 @@ class AhaSendApiTransportTest extends TestCase
         ];
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $email = new Email();
         $email->from(new Address('foo@example.com', 'Ms. Foo Bar'))
@@ -95,7 +95,7 @@ class AhaSendApiTransportTest extends TestCase
         $mailer->send($email);
     }
 
-    public function testSendDeliveryEventIsDispatched()
+    public function testSendDeliveryEventIsDispatched(): void
     {
         $responseFactory = new JsonMockResponse([
             'success_count' => 0,
@@ -135,7 +135,7 @@ class AhaSendApiTransportTest extends TestCase
         $transport->send($email);
     }
 
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
@@ -150,7 +150,7 @@ class AhaSendApiTransportTest extends TestCase
         $this->assertEquals('bar', $payload['content']['headers']['foo']);
     }
 
-    public function testReplyTo()
+    public function testReplyTo(): void
     {
         $from = 'from@example.com';
         $to = 'to@example.com';
@@ -175,7 +175,7 @@ class AhaSendApiTransportTest extends TestCase
         $this->assertSame($replyTo, $payload['content']['reply_to']['email']);
     }
 
-    public function testEnvelopeSenderAndRecipients()
+    public function testEnvelopeSenderAndRecipients(): void
     {
         $from = 'from@example.com';
         $to = 'to@example.com';
@@ -203,7 +203,7 @@ class AhaSendApiTransportTest extends TestCase
         $this->assertSame($envelopeTo, $payload['recipients'][0]['email']);
     }
 
-    public function testTagHeaders()
+    public function testTagHeaders(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('category-one'));
@@ -223,7 +223,7 @@ class AhaSendApiTransportTest extends TestCase
         $this->assertSame('category-one,category-two', $payload['content']['headers']['AhaSend-Tags']);
     }
 
-    public function testInlineWithCustomContentId()
+    public function testInlineWithCustomContentId(): void
     {
         $imagePart = (new DataPart('text-contents', 'text.txt'));
         $imagePart->asInline();
@@ -244,7 +244,7 @@ class AhaSendApiTransportTest extends TestCase
         $this->assertSame('content-identifier@symfony', $payload['content']['attachments'][0]['content_id']);
     }
 
-    public function testInlineWithoutCustomContentId()
+    public function testInlineWithoutCustomContentId(): void
     {
         $imagePart = (new DataPart('text-contents', 'text.txt'));
         $imagePart->asInline();
@@ -264,7 +264,7 @@ class AhaSendApiTransportTest extends TestCase
         $this->assertSame('text.txt', $payload['content']['attachments'][0]['content_id']);
     }
 
-    public function testAttachmentWithBase64Encoding()
+    public function testAttachmentWithBase64Encoding(): void
     {
         $textPart = (new DataPart('image-contents', 'image.png'));
 
@@ -284,7 +284,7 @@ class AhaSendApiTransportTest extends TestCase
         $this->assertNotSame('image-contents', $payload['content']['attachments'][0]['data']);
     }
 
-    public function testAttachmentWithoutBase64Encoding()
+    public function testAttachmentWithoutBase64Encoding(): void
     {
         $textPart = (new DataPart('text-contents', 'text.txt', 'text/plain'));
 

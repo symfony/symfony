@@ -20,7 +20,7 @@ use Symfony\Component\Config\Definition\ScalarNode;
 
 class ArrayNodeTest extends TestCase
 {
-    public function testNormalizeThrowsExceptionWhenFalseIsNotAllowed()
+    public function testNormalizeThrowsExceptionWhenFalseIsNotAllowed(): void
     {
         $node = new ArrayNode('root');
 
@@ -29,7 +29,7 @@ class ArrayNodeTest extends TestCase
         $node->normalize(false);
     }
 
-    public function testExceptionThrownOnUnrecognizedChild()
+    public function testExceptionThrownOnUnrecognizedChild(): void
     {
         $node = new ArrayNode('root');
 
@@ -39,7 +39,7 @@ class ArrayNodeTest extends TestCase
         $node->normalize(['foo' => 'bar']);
     }
 
-    public function testNormalizeWithProposals()
+    public function testNormalizeWithProposals(): void
     {
         $node = new ArrayNode('root');
         $node->addChild(new ArrayNode('alpha1'));
@@ -52,7 +52,7 @@ class ArrayNodeTest extends TestCase
         $node->normalize(['alpha3' => 'foo']);
     }
 
-    public function testNormalizeWithoutProposals()
+    public function testNormalizeWithoutProposals(): void
     {
         $node = new ArrayNode('root');
         $node->addChild(new ArrayNode('alpha1'));
@@ -77,7 +77,7 @@ class ArrayNodeTest extends TestCase
     }
 
     #[DataProvider('ignoreAndRemoveMatrixProvider')]
-    public function testIgnoreAndRemoveBehaviors(bool $ignore, bool $remove, array|\Exception $expected, string $message = '')
+    public function testIgnoreAndRemoveBehaviors(bool $ignore, bool $remove, array|\Exception $expected, string $message = ''): void
     {
         if ($expected instanceof \Exception) {
             $this->expectException($expected::class);
@@ -90,7 +90,7 @@ class ArrayNodeTest extends TestCase
     }
 
     #[DataProvider('getPreNormalizationTests')]
-    public function testPreNormalize(array $denormalized, array $normalized)
+    public function testPreNormalize(array $denormalized, array $normalized): void
     {
         $node = new ArrayNode('foo');
 
@@ -122,7 +122,7 @@ class ArrayNodeTest extends TestCase
     }
 
     #[DataProvider('getZeroNamedNodeExamplesData')]
-    public function testNodeNameCanBeZero(array $denormalized, array $normalized)
+    public function testNodeNameCanBeZero(array $denormalized, array $normalized): void
     {
         $zeroNode = new ArrayNode(0);
         $zeroNode->addChild(new ScalarNode('name'));
@@ -167,7 +167,7 @@ class ArrayNodeTest extends TestCase
     }
 
     #[DataProvider('getPreNormalizedNormalizedOrderedData')]
-    public function testChildrenOrderIsMaintainedOnNormalizeValue(array $prenormalized, array $normalized)
+    public function testChildrenOrderIsMaintainedOnNormalizeValue(array $prenormalized, array $normalized): void
     {
         $scalar1 = new ScalarNode('1');
         $scalar2 = new ScalarNode('2');
@@ -192,7 +192,7 @@ class ArrayNodeTest extends TestCase
         ];
     }
 
-    public function testAddChildEmptyName()
+    public function testAddChildEmptyName(): void
     {
         $node = new ArrayNode('root');
 
@@ -204,7 +204,7 @@ class ArrayNodeTest extends TestCase
         $node->addChild($childNode);
     }
 
-    public function testAddChildNameAlreadyExists()
+    public function testAddChildNameAlreadyExists(): void
     {
         $node = new ArrayNode('root');
 
@@ -219,7 +219,7 @@ class ArrayNodeTest extends TestCase
         $node->addChild($childNodeWithSameName);
     }
 
-    public function testGetDefaultValueWithoutDefaultValue()
+    public function testGetDefaultValueWithoutDefaultValue(): void
     {
         $node = new ArrayNode('foo');
 
@@ -229,7 +229,7 @@ class ArrayNodeTest extends TestCase
         $node->getDefaultValue();
     }
 
-    public function testSetDeprecated()
+    public function testSetDeprecated(): void
     {
         $childNode = new ArrayNode('foo');
         $childNode->setDeprecated('vendor/package', '1.1', '"%node%" is deprecated');
@@ -271,7 +271,7 @@ class ArrayNodeTest extends TestCase
     }
 
     #[DataProvider('getDataWithIncludedExtraKeys')]
-    public function testMergeWithoutIgnoringExtraKeys(array $prenormalizeds, array $merged)
+    public function testMergeWithoutIgnoringExtraKeys(array $prenormalizeds, array $merged): void
     {
         $node = new ArrayNode('root');
         $node->addChild(new ScalarNode('foo'));
@@ -287,7 +287,7 @@ class ArrayNodeTest extends TestCase
     }
 
     #[DataProvider('getDataWithIncludedExtraKeys')]
-    public function testMergeWithIgnoringAndRemovingExtraKeys(array $prenormalizeds, array $merged)
+    public function testMergeWithIgnoringAndRemovingExtraKeys(array $prenormalizeds, array $merged): void
     {
         $node = new ArrayNode('root');
         $node->addChild(new ScalarNode('foo'));
@@ -303,7 +303,7 @@ class ArrayNodeTest extends TestCase
     }
 
     #[DataProvider('getDataWithIncludedExtraKeys')]
-    public function testMergeWithIgnoringExtraKeys(array $prenormalizeds, array $merged)
+    public function testMergeWithIgnoringExtraKeys(array $prenormalizeds, array $merged): void
     {
         $node = new ArrayNode('root');
         $node->addChild(new ScalarNode('foo'));

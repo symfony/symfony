@@ -34,7 +34,7 @@ use Twig\Loader\LoaderInterface;
 
 class ProfilerControllerTest extends WebTestCase
 {
-    public function testHomeActionWithProfilerDisabled()
+    public function testHomeActionWithProfilerDisabled(): void
     {
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
 
@@ -46,7 +46,7 @@ class ProfilerControllerTest extends WebTestCase
         $controller->homeAction();
     }
 
-    public function testHomeActionRedirect()
+    public function testHomeActionRedirect(): void
     {
         $kernel = new WebProfilerBundleKernel();
         $client = new KernelBrowser($kernel);
@@ -57,7 +57,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertSame('/_profiler/empty/search/results?limit=10', $client->getResponse()->getTargetUrl());
     }
 
-    public function testPanelActionWithLatestTokenWhenNoTokensExist()
+    public function testPanelActionWithLatestTokenWhenNoTokensExist(): void
     {
         $kernel = new WebProfilerBundleKernel();
         $client = new KernelBrowser($kernel);
@@ -67,7 +67,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertStringContainsString('No profiles found.', $client->getResponse()->getContent());
     }
 
-    public function testPanelActionWithLatestToken()
+    public function testPanelActionWithLatestToken(): void
     {
         $kernel = new WebProfilerBundleKernel();
         $client = new KernelBrowser($kernel);
@@ -78,7 +78,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertStringContainsString('kernel::homepageController', $client->getResponse()->getContent());
     }
 
-    public function testPanelActionWithoutValidToken()
+    public function testPanelActionWithoutValidToken(): void
     {
         $kernel = new WebProfilerBundleKernel();
         $client = new KernelBrowser($kernel);
@@ -88,7 +88,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertStringContainsString('Token &quot;this-token-does-not-exist&quot; not found.', $client->getResponse()->getContent());
     }
 
-    public function testPanelActionWithWrongPanel()
+    public function testPanelActionWithWrongPanel(): void
     {
         $kernel = new WebProfilerBundleKernel();
         $client = new KernelBrowser($kernel);
@@ -99,7 +99,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertSame(404, $client->getResponse()->getStatusCode());
     }
 
-    public function testPanelActionWithValidPanelAndToken()
+    public function testPanelActionWithValidPanelAndToken(): void
     {
         $kernel = new WebProfilerBundleKernel();
         $client = new KernelBrowser($kernel);
@@ -110,7 +110,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertSame('_', $crawler->filter('.metrics .metric .value')->eq(0)->text());
     }
 
-    public function testToolbarActionWithProfilerDisabled()
+    public function testToolbarActionWithProfilerDisabled(): void
     {
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
 
@@ -123,7 +123,7 @@ class ProfilerControllerTest extends WebTestCase
     }
 
     #[DataProvider('getEmptyTokenCases')]
-    public function testToolbarActionWithEmptyToken($token)
+    public function testToolbarActionWithEmptyToken($token): void
     {
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
         $profiler = $this->createStub(Profiler::class);
@@ -134,7 +134,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testToolbarStylesheetActionWithProfilerDisabled()
+    public function testToolbarStylesheetActionWithProfilerDisabled(): void
     {
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
 
@@ -146,7 +146,7 @@ class ProfilerControllerTest extends WebTestCase
         $controller->toolbarStylesheetAction();
     }
 
-    public function testToolbarStylesheetAction()
+    public function testToolbarStylesheetAction(): void
     {
         $kernel = new WebProfilerBundleKernel();
         $client = new KernelBrowser($kernel);
@@ -170,7 +170,7 @@ class ProfilerControllerTest extends WebTestCase
     }
 
     #[DataProvider('getOpenFileCases')]
-    public function testOpeningDisallowedPaths($path, $isAllowed)
+    public function testOpeningDisallowedPaths($path, $isAllowed): void
     {
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
         $twig = $this->createStub(Environment::class);
@@ -201,7 +201,7 @@ class ProfilerControllerTest extends WebTestCase
     }
 
     #[DataProvider('provideCspVariants')]
-    public function testReturns404onTokenNotFound($withCsp)
+    public function testReturns404onTokenNotFound($withCsp): void
     {
         $twig = $this->createStub(Environment::class);
         $profiler = $this->createMock(Profiler::class);
@@ -221,7 +221,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertEquals(404, $response->getStatusCode());
     }
 
-    public function testSearchBarActionWithProfilerDisabled()
+    public function testSearchBarActionWithProfilerDisabled(): void
     {
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
 
@@ -233,7 +233,7 @@ class ProfilerControllerTest extends WebTestCase
         $controller->searchBarAction(Request::create('/_profiler/search_bar'));
     }
 
-    public function testSearchBarActionDefaultPage()
+    public function testSearchBarActionDefaultPage(): void
     {
         $kernel = new WebProfilerBundleKernel();
         $client = new KernelBrowser($kernel);
@@ -248,7 +248,7 @@ class ProfilerControllerTest extends WebTestCase
     }
 
     #[DataProvider('provideCspVariants')]
-    public function testSearchResultsAction($withCsp)
+    public function testSearchResultsAction($withCsp): void
     {
         $twig = $this->createMock(Environment::class);
         $profiler = $this->createMock(Profiler::class);
@@ -313,7 +313,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testSearchActionWithProfilerDisabled()
+    public function testSearchActionWithProfilerDisabled(): void
     {
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
 
@@ -325,7 +325,7 @@ class ProfilerControllerTest extends WebTestCase
         $controller->searchBarAction(Request::create('/_profiler/search'));
     }
 
-    public function testSearchActionWithToken()
+    public function testSearchActionWithToken(): void
     {
         $kernel = new WebProfilerBundleKernel();
         $client = new KernelBrowser($kernel);
@@ -338,7 +338,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertSame('/_profiler/'.$token, $client->getResponse()->getTargetUrl());
     }
 
-    public function testSearchActionWithoutToken()
+    public function testSearchActionWithoutToken(): void
     {
         $kernel = new WebProfilerBundleKernel();
         $client = new KernelBrowser($kernel);
@@ -352,7 +352,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertStringContainsString(\sprintf('<a href="/_profiler/%s">%s</a>', $token, $token), $client->getResponse()->getContent());
     }
 
-    public function testPhpinfoActionWithProfilerDisabled()
+    public function testPhpinfoActionWithProfilerDisabled(): void
     {
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
 
@@ -364,7 +364,7 @@ class ProfilerControllerTest extends WebTestCase
         $controller->phpinfoAction();
     }
 
-    public function testPhpinfoAction()
+    public function testPhpinfoAction(): void
     {
         $kernel = new WebProfilerBundleKernel();
         $client = new KernelBrowser($kernel);
@@ -374,7 +374,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertStringContainsString('PHP License', $client->getResponse()->getContent());
     }
 
-    public function testFontActionWithProfilerDisabled()
+    public function testFontActionWithProfilerDisabled(): void
     {
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
 
@@ -386,7 +386,7 @@ class ProfilerControllerTest extends WebTestCase
         $controller->fontAction('JetBrainsMono');
     }
 
-    public function testFontActionWithInvalidFontName()
+    public function testFontActionWithInvalidFontName(): void
     {
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
         $profiler = $this->createStub(Profiler::class);
@@ -399,7 +399,7 @@ class ProfilerControllerTest extends WebTestCase
         $controller->fontAction('InvalidFontName');
     }
 
-    public function testDownloadFontAction()
+    public function testDownloadFontAction(): void
     {
         $kernel = new WebProfilerBundleKernel();
         $client = new KernelBrowser($kernel);
@@ -419,7 +419,7 @@ class ProfilerControllerTest extends WebTestCase
     }
 
     #[DataProvider('defaultPanelProvider')]
-    public function testDefaultPanel(string $expectedPanel, Profile $profile)
+    public function testDefaultPanel(string $expectedPanel, Profile $profile): void
     {
         $this->assertDefaultPanel($expectedPanel, $profile);
     }
@@ -452,7 +452,7 @@ class ProfilerControllerTest extends WebTestCase
         return new ProfilerController($urlGenerator, $profiler, $twig, $templates);
     }
 
-    public function testDumpPanelExceptionPriority()
+    public function testDumpPanelExceptionPriority(): void
     {
         $exceptionDataCollector = new ExceptionDataCollector();
         $exceptionDataCollector->collect(new Request(), new Response(), new \DomainException());
@@ -465,7 +465,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertDefaultPanel($exceptionDataCollector->getName(), $profile);
     }
 
-    public function testDumpPanelWhenDefinedAfterwards()
+    public function testDumpPanelWhenDefinedAfterwards(): void
     {
         $exceptionDataCollector = new ExceptionDataCollector();
         $exceptionDataCollector->collect(new Request(), new Response(), new \DomainException());
@@ -483,7 +483,7 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertDefaultPanel($exceptionDataCollector->getName(), $profile);
     }
 
-    public function testDumpPanel()
+    public function testDumpPanel(): void
     {
         $dumpDataCollector = $this->createDumpDataCollector();
         $dumpDataCollector
@@ -509,7 +509,7 @@ class ProfilerControllerTest extends WebTestCase
         return $dumpDataCollector;
     }
 
-    private function assertDefaultPanel(string $expectedPanel, Profile $profile)
+    private function assertDefaultPanel(string $expectedPanel, Profile $profile): void
     {
         $profiler = $this->createMock(Profiler::class);
         $profiler

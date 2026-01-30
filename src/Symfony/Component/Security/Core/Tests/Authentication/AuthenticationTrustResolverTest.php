@@ -20,7 +20,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class AuthenticationTrustResolverTest extends TestCase
 {
-    public function testIsRememberMe()
+    public function testIsRememberMe(): void
     {
         $resolver = new AuthenticationTrustResolver();
 
@@ -30,7 +30,7 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertTrue($resolver->isRememberMe($this->getRememberMeToken()));
     }
 
-    public function testisFullFledged()
+    public function testisFullFledged(): void
     {
         $resolver = new AuthenticationTrustResolver();
 
@@ -40,7 +40,7 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertTrue($resolver->isFullFledged(new FakeCustomToken()));
     }
 
-    public function testIsAuthenticated()
+    public function testIsAuthenticated(): void
     {
         $resolver = new AuthenticationTrustResolver();
         $this->assertFalse($resolver->isAuthenticated(null));
@@ -48,7 +48,7 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertTrue($resolver->isAuthenticated(new FakeCustomToken()));
     }
 
-    public function testIsRememberMeWithClassAsConstructorButStillExtending()
+    public function testIsRememberMeWithClassAsConstructorButStillExtending(): void
     {
         $resolver = new AuthenticationTrustResolver();
 
@@ -58,7 +58,7 @@ class AuthenticationTrustResolverTest extends TestCase
         $this->assertTrue($resolver->isRememberMe(new RealCustomRememberMeToken()));
     }
 
-    public function testisFullFledgedWithClassAsConstructorButStillExtending()
+    public function testisFullFledgedWithClassAsConstructorButStillExtending(): void
     {
         $resolver = new AuthenticationTrustResolver();
 
@@ -90,7 +90,7 @@ class FakeCustomToken implements TokenInterface
     {
     }
 
-    public function unserialize($serialized)
+    public function unserialize($serialized): void
     {
     }
 

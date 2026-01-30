@@ -40,14 +40,14 @@ class ResourceCheckerConfigCacheTest extends TestCase
         }
     }
 
-    public function testGetPath()
+    public function testGetPath(): void
     {
         $cache = new ResourceCheckerConfigCache($this->cacheFile);
 
         $this->assertSame($this->cacheFile, $cache->getPath());
     }
 
-    public function testCacheIsNotFreshIfEmpty()
+    public function testCacheIsNotFreshIfEmpty(): void
     {
         $checker = $this->createMock(ResourceCheckerInterface::class)
             ->expects($this->never())->method('supports');
@@ -61,7 +61,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertFalse($cache->isFresh());
     }
 
-    public function testCacheIsFreshIfNoCheckerProvided()
+    public function testCacheIsFreshIfNoCheckerProvided(): void
     {
         /* For example in prod mode, you may choose not to run any checkers
            at all. In that case, the cache should always be considered fresh. */
@@ -69,13 +69,13 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertTrue($cache->isFresh());
     }
 
-    public function testCacheIsFreshIfEmptyCheckerIteratorProvided()
+    public function testCacheIsFreshIfEmptyCheckerIteratorProvided(): void
     {
         $cache = new ResourceCheckerConfigCache($this->cacheFile, new \ArrayIterator([]));
         $this->assertTrue($cache->isFresh());
     }
 
-    public function testResourcesWithoutcheckersAreIgnoredAndConsideredFresh()
+    public function testResourcesWithoutcheckersAreIgnoredAndConsideredFresh(): void
     {
         /* As in the previous test, but this time we have a resource. */
         $cache = new ResourceCheckerConfigCache($this->cacheFile);
@@ -84,7 +84,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertTrue($cache->isFresh()); // no (matching) ResourceChecker passed
     }
 
-    public function testIsFreshWithchecker()
+    public function testIsFreshWithchecker(): void
     {
         $checker = $this->createMock(ResourceCheckerInterface::class);
 
@@ -102,7 +102,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertTrue($cache->isFresh());
     }
 
-    public function testIsNotFreshWithchecker()
+    public function testIsNotFreshWithchecker(): void
     {
         $checker = $this->createMock(ResourceCheckerInterface::class);
 
@@ -120,7 +120,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertFalse($cache->isFresh());
     }
 
-    public function testCacheIsNotFreshWhenUnserializeFails()
+    public function testCacheIsNotFreshWhenUnserializeFails(): void
     {
         $checker = $this->createStub(ResourceCheckerInterface::class);
         $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
@@ -132,7 +132,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertFalse($cache->isFresh());
     }
 
-    public function testCacheKeepsContent()
+    public function testCacheKeepsContent(): void
     {
         $cache = new ResourceCheckerConfigCache($this->cacheFile);
         $cache->write('FOOBAR');
@@ -140,7 +140,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertSame('FOOBAR', file_get_contents($cache->getPath()));
     }
 
-    public function testCacheIsNotFreshIfNotExistsMetaFile()
+    public function testCacheIsNotFreshIfNotExistsMetaFile(): void
     {
         $checker = $this->createStub(ResourceCheckerInterface::class);
         $cache = new ResourceCheckerConfigCache($this->cacheFile, [$checker]);
@@ -152,7 +152,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         $this->assertFalse($cache->isFresh());
     }
 
-    public function testCacheWithCustomMetaFile()
+    public function testCacheWithCustomMetaFile(): void
     {
         $this->assertStringEqualsFile($this->metaFile, '');
 
@@ -172,7 +172,7 @@ class ResourceCheckerConfigCacheTest extends TestCase
         ], \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE));
     }
 
-    public function testCacheWithResourceWithLongPropertyId()
+    public function testCacheWithResourceWithLongPropertyId(): void
     {
         $cache = new ResourceCheckerConfigCache($this->cacheFile);
         $cache->write('foo', [new ResourceWithVeryVeryVeryVeryVeryVeryVeryVeryLongName(__FILE__)]);

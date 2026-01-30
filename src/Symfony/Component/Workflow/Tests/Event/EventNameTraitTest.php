@@ -27,7 +27,7 @@ class EventNameTraitTest extends TestCase
      * @param class-string $class
      */
     #[DataProvider('getEvents')]
-    public function testEventNames(string $class, ?string $workflowName, ?string $transitionOrPlaceName, string $expected)
+    public function testEventNames(string $class, ?string $workflowName, ?string $transitionOrPlaceName, string $expected): void
     {
         $name = $class::getName($workflowName, $transitionOrPlaceName);
         $this->assertEquals($expected, $name);
@@ -64,7 +64,7 @@ class EventNameTraitTest extends TestCase
         yield [TransitionEvent::class, 'post', 'publish', 'workflow.post.transition.publish'];
     }
 
-    public function testInvalidArgumentExceptionIsThrownIfWorkflowNameIsMissing()
+    public function testInvalidArgumentExceptionIsThrownIfWorkflowNameIsMissing(): void
     {
         $this->expectException(\InvalidArgumentException::class);
 

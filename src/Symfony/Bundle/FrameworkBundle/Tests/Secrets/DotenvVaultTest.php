@@ -30,7 +30,7 @@ class DotenvVaultTest extends TestCase
         @unlink($this->envFile);
     }
 
-    public function testGenerateKeys()
+    public function testGenerateKeys(): void
     {
         $vault = new DotenvVault($this->envFile);
 
@@ -38,7 +38,7 @@ class DotenvVaultTest extends TestCase
         $this->assertSame('The dotenv vault doesn\'t encrypt secrets thus doesn\'t need keys.', $vault->getLastMessage());
     }
 
-    public function testEncryptAndDecrypt()
+    public function testEncryptAndDecrypt(): void
     {
         $vault = new DotenvVault($this->envFile);
 

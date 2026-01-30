@@ -47,7 +47,7 @@ final class ContactEveryoneTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendSuccessfully()
+    public function testSendSuccessfully(): void
     {
         $messageId = bin2hex(random_bytes(7));
         $response = new MockResponse($messageId);
@@ -60,7 +60,7 @@ final class ContactEveryoneTransportTest extends TransportTestCase
         $this->assertSame($messageId, $sentMessage->getMessageId());
     }
 
-    public function testSmsMessageWithFrom()
+    public function testSmsMessageWithFrom(): void
     {
         $transport = $this->createTransport();
 

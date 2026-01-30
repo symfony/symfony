@@ -36,7 +36,7 @@ class ImportMapUpdateCheckerTest extends TestCase
         $this->updateChecker = new ImportMapUpdateChecker($this->importMapConfigReader, $httpClient);
     }
 
-    public function testGetAvailableUpdates()
+    public function testGetAvailableUpdates(): void
     {
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries([
             '@hotwired/stimulus' => self::createRemoteEntry(
@@ -115,7 +115,7 @@ class ImportMapUpdateCheckerTest extends TestCase
      * @param PackageUpdateInfo[] $expectedUpdateInfo
      */
     #[DataProvider('provideImportMapEntry')]
-    public function testGetAvailableUpdatesForSinglePackage(array $entries, array $expectedUpdateInfo, ?\Exception $expectedException)
+    public function testGetAvailableUpdatesForSinglePackage(array $entries, array $expectedUpdateInfo, ?\Exception $expectedException): void
     {
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries($entries));
         if (null !== $expectedException) {

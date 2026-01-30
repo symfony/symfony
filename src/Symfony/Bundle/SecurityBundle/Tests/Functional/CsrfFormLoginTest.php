@@ -21,11 +21,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class CsrfFormLoginTest extends AbstractWebTestCase
 {
     #[DataProvider('provideClientOptions')]
-    public function testFormLoginAndLogoutWithCsrfTokens($options)
+    public function testFormLoginAndLogoutWithCsrfTokens($options): void
     {
         $client = $this->createClient($options);
 
-        $this->callInRequestContext($client, static function () {
+        $this->callInRequestContext($client, static function (): void {
             static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
         });
 
@@ -50,17 +50,17 @@ class CsrfFormLoginTest extends AbstractWebTestCase
 
         $this->assertRedirect($client->getResponse(), '/');
 
-        $this->callInRequestContext($client, function () {
+        $this->callInRequestContext($client, function (): void {
             $this->assertFalse(static::getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
         });
     }
 
     #[DataProvider('provideClientOptions')]
-    public function testFormLoginWithInvalidCsrfToken($options)
+    public function testFormLoginWithInvalidCsrfToken($options): void
     {
         $client = $this->createClient($options);
 
-        $this->callInRequestContext($client, static function () {
+        $this->callInRequestContext($client, static function (): void {
             static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
         });
 
@@ -75,13 +75,13 @@ class CsrfFormLoginTest extends AbstractWebTestCase
         $text = $client->followRedirect()->text(null, true);
         $this->assertStringContainsString('Invalid CSRF token.', $text);
 
-        $this->callInRequestContext($client, function () {
+        $this->callInRequestContext($client, function (): void {
             $this->assertTrue(static::getContainer()->get('security.csrf.token_storage')->hasToken('foo'));
         });
     }
 
     #[DataProvider('provideClientOptions')]
-    public function testFormLoginWithCustomTargetPath($options)
+    public function testFormLoginWithCustomTargetPath($options): void
     {
         $client = $this->createClient($options);
 
@@ -99,7 +99,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideClientOptions')]
-    public function testFormLoginRedirectsToProtectedResourceAfterLogin($options)
+    public function testFormLoginRedirectsToProtectedResourceAfterLogin($options): void
     {
         $client = $this->createClient($options);
 
@@ -127,7 +127,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
     {
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
-        $wrappedCallable = static function (RequestEvent $event) use (&$callable) {
+        $wrappedCallable = static function (RequestEvent $event) use (&$callable): void {
             $callable();
             $event->setResponse(new Response(''));
             $event->stopPropagation();

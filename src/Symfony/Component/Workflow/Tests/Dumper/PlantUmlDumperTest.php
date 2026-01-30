@@ -25,7 +25,7 @@ class PlantUmlDumperTest extends TestCase
     use WorkflowBuilderTrait;
 
     #[DataProvider('provideWorkflowDefinitionWithoutMarking')]
-    public function testDumpWorkflowWithoutMarking($definition, $marking, $expectedFileName, $title)
+    public function testDumpWorkflowWithoutMarking($definition, $marking, $expectedFileName, $title): void
     {
         $dumper = new PlantUmlDumper(PlantUmlDumper::WORKFLOW_TRANSITION);
         $dump = $dumper->dump($definition, $marking, ['title' => $title]);
@@ -46,7 +46,7 @@ class PlantUmlDumperTest extends TestCase
     }
 
     #[DataProvider('provideStateMachineDefinitionWithoutMarking')]
-    public function testDumpStateMachineWithoutMarking($definition, $marking, $expectedFileName, $title)
+    public function testDumpStateMachineWithoutMarking($definition, $marking, $expectedFileName, $title): void
     {
         $dumper = new PlantUmlDumper(PlantUmlDumper::STATEMACHINE_TRANSITION);
         $dump = $dumper->dump($definition, $marking, ['title' => $title]);
@@ -63,7 +63,7 @@ class PlantUmlDumperTest extends TestCase
         yield [static::createComplexStateMachineDefinition(), $marking, 'complex-state-machine-marking', 'SimpleDiagram'];
     }
 
-    public function testDumpWorkflowWithSpacesInTheStateNamesAndDescription()
+    public function testDumpWorkflowWithSpacesInTheStateNamesAndDescription(): void
     {
         $dumper = new PlantUmlDumper(PlantUmlDumper::WORKFLOW_TRANSITION);
 

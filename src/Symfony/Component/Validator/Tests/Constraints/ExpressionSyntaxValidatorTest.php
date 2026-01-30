@@ -24,21 +24,21 @@ class ExpressionSyntaxValidatorTest extends ConstraintValidatorTestCase
         return new ExpressionSyntaxValidator(new ExpressionLanguage());
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new ExpressionSyntax());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new ExpressionSyntax());
 
         $this->assertNoViolation();
     }
 
-    public function testExpressionValid()
+    public function testExpressionValid(): void
     {
         $this->validator->validate('1 + 1', new ExpressionSyntax(
             message: 'myMessage',
@@ -48,7 +48,7 @@ class ExpressionSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testStringableExpressionValid()
+    public function testStringableExpressionValid(): void
     {
         $this->validator->validate(new StringableValue('1 + 1'), new ExpressionSyntax(
             message: 'myMessage',
@@ -58,14 +58,14 @@ class ExpressionSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testExpressionWithoutNames()
+    public function testExpressionWithoutNames(): void
     {
         $this->validator->validate('1 + 1', new ExpressionSyntax(null, 'myMessage', null, []));
 
         $this->assertNoViolation();
     }
 
-    public function testExpressionWithAllowedVariableName()
+    public function testExpressionWithAllowedVariableName(): void
     {
         $this->validator->validate('a + 1', new ExpressionSyntax(
             message: 'myMessage',
@@ -75,7 +75,7 @@ class ExpressionSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testExpressionIsNotValid()
+    public function testExpressionIsNotValid(): void
     {
         $this->validator->validate('a + 1', new ExpressionSyntax(
             message: 'myMessage',
@@ -89,7 +89,7 @@ class ExpressionSyntaxValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testStringableExpressionIsNotValid()
+    public function testStringableExpressionIsNotValid(): void
     {
         $this->validator->validate(new StringableValue('a + 1'), new ExpressionSyntax(
             message: 'myMessage',

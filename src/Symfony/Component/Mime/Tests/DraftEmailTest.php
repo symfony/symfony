@@ -20,7 +20,7 @@ use Symfony\Component\Mime\Exception\LogicException;
  */
 final class DraftEmailTest extends TestCase
 {
-    public function testCanHaveJustBody()
+    public function testCanHaveJustBody(): void
     {
         $email = (new DraftEmail())->text('some text')->toString();
 
@@ -29,21 +29,21 @@ final class DraftEmailTest extends TestCase
         $this->assertStringContainsString('X-Unsent: 1', $email);
     }
 
-    public function testBccIsRemoved()
+    public function testBccIsRemoved(): void
     {
         $email = (new DraftEmail())->text('some text')->bcc('sam@example.com')->toString();
 
         $this->assertStringNotContainsString('sam@example.com', $email);
     }
 
-    public function testMustHaveBody()
+    public function testMustHaveBody(): void
     {
         $this->expectException(LogicException::class);
 
         (new DraftEmail())->toString();
     }
 
-    public function testEnsureValidityAlwaysFails()
+    public function testEnsureValidityAlwaysFails(): void
     {
         $email = (new DraftEmail())
             ->to('alice@example.com')

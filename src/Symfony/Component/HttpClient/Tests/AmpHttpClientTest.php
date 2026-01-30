@@ -19,7 +19,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class AmpHttpClientTest extends HttpClientTestCase
 {
     #[Group('transient')]
-    public function testNonBlockingStream()
+    public function testNonBlockingStream(): void
     {
         parent::testNonBlockingStream();
     }
@@ -29,12 +29,12 @@ class AmpHttpClientTest extends HttpClientTestCase
         return new AmpHttpClient(['verify_peer' => false, 'verify_host' => false, 'timeout' => 30]);
     }
 
-    public function testProxy()
+    public function testProxy(): void
     {
         $this->markTestSkipped('A real proxy server would be needed.');
     }
 
-    public function testMaxConnectDurationPreservesAsync()
+    public function testMaxConnectDurationPreservesAsync(): void
     {
         $client = $this->getHttpClient(__FUNCTION__);
 

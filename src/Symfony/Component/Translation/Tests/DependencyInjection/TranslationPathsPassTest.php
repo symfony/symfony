@@ -26,7 +26,7 @@ use Symfony\Component\Translation\Tests\DependencyInjection\Fixtures\ServiceSubs
 
 class TranslationPathsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->register('translator');

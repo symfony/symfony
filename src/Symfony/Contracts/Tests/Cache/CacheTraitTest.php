@@ -21,7 +21,7 @@ use Symfony\Contracts\Cache\CacheTrait;
  */
 class CacheTraitTest extends TestCase
 {
-    public function testSave()
+    public function testSave(): void
     {
         $item = $this->createMock(CacheItemInterface::class);
         $item->method('set')
@@ -48,7 +48,7 @@ class CacheTraitTest extends TestCase
         $cache->get('key', $callback);
     }
 
-    public function testNoCallbackCallOnHit()
+    public function testNoCallbackCallOnHit(): void
     {
         $item = $this->createMock(CacheItemInterface::class);
         $item->method('isHit')
@@ -68,14 +68,14 @@ class CacheTraitTest extends TestCase
         $cache->expects($this->never())
             ->method('save');
 
-        $callback = function (CacheItemInterface $item) {
+        $callback = function (CacheItemInterface $item): void {
             $this->fail('This code should never be reached');
         };
 
         $cache->get('key', $callback);
     }
 
-    public function testRecomputeOnBetaInf()
+    public function testRecomputeOnBetaInf(): void
     {
         $item = $this->createMock(CacheItemInterface::class);
         $item->method('set')
@@ -104,7 +104,7 @@ class CacheTraitTest extends TestCase
         $cache->get('key', $callback, \INF);
     }
 
-    public function testExceptionOnNegativeBeta()
+    public function testExceptionOnNegativeBeta(): void
     {
         $cache = new TestPool();
 

@@ -41,7 +41,7 @@ final class TimePointTypeTest extends TestCase
         $this->type = Type::getType(TimePointType::NAME);
     }
 
-    public function testDatePointConvertsToDatabaseValue()
+    public function testDatePointConvertsToDatabaseValue(): void
     {
         $datePoint = DatePoint::createFromFormat('!H:i:s', '05:10:15');
 
@@ -51,7 +51,7 @@ final class TimePointTypeTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
-    public function testDatePointConvertsToPHPValue()
+    public function testDatePointConvertsToPHPValue(): void
     {
         $datePoint = new DatePoint();
         $actual = $this->type->convertToPHPValue($datePoint, self::getSqlitePlatform());
@@ -59,14 +59,14 @@ final class TimePointTypeTest extends TestCase
         $this->assertSame($datePoint, $actual);
     }
 
-    public function testNullConvertsToPHPValue()
+    public function testNullConvertsToPHPValue(): void
     {
         $actual = $this->type->convertToPHPValue(null, self::getSqlitePlatform());
 
         $this->assertNull($actual);
     }
 
-    public function testDateTimeImmutableConvertsToPHPValue()
+    public function testDateTimeImmutableConvertsToPHPValue(): void
     {
         $format = 'Y-m-d H:i:s.u';
         $time = '05:10:15';
@@ -78,7 +78,7 @@ final class TimePointTypeTest extends TestCase
         $this->assertSame($expected->format($format), $actual->format($format));
     }
 
-    public function testDatabaseValueConvertsToPHPValue()
+    public function testDatabaseValueConvertsToPHPValue(): void
     {
         $format = 'Y-m-d H:i:s.u';
         $time = '05:10:15';
@@ -89,7 +89,7 @@ final class TimePointTypeTest extends TestCase
         $this->assertSame($expected->format($format), $actual->format($format));
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertSame('time_point', $this->type->getName());
     }

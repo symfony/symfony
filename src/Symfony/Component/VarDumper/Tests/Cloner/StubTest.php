@@ -16,7 +16,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
 
 final class StubTest extends TestCase
 {
-    public function testUnserializeNullValue()
+    public function testUnserializeNullValue(): void
     {
         $stub = new Stub();
         $stub->value = null;
@@ -26,7 +26,7 @@ final class StubTest extends TestCase
         self::assertNull($stub->value);
     }
 
-    public function testUnserializeNullInTypedProperty()
+    public function testUnserializeNullInTypedProperty(): void
     {
         $stub = new MyStub();
         $stub->myProp = null;
@@ -36,7 +36,7 @@ final class StubTest extends TestCase
         self::assertNull($stub->myProp);
     }
 
-    public function testUninitializedStubPropertiesAreLeftUninitialized()
+    public function testUninitializedStubPropertiesAreLeftUninitialized(): void
     {
         $stub = new MyStub();
 

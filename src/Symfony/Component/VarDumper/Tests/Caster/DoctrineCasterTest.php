@@ -24,7 +24,7 @@ class DoctrineCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testCastPersistentCollection()
+    public function testCastPersistentCollection(): void
     {
         $classMetadata = new ClassMetadata(__CLASS__);
 

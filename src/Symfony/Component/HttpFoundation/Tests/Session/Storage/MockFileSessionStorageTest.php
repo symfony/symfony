@@ -41,7 +41,7 @@ class MockFileSessionStorageTest extends TestCase
         }
     }
 
-    public function testStart()
+    public function testStart(): void
     {
         $this->assertEquals('', $this->storage->getId());
         $this->assertTrue($this->storage->start());
@@ -51,7 +51,7 @@ class MockFileSessionStorageTest extends TestCase
         $this->assertEquals($id, $this->storage->getId());
     }
 
-    public function testRegenerate()
+    public function testRegenerate(): void
     {
         $this->storage->start();
         $this->storage->getBag('attributes')->set('regenerate', 1234);
@@ -61,14 +61,14 @@ class MockFileSessionStorageTest extends TestCase
         $this->assertEquals(1234, $this->storage->getBag('attributes')->get('regenerate'));
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertEquals('', $this->storage->getId());
         $this->storage->start();
         $this->assertNotEquals('', $this->storage->getId());
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $this->storage->start();
         $id = $this->storage->getId();
@@ -86,7 +86,7 @@ class MockFileSessionStorageTest extends TestCase
         $this->assertEquals(['test'], $storage->getBag('flashes')->peek('newkey'));
     }
 
-    public function testMultipleInstances()
+    public function testMultipleInstances(): void
     {
         $storage1 = $this->getStorage();
         $storage1->start();
@@ -99,7 +99,7 @@ class MockFileSessionStorageTest extends TestCase
         $this->assertEquals('bar', $storage2->getBag('attributes')->get('foo'), 'values persist between instances');
     }
 
-    public function testSaveWithoutStart()
+    public function testSaveWithoutStart(): void
     {
         $this->expectException(\RuntimeException::class);
         $storage1 = $this->getStorage();

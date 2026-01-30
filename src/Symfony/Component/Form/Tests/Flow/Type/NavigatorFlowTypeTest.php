@@ -25,7 +25,7 @@ class NavigatorFlowTypeTest extends TestCase
         $this->factory = Forms::createFormFactoryBuilder()->getFormFactory();
     }
 
-    public function testDefaultOptionsDoNotIncludeReset()
+    public function testDefaultOptionsDoNotIncludeReset(): void
     {
         $form = $this->factory->create(NavigatorFlowType::class);
 
@@ -35,7 +35,7 @@ class NavigatorFlowTypeTest extends TestCase
         self::assertFalse($form->has('reset'));
     }
 
-    public function testWithResetOptionAddsResetButton()
+    public function testWithResetOptionAddsResetButton(): void
     {
         $form = $this->factory->create(NavigatorFlowType::class, null, [
             'with_reset' => true,

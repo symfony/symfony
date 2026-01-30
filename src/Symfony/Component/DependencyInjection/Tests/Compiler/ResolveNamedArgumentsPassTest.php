@@ -30,7 +30,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1;
  */
 class ResolveNamedArgumentsPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 
@@ -49,7 +49,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $this->assertEquals([['setApiKey', ['123']]], $definition->getMethodCalls());
     }
 
-    public function testWithFactory()
+    public function testWithFactory(): void
     {
         $container = new ContainerBuilder();
 
@@ -64,7 +64,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $this->assertSame([0 => '123'], $definition->getArguments());
     }
 
-    public function testClassNull()
+    public function testClassNull(): void
     {
         $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
@@ -76,7 +76,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testClassNotExist()
+    public function testClassNotExist(): void
     {
         $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
@@ -88,7 +88,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testClassNoConstructor()
+    public function testClassNoConstructor(): void
     {
         $this->expectException(RuntimeException::class);
         $container = new ContainerBuilder();
@@ -100,7 +100,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testArgumentNotFound()
+    public function testArgumentNotFound(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy": method "__construct()" has no argument named "$notFound". Check your service definition.');
@@ -113,7 +113,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testCorrectMethodReportedInException()
+    public function testCorrectMethodReportedInException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\TestDefinition1": method "Symfony\Component\DependencyInjection\Tests\Fixtures\FactoryDummyWithoutReturnTypes::createTestDefinition1()" has no argument named "$notFound". Check your service definition.');
@@ -129,7 +129,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testTypedArgument()
+    public function testTypedArgument(): void
     {
         $container = new ContainerBuilder();
 
@@ -142,7 +142,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $this->assertEquals([new Reference('foo'), '123'], $definition->getArguments());
     }
 
-    public function testTypedArgumentWithMissingDollar()
+    public function testTypedArgumentWithMissingDollar(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid service "Symfony\Component\DependencyInjection\Tests\Fixtures\NamedArgumentsDummy": did you forget to add the "$" prefix to argument "apiKey"?');
@@ -155,7 +155,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testInterfaceTypedArgument()
+    public function testInterfaceTypedArgument(): void
     {
         $container = new ContainerBuilder();
 
@@ -168,7 +168,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $this->assertSame($expected, $definition->getArgument('container'));
     }
 
-    public function testResolvesMultipleArgumentsOfTheSameType()
+    public function testResolvesMultipleArgumentsOfTheSameType(): void
     {
         $container = new ContainerBuilder();
 
@@ -181,7 +181,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $this->assertEquals([new Reference('foo'), 'qwerty', new Reference('foo')], $definition->getArguments());
     }
 
-    public function testResolvePrioritizeNamedOverType()
+    public function testResolvePrioritizeNamedOverType(): void
     {
         $container = new ContainerBuilder();
 
@@ -194,7 +194,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
         $this->assertEquals([new Reference('bar'), 'qwerty', new Reference('foo')], $definition->getArguments());
     }
 
-    public function testVariadics()
+    public function testVariadics(): void
     {
         $container = new ContainerBuilder();
 
@@ -225,7 +225,7 @@ class ResolveNamedArgumentsPassTest extends TestCase
 
 class NoConstructor
 {
-    public static function create($apiKey)
+    public static function create($apiKey): void
     {
     }
 }

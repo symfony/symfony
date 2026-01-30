@@ -46,7 +46,7 @@ require_once __DIR__.'/../Fixtures/includes/classes.php';
 
 class RegisterServiceSubscribersPassTest extends TestCase
 {
-    public function testInvalidClass()
+    public function testInvalidClass(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Service "foo" must implement interface "Symfony\Contracts\Service\ServiceSubscriberInterface".');
@@ -60,7 +60,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         (new ResolveServiceSubscribersPass())->process($container);
     }
 
-    public function testInvalidAttributes()
+    public function testInvalidAttributes(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "container.service_subscriber" tag accepts only the "key" and "id" attributes, "bar" given for service "foo".');
@@ -74,7 +74,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         (new ResolveServiceSubscribersPass())->process($container);
     }
 
-    public function testNoAttributes()
+    public function testNoAttributes(): void
     {
         $container = new ContainerBuilder();
 
@@ -103,7 +103,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    public function testWithAttributes()
+    public function testWithAttributes(): void
     {
         $container = new ContainerBuilder();
 
@@ -134,7 +134,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    public function testUnionServices()
+    public function testUnionServices(): void
     {
         $container = new ContainerBuilder();
 
@@ -173,7 +173,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    public function testIntersectionServices()
+    public function testIntersectionServices(): void
     {
         $container = new ContainerBuilder();
 
@@ -200,7 +200,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    public function testExtraServiceSubscriber()
+    public function testExtraServiceSubscriber(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Service key "test" does not exist in the map returned by "Symfony\Component\DependencyInjection\Tests\Fixtures\TestServiceSubscriber::getSubscribedServices()" for service "foo_service".');
@@ -217,7 +217,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $container->compile();
     }
 
-    public function testServiceMethodsSubscriberTraitWithSubscribedServiceAttribute()
+    public function testServiceMethodsSubscriberTraitWithSubscribedServiceAttribute(): void
     {
         $container = new ContainerBuilder();
 
@@ -243,7 +243,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    public function testServiceMethodsSubscriberTraitWithSubscribedServiceAttributeOnStaticMethod()
+    public function testServiceMethodsSubscriberTraitWithSubscribedServiceAttributeOnStaticMethod(): void
     {
         $subscriber = new class implements ServiceSubscriberInterface {
             use ServiceMethodsSubscriberTrait;
@@ -259,7 +259,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $subscriber::getSubscribedServices();
     }
 
-    public function testServiceMethodsSubscriberTraitWithSubscribedServiceAttributeOnMethodWithRequiredParameters()
+    public function testServiceMethodsSubscriberTraitWithSubscribedServiceAttributeOnMethodWithRequiredParameters(): void
     {
         $subscriber = new class implements ServiceSubscriberInterface {
             use ServiceMethodsSubscriberTrait;
@@ -275,13 +275,13 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $subscriber::getSubscribedServices();
     }
 
-    public function testServiceMethodsSubscriberTraitWithSubscribedServiceAttributeOnMethodMissingReturnType()
+    public function testServiceMethodsSubscriberTraitWithSubscribedServiceAttributeOnMethodMissingReturnType(): void
     {
         $subscriber = new class implements ServiceSubscriberInterface {
             use ServiceMethodsSubscriberTrait;
 
             #[SubscribedService]
-            public function method()
+            public function method(): void
             {
             }
         };
@@ -291,7 +291,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $subscriber::getSubscribedServices();
     }
 
-    public function testServiceMethodsSubscriberTraitWithUnionReturnType()
+    public function testServiceMethodsSubscriberTraitWithUnionReturnType(): void
     {
         $container = new ContainerBuilder();
 
@@ -314,7 +314,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    public function testServiceMethodsSubscriberTraitWithIntersectionReturnType()
+    public function testServiceMethodsSubscriberTraitWithIntersectionReturnType(): void
     {
         $container = new ContainerBuilder();
 
@@ -336,7 +336,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    public function testServiceSubscriberWithSemanticId()
+    public function testServiceSubscriberWithSemanticId(): void
     {
         $container = new ContainerBuilder();
 
@@ -381,7 +381,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    public function testSubscribedServiceWithAttributes()
+    public function testSubscribedServiceWithAttributes(): void
     {
         $container = new ContainerBuilder();
 
@@ -430,7 +430,7 @@ class RegisterServiceSubscribersPassTest extends TestCase
         $this->assertEquals($expected, $container->getDefinition((string) $locator->getFactory()[0])->getArgument(0));
     }
 
-    public function testBinding()
+    public function testBinding(): void
     {
         $container = new ContainerBuilder();
 

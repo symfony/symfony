@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Plivo\PlivoOptions;
 
 class PlivoOptionsTest extends TestCase
 {
-    public function testPlivoOptions()
+    public function testPlivoOptions(): void
     {
         $plivoOptions = (new PlivoOptions())
             ->log(true)

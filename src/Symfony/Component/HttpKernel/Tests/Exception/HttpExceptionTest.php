@@ -31,28 +31,28 @@ class HttpExceptionTest extends TestCase
         ];
     }
 
-    public function testHeadersDefault()
+    public function testHeadersDefault(): void
     {
         $exception = $this->createException();
         $this->assertSame([], $exception->getHeaders());
     }
 
     #[DataProvider('headerDataProvider')]
-    public function testHeadersConstructor($headers)
+    public function testHeadersConstructor($headers): void
     {
         $exception = new HttpException(200, '', null, $headers);
         $this->assertSame($headers, $exception->getHeaders());
     }
 
     #[DataProvider('headerDataProvider')]
-    public function testHeadersSetter($headers)
+    public function testHeadersSetter($headers): void
     {
         $exception = $this->createException();
         $exception->setHeaders($headers);
         $this->assertSame($headers, $exception->getHeaders());
     }
 
-    public function testThrowableIsAllowedForPrevious()
+    public function testThrowableIsAllowedForPrevious(): void
     {
         $previous = new class('Error of PHP 7+') extends \Error {
         };
@@ -61,7 +61,7 @@ class HttpExceptionTest extends TestCase
     }
 
     #[DataProvider('provideStatusCode')]
-    public function testFromStatusCode(int $statusCode)
+    public function testFromStatusCode(int $statusCode): void
     {
         $exception = HttpException::fromStatusCode($statusCode);
         $this->assertInstanceOf(HttpException::class, $exception);

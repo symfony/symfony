@@ -27,7 +27,7 @@ class PhpSubprocessTest extends TestCase
     }
 
     #[DataProvider('subprocessProvider')]
-    public function testSubprocess(string $processClass, string $memoryLimit, string $expectedMemoryLimit)
+    public function testSubprocess(string $processClass, string $memoryLimit, string $expectedMemoryLimit): void
     {
         $process = new Process([self::$phpBin,
             '-d',

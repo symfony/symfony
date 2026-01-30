@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Section\Field\Activity;
 
 final class ActivityTest extends TestCase
 {
-    public function testImage()
+    public function testImage(): void
     {
         $field = (new Activity())
             ->image($value = 'https://symfony.com/logo.png');
@@ -24,7 +24,7 @@ final class ActivityTest extends TestCase
         $this->assertSame($value, $field->toArray()['activityImage']);
     }
 
-    public function testTitle()
+    public function testTitle(): void
     {
         $field = (new Activity())
             ->title($value = 'Symfony is great!');
@@ -32,7 +32,7 @@ final class ActivityTest extends TestCase
         $this->assertSame($value, $field->toArray()['activityTitle']);
     }
 
-    public function testSubtitle()
+    public function testSubtitle(): void
     {
         $field = (new Activity())
             ->subtitle($value = 'I am a subtitle!');
@@ -40,7 +40,7 @@ final class ActivityTest extends TestCase
         $this->assertSame($value, $field->toArray()['activitySubtitle']);
     }
 
-    public function testText()
+    public function testText(): void
     {
         $field = (new Activity())
             ->text($value = 'Text goes here');

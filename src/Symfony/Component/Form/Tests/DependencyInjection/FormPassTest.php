@@ -30,7 +30,7 @@ use Symfony\Component\Form\FormRegistry;
  */
 class FormPassTest extends TestCase
 {
-    public function testDoNothingIfFormExtensionNotLoaded()
+    public function testDoNothingIfFormExtensionNotLoaded(): void
     {
         $container = $this->createContainerBuilder();
 
@@ -39,7 +39,7 @@ class FormPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('form.extension'));
     }
 
-    public function testDoNothingIfDebugCommandNotLoaded()
+    public function testDoNothingIfDebugCommandNotLoaded(): void
     {
         $container = $this->createContainerBuilder();
 
@@ -48,7 +48,7 @@ class FormPassTest extends TestCase
         $this->assertFalse($container->hasDefinition('console.command.form_debug'));
     }
 
-    public function testAddTaggedTypes()
+    public function testAddTaggedTypes(): void
     {
         $container = $this->createContainerBuilder();
 
@@ -71,7 +71,7 @@ class FormPassTest extends TestCase
         );
     }
 
-    public function testAddTaggedTypesToDebugCommand()
+    public function testAddTaggedTypesToDebugCommand(): void
     {
         $container = $this->createContainerBuilder();
 
@@ -97,7 +97,7 @@ class FormPassTest extends TestCase
         );
     }
 
-    public function testAddTaggedTypesToCsrfTypeExtension()
+    public function testAddTaggedTypesToCsrfTypeExtension(): void
     {
         $container = $this->createContainerBuilder();
 
@@ -117,7 +117,7 @@ class FormPassTest extends TestCase
     }
 
     #[DataProvider('addTaggedTypeExtensionsDataProvider')]
-    public function testAddTaggedTypeExtensions(array $extensions, array $expectedRegisteredExtensions, array $parameters = [])
+    public function testAddTaggedTypeExtensions(array $extensions, array $expectedRegisteredExtensions, array $parameters = []): void
     {
         $container = $this->createContainerBuilder();
 
@@ -239,7 +239,7 @@ class FormPassTest extends TestCase
         ];
     }
 
-    public function testAddTaggedFormTypeExtensionWithoutExtendingAnyType()
+    public function testAddTaggedFormTypeExtensionWithoutExtendingAnyType(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The getExtendedTypes() method for service "my.type_extension" does not return any extended types.');
@@ -253,7 +253,7 @@ class FormPassTest extends TestCase
         $container->compile();
     }
 
-    public function testAddTaggedGuessers()
+    public function testAddTaggedGuessers(): void
     {
         $container = $this->createContainerBuilder();
 
@@ -280,7 +280,7 @@ class FormPassTest extends TestCase
     }
 
     #[DataProvider('privateTaggedServicesProvider')]
-    public function testPrivateTaggedServices($id, $class, $tagName, callable $assertion, array $tagAttributes = [])
+    public function testPrivateTaggedServices($id, $class, $tagName, callable $assertion, array $tagAttributes = []): void
     {
         $formPass = new FormPass();
         $container = new ContainerBuilder();
@@ -299,7 +299,7 @@ class FormPassTest extends TestCase
                 'my.type',
                 'stdClass',
                 'form.type',
-                static function (ContainerBuilder $container) {
+                static function (ContainerBuilder $container): void {
                     $formTypes = $container->getDefinition('form.extension')->getArgument(0);
 
                     self::assertInstanceOf(Reference::class, $formTypes);
@@ -317,7 +317,7 @@ class FormPassTest extends TestCase
                 'my.type_extension',
                 Type1TypeExtension::class,
                 'form.type_extension',
-                static function (ContainerBuilder $container) {
+                static function (ContainerBuilder $container): void {
                     self::assertEquals(
                         ['Symfony\Component\Form\Extension\Core\Type\FormType' => new IteratorArgument([new Reference('my.type_extension')])],
                         $container->getDefinition('form.extension')->getArgument(1)
@@ -325,7 +325,7 @@ class FormPassTest extends TestCase
                 },
                 ['extended_type' => 'Symfony\Component\Form\Extension\Core\Type\FormType'],
             ],
-            ['my.guesser', 'stdClass', 'form.type_guesser', static function (ContainerBuilder $container) {
+            ['my.guesser', 'stdClass', 'form.type_guesser', static function (ContainerBuilder $container): void {
                 self::assertEquals(new IteratorArgument([new Reference('my.guesser')]), $container->getDefinition('form.extension')->getArgument(2));
             }],
         ];

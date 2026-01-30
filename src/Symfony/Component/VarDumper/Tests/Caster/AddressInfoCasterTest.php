@@ -20,7 +20,7 @@ class AddressInfoCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testCaster()
+    public function testCaster(): void
     {
         $xDump = <<<EODUMP
             AddressInfo {

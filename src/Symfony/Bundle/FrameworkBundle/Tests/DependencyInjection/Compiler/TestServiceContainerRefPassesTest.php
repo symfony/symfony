@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Kernel;
 
 class TestServiceContainerRefPassesTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->register('test.private_services_locator', ServiceLocator::class)

@@ -53,7 +53,7 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
         ]);
     }
 
-    public function testPasswordHashSuccess()
+    public function testPasswordHashSuccess(): void
     {
         $user = new User();
 
@@ -77,7 +77,7 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
         $this->assertSame($user->getPassword(), $hashedPassword);
     }
 
-    public function testPasswordHashSkippedWithEmptyPassword()
+    public function testPasswordHashSkippedWithEmptyPassword(): void
     {
         $oldHashedPassword = 'PreviousHashedPassword';
 
@@ -102,7 +102,7 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
         $this->assertSame($user->getPassword(), $oldHashedPassword);
     }
 
-    public function testPasswordHashSuccessWithEmptyData()
+    public function testPasswordHashSuccessWithEmptyData(): void
     {
         $user = new User();
 
@@ -130,7 +130,7 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
     }
 
     #[DataProvider('provideRepeatedPasswordField')]
-    public function testRepeatedPasswordField(string $type, array $options = [])
+    public function testRepeatedPasswordField(string $type, array $options = []): void
     {
         $user = new User();
 
@@ -167,7 +167,7 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
         yield 'RepeatedType child' => [RepeatedPasswordField::class];
     }
 
-    public function testPasswordHashOnInvalidForm()
+    public function testPasswordHashOnInvalidForm(): void
     {
         $user = new User();
 
@@ -194,7 +194,7 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
         $this->assertNull($user->getPassword());
     }
 
-    public function testPasswordHashOnInvalidData()
+    public function testPasswordHashOnInvalidData(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The "hash_property_path" option only supports "Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface" objects, "array" given.');
@@ -211,7 +211,7 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
         $form->submit(['plainPassword' => 'PlainPassword']);
     }
 
-    public function testPasswordHashOnMappedFieldForbidden()
+    public function testPasswordHashOnMappedFieldForbidden(): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('The "hash_property_path" option cannot be used on mapped field.');

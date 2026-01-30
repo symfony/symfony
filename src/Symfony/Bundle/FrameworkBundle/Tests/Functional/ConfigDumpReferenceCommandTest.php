@@ -26,7 +26,7 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
 {
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testShowList(bool $debug)
+    public function testShowList(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute([]);
@@ -44,7 +44,7 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpKernelExtension(bool $debug)
+    public function testDumpKernelExtension(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute(['name' => 'foo']);
@@ -56,7 +56,7 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpBundleName(bool $debug)
+    public function testDumpBundleName(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute(['name' => 'TestBundle']);
@@ -68,7 +68,7 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpExtensionConfigWithoutBundle(bool $debug)
+    public function testDumpExtensionConfigWithoutBundle(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute(['name' => 'test_dump']);
@@ -79,7 +79,7 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpAtPath(bool $debug)
+    public function testDumpAtPath(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute([
@@ -102,7 +102,7 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
-    public function testDumpAtPathXml(bool $debug)
+    public function testDumpAtPathXml(bool $debug): void
     {
         $tester = $this->createCommandTester($debug);
         $ret = $tester->execute([
@@ -117,7 +117,7 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
 
     #[TestWith(['yaml'])]
     #[TestWith(['xml'])]
-    public function testDumpFrameworkBundle(string $format)
+    public function testDumpFrameworkBundle(string $format): void
     {
         $tester = $this->createCommandTester(true);
         $ret = $tester->execute(['name' => 'framework', '--format' => $format]);
@@ -127,7 +127,7 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(bool $debug, array $input, array $expectedSuggestions)
+    public function testComplete(bool $debug, array $input, array $expectedSuggestions): void
     {
         $application = $this->createApplication($debug);
 

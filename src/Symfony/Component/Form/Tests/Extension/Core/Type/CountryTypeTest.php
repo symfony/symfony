@@ -27,7 +27,7 @@ class CountryTypeTest extends BaseTypeTestCase
         parent::setUp();
     }
 
-    public function testCountriesAreSelectable()
+    public function testCountriesAreSelectable(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE)
             ->createView()->vars['choices'];
@@ -41,7 +41,7 @@ class CountryTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testChoiceTranslationLocaleOption()
+    public function testChoiceTranslationLocaleOption(): void
     {
         $choices = $this->factory
             ->create(static::TESTED_TYPE, null, [
@@ -57,7 +57,7 @@ class CountryTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('MY', 'MY', 'Малайзія'), $choices);
     }
 
-    public function testAlpha3Option()
+    public function testAlpha3Option(): void
     {
         $choices = $this->factory
             ->create(static::TESTED_TYPE, null, [
@@ -74,7 +74,7 @@ class CountryTypeTest extends BaseTypeTestCase
     }
 
     #[RequiresPhpExtension('intl')]
-    public function testChoiceTranslationLocaleAndAlpha3Option()
+    public function testChoiceTranslationLocaleAndAlpha3Option(): void
     {
         $choices = $this->factory
             ->create(static::TESTED_TYPE, null, [
@@ -91,7 +91,7 @@ class CountryTypeTest extends BaseTypeTestCase
         $this->assertContainsEquals(new ChoiceView('MYS', 'MYS', 'Малайзія'), $choices);
     }
 
-    public function testUnknownCountryIsNotIncluded()
+    public function testUnknownCountryIsNotIncluded(): void
     {
         $choices = $this->factory->create(static::TESTED_TYPE, 'country')
             ->createView()->vars['choices'];
@@ -105,12 +105,12 @@ class CountryTypeTest extends BaseTypeTestCase
         $this->assertNotContains('ZZ', $countryCodes);
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }
 
-    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'FR', $expectedData = 'FR')
+    public function testSubmitNullUsesDefaultEmptyData($emptyData = 'FR', $expectedData = 'FR'): void
     {
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
     }

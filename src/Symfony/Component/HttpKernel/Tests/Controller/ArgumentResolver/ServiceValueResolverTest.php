@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Exception\NearMissValueResolverException;
 
 class ServiceValueResolverTest extends TestCase
 {
-    public function testDoNotSupportWhenControllerDoNotExists()
+    public function testDoNotSupportWhenControllerDoNotExists(): void
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([]));
         $argument = new ArgumentMetadata('dummy', DummyService::class, false, false, null);
@@ -31,7 +31,7 @@ class ServiceValueResolverTest extends TestCase
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
-    public function testExistingController()
+    public function testExistingController(): void
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([
             'App\\Controller\\Mine::method' => static fn () => new ServiceLocator([
@@ -45,7 +45,7 @@ class ServiceValueResolverTest extends TestCase
         $this->assertEquals([new DummyService()], $resolver->resolve($request, $argument));
     }
 
-    public function testExistingControllerWithATrailingBackSlash()
+    public function testExistingControllerWithATrailingBackSlash(): void
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([
             'App\\Controller\\Mine::method' => static fn () => new ServiceLocator([
@@ -59,7 +59,7 @@ class ServiceValueResolverTest extends TestCase
         $this->assertEquals([new DummyService()], $resolver->resolve($request, $argument));
     }
 
-    public function testExistingControllerWithMethodNameStartUppercase()
+    public function testExistingControllerWithMethodNameStartUppercase(): void
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([
             'App\\Controller\\Mine::method' => static fn () => new ServiceLocator([
@@ -72,7 +72,7 @@ class ServiceValueResolverTest extends TestCase
         $this->assertEquals([new DummyService()], $resolver->resolve($request, $argument));
     }
 
-    public function testControllerNameIsAnArray()
+    public function testControllerNameIsAnArray(): void
     {
         $resolver = new ServiceValueResolver(new ServiceLocator([
             'App\\Controller\\Mine::method' => static fn () => new ServiceLocator([
@@ -86,7 +86,7 @@ class ServiceValueResolverTest extends TestCase
         $this->assertEquals([new DummyService()], $resolver->resolve($request, $argument));
     }
 
-    public function testErrorIsTruncated()
+    public function testErrorIsTruncated(): void
     {
         $this->expectException(NearMissValueResolverException::class);
         $this->expectExceptionMessage('Cannot autowire argument $dummy required by "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\DummyController::index()": it references class "Symfony\Component\HttpKernel\Tests\Controller\ArgumentResolver\DummyService" but no such service exists.');
@@ -121,7 +121,7 @@ class DummyService
 
 class DummyController
 {
-    public function index(DummyService $dummy)
+    public function index(DummyService $dummy): void
     {
     }
 }

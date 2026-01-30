@@ -19,7 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\ObjectToBeMapped;
  */
 class ObjectMapperTest extends AbstractWebTestCase
 {
-    public function testObjectMapper()
+    public function testObjectMapper(): void
     {
         static::bootKernel(['test_case' => 'ObjectMapper']);
 

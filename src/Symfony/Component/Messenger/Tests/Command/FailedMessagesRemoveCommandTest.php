@@ -25,7 +25,7 @@ use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 
 class FailedMessagesRemoveCommandTest extends TestCase
 {
-    public function testRemoveSingleMessageWithServiceLocator()
+    public function testRemoveSingleMessageWithServiceLocator(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createMock(ListableReceiverInterface::class);
@@ -43,7 +43,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
     }
 
-    public function testRemoveUniqueMessageWithServiceLocator()
+    public function testRemoveUniqueMessageWithServiceLocator(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createMock(ListableReceiverInterface::class);
@@ -61,7 +61,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
     }
 
-    public function testRemoveUniqueMessageWithServiceLocatorFromSpecificFailureTransport()
+    public function testRemoveUniqueMessageWithServiceLocatorFromSpecificFailureTransport(): void
     {
         $failureReveiverName = 'specific_failure_receiver';
         $receiver = $this->createMock(ListableReceiverInterface::class);
@@ -79,7 +79,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
     }
 
-    public function testThrowExceptionIfFailureTransportNotDefinedWithServiceLocator()
+    public function testThrowExceptionIfFailureTransportNotDefinedWithServiceLocator(): void
     {
         $failureReceiverName = 'failure_receiver';
 
@@ -96,7 +96,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertStringContainsString('Message with id 20 removed.', $tester->getDisplay());
     }
 
-    public function testRemoveMultipleMessagesWithServiceLocator()
+    public function testRemoveMultipleMessagesWithServiceLocator(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createMock(ListableReceiverInterface::class);
@@ -130,7 +130,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertStringContainsString('Message with id 40 removed.', $tester->getDisplay());
     }
 
-    public function testRemoveMultipleMessagesAndDisplayMessagesWithServiceLocator()
+    public function testRemoveMultipleMessagesAndDisplayMessagesWithServiceLocator(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createMock(ListableReceiverInterface::class);
@@ -162,7 +162,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertStringContainsString('Message with id 30 removed.', $tester->getDisplay());
     }
 
-    public function testRemoveMessagesFilteredByClassMessage()
+    public function testRemoveMessagesFilteredByClassMessage(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createMock(ListableReceiverInterface::class);
@@ -205,7 +205,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertStringContainsString('Message with id 30 removed.', $tester->getDisplay());
     }
 
-    public function testCompletingTransport()
+    public function testCompletingTransport(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
 
@@ -224,7 +224,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertSame(['global_receiver', 'failure_receiver'], $suggestions);
     }
 
-    public function testCompleteId()
+    public function testCompleteId(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
 
@@ -245,7 +245,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
     }
 
-    public function testCompleteIdWithSpecifiedTransport()
+    public function testCompleteIdWithSpecifiedTransport(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
         $anotherFailureReceiverName = 'another_receiver';
@@ -268,7 +268,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
     }
 
-    public function testOptionAllIsSetWithIdsThrows()
+    public function testOptionAllIsSetWithIdsThrows(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
 
@@ -280,7 +280,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester->execute(['id' => [20], '--all' => true]);
     }
 
-    public function testOptionAllIsSetWithoutForceAsksConfirmation()
+    public function testOptionAllIsSetWithoutForceAsksConfirmation(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
 
@@ -295,7 +295,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertStringContainsString('Do you want to permanently remove all failed messages? (yes/no)', $tester->getDisplay());
     }
 
-    public function testOptionAllIsSetWithoutForceAsksConfirmationOnMessageCountAwareInterface()
+    public function testOptionAllIsSetWithoutForceAsksConfirmationOnMessageCountAwareInterface(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
 
@@ -311,7 +311,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertStringContainsString('Do you want to permanently remove all (2) messages? (yes/no)', $tester->getDisplay());
     }
 
-    public function testOptionAllIsNotSetNorIdsThrows()
+    public function testOptionAllIsNotSetNorIdsThrows(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
 
@@ -323,7 +323,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $tester->execute([]);
     }
 
-    public function testRemoveAllMessages()
+    public function testRemoveAllMessages(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createMock(ListableReceiverInterface::class);
@@ -345,7 +345,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertStringContainsString('4 messages were removed.', $tester->getDisplay());
     }
 
-    public function testSuccessMessageGoesToStdout()
+    public function testSuccessMessageGoesToStdout(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createStub(ListableReceiverInterface::class);
@@ -364,7 +364,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertStringNotContainsString('Message with id some_id removed', $stderr);
     }
 
-    public function testErrorMessageGoesToStderr()
+    public function testErrorMessageGoesToStderr(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createStub(ListableReceiverInterface::class);
@@ -382,7 +382,7 @@ class FailedMessagesRemoveCommandTest extends TestCase
         $this->assertStringContainsString('The message with id "not_found" was not found', $stderr);
     }
 
-    public function testNoteMessageGoesToStderr()
+    public function testNoteMessageGoesToStderr(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
         $receiver = $this->createStub(ListableReceiverInterface::class);

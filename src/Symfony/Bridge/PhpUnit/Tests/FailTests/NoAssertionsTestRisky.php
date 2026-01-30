@@ -31,7 +31,7 @@ final class NoAssertionsTestRisky extends TestCase
      * @group legacy
      */
     #[Group('legacy')]
-    public function testOne()
+    public function testOne(): void
     {
         $this->expectNotToPerformAssertions();
         $this->expectDeprecation('foo');
@@ -41,7 +41,7 @@ final class NoAssertionsTestRisky extends TestCase
     /**
      * Do not remove this test in the next major version.
      */
-    public function testTwo()
+    public function testTwo(): void
     {
         $this->expectNotToPerformAssertions();
     }

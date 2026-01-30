@@ -29,19 +29,19 @@ class AbstractBrowserTest extends TestCase
         return new TestClient($server, $history, $cookieJar);
     }
 
-    public function testGetHistory()
+    public function testGetHistory(): void
     {
         $client = $this->getBrowser([], $history = new History());
         $this->assertSame($history, $client->getHistory(), '->getHistory() returns the History');
     }
 
-    public function testGetCookieJar()
+    public function testGetCookieJar(): void
     {
         $client = $this->getBrowser([], null, $cookieJar = new CookieJar());
         $this->assertSame($cookieJar, $client->getCookieJar(), '->getCookieJar() returns the CookieJar');
     }
 
-    public function testGetRequest()
+    public function testGetRequest(): void
     {
         $client = $this->getBrowser();
         $client->request('GET', 'http://example.com/');
@@ -49,7 +49,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertEquals('http://example.com/', $client->getRequest()->getUri(), '->getCrawler() returns the Request of the last request');
     }
 
-    public function testGetRequestNull()
+    public function testGetRequestNull(): void
     {
         $client = $this->getBrowser();
 
@@ -59,7 +59,7 @@ class AbstractBrowserTest extends TestCase
         $client->getRequest();
     }
 
-    public function testXmlHttpRequest()
+    public function testXmlHttpRequest(): void
     {
         $client = $this->getBrowser();
         $client->xmlHttpRequest('GET', 'http://example.com/', [], [], [], null, true);
@@ -67,7 +67,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertFalse($client->getServerParameter('HTTP_X_REQUESTED_WITH', false));
     }
 
-    public function testJsonRequest()
+    public function testJsonRequest(): void
     {
         $client = $this->getBrowser();
         $client->jsonRequest('GET', 'http://example.com/', ['param' => 1, 'float' => 10.0], [], true);
@@ -78,7 +78,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('{"param":1,"float":10.0}', $client->getRequest()->getContent());
     }
 
-    public function testGetRequestWithIpAsHttpHost()
+    public function testGetRequestWithIpAsHttpHost(): void
     {
         $client = $this->getBrowser();
         $client->request('GET', 'https://example.com/foo', [], [], ['HTTP_HOST' => '127.0.0.1']);
@@ -88,7 +88,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('127.0.0.1', $headers['HTTP_HOST']);
     }
 
-    public function testGetResponse()
+    public function testGetResponse(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('foo'));
@@ -98,7 +98,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertInstanceOf(Response::class, $client->getResponse(), '->getCrawler() returns the Response of the last request');
     }
 
-    public function testGetResponseNull()
+    public function testGetResponseNull(): void
     {
         $client = $this->getBrowser();
 
@@ -108,7 +108,7 @@ class AbstractBrowserTest extends TestCase
         $client->getResponse();
     }
 
-    public function testGetResponseWithWrappedContent()
+    public function testGetResponseWithWrappedContent(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<tr><td>Cell content</td></tr>'));
@@ -118,7 +118,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertStringContainsString('<tr><td>Cell content</td></tr>', $crawler->html());
     }
 
-    public function testGetInternalResponseNull()
+    public function testGetInternalResponseNull(): void
     {
         $client = $this->getBrowser();
 
@@ -128,7 +128,7 @@ class AbstractBrowserTest extends TestCase
         $client->getInternalResponse();
     }
 
-    public function testGetContent()
+    public function testGetContent(): void
     {
         $json = '{"jsonrpc":"2.0","method":"echo","id":7,"params":["Hello World"]}';
 
@@ -137,7 +137,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame($json, $client->getRequest()->getContent());
     }
 
-    public function testGetCrawler()
+    public function testGetCrawler(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('foo'));
@@ -146,7 +146,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame($crawler, $client->getCrawler(), '->getCrawler() returns the Crawler of the last request');
     }
 
-    public function testGetCrawlerNull()
+    public function testGetCrawlerNull(): void
     {
         $client = $this->getBrowser();
 
@@ -156,7 +156,7 @@ class AbstractBrowserTest extends TestCase
         $client->getCrawler();
     }
 
-    public function testRequestHttpHeaders()
+    public function testRequestHttpHeaders(): void
     {
         $client = $this->getBrowser();
         $client->request('GET', '/');
@@ -178,7 +178,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('www.example.com:8080', $headers['HTTP_HOST'], '->request() sets the HTTP_HOST header with port');
     }
 
-    public function testRequestURIConversion()
+    public function testRequestURIConversion(): void
     {
         $client = $this->getBrowser();
         $client->request('GET', '/foo');
@@ -237,7 +237,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('http://www.example.com/foo?foo=bar', $client->getRequest()->getUri(), '->request() uses the previous request for ?');
     }
 
-    public function testRequestReferer()
+    public function testRequestReferer(): void
     {
         $client = $this->getBrowser();
         $client->request('GET', 'http://www.example.com/foo/foobar');
@@ -246,7 +246,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('http://www.example.com/foo/foobar', $server['HTTP_REFERER'], '->request() sets the referer');
     }
 
-    public function testRequestRefererCanBeOverridden()
+    public function testRequestRefererCanBeOverridden(): void
     {
         $client = new TestClient();
         $client->request('GET', 'http://www.example.com/foo/foobar');
@@ -255,7 +255,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('xyz', $server['HTTP_REFERER'], '->request() allows referer to be overridden');
     }
 
-    public function testRequestHistory()
+    public function testRequestHistory(): void
     {
         $client = $this->getBrowser();
         $client->request('GET', 'http://www.example.com/foo/foobar');
@@ -265,7 +265,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('http://www.example.com/foo/foobar', $client->getHistory()->back()->getUri(), '->request() updates the History');
     }
 
-    public function testRequestCookies()
+    public function testRequestCookies(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>', 200, ['Set-Cookie' => 'foo=bar']));
@@ -276,7 +276,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $client->getCookieJar()->allValues('http://www.example.com/foo/foobar'), '->request() updates the CookieJar');
     }
 
-    public function testRequestSecureCookies()
+    public function testRequestSecureCookies(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>', 200, ['Set-Cookie' => 'foo=bar; path=/; secure']));
@@ -285,7 +285,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertTrue($client->getCookieJar()->get('foo', '/', 'www.example.com')->isSecure());
     }
 
-    public function testClick()
+    public function testClick(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>'));
@@ -296,7 +296,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() clicks on links');
     }
 
-    public function testClickPreserveHeaders()
+    public function testClickPreserveHeaders(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>'));
@@ -309,7 +309,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('Special Header Value', $server['X-Special-Header']);
     }
 
-    public function testClickLink()
+    public function testClickLink(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>'));
@@ -319,7 +319,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() clicks on links');
     }
 
-    public function testClickLinkNotFound()
+    public function testClickLinkNotFound(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<html><a href="/foo">foobar</a></html>'));
@@ -329,7 +329,7 @@ class AbstractBrowserTest extends TestCase
         $client->clickLink('foo');
     }
 
-    public function testClickLinkPreserveHeaders()
+    public function testClickLinkPreserveHeaders(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<html><a href="/foo">foo</a></html>'));
@@ -341,7 +341,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('Special Header Value', $server['X-Special-Header']);
     }
 
-    public function testClickForm()
+    public function testClickForm(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
@@ -352,7 +352,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('http://www.example.com/foo', $client->getRequest()->getUri(), '->click() Form submit forms');
     }
 
-    public function testClickFormPreserveHeaders()
+    public function testClickFormPreserveHeaders(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
@@ -365,7 +365,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('Special Header Value', $server['X-Special-Header']);
     }
 
-    public function testSubmit()
+    public function testSubmit(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
@@ -376,7 +376,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('http://www.example.com/foo', $client->getRequest()->getUri(), '->submit() submit forms');
     }
 
-    public function testSubmitForm()
+    public function testSubmitForm(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<html><form name="signup" action="/foo"><input type="text" name="username" value="the username" /><input type="password" name="password" value="the password" /><input type="submit" value="Register" /></form></html>'));
@@ -396,7 +396,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('Symfony User Agent', $client->getRequest()->getServer()['HTTP_USER_AGENT'], '->submitForm() allows to change the $_SERVER parameters');
     }
 
-    public function testSubmitFormNotFound()
+    public function testSubmitFormNotFound(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
@@ -412,7 +412,7 @@ class AbstractBrowserTest extends TestCase
         ], 'POST');
     }
 
-    public function testSubmitPreserveAuth()
+    public function testSubmitPreserveAuth(): void
     {
         $client = $this->getBrowser(['PHP_AUTH_USER' => 'foo', 'PHP_AUTH_PW' => 'bar']);
         $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
@@ -435,7 +435,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('bar', $server['PHP_AUTH_PW']);
     }
 
-    public function testSubmitPassthroughHeaders()
+    public function testSubmitPassthroughHeaders(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('<html><form action="/foo"><input type="submit" /></form></html>'));
@@ -449,7 +449,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('de', $server['Accept-Language']);
     }
 
-    public function testFollowRedirect()
+    public function testFollowRedirect(): void
     {
         $client = $this->getBrowser();
         $client->followRedirects(false);
@@ -493,7 +493,7 @@ class AbstractBrowserTest extends TestCase
         }
     }
 
-    public function testFollowRelativeRedirect()
+    public function testFollowRelativeRedirect(): void
     {
         $client = $this->getBrowser();
         $client->setNextResponse(new Response('', 302, ['Location' => '/redirected']));
@@ -506,7 +506,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('http://www.example.com/redirected:1234', $client->getRequest()->getUri(), '->followRedirect() follows relative urls');
     }
 
-    public function testFollowRedirectWithMaxRedirects()
+    public function testFollowRedirectWithMaxRedirects(): void
     {
         $client = $this->getBrowser();
         $client->setMaxRedirects(1);
@@ -545,7 +545,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame([], $client->getRequest()->getParameters(), '->followRedirect() does not submit parameters when changing the method');
     }
 
-    public function testFollowRedirectWithCookies()
+    public function testFollowRedirectWithCookies(): void
     {
         $client = $this->getBrowser();
         $client->followRedirects(false);
@@ -559,7 +559,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $client->getRequest()->getCookies());
     }
 
-    public function testFollowRedirectWithHeaders()
+    public function testFollowRedirectWithHeaders(): void
     {
         $headers = [
             'HTTP_HOST' => 'www.example.com',
@@ -586,7 +586,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertEquals($headers, $client->getRequest()->getServer());
     }
 
-    public function testFollowRedirectWithPort()
+    public function testFollowRedirectWithPort(): void
     {
         $headers = [
             'HTTP_HOST' => 'www.example.com:8080',
@@ -604,7 +604,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertEquals($headers, $client->getRequest()->getServer());
     }
 
-    public function testIsFollowingRedirects()
+    public function testIsFollowingRedirects(): void
     {
         $client = $this->getBrowser();
         $this->assertTrue($client->isFollowingRedirects(), '->getFollowRedirects() returns default value');
@@ -612,7 +612,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertFalse($client->isFollowingRedirects(), '->getFollowRedirects() returns assigned value');
     }
 
-    public function testGetMaxRedirects()
+    public function testGetMaxRedirects(): void
     {
         $client = $this->getBrowser();
         $this->assertSame(-1, $client->getMaxRedirects(), '->getMaxRedirects() returns default value');
@@ -620,7 +620,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame(3, $client->getMaxRedirects(), '->getMaxRedirects() returns assigned value');
     }
 
-    public function testFollowRedirectWithPostMethod()
+    public function testFollowRedirectWithPostMethod(): void
     {
         $parameters = ['foo' => 'bar'];
         $files = ['myfile.foo' => 'baz'];
@@ -640,7 +640,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('POST', $client->getRequest()->getMethod(), '->followRedirect() keeps request method');
     }
 
-    public function testFollowRedirectDropPostMethod()
+    public function testFollowRedirectDropPostMethod(): void
     {
         $parameters = ['foo' => 'bar'];
         $files = ['myfile.foo' => 'baz'];
@@ -663,7 +663,7 @@ class AbstractBrowserTest extends TestCase
     }
 
     #[DataProvider('getTestsForMetaRefresh')]
-    public function testFollowMetaRefresh(string $content, string $expectedEndingUrl, bool $followMetaRefresh = true)
+    public function testFollowMetaRefresh(string $content, string $expectedEndingUrl, bool $followMetaRefresh = true): void
     {
         $client = $this->getBrowser();
         $client->followMetaRefresh($followMetaRefresh);
@@ -693,7 +693,7 @@ class AbstractBrowserTest extends TestCase
         ];
     }
 
-    public function testBack()
+    public function testBack(): void
     {
         $client = $this->getBrowser();
 
@@ -715,7 +715,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertFalse($client->getHistory()->isLastPage());
     }
 
-    public function testForward()
+    public function testForward(): void
     {
         $client = $this->getBrowser();
 
@@ -736,7 +736,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame($content, $client->getRequest()->getContent(), '->forward() keeps content');
     }
 
-    public function testBackAndFrowardWithRedirects()
+    public function testBackAndFrowardWithRedirects(): void
     {
         $client = $this->getBrowser();
 
@@ -757,7 +757,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertFalse($client->getHistory()->isFirstPage());
     }
 
-    public function testReload()
+    public function testReload(): void
     {
         $client = $this->getBrowser();
 
@@ -776,7 +776,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame($content, $client->getRequest()->getContent(), '->reload() keeps content');
     }
 
-    public function testRestart()
+    public function testRestart(): void
     {
         $client = $this->getBrowser();
         $client->request('GET', 'http://www.example.com/foo/foobar');
@@ -787,7 +787,7 @@ class AbstractBrowserTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testInsulatedRequests()
+    public function testInsulatedRequests(): void
     {
         $client = $this->getBrowser();
         $client->insulate();
@@ -806,7 +806,7 @@ class AbstractBrowserTest extends TestCase
         }
     }
 
-    public function testGetServerParameter()
+    public function testGetServerParameter(): void
     {
         $client = $this->getBrowser();
         $this->assertSame('', $client->getServerParameter('HTTP_HOST'));
@@ -814,7 +814,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('testvalue', $client->getServerParameter('testkey', 'testvalue'));
     }
 
-    public function testSetServerParameter()
+    public function testSetServerParameter(): void
     {
         $client = $this->getBrowser();
 
@@ -828,7 +828,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('testua', $client->getServerParameter('HTTP_USER_AGENT'));
     }
 
-    public function testSetServerParameterInRequest()
+    public function testSetServerParameterInRequest(): void
     {
         $client = $this->getBrowser();
 
@@ -862,7 +862,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertTrue($server['HTTPS']);
     }
 
-    public function testRequestWithRelativeUri()
+    public function testRequestWithRelativeUri(): void
     {
         $client = $this->getBrowser();
 
@@ -879,7 +879,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('https://www.example.com/', $client->getRequest()->getUri());
     }
 
-    public function testInternalRequest()
+    public function testInternalRequest(): void
     {
         $client = $this->getBrowser();
 
@@ -893,7 +893,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertInstanceOf(Request::class, $client->getInternalRequest());
     }
 
-    public function testInternalRequestNull()
+    public function testInternalRequestNull(): void
     {
         $client = $this->getBrowser();
 
@@ -903,7 +903,7 @@ class AbstractBrowserTest extends TestCase
         $client->getInternalRequest();
     }
 
-    public function testHistoryWithParametersAndNoSlash()
+    public function testHistoryWithParametersAndNoSlash(): void
     {
         $client = $this->getBrowser();
         $client->request('GET', 'https://www.example.com?the=value');
@@ -912,7 +912,7 @@ class AbstractBrowserTest extends TestCase
         $this->assertSame('https://www.example.com/path/?parameter=value', $client->getRequest()->getUri(), '->request() history provides proper base.');
     }
 
-    public function testFollowRedirectWithoutRequest()
+    public function testFollowRedirectWithoutRequest(): void
     {
         $browser = $this->getBrowser();
 

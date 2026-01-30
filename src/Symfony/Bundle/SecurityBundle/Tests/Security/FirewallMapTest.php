@@ -26,7 +26,7 @@ class FirewallMapTest extends TestCase
 {
     private const ATTRIBUTE_FIREWALL_CONTEXT = '_firewall_context';
 
-    public function testGetListenersWithEmptyMap()
+    public function testGetListenersWithEmptyMap(): void
     {
         $request = new Request();
 
@@ -41,7 +41,7 @@ class FirewallMapTest extends TestCase
         $this->assertFalse($request->attributes->has(self::ATTRIBUTE_FIREWALL_CONTEXT));
     }
 
-    public function testGetListenersWithInvalidParameter()
+    public function testGetListenersWithInvalidParameter(): void
     {
         $request = new Request();
         $request->attributes->set(self::ATTRIBUTE_FIREWALL_CONTEXT, 'foo');
@@ -59,10 +59,10 @@ class FirewallMapTest extends TestCase
     }
 
     #[DataProvider('providesStatefulStatelessRequests')]
-    public function testGetListeners(Request $request, bool $expectedState)
+    public function testGetListeners(Request $request, bool $expectedState): void
     {
         $firewallConfig = new FirewallConfig('main', 'user_checker', null, true, true);
-        $listener = static function () {};
+        $listener = static function (): void {};
         $exceptionListener = $this->createStub(ExceptionListener::class);
         $logoutListener = $this->createStub(LogoutListener::class);
         $firewallContext = new FirewallContext([$listener], $exceptionListener, $logoutListener, $firewallConfig);

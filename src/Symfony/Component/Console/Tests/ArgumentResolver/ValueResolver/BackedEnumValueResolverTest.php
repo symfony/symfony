@@ -25,7 +25,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class BackedEnumValueResolverTest extends TestCase
 {
-    public function testResolveBackedEnumArgument()
+    public function testResolveBackedEnumArgument(): void
     {
         $resolver = new BackedEnumValueResolver();
 
@@ -37,7 +37,7 @@ class BackedEnumValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 BackedEnumTestStatus $status,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -49,7 +49,7 @@ class BackedEnumValueResolverTest extends TestCase
         $this->assertSame([BackedEnumTestStatus::Pending], $result);
     }
 
-    public function testResolveBackedEnumOption()
+    public function testResolveBackedEnumOption(): void
     {
         $resolver = new BackedEnumValueResolver();
 
@@ -61,7 +61,7 @@ class BackedEnumValueResolverTest extends TestCase
             public function __invoke(
                 #[Option]
                 BackedEnumTestStatus $status = BackedEnumTestStatus::Pending,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -73,7 +73,7 @@ class BackedEnumValueResolverTest extends TestCase
         $this->assertSame([BackedEnumTestStatus::Completed], $result);
     }
 
-    public function testBackedEnumArgumentThrowsOnInvalidValue()
+    public function testBackedEnumArgumentThrowsOnInvalidValue(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -87,7 +87,7 @@ class BackedEnumValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 BackedEnumTestStatus $status,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -97,7 +97,7 @@ class BackedEnumValueResolverTest extends TestCase
         iterator_to_array($resolver->resolve('status', $input, $member));
     }
 
-    public function testBackedEnumOptionThrowsOnInvalidValue()
+    public function testBackedEnumOptionThrowsOnInvalidValue(): void
     {
         $this->expectException(InvalidOptionException::class);
 
@@ -111,7 +111,7 @@ class BackedEnumValueResolverTest extends TestCase
             public function __invoke(
                 #[Option]
                 BackedEnumTestStatus $status = BackedEnumTestStatus::Pending,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -121,7 +121,7 @@ class BackedEnumValueResolverTest extends TestCase
         iterator_to_array($resolver->resolve('status', $input, $member));
     }
 
-    public function testDoesNotResolveNonEnumArgument()
+    public function testDoesNotResolveNonEnumArgument(): void
     {
         $resolver = new BackedEnumValueResolver();
 
@@ -133,7 +133,7 @@ class BackedEnumValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 string $username,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -145,7 +145,7 @@ class BackedEnumValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testDoesNotResolveNonEnumOption()
+    public function testDoesNotResolveNonEnumOption(): void
     {
         $resolver = new BackedEnumValueResolver();
 
@@ -157,7 +157,7 @@ class BackedEnumValueResolverTest extends TestCase
             public function __invoke(
                 #[Option]
                 string $name = '',
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -169,7 +169,7 @@ class BackedEnumValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testDoesNotResolveWithoutAttribute()
+    public function testDoesNotResolveWithoutAttribute(): void
     {
         $resolver = new BackedEnumValueResolver();
 
@@ -187,7 +187,7 @@ class BackedEnumValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testResolveIntBackedEnumArgument()
+    public function testResolveIntBackedEnumArgument(): void
     {
         $resolver = new BackedEnumValueResolver();
 
@@ -199,7 +199,7 @@ class BackedEnumValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 BackedEnumTestPriority $priority,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');

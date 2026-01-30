@@ -18,7 +18,7 @@ use Symfony\Component\Runtime\SymfonyRuntime;
 
 class SymfonyRuntimeTest extends TestCase
 {
-    public function testGetRunner()
+    public function testGetRunner(): void
     {
         $application = $this->createStub(HttpKernelInterface::class);
 
@@ -35,7 +35,7 @@ class SymfonyRuntimeTest extends TestCase
         }
     }
 
-    public function testStringWorkerMaxLoopThrows()
+    public function testStringWorkerMaxLoopThrows(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The "worker_loop_max" runtime option must be an integer, "string" given.');
@@ -43,7 +43,7 @@ class SymfonyRuntimeTest extends TestCase
         new SymfonyRuntime(['worker_loop_max' => 'foo']);
     }
 
-    public function testBoolWorkerMaxLoopThrows()
+    public function testBoolWorkerMaxLoopThrows(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The "worker_loop_max" runtime option must be an integer, "bool" given.');

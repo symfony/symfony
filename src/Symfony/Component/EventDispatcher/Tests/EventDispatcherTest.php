@@ -37,14 +37,14 @@ class EventDispatcherTest extends TestCase
         return new EventDispatcher();
     }
 
-    public function testInitialState()
+    public function testInitialState(): void
     {
         $this->assertEquals([], $this->dispatcher->getListeners());
         $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
         $this->assertFalse($this->dispatcher->hasListeners(self::postFoo));
     }
 
-    public function testAddListener()
+    public function testAddListener(): void
     {
         $this->dispatcher->addListener('pre.foo', [$this->listener, 'preFoo']);
         $this->dispatcher->addListener('post.foo', $this->listener->postFoo(...));
@@ -56,7 +56,7 @@ class EventDispatcherTest extends TestCase
         $this->assertCount(2, $this->dispatcher->getListeners());
     }
 
-    public function testGetListenersSortsByPriority()
+    public function testGetListenersSortsByPriority(): void
     {
         $listener1 = new TestEventListener();
         $listener2 = new TestEventListener();
@@ -82,7 +82,7 @@ class EventDispatcherTest extends TestCase
         $this->assertEquals($expected, $this->dispatcher->getListeners('pre.foo'));
     }
 
-    public function testGetAllListenersSortsByPriority()
+    public function testGetAllListenersSortsByPriority(): void
     {
         $listener1 = new TestEventListener();
         $listener2 = new TestEventListener();
@@ -106,7 +106,7 @@ class EventDispatcherTest extends TestCase
         $this->assertSame($expected, $this->dispatcher->getListeners());
     }
 
-    public function testGetListenerPriority()
+    public function testGetListenerPriority(): void
     {
         $listener1 = new TestEventListener();
         $listener2 = new TestEventListener();
@@ -117,10 +117,10 @@ class EventDispatcherTest extends TestCase
         $this->assertSame(-10, $this->dispatcher->getListenerPriority('pre.foo', $listener1));
         $this->assertSame(0, $this->dispatcher->getListenerPriority('pre.foo', $listener2));
         $this->assertNull($this->dispatcher->getListenerPriority('pre.bar', $listener2));
-        $this->assertNull($this->dispatcher->getListenerPriority('pre.foo', static function () {}));
+        $this->assertNull($this->dispatcher->getListenerPriority('pre.foo', static function (): void {}));
     }
 
-    public function testDispatch()
+    public function testDispatch(): void
     {
         $this->dispatcher->addListener('pre.foo', [$this->listener, 'preFoo']);
         $this->dispatcher->addListener('post.foo', $this->listener->postFoo(...));
@@ -134,10 +134,10 @@ class EventDispatcherTest extends TestCase
         $this->assertSame($event, $return);
     }
 
-    public function testDispatchForClosure()
+    public function testDispatchForClosure(): void
     {
         $invoked = 0;
-        $listener = static function () use (&$invoked) {
+        $listener = static function () use (&$invoked): void {
             ++$invoked;
         };
         $this->dispatcher->addListener('pre.foo', $listener);
@@ -146,7 +146,7 @@ class EventDispatcherTest extends TestCase
         $this->assertEquals(1, $invoked);
     }
 
-    public function testStopEventPropagation()
+    public function testStopEventPropagation(): void
     {
         $otherListener = new TestEventListener();
 
@@ -160,16 +160,16 @@ class EventDispatcherTest extends TestCase
         $this->assertFalse($otherListener->postFooInvoked);
     }
 
-    public function testDispatchByPriority()
+    public function testDispatchByPriority(): void
     {
         $invoked = [];
-        $listener1 = static function () use (&$invoked) {
+        $listener1 = static function () use (&$invoked): void {
             $invoked[] = '1';
         };
-        $listener2 = static function () use (&$invoked) {
+        $listener2 = static function () use (&$invoked): void {
             $invoked[] = '2';
         };
-        $listener3 = static function () use (&$invoked) {
+        $listener3 = static function () use (&$invoked): void {
             $invoked[] = '3';
         };
         $this->dispatcher->addListener('pre.foo', $listener1, -10);
@@ -179,7 +179,7 @@ class EventDispatcherTest extends TestCase
         $this->assertEquals(['3', '2', '1'], $invoked);
     }
 
-    public function testRemoveListener()
+    public function testRemoveListener(): void
     {
         $this->dispatcher->addListener('pre.bar', $this->listener);
         $this->assertTrue($this->dispatcher->hasListeners(self::preBar));
@@ -188,7 +188,7 @@ class EventDispatcherTest extends TestCase
         $this->dispatcher->removeListener('notExists', $this->listener);
     }
 
-    public function testAddSubscriber()
+    public function testAddSubscriber(): void
     {
         $eventSubscriber = new TestEventSubscriber();
         $this->dispatcher->addSubscriber($eventSubscriber);
@@ -196,7 +196,7 @@ class EventDispatcherTest extends TestCase
         $this->assertTrue($this->dispatcher->hasListeners(self::postFoo));
     }
 
-    public function testAddSubscriberWithPriorities()
+    public function testAddSubscriberWithPriorities(): void
     {
         $eventSubscriber = new TestEventSubscriber();
         $this->dispatcher->addSubscriber($eventSubscriber);
@@ -210,7 +210,7 @@ class EventDispatcherTest extends TestCase
         $this->assertInstanceOf(TestEventSubscriberWithPriorities::class, $listeners[0][0]);
     }
 
-    public function testAddSubscriberWithMultipleListeners()
+    public function testAddSubscriberWithMultipleListeners(): void
     {
         $eventSubscriber = new TestEventSubscriberWithMultipleListeners();
         $this->dispatcher->addSubscriber($eventSubscriber);
@@ -221,7 +221,7 @@ class EventDispatcherTest extends TestCase
         $this->assertEquals('preFoo2', $listeners[0][1]);
     }
 
-    public function testRemoveSubscriber()
+    public function testRemoveSubscriber(): void
     {
         $eventSubscriber = new TestEventSubscriber();
         $this->dispatcher->addSubscriber($eventSubscriber);
@@ -232,7 +232,7 @@ class EventDispatcherTest extends TestCase
         $this->assertFalse($this->dispatcher->hasListeners(self::postFoo));
     }
 
-    public function testRemoveSubscriberWithPriorities()
+    public function testRemoveSubscriberWithPriorities(): void
     {
         $eventSubscriber = new TestEventSubscriberWithPriorities();
         $this->dispatcher->addSubscriber($eventSubscriber);
@@ -241,7 +241,7 @@ class EventDispatcherTest extends TestCase
         $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
     }
 
-    public function testRemoveSubscriberWithMultipleListeners()
+    public function testRemoveSubscriberWithMultipleListeners(): void
     {
         $eventSubscriber = new TestEventSubscriberWithMultipleListeners();
         $this->dispatcher->addSubscriber($eventSubscriber);
@@ -251,7 +251,7 @@ class EventDispatcherTest extends TestCase
         $this->assertFalse($this->dispatcher->hasListeners(self::preFoo));
     }
 
-    public function testEventReceivesTheDispatcherInstanceAsArgument()
+    public function testEventReceivesTheDispatcherInstanceAsArgument(): void
     {
         $listener = new TestWithDispatcher();
         $this->dispatcher->addListener('test', [$listener, 'foo']);
@@ -270,47 +270,47 @@ class EventDispatcherTest extends TestCase
      *  - The PHP 5.4 branch for versions < 5.4.8
      *  - The PHP 5.5 branch is not affected
      */
-    public function testWorkaroundForPhpBug62976()
+    public function testWorkaroundForPhpBug62976(): void
     {
         $dispatcher = $this->createEventDispatcher();
         $dispatcher->addListener('bug.62976', new CallableClass());
-        $dispatcher->removeListener('bug.62976', static function () {});
+        $dispatcher->removeListener('bug.62976', static function (): void {});
         $this->assertTrue($dispatcher->hasListeners('bug.62976'));
     }
 
-    public function testHasListenersWhenAddedCallbackListenerIsRemoved()
+    public function testHasListenersWhenAddedCallbackListenerIsRemoved(): void
     {
-        $listener = static function () {};
+        $listener = static function (): void {};
         $this->dispatcher->addListener('foo', $listener);
         $this->dispatcher->removeListener('foo', $listener);
         $this->assertFalse($this->dispatcher->hasListeners());
     }
 
-    public function testGetListenersWhenAddedCallbackListenerIsRemoved()
+    public function testGetListenersWhenAddedCallbackListenerIsRemoved(): void
     {
-        $listener = static function () {};
+        $listener = static function (): void {};
         $this->dispatcher->addListener('foo', $listener);
         $this->dispatcher->removeListener('foo', $listener);
         $this->assertSame([], $this->dispatcher->getListeners());
     }
 
-    public function testHasListenersWithoutEventsReturnsFalseAfterHasListenersWithEventHasBeenCalled()
+    public function testHasListenersWithoutEventsReturnsFalseAfterHasListenersWithEventHasBeenCalled(): void
     {
         $this->assertFalse($this->dispatcher->hasListeners('foo'));
         $this->assertFalse($this->dispatcher->hasListeners());
     }
 
-    public function testHasListenersIsLazy()
+    public function testHasListenersIsLazy(): void
     {
         $called = 0;
-        $listener = [static function () use (&$called) { ++$called; }, 'onFoo'];
+        $listener = [static function () use (&$called): void { ++$called; }, 'onFoo'];
         $this->dispatcher->addListener('foo', $listener);
         $this->assertTrue($this->dispatcher->hasListeners());
         $this->assertTrue($this->dispatcher->hasListeners('foo'));
         $this->assertSame(0, $called);
     }
 
-    public function testDispatchLazyListener()
+    public function testDispatchLazyListener(): void
     {
         $dispatcher = new TestWithDispatcher();
         $called = 0;
@@ -334,7 +334,7 @@ class EventDispatcherTest extends TestCase
         $this->assertSame(2, $called);
     }
 
-    public function testRemoveFindsLazyListeners()
+    public function testRemoveFindsLazyListeners(): void
     {
         $test = new TestWithDispatcher();
         $factory = static fn () => $test;
@@ -350,7 +350,7 @@ class EventDispatcherTest extends TestCase
         $this->assertFalse($this->dispatcher->hasListeners('foo'));
     }
 
-    public function testPriorityFindsLazyListeners()
+    public function testPriorityFindsLazyListeners(): void
     {
         $test = new TestWithDispatcher();
         $factory = static fn () => $test;
@@ -363,7 +363,7 @@ class EventDispatcherTest extends TestCase
         $this->assertSame(5, $this->dispatcher->getListenerPriority('foo', [$factory, 'foo']));
     }
 
-    public function testGetLazyListeners()
+    public function testGetLazyListeners(): void
     {
         $test = new TestWithDispatcher();
         $factory = static fn () => $test;
@@ -376,7 +376,7 @@ class EventDispatcherTest extends TestCase
         $this->assertSame(['bar' => [[$test, 'foo']]], $this->dispatcher->getListeners());
     }
 
-    public function testMutatingWhilePropagationIsStopped()
+    public function testMutatingWhilePropagationIsStopped(): void
     {
         $testLoaded = false;
         $test = new TestEventListener();
@@ -400,7 +400,7 @@ class EventDispatcherTest extends TestCase
         $this->assertTrue($testLoaded);
     }
 
-    public function testNamedClosures()
+    public function testNamedClosures(): void
     {
         $listener = new TestEventListener();
 
@@ -427,7 +427,7 @@ class EventDispatcherTest extends TestCase
 
 class CallableClass
 {
-    public function __invoke()
+    public function __invoke(): void
     {
     }
 }
@@ -440,12 +440,12 @@ class TestEventListener
 
     /* Listener methods */
 
-    public function preFoo($e)
+    public function preFoo($e): void
     {
         $this->preFooInvoked = true;
     }
 
-    public function postFoo($e)
+    public function postFoo($e): void
     {
         $this->postFooInvoked = true;
 
@@ -454,7 +454,7 @@ class TestEventListener
         }
     }
 
-    public function __invoke()
+    public function __invoke(): void
     {
     }
 }
@@ -465,13 +465,13 @@ class TestWithDispatcher
     public ?EventDispatcher $dispatcher = null;
     public bool $invoked = false;
 
-    public function foo($e, $name, $dispatcher)
+    public function foo($e, $name, $dispatcher): void
     {
         $this->name = $name;
         $this->dispatcher = $dispatcher;
     }
 
-    public function __invoke($e, $name, $dispatcher)
+    public function __invoke($e, $name, $dispatcher): void
     {
         $this->name = $name;
         $this->dispatcher = $dispatcher;

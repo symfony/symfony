@@ -18,14 +18,14 @@ use Symfony\Component\String\UnicodeString;
 class UnicodeStringTest extends AbstractUnicodeTestCase
 {
     #[DataProvider('provideTrimNormalization')]
-    public function testTrimPrefixNormalization(string $expected, string $string, $prefix)
+    public function testTrimPrefixNormalization(string $expected, string $string, $prefix): void
     {
         $str = new UnicodeString($string);
         $this->assertSame($expected, $str->trimPrefix($prefix)->toString());
     }
 
     #[DataProvider('provideTrimNormalization')]
-    public function testTrimSuffixNormalization(string $expected, string $string, $suffix)
+    public function testTrimSuffixNormalization(string $expected, string $string, $suffix): void
     {
         $suffixStr = match (true) {
             $suffix instanceof AbstractString => $suffix->toString(),

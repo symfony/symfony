@@ -55,7 +55,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
 
     #[RequiresPhpExtension('pdo_sqlite')]
     #[DataProvider('getInvalidDrivers')]
-    public function testInvalidDriver($connOrDsn)
+    public function testInvalidDriver($connOrDsn): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The adapter "Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore" does not support');
@@ -70,7 +70,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         yield [self::getDbalConnection('sqlite:///tmp/foo.db')];
     }
 
-    public function testSaveAfterConflict()
+    public function testSaveAfterConflict(): void
     {
         $store1 = $this->getStore();
         $store2 = $this->getStore();
@@ -96,7 +96,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         $this->assertTrue($store2->exists($key));
     }
 
-    public function testWaitAndSaveAfterConflictReleasesLockFromInternalStore()
+    public function testWaitAndSaveAfterConflictReleasesLockFromInternalStore(): void
     {
         $store1 = $this->getStore();
         $conn = $this->createPostgreSqlConnection();
@@ -132,7 +132,7 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         $this->assertTrue($store2->exists($store2Key));
     }
 
-    public function testWaitAndSaveReadAfterConflictReleasesLockFromInternalStore()
+    public function testWaitAndSaveReadAfterConflictReleasesLockFromInternalStore(): void
     {
         $store1 = $this->getStore();
         $conn = $this->createPostgreSqlConnection();

@@ -31,14 +31,14 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class AmazonSqsTransportTest extends TestCase
 {
-    public function testItIsATransport()
+    public function testItIsATransport(): void
     {
         $transport = $this->getTransport();
 
         $this->assertInstanceOf(TransportInterface::class, $transport);
     }
 
-    public function testReceivesMessages()
+    public function testReceivesMessages(): void
     {
         $transport = $this->getTransport(
             $serializer = $this->createStub(SerializerInterface::class),
@@ -60,14 +60,14 @@ class AmazonSqsTransportTest extends TestCase
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
     }
 
-    public function testTransportIsAMessageCountAware()
+    public function testTransportIsAMessageCountAware(): void
     {
         $transport = $this->getTransport();
 
         $this->assertInstanceOf(MessageCountAwareInterface::class, $transport);
     }
 
-    public function testItCanGetMessagesViaTheReceiver()
+    public function testItCanGetMessagesViaTheReceiver(): void
     {
         $receiver = $this->createMock(AmazonSqsReceiver::class);
         $transport = $this->getTransport(null, null, $receiver);
@@ -76,7 +76,7 @@ class AmazonSqsTransportTest extends TestCase
         $this->assertSame($envelopes, $transport->get());
     }
 
-    public function testItCanAcknowledgeAMessageViaTheReceiver()
+    public function testItCanAcknowledgeAMessageViaTheReceiver(): void
     {
         $receiver = $this->createMock(AmazonSqsReceiver::class);
         $transport = $this->getTransport(null, null, $receiver);
@@ -85,7 +85,7 @@ class AmazonSqsTransportTest extends TestCase
         $transport->ack($envelope);
     }
 
-    public function testItCanRejectAMessageViaTheReceiver()
+    public function testItCanRejectAMessageViaTheReceiver(): void
     {
         $receiver = $this->createMock(AmazonSqsReceiver::class);
         $transport = $this->getTransport(null, null, $receiver);
@@ -94,7 +94,7 @@ class AmazonSqsTransportTest extends TestCase
         $transport->reject($envelope);
     }
 
-    public function testItCanGetMessageCountViaTheReceiver()
+    public function testItCanGetMessageCountViaTheReceiver(): void
     {
         $receiver = $this->createMock(AmazonSqsReceiver::class);
         $transport = $this->getTransport(null, null, $receiver);
@@ -103,7 +103,7 @@ class AmazonSqsTransportTest extends TestCase
         $this->assertSame($messageCount, $transport->getMessageCount());
     }
 
-    public function testItCanSendAMessageViaTheSender()
+    public function testItCanSendAMessageViaTheSender(): void
     {
         $sender = $this->createMock(SenderInterface::class);
         $transport = $this->getTransport(null, null, null, $sender);
@@ -112,7 +112,7 @@ class AmazonSqsTransportTest extends TestCase
         $this->assertSame($envelope, $transport->send($envelope));
     }
 
-    public function testItSendsAMessageViaTheSenderWithRedeliveryStamp()
+    public function testItSendsAMessageViaTheSenderWithRedeliveryStamp(): void
     {
         $sender = $this->createMock(SenderInterface::class);
         $transport = $this->getTransport(null, null, null, $sender);
@@ -121,7 +121,7 @@ class AmazonSqsTransportTest extends TestCase
         $this->assertSame($envelope, $transport->send($envelope));
     }
 
-    public function testItDoesNotSendRedeliveredMessageWhenNotHandlingRetries()
+    public function testItDoesNotSendRedeliveredMessageWhenNotHandlingRetries(): void
     {
         $sender = $this->createMock(SenderInterface::class);
         $transport = $this->getTransport(null, null, null, $sender, false);
@@ -131,7 +131,7 @@ class AmazonSqsTransportTest extends TestCase
         $this->assertSame($envelope, $transport->send($envelope));
     }
 
-    public function testItCanSetUpTheConnection()
+    public function testItCanSetUpTheConnection(): void
     {
         $connection = $this->createMock(Connection::class);
         $transport = $this->getTransport(null, $connection);
@@ -139,7 +139,7 @@ class AmazonSqsTransportTest extends TestCase
         $transport->setup();
     }
 
-    public function testItConvertsHttpExceptionDuringSetupIntoTransportException()
+    public function testItConvertsHttpExceptionDuringSetupIntoTransportException(): void
     {
         $connection = $this->createMock(Connection::class);
         $transport = $this->getTransport(null, $connection);
@@ -153,7 +153,7 @@ class AmazonSqsTransportTest extends TestCase
         $transport->setup();
     }
 
-    public function testItCanResetTheConnection()
+    public function testItCanResetTheConnection(): void
     {
         $connection = $this->createMock(Connection::class);
         $transport = $this->getTransport(null, $connection);
@@ -161,7 +161,7 @@ class AmazonSqsTransportTest extends TestCase
         $transport->reset();
     }
 
-    public function testItConvertsHttpExceptionDuringResetIntoTransportException()
+    public function testItConvertsHttpExceptionDuringResetIntoTransportException(): void
     {
         $connection = $this->createMock(Connection::class);
         $transport = $this->getTransport(null, $connection);
@@ -175,7 +175,7 @@ class AmazonSqsTransportTest extends TestCase
         $transport->reset();
     }
 
-    public function testKeepalive()
+    public function testKeepalive(): void
     {
         $transport = $this->getTransport(
             null,
@@ -186,7 +186,7 @@ class AmazonSqsTransportTest extends TestCase
         $transport->keepalive(new Envelope(new DummyMessage('foo'), [new AmazonSqsReceivedStamp('123')]), 10);
     }
 
-    public function testKeepaliveWhenASqsExceptionOccurs()
+    public function testKeepaliveWhenASqsExceptionOccurs(): void
     {
         $transport = $this->getTransport(
             null,

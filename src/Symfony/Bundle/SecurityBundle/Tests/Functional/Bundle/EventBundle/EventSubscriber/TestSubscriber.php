@@ -31,7 +31,7 @@ final class TestSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function __call(string $name, array $arguments)
+    public function __call(string $name, array $arguments): void
     {
         $this->calledMethods[$name] = ($this->calledMethods[$name] ?? 0) + 1;
     }

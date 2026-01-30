@@ -34,7 +34,7 @@ class EventSourceHttpClientTest extends TestCase
     #[TestWith(["\n"])]
     #[TestWith(["\r"])]
     #[TestWith(["\r\n"])]
-    public function testGetServerSentEvents(string $sep)
+    public function testGetServerSentEvents(string $sep): void
     {
         $es = new EventSourceHttpClient(new MockHttpClient(function (string $method, string $url, array $options) use ($sep): MockResponse {
             $this->assertSame(['Accept: text/event-stream', 'Cache-Control: no-cache'], $options['headers']);
@@ -108,7 +108,7 @@ class EventSourceHttpClientTest extends TestCase
         $this->assertSame([], $expected);
     }
 
-    public function testPostServerSentEvents()
+    public function testPostServerSentEvents(): void
     {
         $chunk = new DataChunk(0, '');
         $response = new MockResponse('', ['canceled' => false, 'http_method' => 'POST', 'url' => 'http://localhost:8080/events', 'response_headers' => ['content-type: text/event-stream']]);
@@ -136,7 +136,7 @@ class EventSourceHttpClientTest extends TestCase
     }
 
     #[DataProvider('contentTypeProvider')]
-    public function testContentType($contentType, $expected)
+    public function testContentType($contentType, $expected): void
     {
         $chunk = new DataChunk(0, '');
         $response = new MockResponse('', ['canceled' => false, 'http_method' => 'GET', 'url' => 'http://localhost:8080/events', 'response_headers' => ['content-type: '.$contentType]]);

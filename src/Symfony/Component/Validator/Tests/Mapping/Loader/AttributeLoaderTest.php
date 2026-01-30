@@ -41,7 +41,7 @@ use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProv
 
 class AttributeLoaderTest extends TestCase
 {
-    public function testLoadClassMetadataReturnsTrueIfSuccessful()
+    public function testLoadClassMetadataReturnsTrueIfSuccessful(): void
     {
         $loader = new AttributeLoader();
         $metadata = new ClassMetadata(Entity::class);
@@ -49,7 +49,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertTrue($loader->loadClassMetadata($metadata));
     }
 
-    public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
+    public function testLoadClassMetadataReturnsFalseIfNotSuccessful(): void
     {
         $loader = new AttributeLoader();
         $metadata = new ClassMetadata('\stdClass');
@@ -57,7 +57,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertFalse($loader->loadClassMetadata($metadata));
     }
 
-    public function testLoadClassMetadata()
+    public function testLoadClassMetadata(): void
     {
         $loader = new AttributeLoader();
 
@@ -112,7 +112,7 @@ class AttributeLoaderTest extends TestCase
     /**
      * Test MetaData merge with parent attribute.
      */
-    public function testLoadParentClassMetadata()
+    public function testLoadParentClassMetadata(): void
     {
         $loader = new AttributeLoader();
 
@@ -130,7 +130,7 @@ class AttributeLoaderTest extends TestCase
     /**
      * Test MetaData merge with parent attribute.
      */
-    public function testLoadClassMetadataAndMerge()
+    public function testLoadClassMetadataAndMerge(): void
     {
         $loader = new AttributeLoader();
 
@@ -199,7 +199,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertInstanceOf(NotNull::class, $otherMetadata[1]->getConstraints()[0]);
     }
 
-    public function testLoadGroupSequenceProviderAttribute()
+    public function testLoadGroupSequenceProviderAttribute(): void
     {
         $loader = new AttributeLoader();
 
@@ -213,7 +213,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
-    public function testLoadExternalGroupSequenceProvider()
+    public function testLoadExternalGroupSequenceProvider(): void
     {
         $loader = new AttributeLoader();
 
@@ -228,7 +228,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
-    public function testGetMappedClasses()
+    public function testGetMappedClasses(): void
     {
         $classes = [
             'App\Entity\User' => ['App\Entity\User'],
@@ -240,7 +240,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertSame(array_keys($classes), $loader->getMappedClasses());
     }
 
-    public function testLoadClassMetadataReturnsFalseForUnmappedClass()
+    public function testLoadClassMetadataReturnsFalseForUnmappedClass(): void
     {
         $loader = new AttributeLoader(false, ['App\Entity\User' => ['App\Entity\User']]);
         $metadata = new ClassMetadata('App\Entity\Product');
@@ -248,7 +248,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertFalse($loader->loadClassMetadata($metadata));
     }
 
-    public function testLoadClassMetadataReturnsFalseForClassWithoutAttributes()
+    public function testLoadClassMetadataReturnsFalseForClassWithoutAttributes(): void
     {
         $loader = new AttributeLoader(false, ['stdClass' => ['stdClass']]);
         $metadata = new ClassMetadata('stdClass');
@@ -256,7 +256,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertFalse($loader->loadClassMetadata($metadata));
     }
 
-    public function testLoadClassMetadataForMappedClassWithAttributes()
+    public function testLoadClassMetadataForMappedClassWithAttributes(): void
     {
         $loader = new AttributeLoader(false, [Entity::class => [Entity::class]]);
         $metadata = new ClassMetadata(Entity::class);
@@ -266,7 +266,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertNotEmpty($metadata->getConstraints());
     }
 
-    public function testLoadClassMetadataFromExplicitAttributeMappings()
+    public function testLoadClassMetadataFromExplicitAttributeMappings(): void
     {
         $targetClass = _AttrMap_Target::class;
         $sourceClass = _AttrMap_Source::class;
@@ -278,7 +278,7 @@ class AttributeLoaderTest extends TestCase
         $this->assertInstanceOf(NotBlank::class, $metadata->getPropertyMetadata('name', $sourceClass)[0]->getConstraints()[0]);
     }
 
-    public function testLoadClassMetadataWithClassLevelConstraints()
+    public function testLoadClassMetadataWithClassLevelConstraints(): void
     {
         $targetClass = _AttrMap_Target::class;
         $sourceClass = _AttrMap_ClassLevelSource::class;

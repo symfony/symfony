@@ -23,7 +23,7 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ImmutableEventDispatcherTest extends TestCase
 {
-    public function testDispatchDelegates()
+    public function testDispatchDelegates(): void
     {
         $innerDispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher = new ImmutableEventDispatcher($innerDispatcher);
@@ -39,7 +39,7 @@ class ImmutableEventDispatcherTest extends TestCase
         $this->assertSame($resultEvent, $dispatcher->dispatch($event, 'event'));
     }
 
-    public function testGetListenersDelegates()
+    public function testGetListenersDelegates(): void
     {
         $innerDispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher = new ImmutableEventDispatcher($innerDispatcher);
@@ -52,7 +52,7 @@ class ImmutableEventDispatcherTest extends TestCase
         $this->assertSame(['result'], $dispatcher->getListeners('event'));
     }
 
-    public function testHasListenersDelegates()
+    public function testHasListenersDelegates(): void
     {
         $innerDispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher = new ImmutableEventDispatcher($innerDispatcher);
@@ -65,7 +65,7 @@ class ImmutableEventDispatcherTest extends TestCase
         $this->assertTrue($dispatcher->hasListeners('event'));
     }
 
-    public function testAddListenerDisallowed()
+    public function testAddListenerDisallowed(): void
     {
         $dispatcher = new ImmutableEventDispatcher(new EventDispatcher());
 
@@ -73,7 +73,7 @@ class ImmutableEventDispatcherTest extends TestCase
         $dispatcher->addListener('event', static fn () => 'foo');
     }
 
-    public function testAddSubscriberDisallowed()
+    public function testAddSubscriberDisallowed(): void
     {
         $dispatcher = new ImmutableEventDispatcher(new EventDispatcher());
 
@@ -83,7 +83,7 @@ class ImmutableEventDispatcherTest extends TestCase
         $dispatcher->addSubscriber($subscriber);
     }
 
-    public function testRemoveListenerDisallowed()
+    public function testRemoveListenerDisallowed(): void
     {
         $dispatcher = new ImmutableEventDispatcher(new EventDispatcher());
 
@@ -91,7 +91,7 @@ class ImmutableEventDispatcherTest extends TestCase
         $dispatcher->removeListener('event', static fn () => 'foo');
     }
 
-    public function testRemoveSubscriberDisallowed()
+    public function testRemoveSubscriberDisallowed(): void
     {
         $dispatcher = new ImmutableEventDispatcher(new EventDispatcher());
 

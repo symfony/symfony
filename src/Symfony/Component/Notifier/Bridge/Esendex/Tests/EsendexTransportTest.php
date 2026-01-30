@@ -47,7 +47,7 @@ final class EsendexTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendWithErrorResponseThrowsTransportException()
+    public function testSendWithErrorResponseThrowsTransportException(): void
     {
         $client = new MockHttpClient(new MockResponse('', ['http_code' => 500]));
 
@@ -59,7 +59,7 @@ final class EsendexTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('phone', 'testMessage'));
     }
 
-    public function testSendWithErrorResponseContainingDetailsThrowsTransportException()
+    public function testSendWithErrorResponseContainingDetailsThrowsTransportException(): void
     {
         $client = new MockHttpClient(new MockResponse(json_encode(['errors' => [['code' => 'accountreference_invalid', 'description' => 'Invalid Account Reference EX0000000']]]), ['http_code' => 500]));
 
@@ -71,7 +71,7 @@ final class EsendexTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('phone', 'testMessage'));
     }
 
-    public function testSendWithSuccessfulResponseDispatchesMessageEvent()
+    public function testSendWithSuccessfulResponseDispatchesMessageEvent(): void
     {
         $messageId = bin2hex(random_bytes(7));
         $client = new MockHttpClient(new MockResponse(json_encode(['batch' => ['messageheaders' => [['id' => $messageId]]]])));
@@ -83,7 +83,7 @@ final class EsendexTransportTest extends TransportTestCase
         $this->assertSame($messageId, $sentMessage->getMessageId());
     }
 
-    public function testSentMessageContainsAnArrayOfMessages()
+    public function testSentMessageContainsAnArrayOfMessages(): void
     {
         $requestOptions = [];
         $client = new MockHttpClient(static function ($method, $url, $options) use (&$requestOptions): ResponseInterface {

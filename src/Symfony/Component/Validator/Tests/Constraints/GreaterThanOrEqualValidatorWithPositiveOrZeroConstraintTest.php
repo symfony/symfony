@@ -62,33 +62,33 @@ class GreaterThanOrEqualValidatorWithPositiveOrZeroConstraintTest extends Abstra
     }
 
     #[DataProvider('provideInvalidConstraintOptions')]
-    public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options)
+    public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options): void
     {
         $this->markTestSkipped('Value option always set for PositiveOrZero constraint');
     }
 
-    public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
+    public function testThrowsConstraintExceptionIfBothValueAndPropertyPath(): void
     {
         $this->markTestSkipped('Value option is set for PositiveOrZero constraint automatically');
     }
 
-    public function testInvalidValuePath()
+    public function testInvalidValuePath(): void
     {
         $this->markTestSkipped('PropertyPath option is not used in PositiveOrZero constraint');
     }
 
     #[DataProvider('provideValidComparisonsToPropertyPath')]
-    public function testValidComparisonToPropertyPath($comparedValue)
+    public function testValidComparisonToPropertyPath($comparedValue): void
     {
         $this->markTestSkipped('PropertyPath option is not used in PositiveOrZero constraint');
     }
 
-    public function testNoViolationOnNullObjectWithPropertyPath()
+    public function testNoViolationOnNullObjectWithPropertyPath(): void
     {
         $this->markTestSkipped('PropertyPath option is not used in PositiveOrZero constraint');
     }
 
-    public function testInvalidComparisonToPropertyPathAddsPathAsParameter()
+    public function testInvalidComparisonToPropertyPathAddsPathAsParameter(): void
     {
         $this->markTestSkipped('PropertyPath option is not used in PositiveOrZero constraint');
     }

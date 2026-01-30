@@ -35,7 +35,7 @@ use Symfony\Component\HttpKernel\Tests\Fixtures\Suit;
 
 class RegisterControllerArgumentLocatorsPassTest extends TestCase
 {
-    public function testInvalidClass()
+    public function testInvalidClass(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Class "Symfony\Component\HttpKernel\Tests\DependencyInjection\NotFound" used for service "foo" cannot be found.');
@@ -50,7 +50,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testNoAction()
+    public function testNoAction(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing "action" attribute on tag "controller.service_arguments" {"argument":"bar"} for service "foo".');
@@ -65,7 +65,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testNoArgument()
+    public function testNoArgument(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing "argument" attribute on tag "controller.service_arguments" {"action":"fooAction"} for service "foo".');
@@ -80,7 +80,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testNoService()
+    public function testNoService(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Missing "id" attribute on tag "controller.service_arguments" {"action":"fooAction","argument":"bar"} for service "foo".');
@@ -95,7 +95,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testInvalidMethod()
+    public function testInvalidMethod(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid "action" attribute on tag "controller.service_arguments" for service "foo": no public "barAction()" method found on class "Symfony\Component\HttpKernel\Tests\DependencyInjection\RegisterTestController".');
@@ -110,7 +110,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testInvalidArgument()
+    public function testInvalidArgument(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid "controller.service_arguments" tag for service "foo": method "fooAction()" has no "baz" argument on class "Symfony\Component\HttpKernel\Tests\DependencyInjection\RegisterTestController".');
@@ -125,7 +125,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
     }
 
-    public function testAllActions()
+    public function testAllActions(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
@@ -152,7 +152,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
-    public function testExplicitArgument()
+    public function testExplicitArgument(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
@@ -173,7 +173,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
-    public function testOptionalArgument()
+    public function testOptionalArgument(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
@@ -193,7 +193,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
-    public function testSkipSetContainer()
+    public function testSkipSetContainer(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
@@ -208,7 +208,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame(['foo::fooAction'], array_keys($locator));
     }
 
-    public function testExceptionOnNonExistentTypeHint()
+    public function testExceptionOnNonExistentTypeHint(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot determine controller argument for "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClassController::fooAction()": the $nonExistent argument is type-hinted with the non-existent class or interface: "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClass". Did you forget to add a use statement?');
@@ -228,7 +228,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $container->get($error);
     }
 
-    public function testExceptionOnNonExistentTypeHintDifferentNamespace()
+    public function testExceptionOnNonExistentTypeHintDifferentNamespace(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot determine controller argument for "Symfony\Component\HttpKernel\Tests\DependencyInjection\NonExistentClassDifferentNamespaceController::fooAction()": the $nonExistent argument is type-hinted with the non-existent class or interface: "Acme\NonExistentClass".');
@@ -248,7 +248,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $container->get($error);
     }
 
-    public function testNoExceptionOnNonExistentTypeHintOptionalArg()
+    public function testNoExceptionOnNonExistentTypeHintOptionalArg(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
@@ -264,7 +264,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEqualsCanonicalizing(['foo::barAction', 'foo::fooAction'], array_keys($locator));
     }
 
-    public function testArgumentWithNoTypeHintIsOk()
+    public function testArgumentWithNoTypeHintIsOk(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
@@ -279,7 +279,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame([], array_keys($locator));
     }
 
-    public function testControllersAreMadePublic()
+    public function testControllersAreMadePublic(): void
     {
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
@@ -293,7 +293,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertTrue($container->getDefinition('foo')->isPublic());
     }
 
-    public function testControllersAreMadeNonLazy()
+    public function testControllersAreMadeNonLazy(): void
     {
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
@@ -309,7 +309,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     }
 
     #[DataProvider('provideBindings')]
-    public function testBindings($bindingName)
+    public function testBindings($bindingName): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
@@ -339,7 +339,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
     }
 
     #[DataProvider('provideBindScalarValueToControllerArgument')]
-    public function testBindScalarValueToControllerArgument($bindingKey)
+    public function testBindScalarValueToControllerArgument($bindingKey): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
@@ -368,7 +368,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         yield ['string $someArg'];
     }
 
-    public function testBindingsOnChildDefinitions()
+    public function testBindingsOnChildDefinitions(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
@@ -392,7 +392,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEquals(new Reference('parent'), $locator['someArg']->getValues()[0]);
     }
 
-    public function testNotTaggedControllerServiceReceivesLocatorArgument()
+    public function testNotTaggedControllerServiceReceivesLocatorArgument(): void
     {
         $container = new ContainerBuilder();
         $container->register('argument_resolver.not_tagged_controller')->addArgument([]);
@@ -405,7 +405,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertInstanceOf(Reference::class, $locatorArgument);
     }
 
-    public function testAlias()
+    public function testAlias(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
@@ -422,7 +422,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEqualsCanonicalizing([RegisterTestController::class.'::fooAction', 'foo::fooAction'], array_keys($locator));
     }
 
-    public function testEnumArgumentIsIgnored()
+    public function testEnumArgumentIsIgnored(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
@@ -438,7 +438,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame([], array_keys($locator), 'enum typed argument is ignored');
     }
 
-    public function testBindWithTarget()
+    public function testBindWithTarget(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service')->addArgument([]);
@@ -464,7 +464,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertEquals($expected, $locator->getArgument(0));
     }
 
-    public function testResponseArgumentIsIgnored()
+    public function testResponseArgumentIsIgnored(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
@@ -478,7 +478,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame([], array_keys($locator), 'Response typed argument is ignored');
     }
 
-    public function testAutowireAttribute()
+    public function testAutowireAttribute(): void
     {
         $container = new ContainerBuilder();
         $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
@@ -514,7 +514,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertFalse($locator->has('service2'));
     }
 
-    public function testAutowireIteratorAndAutowireLocatorAttributes()
+    public function testAutowireIteratorAndAutowireLocatorAttributes(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('some.parameter', 'bar');
@@ -563,7 +563,7 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertSame('bar', $argLocator->get('foo'));
     }
 
-    public function testTaggedControllersAreRegisteredInControllerResolver()
+    public function testTaggedControllersAreRegisteredInControllerResolver(): void
     {
         $container = new ContainerBuilder();
         $container->register('argument_resolver.service')->addArgument([]);
@@ -594,11 +594,11 @@ class RegisterTestController
     {
     }
 
-    public function fooAction(ControllerDummy $bar)
+    public function fooAction(ControllerDummy $bar): void
     {
     }
 
-    protected function barAction(ControllerDummy $bar)
+    protected function barAction(ControllerDummy $bar): void
     {
     }
 }
@@ -612,7 +612,7 @@ class ContainerAwareRegisterTestController
         $this->container = $container;
     }
 
-    public function fooAction(ControllerDummy $bar)
+    public function fooAction(ControllerDummy $bar): void
     {
     }
 }
@@ -623,39 +623,39 @@ class ControllerDummy
 
 class NonExistentClassController
 {
-    public function fooAction(NonExistentClass $nonExistent)
+    public function fooAction(NonExistentClass $nonExistent): void
     {
     }
 }
 
 class NonExistentClassDifferentNamespaceController
 {
-    public function fooAction(\Acme\NonExistentClass $nonExistent)
+    public function fooAction(\Acme\NonExistentClass $nonExistent): void
     {
     }
 }
 
 class NonExistentClassOptionalController
 {
-    public function fooAction(?NonExistentClass $nonExistent = null)
+    public function fooAction(?NonExistentClass $nonExistent = null): void
     {
     }
 
-    public function barAction(?NonExistentClass $nonExistent, $bar)
+    public function barAction(?NonExistentClass $nonExistent, $bar): void
     {
     }
 }
 
 class ArgumentWithoutTypeController
 {
-    public function fooAction(string $someArg)
+    public function fooAction(string $someArg): void
     {
     }
 }
 
 class NonNullableEnumArgumentWithDefaultController
 {
-    public function fooAction(Suit $suit = Suit::Spades)
+    public function fooAction(Suit $suit = Suit::Spades): void
     {
     }
 }
@@ -668,13 +668,13 @@ class WithTarget
         #[Target('image.storage')]
         ControllerDummy $service1,
         ControllerDummy $service2,
-    ) {
+    ): void {
     }
 }
 
 class WithResponseArgument
 {
-    public function fooAction(Response $response, ?Response $nullableResponse)
+    public function fooAction(Response $response, ?Response $nullableResponse): void
     {
     }
 }
@@ -718,7 +718,7 @@ class WithAutowireAttribute
         FooInterface $autowireCallable,
         #[Autowire(service: 'invalid.id')]
         ?\stdClass $service2 = null,
-    ) {
+    ): void {
     }
 }
 
@@ -729,6 +729,6 @@ class WithAutowireIteratorAndAutowireLocator
         #[AutowireLocator('foobar')] ServiceLocator $locator1,
         #[AutowireLocator(['bar', 'baz'])] ContainerInterface $container1,
         #[AutowireLocator(['foo' => new Autowire('%some.parameter%')])] ContainerInterface $container2,
-    ) {
+    ): void {
     }
 }

@@ -33,7 +33,7 @@ class JsonEncoderContextBuilderTest extends TestCase
      * @param array<string, mixed> $values
      */
     #[DataProvider('withersDataProvider')]
-    public function testWithers(array $values)
+    public function testWithers(array $values): void
     {
         $context = $this->contextBuilder
             ->withEncodeOptions($values[JsonEncode::OPTIONS])

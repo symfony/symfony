@@ -20,19 +20,19 @@ use Symfony\Component\Config\Tests\Fixtures\Resource\ConditionalClass;
 
 class ClassExistenceResourceTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $res = new ClassExistenceResource('BarClass');
         $this->assertSame('BarClass', (string) $res);
     }
 
-    public function testGetResource()
+    public function testGetResource(): void
     {
         $res = new ClassExistenceResource('BarClass');
         $this->assertSame('BarClass', $res->getResource());
     }
 
-    public function testIsFreshWhenClassDoesNotExist()
+    public function testIsFreshWhenClassDoesNotExist(): void
     {
         $res = new ClassExistenceResource('Symfony\Component\Config\Tests\Fixtures\BarClass');
 
@@ -50,16 +50,16 @@ class ClassExistenceResourceTest extends TestCase
         $this->assertFalse($res->isFresh(time()));
     }
 
-    public function testIsFreshWhenClassExists()
+    public function testIsFreshWhenClassExists(): void
     {
         $res = new ClassExistenceResource('Symfony\Component\Config\Tests\Resource\ClassExistenceResourceTest');
 
         $this->assertTrue($res->isFresh(time()));
     }
 
-    public function testExistsKo()
+    public function testExistsKo(): void
     {
-        spl_autoload_register($autoloader = static function ($class) use (&$loadedClass) { $loadedClass = $class; });
+        spl_autoload_register($autoloader = static function ($class) use (&$loadedClass): void { $loadedClass = $class; });
 
         try {
             $res = new ClassExistenceResource('MissingFooClass');
@@ -77,13 +77,13 @@ class ClassExistenceResourceTest extends TestCase
         }
     }
 
-    public function testBadParentWithTimestamp()
+    public function testBadParentWithTimestamp(): void
     {
         $res = new ClassExistenceResource(BadParent::class, false);
         $this->assertTrue($res->isFresh(time()));
     }
 
-    public function testBadParentWithNoTimestamp()
+    public function testBadParentWithNoTimestamp(): void
     {
         $res = new ClassExistenceResource(BadParent::class, false);
 
@@ -93,7 +93,7 @@ class ClassExistenceResourceTest extends TestCase
         $res->isFresh(0);
     }
 
-    public function testBadFileName()
+    public function testBadFileName(): void
     {
         $res = new ClassExistenceResource(BadFileName::class, false);
 
@@ -103,7 +103,7 @@ class ClassExistenceResourceTest extends TestCase
         $res->isFresh(0);
     }
 
-    public function testBadFileNameBis()
+    public function testBadFileNameBis(): void
     {
         $res = new ClassExistenceResource(BadFileName::class, false);
 
@@ -113,14 +113,14 @@ class ClassExistenceResourceTest extends TestCase
         $res->isFresh(0);
     }
 
-    public function testConditionalClass()
+    public function testConditionalClass(): void
     {
         $res = new ClassExistenceResource(ConditionalClass::class, false);
 
         $this->assertFalse($res->isFresh(0));
     }
 
-    public function testParseError()
+    public function testParseError(): void
     {
         $res = new ClassExistenceResource(ParseError::class, false);
 

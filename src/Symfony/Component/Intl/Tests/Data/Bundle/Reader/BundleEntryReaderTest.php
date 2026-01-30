@@ -54,7 +54,7 @@ class BundleEntryReaderTest extends TestCase
         'Foo' => 'Bar',
     ];
 
-    public function testForwardCallToRead()
+    public function testForwardCallToRead(): void
     {
         $readerImpl = $this->createMock(BundleEntryReaderInterface::class);
         $readerImpl->expects($this->once())
@@ -65,7 +65,7 @@ class BundleEntryReaderTest extends TestCase
         $this->assertSame(self::DATA, $this->getReader($readerImpl)->read(self::RES_DIR, 'root'));
     }
 
-    public function testReadEntireDataFileIfNoIndicesGiven()
+    public function testReadEntireDataFileIfNoIndicesGiven(): void
     {
         $readerImpl = $this->createMock(BundleEntryReaderInterface::class);
         $readerImpl->expects($this->exactly(2))
@@ -86,7 +86,7 @@ class BundleEntryReaderTest extends TestCase
         $this->assertSame(self::MERGED_DATA, $this->getReader($readerImpl)->readEntry(self::RES_DIR, 'en', []));
     }
 
-    public function testReadExistingEntry()
+    public function testReadExistingEntry(): void
     {
         $readerImpl = $this->createMock(BundleEntryReaderInterface::class);
         $readerImpl->expects($this->once())
@@ -97,7 +97,7 @@ class BundleEntryReaderTest extends TestCase
         $this->assertSame('Bar', $this->getReader($readerImpl)->readEntry(self::RES_DIR, 'root', ['Entries', 'Foo']));
     }
 
-    public function testReadNonExistingEntry()
+    public function testReadNonExistingEntry(): void
     {
         $this->expectException(MissingResourceException::class);
         $readerImpl = $this->createMock(BundleEntryReaderInterface::class);
@@ -109,7 +109,7 @@ class BundleEntryReaderTest extends TestCase
         $this->getReader($readerImpl)->readEntry(self::RES_DIR, 'root', ['Entries', 'NonExisting']);
     }
 
-    public function testFallbackIfEntryDoesNotExist()
+    public function testFallbackIfEntryDoesNotExist(): void
     {
         $readerImpl = $this->createMock(BundleEntryReaderInterface::class);
         $readerImpl->expects($this->exactly(2))
@@ -130,7 +130,7 @@ class BundleEntryReaderTest extends TestCase
         $this->assertSame('Lah', $this->getReader($readerImpl)->readEntry(self::RES_DIR, 'en_GB', ['Entries', 'Bam']));
     }
 
-    public function testDontFallbackIfEntryDoesNotExistAndFallbackDisabled()
+    public function testDontFallbackIfEntryDoesNotExistAndFallbackDisabled(): void
     {
         $this->expectException(MissingResourceException::class);
         $readerImpl = $this->createMock(BundleEntryReaderInterface::class);
@@ -142,7 +142,7 @@ class BundleEntryReaderTest extends TestCase
         $this->getReader($readerImpl)->readEntry(self::RES_DIR, 'en_GB', ['Entries', 'Bam'], false);
     }
 
-    public function testFallbackIfLocaleDoesNotExist()
+    public function testFallbackIfLocaleDoesNotExist(): void
     {
         $exception = new ResourceBundleNotFoundException();
         $series = [
@@ -168,7 +168,7 @@ class BundleEntryReaderTest extends TestCase
         $this->assertSame('Lah', $this->getReader($readerImpl)->readEntry(self::RES_DIR, 'en_GB', ['Entries', 'Bam']));
     }
 
-    public function testDontFallbackIfLocaleDoesNotExistAndFallbackDisabled()
+    public function testDontFallbackIfLocaleDoesNotExistAndFallbackDisabled(): void
     {
         $this->expectException(MissingResourceException::class);
         $readerImpl = $this->createMock(BundleEntryReaderInterface::class);
@@ -194,7 +194,7 @@ class BundleEntryReaderTest extends TestCase
     }
 
     #[DataProvider('provideMergeableValues')]
-    public function testMergeDataWithFallbackData($childData, $parentData, $result)
+    public function testMergeDataWithFallbackData($childData, $parentData, $result): void
     {
         $readerImpl = $this->createMock(BundleEntryReaderInterface::class);
 
@@ -224,7 +224,7 @@ class BundleEntryReaderTest extends TestCase
     }
 
     #[DataProvider('provideMergeableValues')]
-    public function testDontMergeDataIfFallbackDisabled($childData, $parentData, $result)
+    public function testDontMergeDataIfFallbackDisabled($childData, $parentData, $result): void
     {
         $readerImpl = $this->createMock(BundleEntryReaderInterface::class);
         $readerImpl->expects($this->once())
@@ -236,7 +236,7 @@ class BundleEntryReaderTest extends TestCase
     }
 
     #[DataProvider('provideMergeableValues')]
-    public function testMergeExistingEntryWithExistingFallbackEntry($childData, $parentData, $result)
+    public function testMergeExistingEntryWithExistingFallbackEntry($childData, $parentData, $result): void
     {
         $readerImpl = $this->createMock(BundleEntryReaderInterface::class);
 
@@ -266,7 +266,7 @@ class BundleEntryReaderTest extends TestCase
     }
 
     #[DataProvider('provideMergeableValues')]
-    public function testMergeNonExistingEntryWithExistingFallbackEntry($childData, $parentData, $result)
+    public function testMergeNonExistingEntryWithExistingFallbackEntry($childData, $parentData, $result): void
     {
         $series = [
             [[self::RES_DIR, 'en_GB'], ['Foo' => 'Baz']],
@@ -287,7 +287,7 @@ class BundleEntryReaderTest extends TestCase
     }
 
     #[DataProvider('provideMergeableValues')]
-    public function testMergeExistingEntryWithNonExistingFallbackEntry($childData, $parentData, $result)
+    public function testMergeExistingEntryWithNonExistingFallbackEntry($childData, $parentData, $result): void
     {
         if (null === $childData || \is_array($childData)) {
             $series = [
@@ -315,7 +315,7 @@ class BundleEntryReaderTest extends TestCase
         $this->assertSame($childData, $this->getReader($readerImpl)->readEntry(self::RES_DIR, 'en_GB', ['Foo', 'Bar'], true));
     }
 
-    public function testFailIfEntryFoundNeitherInParentNorChild()
+    public function testFailIfEntryFoundNeitherInParentNorChild(): void
     {
         $this->expectException(MissingResourceException::class);
 
@@ -338,7 +338,7 @@ class BundleEntryReaderTest extends TestCase
     }
 
     #[DataProvider('provideMergeableValues')]
-    public function testMergeTraversables($childData, $parentData, $result)
+    public function testMergeTraversables($childData, $parentData, $result): void
     {
         $parentData = \is_array($parentData) ? new \ArrayObject($parentData) : $parentData;
         $childData = \is_array($childData) ? new \ArrayObject($childData) : $childData;
@@ -370,7 +370,7 @@ class BundleEntryReaderTest extends TestCase
     }
 
     #[DataProvider('provideMergeableValues')]
-    public function testFollowLocaleAliases($childData, $parentData, $result)
+    public function testFollowLocaleAliases($childData, $parentData, $result): void
     {
         if (null === $childData || \is_array($childData)) {
             $series = [

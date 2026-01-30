@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 class TransportFactoryTest extends TestCase
 {
     #[DataProvider('provideThrowsExceptionOnUnsupportedTransport')]
-    public function testThrowsExceptionOnUnsupportedTransport(array $transportSupport, string $dsn, ?string $expectedMessage)
+    public function testThrowsExceptionOnUnsupportedTransport(array $transportSupport, string $dsn, ?string $expectedMessage): void
     {
         if (null !== $expectedMessage) {
             $this->expectException(InvalidArgumentException::class);

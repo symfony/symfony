@@ -46,7 +46,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
             ->getForm();
     }
 
-    public function testOnSubmitDoNothing()
+    public function testOnSubmitDoNothing(): void
     {
         $submittedData = ['test'];
         $event = new FormEvent($this->getForm(), $submittedData);
@@ -57,7 +57,7 @@ class MergeDoctrineCollectionListenerTest extends TestCase
         $this->assertSame(1, $this->collection->count());
     }
 
-    public function testOnSubmitNullClearCollection()
+    public function testOnSubmitNullClearCollection(): void
     {
         $submittedData = [];
         $event = new FormEvent($this->getForm(), $submittedData);

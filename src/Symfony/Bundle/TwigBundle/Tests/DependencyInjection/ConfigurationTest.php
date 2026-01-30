@@ -17,7 +17,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends TestCase
 {
-    public function testDoNoDuplicateDefaultFormResources()
+    public function testDoNoDuplicateDefaultFormResources(): void
     {
         $input = [
             'form_themes' => ['form_div_layout.html.twig'],
@@ -29,7 +29,7 @@ class ConfigurationTest extends TestCase
         $this->assertEquals(['form_div_layout.html.twig'], $config['form_themes']);
     }
 
-    public function testGlobalsAreNotNormalized()
+    public function testGlobalsAreNotNormalized(): void
     {
         $input = [
             'globals' => ['some-global' => true],
@@ -41,7 +41,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame(['some-global' => ['value' => true]], $config['globals']);
     }
 
-    public function testArrayKeysInGlobalsAreNotNormalized()
+    public function testArrayKeysInGlobalsAreNotNormalized(): void
     {
         $input = [
             'globals' => ['global' => ['some-key' => 'some-value']],
@@ -53,7 +53,7 @@ class ConfigurationTest extends TestCase
         $this->assertSame(['global' => ['value' => ['some-key' => 'some-value']]], $config['globals']);
     }
 
-    public function testNullPathsAreConvertedToIterable()
+    public function testNullPathsAreConvertedToIterable(): void
     {
         $input = [
             'paths' => null,

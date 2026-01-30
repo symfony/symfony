@@ -55,7 +55,7 @@ class SubRequestController
         return new Response('--'.$request->getLocale().'/'.$request->getRequestFormat());
     }
 
-    public function fragmentErrorAction()
+    public function fragmentErrorAction(): void
     {
         throw new \RuntimeException('error');
     }

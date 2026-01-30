@@ -30,13 +30,13 @@ class ReflectionReturnTypeResolverTest extends TestCase
         $this->resolver = new ReflectionReturnTypeResolver(new ReflectionTypeResolver(), new TypeContextFactory());
     }
 
-    public function testCannotResolveNonReflectionFunctionAbstract()
+    public function testCannotResolveNonReflectionFunctionAbstract(): void
     {
         $this->expectException(UnsupportedException::class);
         $this->resolver->resolve(123);
     }
 
-    public function testCannotResolveReflectionFunctionAbstractWithoutType()
+    public function testCannotResolveReflectionFunctionAbstractWithoutType(): void
     {
         $this->expectException(UnsupportedException::class);
 
@@ -46,7 +46,7 @@ class ReflectionReturnTypeResolverTest extends TestCase
         $this->resolver->resolve($reflectionFunction);
     }
 
-    public function testCannotResolveReflectionFunctionWithoutType()
+    public function testCannotResolveReflectionFunctionWithoutType(): void
     {
         $reflectionFunction = new \ReflectionFunction('fopen');
 
@@ -56,7 +56,7 @@ class ReflectionReturnTypeResolverTest extends TestCase
         $this->resolver->resolve($reflectionFunction);
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableDummy::class);
         $reflectionFunction = $reflectionClass->getMethod('getBuiltin');
@@ -64,7 +64,7 @@ class ReflectionReturnTypeResolverTest extends TestCase
         $this->assertEquals(Type::int(), $this->resolver->resolve($reflectionFunction));
     }
 
-    public function testResolveSelfFromClassWithoutContext()
+    public function testResolveSelfFromClassWithoutContext(): void
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableDummy::class);
         $reflectionFunction = $reflectionClass->getMethod('getSelf');
@@ -72,7 +72,7 @@ class ReflectionReturnTypeResolverTest extends TestCase
         $this->assertEquals(Type::object(ReflectionExtractableDummy::class), $this->resolver->resolve($reflectionFunction));
     }
 
-    public function testResolveSelfFromTraitWithoutContext()
+    public function testResolveSelfFromTraitWithoutContext(): void
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableTrait::class);
         $reflectionFunction = $reflectionClass->getMethod('getSelf');
@@ -80,7 +80,7 @@ class ReflectionReturnTypeResolverTest extends TestCase
         $this->assertEquals(Type::object(ReflectionExtractableTrait::class), $this->resolver->resolve($reflectionFunction));
     }
 
-    public function testResolveSelfFromTraitWithClassContext()
+    public function testResolveSelfFromTraitWithClassContext(): void
     {
         $reflectionClass = new \ReflectionClass(ReflectionExtractableTrait::class);
         $reflectionFunction = $reflectionClass->getMethod('getSelf');

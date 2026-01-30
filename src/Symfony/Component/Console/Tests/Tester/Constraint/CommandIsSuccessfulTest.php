@@ -19,7 +19,7 @@ use Symfony\Component\Console\Tester\Constraint\CommandIsSuccessful;
 
 final class CommandIsSuccessfulTest extends TestCase
 {
-    public function testConstraint()
+    public function testConstraint(): void
     {
         $constraint = new CommandIsSuccessful();
 
@@ -29,7 +29,7 @@ final class CommandIsSuccessfulTest extends TestCase
     }
 
     #[DataProvider('providesUnsuccessful')]
-    public function testUnsuccessfulCommand(string $expectedException, int $exitCode)
+    public function testUnsuccessfulCommand(string $expectedException, int $exitCode): void
     {
         $constraint = new CommandIsSuccessful();
 

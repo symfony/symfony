@@ -22,7 +22,7 @@ use Symfony\Component\Lock\PersistingStoreInterface;
  */
 class LockFactoryTest extends TestCase
 {
-    public function testCreateLock()
+    public function testCreateLock(): void
     {
         $store = $this->createMock(PersistingStoreInterface::class);
         $store->expects($this->any())->method('exists')->willReturn(false);
@@ -50,7 +50,7 @@ class LockFactoryTest extends TestCase
         $this->assertNotSame($keys[0], $keys[1]);
     }
 
-    public function testCreateLockFromKey()
+    public function testCreateLockFromKey(): void
     {
         $store = $this->createMock(PersistingStoreInterface::class);
         $store->expects($this->any())->method('exists')->willReturn(false);

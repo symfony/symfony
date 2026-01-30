@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class TokenStorageTest extends TestCase
 {
-    public function testGetSetToken()
+    public function testGetSetToken(): void
     {
         $tokenStorage = new TokenStorage();
         $this->assertNull($tokenStorage->getToken());

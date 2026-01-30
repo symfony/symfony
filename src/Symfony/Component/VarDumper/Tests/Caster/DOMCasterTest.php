@@ -18,7 +18,7 @@ class DOMCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testCastImplementation()
+    public function testCastImplementation(): void
     {
         $implementation = new \DOMImplementation();
 
@@ -32,7 +32,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastModernImplementation()
+    public function testCastModernImplementation(): void
     {
         $implementation = new \Dom\Implementation();
 
@@ -46,7 +46,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastNode()
+    public function testCastNode(): void
     {
         $doc = new \DOMDocument();
         $doc->loadXML('<foo><bar/></foo>');
@@ -61,7 +61,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastModernNode()
+    public function testCastModernNode(): void
     {
         $doc = \Dom\XMLDocument::createFromString('<foo><bar/></foo>');
         $node = $doc->documentElement->firstChild;
@@ -75,7 +75,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastDocument()
+    public function testCastDocument(): void
     {
         $doc = new \DOMDocument();
         $doc->loadXML('<foo><bar/></foo>');
@@ -94,7 +94,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastXMLDocument()
+    public function testCastXMLDocument(): void
     {
         $doc = \Dom\XMLDocument::createFromString('<foo><bar/></foo>');
 
@@ -112,7 +112,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastHTMLDocument()
+    public function testCastHTMLDocument(): void
     {
         $doc = \Dom\HTMLDocument::createFromString('<!DOCTYPE html><html><body><p>foo</p></body></html>');
 
@@ -125,7 +125,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastText()
+    public function testCastText(): void
     {
         $doc = new \DOMText('foo');
 
@@ -138,7 +138,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastModernText()
+    public function testCastModernText(): void
     {
         $text = \Dom\HTMLDocument::createEmpty()->createTextNode('foo');
         $this->assertDumpMatchesFormat(<<<'EODUMP'
@@ -150,7 +150,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastAttr()
+    public function testCastAttr(): void
     {
         $attr = new \DOMAttr('attr', 'value');
 
@@ -163,7 +163,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastModernAttr()
+    public function testCastModernAttr(): void
     {
         $attr = \Dom\HTMLDocument::createEmpty()->createAttribute('attr');
 
@@ -176,7 +176,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastElement()
+    public function testCastElement(): void
     {
         $attr = new \DOMElement('foo');
 
@@ -189,7 +189,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastModernElement()
+    public function testCastModernElement(): void
     {
         $attr = \Dom\HTMLDocument::createEmpty()->createElement('foo');
 
@@ -202,7 +202,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastDocumentType()
+    public function testCastDocumentType(): void
     {
         $implementation = new \DOMImplementation();
         $type = $implementation->createDocumentType('html', 'publicId', 'systemId');
@@ -218,7 +218,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastModernDocumentType()
+    public function testCastModernDocumentType(): void
     {
         $implementation = new \Dom\Implementation();
         $type = $implementation->createDocumentType('html', 'publicId', 'systemId');
@@ -232,7 +232,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastProcessingInstruction()
+    public function testCastProcessingInstruction(): void
     {
         $entity = new \DOMProcessingInstruction('target', 'data');
 
@@ -245,7 +245,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastModernProcessingInstruction()
+    public function testCastModernProcessingInstruction(): void
     {
         $entity = \Dom\HTMLDocument::createEmpty()->createProcessingInstruction('target', 'data');
 
@@ -258,7 +258,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastXPath()
+    public function testCastXPath(): void
     {
         $xpath = new \DOMXPath(new \DOMDocument());
 
@@ -272,7 +272,7 @@ class DOMCasterTest extends TestCase
         );
     }
 
-    public function testCastModernXPath()
+    public function testCastModernXPath(): void
     {
         $entity = new \Dom\XPath(\Dom\HTMLDocument::createEmpty());
 

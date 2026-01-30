@@ -19,21 +19,21 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class CharsetTest extends TestCase
 {
-    public function testSingleEncodingCanBeSet()
+    public function testSingleEncodingCanBeSet(): void
     {
         $encoding = new Charset('UTF-8');
 
         $this->assertSame('UTF-8', $encoding->encodings);
     }
 
-    public function testMultipleEncodingCanBeSet()
+    public function testMultipleEncodingCanBeSet(): void
     {
         $encoding = new Charset(['ASCII', 'UTF-8']);
 
         $this->assertSame(['ASCII', 'UTF-8'], $encoding->encodings);
     }
 
-    public function testThrowsOnNoCharset()
+    public function testThrowsOnNoCharset(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\Charset" constraint requires at least one encoding.');
@@ -41,7 +41,7 @@ class CharsetTest extends TestCase
         new Charset();
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(CharsetDummy::class);
         $loader = new AttributeLoader();

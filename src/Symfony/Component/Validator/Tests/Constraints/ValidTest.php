@@ -21,21 +21,21 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class ValidTest extends TestCase
 {
-    public function testGroupsCanBeSet()
+    public function testGroupsCanBeSet(): void
     {
         $constraint = new Valid(groups: ['foo']);
 
         $this->assertSame(['foo'], $constraint->groups);
     }
 
-    public function testGroupsAreNullByDefault()
+    public function testGroupsAreNullByDefault(): void
     {
         $constraint = new Valid();
 
         $this->assertNull($constraint->groups);
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(ValidDummy::class);
         $loader = new AttributeLoader();

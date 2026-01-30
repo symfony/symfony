@@ -21,7 +21,7 @@ use Twig\Loader\ArrayLoader;
 
 class TwigErrorRendererTest extends TestCase
 {
-    public function testFallbackToNativeRendererIfDebugOn()
+    public function testFallbackToNativeRendererIfDebugOn(): void
     {
         $exception = new \Exception();
 
@@ -35,7 +35,7 @@ class TwigErrorRendererTest extends TestCase
         (new TwigErrorRenderer(new Environment(new ArrayLoader()), $nativeRenderer, true))->render(new \Exception());
     }
 
-    public function testFallbackToNativeRendererIfCustomTemplateNotFound()
+    public function testFallbackToNativeRendererIfCustomTemplateNotFound(): void
     {
         $exception = new NotFoundHttpException();
 
@@ -52,7 +52,7 @@ class TwigErrorRendererTest extends TestCase
         (new TwigErrorRenderer($twig, $nativeRenderer, false))->render($exception);
     }
 
-    public function testRenderCustomErrorTemplate()
+    public function testRenderCustomErrorTemplate(): void
     {
         $twig = new Environment(new ArrayLoader([
             '@Twig/Exception/error404.html.twig' => '<h1>Page Not Found</h1>',

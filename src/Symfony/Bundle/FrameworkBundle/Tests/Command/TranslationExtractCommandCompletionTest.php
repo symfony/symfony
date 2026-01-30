@@ -32,7 +32,7 @@ class TranslationExtractCommandCompletionTest extends TestCase
     private string $translationDir;
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $tester = $this->createCommandCompletionTester(['messages' => ['foo' => 'foo']]);
 
@@ -76,7 +76,7 @@ class TranslationExtractCommandCompletionTest extends TestCase
         $extractor
             ->method('extract')
             ->willReturnCallback(
-                static function ($path, $catalogue) use ($extractedMessages) {
+                static function ($path, $catalogue) use ($extractedMessages): void {
                     foreach ($extractedMessages as $domain => $messages) {
                         $catalogue->add($messages, $domain);
                     }
@@ -87,7 +87,7 @@ class TranslationExtractCommandCompletionTest extends TestCase
         $loader
             ->method('read')
             ->willReturnCallback(
-                static function ($path, $catalogue) use ($loadedMessages) {
+                static function ($path, $catalogue) use ($loadedMessages): void {
                     $catalogue->add($loadedMessages);
                 }
             );

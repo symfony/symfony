@@ -24,7 +24,7 @@ class AuditTrailListenerTest extends TestCase
 {
     use WorkflowBuilderTrait;
 
-    public function testItWorks()
+    public function testItWorks(): void
     {
         $definition = $this->createSimpleWorkflowDefinition();
 

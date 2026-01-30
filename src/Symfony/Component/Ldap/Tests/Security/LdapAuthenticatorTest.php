@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 
 class LdapAuthenticatorTest extends TestCase
 {
-    public function testAuthenticate()
+    public function testAuthenticate(): void
     {
         $decorated = $this->createMock(AuthenticatorInterface::class);
         $passport = new Passport(new UserBadge('test'), new PasswordCredentials('s3cret'));

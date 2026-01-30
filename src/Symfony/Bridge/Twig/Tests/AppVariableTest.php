@@ -35,7 +35,7 @@ class AppVariableTest extends TestCase
     }
 
     #[DataProvider('debugDataProvider')]
-    public function testDebug($debugFlag)
+    public function testDebug($debugFlag): void
     {
         $this->appVariable->setDebug($debugFlag);
 
@@ -50,7 +50,7 @@ class AppVariableTest extends TestCase
         ];
     }
 
-    public function testEnvironment()
+    public function testEnvironment(): void
     {
         $this->appVariable->setEnvironment('dev');
 
@@ -58,7 +58,7 @@ class AppVariableTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testGetSession()
+    public function testGetSession(): void
     {
         $session = new Session();
         $request = new Request();
@@ -69,21 +69,21 @@ class AppVariableTest extends TestCase
         $this->assertEquals($session, $this->appVariable->getSession());
     }
 
-    public function testGetSessionWithNoRequest()
+    public function testGetSessionWithNoRequest(): void
     {
         $this->setRequestStack(null);
 
         $this->assertNull($this->appVariable->getSession());
     }
 
-    public function testGetRequest()
+    public function testGetRequest(): void
     {
         $this->setRequestStack($request = new Request());
 
         $this->assertEquals($request, $this->appVariable->getRequest());
     }
 
-    public function testGetToken()
+    public function testGetToken(): void
     {
         $tokenStorage = new TokenStorage();
         $this->appVariable->setTokenStorage($tokenStorage);
@@ -94,92 +94,92 @@ class AppVariableTest extends TestCase
         $this->assertEquals($token, $this->appVariable->getToken());
     }
 
-    public function testGetUser()
+    public function testGetUser(): void
     {
         $this->setTokenStorage($user = new InMemoryUser('john', 'password'));
 
         $this->assertEquals($user, $this->appVariable->getUser());
     }
 
-    public function testGetLocale()
+    public function testGetLocale(): void
     {
         $this->appVariable->setLocaleSwitcher(new LocaleSwitcher('fr', []));
 
         self::assertEquals('fr', $this->appVariable->getLocale());
     }
 
-    public function testGetEnabledLocales()
+    public function testGetEnabledLocales(): void
     {
         $this->appVariable->setEnabledLocales(['en', 'fr']);
 
         self::assertSame(['en', 'fr'], $this->appVariable->getEnabled_locales());
     }
 
-    public function testGetTokenWithNoToken()
+    public function testGetTokenWithNoToken(): void
     {
         $this->appVariable->setTokenStorage(new TokenStorage());
 
         $this->assertNull($this->appVariable->getToken());
     }
 
-    public function testGetUserWithNoToken()
+    public function testGetUserWithNoToken(): void
     {
         $this->appVariable->setTokenStorage(new TokenStorage());
 
         $this->assertNull($this->appVariable->getUser());
     }
 
-    public function testEnvironmentNotSet()
+    public function testEnvironmentNotSet(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getEnvironment();
     }
 
-    public function testDebugNotSet()
+    public function testDebugNotSet(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getDebug();
     }
 
-    public function testGetTokenWithTokenStorageNotSet()
+    public function testGetTokenWithTokenStorageNotSet(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getToken();
     }
 
-    public function testGetUserWithTokenStorageNotSet()
+    public function testGetUserWithTokenStorageNotSet(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getUser();
     }
 
-    public function testGetRequestWithRequestStackNotSet()
+    public function testGetRequestWithRequestStackNotSet(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getRequest();
     }
 
-    public function testGetSessionWithRequestStackNotSet()
+    public function testGetSessionWithRequestStackNotSet(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getSession();
     }
 
-    public function testGetLocaleWithLocaleSwitcherNotSet()
+    public function testGetLocaleWithLocaleSwitcherNotSet(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The "app.locale" variable is not available.');
         $this->appVariable->getLocale();
     }
 
-    public function testGetEnabledLocalesWithEnabledLocalesNotSet()
+    public function testGetEnabledLocalesWithEnabledLocalesNotSet(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('The "app.enabled_locales" variable is not available.');
         $this->appVariable->getEnabled_locales();
     }
 
-    public function testGetFlashesWithNoRequest()
+    public function testGetFlashesWithNoRequest(): void
     {
         $this->setRequestStack(null);
 
@@ -187,14 +187,14 @@ class AppVariableTest extends TestCase
     }
 
     #[RunInSeparateProcess]
-    public function testGetFlashesWithNoSessionStarted()
+    public function testGetFlashesWithNoSessionStarted(): void
     {
         $flashMessages = $this->setFlashMessages(false);
         $this->assertEquals($flashMessages, $this->appVariable->getFlashes());
     }
 
     #[RunInSeparateProcess]
-    public function testGetFlashes()
+    public function testGetFlashes(): void
     {
         $flashMessages = $this->setFlashMessages();
         $this->assertEquals($flashMessages, $this->appVariable->getFlashes(null));
@@ -247,20 +247,20 @@ class AppVariableTest extends TestCase
         );
     }
 
-    public function testGetCurrentRoute()
+    public function testGetCurrentRoute(): void
     {
         $this->setRequestStack(new Request(attributes: ['_route' => 'some_route']));
 
         $this->assertSame('some_route', $this->appVariable->getCurrent_route());
     }
 
-    public function testGetCurrentRouteWithRequestStackNotSet()
+    public function testGetCurrentRouteWithRequestStackNotSet(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getCurrent_route();
     }
 
-    public function testGetCurrentRouteParameters()
+    public function testGetCurrentRouteParameters(): void
     {
         $routeParams = ['some_param' => true];
         $this->setRequestStack(new Request(attributes: ['_route_params' => $routeParams]));
@@ -268,20 +268,20 @@ class AppVariableTest extends TestCase
         $this->assertSame($routeParams, $this->appVariable->getCurrent_route_parameters());
     }
 
-    public function testGetCurrentRouteParametersWithoutAttribute()
+    public function testGetCurrentRouteParametersWithoutAttribute(): void
     {
         $this->setRequestStack(new Request());
 
         $this->assertSame([], $this->appVariable->getCurrent_route_parameters());
     }
 
-    public function testGetCurrentRouteParametersWithRequestStackNotSet()
+    public function testGetCurrentRouteParametersWithRequestStackNotSet(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->appVariable->getCurrent_route_parameters();
     }
 
-    protected function setRequestStack(?Request $request)
+    protected function setRequestStack(?Request $request): void
     {
         $requestStack = new RequestStack();
 
@@ -292,7 +292,7 @@ class AppVariableTest extends TestCase
         $this->appVariable->setRequestStack($requestStack);
     }
 
-    protected function setTokenStorage($user)
+    protected function setTokenStorage($user): void
     {
         $tokenStorage = new TokenStorage();
         $this->appVariable->setTokenStorage($tokenStorage);
@@ -301,7 +301,7 @@ class AppVariableTest extends TestCase
         $tokenStorage->setToken($token);
     }
 
-    public function testSetEnabledLocalesFiltersEmptyValues()
+    public function testSetEnabledLocalesFiltersEmptyValues(): void
     {
         $this->appVariable->setEnabledLocales(['en', '', 'fr', null, 'de']);
 

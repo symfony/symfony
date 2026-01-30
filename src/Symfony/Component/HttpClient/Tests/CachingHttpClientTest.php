@@ -40,7 +40,7 @@ class CachingHttpClientTest extends TestCase
         }
     }
 
-    public function testBypassCacheWhenBodyPresent()
+    public function testBypassCacheWhenBodyPresent(): void
     {
         // If a request has a non-empty body, caching should be bypassed.
         $mockClient = new MockHttpClient([
@@ -56,7 +56,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('non-cached response', $response->getContent(), 'Request with body should bypass cache.');
     }
 
-    public function testBypassCacheWhenRangeHeaderPresent()
+    public function testBypassCacheWhenRangeHeaderPresent(): void
     {
         // If a "range" header is present, caching is bypassed.
         $mockClient = new MockHttpClient([
@@ -73,7 +73,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('second response', $response->getContent(), 'Presence of range header must bypass caching.');
     }
 
-    public function testBypassCacheForNonCacheableMethod()
+    public function testBypassCacheForNonCacheableMethod(): void
     {
         // Methods not in CACHEABLE_METHODS (e.g. POST) bypass caching.
         $mockClient = new MockHttpClient([
@@ -87,7 +87,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('second response', $response->getContent(), 'Non-cacheable method must bypass caching.');
     }
 
-    public function testItServesResponseFromCache()
+    public function testItServesResponseFromCache(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -116,7 +116,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('2', $response->getHeaders()['age'][0]);
     }
 
-    public function testItSupportsVaryHeader()
+    public function testItSupportsVaryHeader(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -150,7 +150,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('bar', $response->getContent());
     }
 
-    public function testItDoesntServeAStaleResponse()
+    public function testItDoesntServeAStaleResponse(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -187,7 +187,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('bar', $response->getContent());
     }
 
-    public function testAResponseWithoutExpirationAsStale()
+    public function testAResponseWithoutExpirationAsStale(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -215,7 +215,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('bar', $response->getContent());
     }
 
-    public function testItRevalidatesAResponseWithNoCacheDirective()
+    public function testItRevalidatesAResponseWithNoCacheDirective(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -244,7 +244,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('bar', $response->getContent());
     }
 
-    public function testItServesAStaleResponseIfError()
+    public function testItServesAStaleResponseIfError(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -273,7 +273,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('foo', $response->getContent(false));
     }
 
-    public function testPrivateCacheWithSharedCacheFalse()
+    public function testPrivateCacheWithSharedCacheFalse(): void
     {
         $responses = [
             new MockResponse('foo', [
@@ -301,7 +301,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('foo', $response->getContent());
     }
 
-    public function testItDoesntStoreAResponseWithNoStoreDirective()
+    public function testItDoesntStoreAResponseWithNoStoreDirective(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -327,7 +327,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('bar', $response->getContent());
     }
 
-    public function testASharedCacheDoesntStoreAResponseFromRequestWithAuthorization()
+    public function testASharedCacheDoesntStoreAResponseFromRequestWithAuthorization(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -355,7 +355,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('bar', $response->getContent());
     }
 
-    public function testASharedCacheStoresAResponseWithPublicDirectiveFromRequestWithAuthorization()
+    public function testASharedCacheStoresAResponseWithPublicDirectiveFromRequestWithAuthorization(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -387,7 +387,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('foo', $response->getContent());
     }
 
-    public function testASharedCacheStoresAResponseWithSMaxAgeDirectiveFromRequestWithAuthorization()
+    public function testASharedCacheStoresAResponseWithSMaxAgeDirectiveFromRequestWithAuthorization(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -419,7 +419,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('foo', $response->getContent());
     }
 
-    public function testASharedCacheDoesntStoreAResponseWithPrivateDirective()
+    public function testASharedCacheDoesntStoreAResponseWithPrivateDirective(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -446,7 +446,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('bar', $response->getContent());
     }
 
-    public function testAPrivateCacheStoresAResponseWithPrivateDirective()
+    public function testAPrivateCacheStoresAResponseWithPrivateDirective(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -473,7 +473,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('foo', $response->getContent());
     }
 
-    public function testASharedCacheDoesntStoreAResponseWithAuthenticationHeader()
+    public function testASharedCacheDoesntStoreAResponseWithAuthenticationHeader(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -501,7 +501,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('bar', $response->getContent());
     }
 
-    public function testAPrivateCacheStoresAResponseWithAuthenticationHeader()
+    public function testAPrivateCacheStoresAResponseWithAuthenticationHeader(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -529,7 +529,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('foo', $response->getContent());
     }
 
-    public function testCacheMissAfterInvalidation()
+    public function testCacheMissAfterInvalidation(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -558,7 +558,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('bar', $response->getContent());
     }
 
-    public function testChunkErrorServesStaleResponse()
+    public function testChunkErrorServesStaleResponse(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -586,7 +586,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('foo', $response->getContent());
     }
 
-    public function testChunkErrorMustRevalidate()
+    public function testChunkErrorMustRevalidate(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -613,7 +613,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame(504, $response->getStatusCode());
     }
 
-    public function testExceedingMaxAgeIsCappedByTtl()
+    public function testExceedingMaxAgeIsCappedByTtl(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -642,7 +642,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('bar', $response->getContent());
     }
 
-    public function testItCanStreamAsyncResponse()
+    public function testItCanStreamAsyncResponse(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', ['http_code' => 200]),
@@ -665,7 +665,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('foo', $collected);
     }
 
-    public function testItCanStreamCachedResponse()
+    public function testItCanStreamCachedResponse(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -694,7 +694,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('foo', $collected);
     }
 
-    public function testItCanStreamBoth()
+    public function testItCanStreamBoth(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -726,7 +726,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('foobar', $collected);
     }
 
-    public function testMultipleChunksResponse()
+    public function testMultipleChunksResponse(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse(['chunk1', 'chunk2', 'chunk3'], ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=5']]),
@@ -749,7 +749,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('chunk1chunk2chunk3', $content);
     }
 
-    public function testConditionalCacheableStatusCodeWithoutExpiration()
+    public function testConditionalCacheableStatusCodeWithoutExpiration(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('redirected', ['http_code' => 302]),
@@ -767,7 +767,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('new redirect', $response->getContent(false));
     }
 
-    public function testConditionalCacheableStatusCodeWithExpiration()
+    public function testConditionalCacheableStatusCodeWithExpiration(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('redirected', [
@@ -788,7 +788,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('redirected', $response->getContent(false));
     }
 
-    public function testETagRevalidation()
+    public function testETagRevalidation(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -811,7 +811,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('foo', $response->getContent());
     }
 
-    public function testLastModifiedRevalidation()
+    public function testLastModifiedRevalidation(): void
     {
         $lastModified = 'Wed, 21 Oct 2015 07:28:00 GMT';
         $mockClient = new MockHttpClient([
@@ -835,7 +835,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('foo', $response->getContent());
     }
 
-    public function testAgeCalculation()
+    public function testAgeCalculation(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
@@ -855,7 +855,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('3', $response->getHeaders()['age'][0]);
     }
 
-    public function testGatewayTimeoutOnMustRevalidateFailure()
+    public function testGatewayTimeoutOnMustRevalidateFailure(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -877,7 +877,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame(504, $response->getStatusCode());
     }
 
-    public function testVaryAsteriskPreventsCaching()
+    public function testVaryAsteriskPreventsCaching(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', ['http_code' => 200, 'response_headers' => ['Vary' => '*']]),
@@ -895,7 +895,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('bar', $response->getContent());
     }
 
-    public function testExcludedHeadersAreNotCached()
+    public function testExcludedHeadersAreNotCached(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('foo', [
@@ -935,7 +935,7 @@ class CachingHttpClientTest extends TestCase
         self::assertArrayHasKey('x-custom-header', $cachedHeaders);
     }
 
-    public function testHeuristicFreshnessWithLastModified()
+    public function testHeuristicFreshnessWithLastModified(): void
     {
         $lastModified = gmdate('D, d M Y H:i:s T', time() - 3600); // 1 hour ago
         $mockClient = new MockHttpClient([
@@ -968,7 +968,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('bar', $response->getContent());
     }
 
-    public function testResponseInfluencingHeadersAffectCacheKey()
+    public function testResponseInfluencingHeadersAffectCacheKey(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('response for en', [
@@ -998,7 +998,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('response for fr', $response->getContent());
     }
 
-    public function testUnsafeInvalidationInBypassFlow()
+    public function testUnsafeInvalidationInBypassFlow(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('initial get', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
@@ -1022,7 +1022,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('after invalidate', $response->getContent());
     }
 
-    public function testNoInvalidationOnErrorInBypassFlow()
+    public function testNoInvalidationOnErrorInBypassFlow(): void
     {
         $mockClient = new MockHttpClient([
             new MockResponse('initial get', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
@@ -1047,7 +1047,7 @@ class CachingHttpClientTest extends TestCase
         self::assertSame('initial get', $response->getContent());
     }
 
-    public function testMultipleValuesForResponseInfluencingHeadersAffectCacheKey()
+    public function testMultipleValuesForResponseInfluencingHeadersAffectCacheKey(): void
     {
         // Test that multiple values for a response-influencing header (like Accept-Language)
         // result in different cache keys and don't incorrectly share cached responses.

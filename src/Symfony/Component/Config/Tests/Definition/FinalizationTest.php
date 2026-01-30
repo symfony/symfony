@@ -18,7 +18,7 @@ use Symfony\Component\Config\Definition\Processor;
 
 class FinalizationTest extends TestCase
 {
-    public function testUnsetKeyWithDeepHierarchy()
+    public function testUnsetKeyWithDeepHierarchy(): void
     {
         $tb = new TreeBuilder('config', 'array');
         $tree = $tb

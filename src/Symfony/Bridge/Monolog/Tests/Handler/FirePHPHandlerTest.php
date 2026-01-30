@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 
 class FirePHPHandlerTest extends TestCase
 {
-    public function testLogHandling()
+    public function testLogHandling(): void
     {
         $handler = $this->createHandler();
         $logger = new Logger('my_logger', [$handler]);
@@ -50,7 +50,7 @@ class FirePHPHandlerTest extends TestCase
         );
     }
 
-    public function testEmptyLog()
+    public function testEmptyLog(): void
     {
         $handler = $this->createHandler();
 
@@ -72,7 +72,7 @@ class FirePHPHandlerTest extends TestCase
         );
     }
 
-    public function testNoFirePhpClient()
+    public function testNoFirePhpClient(): void
     {
         $handler = $this->createHandler();
         $logger = new Logger('my_logger', [$handler]);
@@ -114,7 +114,7 @@ class FirePHPHandlerTest extends TestCase
         return $handler;
     }
 
-    public function testOnKernelResponseShouldNotTriggerDeprecation()
+    public function testOnKernelResponseShouldNotTriggerDeprecation(): void
     {
         $handler = $this->createHandler();
 
@@ -122,7 +122,7 @@ class FirePHPHandlerTest extends TestCase
         $request->headers->remove('User-Agent');
 
         $error = null;
-        set_error_handler(static function ($type, $message) use (&$error) { $error = $message; }, \E_DEPRECATED);
+        set_error_handler(static function ($type, $message) use (&$error): void { $error = $message; }, \E_DEPRECATED);
 
         $this->dispatchResponseEvent($handler, $request);
         restore_error_handler();

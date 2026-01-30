@@ -23,7 +23,7 @@ class ChoiceLoaderTest extends TestCase
 {
     use ChoiceListAssertionTrait;
 
-    public function testSameFormTypeUseCachedLoader()
+    public function testSameFormTypeUseCachedLoader(): void
     {
         $choices = ['f' => 'foo', 'b' => 'bar', 'z' => 'baz'];
         $choiceList = new ArrayChoiceList($choices);

@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 final class CssColorTest extends TestCase
 {
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(CssColorDummy::class);
         $loader = new AttributeLoader();
@@ -41,7 +41,7 @@ final class CssColorTest extends TestCase
         self::assertSame('some attached data', $cConstraint->payload);
     }
 
-    public function testMissingPatternDoctrineStyle()
+    public function testMissingPatternDoctrineStyle(): void
     {
         $constraint = new CssColor([]);
 

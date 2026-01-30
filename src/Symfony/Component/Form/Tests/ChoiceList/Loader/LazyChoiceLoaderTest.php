@@ -24,24 +24,24 @@ class LazyChoiceLoaderTest extends TestCase
         $this->loader = new LazyChoiceLoader(new ArrayChoiceLoader(['A', 'B', 'C']));
     }
 
-    public function testInitialEmptyChoiceListLoading()
+    public function testInitialEmptyChoiceListLoading(): void
     {
         $this->assertSame([], $this->loader->loadChoiceList()->getChoices());
     }
 
-    public function testOnDemandChoiceListAfterLoadingValuesForChoices()
+    public function testOnDemandChoiceListAfterLoadingValuesForChoices(): void
     {
         $this->loader->loadValuesForChoices(['A']);
         $this->assertSame(['A' => 'A'], $this->loader->loadChoiceList()->getChoices());
     }
 
-    public function testOnDemandChoiceListAfterLoadingChoicesForValues()
+    public function testOnDemandChoiceListAfterLoadingChoicesForValues(): void
     {
         $this->loader->loadChoicesForValues(['B']);
         $this->assertSame(['B' => 'B'], $this->loader->loadChoiceList()->getChoices());
     }
 
-    public function testOnDemandChoiceList()
+    public function testOnDemandChoiceList(): void
     {
         $this->loader->loadValuesForChoices(['A']);
         $this->loader->loadChoicesForValues(['B']);

@@ -31,7 +31,7 @@ class AccessDecisionManagerTest extends TestCase
         ];
     }
 
-    public function testVoterCalls()
+    public function testVoterCalls(): void
     {
         $voters = [
             $this->getExpectedVoter(VoterInterface::ACCESS_DENIED),
@@ -65,7 +65,7 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertTrue($manager->decide(new NullToken(), ['ROLE_FOO']));
     }
 
-    public function testCacheableVoters()
+    public function testCacheableVoters(): void
     {
         $token = new NullToken();
         $voter = $this->createMock(CacheableVoterInterface::class);
@@ -90,7 +90,7 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertTrue($manager->decide($token, ['foo'], 'bar'));
     }
 
-    public function testCacheableVotersIgnoresNonStringAttributes()
+    public function testCacheableVotersIgnoresNonStringAttributes(): void
     {
         $token = new NullToken();
         $voter = $this->createMock(CacheableVoterInterface::class);
@@ -112,7 +112,7 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertTrue($manager->decide($token, [1337], 'bar'));
     }
 
-    public function testCacheableVotersWithMultipleAttributes()
+    public function testCacheableVotersWithMultipleAttributes(): void
     {
         $token = new NullToken();
         $voter = $this->createMock(CacheableVoterInterface::class);
@@ -145,7 +145,7 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertTrue($manager->decide($token, ['foo', 'bar'], 'bar', true));
     }
 
-    public function testCacheableVotersWithEmptyAttributes()
+    public function testCacheableVotersWithEmptyAttributes(): void
     {
         $token = new NullToken();
         $voter = $this->createMock(CacheableVoterInterface::class);
@@ -167,7 +167,7 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertTrue($manager->decide($token, [], 'bar'));
     }
 
-    public function testCacheableVotersSupportsMethodsCalledOnce()
+    public function testCacheableVotersSupportsMethodsCalledOnce(): void
     {
         $token = new NullToken();
         $voter = $this->createMock(CacheableVoterInterface::class);
@@ -192,7 +192,7 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertTrue($manager->decide($token, ['foo'], 'bar'));
     }
 
-    public function testCacheableVotersNotCalled()
+    public function testCacheableVotersNotCalled(): void
     {
         $token = new NullToken();
         $voter = $this->createMock(CacheableVoterInterface::class);
@@ -212,7 +212,7 @@ class AccessDecisionManagerTest extends TestCase
         $this->assertFalse($manager->decide($token, ['foo'], 'bar'));
     }
 
-    public function testCacheableVotersWithMultipleAttributesAndNonString()
+    public function testCacheableVotersWithMultipleAttributesAndNonString(): void
     {
         $token = new NullToken();
         $voter = $this->createMock(CacheableVoterInterface::class);

@@ -18,14 +18,14 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\WeekToArrayTransformer
 
 class WeekToArrayTransformerTest extends TestCase
 {
-    public function testTransform()
+    public function testTransform(): void
     {
         $transformer = new WeekToArrayTransformer();
 
         $this->assertSame(['year' => 2019, 'week' => 1], $transformer->transform('2019-W01'));
     }
 
-    public function testTransformEmpty()
+    public function testTransformEmpty(): void
     {
         $transformer = new WeekToArrayTransformer();
 
@@ -33,7 +33,7 @@ class WeekToArrayTransformerTest extends TestCase
     }
 
     #[DataProvider('transformationFailuresProvider')]
-    public function testTransformationFailures($input, string $message)
+    public function testTransformationFailures($input, string $message): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage($message);
@@ -50,7 +50,7 @@ class WeekToArrayTransformerTest extends TestCase
         ];
     }
 
-    public function testReverseTransform()
+    public function testReverseTransform(): void
     {
         $transformer = new WeekToArrayTransformer();
 
@@ -62,7 +62,7 @@ class WeekToArrayTransformerTest extends TestCase
         $this->assertEquals('2019-W01', $transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformCompletelyEmpty()
+    public function testReverseTransformCompletelyEmpty(): void
     {
         $transformer = new WeekToArrayTransformer();
 
@@ -74,14 +74,14 @@ class WeekToArrayTransformerTest extends TestCase
         $this->assertNull($transformer->reverseTransform($input));
     }
 
-    public function testReverseTransformNull()
+    public function testReverseTransformNull(): void
     {
         $transformer = new WeekToArrayTransformer();
 
         $this->assertNull($transformer->reverseTransform(null));
     }
 
-    public function testReverseTransformEmpty()
+    public function testReverseTransformEmpty(): void
     {
         $transformer = new WeekToArrayTransformer();
 
@@ -89,7 +89,7 @@ class WeekToArrayTransformerTest extends TestCase
     }
 
     #[DataProvider('reverseTransformationFailuresProvider')]
-    public function testReverseTransformFailures($input, string $message)
+    public function testReverseTransformFailures($input, string $message): void
     {
         $this->expectException(TransformationFailedException::class);
         $this->expectExceptionMessage($message);

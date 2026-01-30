@@ -31,29 +31,29 @@ class ContainerBagTest extends TestCase
         $this->containerBag = new ContainerBag(new Container($this->parameterBag));
     }
 
-    public function testGetAllParameters()
+    public function testGetAllParameters(): void
     {
         $this->assertSame(['foo' => 'value'], $this->containerBag->all());
     }
 
-    public function testHasAParameter()
+    public function testHasAParameter(): void
     {
         $this->assertTrue($this->containerBag->has('foo'));
         $this->assertFalse($this->containerBag->has('bar'));
     }
 
-    public function testGetParameter()
+    public function testGetParameter(): void
     {
         $this->assertSame('value', $this->containerBag->get('foo'));
     }
 
-    public function testGetParameterNotFound()
+    public function testGetParameterNotFound(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->containerBag->get('bar');
     }
 
-    public function testInstanceOf()
+    public function testInstanceOf(): void
     {
         $this->assertInstanceOf(FrozenParameterBag::class, $this->containerBag);
         $this->assertInstanceOf(ContainerBagInterface::class, $this->containerBag);

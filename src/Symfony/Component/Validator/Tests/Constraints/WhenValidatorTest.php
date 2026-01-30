@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 final class WhenValidatorTest extends ConstraintValidatorTestCase
 {
-    public function testConstraintsAreExecuted()
+    public function testConstraintsAreExecuted(): void
     {
         $constraints = [
             new NotNull(),
@@ -40,7 +40,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         ));
     }
 
-    public function testConstraintsAreExecutedWhenClosureIsTrue()
+    public function testConstraintsAreExecutedWhenClosureIsTrue(): void
     {
         $constraints = [
             new NotNull(),
@@ -55,20 +55,20 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         ));
     }
 
-    public function testClosureTakesSubject()
+    public function testClosureTakesSubject(): void
     {
         $subject = new \stdClass();
         $this->setObject($subject);
 
         $this->validator->validate($subject, new When(
-            expression: static function ($closureSubject) use ($subject) {
+            expression: static function ($closureSubject) use ($subject): void {
                 self::assertSame($subject, $closureSubject);
             },
             constraints: new NotNull(),
         ));
     }
 
-    public function testConstraintIsExecuted()
+    public function testConstraintIsExecuted(): void
     {
         $constraint = new NotNull();
         $this->expectValidateValue(0, 'Foo', [$constraint]);
@@ -79,7 +79,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         ));
     }
 
-    public function testOtherwiseIsExecutedWhenFalse()
+    public function testOtherwiseIsExecutedWhenFalse(): void
     {
         $constraint = new NotNull();
         $otherwise = new Length(exactly: 10);
@@ -93,7 +93,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         ));
     }
 
-    public function testOtherwiseIsExecutedWhenClosureReturnsFalse()
+    public function testOtherwiseIsExecutedWhenClosureReturnsFalse(): void
     {
         $constraint = new NotNull();
         $otherwise = new Length(exactly: 10);
@@ -107,7 +107,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         ));
     }
 
-    public function testConstraintsAreExecutedWithNull()
+    public function testConstraintsAreExecutedWithNull(): void
     {
         $constraints = [
             new NotNull(),
@@ -121,7 +121,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         ));
     }
 
-    public function testConstraintsAreExecutedWithObject()
+    public function testConstraintsAreExecutedWithObject(): void
     {
         $number = new \stdClass();
         $number->type = 'positive';
@@ -142,7 +142,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         ));
     }
 
-    public function testConstraintsAreExecutedWithNestedObject()
+    public function testConstraintsAreExecutedWithNestedObject(): void
     {
         $parent = new \stdClass();
         $parent->child = new \stdClass();
@@ -167,7 +167,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         ));
     }
 
-    public function testConstraintsAreExecutedWithValue()
+    public function testConstraintsAreExecutedWithValue(): void
     {
         $constraints = [
             new Callback(),
@@ -181,7 +181,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         ));
     }
 
-    public function testConstraintsAreExecutedWithExpressionValues()
+    public function testConstraintsAreExecutedWithExpressionValues(): void
     {
         $constraints = [
             new Callback(),
@@ -199,7 +199,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         ));
     }
 
-    public function testConstraintsNotExecuted()
+    public function testConstraintsNotExecuted(): void
     {
         $constraints = [
             new NotNull(),
@@ -216,7 +216,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testOtherwiseIsExecutedWhenTrue()
+    public function testOtherwiseIsExecutedWhenTrue(): void
     {
         $constraints = [new NotNull()];
 
@@ -231,7 +231,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testConstraintsNotExecutedWithObject()
+    public function testConstraintsNotExecutedWithObject(): void
     {
         $number = new \stdClass();
         $number->type = 'positive';
@@ -254,7 +254,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testConstraintsNotExecutedWithValue()
+    public function testConstraintsNotExecutedWithValue(): void
     {
         $constraints = [
             new Callback(),
@@ -270,7 +270,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testConstraintsNotExecutedWithExpressionValues()
+    public function testConstraintsNotExecutedWithExpressionValues(): void
     {
         $constraints = [
             new Callback(),
@@ -290,7 +290,7 @@ final class WhenValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    public function testConstraintViolations()
+    public function testConstraintViolations(): void
     {
         $constraints = [
             new Blank(message: 'my_message'),

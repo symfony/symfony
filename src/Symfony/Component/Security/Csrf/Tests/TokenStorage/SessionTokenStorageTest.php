@@ -39,14 +39,14 @@ class SessionTokenStorageTest extends TestCase
         $this->storage = new SessionTokenStorage($requestStack, self::SESSION_NAMESPACE);
     }
 
-    public function testStoreTokenInNotStartedSessionStartsTheSession()
+    public function testStoreTokenInNotStartedSessionStartsTheSession(): void
     {
         $this->storage->setToken('token_id', 'TOKEN');
 
         $this->assertTrue($this->session->isStarted());
     }
 
-    public function testStoreTokenInActiveSession()
+    public function testStoreTokenInActiveSession(): void
     {
         $this->session->start();
         $this->storage->setToken('token_id', 'TOKEN');
@@ -54,7 +54,7 @@ class SessionTokenStorageTest extends TestCase
         $this->assertSame('TOKEN', $this->session->get(self::SESSION_NAMESPACE.'/token_id'));
     }
 
-    public function testCheckTokenInClosedSession()
+    public function testCheckTokenInClosedSession(): void
     {
         $this->session->set(self::SESSION_NAMESPACE.'/token_id', 'RESULT');
 
@@ -62,7 +62,7 @@ class SessionTokenStorageTest extends TestCase
         $this->assertTrue($this->session->isStarted());
     }
 
-    public function testCheckTokenInActiveSession()
+    public function testCheckTokenInActiveSession(): void
     {
         $this->session->start();
         $this->session->set(self::SESSION_NAMESPACE.'/token_id', 'RESULT');
@@ -70,7 +70,7 @@ class SessionTokenStorageTest extends TestCase
         $this->assertTrue($this->storage->hasToken('token_id'));
     }
 
-    public function testGetExistingTokenFromClosedSession()
+    public function testGetExistingTokenFromClosedSession(): void
     {
         $this->session->set(self::SESSION_NAMESPACE.'/token_id', 'RESULT');
 
@@ -78,7 +78,7 @@ class SessionTokenStorageTest extends TestCase
         $this->assertTrue($this->session->isStarted());
     }
 
-    public function testGetExistingTokenFromActiveSession()
+    public function testGetExistingTokenFromActiveSession(): void
     {
         $this->session->start();
         $this->session->set(self::SESSION_NAMESPACE.'/token_id', 'RESULT');
@@ -86,13 +86,13 @@ class SessionTokenStorageTest extends TestCase
         $this->assertSame('RESULT', $this->storage->getToken('token_id'));
     }
 
-    public function testGetNonExistingTokenFromClosedSession()
+    public function testGetNonExistingTokenFromClosedSession(): void
     {
         $this->expectException(TokenNotFoundException::class);
         $this->storage->getToken('token_id');
     }
 
-    public function testGetNonExistingTokenFromActiveSession()
+    public function testGetNonExistingTokenFromActiveSession(): void
     {
         $this->session->start();
 
@@ -101,26 +101,26 @@ class SessionTokenStorageTest extends TestCase
         $this->storage->getToken('token_id');
     }
 
-    public function testRemoveNonExistingTokenFromClosedSession()
+    public function testRemoveNonExistingTokenFromClosedSession(): void
     {
         $this->assertNull($this->storage->removeToken('token_id'));
     }
 
-    public function testRemoveNonExistingTokenFromActiveSession()
+    public function testRemoveNonExistingTokenFromActiveSession(): void
     {
         $this->session->start();
 
         $this->assertNull($this->storage->removeToken('token_id'));
     }
 
-    public function testRemoveExistingTokenFromClosedSession()
+    public function testRemoveExistingTokenFromClosedSession(): void
     {
         $this->session->set(self::SESSION_NAMESPACE.'/token_id', 'TOKEN');
 
         $this->assertSame('TOKEN', $this->storage->removeToken('token_id'));
     }
 
-    public function testRemoveExistingTokenFromActiveSession()
+    public function testRemoveExistingTokenFromActiveSession(): void
     {
         $this->session->start();
         $this->session->set(self::SESSION_NAMESPACE.'/token_id', 'TOKEN');
@@ -128,7 +128,7 @@ class SessionTokenStorageTest extends TestCase
         $this->assertSame('TOKEN', $this->storage->removeToken('token_id'));
     }
 
-    public function testClearRemovesAllTokensFromTheConfiguredNamespace()
+    public function testClearRemovesAllTokensFromTheConfiguredNamespace(): void
     {
         $this->storage->setToken('foo', 'bar');
         $this->storage->clear();
@@ -137,7 +137,7 @@ class SessionTokenStorageTest extends TestCase
         $this->assertFalse($this->session->has(self::SESSION_NAMESPACE.'/foo'));
     }
 
-    public function testClearDoesNotRemoveSessionValuesFromOtherNamespaces()
+    public function testClearDoesNotRemoveSessionValuesFromOtherNamespaces(): void
     {
         $this->session->set('foo/bar', 'baz');
         $this->storage->clear();
@@ -146,7 +146,7 @@ class SessionTokenStorageTest extends TestCase
         $this->assertSame('baz', $this->session->get('foo/bar'));
     }
 
-    public function testClearDoesNotRemoveNonNamespacedSessionValues()
+    public function testClearDoesNotRemoveNonNamespacedSessionValues(): void
     {
         $this->session->set('foo', 'baz');
         $this->storage->clear();

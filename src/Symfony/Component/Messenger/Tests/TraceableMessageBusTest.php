@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\TraceableMessageBus;
 
 class TraceableMessageBusTest extends TestCase
 {
-    public function testItTracesDispatch()
+    public function testItTracesDispatch(): void
     {
         $message = new DummyMessage('Hello');
 
@@ -49,7 +49,7 @@ class TraceableMessageBusTest extends TestCase
         ], $actualTracedMessage);
     }
 
-    public function testItTracesDispatchWhenHandleTraitIsUsed()
+    public function testItTracesDispatchWhenHandleTraitIsUsed(): void
     {
         $message = new DummyMessage('Hello');
 
@@ -73,7 +73,7 @@ class TraceableMessageBusTest extends TestCase
         ], $actualTracedMessage);
     }
 
-    public function testItTracesDispatchWithEnvelope()
+    public function testItTracesDispatchWithEnvelope(): void
     {
         $message = new DummyMessage('Hello');
         $envelope = (new Envelope($message))->with($stamp = new AnEnvelopeStamp());
@@ -99,7 +99,7 @@ class TraceableMessageBusTest extends TestCase
         ], $actualTracedMessage);
     }
 
-    public function testItCollectsStampsAddedDuringDispatch()
+    public function testItCollectsStampsAddedDuringDispatch(): void
     {
         $message = new DummyMessage('Hello');
         $envelope = (new Envelope($message))->with($stamp = new AnEnvelopeStamp());
@@ -125,7 +125,7 @@ class TraceableMessageBusTest extends TestCase
         ], $actualTracedMessage);
     }
 
-    public function testItTracesExceptions()
+    public function testItTracesExceptions(): void
     {
         $message = new DummyMessage('Hello');
 
@@ -157,7 +157,7 @@ class TraceableMessageBusTest extends TestCase
         ], $actualTracedMessage);
     }
 
-    public function testItTracesExceptionsWhenMessageBusIsFiredFromArrayCallback()
+    public function testItTracesExceptionsWhenMessageBusIsFiredFromArrayCallback(): void
     {
         $message = new DummyMessage('Hello');
         $exception = new \RuntimeException();

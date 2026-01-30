@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Chatwork\ChatworkOptions;
 
 class ChatworkOptionsTest extends TestCase
 {
-    public function testSetTo()
+    public function testSetTo(): void
     {
         $options = new ChatworkOptions();
         $options->to(['abc', 'def']);
@@ -26,7 +26,7 @@ class ChatworkOptionsTest extends TestCase
         $this->assertSame(['to' => 'ghi'], $options->toArray());
     }
 
-    public function testSetSelfUnread()
+    public function testSetSelfUnread(): void
     {
         $options = new ChatworkOptions();
         $options->selfUnread(true);

@@ -16,7 +16,7 @@ use Symfony\Component\Console\Helper\DescriptorHelper;
 
 class DescriptorHelperTest extends TestCase
 {
-    public function testGetFormats()
+    public function testGetFormats(): void
     {
         $helper = new DescriptorHelper();
         $expectedFormats = [

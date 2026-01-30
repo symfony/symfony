@@ -18,7 +18,7 @@ use Symfony\Component\Console\Terminal;
 
 class ColorTest extends TestCase
 {
-    public function testAnsi4Colors()
+    public function testAnsi4Colors(): void
     {
         $color = new Color();
         $this->assertSame(' ', $color->apply(' '));
@@ -33,7 +33,7 @@ class ColorTest extends TestCase
         $this->assertSame("\033[31;43;4m \033[39;49;24m", $color->apply(' '));
     }
 
-    public function testTrueColors()
+    public function testTrueColors(): void
     {
         Terminal::setColorMode(AnsiColorMode::Ansi24);
 
@@ -48,7 +48,7 @@ class ColorTest extends TestCase
         }
     }
 
-    public function testDegradedTrueColorsToAnsi4()
+    public function testDegradedTrueColorsToAnsi4(): void
     {
         Terminal::setColorMode(AnsiColorMode::Ansi4);
 
@@ -63,7 +63,7 @@ class ColorTest extends TestCase
         }
     }
 
-    public function testDegradedTrueColorsToAnsi8()
+    public function testDegradedTrueColorsToAnsi8(): void
     {
         Terminal::setColorMode(AnsiColorMode::Ansi8);
 

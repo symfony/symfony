@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\StreamOutput;
 #[Group('time-sensitive')]
 class ProgressIndicatorTest extends TestCase
 {
-    public function testDefaultIndicator()
+    public function testDefaultIndicator(): void
     {
         $bar = new ProgressIndicator($output = $this->getOutputStream());
         $bar->start('Starting...');
@@ -64,7 +64,7 @@ class ProgressIndicatorTest extends TestCase
         );
     }
 
-    public function testNonDecoratedOutput()
+    public function testNonDecoratedOutput(): void
     {
         $bar = new ProgressIndicator($output = $this->getOutputStream(false));
 
@@ -86,7 +86,7 @@ class ProgressIndicatorTest extends TestCase
         );
     }
 
-    public function testCustomIndicatorValues()
+    public function testCustomIndicatorValues(): void
     {
         $bar = new ProgressIndicator($output = $this->getOutputStream(), null, 100, ['a', 'b', 'c']);
 
@@ -109,7 +109,7 @@ class ProgressIndicatorTest extends TestCase
         );
     }
 
-    public function testCustomFinishedIndicatorValue()
+    public function testCustomFinishedIndicatorValue(): void
     {
         $bar = new ProgressIndicator($output = $this->getOutputStream(), null, 100, ['a', 'b'], '✅');
 
@@ -126,7 +126,7 @@ class ProgressIndicatorTest extends TestCase
         );
     }
 
-    public function testCustomFinishedIndicatorWhenFinishingProcess()
+    public function testCustomFinishedIndicatorWhenFinishingProcess(): void
     {
         $bar = new ProgressIndicator($output = $this->getOutputStream(), null, 100, ['a', 'b']);
 
@@ -142,14 +142,14 @@ class ProgressIndicatorTest extends TestCase
         );
     }
 
-    public function testCannotSetInvalidIndicatorCharacters()
+    public function testCannotSetInvalidIndicatorCharacters(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Must have at least 2 indicator value characters.');
         new ProgressIndicator($this->getOutputStream(), null, 100, ['1']);
     }
 
-    public function testCannotStartAlreadyStartedIndicator()
+    public function testCannotStartAlreadyStartedIndicator(): void
     {
         $bar = new ProgressIndicator($this->getOutputStream());
         $bar->start('Starting...');
@@ -160,7 +160,7 @@ class ProgressIndicatorTest extends TestCase
         $bar->start('Starting Again.');
     }
 
-    public function testCannotAdvanceUnstartedIndicator()
+    public function testCannotAdvanceUnstartedIndicator(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Progress indicator has not yet been started.');
@@ -168,7 +168,7 @@ class ProgressIndicatorTest extends TestCase
         $bar->advance();
     }
 
-    public function testCannotFinishUnstartedIndicator()
+    public function testCannotFinishUnstartedIndicator(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Progress indicator has not yet been started.');
@@ -177,7 +177,7 @@ class ProgressIndicatorTest extends TestCase
     }
 
     #[DataProvider('provideFormat')]
-    public function testFormats($format)
+    public function testFormats($format): void
     {
         $bar = new ProgressIndicator($output = $this->getOutputStream(), $format);
         $bar->start('Starting...');

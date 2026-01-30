@@ -20,7 +20,7 @@ use Symfony\Component\Serializer\Context\ContextBuilderTrait;
  */
 class ContextBuilderTraitTest extends TestCase
 {
-    public function testWithContext()
+    public function testWithContext(): void
     {
         $contextBuilder = new class implements ContextBuilderInterface {
             use ContextBuilderTrait;
@@ -35,7 +35,7 @@ class ContextBuilderTraitTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $withContextBuilderObject);
     }
 
-    public function testWith()
+    public function testWith(): void
     {
         $contextBuilder = new class {
             use ContextBuilderTrait;

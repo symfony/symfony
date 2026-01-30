@@ -34,7 +34,7 @@ class ErrorDumpCommandTest extends TestCase
         $fs->remove($this->tmpDir);
     }
 
-    public function testDumpPages()
+    public function testDumpPages(): void
     {
         $tester = $this->getCommandTester($this->createStub(KernelInterface::class), []);
         $tester->execute([
@@ -45,7 +45,7 @@ class ErrorDumpCommandTest extends TestCase
         $this->assertStringContainsString('Error 404', file_get_contents($this->tmpDir.\DIRECTORY_SEPARATOR.'404.html'));
     }
 
-    public function testDumpPagesOnlyForGivenStatusCodes()
+    public function testDumpPagesOnlyForGivenStatusCodes(): void
     {
         $fs = new Filesystem();
         $fs->mkdir($this->tmpDir);
@@ -64,7 +64,7 @@ class ErrorDumpCommandTest extends TestCase
         $this->assertStringContainsString('Error 400', file_get_contents($this->tmpDir.\DIRECTORY_SEPARATOR.'400.html'));
     }
 
-    public function testForceRemovalPages()
+    public function testForceRemovalPages(): void
     {
         $fs = new Filesystem();
         $fs->mkdir($this->tmpDir);

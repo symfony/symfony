@@ -27,7 +27,7 @@ use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 
 class FailedMessagesRetryCommandTest extends TestCase
 {
-    public function testBasicRunWithServiceLocator()
+    public function testBasicRunWithServiceLocator(): void
     {
         $series = [
             [[10], new Envelope(new \stdClass())],
@@ -68,7 +68,7 @@ class FailedMessagesRetryCommandTest extends TestCase
         $this->assertStringNotContainsString('Available failure transports are:', $tester->getDisplay());
     }
 
-    public function testBasicRunWithServiceLocatorMultipleFailedTransportsDefined()
+    public function testBasicRunWithServiceLocatorMultipleFailedTransportsDefined(): void
     {
         $receiver = $this->createStub(ListableReceiverInterface::class);
         $receiver->method('all')->willReturn([]);
@@ -97,7 +97,7 @@ class FailedMessagesRetryCommandTest extends TestCase
         $this->assertStringContainsString($expectedLadingMessage, $tester->getDisplay());
     }
 
-    public function testBasicRunWithServiceLocatorWithSpecificFailureTransport()
+    public function testBasicRunWithServiceLocatorWithSpecificFailureTransport(): void
     {
         $series = [
             [[10], new Envelope(new \stdClass())],
@@ -137,7 +137,7 @@ class FailedMessagesRetryCommandTest extends TestCase
         $this->assertStringContainsString('[OK]', $tester->getDisplay());
     }
 
-    public function testCompletingTransport()
+    public function testCompletingTransport(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
 
@@ -158,7 +158,7 @@ class FailedMessagesRetryCommandTest extends TestCase
         $this->assertSame(['global_receiver', 'failure_receiver'], $suggestions);
     }
 
-    public function testCompleteId()
+    public function testCompleteId(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
 
@@ -181,7 +181,7 @@ class FailedMessagesRetryCommandTest extends TestCase
         $this->assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
     }
 
-    public function testCompleteIdWithSpecifiedTransport()
+    public function testCompleteIdWithSpecifiedTransport(): void
     {
         $globalFailureReceiverName = 'failure_receiver';
         $anotherFailureReceiverName = 'another_receiver';
@@ -205,7 +205,7 @@ class FailedMessagesRetryCommandTest extends TestCase
         $this->assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
     }
 
-    public function testSuccessMessageGoesToStdout()
+    public function testSuccessMessageGoesToStdout(): void
     {
         $envelope = new Envelope(new \stdClass(), [new TransportMessageIdStamp('some_id')]);
         $receiver = $this->createStub(ListableReceiverInterface::class);
@@ -229,7 +229,7 @@ class FailedMessagesRetryCommandTest extends TestCase
         $this->assertStringNotContainsString('All done!', $stderr);
     }
 
-    public function testCommentsGoToStderr()
+    public function testCommentsGoToStderr(): void
     {
         $envelope = new Envelope(new \stdClass(), [new TransportMessageIdStamp('some_id')]);
         $receiver = $this->createStub(ListableReceiverInterface::class);
@@ -253,7 +253,7 @@ class FailedMessagesRetryCommandTest extends TestCase
         $this->assertStringNotContainsString('Quit this command with CONTROL-C', $stdout);
     }
 
-    public function testPendingMessageCountGoesToStdout()
+    public function testPendingMessageCountGoesToStdout(): void
     {
         $receiver = new class implements ListableReceiverInterface, MessageCountAwareInterface {
             public function get(): iterable
@@ -304,7 +304,7 @@ class FailedMessagesRetryCommandTest extends TestCase
         $this->assertStringNotContainsString('messages pending', $stderr);
     }
 
-    public function testSkipRunWithServiceLocator()
+    public function testSkipRunWithServiceLocator(): void
     {
         $failureTransportName = 'failure_receiver';
         $originalTransportName = 'original_receiver';

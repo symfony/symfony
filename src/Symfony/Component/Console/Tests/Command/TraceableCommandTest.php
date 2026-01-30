@@ -30,7 +30,7 @@ class TraceableCommandTest extends TestCase
         $this->application->addCommand(new InvokableTestCommand());
     }
 
-    public function testRunIsOverriddenWithoutProfile()
+    public function testRunIsOverriddenWithoutProfile(): void
     {
         $command = $this->application->find('app:loop:example');
         $commandTester = new CommandTester($command);
@@ -41,7 +41,7 @@ class TraceableCommandTest extends TestCase
         $this->assertLoopOutputCorrectness($output);
     }
 
-    public function testRunIsNotOverriddenWithProfile()
+    public function testRunIsNotOverriddenWithProfile(): void
     {
         // Simulate the bug environment by wrapping
         // our command in TraceableCommand, which is what Symfony does
@@ -59,7 +59,7 @@ class TraceableCommandTest extends TestCase
         $this->assertLoopOutputCorrectness($output);
     }
 
-    public function testRunOnInvokableCommand()
+    public function testRunOnInvokableCommand(): void
     {
         $command = $this->application->find('invokable:test');
         $traceableCommand = new TraceableCommand($command, new Stopwatch());
@@ -69,7 +69,7 @@ class TraceableCommandTest extends TestCase
         $commandTester->assertCommandIsSuccessful();
     }
 
-    public function assertLoopOutputCorrectness(string $output)
+    public function assertLoopOutputCorrectness(string $output): void
     {
         $completeChar = '\\' !== \DIRECTORY_SEPARATOR ? '▓' : '=';
         self::assertMatchesRegularExpression('~3/3\s+\['.$completeChar.'+]\s+100%~u', $output);

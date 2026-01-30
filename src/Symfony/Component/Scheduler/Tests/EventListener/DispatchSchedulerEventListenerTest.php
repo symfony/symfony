@@ -31,7 +31,7 @@ use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 class DispatchSchedulerEventListenerTest extends TestCase
 {
-    public function testDispatchSchedulerEvents()
+    public function testDispatchSchedulerEvents(): void
     {
         $trigger = $this->createStub(TriggerInterface::class);
         $defaultRecurringMessage = RecurringMessage::trigger($trigger, (object) ['id' => 'default']);
@@ -72,17 +72,17 @@ class TestEventListener
 
     /* Listener methods */
 
-    public function preRun($e)
+    public function preRun($e): void
     {
         $this->preRunEvent = $e;
     }
 
-    public function postRun($e)
+    public function postRun($e): void
     {
         $this->postRunEvent = $e;
     }
 
-    public function onFailure($e)
+    public function onFailure($e): void
     {
         $this->failureEvent = $e;
     }

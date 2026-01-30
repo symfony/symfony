@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Util\PropertyPath;
 class PropertyPathTest extends TestCase
 {
     #[DataProvider('provideAppendPaths')]
-    public function testAppend($basePath, $subPath, $expectedPath, $message)
+    public function testAppend($basePath, $subPath, $expectedPath, $message): void
     {
         $this->assertSame($expectedPath, PropertyPath::append($basePath, $subPath), $message);
     }

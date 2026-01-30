@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 
 class DumpDataCollectorPassTest extends TestCase
 {
-    public function testProcessWithoutFileLinkFormatParameter()
+    public function testProcessWithoutFileLinkFormatParameter(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
@@ -35,7 +35,7 @@ class DumpDataCollectorPassTest extends TestCase
         $this->assertNull($definition->getArgument(1));
     }
 
-    public function testProcessWithToolbarEnabledAndVirtualRequestStackPresent()
+    public function testProcessWithToolbarEnabledAndVirtualRequestStackPresent(): void
     {
         $container = new ContainerBuilder();
         $container->register('request_stack', RequestStack::class);
@@ -51,7 +51,7 @@ class DumpDataCollectorPassTest extends TestCase
         $this->assertEquals(new Reference('.virtual_request_stack'), $definition->getArgument(3));
     }
 
-    public function testProcessWithToolbarEnabledAndVirtualRequestStackNotPresent()
+    public function testProcessWithToolbarEnabledAndVirtualRequestStackNotPresent(): void
     {
         $container = new ContainerBuilder();
         $container->register('request_stack', RequestStack::class);
@@ -66,7 +66,7 @@ class DumpDataCollectorPassTest extends TestCase
         $this->assertEquals(new Reference('request_stack'), $definition->getArgument(3));
     }
 
-    public function testProcessWithToolbarDisabled()
+    public function testProcessWithToolbarDisabled(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());
@@ -80,7 +80,7 @@ class DumpDataCollectorPassTest extends TestCase
         $this->assertNull($definition->getArgument(3));
     }
 
-    public function testProcessWithoutToolbar()
+    public function testProcessWithoutToolbar(): void
     {
         $container = new ContainerBuilder();
         $container->addCompilerPass(new DumpDataCollectorPass());

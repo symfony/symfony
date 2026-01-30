@@ -35,7 +35,7 @@ class AbstractPropertyInfoExtractorTest extends TestCase
         $this->propertyInfo = new PropertyInfoExtractor($extractors, $extractors, $extractors, $extractors, $extractors);
     }
 
-    public function testInstanceOf()
+    public function testInstanceOf(): void
     {
         $this->assertInstanceOf(PropertyInfoExtractorInterface::class, $this->propertyInfo);
         $this->assertInstanceOf(PropertyTypeExtractorInterface::class, $this->propertyInfo);
@@ -44,37 +44,37 @@ class AbstractPropertyInfoExtractorTest extends TestCase
         $this->assertInstanceOf(PropertyInitializableExtractorInterface::class, $this->propertyInfo);
     }
 
-    public function testGetShortDescription()
+    public function testGetShortDescription(): void
     {
         $this->assertSame('short', $this->propertyInfo->getShortDescription('Foo', 'bar', []));
     }
 
-    public function testGetLongDescription()
+    public function testGetLongDescription(): void
     {
         $this->assertSame('long', $this->propertyInfo->getLongDescription('Foo', 'bar', []));
     }
 
-    public function testGetType()
+    public function testGetType(): void
     {
         $this->assertEquals(Type::int(), $this->propertyInfo->getType('Foo', 'bar', []));
     }
 
-    public function testIsReadable()
+    public function testIsReadable(): void
     {
         $this->assertTrue($this->propertyInfo->isReadable('Foo', 'bar', []));
     }
 
-    public function testIsWritable()
+    public function testIsWritable(): void
     {
         $this->assertTrue($this->propertyInfo->isWritable('Foo', 'bar', []));
     }
 
-    public function testGetProperties()
+    public function testGetProperties(): void
     {
         $this->assertEquals(['a', 'b'], $this->propertyInfo->getProperties('Foo'));
     }
 
-    public function testIsInitializable()
+    public function testIsInitializable(): void
     {
         $this->assertTrue($this->propertyInfo->isInitializable('Foo', 'bar', []));
     }

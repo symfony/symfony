@@ -17,7 +17,7 @@ use Symfony\Component\Uid\Factory\UlidFactory;
 
 final class UlidFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $ulidFactory = new UlidFactory();
 
@@ -35,7 +35,7 @@ final class UlidFactoryTest extends TestCase
         $this->assertSame('1234.162000', $ulid3->getDateTime()->format('U.u'));
     }
 
-    public function testCreateWithInvalidTimestamp()
+    public function testCreateWithInvalidTimestamp(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The timestamp must be positive.');

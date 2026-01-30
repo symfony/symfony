@@ -25,7 +25,7 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
 
     #[Group('network')]
     #[Group('integration')]
-    public function testRewindOnFtp()
+    public function testRewindOnFtp(): void
     {
         if (!getenv('INTEGRATION_FTP_URL')) {
             self::markTestSkipped('INTEGRATION_FTP_URL env var is not defined.');
@@ -40,7 +40,7 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
 
     #[Group('network')]
     #[Group('integration')]
-    public function testSeekOnFtp()
+    public function testSeekOnFtp(): void
     {
         if (!getenv('INTEGRATION_FTP_URL')) {
             self::markTestSkipped('INTEGRATION_FTP_URL env var is not defined.');
@@ -65,7 +65,7 @@ class RecursiveDirectoryIteratorTest extends IteratorTestCase
         $this->assertEquals($contains, $actual);
     }
 
-    public function testTrailingDirectorySeparatorIsStripped()
+    public function testTrailingDirectorySeparatorIsStripped(): void
     {
         $fixturesDirectory = __DIR__.'/../Fixtures/';
         $actual = [];

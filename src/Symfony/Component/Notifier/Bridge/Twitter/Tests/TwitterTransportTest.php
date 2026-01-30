@@ -45,7 +45,7 @@ class TwitterTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testBasicTweet()
+    public function testBasicTweet(): void
     {
         $transport = $this->createTransport(new MockHttpClient(function (string $method, string $url, array $options) {
             $this->assertSame('POST', $method);
@@ -61,7 +61,7 @@ class TwitterTransportTest extends TransportTestCase
         $this->assertSame('abc123', $result->getMessageId());
     }
 
-    public function testTweetImage()
+    public function testTweetImage(): void
     {
         $transport = $this->createTransport(new MockHttpClient((function () {
             yield function (string $method, string $url, array $options) {
@@ -124,7 +124,7 @@ class TwitterTransportTest extends TransportTestCase
         $this->assertSame('abc123', $result->getMessageId());
     }
 
-    public function testTweetVideo()
+    public function testTweetVideo(): void
     {
         $transport = $this->createTransport(new MockHttpClient((function () {
             yield function (string $method, string $url, array $options) {

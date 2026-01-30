@@ -27,7 +27,7 @@ class UlidToStringTransformerTest extends TestCase
     }
 
     #[DataProvider('provideValidUlid')]
-    public function testTransform($output, $input)
+    public function testTransform($output, $input): void
     {
         $transformer = new UlidToStringTransformer();
 
@@ -36,14 +36,14 @@ class UlidToStringTransformerTest extends TestCase
         $this->assertEquals($output, $transformer->transform($input));
     }
 
-    public function testTransformEmpty()
+    public function testTransformEmpty(): void
     {
         $transformer = new UlidToStringTransformer();
 
         $this->assertNull($transformer->transform(null));
     }
 
-    public function testTransformExpectsUlid()
+    public function testTransformExpectsUlid(): void
     {
         $transformer = new UlidToStringTransformer();
 
@@ -53,7 +53,7 @@ class UlidToStringTransformerTest extends TestCase
     }
 
     #[DataProvider('provideValidUlid')]
-    public function testReverseTransform($input, $output)
+    public function testReverseTransform($input, $output): void
     {
         $reverseTransformer = new UlidToStringTransformer();
 
@@ -62,14 +62,14 @@ class UlidToStringTransformerTest extends TestCase
         $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
-    public function testReverseTransformEmpty()
+    public function testReverseTransformEmpty(): void
     {
         $reverseTransformer = new UlidToStringTransformer();
 
         $this->assertNull($reverseTransformer->reverseTransform(''));
     }
 
-    public function testReverseTransformExpectsString()
+    public function testReverseTransformExpectsString(): void
     {
         $reverseTransformer = new UlidToStringTransformer();
 
@@ -78,7 +78,7 @@ class UlidToStringTransformerTest extends TestCase
         $reverseTransformer->reverseTransform(1234);
     }
 
-    public function testReverseTransformExpectsValidUlidString()
+    public function testReverseTransformExpectsValidUlidString(): void
     {
         $reverseTransformer = new UlidToStringTransformer();
 

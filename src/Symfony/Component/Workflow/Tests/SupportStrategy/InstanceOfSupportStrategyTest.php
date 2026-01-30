@@ -17,14 +17,14 @@ use Symfony\Component\Workflow\WorkflowInterface;
 
 class InstanceOfSupportStrategyTest extends TestCase
 {
-    public function testSupportsIfClassInstance()
+    public function testSupportsIfClassInstance(): void
     {
         $strategy = new InstanceOfSupportStrategy(Subject1::class);
 
         $this->assertTrue($strategy->supports($this->createStub(WorkflowInterface::class), new Subject1()));
     }
 
-    public function testSupportsIfNotClassInstance()
+    public function testSupportsIfNotClassInstance(): void
     {
         $strategy = new InstanceOfSupportStrategy(Subject2::class);
 

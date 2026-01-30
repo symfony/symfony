@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ResolveNoPreloadPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
 

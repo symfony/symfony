@@ -20,18 +20,18 @@ use Symfony\Component\Intl\Util\IntlTestHelper;
 #[Group('intl-data')]
 class LocalesTest extends ResourceBundleTestCase
 {
-    public function testGetLocales()
+    public function testGetLocales(): void
     {
         $this->assertSame(static::getLocales(), Locales::getLocales());
     }
 
-    public function testGetAliases()
+    public function testGetAliases(): void
     {
         $this->assertSame(static::getLocaleAliases(), Locales::getAliases());
     }
 
     #[DataProvider('provideLocales')]
-    public function testGetNames($displayLocale)
+    public function testGetNames($displayLocale): void
     {
         if ('en' !== $displayLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -47,7 +47,7 @@ class LocalesTest extends ResourceBundleTestCase
         $this->assertSame([], array_diff($locales, static::getLocales()));
     }
 
-    public function testGetNamesDefaultLocale()
+    public function testGetNamesDefaultLocale(): void
     {
         IntlTestHelper::requireFullIntl($this);
 
@@ -57,7 +57,7 @@ class LocalesTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLocaleAliases')]
-    public function testGetNamesSupportsAliases($alias, $ofLocale)
+    public function testGetNamesSupportsAliases($alias, $ofLocale): void
     {
         if ('en' !== $ofLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -70,7 +70,7 @@ class LocalesTest extends ResourceBundleTestCase
     }
 
     #[DataProvider('provideLocales')]
-    public function testGetName($displayLocale)
+    public function testGetName($displayLocale): void
     {
         if ('en' !== $displayLocale) {
             IntlTestHelper::requireFullIntl($this);
@@ -83,7 +83,7 @@ class LocalesTest extends ResourceBundleTestCase
         }
     }
 
-    public function testGetNameDefaultLocale()
+    public function testGetNameDefaultLocale(): void
     {
         IntlTestHelper::requireFullIntl($this);
 
@@ -96,18 +96,18 @@ class LocalesTest extends ResourceBundleTestCase
         }
     }
 
-    public function testGetNameWithInvalidLocale()
+    public function testGetNameWithInvalidLocale(): void
     {
         $this->expectException(MissingResourceException::class);
         Locales::getName('foo');
     }
 
-    public function testGetNameWithAliasLocale()
+    public function testGetNameWithAliasLocale(): void
     {
         $this->assertSame(Locales::getName('tl_PH'), Locales::getName('fil_PH'));
     }
 
-    public function testExists()
+    public function testExists(): void
     {
         $this->assertTrue(Locales::exists('nl_NL'));
         $this->assertTrue(Locales::exists('tl_PH'));

@@ -17,7 +17,7 @@ use Symfony\Component\Translation\MessageCatalogue;
 
 class PoFileDumperTest extends TestCase
 {
-    public function testFormatCatalogue()
+    public function testFormatCatalogue(): void
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add(['foo' => 'bar', 'bar' => 'foo', 'foo_bar' => 'foobar', 'bar_foo' => 'barfoo']);
@@ -46,7 +46,7 @@ class PoFileDumperTest extends TestCase
         $this->assertStringEqualsFile(__DIR__.'/../Fixtures/resources.po', $dumper->formatCatalogue($catalogue, 'messages'));
     }
 
-    public function testDumpPlurals()
+    public function testDumpPlurals(): void
     {
         $catalogue = new MessageCatalogue('en');
         $catalogue->add([

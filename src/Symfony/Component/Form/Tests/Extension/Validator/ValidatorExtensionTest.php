@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Validation;
 
 class ValidatorExtensionTest extends TestCase
 {
-    public function test2Dot5ValidationApi()
+    public function test2Dot5ValidationApi(): void
     {
         $metadata = new ClassMetadata(Form::class);
 

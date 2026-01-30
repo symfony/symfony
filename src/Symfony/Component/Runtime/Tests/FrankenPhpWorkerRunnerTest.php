@@ -26,7 +26,7 @@ interface TestAppInterface extends HttpKernelInterface, TerminableInterface
 
 class FrankenPhpWorkerRunnerTest extends TestCase
 {
-    public function testRun()
+    public function testRun(): void
     {
         $application = $this->createMock(TestAppInterface::class);
         $application

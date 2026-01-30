@@ -24,7 +24,7 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 class PhpDocAwareReflectionTypeResolverTest extends TestCase
 {
     #[DataProvider('readPhpDocDataProvider')]
-    public function testReadPhpDoc(Type $expected, \Reflector $reflector)
+    public function testReadPhpDoc(Type $expected, \Reflector $reflector): void
     {
         $resolver = new PhpDocAwareReflectionTypeResolver(TypeResolver::create(), new StringTypeResolver(), new TypeContextFactory(new StringTypeResolver()));
 
@@ -47,7 +47,7 @@ class PhpDocAwareReflectionTypeResolverTest extends TestCase
         yield [Type::int(), $reflection->getProperty('aliasedInt')];
     }
 
-    public function testFallbackWhenNoPhpDoc()
+    public function testFallbackWhenNoPhpDoc(): void
     {
         $resolver = new PhpDocAwareReflectionTypeResolver(TypeResolver::create(), new StringTypeResolver(), new TypeContextFactory());
         $reflection = new \ReflectionClass(Dummy::class);

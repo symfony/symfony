@@ -18,7 +18,7 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 class ConfirmationQuestionTest extends TestCase
 {
     #[DataProvider('normalizerUsecases')]
-    public function testDefaultRegexUsecases($default, $answers, $expected, $message)
+    public function testDefaultRegexUsecases($default, $answers, $expected, $message): void
     {
         $sut = new ConfirmationQuestion('A question', $default);
 

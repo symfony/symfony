@@ -33,17 +33,17 @@ class RegistryTest extends TestCase
         $this->registry->addWorkflow(new Workflow(new Definition([], []), $this->createStub(MarkingStoreInterface::class), new EventDispatcher(), 'workflow3'), $this->createWorkflowSupportStrategy(Subject2::class));
     }
 
-    public function testHasWithMatch()
+    public function testHasWithMatch(): void
     {
         $this->assertTrue($this->registry->has(new Subject1()));
     }
 
-    public function testHasWithoutMatch()
+    public function testHasWithoutMatch(): void
     {
         $this->assertFalse($this->registry->has(new Subject1(), 'nope'));
     }
 
-    public function testGetWithSuccess()
+    public function testGetWithSuccess(): void
     {
         $workflow = $this->registry->get(new Subject1());
         $this->assertInstanceOf(Workflow::class, $workflow);
@@ -58,21 +58,21 @@ class RegistryTest extends TestCase
         $this->assertSame('workflow2', $workflow->getName());
     }
 
-    public function testGetWithMultipleMatch()
+    public function testGetWithMultipleMatch(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Too many workflows (workflow2, workflow3) match this subject (Symfony\Component\Workflow\Tests\Subject2); set a different name on each and use the second (name) argument of this method.');
         $this->registry->get(new Subject2());
     }
 
-    public function testGetWithNoMatch()
+    public function testGetWithNoMatch(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unable to find a workflow for class "stdClass".');
         $this->registry->get(new \stdClass());
     }
 
-    public function testAllWithOneMatchWithSuccess()
+    public function testAllWithOneMatchWithSuccess(): void
     {
         $workflows = $this->registry->all(new Subject1());
         $this->assertIsArray($workflows);
@@ -81,7 +81,7 @@ class RegistryTest extends TestCase
         $this->assertSame('workflow1', $workflows[0]->getName());
     }
 
-    public function testAllWithMultipleMatchWithSuccess()
+    public function testAllWithMultipleMatchWithSuccess(): void
     {
         $workflows = $this->registry->all(new Subject2());
         $this->assertIsArray($workflows);
@@ -92,7 +92,7 @@ class RegistryTest extends TestCase
         $this->assertSame('workflow3', $workflows[1]->getName());
     }
 
-    public function testAllWithNoMatch()
+    public function testAllWithNoMatch(): void
     {
         $workflows = $this->registry->all(new \stdClass());
         $this->assertIsArray($workflows);

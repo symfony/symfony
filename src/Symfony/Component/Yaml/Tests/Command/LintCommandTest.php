@@ -29,7 +29,7 @@ class LintCommandTest extends TestCase
 {
     private array $files;
 
-    public function testLintCorrectFile()
+    public function testLintCorrectFile(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('foo: bar');
@@ -40,7 +40,7 @@ class LintCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/^\/\/ OK in /', trim($tester->getDisplay()));
     }
 
-    public function testLintCorrectFiles()
+    public function testLintCorrectFiles(): void
     {
         $tester = $this->createCommandTester();
         $filename1 = $this->createFile('foo: bar');
@@ -52,7 +52,7 @@ class LintCommandTest extends TestCase
         $this->assertMatchesRegularExpression('/^\/\/ OK in /', trim($tester->getDisplay()));
     }
 
-    public function testLintIncorrectFile()
+    public function testLintIncorrectFile(): void
     {
         $incorrectContent = '
 foo:
@@ -66,7 +66,7 @@ bar';
         $this->assertStringContainsString('Unable to parse at line 3 (near "bar").', trim($tester->getDisplay()));
     }
 
-    public function testLintIncorrectFileWithGithubFormat()
+    public function testLintIncorrectFileWithGithubFormat(): void
     {
         $incorrectContent = <<<YAML
             foo:
@@ -81,7 +81,7 @@ bar';
         self::assertStringMatchesFormat('%A::error file=%s,line=2,col=0::Unable to parse at line 2 (near "bar")%A', trim($tester->getDisplay()));
     }
 
-    public function testLintAutodetectsGithubActionEnvironment()
+    public function testLintAutodetectsGithubActionEnvironment(): void
     {
         $prev = getenv('GITHUB_ACTIONS');
         putenv('GITHUB_ACTIONS');
@@ -104,7 +104,7 @@ bar';
         }
     }
 
-    public function testConstantAsKey()
+    public function testConstantAsKey(): void
     {
         $yaml = <<<YAML
             !php/const 'Symfony\Component\Yaml\Tests\Command\Foo::TEST': bar
@@ -113,7 +113,7 @@ bar';
         $this->assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
     }
 
-    public function testCustomTags()
+    public function testCustomTags(): void
     {
         $yaml = <<<YAML
             foo: !my_tag {foo: bar}
@@ -122,7 +122,7 @@ bar';
         $this->assertSame(0, $ret, 'lint:yaml exits with code 0 in case of success');
     }
 
-    public function testCustomTagsError()
+    public function testCustomTagsError(): void
     {
         $yaml = <<<YAML
             foo: !my_tag {foo: bar}
@@ -131,7 +131,7 @@ bar';
         $this->assertSame(1, $ret, 'lint:yaml exits with code 1 in case of error');
     }
 
-    public function testLintWithExclude()
+    public function testLintWithExclude(): void
     {
         $tester = $this->createCommandTester();
         $filename1 = $this->createFile('foo: bar');
@@ -142,7 +142,7 @@ bar';
         $this->assertStringContainsString('All 1 YAML files contain valid syntax.', trim($tester->getDisplay()));
     }
 
-    public function testLintFileNotReadable()
+    public function testLintFileNotReadable(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('');
@@ -154,7 +154,7 @@ bar';
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $tester = new CommandCompletionTester($this->createCommand());
 

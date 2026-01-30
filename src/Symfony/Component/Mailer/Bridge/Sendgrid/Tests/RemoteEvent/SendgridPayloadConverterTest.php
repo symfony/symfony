@@ -21,7 +21,7 @@ use Symfony\Component\RemoteEvent\Exception\ParseException;
 class SendgridPayloadConverterTest extends TestCase
 {
     #[DataProvider('provideDeliveryEvents')]
-    public function testMailDeliveryEvent(string $event, string $expectedEventName)
+    public function testMailDeliveryEvent(string $event, string $expectedEventName): void
     {
         $converter = new SendgridPayloadConverter();
 
@@ -50,7 +50,7 @@ class SendgridPayloadConverterTest extends TestCase
     }
 
     #[DataProvider('provideEngagementEvents')]
-    public function testMailEngagementEvent(string $event, string $expectedEventName)
+    public function testMailEngagementEvent(string $event, string $expectedEventName): void
     {
         $converter = new SendgridPayloadConverter();
 
@@ -74,7 +74,7 @@ class SendgridPayloadConverterTest extends TestCase
         yield ['spamreport', MailerEngagementEvent::SPAM];
     }
 
-    public function testUnsupportedEvent()
+    public function testUnsupportedEvent(): void
     {
         $converter = new SendgridPayloadConverter();
 
@@ -89,7 +89,7 @@ class SendgridPayloadConverterTest extends TestCase
         ]);
     }
 
-    public function testInvalidDate()
+    public function testInvalidDate(): void
     {
         $converter = new SendgridPayloadConverter();
 
@@ -104,7 +104,7 @@ class SendgridPayloadConverterTest extends TestCase
         ]);
     }
 
-    public function testAsynchronousBounce()
+    public function testAsynchronousBounce(): void
     {
         $converter = new SendgridPayloadConverter();
 
@@ -119,7 +119,7 @@ class SendgridPayloadConverterTest extends TestCase
         $this->assertSame('123456', $event->getId());
     }
 
-    public function testWithStringCategory()
+    public function testWithStringCategory(): void
     {
         $converter = new SendgridPayloadConverter();
 

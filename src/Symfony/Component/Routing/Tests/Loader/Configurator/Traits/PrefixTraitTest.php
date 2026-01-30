@@ -18,7 +18,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class PrefixTraitTest extends TestCase
 {
-    public function testAddLocalizedPrefixUpdatesAliases()
+    public function testAddLocalizedPrefixUpdatesAliases(): void
     {
         $collection = new RouteCollection();
         $collection->add('app_route', new Route('/path'));
@@ -27,7 +27,7 @@ class PrefixTraitTest extends TestCase
         $trait = new class {
             use PrefixTrait;
 
-            public function add(RouteCollection $c, array $p)
+            public function add(RouteCollection $c, array $p): void
             {
                 $this->addPrefix($c, $p, false);
             }

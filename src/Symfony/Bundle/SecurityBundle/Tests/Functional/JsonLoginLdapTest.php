@@ -22,7 +22,7 @@ use Symfony\Component\Ldap\Entry;
 
 class JsonLoginLdapTest extends AbstractWebTestCase
 {
-    public function testKernelBoot()
+    public function testKernelBoot(): void
     {
         $kernel = self::createKernel(['test_case' => 'JsonLoginLdap', 'root_config' => 'config.yml']);
         $kernel->boot();
@@ -30,7 +30,7 @@ class JsonLoginLdapTest extends AbstractWebTestCase
         $this->assertInstanceOf(Kernel::class, $kernel);
     }
 
-    public function testDefaultJsonLdapLoginSuccess()
+    public function testDefaultJsonLdapLoginSuccess(): void
     {
         // Given
         $client = $this->createClient(['test_case' => 'JsonLoginLdap', 'root_config' => 'config.yml', 'debug' => true]);

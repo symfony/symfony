@@ -24,7 +24,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class OidcUserInfoTokenHandlerTest extends TestCase
 {
     #[DataProvider('getClaims')]
-    public function testGetsUserIdentifierFromOidcServerResponse(string $claim, string $expected)
+    public function testGetsUserIdentifierFromOidcServerResponse(string $claim, string $expected): void
     {
         $accessToken = 'a-secret-token';
         $claims = [
@@ -61,7 +61,7 @@ class OidcUserInfoTokenHandlerTest extends TestCase
         yield ['email', 'foo@example.com'];
     }
 
-    public function testThrowsAnExceptionIfUserPropertyIsMissing()
+    public function testThrowsAnExceptionIfUserPropertyIsMissing(): void
     {
         $responseMock = $this->createMock(ResponseInterface::class);
         $responseMock->expects($this->once())

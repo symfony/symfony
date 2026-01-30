@@ -17,7 +17,7 @@ use Symfony\Component\JsonPath\JsonPath;
 
 class JsonPathTest extends TestCase
 {
-    public function testBuildPath()
+    public function testBuildPath(): void
     {
         $path = new JsonPath();
         $path = $path->key('users')
@@ -28,7 +28,7 @@ class JsonPathTest extends TestCase
         $this->assertSame('$["users"][0]["address"]..["city"]', (string) $path->deepScan()->key('city'));
     }
 
-    public function testBuildWithFilter()
+    public function testBuildWithFilter(): void
     {
         $path = new JsonPath();
         $path = $path->key('users')
@@ -37,7 +37,7 @@ class JsonPathTest extends TestCase
         $this->assertSame('$["users"][?(@.age > 18)]', (string) $path);
     }
 
-    public function testAll()
+    public function testAll(): void
     {
         $path = new JsonPath();
         $path = $path->key('users')
@@ -46,7 +46,7 @@ class JsonPathTest extends TestCase
         $this->assertSame('$["users"][*]', (string) $path);
     }
 
-    public function testFirst()
+    public function testFirst(): void
     {
         $path = new JsonPath();
         $path = $path->key('users')
@@ -55,7 +55,7 @@ class JsonPathTest extends TestCase
         $this->assertSame('$["users"][0]', (string) $path);
     }
 
-    public function testLast()
+    public function testLast(): void
     {
         $path = new JsonPath();
         $path = $path->key('users')
@@ -65,7 +65,7 @@ class JsonPathTest extends TestCase
     }
 
     #[DataProvider('provideKeysToEscape')]
-    public function testEscapedKey(string $key, string $expectedPath)
+    public function testEscapedKey(string $key, string $expectedPath): void
     {
         $path = new JsonPath();
         $path = $path->key($key);

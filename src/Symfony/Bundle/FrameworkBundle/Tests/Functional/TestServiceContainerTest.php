@@ -23,14 +23,14 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 
 class TestServiceContainerTest extends AbstractWebTestCase
 {
-    public function testLogicExceptionIfTestConfigIsDisabled()
+    public function testLogicExceptionIfTestConfigIsDisabled(): void
     {
         $this->expectException(\LogicException::class);
 
         static::bootKernel(['test_case' => 'TestServiceContainer', 'root_config' => 'test_disabled.yml', 'environment' => 'test_disabled']);
     }
 
-    public function testThatPrivateServicesAreAvailableIfTestConfigIsEnabled()
+    public function testThatPrivateServicesAreAvailableIfTestConfigIsEnabled(): void
     {
         static::bootKernel(['test_case' => 'TestServiceContainer']);
 
@@ -42,7 +42,7 @@ class TestServiceContainerTest extends AbstractWebTestCase
         $this->assertFalse(static::getContainer()->has(UnusedPrivateService::class));
     }
 
-    public function testThatPrivateServicesCanBeSetIfTestConfigIsEnabled()
+    public function testThatPrivateServicesCanBeSetIfTestConfigIsEnabled(): void
     {
         static::bootKernel(['test_case' => 'TestServiceContainer']);
 
@@ -58,7 +58,7 @@ class TestServiceContainerTest extends AbstractWebTestCase
         $container->set('private_service', new \stdClass());
     }
 
-    public function testSetDecoratedService()
+    public function testSetDecoratedService(): void
     {
         static::bootKernel(['test_case' => 'TestServiceContainer']);
 
@@ -71,7 +71,7 @@ class TestServiceContainerTest extends AbstractWebTestCase
 
     #[TestWith(['non_shared_service'])]
     #[TestWith(['non_shared_alias'])]
-    public function testSetNonSharedService(string $serviceId)
+    public function testSetNonSharedService(string $serviceId): void
     {
         static::bootKernel(['test_case' => 'TestServiceContainer']);
 
@@ -86,7 +86,7 @@ class TestServiceContainerTest extends AbstractWebTestCase
         $this->assertSame($service1, $container->get(PublicService::class)->nonSharedAlias);
     }
 
-    public function testThrowsExceptionWhenNonSharedServiceIsReplacedByNonCallable()
+    public function testThrowsExceptionWhenNonSharedServiceIsReplacedByNonCallable(): void
     {
         static::bootKernel(['test_case' => 'TestServiceContainer']);
 
@@ -99,13 +99,13 @@ class TestServiceContainerTest extends AbstractWebTestCase
     }
 
     #[DoesNotPerformAssertions]
-    public function testBootKernel()
+    public function testBootKernel(): void
     {
         static::bootKernel(['test_case' => 'TestServiceContainer']);
     }
 
     #[Depends('testBootKernel')]
-    public function testKernelIsNotInitialized()
+    public function testKernelIsNotInitialized(): void
     {
         self::assertNull(self::$class);
         self::assertNull(self::$kernel);

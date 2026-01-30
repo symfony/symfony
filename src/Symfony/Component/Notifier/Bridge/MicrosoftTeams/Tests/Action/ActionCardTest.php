@@ -24,7 +24,7 @@ use Symfony\Component\Notifier\Bridge\MicrosoftTeams\Action\OpenUriAction;
 
 final class ActionCardTest extends TestCase
 {
-    public function testName()
+    public function testName(): void
     {
         $action = (new ActionCard())
             ->name($value = 'My name');
@@ -33,7 +33,7 @@ final class ActionCardTest extends TestCase
     }
 
     #[DataProvider('availableInputs')]
-    public function testInput(array $expected, InputInterface $input)
+    public function testInput(array $expected, InputInterface $input): void
     {
         $action = (new ActionCard())
             ->input($input);
@@ -50,7 +50,7 @@ final class ActionCardTest extends TestCase
     }
 
     #[DataProvider('compatibleActions')]
-    public function testAction(array $expected, ActionCardCompatibleActionInterface $action)
+    public function testAction(array $expected, ActionCardCompatibleActionInterface $action): void
     {
         $section = (new ActionCard())
             ->action($action);
@@ -65,7 +65,7 @@ final class ActionCardTest extends TestCase
         yield [[['@type' => 'OpenUri']], new OpenUriAction()];
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $this->assertSame(
             [

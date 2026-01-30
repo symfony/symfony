@@ -52,7 +52,7 @@ class AbstractNormalizerTest extends TestCase
         $this->normalizer = new AbstractNormalizerDummy($this->classMetadata);
     }
 
-    public function testGetAllowedAttributesAsString()
+    public function testGetAllowedAttributesAsString(): void
     {
         $classMetadata = new ClassMetadata('c');
 
@@ -84,7 +84,7 @@ class AbstractNormalizerTest extends TestCase
         $this->assertEquals(['a1', 'a2', 'a3', 'a4'], $result);
     }
 
-    public function testGetAllowedAttributesAsObjects()
+    public function testGetAllowedAttributesAsObjects(): void
     {
         $classMetadata = new ClassMetadata('c');
 
@@ -119,7 +119,7 @@ class AbstractNormalizerTest extends TestCase
         $this->assertEquals([$a1, $a2, $a3, $a4], $result);
     }
 
-    public function testObjectWithStaticConstructor()
+    public function testObjectWithStaticConstructor(): void
     {
         $normalizer = new StaticConstructorNormalizer();
         $dummy = $normalizer->denormalize(['foo' => 'baz'], StaticConstructorDummy::class);
@@ -129,7 +129,7 @@ class AbstractNormalizerTest extends TestCase
         $this->assertNull($dummy->foo);
     }
 
-    public function testObjectWithNullableConstructorArgument()
+    public function testObjectWithNullableConstructorArgument(): void
     {
         $normalizer = new ObjectNormalizer();
         $dummy = $normalizer->denormalize(['foo' => null], NullableOptionalConstructorArgumentDummy::class);
@@ -137,7 +137,7 @@ class AbstractNormalizerTest extends TestCase
         $this->assertNull($dummy->getFoo());
     }
 
-    public function testObjectWithNullableConstructorArgumentWithoutInput()
+    public function testObjectWithNullableConstructorArgumentWithoutInput(): void
     {
         $normalizer = new ObjectNormalizer();
         $dummy = $normalizer->denormalize([], NullableOptionalConstructorArgumentDummy::class);
@@ -145,7 +145,7 @@ class AbstractNormalizerTest extends TestCase
         $this->assertNull($dummy->getFoo());
     }
 
-    public function testObjectWithNullableNonOptionalConstructorArgument()
+    public function testObjectWithNullableNonOptionalConstructorArgument(): void
     {
         $normalizer = new ObjectNormalizer();
         $dummy = $normalizer->denormalize(['foo' => null], NullableConstructorArgumentDummy::class);
@@ -153,7 +153,7 @@ class AbstractNormalizerTest extends TestCase
         $this->assertNull($dummy->getFoo());
     }
 
-    public function testObjectWithNullableNonOptionalConstructorArgumentWithoutInput()
+    public function testObjectWithNullableNonOptionalConstructorArgumentWithoutInput(): void
     {
         $normalizer = new ObjectNormalizer();
         $dummy = $normalizer->denormalize([], NullableConstructorArgumentDummy::class);
@@ -161,7 +161,7 @@ class AbstractNormalizerTest extends TestCase
         $this->assertNull($dummy->getFoo());
     }
 
-    public function testObjectWithNullableNonOptionalConstructorArgumentWithoutInputAndRequireAllProperties()
+    public function testObjectWithNullableNonOptionalConstructorArgumentWithoutInputAndRequireAllProperties(): void
     {
         $normalizer = new ObjectNormalizer();
 
@@ -172,7 +172,7 @@ class AbstractNormalizerTest extends TestCase
 
     #[DataProvider('getNormalizer')]
     #[DataProvider('getNormalizerWithCustomNameConverter')]
-    public function testObjectWithVariadicConstructorTypedArguments(AbstractNormalizer $normalizer)
+    public function testObjectWithVariadicConstructorTypedArguments(AbstractNormalizer $normalizer): void
     {
         $d1 = new Dummy();
         $d1->foo = 'Foo';
@@ -205,7 +205,7 @@ class AbstractNormalizerTest extends TestCase
     }
 
     #[DataProvider('getNormalizer')]
-    public function testVariadicSerializationWithPreservingKeys(AbstractNormalizer $normalizer)
+    public function testVariadicSerializationWithPreservingKeys(AbstractNormalizer $normalizer): void
     {
         $d1 = new Dummy();
         $d1->foo = 'Foo';
@@ -242,7 +242,7 @@ class AbstractNormalizerTest extends TestCase
         yield [new ObjectNormalizer(null, null, null, $extractor)];
     }
 
-    public function testVariadicConstructorDenormalization()
+    public function testVariadicConstructorDenormalization(): void
     {
         $data = [
             'foo' => 'woo',
@@ -280,7 +280,7 @@ class AbstractNormalizerTest extends TestCase
         yield [new ObjectNormalizer(null, $nameConverter, null, $extractor)];
     }
 
-    public function testIgnore()
+    public function testIgnore(): void
     {
         $classMetadata = new ClassMetadata(IgnoreDummy::class);
         $attributeMetadata = new AttributeMetadata('ignored1');
@@ -296,7 +296,7 @@ class AbstractNormalizerTest extends TestCase
         $this->assertSame([], $normalizer->normalize($dummy));
     }
 
-    public function testDenormalizeWhenObjectNotInstantiable()
+    public function testDenormalizeWhenObjectNotInstantiable(): void
     {
         $this->expectException(NotNormalizableValueException::class);
 

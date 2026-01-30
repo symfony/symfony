@@ -32,14 +32,14 @@ class WorkflowGuardListenerPassTest extends TestCase
         $this->compilerPass = new WorkflowGuardListenerPass();
     }
 
-    public function testNoExeptionIfParameterIsNotSet()
+    public function testNoExeptionIfParameterIsNotSet(): void
     {
         $this->compilerPass->process($this->container);
 
         $this->assertFalse($this->container->hasParameter('workflow.has_guard_listeners'));
     }
 
-    public function testNoExeptionIfAllDependenciesArePresent()
+    public function testNoExeptionIfAllDependenciesArePresent(): void
     {
         $this->container->setParameter('workflow.has_guard_listeners', true);
         $this->container->register('security.token_storage', TokenStorageInterface::class);
@@ -53,7 +53,7 @@ class WorkflowGuardListenerPassTest extends TestCase
         $this->assertFalse($this->container->hasParameter('workflow.has_guard_listeners'));
     }
 
-    public function testExceptionIfTheTokenStorageServiceIsNotPresent()
+    public function testExceptionIfTheTokenStorageServiceIsNotPresent(): void
     {
         $this->container->setParameter('workflow.has_guard_listeners', true);
         $this->container->register('security.authorization_checker', AuthorizationCheckerInterface::class);
@@ -66,7 +66,7 @@ class WorkflowGuardListenerPassTest extends TestCase
         $this->compilerPass->process($this->container);
     }
 
-    public function testExceptionIfTheAuthorizationCheckerServiceIsNotPresent()
+    public function testExceptionIfTheAuthorizationCheckerServiceIsNotPresent(): void
     {
         $this->container->setParameter('workflow.has_guard_listeners', true);
         $this->container->register('security.token_storage', TokenStorageInterface::class);
@@ -79,7 +79,7 @@ class WorkflowGuardListenerPassTest extends TestCase
         $this->compilerPass->process($this->container);
     }
 
-    public function testExceptionIfTheAuthenticationTrustResolverServiceIsNotPresent()
+    public function testExceptionIfTheAuthenticationTrustResolverServiceIsNotPresent(): void
     {
         $this->container->setParameter('workflow.has_guard_listeners', true);
         $this->container->register('security.token_storage', TokenStorageInterface::class);
@@ -92,7 +92,7 @@ class WorkflowGuardListenerPassTest extends TestCase
         $this->compilerPass->process($this->container);
     }
 
-    public function testExceptionIfTheRoleHierarchyServiceIsNotPresent()
+    public function testExceptionIfTheRoleHierarchyServiceIsNotPresent(): void
     {
         $this->container->setParameter('workflow.has_guard_listeners', true);
         $this->container->register('security.token_storage', TokenStorageInterface::class);

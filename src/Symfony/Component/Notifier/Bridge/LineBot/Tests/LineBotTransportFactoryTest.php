@@ -65,7 +65,7 @@ final class LineBotTransportFactoryTest extends AbstractTransportFactoryTestCase
         yield ['somethingElse://token@host?receiver=abc&token=token'];
     }
 
-    public function testDsnToken()
+    public function testDsnToken(): void
     {
         $encodedToken = urlencode(self::MOCK_TOKEN);
 

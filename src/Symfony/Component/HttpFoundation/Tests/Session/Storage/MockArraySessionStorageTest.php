@@ -44,7 +44,7 @@ class MockArraySessionStorageTest extends TestCase
         $this->storage->setSessionData($this->data);
     }
 
-    public function testStart()
+    public function testStart(): void
     {
         $this->assertEquals('', $this->storage->getId());
         $this->storage->start();
@@ -54,7 +54,7 @@ class MockArraySessionStorageTest extends TestCase
         $this->assertEquals($id, $this->storage->getId());
     }
 
-    public function testRegenerate()
+    public function testRegenerate(): void
     {
         $this->storage->start();
         $id = $this->storage->getId();
@@ -70,14 +70,14 @@ class MockArraySessionStorageTest extends TestCase
         $this->assertEquals(['notice' => 'hello'], $this->storage->getBag('flashes')->peekAll());
     }
 
-    public function testGetId()
+    public function testGetId(): void
     {
         $this->assertEquals('', $this->storage->getId());
         $this->storage->start();
         $this->assertNotEquals('', $this->storage->getId());
     }
 
-    public function testClearClearsBags()
+    public function testClearClearsBags(): void
     {
         $this->storage->clear();
 
@@ -85,14 +85,14 @@ class MockArraySessionStorageTest extends TestCase
         $this->assertSame([], $this->storage->getBag('flashes')->peekAll());
     }
 
-    public function testClearStartsSession()
+    public function testClearStartsSession(): void
     {
         $this->storage->clear();
 
         $this->assertTrue($this->storage->isStarted());
     }
 
-    public function testClearWithNoBagsStartsSession()
+    public function testClearWithNoBagsStartsSession(): void
     {
         $storage = new MockArraySessionStorage();
 
@@ -101,7 +101,7 @@ class MockArraySessionStorageTest extends TestCase
         $this->assertTrue($storage->isStarted());
     }
 
-    public function testUnstartedSave()
+    public function testUnstartedSave(): void
     {
         $this->expectException(\RuntimeException::class);
         $this->storage->save();

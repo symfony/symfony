@@ -33,28 +33,28 @@ use Symfony\Component\Serializer\Serializer;
 
 class EmailTest extends TestCase
 {
-    public function testSubject()
+    public function testSubject(): void
     {
         $e = new Email();
         $e->subject('Subject');
         $this->assertEquals('Subject', $e->getSubject());
     }
 
-    public function testDate()
+    public function testDate(): void
     {
         $e = new Email();
         $e->date($d = new \DateTimeImmutable());
         $this->assertEquals($d, $e->getDate());
     }
 
-    public function testReturnPath()
+    public function testReturnPath(): void
     {
         $e = new Email();
         $e->returnPath('fabien@symfony.com');
         $this->assertEquals(new Address('fabien@symfony.com'), $e->getReturnPath());
     }
 
-    public function testSender()
+    public function testSender(): void
     {
         $e = new Email();
         $e->sender('fabien@symfony.com');
@@ -64,14 +64,14 @@ class EmailTest extends TestCase
         $this->assertSame($fabien, $e->getSender());
     }
 
-    public function testFromWithNoAddress()
+    public function testFromWithNoAddress(): void
     {
         $e = new Email();
         $this->expectException(LogicException::class);
         $e->from();
     }
 
-    public function testFrom()
+    public function testFrom(): void
     {
         $e = new Email();
         $helene = new Address('helene@symfony.com');
@@ -104,7 +104,7 @@ class EmailTest extends TestCase
         $this->assertSame([$caramel], $e->getFrom());
     }
 
-    public function testReplyTo()
+    public function testReplyTo(): void
     {
         $e = new Email();
         $helene = new Address('helene@symfony.com');
@@ -137,7 +137,7 @@ class EmailTest extends TestCase
         $this->assertSame([$caramel], $e->getReplyTo());
     }
 
-    public function testTo()
+    public function testTo(): void
     {
         $e = new Email();
         $helene = new Address('helene@symfony.com');
@@ -170,7 +170,7 @@ class EmailTest extends TestCase
         $this->assertSame([$caramel], $e->getTo());
     }
 
-    public function testCc()
+    public function testCc(): void
     {
         $e = new Email();
         $helene = new Address('helene@symfony.com');
@@ -203,7 +203,7 @@ class EmailTest extends TestCase
         $this->assertSame([$caramel], $e->getCc());
     }
 
-    public function testBcc()
+    public function testBcc(): void
     {
         $e = new Email();
         $helene = new Address('helene@symfony.com');
@@ -236,7 +236,7 @@ class EmailTest extends TestCase
         $this->assertSame([$caramel], $e->getBcc());
     }
 
-    public function testPriority()
+    public function testPriority(): void
     {
         $e = new Email();
         $this->assertEquals(3, $e->getPriority());
@@ -249,20 +249,20 @@ class EmailTest extends TestCase
         $this->assertEquals(1, $e->getPriority());
     }
 
-    public function testGenerateBodyThrowsWhenEmptyBody()
+    public function testGenerateBodyThrowsWhenEmptyBody(): void
     {
         $this->expectException(\LogicException::class);
         (new Email())->getBody();
     }
 
-    public function testGetBody()
+    public function testGetBody(): void
     {
         $e = new Email();
         $e->setBody($text = new TextPart('text content'));
         $this->assertEquals($text, $e->getBody());
     }
 
-    public function testGenerateBodyWithTextOnly()
+    public function testGenerateBodyWithTextOnly(): void
     {
         $text = new TextPart('text content');
         $e = (new Email())->from('me@example.com')->to('you@example.com');
@@ -271,7 +271,7 @@ class EmailTest extends TestCase
         $this->assertEquals('text content', $e->getTextBody());
     }
 
-    public function testGenerateBodyWithHtmlOnly()
+    public function testGenerateBodyWithHtmlOnly(): void
     {
         $html = new TextPart('html content', 'utf-8', 'html');
         $e = (new Email())->from('me@example.com')->to('you@example.com');
@@ -280,7 +280,7 @@ class EmailTest extends TestCase
         $this->assertEquals('html content', $e->getHtmlBody());
     }
 
-    public function testGenerateBodyWithTextAndHtml()
+    public function testGenerateBodyWithTextAndHtml(): void
     {
         $text = new TextPart('text content');
         $html = new TextPart('html content', 'utf-8', 'html');
@@ -290,7 +290,7 @@ class EmailTest extends TestCase
         $this->assertEquals(new AlternativePart($text, $html), $e->getBody());
     }
 
-    public function testGenerateBodyWithTextAndHtmlNotUtf8()
+    public function testGenerateBodyWithTextAndHtmlNotUtf8(): void
     {
         $e = (new Email())->from('me@example.com')->to('you@example.com');
         $e->html('html content', 'iso-8859-1');
@@ -300,7 +300,7 @@ class EmailTest extends TestCase
         $this->assertEquals(new AlternativePart(new TextPart('text content', 'iso-8859-1'), new TextPart('html content', 'iso-8859-1', 'html')), $e->getBody());
     }
 
-    public function testGenerateBodyWithTextContentAndAttachedFile()
+    public function testGenerateBodyWithTextContentAndAttachedFile(): void
     {
         [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
@@ -309,7 +309,7 @@ class EmailTest extends TestCase
         $this->assertEquals(new MixedPart($text, $filePart), $e->getBody());
     }
 
-    public function testGenerateBodyWithHtmlContentAndAttachedFile()
+    public function testGenerateBodyWithHtmlContentAndAttachedFile(): void
     {
         [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
@@ -318,7 +318,7 @@ class EmailTest extends TestCase
         $this->assertEquals(new MixedPart($html, $filePart), $e->getBody());
     }
 
-    public function testGenerateBodyWithHtmlContentAndInlineImageNotreferenced()
+    public function testGenerateBodyWithHtmlContentAndInlineImageNotreferenced(): void
     {
         [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $imagePart = new DataPart($image = fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'));
@@ -329,7 +329,7 @@ class EmailTest extends TestCase
         $this->assertEquals(new MixedPart($html, $imagePart), $e->getBody());
     }
 
-    public function testGenerateBodyWithAttachedFileOnly()
+    public function testGenerateBodyWithAttachedFileOnly(): void
     {
         [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
@@ -337,7 +337,7 @@ class EmailTest extends TestCase
         $this->assertEquals(new MixedPart($filePart), $e->getBody());
     }
 
-    public function testGenerateBodyWithInlineImageOnly()
+    public function testGenerateBodyWithInlineImageOnly(): void
     {
         $imagePart = new DataPart($image = fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'));
         $imagePart->asInline();
@@ -346,7 +346,7 @@ class EmailTest extends TestCase
         $this->assertEquals(new MixedPart($imagePart), $e->getBody());
     }
 
-    public function testGenerateBodyWithEmbeddedImageOnly()
+    public function testGenerateBodyWithEmbeddedImageOnly(): void
     {
         $imagePart = new DataPart($image = fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r'));
         $e = (new Email())->from('me@example.com')->to('you@example.com');
@@ -355,7 +355,7 @@ class EmailTest extends TestCase
         $this->assertEquals(new MixedPart($imagePart), $e->getBody());
     }
 
-    public function testGenerateBodyWithTextAndHtmlContentAndAttachedFile()
+    public function testGenerateBodyWithTextAndHtmlContentAndAttachedFile(): void
     {
         [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
@@ -365,7 +365,7 @@ class EmailTest extends TestCase
         $this->assertEquals(new MixedPart(new AlternativePart($text, $html), $filePart), $e->getBody());
     }
 
-    public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageNotReferenced()
+    public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageNotReferenced(): void
     {
         [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
@@ -376,7 +376,7 @@ class EmailTest extends TestCase
         $this->assertEquals(new MixedPart(new AlternativePart($text, $html), $filePart, $imagePart), $e->getBody());
     }
 
-    public function testGenerateBodyWithTextAndAttachedFileAndAttachedImageNotReferenced()
+    public function testGenerateBodyWithTextAndAttachedFileAndAttachedImageNotReferenced(): void
     {
         [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
@@ -386,7 +386,7 @@ class EmailTest extends TestCase
         $this->assertEquals(new MixedPart($text, $filePart, $imagePart), $e->getBody());
     }
 
-    public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageNotReferencedViaCid()
+    public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageNotReferencedViaCid(): void
     {
         [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
@@ -398,7 +398,7 @@ class EmailTest extends TestCase
         $this->assertEquals(new MixedPart(new AlternativePart($text, $fullhtml), $filePart, $imagePart), $e->getBody());
     }
 
-    public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageReferencedViaCid()
+    public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageReferencedViaCid(): void
     {
         [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
@@ -417,7 +417,7 @@ class EmailTest extends TestCase
         $this->assertStringContainsString('cid:'.$parts[1]->getContentId(), $generatedHtml->getBody());
     }
 
-    public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageReferencedViaCidAndContentId()
+    public function testGenerateBodyWithTextAndHtmlAndAttachedFileAndAttachedImageReferencedViaCidAndContentId(): void
     {
         [$text, $html, $filePart, $file, $imagePart, $image] = $this->generateSomeParts();
         $e = (new Email())->from('me@example.com')->to('you@example.com');
@@ -435,7 +435,7 @@ class EmailTest extends TestCase
         $this->assertInstanceOf(AlternativePart::class, $parts[0]);
     }
 
-    public function testGenerateBodyWithHtmlAndInlinedImageTwiceReferencedViaCid()
+    public function testGenerateBodyWithHtmlAndInlinedImageTwiceReferencedViaCid(): void
     {
         // inline image (twice) referenced in the HTML content
         $content = 'html content <img src="cid:test.gif">';
@@ -474,7 +474,7 @@ class EmailTest extends TestCase
         return [$text, $html, $filePart, $file, $imagePart, $image];
     }
 
-    public function testAttachments()
+    public function testAttachments(): void
     {
         // inline part
         $contents = file_get_contents($name = __DIR__.'/Fixtures/mimetypes/test');
@@ -495,7 +495,7 @@ class EmailTest extends TestCase
         $this->assertEquals([$att->getPreparedHeaders(), $inline->getPreparedHeaders()], array_map(static fn (DataPart $a) => $a->getPreparedHeaders(), $e->getAttachments()));
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $r = fopen('php://memory', 'r+', false);
         fwrite($r, 'Text content');
@@ -518,7 +518,7 @@ class EmailTest extends TestCase
         $this->assertSame($a, $b);
     }
 
-    public function testSymfonySerialize()
+    public function testSymfonySerialize(): void
     {
         // we don't add from/sender to check that validation is not triggered to serialize an email
         $e = new Email();
@@ -590,7 +590,7 @@ class EmailTest extends TestCase
         $this->assertEquals($expected->getBody(), $n->getBody());
     }
 
-    public function testMissingHeaderDoesNotThrowError()
+    public function testMissingHeaderDoesNotThrowError(): void
     {
         $this->expectException(ExpectationFailedException::class);
         $this->expectExceptionMessage('Failed asserting that the Email has header "foo" with value "bar" (value is null).');
@@ -600,7 +600,7 @@ class EmailTest extends TestCase
         $emailHeaderSame->evaluate($e);
     }
 
-    public function testHtmlBodyExpectStringOrResourceOrNull()
+    public function testHtmlBodyExpectStringOrResourceOrNull(): void
     {
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('The body must be a string, a resource or null (got "bool").');
@@ -608,7 +608,7 @@ class EmailTest extends TestCase
         (new Email())->html(false);
     }
 
-    public function testHtmlBodyAcceptedTypes()
+    public function testHtmlBodyAcceptedTypes(): void
     {
         $email = new Email();
 
@@ -623,7 +623,7 @@ class EmailTest extends TestCase
         $this->assertSame($contents, $email->getHtmlBody());
     }
 
-    public function testTextBodyExpectStringOrResourceOrNull()
+    public function testTextBodyExpectStringOrResourceOrNull(): void
     {
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('The body must be a string, a resource or null (got "bool").');
@@ -631,7 +631,7 @@ class EmailTest extends TestCase
         (new Email())->text(false);
     }
 
-    public function testTextBodyAcceptedTypes()
+    public function testTextBodyAcceptedTypes(): void
     {
         $email = new Email();
 
@@ -646,7 +646,7 @@ class EmailTest extends TestCase
         $this->assertSame($contents, $email->getTextBody());
     }
 
-    public function testBodyCache()
+    public function testBodyCache(): void
     {
         $email = new Email();
         $email->from('fabien@symfony.com');
@@ -666,7 +666,7 @@ class EmailTest extends TestCase
         $this->assertNotSame($body1, $body2, 'The two bodies must not reference the same object, so the body cache does not ensure that the hash for the DKIM signature is unique.');
     }
 
-    public function testAttachmentBodyIsPartOfTheSerializationEmailPayloadWhenUsingAttachMethod()
+    public function testAttachmentBodyIsPartOfTheSerializationEmailPayloadWhenUsingAttachMethod(): void
     {
         $email = new Email();
         $email->attach(file_get_contents(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'foo_attachment.txt') ?: '');
@@ -674,7 +674,7 @@ class EmailTest extends TestCase
         $this->assertTrue(str_contains(serialize($email), 'foo_bar_xyz_123'));
     }
 
-    public function testAttachmentBodyIsNotPartOfTheSerializationEmailPayloadWhenUsingAttachFromPathMethod()
+    public function testAttachmentBodyIsNotPartOfTheSerializationEmailPayloadWhenUsingAttachFromPathMethod(): void
     {
         $email = new Email();
         $email->attachFromPath(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'foo_attachment.txt');
@@ -682,7 +682,7 @@ class EmailTest extends TestCase
         $this->assertFalse(str_contains(serialize($email), 'foo_bar_xyz_123'));
     }
 
-    public function testEmailsWithAttachmentsWhichAreAFileInstanceCanBeUnserialized()
+    public function testEmailsWithAttachmentsWhichAreAFileInstanceCanBeUnserialized(): void
     {
         $email = new Email();
         $email->attachFromPath(__DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'foo_attachment.txt');
@@ -696,7 +696,7 @@ class EmailTest extends TestCase
         $this->assertStringContainsString('foo_bar_xyz_123', $attachments[0]->getBody());
     }
 
-    public function testInvalidBodyWithEmptyEmail()
+    public function testInvalidBodyWithEmptyEmail(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('A message must have a text or an HTML part or attachments.');
@@ -704,7 +704,7 @@ class EmailTest extends TestCase
         (new Email())->ensureValidity();
     }
 
-    public function testBodyWithTextIsValid()
+    public function testBodyWithTextIsValid(): void
     {
         $email = new Email();
         $email->to('test@example.com')
@@ -716,7 +716,7 @@ class EmailTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testBodyWithHtmlIsValid()
+    public function testBodyWithHtmlIsValid(): void
     {
         $email = new Email();
         $email->to('test@example.com')
@@ -728,7 +728,7 @@ class EmailTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testEmptyBodyWithAttachmentsIsValid()
+    public function testEmptyBodyWithAttachmentsIsValid(): void
     {
         $email = new Email();
         $email->to('test@example.com')
@@ -740,7 +740,7 @@ class EmailTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testSetBodyIsValid()
+    public function testSetBodyIsValid(): void
     {
         $email = new Email();
         $email->to('test@example.com')

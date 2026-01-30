@@ -28,45 +28,45 @@ class DateTimeZoneNormalizerTest extends TestCase
         $this->normalizer = new DateTimeZoneNormalizer();
     }
 
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsNormalization(new \DateTimeZone('UTC')));
         $this->assertFalse($this->normalizer->supportsNormalization(new \DateTimeImmutable()));
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $this->assertEquals('UTC', $this->normalizer->normalize(new \DateTimeZone('UTC')));
         $this->assertEquals('Asia/Tokyo', $this->normalizer->normalize(new \DateTimeZone('Asia/Tokyo')));
     }
 
-    public function testNormalizeBadObjectTypeThrowsException()
+    public function testNormalizeBadObjectTypeThrowsException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->normalizer->normalize(new \stdClass());
     }
 
-    public function testSupportsDenormalization()
+    public function testSupportsDenormalization(): void
     {
         $this->assertTrue($this->normalizer->supportsDenormalization(null, \DateTimeZone::class));
         $this->assertFalse($this->normalizer->supportsDenormalization(null, \DateTimeImmutable::class));
         $this->assertFalse($this->normalizer->supportsDenormalization(null, \stdClass::class));
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $this->assertEquals(new \DateTimeZone('UTC'), $this->normalizer->denormalize('UTC', \DateTimeZone::class, null));
         $this->assertEquals(new \DateTimeZone('Asia/Tokyo'), $this->normalizer->denormalize('Asia/Tokyo', \DateTimeZone::class, null));
     }
 
-    public function testDenormalizeNullTimeZoneThrowsException()
+    public function testDenormalizeNullTimeZoneThrowsException(): void
     {
         $this->expectException(NotNormalizableValueException::class);
         $this->normalizer->denormalize(null, \DateTimeZone::class, null);
     }
 
-    public function testDenormalizeBadTimeZoneThrowsException()
+    public function testDenormalizeBadTimeZoneThrowsException(): void
     {
         $this->expectException(NotNormalizableValueException::class);
         $this->normalizer->denormalize('Jupiter/Europa', \DateTimeZone::class, null);

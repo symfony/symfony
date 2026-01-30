@@ -26,7 +26,7 @@ use Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers\MyController;
 
 class YamlFileLoaderTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $loader = new YamlFileLoader($this->createStub(FileLocatorInterface::class));
 
@@ -39,7 +39,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertFalse($loader->supports('foo.yml', 'foo'), '->supports() checks the resource type if specified');
     }
 
-    public function testLoadDoesNothingIfEmpty()
+    public function testLoadDoesNothingIfEmpty(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $collection = $loader->load('empty.yml');
@@ -49,7 +49,7 @@ class YamlFileLoaderTest extends TestCase
     }
 
     #[DataProvider('getPathsToInvalidFiles')]
-    public function testLoadThrowsExceptionWithInvalidFile(string $filePath)
+    public function testLoadThrowsExceptionWithInvalidFile(string $filePath): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
 
@@ -74,7 +74,7 @@ class YamlFileLoaderTest extends TestCase
         ];
     }
 
-    public function testLoadSpecialRouteName()
+    public function testLoadSpecialRouteName(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('special_route_name.yml');
@@ -84,7 +84,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame('/true', $route->getPath());
     }
 
-    public function testLoadWithRoute()
+    public function testLoadWithRoute(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('validpattern.yml');
@@ -102,7 +102,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertTrue($route->getDefault('_stateless'));
     }
 
-    public function testLoadWithResource()
+    public function testLoadWithResource(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routeCollection = $loader->load('validresource.yml');
@@ -121,7 +121,7 @@ class YamlFileLoaderTest extends TestCase
         }
     }
 
-    public function testLoadRouteWithControllerAttribute()
+    public function testLoadRouteWithControllerAttribute(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $routeCollection = $loader->load('routing.yml');
@@ -131,7 +131,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame('AppBundle:Homepage:show', $route->getDefault('_controller'));
     }
 
-    public function testLoadRouteWithoutControllerAttribute()
+    public function testLoadRouteWithoutControllerAttribute(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $routeCollection = $loader->load('routing.yml');
@@ -141,7 +141,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertNull($route->getDefault('_controller'));
     }
 
-    public function testLoadRouteWithControllerSetInDefaults()
+    public function testLoadRouteWithControllerSetInDefaults(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $routeCollection = $loader->load('routing.yml');
@@ -151,7 +151,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame('AppBundle:Blog:list', $route->getDefault('_controller'));
     }
 
-    public function testOverrideControllerInDefaults()
+    public function testOverrideControllerInDefaults(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
 
@@ -162,7 +162,7 @@ class YamlFileLoaderTest extends TestCase
     }
 
     #[DataProvider('provideFilesImportingRoutesWithControllers')]
-    public function testImportRouteWithController($file)
+    public function testImportRouteWithController($file): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
         $routeCollection = $loader->load($file);
@@ -183,7 +183,7 @@ class YamlFileLoaderTest extends TestCase
         yield ['import__controller.yml'];
     }
 
-    public function testImportWithOverriddenController()
+    public function testImportWithOverriddenController(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/controller']));
 
@@ -193,7 +193,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('import_override_defaults.yml');
     }
 
-    public function testImportRouteWithGlobMatchingSingleFile()
+    public function testImportRouteWithGlobMatchingSingleFile(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/glob']));
         $routeCollection = $loader->load('import_single.yml');
@@ -202,7 +202,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame('AppBundle:Bar:view', $route->getDefault('_controller'));
     }
 
-    public function testImportRouteWithGlobMatchingMultipleFiles()
+    public function testImportRouteWithGlobMatchingMultipleFiles(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/glob']));
         $routeCollection = $loader->load('import_multiple.yml');
@@ -214,7 +214,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame('AppBundle:Baz:view', $route->getDefault('_controller'));
     }
 
-    public function testImportRouteWithNamePrefix()
+    public function testImportRouteWithNamePrefix(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/import_with_name_prefix']));
         $routeCollection = $loader->load('routing.yml');
@@ -225,14 +225,14 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals('/api/blog', $routeCollection->get('api_app_blog')->getPath());
     }
 
-    public function testRemoteSourcesAreNotAccepted()
+    public function testRemoteSourcesAreNotAccepted(): void
     {
         $loader = new YamlFileLoader(new FileLocatorStub());
         $this->expectException(\InvalidArgumentException::class);
         $loader->load('http://remote.com/here.yml');
     }
 
-    public function testLoadingRouteWithDefaults()
+    public function testLoadingRouteWithDefaults(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routes = $loader->load('defaults.yml');
@@ -247,7 +247,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertTrue($defaultsRoute->getDefault('_stateless'));
     }
 
-    public function testLoadingImportedRoutesWithDefaults()
+    public function testLoadingImportedRoutesWithDefaults(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
         $routes = $loader->load('importer-with-defaults.yml');
@@ -271,7 +271,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes, $routes);
     }
 
-    public function testLoadingUtf8Route()
+    public function testLoadingUtf8Route(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('utf8.yml');
@@ -289,7 +289,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes, $routes);
     }
 
-    public function testLoadingUtf8ImportedRoutes()
+    public function testLoadingUtf8ImportedRoutes(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('importer-with-utf8.yml');
@@ -309,7 +309,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes, $routes);
     }
 
-    public function testLoadingLocalizedRoute()
+    public function testLoadingLocalizedRoute(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('localized-route.yml');
@@ -317,7 +317,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertCount(3, $routes);
     }
 
-    public function testImportingRoutesFromDefinition()
+    public function testImportingRoutesFromDefinition(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('importing-localized-route.yml');
@@ -328,7 +328,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals('/here', $routes->get('not_localized')->getPath());
     }
 
-    public function testImportingRoutesWithLocales()
+    public function testImportingRoutesWithLocales(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('importer-with-locale.yml');
@@ -341,7 +341,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals('en', $routes->get('imported.en')->getRequirement('_locale'));
     }
 
-    public function testImportingNonLocalizedRoutesWithLocales()
+    public function testImportingNonLocalizedRoutesWithLocales(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('importer-with-locale-imports-non-localized-route.yml');
@@ -354,7 +354,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame('en', $routes->get('imported.en')->getRequirement('_locale'));
     }
 
-    public function testImportingRoutesWithOfficialLocales()
+    public function testImportingRoutesWithOfficialLocales(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('officially_formatted_locales.yml');
@@ -365,21 +365,21 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals('/churrasco', $routes->get('official.pt_BR')->getPath());
     }
 
-    public function testImportingRoutesFromDefinitionMissingLocalePrefix()
+    public function testImportingRoutesFromDefinitionMissingLocalePrefix(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $this->expectException(\InvalidArgumentException::class);
         $loader->load('missing-locale-in-importer.yml');
     }
 
-    public function testImportingRouteWithoutPathOrLocales()
+    public function testImportingRouteWithoutPathOrLocales(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $this->expectException(\InvalidArgumentException::class);
         $loader->load('route-without-path-or-locales.yml');
     }
 
-    public function testImportingWithControllerDefault()
+    public function testImportingWithControllerDefault(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/localized']));
         $routes = $loader->load('importer-with-controller-default.yml');
@@ -389,7 +389,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals('DefaultController::defaultAction', $routes->get('not_localized')->getDefault('_controller'));
     }
 
-    public function testImportRouteWithNoTrailingSlash()
+    public function testImportRouteWithNoTrailingSlash(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/import_with_no_trailing_slash']));
         $routeCollection = $loader->load('routing.yml');
@@ -398,7 +398,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals('/no-slash', $routeCollection->get('b_app_homepage')->getPath());
     }
 
-    public function testRequirementsWithoutPlaceholderName()
+    public function testRequirementsWithoutPlaceholderName(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']));
 
@@ -408,7 +408,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('requirements_without_placeholder_name.yml');
     }
 
-    public function testImportingRoutesWithHostsInImporter()
+    public function testImportingRoutesWithHostsInImporter(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
         $routes = $loader->load('importer-with-host.yml');
@@ -418,7 +418,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('yml'), $routes);
     }
 
-    public function testImportingRoutesWithLocalesAndHostInImporter()
+    public function testImportingRoutesWithLocalesAndHostInImporter(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
         $routes = $loader->load('importer-with-locale-and-host.yml');
@@ -428,7 +428,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('yml'), $routes);
     }
 
-    public function testImportingRoutesWithoutHostInImporter()
+    public function testImportingRoutesWithoutHostInImporter(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
         $routes = $loader->load('importer-without-host.yml');
@@ -438,7 +438,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('yml'), $routes);
     }
 
-    public function testImportingRoutesWithSingleHostInImporter()
+    public function testImportingRoutesWithSingleHostInImporter(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
         $routes = $loader->load('importer-with-single-host.yml');
@@ -448,7 +448,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('yml'), $routes);
     }
 
-    public function testAddingRouteWithHosts()
+    public function testAddingRouteWithHosts(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));
         $routes = $loader->load('route-with-hosts.yml');
@@ -458,7 +458,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('yml'), $routes);
     }
 
-    public function testWhenEnv()
+    public function testWhenEnv(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures']), 'some-env');
         $routes = $loader->load('when-env.yml');
@@ -468,7 +468,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame('/a1', $routes->get('a')->getPath());
     }
 
-    public function testImportingAliases()
+    public function testImportingAliases(): void
     {
         $loader = new YamlFileLoader(new FileLocator([__DIR__.'/../Fixtures/alias']));
         $routes = $loader->load('alias.yaml');
@@ -478,7 +478,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expectedRoutes('yaml'), $routes);
     }
 
-    public function testPriorityWithPrefix()
+    public function testPriorityWithPrefix(): void
     {
         new LoaderResolver([
             $loader = new YamlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures/localized')),
@@ -497,7 +497,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame(1, $routes->getPriority('also_important'));
     }
 
-    public function testPriorityWithHost()
+    public function testPriorityWithHost(): void
     {
         new LoaderResolver([
             $loader = new YamlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures/locale_and_host')),
@@ -521,7 +521,7 @@ class YamlFileLoaderTest extends TestCase
     }
 
     #[DataProvider('providePsr4ConfigFiles')]
-    public function testImportAttributesWithPsr4Prefix(string $configFile)
+    public function testImportAttributesWithPsr4Prefix(string $configFile): void
     {
         $locator = new FileLocator(\dirname(__DIR__).'/Fixtures');
         new LoaderResolver([
@@ -548,7 +548,7 @@ class YamlFileLoaderTest extends TestCase
         ];
     }
 
-    public function testImportAttributesFromClass()
+    public function testImportAttributesFromClass(): void
     {
         new LoaderResolver([
             $loader = new YamlFileLoader(new FileLocator(\dirname(__DIR__).'/Fixtures')),

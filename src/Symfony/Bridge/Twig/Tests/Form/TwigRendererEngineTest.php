@@ -24,7 +24,7 @@ use Twig\Loader\ArrayLoader;
 
 class TwigRendererEngineTest extends FormIntegrationTestCase
 {
-    public function testNestedCollectionsDoNotReuseParentBlockPrefixCache()
+    public function testNestedCollectionsDoNotReuseParentBlockPrefixCache(): void
     {
         $renderer = $this->createRenderer();
 

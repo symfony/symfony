@@ -26,7 +26,7 @@ use Symfony\Component\Validator\Exception\MissingOptionsException;
  */
 class CollectionTest extends TestCase
 {
-    public function testRejectValidConstraint()
+    public function testRejectValidConstraint(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         new Collection([
@@ -34,7 +34,7 @@ class CollectionTest extends TestCase
         ]);
     }
 
-    public function testRejectValidConstraintWithinOptional()
+    public function testRejectValidConstraintWithinOptional(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         new Collection([
@@ -42,7 +42,7 @@ class CollectionTest extends TestCase
         ]);
     }
 
-    public function testRejectValidConstraintWithinRequired()
+    public function testRejectValidConstraintWithinRequired(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         new Collection([
@@ -50,7 +50,7 @@ class CollectionTest extends TestCase
         ]);
     }
 
-    public function testAcceptOptionalConstraintAsOneElementArray()
+    public function testAcceptOptionalConstraintAsOneElementArray(): void
     {
         $collection1 = new Collection(fields: [
             'alternate_email' => [
@@ -65,7 +65,7 @@ class CollectionTest extends TestCase
         $this->assertEquals($collection1, $collection2);
     }
 
-    public function testAcceptRequiredConstraintAsOneElementArray()
+    public function testAcceptRequiredConstraintAsOneElementArray(): void
     {
         $collection1 = new Collection(fields: [
             'alternate_email' => [
@@ -80,7 +80,7 @@ class CollectionTest extends TestCase
         $this->assertEquals($collection1, $collection2);
     }
 
-    public function testConstraintHasDefaultGroupWithOptionalValues()
+    public function testConstraintHasDefaultGroupWithOptionalValues(): void
     {
         $constraint = new Collection([
             'foo' => new Required(),
@@ -92,7 +92,7 @@ class CollectionTest extends TestCase
         $this->assertEquals(['Default'], $constraint->fields['bar']->groups);
     }
 
-    public function testAllKeysAreKnowOptions()
+    public function testAllKeysAreKnowOptions(): void
     {
         $constraint = new Collection(
             fields: [
@@ -115,7 +115,7 @@ class CollectionTest extends TestCase
         $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
     }
 
-    public function testEmptyFields()
+    public function testEmptyFields(): void
     {
         $constraint = new Collection([], [], null, true, null, 'foo bar baz');
 
@@ -123,7 +123,7 @@ class CollectionTest extends TestCase
         $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
     }
 
-    public function testEmptyFieldsInOptions()
+    public function testEmptyFieldsInOptions(): void
     {
         $constraint = new Collection(
             fields: [],
@@ -138,7 +138,7 @@ class CollectionTest extends TestCase
 
     #[TestWithJson('[[]]')]
     #[TestWithJson('[null]')]
-    public function testEmptyConstraintListForField(?array $fieldConstraint)
+    public function testEmptyConstraintListForField(?array $fieldConstraint): void
     {
         $constraint = new Collection(
             [
@@ -159,7 +159,7 @@ class CollectionTest extends TestCase
 
     #[TestWithJson('[[]]')]
     #[TestWithJson('[null]')]
-    public function testEmptyConstraintListForFieldInOptions(?array $fieldConstraint)
+    public function testEmptyConstraintListForFieldInOptions(?array $fieldConstraint): void
     {
         $constraint = new Collection(
             fields: [
@@ -175,7 +175,7 @@ class CollectionTest extends TestCase
         $this->assertSame('foo bar baz', $constraint->extraFieldsMessage);
     }
 
-    public function testMissingFields()
+    public function testMissingFields(): void
     {
         $this->expectException(MissingOptionsException::class);
         $this->expectExceptionMessage(\sprintf('The options "fields" must be set for constraint "%s".', Collection::class));

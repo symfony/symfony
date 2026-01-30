@@ -22,7 +22,7 @@ use Symfony\Component\Config\Exception\LogicException;
 class ScalarNodeTest extends TestCase
 {
     #[DataProvider('getValidValues')]
-    public function testNormalize($value)
+    public function testNormalize($value): void
     {
         $node = new ScalarNode('test');
         $this->assertSame($value, $node->normalize($value));
@@ -43,7 +43,7 @@ class ScalarNodeTest extends TestCase
         ];
     }
 
-    public function testSetDeprecated()
+    public function testSetDeprecated(): void
     {
         $childNode = new ScalarNode('foo');
         $childNode->setDeprecated('vendor/package', '1.1', '"%node%" is deprecated');
@@ -84,7 +84,7 @@ class ScalarNodeTest extends TestCase
         $this->assertSame(1, $deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
     }
 
-    public function testNotDeprecatedException()
+    public function testNotDeprecatedException(): void
     {
         $childNode = new ScalarNode('foo');
 
@@ -95,7 +95,7 @@ class ScalarNodeTest extends TestCase
     }
 
     #[DataProvider('getInvalidValues')]
-    public function testNormalizeThrowsExceptionOnInvalidValues($value)
+    public function testNormalizeThrowsExceptionOnInvalidValues($value): void
     {
         $node = new ScalarNode('test');
 
@@ -113,7 +113,7 @@ class ScalarNodeTest extends TestCase
         ];
     }
 
-    public function testNormalizeThrowsExceptionWithoutHint()
+    public function testNormalizeThrowsExceptionWithoutHint(): void
     {
         $node = new ScalarNode('test');
 
@@ -123,7 +123,7 @@ class ScalarNodeTest extends TestCase
         $node->normalize([]);
     }
 
-    public function testNormalizeThrowsExceptionWithErrorMessage()
+    public function testNormalizeThrowsExceptionWithErrorMessage(): void
     {
         $node = new ScalarNode('test');
         $node->setInfo('"the test value"');
@@ -135,7 +135,7 @@ class ScalarNodeTest extends TestCase
     }
 
     #[DataProvider('getValidNonEmptyValues')]
-    public function testValidNonEmptyValues($value)
+    public function testValidNonEmptyValues($value): void
     {
         $node = new ScalarNode('test');
         $node->setAllowEmptyValue(false);
@@ -157,7 +157,7 @@ class ScalarNodeTest extends TestCase
     }
 
     #[DataProvider('getEmptyValues')]
-    public function testNotAllowedEmptyValuesThrowException($value)
+    public function testNotAllowedEmptyValuesThrowException($value): void
     {
         $node = new ScalarNode('test');
         $node->setAllowEmptyValue(false);

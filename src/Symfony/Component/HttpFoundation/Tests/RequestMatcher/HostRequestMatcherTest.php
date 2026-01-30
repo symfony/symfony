@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\HostRequestMatcher;
 class HostRequestMatcherTest extends TestCase
 {
     #[DataProvider('getData')]
-    public function test($pattern, $isMatch)
+    public function test($pattern, $isMatch): void
     {
         $matcher = new HostRequestMatcher($pattern);
         $request = Request::create('', 'get', [], [], [], ['HTTP_HOST' => 'foo.example.com']);

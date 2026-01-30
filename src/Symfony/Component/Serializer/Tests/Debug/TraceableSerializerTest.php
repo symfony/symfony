@@ -22,7 +22,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class TraceableSerializerTest extends TestCase
 {
-    public function testForwardsToSerializer()
+    public function testForwardsToSerializer(): void
     {
         $serializer = $this->createMock(Serializer::class);
         $serializer
@@ -66,7 +66,7 @@ class TraceableSerializerTest extends TestCase
         $this->assertSame('decoded', $traceableSerializer->decode('data', 'format'));
     }
 
-    public function testCollectData()
+    public function testCollectData(): void
     {
         $serializerName = uniqid('name', true);
 
@@ -106,7 +106,7 @@ class TraceableSerializerTest extends TestCase
         $traceableSerializer->decode('data', 'format');
     }
 
-    public function testAddDebugTraceIdInContext()
+    public function testAddDebugTraceIdInContext(): void
     {
         $serializer = $this->createStub(Serializer::class);
 
@@ -129,7 +129,7 @@ class TraceableSerializerTest extends TestCase
         $traceableSerializer->decode('data', 'format');
     }
 
-    public function testCollectedCaller()
+    public function testCollectedCaller(): void
     {
         $serializer = new \Symfony\Component\Serializer\Serializer();
 
@@ -146,7 +146,7 @@ class TraceableSerializerTest extends TestCase
         ], $collector->getData()['normalize'][0]['caller']);
     }
 
-    public function testCollectedCallerFromArrayMap()
+    public function testCollectedCallerFromArrayMap(): void
     {
         $serializer = new \Symfony\Component\Serializer\Serializer();
 

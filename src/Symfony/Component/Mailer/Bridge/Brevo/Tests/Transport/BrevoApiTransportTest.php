@@ -29,7 +29,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class BrevoApiTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(BrevoApiTransport $transport, string $expected)
+    public function testToString(BrevoApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -52,7 +52,7 @@ class BrevoApiTransportTest extends TestCase
         ];
     }
 
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $params = ['param1' => 'foo', 'param2' => 'bar'];
         $json = json_encode(['"custom_header_1' => 'custom_value_1']);
@@ -84,7 +84,7 @@ class BrevoApiTransportTest extends TestCase
         $this->assertEquals('bar', $payload['headers']['foo']);
     }
 
-    public function testSendThrowsForErrorResponse()
+    public function testSendThrowsForErrorResponse(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -110,7 +110,7 @@ class BrevoApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -147,7 +147,7 @@ class BrevoApiTransportTest extends TestCase
      *
      * @throws TransportExceptionInterface
      */
-    public function testSendForIdnDomains()
+    public function testSendForIdnDomains(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);

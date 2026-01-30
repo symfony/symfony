@@ -21,7 +21,7 @@ class BirthdayTypeTest extends DateTypeTest
 {
     public const TESTED_TYPE = BirthdayType::class;
 
-    public function testSetInvalidYearsOption()
+    public function testSetInvalidYearsOption(): void
     {
         $this->expectException(InvalidOptionsException::class);
         $this->factory->create(static::TESTED_TYPE, null, [

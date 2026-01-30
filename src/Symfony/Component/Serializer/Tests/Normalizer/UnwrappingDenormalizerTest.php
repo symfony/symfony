@@ -21,7 +21,7 @@ use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummy;
  */
 class UnwrappingDenormalizerTest extends TestCase
 {
-    public function testSupportsNormalization()
+    public function testSupportsNormalization(): void
     {
         $denormalizer = new UnwrappingDenormalizer();
         $denormalizer->setSerializer($this->createStub(Serializer::class));
@@ -31,7 +31,7 @@ class UnwrappingDenormalizerTest extends TestCase
         $this->assertFalse($denormalizer->supportsDenormalization([], 'stdClass', 'any', []));
     }
 
-    public function testDenormalize()
+    public function testDenormalize(): void
     {
         $expected = new ObjectDummy();
         $expected->setBaz(true);
@@ -58,7 +58,7 @@ class UnwrappingDenormalizerTest extends TestCase
         $this->assertTrue($result->isBaz());
     }
 
-    public function testDenormalizeInvalidPath()
+    public function testDenormalizeInvalidPath(): void
     {
         $serializer = $this->createMock(Serializer::class);
         $serializer->expects($this->exactly(1))

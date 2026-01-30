@@ -50,7 +50,7 @@ final class GatewayApiTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(new MockResponse(json_encode(['ids' => [42]])));
 

@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\StringBackedEnum;
 final class EnvConfiguratorTest extends TestCase
 {
     #[DataProvider('provide')]
-    public function test(string $expected, EnvConfigurator $envConfigurator)
+    public function test(string $expected, EnvConfigurator $envConfigurator): void
     {
         $this->assertSame($expected, (string) $envConfigurator);
     }

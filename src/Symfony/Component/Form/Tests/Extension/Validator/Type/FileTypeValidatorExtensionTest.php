@@ -20,7 +20,7 @@ class FileTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         return $this->factory->create(FileType::class, null, $options);
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 

@@ -32,7 +32,7 @@ class DeserializeNestedArrayOfObjectsTest extends TestCase
     }
 
     #[DataProvider('provider')]
-    public function testPropertyPhpDoc($class)
+    public function testPropertyPhpDoc($class): void
     {
         $json = <<<EOF
             {
@@ -53,7 +53,7 @@ class DeserializeNestedArrayOfObjectsTest extends TestCase
         self::assertInstanceOf(Animal::class, $zoo->getAnimals()[0]);
     }
 
-    public function testPropertyPhpDocWithKeyTypes()
+    public function testPropertyPhpDocWithKeyTypes(): void
     {
         $json = <<<EOF
             {
@@ -119,7 +119,7 @@ class Zoo
     /**
      * @param Animal[] $animals
      */
-    public function setAnimals(array $animals)
+    public function setAnimals(array $animals): void
     {
         $this->animals = $animals;
     }
@@ -172,7 +172,7 @@ class Animal
     /**
      * @param string|null $name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }

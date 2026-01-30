@@ -47,17 +47,17 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         );
     }
 
-    public function testOpenSession()
+    public function testOpenSession(): void
     {
         $this->assertTrue($this->storage->open('', ''));
     }
 
-    public function testCloseSession()
+    public function testCloseSession(): void
     {
         $this->assertTrue($this->storage->close());
     }
 
-    public function testReadSession()
+    public function testReadSession(): void
     {
         $this->redisClient->set(self::PREFIX.'id1', null);
         $this->redisClient->set(self::PREFIX.'id2', 'abc123');
@@ -66,7 +66,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $this->assertEquals('abc123', $this->storage->read('id2'));
     }
 
-    public function testWriteSession()
+    public function testWriteSession(): void
     {
         $this->assertTrue($this->storage->write('id', 'data'));
 
@@ -74,7 +74,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $this->assertEquals('data', $this->redisClient->get(self::PREFIX.'id'));
     }
 
-    public function testUseSessionGcMaxLifetimeAsTimeToLive()
+    public function testUseSessionGcMaxLifetimeAsTimeToLive(): void
     {
         $this->storage->write('id', 'data');
         $ttl = $this->redisClient->ttl(self::PREFIX.'id');
@@ -83,7 +83,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $this->assertGreaterThanOrEqual(0, $ttl);
     }
 
-    public function testDestroySession()
+    public function testDestroySession(): void
     {
         $this->storage->open('', 'test');
         $this->redisClient->set(self::PREFIX.'id', 'foo');
@@ -93,12 +93,12 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
         $this->assertFalse((bool) $this->redisClient->exists(self::PREFIX.'id'));
     }
 
-    public function testGcSession()
+    public function testGcSession(): void
     {
         $this->assertIsInt($this->storage->gc(123));
     }
 
-    public function testUpdateTimestamp()
+    public function testUpdateTimestamp(): void
     {
         $lowTtl = 10;
 
@@ -109,7 +109,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
     }
 
     #[DataProvider('getOptionFixtures')]
-    public function testSupportedParam(array $options, bool $supported)
+    public function testSupportedParam(array $options, bool $supported): void
     {
         try {
             new RedisSessionHandler($this->redisClient, $options);
@@ -131,7 +131,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
     }
 
     #[DataProvider('getTtlFixtures')]
-    public function testUseTtlOption(int $ttl)
+    public function testUseTtlOption(int $ttl): void
     {
         $options = [
             'prefix' => self::PREFIX,

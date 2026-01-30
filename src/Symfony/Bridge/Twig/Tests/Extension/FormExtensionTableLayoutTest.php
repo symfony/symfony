@@ -17,7 +17,7 @@ use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 
 class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
 {
-    public function testStartTagHasNoActionAttributeWhenActionIsEmpty()
+    public function testStartTagHasNoActionAttributeWhenActionIsEmpty(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
@@ -29,7 +29,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         $this->assertSame('<form name="form" method="get">', $html);
     }
 
-    public function testStartTagHasActionAttributeWhenActionIsZero()
+    public function testStartTagHasActionAttributeWhenActionIsZero(): void
     {
         $form = $this->factory->create('Symfony\Component\Form\Extension\Core\Type\FormType', null, [
             'method' => 'get',
@@ -41,7 +41,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         $this->assertSame('<form name="form" method="get" action="0">', $html);
     }
 
-    public function testHelpAttr()
+    public function testHelpAttr(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help text test!',
@@ -61,7 +61,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         );
     }
 
-    public function testHelpHtmlDefaultIsFalse()
+    public function testHelpHtmlDefaultIsFalse(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help <b>text</b> test!',
@@ -88,7 +88,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         );
     }
 
-    public function testHelpHtmlIsFalse()
+    public function testHelpHtmlIsFalse(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help <b>text</b> test!',
@@ -116,7 +116,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         );
     }
 
-    public function testHelpHtmlIsTrue()
+    public function testHelpHtmlIsTrue(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'help' => 'Help <b>text</b> test!',
@@ -144,7 +144,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         );
     }
 
-    public function testLabelHtmlDefaultIsFalse()
+    public function testLabelHtmlDefaultIsFalse(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'label' => '<b>Bolded label</b>',
@@ -160,7 +160,7 @@ class FormExtensionTableLayoutTest extends AbstractTableLayoutTestCase
         $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class required"]/b[.="Bolded label"]', 0);
     }
 
-    public function testLabelHtmlIsTrue()
+    public function testLabelHtmlIsTrue(): void
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
             'label' => '<b>Bolded label</b>',

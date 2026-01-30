@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Tests\Fixtures\Enum\TestUnitEnum;
 
 class EnumRequirementTest extends TestCase
 {
-    public function testNotABackedEnum()
+    public function testNotABackedEnum(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"Symfony\Component\Routing\Tests\Fixtures\Enum\TestUnitEnum" is not a "BackedEnum" class.');
@@ -31,7 +31,7 @@ class EnumRequirementTest extends TestCase
         new EnumRequirement(TestUnitEnum::class);
     }
 
-    public function testCaseNotABackedEnum()
+    public function testCaseNotABackedEnum(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Case must be a "BackedEnum" instance, "string" given.');
@@ -39,7 +39,7 @@ class EnumRequirementTest extends TestCase
         new EnumRequirement(['wrong']);
     }
 
-    public function testCaseFromAnotherEnum()
+    public function testCaseFromAnotherEnum(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('"Symfony\Component\Routing\Tests\Fixtures\Enum\TestStringBackedEnum2::Spades" is not a case of "Symfony\Component\Routing\Tests\Fixtures\Enum\TestStringBackedEnum".');
@@ -48,7 +48,7 @@ class EnumRequirementTest extends TestCase
     }
 
     #[DataProvider('provideToString')]
-    public function testToString(string $expected, string|array $cases = [])
+    public function testToString(string $expected, string|array $cases = []): void
     {
         $this->assertSame($expected, (string) new EnumRequirement($cases));
     }
@@ -64,7 +64,7 @@ class EnumRequirementTest extends TestCase
         ];
     }
 
-    public function testInRoute()
+    public function testInRoute(): void
     {
         $this->assertSame([
             'bar' => 'hearts|diamonds|clubs|spades',

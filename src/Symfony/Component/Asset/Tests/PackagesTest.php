@@ -21,7 +21,7 @@ use Symfony\Component\Asset\VersionStrategy\StaticVersionStrategy;
 
 class PackagesTest extends TestCase
 {
-    public function testGetterSetters()
+    public function testGetterSetters(): void
     {
         $packages = new Packages();
         $packages->setDefaultPackage($default = $this->createStub(PackageInterface::class));
@@ -36,7 +36,7 @@ class PackagesTest extends TestCase
         $this->assertSame($a, $packages->getPackage('a'));
     }
 
-    public function testGetVersion()
+    public function testGetVersion(): void
     {
         $packages = new Packages(
             new Package(new StaticVersionStrategy('default')),
@@ -47,7 +47,7 @@ class PackagesTest extends TestCase
         $this->assertSame('a', $packages->getVersion('/foo', 'a'));
     }
 
-    public function testGetUrl()
+    public function testGetUrl(): void
     {
         $packages = new Packages(
             new Package(new StaticVersionStrategy('default')),
@@ -58,13 +58,13 @@ class PackagesTest extends TestCase
         $this->assertSame('/foo?a', $packages->getUrl('/foo', 'a'));
     }
 
-    public function testNoDefaultPackage()
+    public function testNoDefaultPackage(): void
     {
         $this->expectException(LogicException::class);
         (new Packages())->getPackage();
     }
 
-    public function testUndefinedPackage()
+    public function testUndefinedPackage(): void
     {
         $this->expectException(InvalidArgumentException::class);
         (new Packages())->getPackage('a');

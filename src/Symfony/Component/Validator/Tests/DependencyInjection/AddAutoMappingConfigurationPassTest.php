@@ -23,14 +23,14 @@ use Symfony\Component\Validator\ValidatorBuilder;
  */
 class AddAutoMappingConfigurationPassTest extends TestCase
 {
-    public function testNoConfigParameter()
+    public function testNoConfigParameter(): void
     {
         $container = new ContainerBuilder();
         (new AddAutoMappingConfigurationPass())->process($container);
         $this->assertCount(1, $container->getDefinitions());
     }
 
-    public function testNoValidatorBuilder()
+    public function testNoValidatorBuilder(): void
     {
         $container = new ContainerBuilder();
         (new AddAutoMappingConfigurationPass())->process($container);
@@ -38,7 +38,7 @@ class AddAutoMappingConfigurationPassTest extends TestCase
     }
 
     #[DataProvider('mappingProvider')]
-    public function testProcess(string $namespace, array $services, string $expectedRegexp)
+    public function testProcess(string $namespace, array $services, string $expectedRegexp): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('validator.auto_mapping', [
@@ -70,7 +70,7 @@ class AddAutoMappingConfigurationPassTest extends TestCase
         ];
     }
 
-    public function testDoNotMapAllClassesWhenConfigIsEmpty()
+    public function testDoNotMapAllClassesWhenConfigIsEmpty(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('validator.auto_mapping', []);

@@ -16,7 +16,7 @@ use Symfony\Bridge\Twig\Mime\NotificationEmail;
 
 class NotificationEmailTest extends TestCase
 {
-    public function test()
+    public function test(): void
     {
         $email = (new NotificationEmail())
             ->markdown('Foo')
@@ -39,7 +39,7 @@ class NotificationEmailTest extends TestCase
         ], $email->getContext());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $email = unserialize(serialize((new NotificationEmail())
             ->content('Foo', true)
@@ -64,21 +64,21 @@ class NotificationEmailTest extends TestCase
         $this->assertSame('@email/example/notification/body.html.twig', $email->getHtmlTemplate());
     }
 
-    public function testTheme()
+    public function testTheme(): void
     {
         $email = (new NotificationEmail())->theme('mine');
         $this->assertSame('@email/mine/notification/body.html.twig', $email->getHtmlTemplate());
         $this->assertSame('@email/mine/notification/body.txt.twig', $email->getTextTemplate());
     }
 
-    public function testSubject()
+    public function testSubject(): void
     {
         $email = (new NotificationEmail())->from('me@example.com')->subject('Foo');
         $headers = $email->getPreparedHeaders();
         $this->assertSame('[LOW] Foo', $headers->get('Subject')->getValue());
     }
 
-    public function testPublicMail()
+    public function testPublicMail(): void
     {
         $email = NotificationEmail::asPublicEmail()
             ->markdown('Foo')
@@ -118,7 +118,7 @@ class NotificationEmailTest extends TestCase
         ], $email->getContext());
     }
 
-    public function testPublicMailSubject()
+    public function testPublicMailSubject(): void
     {
         $email = NotificationEmail::asPublicEmail()->from('me@example.com')->subject('Foo');
         $headers = $email->getPreparedHeaders();
@@ -129,7 +129,7 @@ class NotificationEmailTest extends TestCase
         $this->assertSame('Foo', $headers->get('Subject')->getValue());
     }
 
-    public function testContext()
+    public function testContext(): void
     {
         $email = new NotificationEmail();
         $email->context(['some' => 'context']);

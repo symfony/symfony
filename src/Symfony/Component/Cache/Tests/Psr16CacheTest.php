@@ -62,7 +62,7 @@ class Psr16CacheTest extends SimpleCacheTest
         return array_merge(parent::validKeys(), [["a\0b"]]);
     }
 
-    public function testDefaultLifeTime()
+    public function testDefaultLifeTime(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
@@ -82,7 +82,7 @@ class Psr16CacheTest extends SimpleCacheTest
         $cache->clear();
     }
 
-    public function testNotUnserializable()
+    public function testNotUnserializable(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
@@ -104,7 +104,7 @@ class Psr16CacheTest extends SimpleCacheTest
         $cache->clear();
     }
 
-    public function testPrune()
+    public function testPrune(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);

@@ -18,7 +18,7 @@ use Symfony\Component\TypeInfo\Type;
 
 class TypeInfoTest extends AbstractWebTestCase
 {
-    public function testComponent()
+    public function testComponent(): void
     {
         static::bootKernel(['test_case' => 'TypeInfo']);
 

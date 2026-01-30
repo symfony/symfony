@@ -42,7 +42,7 @@ class CouchbaseCollectionAdapterTest extends AdapterTestCase
      * Couchbase consider expiration time greater than 30 days as an absolute timestamp.
      * This test case overrides parent to avoid this behavior for the "k2" item.
      */
-    public function testExpiration()
+    public function testExpiration(): void
     {
         $cache = $this->createCachePool();
         $cache->save($cache->getItem('k1')->set('v1')->expiresAfter(2));

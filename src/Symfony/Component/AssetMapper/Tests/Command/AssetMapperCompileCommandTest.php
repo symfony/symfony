@@ -39,7 +39,7 @@ class AssetMapperCompileCommandTest extends TestCase
         $this->filesystem->remove($this->kernel->getProjectDir().'/var');
     }
 
-    public function testAssetsAreCompiled()
+    public function testAssetsAreCompiled(): void
     {
         $application = new Application($this->kernel);
 
@@ -110,7 +110,7 @@ class AssetMapperCompileCommandTest extends TestCase
         ], $entrypointData);
     }
 
-    public function testEventIsDispatched()
+    public function testEventIsDispatched(): void
     {
         $this->kernel->boot();
         $application = new Application($this->kernel);
@@ -119,7 +119,7 @@ class AssetMapperCompileCommandTest extends TestCase
         \assert($dispatcher instanceof EventDispatcherInterface);
 
         $listenerCalled = false;
-        $dispatcher->addListener(PreAssetsCompileEvent::class, function (PreAssetsCompileEvent $event) use (&$listenerCalled) {
+        $dispatcher->addListener(PreAssetsCompileEvent::class, function (PreAssetsCompileEvent $event) use (&$listenerCalled): void {
             $listenerCalled = true;
             $this->assertInstanceOf(OutputInterface::class, $event->getOutput());
         });

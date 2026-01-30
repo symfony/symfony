@@ -16,53 +16,53 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 
 class HeaderBagTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $bag = new HeaderBag(['foo' => 'bar']);
         $this->assertTrue($bag->has('foo'));
     }
 
-    public function testToStringNull()
+    public function testToStringNull(): void
     {
         $bag = new HeaderBag();
         $this->assertEquals('', $bag->__toString());
     }
 
-    public function testToStringNotNull()
+    public function testToStringNotNull(): void
     {
         $bag = new HeaderBag(['foo' => 'bar']);
         $this->assertEquals("Foo: bar\r\n", $bag->__toString());
     }
 
-    public function testKeys()
+    public function testKeys(): void
     {
         $bag = new HeaderBag(['foo' => 'bar']);
         $keys = $bag->keys();
         $this->assertEquals('foo', $keys[0]);
     }
 
-    public function testGetDate()
+    public function testGetDate(): void
     {
         $bag = new HeaderBag(['foo' => 'Tue, 4 Sep 2012 20:00:00 +0200']);
         $headerDate = $bag->getDate('foo');
         $this->assertInstanceOf(\DateTimeImmutable::class, $headerDate);
     }
 
-    public function testGetDateNull()
+    public function testGetDateNull(): void
     {
         $bag = new HeaderBag(['foo' => null]);
         $headerDate = $bag->getDate('foo');
         $this->assertNull($headerDate);
     }
 
-    public function testGetDateException()
+    public function testGetDateException(): void
     {
         $this->expectException(\RuntimeException::class);
         $bag = new HeaderBag(['foo' => 'Tue']);
         $bag->getDate('foo');
     }
 
-    public function testGetCacheControlHeader()
+    public function testGetCacheControlHeader(): void
     {
         $bag = new HeaderBag();
         $bag->addCacheControlDirective('public', '#a');
@@ -70,7 +70,7 @@ class HeaderBagTest extends TestCase
         $this->assertEquals('#a', $bag->getCacheControlDirective('public'));
     }
 
-    public function testAll()
+    public function testAll(): void
     {
         $bag = new HeaderBag(['foo' => 'bar']);
         $this->assertEquals(['foo' => ['bar']], $bag->all(), '->all() gets all the input');
@@ -79,7 +79,7 @@ class HeaderBagTest extends TestCase
         $this->assertEquals(['foo' => ['BAR']], $bag->all(), '->all() gets all the input key are lower case');
     }
 
-    public function testReplace()
+    public function testReplace(): void
     {
         $bag = new HeaderBag(['foo' => 'bar']);
 
@@ -88,7 +88,7 @@ class HeaderBagTest extends TestCase
         $this->assertFalse($bag->has('foo'), '->replace() overrides previously set the input');
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $bag = new HeaderBag(['foo' => 'bar', 'fuzz' => 'bizz']);
         $this->assertEquals('bar', $bag->get('foo'), '->get return current value');
@@ -108,7 +108,7 @@ class HeaderBagTest extends TestCase
         $this->assertNull($bag->get('baz', 'nope'), '->get return null although different default value is given');
     }
 
-    public function testSetAssociativeArray()
+    public function testSetAssociativeArray(): void
     {
         $bag = new HeaderBag();
         $bag->set('foo', ['bad-assoc-index' => 'value']);
@@ -116,7 +116,7 @@ class HeaderBagTest extends TestCase
         $this->assertSame(['value'], $bag->all('foo'), 'assoc indices of multi-valued headers are ignored');
     }
 
-    public function testContains()
+    public function testContains(): void
     {
         $bag = new HeaderBag(['foo' => 'bar', 'fuzz' => 'bizz']);
         $this->assertTrue($bag->contains('foo', 'bar'), '->contains first value');
@@ -131,7 +131,7 @@ class HeaderBagTest extends TestCase
         $this->assertFalse($bag->contains('foo', 'nope'), '->contains unknown value');
     }
 
-    public function testCacheControlDirectiveAccessors()
+    public function testCacheControlDirectiveAccessors(): void
     {
         $bag = new HeaderBag();
         $bag->addCacheControlDirective('public');
@@ -149,7 +149,7 @@ class HeaderBagTest extends TestCase
         $this->assertFalse($bag->hasCacheControlDirective('max-age'));
     }
 
-    public function testCacheControlDirectiveParsing()
+    public function testCacheControlDirectiveParsing(): void
     {
         $bag = new HeaderBag(['cache-control' => 'public, max-age=10']);
         $this->assertTrue($bag->hasCacheControlDirective('public'));
@@ -162,14 +162,14 @@ class HeaderBagTest extends TestCase
         $this->assertEquals('max-age=10, public, s-maxage=100', $bag->get('cache-control'));
     }
 
-    public function testCacheControlDirectiveParsingQuotedZero()
+    public function testCacheControlDirectiveParsingQuotedZero(): void
     {
         $bag = new HeaderBag(['cache-control' => 'max-age="0"']);
         $this->assertTrue($bag->hasCacheControlDirective('max-age'));
         $this->assertEquals(0, $bag->getCacheControlDirective('max-age'));
     }
 
-    public function testCacheControlDirectiveOverrideWithReplace()
+    public function testCacheControlDirectiveOverrideWithReplace(): void
     {
         $bag = new HeaderBag(['cache-control' => 'private, max-age=100']);
         $bag->replace(['cache-control' => 'public, max-age=10']);
@@ -180,7 +180,7 @@ class HeaderBagTest extends TestCase
         $this->assertEquals(10, $bag->getCacheControlDirective('max-age'));
     }
 
-    public function testCacheControlClone()
+    public function testCacheControlClone(): void
     {
         $headers = ['foo' => 'bar'];
         $bag1 = new HeaderBag($headers);
@@ -189,7 +189,7 @@ class HeaderBagTest extends TestCase
         $this->assertEquals($bag1->all(), $bag2->all());
     }
 
-    public function testGetIterator()
+    public function testGetIterator(): void
     {
         $headers = ['foo' => 'bar', 'hello' => 'world', 'third' => 'charm'];
         $headerBag = new HeaderBag($headers);
@@ -203,7 +203,7 @@ class HeaderBagTest extends TestCase
         $this->assertEquals(\count($headers), $i);
     }
 
-    public function testCount()
+    public function testCount(): void
     {
         $headers = ['foo' => 'bar', 'HELLO' => 'WORLD'];
         $headerBag = new HeaderBag($headers);

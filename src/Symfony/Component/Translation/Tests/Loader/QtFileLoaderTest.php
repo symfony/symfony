@@ -19,7 +19,7 @@ use Symfony\Component\Translation\Loader\QtFileLoader;
 
 class QtFileLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new QtFileLoader();
         $resource = __DIR__.'/../Fixtures/resources.ts';
@@ -34,28 +34,28 @@ class QtFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $this->expectException(NotFoundResourceException::class);
 
         (new QtFileLoader())->load(__DIR__.'/../Fixtures/non-existing.ts', 'en', 'domain1');
     }
 
-    public function testLoadNonLocalResource()
+    public function testLoadNonLocalResource(): void
     {
         $this->expectException(InvalidResourceException::class);
 
         (new QtFileLoader())->load('http://domain1.com/resources.ts', 'en', 'domain1');
     }
 
-    public function testLoadInvalidResource()
+    public function testLoadInvalidResource(): void
     {
         $this->expectException(InvalidResourceException::class);
 
         (new QtFileLoader())->load(__DIR__.'/../Fixtures/invalid-xml-resources.xlf', 'en', 'domain1');
     }
 
-    public function testLoadEmptyResource()
+    public function testLoadEmptyResource(): void
     {
         $resource = __DIR__.'/../Fixtures/empty.xlf';
 

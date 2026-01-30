@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class CacheAttributeListenerTest extends AbstractWebTestCase
 {
-    public function testAnonimousUserWithEtag()
+    public function testAnonimousUserWithEtag(): void
     {
         $client = self::createClient(['test_case' => 'CacheAttributeListener']);
 
@@ -30,7 +30,7 @@ class CacheAttributeListenerTest extends AbstractWebTestCase
         self::assertTrue($client->getResponse()->isRedirect('http://localhost/login'));
     }
 
-    public function testAnonimousUserWithoutEtag()
+    public function testAnonimousUserWithoutEtag(): void
     {
         $client = self::createClient(['test_case' => 'CacheAttributeListener']);
 
@@ -39,7 +39,7 @@ class CacheAttributeListenerTest extends AbstractWebTestCase
         self::assertTrue($client->getResponse()->isRedirect('http://localhost/login'));
     }
 
-    public function testLoggedInUserWithEtag()
+    public function testLoggedInUserWithEtag(): void
     {
         $client = self::createClient(['test_case' => 'CacheAttributeListener']);
 
@@ -52,7 +52,7 @@ class CacheAttributeListenerTest extends AbstractWebTestCase
         self::assertSame('', $response->getContent());
     }
 
-    public function testLoggedInUserWithoutEtag()
+    public function testLoggedInUserWithoutEtag(): void
     {
         $client = self::createClient(['test_case' => 'CacheAttributeListener']);
 

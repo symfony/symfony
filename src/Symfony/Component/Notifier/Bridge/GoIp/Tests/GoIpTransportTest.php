@@ -58,7 +58,7 @@ final class GoIpTransportTest extends TransportTestCase
     /**
      * @throws TransportExceptionInterface
      */
-    public function testSendMessage()
+    public function testSendMessage(): void
     {
         $successReply = 'Sending,L5 Send SMS to:0123; ID:'.($messageId = 'dj282jjs8');
 
@@ -72,7 +72,7 @@ final class GoIpTransportTest extends TransportTestCase
      * @throws TransportExceptionInterface
      */
     #[DataProvider('goipErrorsProvider')]
-    public function testSendMessageWithUnsuccessfulReplyFromGoipThrows(string $goipError)
+    public function testSendMessageWithUnsuccessfulReplyFromGoipThrows(string $goipError): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage(\sprintf('Could not send the message through GoIP. Response: "%s".', $goipError));
@@ -90,7 +90,7 @@ final class GoIpTransportTest extends TransportTestCase
     /**
      * @throws TransportExceptionInterface
      */
-    public function testSendMessageWithSuccessfulReplyButNoMessageIdThrows()
+    public function testSendMessageWithSuccessfulReplyButNoMessageIdThrows(): void
     {
         $misFormedReply = 'Sending,L5 Send SMS to:0123';
 

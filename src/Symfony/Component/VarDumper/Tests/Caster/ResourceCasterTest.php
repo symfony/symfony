@@ -20,7 +20,7 @@ class ResourceCasterTest extends TestCase
     use VarDumperTestTrait;
 
     #[RequiresPhpExtension('dba')]
-    public function testCastDba()
+    public function testCastDba(): void
     {
         $dba = dba_open(sys_get_temp_dir().'/test.db', 'c');
 
@@ -35,7 +35,7 @@ class ResourceCasterTest extends TestCase
     }
 
     #[RequiresPhpExtension('dba')]
-    public function testCastDbaOnBuggyPhp84()
+    public function testCastDbaOnBuggyPhp84(): void
     {
         if (\PHP_VERSION_ID >= 80402) {
             $this->markTestSkipped('The test can only be run on PHP 8.4.0 and 8.4.1, see https://github.com/php/php-src/issues/16990');

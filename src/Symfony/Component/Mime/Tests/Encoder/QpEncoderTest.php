@@ -32,7 +32,7 @@ class QpEncoderTest extends TestCase
                     allow an alternative encoding.
                     */
 
-    public function testPermittedCharactersAreNotEncoded()
+    public function testPermittedCharactersAreNotEncoded(): void
     {
         /* -- RFC 2045, 6.7 --
         (2)   (Literal representation) Octets with decimal values of
@@ -50,7 +50,7 @@ class QpEncoderTest extends TestCase
         }
     }
 
-    public function testWhiteSpaceAtLineEndingIsEncoded()
+    public function testWhiteSpaceAtLineEndingIsEncoded(): void
     {
         /* -- RFC 2045, 6.7 --
         (3)   (White Space) Octets with values of 9 and 32 MAY be
@@ -89,7 +89,7 @@ class QpEncoderTest extends TestCase
         $this->assertEquals('a'.$SPACE.'=20'."\r\n".'b', $encoder->encodeString($string));
     }
 
-    public function testCRLFIsLeftAlone()
+    public function testCRLFIsLeftAlone(): void
     {
         /*
         (4)   (Line Breaks) A line break in a text body, represented
@@ -123,7 +123,7 @@ class QpEncoderTest extends TestCase
         $this->assertEquals($string, $encoder->encodeString($string));
     }
 
-    public function testLinesLongerThan76CharactersAreSoftBroken()
+    public function testLinesLongerThan76CharactersAreSoftBroken(): void
     {
         /*
         (5)   (Soft Line Breaks) The Quoted-Printable encoding
@@ -148,7 +148,7 @@ class QpEncoderTest extends TestCase
         $this->assertEquals($output, $encoder->encodeString($input));
     }
 
-    public function testMaxLineLengthCanBeSpecified()
+    public function testMaxLineLengthCanBeSpecified(): void
     {
         $encoder = new QpEncoder();
         $input = str_repeat('a', 100);
@@ -163,7 +163,7 @@ class QpEncoderTest extends TestCase
         $this->assertEquals($output, $encoder->encodeString($input, 'utf-8', 0, 54));
     }
 
-    public function testBytesBelowPermittedRangeAreEncoded()
+    public function testBytesBelowPermittedRangeAreEncoded(): void
     {
         // According to Rule (1 & 2)
         $encoder = new QpEncoder();
@@ -173,14 +173,14 @@ class QpEncoderTest extends TestCase
         }
     }
 
-    public function testDecimalByte61IsEncoded()
+    public function testDecimalByte61IsEncoded(): void
     {
         // According to Rule (1 & 2)
         $encoder = new QpEncoder();
         $this->assertEquals('=3D', $encoder->encodeString('='));
     }
 
-    public function testBytesAbovePermittedRangeAreEncoded()
+    public function testBytesAbovePermittedRangeAreEncoded(): void
     {
         // According to Rule (1 & 2)
         $encoder = new QpEncoder();
@@ -189,7 +189,7 @@ class QpEncoderTest extends TestCase
         }
     }
 
-    public function testFirstLineLengthCanBeDifferent()
+    public function testFirstLineLengthCanBeDifferent(): void
     {
         $encoder = new QpEncoder();
         $input = str_repeat('a', 140);
@@ -204,7 +204,7 @@ class QpEncoderTest extends TestCase
         $this->assertEquals($output, $encoder->encodeString($input, 'utf-8', 22), 'First line should start at offset 22 so can only have max length 54');
     }
 
-    public function testTextIsPreWrapped()
+    public function testTextIsPreWrapped(): void
     {
         $encoder = new QpEncoder();
         $input = str_repeat('a', 70)."\r\n".str_repeat('a', 70)."\r\n".str_repeat('a', 70);

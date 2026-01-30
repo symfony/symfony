@@ -27,7 +27,7 @@ class TranslationDebugCommandTest extends AbstractWebTestCase
         $this->application = new Application($kernel);
     }
 
-    public function testDumpAllTrans()
+    public function testDumpAllTrans(): void
     {
         $tester = $this->createCommandTester();
         $ret = $tester->execute(['locale' => 'en']);

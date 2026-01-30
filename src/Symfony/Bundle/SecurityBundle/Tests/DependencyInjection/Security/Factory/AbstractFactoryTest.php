@@ -27,7 +27,7 @@ class AbstractFactoryTest extends TestCase
     }
 
     #[DataProvider('getFailureHandlers')]
-    public function testDefaultFailureHandler($serviceId, $defaultHandlerInjection)
+    public function testDefaultFailureHandler($serviceId, $defaultHandlerInjection): void
     {
         $options = [
             'remember_me' => true,
@@ -68,7 +68,7 @@ class AbstractFactoryTest extends TestCase
     }
 
     #[DataProvider('getSuccessHandlers')]
-    public function testDefaultSuccessHandler($serviceId, $defaultHandlerInjection)
+    public function testDefaultSuccessHandler($serviceId, $defaultHandlerInjection): void
     {
         $options = [
             'remember_me' => true,
@@ -112,7 +112,7 @@ class AbstractFactoryTest extends TestCase
         ];
     }
 
-    protected function callFactory(string $firewallName, array $config, string $userProviderId, string $defaultEntryPointId)
+    protected function callFactory(string $firewallName, array $config, string $userProviderId, string $defaultEntryPointId): void
     {
         (new StubFactory())->createAuthenticator($this->container, $firewallName, $config, $userProviderId);
     }

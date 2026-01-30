@@ -38,14 +38,14 @@ class ConstraintViolationBuilderTest extends TestCase
         $this->builder = new ConstraintViolationBuilder($this->violations, new Valid(), $this->messageTemplate, [], $this->root, 'data', 'foo', new IdentityTranslator());
     }
 
-    public function testAddViolation()
+    public function testAddViolation(): void
     {
         $this->builder->addViolation();
 
         $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, null, new Valid()));
     }
 
-    public function testAppendPropertyPath()
+    public function testAppendPropertyPath(): void
     {
         $this->builder
             ->atPath('foo')
@@ -54,7 +54,7 @@ class ConstraintViolationBuilderTest extends TestCase
         $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data.foo', 'foo', null, null, new Valid()));
     }
 
-    public function testAppendMultiplePropertyPaths()
+    public function testAppendMultiplePropertyPaths(): void
     {
         $this->builder
             ->atPath('foo')
@@ -64,7 +64,7 @@ class ConstraintViolationBuilderTest extends TestCase
         $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data.foo.bar', 'foo', null, null, new Valid()));
     }
 
-    public function testCodeCanBeSet()
+    public function testCodeCanBeSet(): void
     {
         $this->builder
             ->setCode('5')
@@ -73,7 +73,7 @@ class ConstraintViolationBuilderTest extends TestCase
         $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, '5', new Valid()));
     }
 
-    public function testCauseCanBeSet()
+    public function testCauseCanBeSet(): void
     {
         $cause = new \LogicException();
 
@@ -84,7 +84,7 @@ class ConstraintViolationBuilderTest extends TestCase
         $this->assertViolationEquals(new ConstraintViolation($this->messageTemplate, $this->messageTemplate, [], $this->root, 'data', 'foo', null, null, new Valid(), $cause));
     }
 
-    public function testTranslationDomainFalse()
+    public function testTranslationDomainFalse(): void
     {
         $translator = $this->createMock(TranslatorInterface::class);
         $translator->expects(self::once())->method('trans')->willReturn('');
@@ -96,7 +96,7 @@ class ConstraintViolationBuilderTest extends TestCase
         $builder->addViolation();
     }
 
-    private function assertViolationEquals(ConstraintViolation $expectedViolation)
+    private function assertViolationEquals(ConstraintViolation $expectedViolation): void
     {
         $this->assertCount(1, $this->violations);
 

@@ -50,7 +50,7 @@ class LoaderResolverTest extends TestCase
     }
 
     #[DataProvider('provideResourcesToLoad')]
-    public function testResolvesForcedType($resource, $type, $expectedClass)
+    public function testResolvesForcedType($resource, $type, $expectedClass): void
     {
         $this->assertInstanceOf($expectedClass, $this->resolver->resolve($resource, $type));
     }

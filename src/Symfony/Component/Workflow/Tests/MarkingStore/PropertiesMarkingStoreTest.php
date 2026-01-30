@@ -16,7 +16,7 @@ use Symfony\Component\Workflow\MarkingStore\MethodMarkingStore;
 
 class PropertiesMarkingStoreTest extends TestCase
 {
-    public function testGetSetMarkingWithMultipleState()
+    public function testGetSetMarkingWithMultipleState(): void
     {
         $subject = new SubjectWithProperties();
         $markingStore = new MethodMarkingStore(false);
@@ -36,7 +36,7 @@ class PropertiesMarkingStoreTest extends TestCase
         $this->assertEquals($marking, $marking2);
     }
 
-    public function testGetSetMarkingWithSingleState()
+    public function testGetSetMarkingWithSingleState(): void
     {
         $subject = new SubjectWithProperties();
         $markingStore = new MethodMarkingStore(true, 'place', 'placeContext');
@@ -56,7 +56,7 @@ class PropertiesMarkingStoreTest extends TestCase
         $this->assertEquals($marking, $marking2);
     }
 
-    public function testGetSetMarkingWithSingleStateAndAlmostEmptyPlaceName()
+    public function testGetSetMarkingWithSingleStateAndAlmostEmptyPlaceName(): void
     {
         $subject = new SubjectWithProperties();
         $subject->place = 0;
@@ -68,7 +68,7 @@ class PropertiesMarkingStoreTest extends TestCase
         $this->assertCount(1, $marking->getPlaces());
     }
 
-    public function testGetMarkingWithValueObject()
+    public function testGetMarkingWithValueObject(): void
     {
         $subject = new SubjectWithProperties();
         $subject->place = $this->createValueObject('first_place');
@@ -81,7 +81,7 @@ class PropertiesMarkingStoreTest extends TestCase
         $this->assertSame('first_place', (string) $subject->place);
     }
 
-    public function testGetMarkingWithUninitializedProperty()
+    public function testGetMarkingWithUninitializedProperty(): void
     {
         $subject = new SubjectWithProperties();
 
@@ -92,7 +92,7 @@ class PropertiesMarkingStoreTest extends TestCase
         $this->assertCount(0, $marking->getPlaces());
     }
 
-    public function testSetMarkingWithMultipleSubjectsSharingCachedSetter()
+    public function testSetMarkingWithMultipleSubjectsSharingCachedSetter(): void
     {
         $subject1 = new SubjectWithProperties();
         $subject2 = new SubjectWithProperties();
@@ -120,7 +120,7 @@ class PropertiesMarkingStoreTest extends TestCase
         $this->assertSame(['place3' => 1], $subject3->marking);
     }
 
-    public function testSetMarkingWithMultipleSubjectsSharingCachedSetterSingleState()
+    public function testSetMarkingWithMultipleSubjectsSharingCachedSetterSingleState(): void
     {
         $subject1 = new SubjectWithProperties();
         $subject2 = new SubjectWithProperties();

@@ -22,7 +22,7 @@ use Symfony\Component\Notifier\Message\NullMessage;
 class NullMessageTest extends TestCase
 {
     #[DataProvider('messageDataProvider')]
-    public function testCanBeConstructed(MessageInterface $message)
+    public function testCanBeConstructed(MessageInterface $message): void
     {
         $nullMessage = new NullMessage($message);
 

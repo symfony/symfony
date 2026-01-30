@@ -17,14 +17,14 @@ use Symfony\Component\AssetMapper\Compiler\Parser\JavascriptSequenceParser;
 
 class JavascriptSequenceParserTest extends TestCase
 {
-    public function testParseEmptyContent()
+    public function testParseEmptyContent(): void
     {
         $parser = new JavascriptSequenceParser('');
 
         $this->assertTrue($parser->isExecutable());
     }
 
-    public function testItThrowsWhenOutOfBounds()
+    public function testItThrowsWhenOutOfBounds(): void
     {
         $parser = new JavascriptSequenceParser('');
 
@@ -34,7 +34,7 @@ class JavascriptSequenceParserTest extends TestCase
         $parser->parseUntil(1);
     }
 
-    public function testItThrowWhenBackward()
+    public function testItThrowWhenBackward(): void
     {
         $parser = new JavascriptSequenceParser('  ');
 
@@ -46,7 +46,7 @@ class JavascriptSequenceParserTest extends TestCase
         $parser->parseUntil(1);
     }
 
-    public function testParseToTheEnd()
+    public function testParseToTheEnd(): void
     {
         $parser = new JavascriptSequenceParser('123');
         $parser->parseUntil(3);
@@ -55,7 +55,7 @@ class JavascriptSequenceParserTest extends TestCase
     }
 
     #[DataProvider('provideSequenceCases')]
-    public function testParseSequence(string $content, int $position, bool $isExcecutable)
+    public function testParseSequence(string $content, int $position, bool $isExcecutable): void
     {
         $parser = new JavascriptSequenceParser($content);
         $parser->parseUntil($position);
@@ -103,7 +103,7 @@ class JavascriptSequenceParserTest extends TestCase
     }
 
     #[DataProvider('provideCommentCases')]
-    public function testIdentifyComment(string $content, int $position, bool $isComment)
+    public function testIdentifyComment(string $content, int $position, bool $isComment): void
     {
         $parser = new JavascriptSequenceParser($content);
         $parser->parseUntil($position);
@@ -167,7 +167,7 @@ class JavascriptSequenceParserTest extends TestCase
     }
 
     #[DataProvider('provideStringCases')]
-    public function testIdentifyStrings(string $content, int $position, bool $isString)
+    public function testIdentifyStrings(string $content, int $position, bool $isString): void
     {
         $parser = new JavascriptSequenceParser($content);
         $parser->parseUntil($position);

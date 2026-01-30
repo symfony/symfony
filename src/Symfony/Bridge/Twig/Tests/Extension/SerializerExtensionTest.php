@@ -33,7 +33,7 @@ use Twig\RuntimeLoader\ContainerRuntimeLoader;
 class SerializerExtensionTest extends TestCase
 {
     #[DataProvider('serializerDataProvider')]
-    public function testSerializeFilter(string $template, string $expectedResult)
+    public function testSerializeFilter(string $template, string $expectedResult): void
     {
         $twig = $this->getTwig($template);
 

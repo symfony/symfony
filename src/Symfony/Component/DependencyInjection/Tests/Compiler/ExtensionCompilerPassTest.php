@@ -31,7 +31,7 @@ class ExtensionCompilerPassTest extends TestCase
         $this->pass = new ExtensionCompilerPass();
     }
 
-    public function testProcess()
+    public function testProcess(): void
     {
         $extension1 = new CompilerPassExtension('extension1');
         $extension2 = new DummyExtension('extension2');

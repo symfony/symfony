@@ -24,7 +24,7 @@ use Symfony\Component\Messenger\Worker;
 class StopWorkerOnRestartSignalListenerTest extends TestCase
 {
     #[DataProvider('restartTimeProvider')]
-    public function testWorkerStopsWhenMemoryLimitExceeded(?int $lastRestartTimeOffset, bool $shouldStop)
+    public function testWorkerStopsWhenMemoryLimitExceeded(?int $lastRestartTimeOffset, bool $shouldStop): void
     {
         $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItem = $this->createMock(CacheItemInterface::class);
@@ -48,7 +48,7 @@ class StopWorkerOnRestartSignalListenerTest extends TestCase
         yield [-10, false]; // a restart was requested, but 10 seconds before we started
     }
 
-    public function testWorkerDoesNotStopIfRestartNotInCache()
+    public function testWorkerDoesNotStopIfRestartNotInCache(): void
     {
         $cachePool = $this->createMock(CacheItemPoolInterface::class);
         $cacheItem = $this->createMock(CacheItemInterface::class);

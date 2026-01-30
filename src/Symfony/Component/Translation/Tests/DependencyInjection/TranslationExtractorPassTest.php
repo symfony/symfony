@@ -18,7 +18,7 @@ use Symfony\Component\Translation\DependencyInjection\TranslationExtractorPass;
 
 class TranslationExtractorPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $extractorDefinition = $container->register('translation.extractor');
@@ -31,7 +31,7 @@ class TranslationExtractorPassTest extends TestCase
         $this->assertEquals([['addExtractor', ['bar.alias', new Reference('foo.id')]]], $extractorDefinition->getMethodCalls());
     }
 
-    public function testProcessNoDefinitionFound()
+    public function testProcessNoDefinitionFound(): void
     {
         $container = new ContainerBuilder();
 
@@ -46,7 +46,7 @@ class TranslationExtractorPassTest extends TestCase
         $this->assertCount($aliasesBefore, $container->getAliases());
     }
 
-    public function testProcessMissingAlias()
+    public function testProcessMissingAlias(): void
     {
         $container = new ContainerBuilder();
         $extractorDefinition = $container->register('translation.extractor');

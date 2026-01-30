@@ -53,7 +53,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
         return new CombinedStore([new RedisStore($redis)], new UnanimousStrategy());
     }
 
-    public function testSaveThrowsExceptionOnFailure()
+    public function testSaveThrowsExceptionOnFailure(): void
     {
         $this->expectException(LockConflictedException::class);
         $key = new Key(__METHOD__);
@@ -82,7 +82,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
         $this->createCombinedStore($store1, $store2, $strategy)->save($key);
     }
 
-    public function testSaveCleanupOnFailure()
+    public function testSaveCleanupOnFailure(): void
     {
         $key = new Key(__METHOD__);
 
@@ -121,7 +121,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
         }
     }
 
-    public function testSaveAbortWhenStrategyCantBeMet()
+    public function testSaveAbortWhenStrategyCantBeMet(): void
     {
         $key = new Key(__METHOD__);
 
@@ -153,7 +153,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
         }
     }
 
-    public function testputOffExpirationThrowsExceptionOnFailure()
+    public function testputOffExpirationThrowsExceptionOnFailure(): void
     {
         $this->expectException(LockConflictedException::class);
         $key = new Key(__METHOD__);
@@ -183,7 +183,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
         $this->createCombinedStore($store1, $store2, $strategy)->putOffExpiration($key, $ttl);
     }
 
-    public function testputOffExpirationCleanupOnFailure()
+    public function testputOffExpirationCleanupOnFailure(): void
     {
         $key = new Key(__METHOD__);
         $ttl = random_int(1, 10);
@@ -223,7 +223,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
         }
     }
 
-    public function testputOffExpirationAbortWhenStrategyCantBeMet()
+    public function testputOffExpirationAbortWhenStrategyCantBeMet(): void
     {
         $key = new Key(__METHOD__);
         $ttl = random_int(1, 10);
@@ -256,7 +256,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
         }
     }
 
-    public function testPutOffExpirationIgnoreNonExpiringStorage()
+    public function testPutOffExpirationIgnoreNonExpiringStorage(): void
     {
         $store1 = $this->createStub(PersistingStoreInterface::class);
         $store2 = $this->createStub(PersistingStoreInterface::class);
@@ -280,7 +280,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
         $store->putOffExpiration($key, $ttl);
     }
 
-    public function testExistsDontAskToEveryBody()
+    public function testExistsDontAskToEveryBody(): void
     {
         $key = new Key(__METHOD__);
 
@@ -307,7 +307,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
         $this->assertTrue($this->createCombinedStore($store1, $store2, $strategy)->exists($key));
     }
 
-    public function testExistsAbortWhenStrategyCantBeMet()
+    public function testExistsAbortWhenStrategyCantBeMet(): void
     {
         $key = new Key(__METHOD__);
 
@@ -334,7 +334,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
         $this->assertFalse($this->createCombinedStore($store1, $store2, $strategy)->exists($key));
     }
 
-    public function testDeleteDontStopOnFailure()
+    public function testDeleteDontStopOnFailure(): void
     {
         $key = new Key(__METHOD__);
 
@@ -353,7 +353,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
         $this->createCombinedStore($store1, $store2)->delete($key);
     }
 
-    public function testExistsDontStopOnFailure()
+    public function testExistsDontStopOnFailure(): void
     {
         $key = new Key(__METHOD__);
 
@@ -379,7 +379,7 @@ class CombinedStoreTest extends AbstractStoreTestCase
         $this->assertFalse($this->createCombinedStore($store1, $store2, $strategy)->exists($key));
     }
 
-    public function testSaveReadWithCompatibleStore()
+    public function testSaveReadWithCompatibleStore(): void
     {
         $key = new Key(__METHOD__);
 

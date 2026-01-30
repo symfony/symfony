@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Esendex\EsendexOptions;
 
 class EsendexOptionsTest extends TestCase
 {
-    public function testEsendexOptions()
+    public function testEsendexOptions(): void
     {
         $esendexOptions = (new EsendexOptions())
             ->accountReference('test_account_reference');

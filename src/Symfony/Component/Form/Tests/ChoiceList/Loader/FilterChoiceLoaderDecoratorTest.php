@@ -21,7 +21,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
 {
     use ChoiceListAssertionTrait;
 
-    public function testLoadChoiceList()
+    public function testLoadChoiceList(): void
     {
         $filter = static fn ($choice) => 0 === $choice % 2;
 
@@ -30,7 +30,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
         $this->assertEqualsArrayChoiceList(new ArrayChoiceList([1 => 2, 3 => 4]), $loader->loadChoiceList());
     }
 
-    public function testLoadChoiceListWithGroupedChoices()
+    public function testLoadChoiceListWithGroupedChoices(): void
     {
         $filter = static fn ($choice) => $choice < 9 && 0 === $choice % 2;
 
@@ -46,7 +46,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
         ]), $loader->loadChoiceList());
     }
 
-    public function testLoadChoiceListMixedWithGroupedAndNonGroupedChoices()
+    public function testLoadChoiceListMixedWithGroupedAndNonGroupedChoices(): void
     {
         $filter = static fn ($choice) => 0 === $choice % 2;
 
@@ -67,7 +67,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
         ]), $loader->loadChoiceList());
     }
 
-    public function testLoadValuesForChoices()
+    public function testLoadValuesForChoices(): void
     {
         $evenValues = [1 => '2', 3 => '4'];
 
@@ -78,7 +78,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
         $this->assertSame($evenValues, $loader->loadValuesForChoices(range(1, 4)));
     }
 
-    public function testLoadChoicesForValues()
+    public function testLoadChoicesForValues(): void
     {
         $evenChoices = [1 => 2, 3 => 4];
         $values = array_map('strval', range(1, 4));

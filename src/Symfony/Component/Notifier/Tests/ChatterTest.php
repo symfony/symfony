@@ -31,7 +31,7 @@ class ChatterTest extends TestCase
         $this->bus = $this->createMock(MessageBusInterface::class);
     }
 
-    public function testSendWithoutBus()
+    public function testSendWithoutBus(): void
     {
         $message = new DummyMessage();
 
@@ -51,7 +51,7 @@ class ChatterTest extends TestCase
         $this->assertSame($message, $sentMessage->getOriginalMessage());
     }
 
-    public function testSendWithBus()
+    public function testSendWithBus(): void
     {
         $message = new DummyMessage();
 

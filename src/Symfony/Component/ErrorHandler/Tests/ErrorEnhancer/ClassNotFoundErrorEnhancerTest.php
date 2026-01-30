@@ -45,7 +45,7 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
     }
 
     #[DataProvider('provideClassNotFoundData')]
-    public function testEnhance(string $originalMessage, string $enhancedMessage, $autoloader = null)
+    public function testEnhance(string $originalMessage, string $enhancedMessage, $autoloader = null): void
     {
         try {
             if ($autoloader) {
@@ -132,12 +132,12 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
             [
                 'Class \'Foo\\Bar\\UndefinedFunctionError\' not found',
                 "Attempted to load class \"UndefinedFunctionError\" from namespace \"Foo\\Bar\".\nDid you forget a \"use\" statement for another namespace?",
-                static function ($className) { /* do nothing here */ },
+                static function ($className): void { /* do nothing here */ },
             ],
         ];
     }
 
-    public function testEnhanceWithFatalError()
+    public function testEnhanceWithFatalError(): void
     {
         $error = (new ClassNotFoundErrorEnhancer())->enhance(new FatalError('foo', 0, [
             'type' => \E_ERROR,
@@ -152,7 +152,7 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
         $this->assertSame($expectedLine, $error->getLine());
     }
 
-    public function testCannotRedeclareClass()
+    public function testCannotRedeclareClass(): void
     {
         if (!file_exists(__DIR__.'/../FIXTURES2/REQUIREDTWICE.PHP')) {
             $this->markTestSkipped('Can only be run on case-insensitive filesystems');

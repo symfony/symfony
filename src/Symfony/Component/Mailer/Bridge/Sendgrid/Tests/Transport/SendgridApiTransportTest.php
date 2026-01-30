@@ -27,7 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class SendgridApiTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(SendgridApiTransport $transport, string $expected)
+    public function testToString(SendgridApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -58,7 +58,7 @@ class SendgridApiTransportTest extends TestCase
         ];
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $email = new Email();
         $email->from(new Address('foo@example.com', 'Ms. Foo Bar'))
@@ -110,7 +110,7 @@ class SendgridApiTransportTest extends TestCase
         $mailer->send($email);
     }
 
-    public function testLineBreaksInEncodedAttachment()
+    public function testLineBreaksInEncodedAttachment(): void
     {
         $email = new Email();
         $email->from('foo@example.com')
@@ -162,7 +162,7 @@ class SendgridApiTransportTest extends TestCase
         $mailer->send($email);
     }
 
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
@@ -177,7 +177,7 @@ class SendgridApiTransportTest extends TestCase
         $this->assertEquals('bar', $payload['headers']['foo']);
     }
 
-    public function testReplyTo()
+    public function testReplyTo(): void
     {
         $from = 'from@example.com';
         $to = 'to@example.com';
@@ -202,7 +202,7 @@ class SendgridApiTransportTest extends TestCase
         $this->assertSame($replyTo, $payload['reply_to']['email']);
     }
 
-    public function testEnvelopeSenderAndRecipients()
+    public function testEnvelopeSenderAndRecipients(): void
     {
         $from = 'from@example.com';
         $to = 'to@example.com';
@@ -231,7 +231,7 @@ class SendgridApiTransportTest extends TestCase
         $this->assertSame($envelopeTo, $payload['personalizations'][0]['to'][0]['email']);
     }
 
-    public function testTagAndMetadataHeaders()
+    public function testTagAndMetadataHeaders(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new TagHeader('category-one'));
@@ -254,7 +254,7 @@ class SendgridApiTransportTest extends TestCase
         $this->assertSame('12345', $payload['personalizations'][0]['custom_args']['Client-ID']);
     }
 
-    public function testInlineWithCustomContentId()
+    public function testInlineWithCustomContentId(): void
     {
         $imagePart = (new DataPart('text-contents', 'text.txt'));
         $imagePart->asInline();
@@ -275,7 +275,7 @@ class SendgridApiTransportTest extends TestCase
         $this->assertSame('content-identifier@symfony', $payload['attachments'][0]['content_id']);
     }
 
-    public function testInlineWithoutCustomContentId()
+    public function testInlineWithoutCustomContentId(): void
     {
         $imagePart = (new DataPart('text-contents', 'text.txt'));
         $imagePart->asInline();
@@ -295,7 +295,7 @@ class SendgridApiTransportTest extends TestCase
         $this->assertSame('text.txt', $payload['attachments'][0]['content_id']);
     }
 
-    public function testWithSuppressionGroup()
+    public function testWithSuppressionGroup(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new SuppressionGroupHeader(1, [1, 2, 3, 4, 5]));
@@ -314,7 +314,7 @@ class SendgridApiTransportTest extends TestCase
         $this->assertSame([1, 2, 3, 4, 5], $payload['asm']['groups_to_display']);
     }
 
-    public function testSendAtHeader()
+    public function testSendAtHeader(): void
     {
         $email = new Email();
         $email->getHeaders()->addDateHeader('Send-At', new \DateTime('2025-05-07 16:00:00', new \DateTimeZone('Europe/Paris')));

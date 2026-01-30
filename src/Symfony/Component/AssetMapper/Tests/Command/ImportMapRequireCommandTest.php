@@ -33,7 +33,7 @@ class ImportMapRequireCommandTest extends KernelTestCase
     }
 
     #[DataProvider('getRequirePackageTests')]
-    public function testDryRunOptionToShowInformationBeforeApplyInstallation(int $verbosity, array $packageEntries, array $packagesToInstall, string $expected, ?string $path = null)
+    public function testDryRunOptionToShowInformationBeforeApplyInstallation(int $verbosity, array $packageEntries, array $packagesToInstall, string $expected, ?string $path = null): void
     {
         $importMapManager = $this->createStub(ImportMapManager::class);
         $importMapManager
@@ -157,7 +157,7 @@ class ImportMapRequireCommandTest extends KernelTestCase
         ];
     }
 
-    public function testNothingChangedOnFilesystemAfterUsingDryRunOption()
+    public function testNothingChangedOnFilesystemAfterUsingDryRunOption(): void
     {
         $kernel = self::bootKernel();
         $projectDir = $kernel->getProjectDir();

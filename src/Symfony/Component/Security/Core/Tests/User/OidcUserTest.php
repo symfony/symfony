@@ -16,7 +16,7 @@ use Symfony\Component\Security\Core\User\OidcUser;
 
 class OidcUserTest extends TestCase
 {
-    public function testCannotCreateUserWithoutSubProperty()
+    public function testCannotCreateUserWithoutSubProperty(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "sub" claim cannot be empty.');
@@ -24,7 +24,7 @@ class OidcUserTest extends TestCase
         new OidcUser();
     }
 
-    public function testCreateFullUserWithAdditionalClaimsUsingPositionalParameters()
+    public function testCreateFullUserWithAdditionalClaimsUsingPositionalParameters(): void
     {
         $this->assertEquals(new OidcUser(
             userIdentifier: 'john.doe',
@@ -99,7 +99,7 @@ class OidcUserTest extends TestCase
         ]));
     }
 
-    public function testCreateFullUserWithAdditionalClaims()
+    public function testCreateFullUserWithAdditionalClaims(): void
     {
         $this->assertEquals(new OidcUser(
             userIdentifier: 'john.doe',

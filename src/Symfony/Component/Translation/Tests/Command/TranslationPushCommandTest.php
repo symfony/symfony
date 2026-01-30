@@ -44,7 +44,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
-    public function testPushNewMessages()
+    public function testPushNewMessages(): void
     {
         $arrayLoader = new ArrayLoader();
         $xliffLoader = new XliffFileLoader();
@@ -90,7 +90,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $this->assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
     }
 
-    public function testPushNewIntlIcuMessages()
+    public function testPushNewIntlIcuMessages(): void
     {
         $arrayLoader = new ArrayLoader();
         $xliffLoader = new XliffFileLoader();
@@ -136,7 +136,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $this->assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
     }
 
-    public function testPushForceMessages()
+    public function testPushForceMessages(): void
     {
         $xliffLoader = new XliffFileLoader();
         $filenameMessagesEn = $this->createFile([
@@ -181,7 +181,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $this->assertStringContainsString('[OK] All local translations has been sent to "null" (for "en, fr" locale(s), and "messages, validators" domain(s)).', trim($tester->getDisplay()));
     }
 
-    public function testDeleteMissingMessages()
+    public function testDeleteMissingMessages(): void
     {
         $xliffLoader = new XliffFileLoader();
         $arrayLoader = new ArrayLoader();
@@ -243,7 +243,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $this->assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
     }
 
-    public function testPushForceAndDeleteMissingMessages()
+    public function testPushForceAndDeleteMissingMessages(): void
     {
         $xliffLoader = new XliffFileLoader();
         $arrayLoader = new ArrayLoader();
@@ -308,7 +308,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $this->assertStringContainsString('[OK] All local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
     }
 
-    public function testPushWithProviderDomains()
+    public function testPushWithProviderDomains(): void
     {
         $arrayLoader = new ArrayLoader();
         $xliffLoader = new XliffFileLoader();
@@ -371,7 +371,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $application = new Application();
         $application->addCommand($this->createCommand($this->createStub(ProviderInterface::class), ['en', 'fr', 'it'], ['messages', 'validators'], ['loco', 'crowdin', 'lokalise']));

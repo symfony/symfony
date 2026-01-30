@@ -19,7 +19,7 @@ use Symfony\Component\Translation\Loader\YamlFileLoader;
 
 class YamlFileLoaderTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../Fixtures/resources.yml';
@@ -30,7 +30,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
-    public function testLoadNonStringMessages()
+    public function testLoadNonStringMessages(): void
     {
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../Fixtures/non-string.yml';
@@ -39,7 +39,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertSame(['root.foo2' => '', 'root.bar' => 'bar'], $catalogue->all('domain1'));
     }
 
-    public function testLoadDoesNothingIfEmpty()
+    public function testLoadDoesNothingIfEmpty(): void
     {
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../Fixtures/empty.yml';
@@ -50,7 +50,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
     }
 
-    public function testLoadNonExistingResource()
+    public function testLoadNonExistingResource(): void
     {
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../Fixtures/non-existing.yml';
@@ -60,7 +60,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load($resource, 'en', 'domain1');
     }
 
-    public function testLoadThrowsAnExceptionIfFileNotLocal()
+    public function testLoadThrowsAnExceptionIfFileNotLocal(): void
     {
         $loader = new YamlFileLoader();
         $resource = 'http://example.com/resources.yml';
@@ -70,7 +70,7 @@ class YamlFileLoaderTest extends TestCase
         $loader->load($resource, 'en', 'domain1');
     }
 
-    public function testLoadThrowsAnExceptionIfNotAnArray()
+    public function testLoadThrowsAnExceptionIfNotAnArray(): void
     {
         $loader = new YamlFileLoader();
         $resource = __DIR__.'/../Fixtures/non-valid.yml';

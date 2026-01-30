@@ -17,7 +17,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 
 class LazyInstantiatorTest extends TestCase
 {
-    public function testCreateLazyGhostUsingPhp()
+    public function testCreateLazyGhostUsingPhp(): void
     {
         $ghost = (new LazyInstantiator())->instantiate(ClassicDummy::class, static function (ClassicDummy $object): void {
             $object->id = 123;

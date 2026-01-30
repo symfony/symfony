@@ -26,7 +26,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
  */
 class CacheMetadataFactoryTest extends TestCase
 {
-    public function testGetMetadataFor()
+    public function testGetMetadataFor(): void
     {
         $metadata = new ClassMetadata(Dummy::class);
 
@@ -44,7 +44,7 @@ class CacheMetadataFactoryTest extends TestCase
         $this->assertEquals($metadata, $factory->getMetadataFor(Dummy::class));
     }
 
-    public function testHasMetadataFor()
+    public function testHasMetadataFor(): void
     {
         $decorated = $this->createMock(ClassMetadataFactoryInterface::class);
         $decorated
@@ -58,7 +58,7 @@ class CacheMetadataFactoryTest extends TestCase
         $this->assertTrue($factory->hasMetadataFor(Dummy::class));
     }
 
-    public function testInvalidClassThrowsException()
+    public function testInvalidClassThrowsException(): void
     {
         $factory = new CacheClassMetadataFactory(new ClassMetadataFactory(new AttributeLoader()), new ArrayAdapter());
 
@@ -67,7 +67,7 @@ class CacheMetadataFactoryTest extends TestCase
         $factory->getMetadataFor('Not\Exist');
     }
 
-    public function testAnonymousClass()
+    public function testAnonymousClass(): void
     {
         $anonymousObject = new class {
         };

@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
  */
 class ActivationMiddlewareTest extends MiddlewareTestCase
 {
-    public function testExecuteMiddlewareOnActivated()
+    public function testExecuteMiddlewareOnActivated(): void
     {
         $message = new DummyMessage('Hello');
         $envelope = new Envelope($message);
@@ -37,7 +37,7 @@ class ActivationMiddlewareTest extends MiddlewareTestCase
         $decorator->handle($envelope, $stack);
     }
 
-    public function testExecuteMiddlewareOnActivatedWithCallable()
+    public function testExecuteMiddlewareOnActivatedWithCallable(): void
     {
         $message = new DummyMessage('Hello');
         $envelope = new Envelope($message);
@@ -55,7 +55,7 @@ class ActivationMiddlewareTest extends MiddlewareTestCase
         $decorator->handle($envelope, $stack);
     }
 
-    public function testExecuteMiddlewareOnDeactivated()
+    public function testExecuteMiddlewareOnDeactivated(): void
     {
         $message = new DummyMessage('Hello');
         $envelope = new Envelope($message);
@@ -71,7 +71,7 @@ class ActivationMiddlewareTest extends MiddlewareTestCase
 
 class ActivationMiddlewareTestCallable
 {
-    public function __invoke()
+    public function __invoke(): void
     {
     }
 }

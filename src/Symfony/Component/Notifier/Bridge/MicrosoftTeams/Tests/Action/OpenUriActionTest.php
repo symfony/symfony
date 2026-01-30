@@ -18,7 +18,7 @@ use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 
 final class OpenUriActionTest extends TestCase
 {
-    public function testName()
+    public function testName(): void
     {
         $action = (new OpenUriAction())
             ->name($value = 'My name');
@@ -26,7 +26,7 @@ final class OpenUriActionTest extends TestCase
         $this->assertSame($value, $action->toArray()['name']);
     }
 
-    public function testTargetWithDefaultValue()
+    public function testTargetWithDefaultValue(): void
     {
         $action = (new OpenUriAction())
             ->target($uri = 'URI');
@@ -40,7 +40,7 @@ final class OpenUriActionTest extends TestCase
     }
 
     #[DataProvider('operatingSystems')]
-    public function testTarget(string $os)
+    public function testTarget(string $os): void
     {
         $action = (new OpenUriAction())
             ->target($uri = 'URI', $os);
@@ -64,14 +64,14 @@ final class OpenUriActionTest extends TestCase
         yield 'os-windows' => ['windows'];
     }
 
-    public function testTargetThrowsWithUnknownOperatingSystem()
+    public function testTargetThrowsWithUnknownOperatingSystem(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         (new OpenUriAction())->target('URI', 'FOO');
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $this->assertSame(
             [

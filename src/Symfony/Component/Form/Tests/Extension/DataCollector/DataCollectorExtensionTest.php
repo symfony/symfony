@@ -26,7 +26,7 @@ class DataCollectorExtensionTest extends TestCase
         $this->extension = new DataCollectorExtension(new FormDataCollector(new FormDataExtractor()));
     }
 
-    public function testLoadTypeExtensions()
+    public function testLoadTypeExtensions(): void
     {
         $typeExtensions = $this->extension->getTypeExtensions('Symfony\Component\Form\Extension\Core\Type\FormType');
 

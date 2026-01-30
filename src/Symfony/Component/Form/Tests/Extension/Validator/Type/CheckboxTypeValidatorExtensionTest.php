@@ -20,7 +20,7 @@ class CheckboxTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         return $this->factory->create(CheckboxType::class, null, $options);
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 

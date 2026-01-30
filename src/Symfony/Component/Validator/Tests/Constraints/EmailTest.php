@@ -19,42 +19,42 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class EmailTest extends TestCase
 {
-    public function testConstructorStrict()
+    public function testConstructorStrict(): void
     {
         $subject = new Email(mode: Email::VALIDATION_MODE_STRICT);
 
         $this->assertEquals(Email::VALIDATION_MODE_STRICT, $subject->mode);
     }
 
-    public function testConstructorHtml5AllowNoTld()
+    public function testConstructorHtml5AllowNoTld(): void
     {
         $subject = new Email(mode: Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD);
 
         $this->assertEquals(Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD, $subject->mode);
     }
 
-    public function testUnknownModesTriggerException()
+    public function testUnknownModesTriggerException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "mode" parameter value is not valid.');
         new Email(mode: 'Unknown Mode');
     }
 
-    public function testUnknownModeArgumentsTriggerException()
+    public function testUnknownModeArgumentsTriggerException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "mode" parameter value is not valid.');
         new Email(null, null, 'Unknown Mode');
     }
 
-    public function testNormalizerCanBeSet()
+    public function testNormalizerCanBeSet(): void
     {
         $email = new Email(normalizer: 'trim');
 
         $this->assertEquals('trim', $email->normalizer);
     }
 
-    public function testAttribute()
+    public function testAttribute(): void
     {
         $metadata = new ClassMetadata(EmailDummy::class);
         (new AttributeLoader())->loadClassMetadata($metadata);

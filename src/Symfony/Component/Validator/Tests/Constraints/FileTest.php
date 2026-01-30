@@ -22,7 +22,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 class FileTest extends TestCase
 {
     #[DataProvider('provideValidSizes')]
-    public function testMaxSize($maxSize, $bytes, $binaryFormat)
+    public function testMaxSize($maxSize, $bytes, $binaryFormat): void
     {
         $file = new File(maxSize: $maxSize);
 
@@ -31,7 +31,7 @@ class FileTest extends TestCase
         $this->assertTrue($file->__isset('maxSize'));
     }
 
-    public function testMagicIsset()
+    public function testMagicIsset(): void
     {
         $file = new File(maxSize: 1);
 
@@ -41,7 +41,7 @@ class FileTest extends TestCase
     }
 
     #[DataProvider('provideValidSizes')]
-    public function testMaxSizeCanBeSetAfterInitialization($maxSize, $bytes, $binaryFormat)
+    public function testMaxSizeCanBeSetAfterInitialization($maxSize, $bytes, $binaryFormat): void
     {
         $file = new File();
         $file->maxSize = $maxSize;
@@ -51,7 +51,7 @@ class FileTest extends TestCase
     }
 
     #[DataProvider('provideInvalidSizes')]
-    public function testInvalidValueForMaxSizeThrowsExceptionAfterInitialization($maxSize)
+    public function testInvalidValueForMaxSizeThrowsExceptionAfterInitialization($maxSize): void
     {
         $file = new File(maxSize: 1000);
 
@@ -61,7 +61,7 @@ class FileTest extends TestCase
     }
 
     #[DataProvider('provideInvalidSizes')]
-    public function testMaxSizeCannotBeSetToInvalidValueAfterInitialization($maxSize)
+    public function testMaxSizeCannotBeSetToInvalidValueAfterInitialization($maxSize): void
     {
         $file = new File(maxSize: 1000);
 
@@ -73,25 +73,25 @@ class FileTest extends TestCase
         $this->assertSame(1000, $file->maxSize);
     }
 
-    public function testFilenameMaxLength()
+    public function testFilenameMaxLength(): void
     {
         $file = new File(filenameMaxLength: 30);
         $this->assertSame(30, $file->filenameMaxLength);
     }
 
-    public function testDefaultFilenameCountUnitIsUsed()
+    public function testDefaultFilenameCountUnitIsUsed(): void
     {
         $file = new File();
         self::assertSame(File::FILENAME_COUNT_BYTES, $file->filenameCountUnit);
     }
 
-    public function testFilenameCharsetDefaultsToNull()
+    public function testFilenameCharsetDefaultsToNull(): void
     {
         $file = new File();
         self::assertNull($file->filenameCharset);
     }
 
-    public function testInvalidFilenameCountUnitThrowsException()
+    public function testInvalidFilenameCountUnitThrowsException(): void
     {
         self::expectException(InvalidArgumentException::class);
         self::expectExceptionMessage(\sprintf('The "filenameCountUnit" option must be one of the "%s::FILENAME_COUNT_*" constants ("%s" given).', File::class, 'nonExistentCountUnit'));
@@ -99,7 +99,7 @@ class FileTest extends TestCase
     }
 
     #[DataProvider('provideInValidSizes')]
-    public function testInvalidMaxSize($maxSize)
+    public function testInvalidMaxSize($maxSize): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         new File(maxSize: $maxSize);
@@ -138,7 +138,7 @@ class FileTest extends TestCase
     }
 
     #[DataProvider('provideFormats')]
-    public function testBinaryFormat($maxSize, $guessedFormat, $binaryFormat)
+    public function testBinaryFormat($maxSize, $guessedFormat, $binaryFormat): void
     {
         $file = new File(maxSize: $maxSize, binaryFormat: $guessedFormat);
 
@@ -160,7 +160,7 @@ class FileTest extends TestCase
         ];
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(FileDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));

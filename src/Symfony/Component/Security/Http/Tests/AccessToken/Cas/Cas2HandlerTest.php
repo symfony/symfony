@@ -22,7 +22,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
 final class Cas2HandlerTest extends TestCase
 {
-    public function testWithValidTicket()
+    public function testWithValidTicket(): void
     {
         $response = new MockResponse(<<<BODY
                 <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
@@ -43,7 +43,7 @@ final class Cas2HandlerTest extends TestCase
         $this->assertEquals(new UserBadge('lobster'), $userbadge);
     }
 
-    public function testWithInvalidTicket()
+    public function testWithInvalidTicket(): void
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('CAS Authentication Failure: Ticket ST-1856339 not recognized');
@@ -65,7 +65,7 @@ final class Cas2HandlerTest extends TestCase
         $cas2Handler->getUserBadgeFrom('should-not-work');
     }
 
-    public function testWithInvalidCasResponse()
+    public function testWithInvalidCasResponse(): void
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid CAS response.');
@@ -84,7 +84,7 @@ final class Cas2HandlerTest extends TestCase
         $cas2Handler->getUserBadgeFrom('should-not-work');
     }
 
-    public function testWithoutTicket()
+    public function testWithoutTicket(): void
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('No ticket found in request.');
@@ -97,7 +97,7 @@ final class Cas2HandlerTest extends TestCase
         $cas2Handler->getUserBadgeFrom('should-not-work');
     }
 
-    public function testWithInvalidPrefix()
+    public function testWithInvalidPrefix(): void
     {
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage('Invalid CAS response.');

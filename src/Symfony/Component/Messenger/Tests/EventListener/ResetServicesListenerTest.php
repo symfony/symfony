@@ -30,7 +30,7 @@ class ResetServicesListenerTest extends TestCase
     }
 
     #[DataProvider('provideResetServices')]
-    public function testResetServices(bool $shouldReset)
+    public function testResetServices(bool $shouldReset): void
     {
         $resettableService = $this->createMock(ResetInterface::class);
         $resettableService->expects($shouldReset ? $this->once() : $this->never())->method('reset');
@@ -42,7 +42,7 @@ class ResetServicesListenerTest extends TestCase
         $resetListener->resetServices($event);
     }
 
-    public function testResetServicesAtStop()
+    public function testResetServicesAtStop(): void
     {
         $resettableService = $this->createMock(ResetInterface::class);
         $resettableService->expects($this->once())->method('reset');

@@ -46,7 +46,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         return new DoctrineDbalAdapter(DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $this->getDbalConfig()), '', $defaultLifetime);
     }
 
-    public function testConfigureSchemaDecoratedDbalDriver()
+    public function testConfigureSchemaDecoratedDbalDriver(): void
     {
         if (file_exists(self::$dbFile)) {
             @unlink(self::$dbFile);
@@ -72,7 +72,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         $this->assertTrue($adapter->save($item));
     }
 
-    public function testConfigureSchema()
+    public function testConfigureSchema(): void
     {
         if (file_exists(self::$dbFile)) {
             @unlink(self::$dbFile);
@@ -86,7 +86,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         $this->assertTrue($schema->hasTable('cache_items'));
     }
 
-    public function testConfigureSchemaDifferentDbalConnection()
+    public function testConfigureSchemaDifferentDbalConnection(): void
     {
         if (file_exists(self::$dbFile)) {
             @unlink(self::$dbFile);
@@ -100,7 +100,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         $this->assertFalse($schema->hasTable('cache_items'));
     }
 
-    public function testConfigureSchemaTableExists()
+    public function testConfigureSchemaTableExists(): void
     {
         if (file_exists(self::$dbFile)) {
             @unlink(self::$dbFile);
@@ -117,7 +117,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
     }
 
     #[DataProvider('provideDsnWithSQLite')]
-    public function testDsnWithSQLite(string $dsn, ?string $file = null)
+    public function testDsnWithSQLite(string $dsn, ?string $file = null): void
     {
         try {
             $pool = new DoctrineDbalAdapter($dsn);
@@ -142,7 +142,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
 
     #[RequiresPhpExtension('pdo_pgsql')]
     #[Group('integration')]
-    public function testDsnWithPostgreSQL()
+    public function testDsnWithPostgreSQL(): void
     {
         if (!$host = getenv('POSTGRES_HOST')) {
             $this->markTestSkipped('Missing POSTGRES_HOST env variable');

@@ -22,13 +22,13 @@ use Symfony\Component\Routing\RouteCompiler;
 
 class DelegatingLoaderTest extends TestCase
 {
-    public function testConstructorApi()
+    public function testConstructorApi(): void
     {
         new DelegatingLoader(new LoaderResolver());
         $this->assertTrue(true, '__construct() takes a LoaderResolverInterface as its first argument.');
     }
 
-    public function testLoadDefaultOptions()
+    public function testLoadDefaultOptions(): void
     {
         $loaderResolver = $this->createMock(LoaderResolverInterface::class);
 

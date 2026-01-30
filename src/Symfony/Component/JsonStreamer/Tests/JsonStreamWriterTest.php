@@ -59,7 +59,7 @@ class JsonStreamWriterTest extends TestCase
         }
     }
 
-    public function testReturnTraversableAndStringable()
+    public function testReturnTraversableAndStringable(): void
     {
         $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);
 
@@ -67,7 +67,7 @@ class JsonStreamWriterTest extends TestCase
         $this->assertSame('true', (string) $writer->write(true, Type::bool()));
     }
 
-    public function testWriteScalar()
+    public function testWriteScalar(): void
     {
         $this->assertWritten('null', null, Type::null());
         $this->assertWritten('true', true, Type::bool());
@@ -76,7 +76,7 @@ class JsonStreamWriterTest extends TestCase
         $this->assertWritten('1', DummyBackedEnum::ONE, Type::enum(DummyBackedEnum::class));
     }
 
-    public function testWriteUnion()
+    public function testWriteUnion(): void
     {
         $this->assertWritten(
             '[1,true,["foo","bar"]]',
@@ -95,7 +95,7 @@ class JsonStreamWriterTest extends TestCase
         $this->assertWritten('{}', $dummy, Type::object(DummyWithUnionProperties::class));
     }
 
-    public function testWriteCollection()
+    public function testWriteCollection(): void
     {
         $this->assertWritten(
             '{"0":{"id":1,"name":"dummy"},"1":{"id":1,"name":"dummy"}}',
@@ -122,7 +122,7 @@ class JsonStreamWriterTest extends TestCase
         );
     }
 
-    public function testWriteNestedCollection()
+    public function testWriteNestedCollection(): void
     {
         $dummyWithArray1 = new DummyWithArray();
         $dummyWithArray1->dummies = [new ClassicDummy()];
@@ -181,7 +181,7 @@ class JsonStreamWriterTest extends TestCase
         );
     }
 
-    public function testWriteObject()
+    public function testWriteObject(): void
     {
         $dummy = new ClassicDummy();
         $dummy->id = 10;
@@ -190,7 +190,7 @@ class JsonStreamWriterTest extends TestCase
         $this->assertWritten('{"id":10,"name":"dummy name"}', $dummy, Type::object(ClassicDummy::class));
     }
 
-    public function testWriteObjectWithGenerics()
+    public function testWriteObjectWithGenerics(): void
     {
         $nestedDummy = new DummyWithNameAttributes();
         $nestedDummy->id = 10;
@@ -202,7 +202,7 @@ class JsonStreamWriterTest extends TestCase
         $this->assertWritten('{"dummies":[{"id":10,"name":"dummy name"}]}', $dummy, Type::generic(Type::object(DummyWithGenerics::class), Type::object(ClassicDummy::class)));
     }
 
-    public function testWriteObjectWithStreamedName()
+    public function testWriteObjectWithStreamedName(): void
     {
         $dummy = new DummyWithNameAttributes();
         $dummy->id = 10;
@@ -211,7 +211,7 @@ class JsonStreamWriterTest extends TestCase
         $this->assertWritten('{"@id":10,"name":"dummy name"}', $dummy, Type::object(DummyWithNameAttributes::class));
     }
 
-    public function testWriteObjectWithValueTransformer()
+    public function testWriteObjectWithValueTransformer(): void
     {
         $dummy = new DummyWithValueTransformerAttributes();
         $dummy->id = 10;
@@ -229,7 +229,7 @@ class JsonStreamWriterTest extends TestCase
         );
     }
 
-    public function testValueTransformerHasAccessToCurrentObject()
+    public function testValueTransformerHasAccessToCurrentObject(): void
     {
         $dummy = new DummyWithValueTransformerAttributes();
         $dummy->id = 10;
@@ -265,7 +265,7 @@ class JsonStreamWriterTest extends TestCase
         );
     }
 
-    public function testWriteObjectWithPhpDoc()
+    public function testWriteObjectWithPhpDoc(): void
     {
         $dummy = new DummyWithPhpDoc();
         $dummy->arrayOfDummies = ['key' => new DummyWithNameAttributes()];
@@ -273,7 +273,7 @@ class JsonStreamWriterTest extends TestCase
         $this->assertWritten('{"arrayOfDummies":{"key":{"@id":1,"name":"dummy"}},"array":[]}', $dummy, Type::object(DummyWithPhpDoc::class));
     }
 
-    public function testWriteObjectWithNullableProperties()
+    public function testWriteObjectWithNullableProperties(): void
     {
         $dummy = new DummyWithNullableProperties();
 
@@ -291,7 +291,7 @@ class JsonStreamWriterTest extends TestCase
         $this->assertWritten('{"name":null,"enum":1}', $dummy, Type::object(DummyWithNullableProperties::class), options: ['include_null_properties' => true]);
     }
 
-    public function testWriteObjectWithDateTimes()
+    public function testWriteObjectWithDateTimes(): void
     {
         $dummy = new DummyWithDateTimes();
         $dummy->interface = new \DateTimeImmutable('2024-11-20');
@@ -305,19 +305,19 @@ class JsonStreamWriterTest extends TestCase
         );
     }
 
-    public function testWriteObjectWithDollarNamedProperties()
+    public function testWriteObjectWithDollarNamedProperties(): void
     {
         $this->assertWritten('{"$foo":true,"{$foo->bar}":true}', new DummyWithDollarNamedProperties(), Type::object(DummyWithDollarNamedProperties::class));
     }
 
-    public function testWriteObjectWithSyntheticProperty()
+    public function testWriteObjectWithSyntheticProperty(): void
     {
         $writer = new JsonStreamWriter(new Container(), new SyntheticPropertyMetadataLoader(), $this->streamWritersDir);
 
         $this->assertSame('{"synthetic":true}', (string) $writer->write(new DummyWithSyntheticProperties(), Type::object(DummyWithSyntheticProperties::class)));
     }
 
-    public function testWriteNestedSelfList()
+    public function testWriteNestedSelfList(): void
     {
         $dummy = new SelfReferencingDummyList();
         $dummy->items = [new SelfReferencingDummyList(), new SelfReferencingDummyList(), new SelfReferencingDummyList()];
@@ -338,7 +338,7 @@ class JsonStreamWriterTest extends TestCase
         );
     }
 
-    public function testWriteNestedSelfDict()
+    public function testWriteNestedSelfDict(): void
     {
         $dummy = new SelfReferencingDummyDict();
         $dummy->items = [
@@ -368,7 +368,7 @@ class JsonStreamWriterTest extends TestCase
     }
 
     #[DataProvider('throwWhenMaxDepthIsReachedDataProvider')]
-    public function testThrowWhenMaxDepthIsReached(Type $type, mixed $data)
+    public function testThrowWhenMaxDepthIsReached(Type $type, mixed $data): void
     {
         $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);
 
@@ -403,7 +403,7 @@ class JsonStreamWriterTest extends TestCase
         yield [Type::dict(Type::object(SelfReferencingDummy::class)), ['k' => $dummy]];
     }
 
-    public function testThrowWhenEncodeError()
+    public function testThrowWhenEncodeError(): void
     {
         $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);
 
@@ -413,7 +413,7 @@ class JsonStreamWriterTest extends TestCase
         (string) $writer->write(\INF, Type::int());
     }
 
-    public function testCreateStreamWriterFile()
+    public function testCreateStreamWriterFile(): void
     {
         $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);
 
@@ -423,7 +423,7 @@ class JsonStreamWriterTest extends TestCase
         $this->assertCount(1, glob($this->streamWritersDir.'/*'));
     }
 
-    public function testCreateStreamWriterFileOnlyIfNotExists()
+    public function testCreateStreamWriterFileOnlyIfNotExists(): void
     {
         $writer = JsonStreamWriter::create(streamWritersDir: $this->streamWritersDir);
 

@@ -35,7 +35,7 @@ class PasswordStrengthValidatorWithClosureTest extends ConstraintValidatorTestCa
     }
 
     #[DataProvider('getValidValues')]
-    public function testValidValues(string|\Stringable $value, int $expectedStrength)
+    public function testValidValues(string|\Stringable $value, int $expectedStrength): void
     {
         $this->validator->validate($value, new PasswordStrength(minScore: $expectedStrength));
 
@@ -62,7 +62,7 @@ class PasswordStrengthValidatorWithClosureTest extends ConstraintValidatorTestCa
     }
 
     #[DataProvider('provideInvalidConstraints')]
-    public function testThePasswordIsWeak(PasswordStrength $constraint, string $password, string $expectedMessage, string $expectedCode, string $strength)
+    public function testThePasswordIsWeak(PasswordStrength $constraint, string $password, string $expectedMessage, string $expectedCode, string $strength): void
     {
         $this->validator->validate($password, $constraint);
 

@@ -18,7 +18,7 @@ use Symfony\Component\JsonStreamer\Read\Lexer;
 
 class LexerTest extends TestCase
 {
-    public function testTokens()
+    public function testTokens(): void
     {
         $this->assertTokens([['1', 0]], '1');
         $this->assertTokens([['false', 0]], 'false');
@@ -31,12 +31,12 @@ class LexerTest extends TestCase
         $this->assertTokens([['{', 0], ['"foo"', 1], [':', 6], ['{', 8], ['"bar"', 9], [':', 14], ['"baz"', 15], ['}', 20], ['}', 21]], '{"foo": {"bar":"baz"}}');
     }
 
-    public function testTokensSubset()
+    public function testTokensSubset(): void
     {
         $this->assertTokens([['false', 7]], '[1, 2, false]', 7, 5);
     }
 
-    public function testTokenizeOverflowingBuffer()
+    public function testTokenizeOverflowingBuffer(): void
     {
         $veryLongString = \sprintf('"%s"', str_repeat('.', 20000));
 
@@ -47,7 +47,7 @@ class LexerTest extends TestCase
      * Ensures that the lexer is compliant with RFC 8259.
      */
     #[DataProvider('jsonDataProvider')]
-    public function testValidJson(string $name, string $json, bool $valid)
+    public function testValidJson(string $name, string $json, bool $valid): void
     {
         $resource = fopen('php://temp', 'w');
         fwrite($resource, $json);

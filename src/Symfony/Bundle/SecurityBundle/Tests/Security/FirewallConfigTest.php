@@ -16,7 +16,7 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 
 class FirewallConfigTest extends TestCase
 {
-    public function testGetters()
+    public function testGetters(): void
     {
         $authenticators = ['form_login', 'remember_me'];
         $options = [

@@ -18,7 +18,7 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 
 class InstantiatorTest extends TestCase
 {
-    public function testInstantiate()
+    public function testInstantiate(): void
     {
         $expected = new ClassicDummy();
         $expected->id = 100;
@@ -32,7 +32,7 @@ class InstantiatorTest extends TestCase
         $this->assertEquals($expected, (new Instantiator())->instantiate(ClassicDummy::class, $properties));
     }
 
-    public function testThrowOnInvalidProperty()
+    public function testThrowOnInvalidProperty(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->expectExceptionMessage(\sprintf('Cannot assign array to property %s::$id of type int', ClassicDummy::class));

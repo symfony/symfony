@@ -29,16 +29,16 @@ use Symfony\Component\Workflow\Validator\DefinitionValidatorInterface;
 
 class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
 {
-    protected function loadFromFile(ContainerBuilder $container, $file)
+    protected function loadFromFile(ContainerBuilder $container, $file): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(__DIR__.'/Fixtures/php'));
         $loader->load($file.'.php');
     }
 
-    public function testAssetsCannotHavePathAndUrl()
+    public function testAssetsCannotHavePathAndUrl(): void
     {
         $this->expectException(\LogicException::class);
-        $this->createContainerFromClosure(static function ($container) {
+        $this->createContainerFromClosure(static function ($container): void {
             $container->loadFromExtension('framework', [
                 'assets' => [
                     'base_urls' => 'http://cdn.example.com',
@@ -48,10 +48,10 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         });
     }
 
-    public function testAssetPackageCannotHavePathAndUrl()
+    public function testAssetPackageCannotHavePathAndUrl(): void
     {
         $this->expectException(\LogicException::class);
-        $this->createContainerFromClosure(static function ($container) {
+        $this->createContainerFromClosure(static function ($container): void {
             $container->loadFromExtension('framework', [
                 'assets' => [
                     'packages' => [
@@ -65,11 +65,11 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         });
     }
 
-    public function testWorkflowValidationStateMachine()
+    public function testWorkflowValidationStateMachine(): void
     {
         $this->expectException(InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition from a place/state must have an unique name. Multiple transitions named "a_to_b" from place/state "a" were found on StateMachine "article".');
-        $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+        $this->createContainerFromClosure(static function (ContainerBuilder $container): void {
             $container->loadFromExtension('framework', [
                 'workflows' => [
                     'article' => [
@@ -96,11 +96,11 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
     }
 
     #[DataProvider('provideWorkflowValidationCustomTests')]
-    public function testWorkflowValidationCustomBroken(string $class, string $message)
+    public function testWorkflowValidationCustomBroken(string $class, string $message): void
     {
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage($message);
-        $this->createContainerFromClosure(static function ($container) use ($class) {
+        $this->createContainerFromClosure(static function ($container) use ($class): void {
             $container->loadFromExtension('framework', [
                 'workflows' => [
                     'article' => [
@@ -136,9 +136,9 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         yield [WorkflowValidatorWithConstructor::class, 'Invalid configuration for path "framework.workflows.workflows.article.definition_validators.0": The "Symfony\\\\Bundle\\\\FrameworkBundle\\\\Tests\\\\DependencyInjection\\\\WorkflowValidatorWithConstructor" validation class constructor must not have any arguments.'];
     }
 
-    public function testWorkflowDefaultMarkingStoreDefinition()
+    public function testWorkflowDefaultMarkingStoreDefinition(): void
     {
-        $container = $this->createContainerFromClosure(static function ($container) {
+        $container = $this->createContainerFromClosure(static function ($container): void {
             $container->loadFromExtension('framework', [
                 'workflows' => [
                     'workflow_a' => [
@@ -192,10 +192,10 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->assertNull($argumentsB['index_1'], 'workflow_b marking_store argument is null');
     }
 
-    public function testRateLimiterLockFactoryWithLockDisabled()
+    public function testRateLimiterLockFactoryWithLockDisabled(): void
     {
         try {
-            $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $this->createContainerFromClosure(static function (ContainerBuilder $container): void {
                 $container->loadFromExtension('framework', [
                     'lock' => false,
                     'rate_limiter' => [
@@ -210,9 +210,9 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         }
     }
 
-    public function testRateLimiterAutoLockFactoryWithLockEnabled()
+    public function testRateLimiterAutoLockFactoryWithLockEnabled(): void
     {
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container): void {
             $container->loadFromExtension('framework', [
                 'lock' => true,
                 'rate_limiter' => [
@@ -225,9 +225,9 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->assertEquals('lock.factory', (string) $withLock->getArgument(2));
     }
 
-    public function testRateLimiterAutoLockFactoryWithLockDisabled()
+    public function testRateLimiterAutoLockFactoryWithLockDisabled(): void
     {
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container): void {
             $container->loadFromExtension('framework', [
                 'lock' => false,
                 'rate_limiter' => [
@@ -242,9 +242,9 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $container->getDefinition('limiter.without_lock')->getArgument(2);
     }
 
-    public function testRateLimiterDisableLockFactory()
+    public function testRateLimiterDisableLockFactory(): void
     {
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container): void {
             $container->loadFromExtension('framework', [
                 'lock' => true,
                 'rate_limiter' => [
@@ -259,9 +259,9 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $container->getDefinition('limiter.without_lock')->getArgument(2);
     }
 
-    public function testRateLimiterIsTagged()
+    public function testRateLimiterIsTagged(): void
     {
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container): void {
             $container->loadFromExtension('framework', [
                 'lock' => true,
                 'rate_limiter' => [
@@ -275,13 +275,13 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->assertSame('second', $container->getDefinition('limiter.second')->getTag('rate_limiter')[0]['name']);
     }
 
-    public function testRateLimiterCompoundPolicy()
+    public function testRateLimiterCompoundPolicy(): void
     {
         if (!class_exists(CompoundRateLimiterFactory::class)) {
             $this->markTestSkipped('CompoundRateLimiterFactory is not available.');
         }
 
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container): void {
             $container->loadFromExtension('framework', [
                 'lock' => true,
                 'rate_limiter' => [
@@ -317,14 +317,14 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         $this->assertSame('limiter.compound', (string) $container->getAlias(RateLimiterFactoryInterface::class.' $compoundLimiter'));
     }
 
-    public function testRateLimiterCompoundPolicyNoLimiters()
+    public function testRateLimiterCompoundPolicyNoLimiters(): void
     {
         if (!class_exists(CompoundRateLimiterFactory::class)) {
             $this->markTestSkipped('CompoundRateLimiterFactory is not available.');
         }
 
         $this->expectException(\LogicException::class);
-        $this->createContainerFromClosure(static function ($container) {
+        $this->createContainerFromClosure(static function ($container): void {
             $container->loadFromExtension('framework', [
                 'rate_limiter' => [
                     'compound' => ['policy' => 'compound'],
@@ -333,14 +333,14 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         });
     }
 
-    public function testRateLimiterCompoundPolicyInvalidLimiters()
+    public function testRateLimiterCompoundPolicyInvalidLimiters(): void
     {
         if (!class_exists(CompoundRateLimiterFactory::class)) {
             $this->markTestSkipped('CompoundRateLimiterFactory is not available.');
         }
 
         $this->expectException(\LogicException::class);
-        $this->createContainerFromClosure(static function ($container) {
+        $this->createContainerFromClosure(static function ($container): void {
             $container->loadFromExtension('framework', [
                 'rate_limiter' => [
                     'compound' => ['policy' => 'compound', 'limiters' => ['invalid1', 'invalid2']],
@@ -350,11 +350,11 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
     }
 
     #[DataProvider('emailValidationModeProvider')]
-    public function testValidatorEmailValidationMode(string $mode)
+    public function testValidatorEmailValidationMode(string $mode): void
     {
         $this->expectNotToPerformAssertions();
 
-        $this->createContainerFromClosure(static function (ContainerBuilder $container) use ($mode) {
+        $this->createContainerFromClosure(static function (ContainerBuilder $container) use ($mode): void {
             $container->loadFromExtension('framework', [
                 'validation' => [
                     'email_validation_mode' => $mode,
@@ -370,9 +370,9 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         }
     }
 
-    public function testMessengerSigningSerializerWiring()
+    public function testMessengerSigningSerializerWiring(): void
     {
-        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container): void {
             $container->register('signed_handler', 'stdClass')
                 ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'sign' => true]);
 

@@ -18,7 +18,7 @@ use Symfony\Component\Mime\Email;
 
 class SesSmtpTransportTest extends TestCase
 {
-    public function testTagAndMetadataAndMessageStreamHeaders()
+    public function testTagAndMetadataAndMessageStreamHeaders(): void
     {
         $email = new Email();
         $email->getHeaders()->add(new MetadataHeader('tagName1', 'tag Value1'));

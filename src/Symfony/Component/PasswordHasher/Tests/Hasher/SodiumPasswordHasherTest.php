@@ -25,7 +25,7 @@ class SodiumPasswordHasherTest extends TestCase
         }
     }
 
-    public function testValidation()
+    public function testValidation(): void
     {
         $hasher = new SodiumPasswordHasher();
         $result = $hasher->hash('password');
@@ -34,13 +34,13 @@ class SodiumPasswordHasherTest extends TestCase
         $this->assertFalse($hasher->verify($result, ''));
     }
 
-    public function testBcryptValidation()
+    public function testBcryptValidation(): void
     {
         $hasher = new SodiumPasswordHasher();
         $this->assertTrue($hasher->verify('$2y$04$M8GDODMoGQLQRpkYCdoJh.lbiZPee3SZI32RcYK49XYTolDGwoRMm', 'abc'));
     }
 
-    public function testNonArgonValidation()
+    public function testNonArgonValidation(): void
     {
         $hasher = new SodiumPasswordHasher();
         $this->assertTrue($hasher->verify('$5$abcdefgh$ZLdkj8mkc2XVSrPVjskDAgZPGjtj1VGVaa1aUkrMTU/', 'password'));
@@ -49,14 +49,14 @@ class SodiumPasswordHasherTest extends TestCase
         $this->assertFalse($hasher->verify('$6$abcdefgh$yVfUwsw5T.JApa8POvClA1pQ5peiq97DUNyXCZN5IrF.BMSkiaLQ5kvpuEm/VQ1Tvh/KV2TcaWh8qinoW5dhA1', 'anotherPassword'));
     }
 
-    public function testHashLength()
+    public function testHashLength(): void
     {
         $this->expectException(InvalidPasswordException::class);
 
         (new SodiumPasswordHasher())->hash(str_repeat('a', 4097));
     }
 
-    public function testCheckPasswordLength()
+    public function testCheckPasswordLength(): void
     {
         $hasher = new SodiumPasswordHasher();
         $result = $hasher->hash(str_repeat('a', 4096));
@@ -64,7 +64,7 @@ class SodiumPasswordHasherTest extends TestCase
         $this->assertTrue($hasher->verify($result, str_repeat('a', 4096)));
     }
 
-    public function testBcryptWithLongPassword()
+    public function testBcryptWithLongPassword(): void
     {
         $hasher = new SodiumPasswordHasher(null, null);
         $plainPassword = str_repeat('a', 100);
@@ -73,7 +73,7 @@ class SodiumPasswordHasherTest extends TestCase
         $this->assertTrue($hasher->verify((new NativePasswordHasher(null, null, 4, \PASSWORD_BCRYPT))->hash($plainPassword), $plainPassword));
     }
 
-    public function testPasswordNulByteGracefullyHandled()
+    public function testPasswordNulByteGracefullyHandled(): void
     {
         $hasher = new SodiumPasswordHasher(null, null);
         $plainPassword = "a\0b";
@@ -81,14 +81,14 @@ class SodiumPasswordHasherTest extends TestCase
         $this->assertTrue($hasher->verify($hasher->hash($plainPassword), $plainPassword));
     }
 
-    public function testUserProvidedSaltIsNotUsed()
+    public function testUserProvidedSaltIsNotUsed(): void
     {
         $hasher = new SodiumPasswordHasher();
         $result = $hasher->hash('password');
         $this->assertTrue($hasher->verify($result, 'password'));
     }
 
-    public function testNeedsRehash()
+    public function testNeedsRehash(): void
     {
         $hasher = new SodiumPasswordHasher(4, 11000);
 

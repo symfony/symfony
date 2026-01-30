@@ -20,7 +20,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 
 class OAuth2TokenHandlerTest extends TestCase
 {
-    public function testGetsUserIdentifierFromOAuth2ServerResponse()
+    public function testGetsUserIdentifierFromOAuth2ServerResponse(): void
     {
         $accessToken = 'a-secret-token';
         $claims = [

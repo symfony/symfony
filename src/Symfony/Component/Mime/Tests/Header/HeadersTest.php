@@ -22,14 +22,14 @@ use Symfony\Component\Mime\Header\UnstructuredHeader;
 
 class HeadersTest extends TestCase
 {
-    public function testAddMailboxListHeaderDelegatesToFactory()
+    public function testAddMailboxListHeaderDelegatesToFactory(): void
     {
         $headers = new Headers();
         $headers->addMailboxListHeader('From', ['person@domain']);
         $this->assertNotNull($headers->get('From'));
     }
 
-    public function testAddDateHeaderDelegatesToFactory()
+    public function testAddDateHeaderDelegatesToFactory(): void
     {
         $dateTime = new \DateTimeImmutable();
         $headers = new Headers();
@@ -37,35 +37,35 @@ class HeadersTest extends TestCase
         $this->assertNotNull($headers->get('Date'));
     }
 
-    public function testAddTextHeaderDelegatesToFactory()
+    public function testAddTextHeaderDelegatesToFactory(): void
     {
         $headers = new Headers();
         $headers->addTextHeader('Subject', 'some text');
         $this->assertNotNull($headers->get('Subject'));
     }
 
-    public function testAddParameterizedHeaderDelegatesToFactory()
+    public function testAddParameterizedHeaderDelegatesToFactory(): void
     {
         $headers = new Headers();
         $headers->addParameterizedHeader('Content-Type', 'text/plain', ['charset' => 'utf-8']);
         $this->assertNotNull($headers->get('Content-Type'));
     }
 
-    public function testAddIdHeaderDelegatesToFactory()
+    public function testAddIdHeaderDelegatesToFactory(): void
     {
         $headers = new Headers();
         $headers->addIdHeader('Message-ID', 'some@id');
         $this->assertNotNull($headers->get('Message-ID'));
     }
 
-    public function testAddPathHeaderDelegatesToFactory()
+    public function testAddPathHeaderDelegatesToFactory(): void
     {
         $headers = new Headers();
         $headers->addPathHeader('Return-Path', 'some@path');
         $this->assertNotNull($headers->get('Return-Path'));
     }
 
-    public function testAddHeader()
+    public function testAddHeader(): void
     {
         $headers = new Headers();
         $headers->addHeader('from', ['from@example.com']);
@@ -94,20 +94,20 @@ class HeadersTest extends TestCase
         $this->assertSame(['id@id'], $headers->get('message-id')->getBody());
     }
 
-    public function testHasReturnsFalseWhenNoHeaders()
+    public function testHasReturnsFalseWhenNoHeaders(): void
     {
         $headers = new Headers();
         $this->assertFalse($headers->has('Some-Header'));
     }
 
-    public function testAddedMailboxListHeaderIsSeenByHas()
+    public function testAddedMailboxListHeaderIsSeenByHas(): void
     {
         $headers = new Headers();
         $headers->addMailboxListHeader('From', ['person@domain']);
         $this->assertTrue($headers->has('From'));
     }
 
-    public function testAddedDateHeaderIsSeenByHas()
+    public function testAddedDateHeaderIsSeenByHas(): void
     {
         $dateTime = new \DateTimeImmutable();
         $headers = new Headers();
@@ -115,42 +115,42 @@ class HeadersTest extends TestCase
         $this->assertTrue($headers->has('Date'));
     }
 
-    public function testAddedTextHeaderIsSeenByHas()
+    public function testAddedTextHeaderIsSeenByHas(): void
     {
         $headers = new Headers();
         $headers->addTextHeader('Subject', 'some text');
         $this->assertTrue($headers->has('Subject'));
     }
 
-    public function testAddedParameterizedHeaderIsSeenByHas()
+    public function testAddedParameterizedHeaderIsSeenByHas(): void
     {
         $headers = new Headers();
         $headers->addParameterizedHeader('Content-Type', 'text/plain', ['charset' => 'utf-8']);
         $this->assertTrue($headers->has('Content-Type'));
     }
 
-    public function testAddedIdHeaderIsSeenByHas()
+    public function testAddedIdHeaderIsSeenByHas(): void
     {
         $headers = new Headers();
         $headers->addIdHeader('Message-ID', 'some@id');
         $this->assertTrue($headers->has('Message-ID'));
     }
 
-    public function testAddedPathHeaderIsSeenByHas()
+    public function testAddedPathHeaderIsSeenByHas(): void
     {
         $headers = new Headers();
         $headers->addPathHeader('Return-Path', 'some@path');
         $this->assertTrue($headers->has('Return-Path'));
     }
 
-    public function testNewlySetHeaderIsSeenByHas()
+    public function testNewlySetHeaderIsSeenByHas(): void
     {
         $headers = new Headers();
         $headers->add(new UnstructuredHeader('X-Foo', 'bar'));
         $this->assertTrue($headers->has('X-Foo'));
     }
 
-    public function testHasCanDistinguishMultipleHeaders()
+    public function testHasCanDistinguishMultipleHeaders(): void
     {
         $headers = new Headers();
         $headers->addTextHeader('X-Test', 'some@id');
@@ -158,7 +158,7 @@ class HeadersTest extends TestCase
         $this->assertTrue($headers->has('X-Test'));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $header = new IdentificationHeader('Message-ID', 'some@id');
         $headers = new Headers();
@@ -166,13 +166,13 @@ class HeadersTest extends TestCase
         $this->assertEquals($header->toString(), $headers->get('Message-ID')->toString());
     }
 
-    public function testGetReturnsNullIfHeaderNotSet()
+    public function testGetReturnsNullIfHeaderNotSet(): void
     {
         $headers = new Headers();
         $this->assertNull($headers->get('Message-ID'));
     }
 
-    public function testAllReturnsAllHeadersMatchingName()
+    public function testAllReturnsAllHeadersMatchingName(): void
     {
         $header0 = new UnstructuredHeader('X-Test', 'some@id');
         $header1 = new UnstructuredHeader('X-Test', 'other@id');
@@ -184,7 +184,7 @@ class HeadersTest extends TestCase
         $this->assertEquals([$header0, $header1, $header2], iterator_to_array($headers->all('X-Test')));
     }
 
-    public function testAllReturnsAllHeadersIfNoArguments()
+    public function testAllReturnsAllHeadersIfNoArguments(): void
     {
         $header0 = new IdentificationHeader('Message-ID', 'some@id');
         $header1 = new UnstructuredHeader('Subject', 'thing');
@@ -196,13 +196,13 @@ class HeadersTest extends TestCase
         $this->assertEquals(['message-id' => $header0, 'subject' => $header1, 'to' => $header2], iterator_to_array($headers->all()));
     }
 
-    public function testAllReturnsEmptyArrayIfNoneSet()
+    public function testAllReturnsEmptyArrayIfNoneSet(): void
     {
         $headers = new Headers();
         $this->assertEquals([], iterator_to_array($headers->all('Received')));
     }
 
-    public function testRemoveRemovesAllHeadersWithName()
+    public function testRemoveRemovesAllHeadersWithName(): void
     {
         $headers = new Headers();
         $headers->addIdHeader('X-Test', 'some@id');
@@ -212,14 +212,14 @@ class HeadersTest extends TestCase
         $this->assertFalse($headers->has('X-Test'));
     }
 
-    public function testHasIsNotCaseSensitive()
+    public function testHasIsNotCaseSensitive(): void
     {
         $headers = new Headers();
         $headers->addIdHeader('Message-ID', 'some@id');
         $this->assertTrue($headers->has('message-id'));
     }
 
-    public function testGetIsNotCaseSensitive()
+    public function testGetIsNotCaseSensitive(): void
     {
         $header = new IdentificationHeader('Message-ID', 'some@id');
         $headers = new Headers();
@@ -227,7 +227,7 @@ class HeadersTest extends TestCase
         $this->assertEquals($header, $headers->get('message-id'));
     }
 
-    public function testAllIsNotCaseSensitive()
+    public function testAllIsNotCaseSensitive(): void
     {
         $header = new IdentificationHeader('Message-ID', 'some@id');
         $headers = new Headers();
@@ -235,7 +235,7 @@ class HeadersTest extends TestCase
         $this->assertEquals([$header], iterator_to_array($headers->all('message-id')));
     }
 
-    public function testRemoveIsNotCaseSensitive()
+    public function testRemoveIsNotCaseSensitive(): void
     {
         $headers = new Headers();
         $headers->addIdHeader('Message-ID', 'some@id');
@@ -243,7 +243,7 @@ class HeadersTest extends TestCase
         $this->assertFalse($headers->has('Message-ID'));
     }
 
-    public function testAddHeaderIsNotCaseSensitive()
+    public function testAddHeaderIsNotCaseSensitive(): void
     {
         $headers = new Headers();
         $headers->addHeader('From', ['from@example.com']);
@@ -252,12 +252,12 @@ class HeadersTest extends TestCase
         $this->assertEquals([new Address('from@example.com')], $headers->get('from')->getBody());
     }
 
-    public function testIsUniqueHeaderIsNotCaseSensitive()
+    public function testIsUniqueHeaderIsNotCaseSensitive(): void
     {
         $this->assertTrue(Headers::isUniqueHeader('From'));
     }
 
-    public function testToStringJoinsHeadersTogether()
+    public function testToStringJoinsHeadersTogether(): void
     {
         $headers = new Headers();
         $headers->addTextHeader('Foo', 'bar');
@@ -265,7 +265,7 @@ class HeadersTest extends TestCase
         $this->assertEquals("Foo: bar\r\nZip: buttons\r\n", $headers->toString());
     }
 
-    public function testHeadersWithoutBodiesAreNotDisplayed()
+    public function testHeadersWithoutBodiesAreNotDisplayed(): void
     {
         $headers = new Headers();
         $headers->addTextHeader('Foo', 'bar');
@@ -273,7 +273,7 @@ class HeadersTest extends TestCase
         $this->assertEquals("Foo: bar\r\n", $headers->toString());
     }
 
-    public function testToArray()
+    public function testToArray(): void
     {
         $headers = new Headers();
         $headers->addIdHeader('Message-ID', 'some@id');
@@ -284,35 +284,35 @@ class HeadersTest extends TestCase
         ], $headers->toArray());
     }
 
-    public function testInReplyToAcceptsNonIdentifierValues()
+    public function testInReplyToAcceptsNonIdentifierValues(): void
     {
         $headers = new Headers();
         $headers->addTextHeader('In-Reply-To', 'foobar');
         $this->assertEquals('foobar', $headers->get('In-Reply-To')->getBody());
     }
 
-    public function testInReplyToAcceptsIdentifierValues()
+    public function testInReplyToAcceptsIdentifierValues(): void
     {
         $headers = new Headers();
         $headers->addIdHeader('In-Reply-To', 'foo@bar.com');
         $this->assertEquals('<foo@bar.com>', $headers->get('In-Reply-To')->getBodyAsString());
     }
 
-    public function testReferencesAcceptsNonIdentifierValues()
+    public function testReferencesAcceptsNonIdentifierValues(): void
     {
         $headers = new Headers();
         $headers->addTextHeader('References', 'foobar');
         $this->assertEquals('foobar', $headers->get('References')->getBody());
     }
 
-    public function testReferencesAcceptsIdentifierValues()
+    public function testReferencesAcceptsIdentifierValues(): void
     {
         $headers = new Headers();
         $headers->addIdHeader('References', 'foo@bar.com');
         $this->assertEquals('<foo@bar.com>', $headers->get('References')->getBodyAsString());
     }
 
-    public function testHeaderBody()
+    public function testHeaderBody(): void
     {
         $headers = new Headers();
         $this->assertNull($headers->getHeaderBody('Content-Type'));
@@ -320,7 +320,7 @@ class HeadersTest extends TestCase
         $this->assertSame('type', $headers->getHeaderBody('Content-Type'));
     }
 
-    public function testHeaderParameter()
+    public function testHeaderParameter(): void
     {
         $headers = new Headers();
         $this->assertNull($headers->getHeaderParameter('Content-Disposition', 'name'));
@@ -330,7 +330,7 @@ class HeadersTest extends TestCase
         $this->assertSame('foo', $headers->getHeaderParameter('Content-Disposition', 'name'));
     }
 
-    public function testHeaderParameterNotDefined()
+    public function testHeaderParameterNotDefined(): void
     {
         $headers = new Headers();
 
@@ -338,7 +338,7 @@ class HeadersTest extends TestCase
         $headers->setHeaderParameter('Content-Disposition', 'name', 'foo');
     }
 
-    public function testSetHeaderParameterNotParameterized()
+    public function testSetHeaderParameterNotParameterized(): void
     {
         $headers = new Headers();
         $headers->addTextHeader('Content-Disposition', 'name');
@@ -347,7 +347,7 @@ class HeadersTest extends TestCase
         $headers->setHeaderParameter('Content-Disposition', 'name', 'foo');
     }
 
-    public function testPathHeaderHasNoName()
+    public function testPathHeaderHasNoName(): void
     {
         $headers = new Headers();
 

@@ -36,7 +36,7 @@ class ReflectionTypeResolverTest extends TestCase
     }
 
     #[DataProvider('resolveDataProvider')]
-    public function testResolve(Type $expectedType, \ReflectionType $reflection, ?TypeContext $typeContext = null)
+    public function testResolve(Type $expectedType, \ReflectionType $reflection, ?TypeContext $typeContext = null): void
     {
         $this->assertEquals($expectedType, $this->resolver->resolve($reflection, $typeContext));
     }
@@ -72,13 +72,13 @@ class ReflectionTypeResolverTest extends TestCase
         yield [Type::intersection(Type::object(\Traversable::class), Type::object(\Stringable::class)), $reflection->getProperty('intersection')->getType()];
     }
 
-    public function testCannotResolveNonProperReflectionType()
+    public function testCannotResolveNonProperReflectionType(): void
     {
         $this->expectException(UnsupportedException::class);
         $this->resolver->resolve(new \ReflectionClass(self::class));
     }
 
-    public function testCannotResolveStaticKeywordWithoutTypeContext()
+    public function testCannotResolveStaticKeywordWithoutTypeContext(): void
     {
         $subject = (new \ReflectionClass(ReflectionExtractableDummy::class))->getMethod('getStatic')->getReturnType();
 
@@ -86,7 +86,7 @@ class ReflectionTypeResolverTest extends TestCase
         $this->resolver->resolve($subject);
     }
 
-    public function testResolveSelfKeywordWithoutTypeContext()
+    public function testResolveSelfKeywordWithoutTypeContext(): void
     {
         $subject = (new \ReflectionClass(ReflectionExtractableDummy::class))->getProperty('self')->getType();
 
@@ -98,7 +98,7 @@ class ReflectionTypeResolverTest extends TestCase
         }
     }
 
-    public function testResolveParentKeywordsWithoutTypeContext()
+    public function testResolveParentKeywordsWithoutTypeContext(): void
     {
         $subject = (new \ReflectionClass(ReflectionExtractableDummy::class))->getProperty('parent')->getType();
 

@@ -17,7 +17,7 @@ use Symfony\Component\Uid\Command\InspectUuidCommand;
 
 final class InspectUuidCommandTest extends TestCase
 {
-    public function testInvalid()
+    public function testInvalid(): void
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
@@ -25,7 +25,7 @@ final class InspectUuidCommandTest extends TestCase
         $this->assertStringContainsString('Invalid UUID.', $commandTester->getDisplay());
     }
 
-    public function testNil()
+    public function testNil(): void
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
@@ -47,7 +47,7 @@ final class InspectUuidCommandTest extends TestCase
         );
     }
 
-    public function testUnknown()
+    public function testUnknown(): void
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
@@ -120,7 +120,7 @@ final class InspectUuidCommandTest extends TestCase
         );
     }
 
-    public function testV1()
+    public function testV1(): void
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
@@ -144,7 +144,7 @@ final class InspectUuidCommandTest extends TestCase
         );
     }
 
-    public function testV3()
+    public function testV3(): void
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
@@ -166,7 +166,7 @@ final class InspectUuidCommandTest extends TestCase
         );
     }
 
-    public function testV4()
+    public function testV4(): void
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
@@ -188,7 +188,7 @@ final class InspectUuidCommandTest extends TestCase
         );
     }
 
-    public function testV5()
+    public function testV5(): void
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
@@ -210,7 +210,7 @@ final class InspectUuidCommandTest extends TestCase
         );
     }
 
-    public function testV6()
+    public function testV6(): void
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
@@ -234,7 +234,7 @@ final class InspectUuidCommandTest extends TestCase
         );
     }
 
-    public function testV7()
+    public function testV7(): void
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 
@@ -258,7 +258,7 @@ final class InspectUuidCommandTest extends TestCase
         );
     }
 
-    public function testV8()
+    public function testV8(): void
     {
         $commandTester = new CommandTester(new InspectUuidCommand());
 

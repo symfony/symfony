@@ -23,7 +23,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 class JsDelivrEsmResolverTest extends TestCase
 {
     #[DataProvider('provideResolvePackagesTests')]
-    public function testResolvePackages(array $packages, array $expectedRequests, array $expectedResolvedPackages)
+    public function testResolvePackages(array $packages, array $expectedRequests, array $expectedResolvedPackages): void
     {
         $responses = [];
         foreach ($expectedRequests as $expectedRequest) {
@@ -265,7 +265,7 @@ class JsDelivrEsmResolverTest extends TestCase
     }
 
     #[DataProvider('provideDownloadPackagesTests')]
-    public function testDownloadPackages(array $importMapEntries, array $expectedRequests, array $expectedReturn)
+    public function testDownloadPackages(array $importMapEntries, array $expectedRequests, array $expectedReturn): void
     {
         $responses = [];
         foreach ($expectedRequests as $expectedRequest) {
@@ -473,7 +473,7 @@ class JsDelivrEsmResolverTest extends TestCase
         ];
     }
 
-    public function testDownloadCssFileWithUrlReferences()
+    public function testDownloadCssFileWithUrlReferences(): void
     {
         $expectedRequests = [
             [
@@ -536,7 +536,7 @@ class JsDelivrEsmResolverTest extends TestCase
         ]);
     }
 
-    public function testDownloadCssRecursivelyDownloadsUrlCss()
+    public function testDownloadCssRecursivelyDownloadsUrlCss(): void
     {
         $expectedRequests = [
             [
@@ -581,7 +581,7 @@ class JsDelivrEsmResolverTest extends TestCase
     }
 
     #[DataProvider('provideImportRegex')]
-    public function testImportRegex(string $subject, array $expectedPackages)
+    public function testImportRegex(string $subject, array $expectedPackages): void
     {
         preg_match_all(JsDelivrEsmResolver::IMPORT_REGEX, $subject, $matches);
 

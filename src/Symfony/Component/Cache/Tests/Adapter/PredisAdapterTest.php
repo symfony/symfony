@@ -24,7 +24,7 @@ class PredisAdapterTest extends AbstractRedisAdapterTestCase
         self::$redis = new \Predis\Client(array_combine(['host', 'port'], explode(':', getenv('REDIS_HOST')) + [1 => 6379]), ['prefix' => 'prefix_']);
     }
 
-    public function testCreateConnection()
+    public function testCreateConnection(): void
     {
         $redisHost = getenv('REDIS_HOST');
 
@@ -55,7 +55,7 @@ class PredisAdapterTest extends AbstractRedisAdapterTestCase
         $this->assertSame($params, $connectionParameters);
     }
 
-    public function testCreateSslConnection()
+    public function testCreateSslConnection(): void
     {
         $redisHost = getenv('REDIS_HOST');
 
@@ -87,7 +87,7 @@ class PredisAdapterTest extends AbstractRedisAdapterTestCase
         $this->assertSame($params, $connectionParameters);
     }
 
-    public function testAclUserPasswordAuth()
+    public function testAclUserPasswordAuth(): void
     {
         // creating user via php-redis cause Predis (v1.1.10) does not support ACL command yet
         $redis = RedisAdapter::createConnection('redis://'.getenv('REDIS_HOST'));

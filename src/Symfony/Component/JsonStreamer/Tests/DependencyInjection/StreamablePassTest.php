@@ -18,7 +18,7 @@ use Symfony\Component\JsonStreamer\DependencyInjection\StreamablePass;
 
 class StreamablePassTest extends TestCase
 {
-    public function testSetStreamable()
+    public function testSetStreamable(): void
     {
         $container = new ContainerBuilder();
 

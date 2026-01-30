@@ -30,21 +30,21 @@ END'],
         );
     }
 
-    public function testCreateFromStringWithInvalidUtf8Input()
+    public function testCreateFromStringWithInvalidUtf8Input(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         static::createFromString("\xE9");
     }
 
-    public function testAscii()
+    public function testAscii(): void
     {
         $s = static::createFromString('Dieser Wert sollte größer oder gleich');
         $this->assertSame('Dieser Wert sollte grosser oder gleich', (string) $s->ascii());
         $this->assertSame('Dieser Wert sollte groesser oder gleich', (string) $s->ascii(['de-ASCII']));
     }
 
-    public function testAsciiClosureRule()
+    public function testAsciiClosureRule(): void
     {
         $rule = static fn ($c) => str_replace('ö', 'OE', $c);
 
@@ -54,7 +54,7 @@ END'],
 
     #[DataProvider('provideLocaleLower')]
     #[RequiresPhpExtension('intl')]
-    public function testLocaleLower(string $locale, string $expected, string $origin)
+    public function testLocaleLower(string $locale, string $expected, string $origin): void
     {
         $instance = static::createFromString($origin)->localeLower($locale);
 
@@ -65,7 +65,7 @@ END'],
 
     #[DataProvider('provideLocaleUpper')]
     #[RequiresPhpExtension('intl')]
-    public function testLocaleUpper(string $locale, string $expected, string $origin)
+    public function testLocaleUpper(string $locale, string $expected, string $origin): void
     {
         $instance = static::createFromString($origin)->localeUpper($locale);
 
@@ -76,7 +76,7 @@ END'],
 
     #[DataProvider('provideLocaleTitle')]
     #[RequiresPhpExtension('intl')]
-    public function testLocaleTitle(string $locale, string $expected, string $origin)
+    public function testLocaleTitle(string $locale, string $expected, string $origin): void
     {
         $instance = static::createFromString($origin)->localeTitle($locale);
 
@@ -111,7 +111,7 @@ END'],
     }
 
     #[DataProvider('provideCodePointsAt')]
-    public function testCodePointsAt(array $expected, string $string, int $offset, ?int $form = null)
+    public function testCodePointsAt(array $expected, string $string, int $offset, ?int $form = null): void
     {
         if (2 !== grapheme_strlen('च्छे') && 'नमस्ते' === $string) {
             $this->markTestSkipped('Skipping due to issue ICU-21661.');
@@ -288,21 +288,21 @@ END'],
         );
     }
 
-    public function testTrimWithInvalidUtf8CharList()
+    public function testTrimWithInvalidUtf8CharList(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         static::createFromString('Symfony')->trim("\xE9");
     }
 
-    public function testTrimStartWithInvalidUtf8CharList()
+    public function testTrimStartWithInvalidUtf8CharList(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         static::createFromString('Symfony')->trimStart("\xE9");
     }
 
-    public function testTrimEndWithInvalidUtf8CharList()
+    public function testTrimEndWithInvalidUtf8CharList(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -491,7 +491,7 @@ END'],
         );
     }
 
-    public function testAppendInvalidUtf8String()
+    public function testAppendInvalidUtf8String(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -515,7 +515,7 @@ END'],
         );
     }
 
-    public function testPrependInvalidUtf8String()
+    public function testPrependInvalidUtf8String(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -624,12 +624,12 @@ END'],
         );
     }
 
-    public function testReplaceWithInvalidUtf8Pattern()
+    public function testReplaceWithInvalidUtf8Pattern(): void
     {
         $this->assertEquals('Symfony', static::createFromString('Symfony')->replace("\xE9", 'p'));
     }
 
-    public function testReplaceWithInvalidUtf8PatternReplacement()
+    public function testReplaceWithInvalidUtf8PatternReplacement(): void
     {
         $this->expectException(InvalidArgumentException::class);
 

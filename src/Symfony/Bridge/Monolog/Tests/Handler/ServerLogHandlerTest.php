@@ -25,7 +25,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
  */
 class ServerLogHandlerTest extends TestCase
 {
-    public function testFormatter()
+    public function testFormatter(): void
     {
         $handler = new ServerLogHandler('tcp://127.0.0.1:9999');
         $this->assertInstanceOf(VarDumperFormatter::class, $handler->getFormatter());
@@ -35,13 +35,13 @@ class ServerLogHandlerTest extends TestCase
         $this->assertSame($formatter, $handler->getFormatter());
     }
 
-    public function testIsHandling()
+    public function testIsHandling(): void
     {
         $handler = new ServerLogHandler('tcp://127.0.0.1:9999', Level::Info);
         $this->assertFalse($handler->isHandling(RecordFactory::create(Level::Debug)), '->isHandling returns false when no output is set');
     }
 
-    public function testGetFormatter()
+    public function testGetFormatter(): void
     {
         $handler = new ServerLogHandler('tcp://127.0.0.1:9999');
         $this->assertInstanceOf(VarDumperFormatter::class, $handler->getFormatter(),
@@ -49,7 +49,7 @@ class ServerLogHandlerTest extends TestCase
         );
     }
 
-    public function testWritingAndFormatting()
+    public function testWritingAndFormatting(): void
     {
         $host = 'tcp://127.0.0.1:9999';
         $handler = new ServerLogHandler($host, Level::Info, false);

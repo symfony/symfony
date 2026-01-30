@@ -44,7 +44,7 @@ class FormDataCollectorTest extends TestCase
         $this->childView = new FormView();
     }
 
-    public function testBuildPreliminaryFormTree()
+    public function testBuildPreliminaryFormTree(): void
     {
         $this->form->add($this->childForm);
 
@@ -104,7 +104,7 @@ class FormDataCollectorTest extends TestCase
         ], $this->dataCollector->getData());
     }
 
-    public function testBuildMultiplePreliminaryFormTrees()
+    public function testBuildMultiplePreliminaryFormTrees(): void
     {
         $form1 = $this->createForm('form1');
         $form2 = $this->createForm('form2');
@@ -158,7 +158,7 @@ class FormDataCollectorTest extends TestCase
         ], $this->dataCollector->getData());
     }
 
-    public function testBuildSamePreliminaryFormTreeMultipleTimes()
+    public function testBuildSamePreliminaryFormTreeMultipleTimes(): void
     {
         $this->dataCollector->collectConfiguration($this->form);
         $this->dataCollector->buildPreliminaryFormTree($this->form);
@@ -211,7 +211,7 @@ class FormDataCollectorTest extends TestCase
         ], $this->dataCollector->getData());
     }
 
-    public function testBuildPreliminaryFormTreeWithoutCollectingAnyData()
+    public function testBuildPreliminaryFormTreeWithoutCollectingAnyData(): void
     {
         $this->dataCollector->buildPreliminaryFormTree($this->form);
 
@@ -230,7 +230,7 @@ class FormDataCollectorTest extends TestCase
         ], $this->dataCollector->getData());
     }
 
-    public function testBuildFinalFormTree()
+    public function testBuildFinalFormTree(): void
     {
         $this->form->add($this->childForm);
         $this->view->children['child'] = $this->childView;
@@ -300,7 +300,7 @@ class FormDataCollectorTest extends TestCase
         ], $this->dataCollector->getData());
     }
 
-    public function testSerializeWithFormAddedMultipleTimes()
+    public function testSerializeWithFormAddedMultipleTimes(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -334,7 +334,7 @@ class FormDataCollectorTest extends TestCase
         serialize($this->dataCollector);
     }
 
-    public function testFinalFormReliesOnFormViewStructure()
+    public function testFinalFormReliesOnFormViewStructure(): void
     {
         $this->form->add($child1 = $this->createChildForm('first'));
         $this->form->add($child2 = $this->createChildForm('second'));
@@ -392,7 +392,7 @@ class FormDataCollectorTest extends TestCase
         ], $this->dataCollector->getData());
     }
 
-    public function testChildViewsCanBeWithoutCorrespondingChildForms()
+    public function testChildViewsCanBeWithoutCorrespondingChildForms(): void
     {
         // don't add $this->childForm to $this->form!
 
@@ -433,7 +433,7 @@ class FormDataCollectorTest extends TestCase
         ], $this->dataCollector->getData());
     }
 
-    public function testChildViewsWithoutCorrespondingChildFormsMayBeExplicitlyAssociated()
+    public function testChildViewsWithoutCorrespondingChildFormsMayBeExplicitlyAssociated(): void
     {
         // don't add $this->childForm to $this->form!
 
@@ -482,7 +482,7 @@ class FormDataCollectorTest extends TestCase
         ], $this->dataCollector->getData());
     }
 
-    public function testCollectSubmittedDataCountsErrors()
+    public function testCollectSubmittedDataCountsErrors(): void
     {
         $form1 = $this->createForm('form1');
         $childForm1 = $this->createChildForm('child1');
@@ -506,7 +506,7 @@ class FormDataCollectorTest extends TestCase
         $this->assertSame(4, $data['nb_errors']);
     }
 
-    public function testCollectSubmittedDataExpandedFormsErrors()
+    public function testCollectSubmittedDataExpandedFormsErrors(): void
     {
         $child1Form = $this->createChildForm('child1', true);
         $child11Form = $this->createChildForm('child11');
@@ -537,7 +537,7 @@ class FormDataCollectorTest extends TestCase
         $this->assertArrayNotHasKey('has_children_error', $child21Data, 'The leaf data does not contains "has_children_error" property.');
     }
 
-    public function testReset()
+    public function testReset(): void
     {
         $form = $this->createForm('my_form');
 
@@ -559,7 +559,7 @@ class FormDataCollectorTest extends TestCase
         );
     }
 
-    public function testCollectMissingDataFromChildFormAddedOnFormEvents()
+    public function testCollectMissingDataFromChildFormAddedOnFormEvents(): void
     {
         $form = $this->factory->createNamedBuilder('root', FormType::class, ['items' => null])
             ->add('items', CollectionType::class, [

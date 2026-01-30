@@ -17,7 +17,7 @@ use Symfony\Component\JsonStreamer\Exception\LogicException;
 
 class ValueTransformerTest extends TestCase
 {
-    public function testCannotCreateWithoutAnything()
+    public function testCannotCreateWithoutAnything(): void
     {
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('#[ValueTransformer] attribute must declare either $streamToNative or $nativeToStream.');

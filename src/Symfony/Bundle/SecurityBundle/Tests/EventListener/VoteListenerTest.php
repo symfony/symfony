@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\Event\VoteEvent;
 
 class VoteListenerTest extends TestCase
 {
-    public function testOnVoterVote()
+    public function testOnVoterVote(): void
     {
         $voter = $this->createStub(VoterInterface::class);
 

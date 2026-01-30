@@ -50,7 +50,7 @@ class TextTypeHtmlSanitizerExtensionTest extends TypeTestCase
         ]);
     }
 
-    public function testSanitizer()
+    public function testSanitizer(): void
     {
         $form = $this->factory->createBuilder(FormType::class, ['data' => null])
             ->add('data', TextType::class, ['sanitize_html' => true])

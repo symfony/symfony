@@ -21,7 +21,7 @@ use Symfony\Component\Console\Input\InputOption;
 class CompletionInputTest extends TestCase
 {
     #[DataProvider('provideBindData')]
-    public function testBind(CompletionInput $input, string $expectedType, ?string $expectedName, string $expectedValue)
+    public function testBind(CompletionInput $input, string $expectedType, ?string $expectedName, string $expectedValue): void
     {
         $definition = new InputDefinition([
             new InputOption('with-required-value', 'r', InputOption::VALUE_REQUIRED),
@@ -74,7 +74,7 @@ class CompletionInputTest extends TestCase
     }
 
     #[DataProvider('provideBindWithLastArrayArgumentData')]
-    public function testBindWithLastArrayArgument(CompletionInput $input, ?string $expectedValue)
+    public function testBindWithLastArrayArgument(CompletionInput $input, ?string $expectedValue): void
     {
         $definition = new InputDefinition([
             new InputArgument('list-arg', InputArgument::IS_ARRAY | InputArgument::REQUIRED),
@@ -94,7 +94,7 @@ class CompletionInputTest extends TestCase
         yield [CompletionInput::fromTokens(['bin/console', 'symfony', 'sen'], 2), 'sen'];
     }
 
-    public function testBindArgumentWithDefault()
+    public function testBindArgumentWithDefault(): void
     {
         $definition = new InputDefinition([
             new InputArgument('arg-with-default', InputArgument::OPTIONAL, '', 'default'),
@@ -109,7 +109,7 @@ class CompletionInputTest extends TestCase
     }
 
     #[DataProvider('provideFromStringData')]
-    public function testFromString($inputStr, array $expectedTokens)
+    public function testFromString($inputStr, array $expectedTokens): void
     {
         $input = CompletionInput::fromString($inputStr, 1);
 
@@ -128,7 +128,7 @@ class CompletionInputTest extends TestCase
         yield ['bin/console cache:clear \'multi word string\'', ['bin/console', 'cache:clear', '\'multi word string\'']];
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $input = CompletionInput::fromTokens(['foo', 'bar', 'baz'], 0);
         $this->assertSame('foo| bar baz', (string) $input);

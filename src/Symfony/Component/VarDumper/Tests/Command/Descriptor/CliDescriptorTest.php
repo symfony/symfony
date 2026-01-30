@@ -39,7 +39,7 @@ class CliDescriptorTest extends TestCase
     }
 
     #[DataProvider('provideContext')]
-    public function testDescribe(array $context, string $expectedOutput, bool $decorated = false)
+    public function testDescribe(array $context, string $expectedOutput, bool $decorated = false): void
     {
         $output = new BufferedOutput();
         $output->setDecorated($decorated);

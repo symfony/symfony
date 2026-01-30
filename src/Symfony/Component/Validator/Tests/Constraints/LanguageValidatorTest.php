@@ -41,28 +41,28 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
         return new LanguageValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Language());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Language());
 
         $this->assertNoViolation();
     }
 
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Language());
     }
 
     #[DataProvider('getValidLanguages')]
-    public function testValidLanguages($language)
+    public function testValidLanguages($language): void
     {
         $this->validator->validate($language, new Language());
 
@@ -78,7 +78,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidLanguages')]
-    public function testInvalidLanguages($language)
+    public function testInvalidLanguages($language): void
     {
         $constraint = new Language(message: 'myMessage');
 
@@ -99,7 +99,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidAlpha3Languages')]
-    public function testValidAlpha3Languages($language)
+    public function testValidAlpha3Languages($language): void
     {
         $this->validator->validate($language, new Language(alpha3: true));
 
@@ -116,7 +116,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidAlpha3Languages')]
-    public function testInvalidAlpha3Languages($language)
+    public function testInvalidAlpha3Languages($language): void
     {
         $constraint = new Language(
             alpha3: true,
@@ -141,7 +141,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
         ];
     }
 
-    public function testInvalidAlpha3LanguageNamed()
+    public function testInvalidAlpha3LanguageNamed(): void
     {
         $this->validator->validate(
             'DE',
@@ -154,7 +154,7 @@ class LanguageValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testValidateUsingCountrySpecificLocale()
+    public function testValidateUsingCountrySpecificLocale(): void
     {
         IntlTestHelper::requireFullIntl($this);
 

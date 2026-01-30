@@ -23,7 +23,7 @@ use Twig\Source;
 class RoutingExtensionTest extends TestCase
 {
     #[DataProvider('getEscapingTemplates')]
-    public function testEscaping($template, $mustBeEscaped)
+    public function testEscaping($template, $mustBeEscaped): void
     {
         $twig = new Environment(new ArrayLoader(), ['debug' => true, 'cache' => false, 'autoescape' => 'html', 'optimizations' => 0]);
         $twig->addExtension(new RoutingExtension($this->createStub(UrlGeneratorInterface::class)));

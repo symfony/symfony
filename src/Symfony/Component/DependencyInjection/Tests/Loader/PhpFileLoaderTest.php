@@ -32,7 +32,7 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\FooUnitEnum;
 
 class PhpFileLoaderTest extends TestCase
 {
-    public function testSupports()
+    public function testSupports(): void
     {
         $loader = new PhpFileLoader(new ContainerBuilder(), new FileLocator());
 
@@ -41,7 +41,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertTrue($loader->supports('with_wrong_ext.yml', 'php'), '->supports() returns true if the resource with forced type is loadable');
     }
 
-    public function testLoad()
+    public function testLoad(): void
     {
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
 
@@ -53,7 +53,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertTrue(\function_exists('Symfony\Component\DependencyInjection\Loader\Configurator\service'));
     }
 
-    public function testPrependExtensionConfigWithLoadMethod()
+    public function testPrependExtensionConfigWithLoadMethod(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new \AcmeExtension());
@@ -69,7 +69,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame($expected, $container->getExtensionConfig('acme'));
     }
 
-    public function testPrependExtensionConfigWithImportMethod()
+    public function testPrependExtensionConfigWithImportMethod(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new \AcmeExtension());
@@ -85,7 +85,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame($expected, $container->getExtensionConfig('acme'));
     }
 
-    public function testConfigServices()
+    public function testConfigServices(): void
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
@@ -97,7 +97,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertStringEqualsFile($fixtures.'/php/services9_compiled.php', str_replace(str_replace('\\', '\\\\', $fixtures.\DIRECTORY_SEPARATOR.'includes'.\DIRECTORY_SEPARATOR), '%path%', $dumper->dump()));
     }
 
-    public function testConfigServiceClosure()
+    public function testConfigServiceClosure(): void
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
@@ -109,7 +109,7 @@ class PhpFileLoaderTest extends TestCase
     }
 
     #[DataProvider('provideConfig')]
-    public function testConfig($file)
+    public function testConfig($file): void
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();
@@ -150,7 +150,7 @@ class PhpFileLoaderTest extends TestCase
         yield ['return_when_env'];
     }
 
-    public function testResourceTags()
+    public function testResourceTags(): void
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
@@ -165,7 +165,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertFalse($def->isAbstract());
     }
 
-    public function testAutoConfigureAndChildDefinition()
+    public function testAutoConfigureAndChildDefinition(): void
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();
@@ -176,7 +176,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertTrue($container->getDefinition('child_service')->isAutoconfigured());
     }
 
-    public function testFactoryShortNotationNotAllowed()
+    public function testFactoryShortNotationNotAllowed(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid factory "factory:method": the "service:method" notation is not available when using PHP-based DI configuration. Use "[service(\'factory\'), \'method\']" instead.');
@@ -187,7 +187,7 @@ class PhpFileLoaderTest extends TestCase
         $container->compile();
     }
 
-    public function testStack()
+    public function testStack(): void
     {
         $container = new ContainerBuilder();
 
@@ -219,7 +219,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expected, $container->get('stack_d'));
     }
 
-    public function testEnvConfigurator()
+    public function testEnvConfigurator(): void
     {
         $container = new ContainerBuilder();
         $loader = new PhpFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures').'/config'), 'some-env');
@@ -228,7 +228,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame('%env(int:CCC)%', $container->getDefinition('foo')->getArgument(0));
     }
 
-    public function testEnumeration()
+    public function testEnumeration(): void
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();
@@ -241,7 +241,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertSame([FooUnitEnum::BAR], $definition->getArguments());
     }
 
-    public function testWhenEnv()
+    public function testWhenEnv(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -252,7 +252,7 @@ class PhpFileLoaderTest extends TestCase
         $loader->load($fixtures.'/config/when_env.php');
     }
 
-    public function testNotWhenEnv()
+    public function testNotWhenEnv(): void
     {
         $this->expectNotToPerformAssertions();
 
@@ -263,7 +263,7 @@ class PhpFileLoaderTest extends TestCase
         $loader->load($fixtures.'/config/not_when_env.php');
     }
 
-    public function testUsingBothWhenAndNotWhenEnv()
+    public function testUsingBothWhenAndNotWhenEnv(): void
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $container = new ContainerBuilder();
@@ -275,7 +275,7 @@ class PhpFileLoaderTest extends TestCase
         $loader->load($fixtures.'/config/when_not_when_env.php');
     }
 
-    public function testServiceWithServiceLocatorArgument()
+    public function testServiceWithServiceLocatorArgument(): void
     {
         $fixtures = realpath(__DIR__.'/../Fixtures');
         $loader = new PhpFileLoader($container = new ContainerBuilder(), new FileLocator());
@@ -294,7 +294,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals([new ServiceLocatorArgument($values)], $container->getDefinition('locator_dependent_inline_service')->getArguments());
     }
 
-    public function testArrayEnvConfigurator()
+    public function testArrayEnvConfigurator(): void
     {
         $container = new ContainerBuilder();
         $container->registerExtension(new \AcmeExtension());
@@ -304,7 +304,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertIsString($container->getExtensionConfig('acme')[0]['color']);
     }
 
-    public function testNamedClosure()
+    public function testNamedClosure(): void
     {
         $container = new ContainerBuilder();
         $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Fixtures/config'), 'some-env');
@@ -314,7 +314,7 @@ class PhpFileLoaderTest extends TestCase
         $this->assertStringEqualsFile(\dirname(__DIR__).'/Fixtures/php/named_closure_compiled.php', $dumper->dump());
     }
 
-    public function testInstanceofStateIsRestoredAfterImport()
+    public function testInstanceofStateIsRestoredAfterImport(): void
     {
         $container = new ContainerBuilder();
 

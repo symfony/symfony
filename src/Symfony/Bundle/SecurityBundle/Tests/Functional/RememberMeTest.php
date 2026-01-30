@@ -22,7 +22,7 @@ class RememberMeTest extends AbstractWebTestCase
     }
 
     #[DataProvider('provideConfigs')]
-    public function testRememberMe(array $options)
+    public function testRememberMe(array $options): void
     {
         $client = $this->createClient(array_merge_recursive(['root_config' => 'config.yml', 'test_case' => 'RememberMe'], $options));
         $client->request('POST', '/login', [
@@ -46,7 +46,7 @@ class RememberMeTest extends AbstractWebTestCase
         $this->assertNull($client->getCookieJar()->get('REMEMBERME'));
     }
 
-    public function testUserChangeClearsCookie()
+    public function testUserChangeClearsCookie(): void
     {
         $client = $this->createClient(['test_case' => 'RememberMe', 'root_config' => 'clear_on_change_config.yml']);
 
@@ -72,7 +72,7 @@ class RememberMeTest extends AbstractWebTestCase
         $this->assertRedirect($client->getResponse(), '/login');
     }
 
-    public function testSessionLessRememberMeLogout()
+    public function testSessionLessRememberMeLogout(): void
     {
         $client = $this->createClient(['test_case' => 'RememberMe', 'root_config' => 'stateless_config.yml']);
 

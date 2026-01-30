@@ -47,13 +47,13 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
         $_SERVER = self::$serverBackup;
     }
 
-    public function testRequestShouldBeNull()
+    public function testRequestShouldBeNull(): void
     {
         $this->expectException(UnexpectedTypeException::class);
         $this->requestHandler->handleRequest($this->createForm('name', 'GET'), 'request');
     }
 
-    public function testMethodOverrideHeaderTakesPrecedenceIfPost()
+    public function testMethodOverrideHeaderTakesPrecedenceIfPost(): void
     {
         $form = $this->createForm('param1', 'PUT');
 
@@ -69,7 +69,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
         $this->assertSame('DATA', $form->getData());
     }
 
-    public function testConvertEmptyUploadedFilesToNull()
+    public function testConvertEmptyUploadedFilesToNull(): void
     {
         $form = $this->createForm('param1', 'POST', false);
 
@@ -87,7 +87,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
         $this->assertNull($form->getData());
     }
 
-    public function testFixBuggyFilesArray()
+    public function testFixBuggyFilesArray(): void
     {
         $form = $this->createForm('param1', 'POST', true);
         $fieldForm = $this->createBuilder('field', false, ['allow_file_upload' => true])->getForm();
@@ -127,7 +127,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
         ], $fieldForm->getData());
     }
 
-    public function testFixBuggyNestedFilesArray()
+    public function testFixBuggyNestedFilesArray(): void
     {
         $form = $this->createForm('param1', 'POST', true);
         $fieldForm = $this->createForm('field', null, true);
@@ -165,7 +165,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
         ], $subfieldForm->getData());
     }
 
-    public function testMethodOverrideHeaderIgnoredIfNotPost()
+    public function testMethodOverrideHeaderIgnoredIfNotPost(): void
     {
         $form = $this->createForm('param1', 'POST');
 
@@ -180,7 +180,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
         $this->assertFalse($form->isSubmitted());
     }
 
-    public function testFormIgnoresMethodFieldIfRequestMethodIsMatched()
+    public function testFormIgnoresMethodFieldIfRequestMethodIsMatched(): void
     {
         $form = $this->createForm('foo', 'PUT', true);
         $form->add($this->createForm('bar'));
@@ -197,7 +197,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
         $this->assertSame([], $form->getExtraData());
     }
 
-    public function testFormDoesNotIgnoreMethodFieldIfRequestMethodIsNotMatched()
+    public function testFormDoesNotIgnoreMethodFieldIfRequestMethodIsNotMatched(): void
     {
         $form = $this->createForm('foo', 'PUT', true);
         $form->add($this->createForm('bar'));
@@ -214,7 +214,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
         $this->assertSame(['_method' => 'DELETE'], $form->getExtraData());
     }
 
-    public function testMethodSubFormIsSubmitted()
+    public function testMethodSubFormIsSubmitted(): void
     {
         $form = $this->createForm('foo', 'PUT', true);
         $form->add($this->createForm('_method'));
@@ -233,7 +233,7 @@ class NativeRequestHandlerTest extends AbstractRequestHandlerTestCase
         $this->assertSame('PUT', $form->get('_method')->getData());
     }
 
-    protected function setRequestData($method, $data, $files = [])
+    protected function setRequestData($method, $data, $files = []): void
     {
         if ('GET' === $method) {
             $_GET = $data;

@@ -26,7 +26,7 @@ class GraphvizDumperTest extends TestCase
         self::$fixturesPath = realpath(__DIR__.'/../Fixtures');
     }
 
-    public function testDump()
+    public function testDump(): void
     {
         $dumper = new GraphvizDumper($container = new ContainerBuilder());
 
@@ -52,21 +52,21 @@ class GraphvizDumperTest extends TestCase
         ]), file_get_contents(self::$fixturesPath.'/graphviz/services10-1.dot'), '->dump() dumps services');
     }
 
-    public function testDumpWithFrozenContainer()
+    public function testDumpWithFrozenContainer(): void
     {
         $container = include self::$fixturesPath.'/containers/container13.php';
         $dumper = new GraphvizDumper($container);
         $this->assertStringEqualsGeneratedFile('services13.dot', $dumper->dump(), '->dump() dumps services');
     }
 
-    public function testDumpWithFrozenCustomClassContainer()
+    public function testDumpWithFrozenCustomClassContainer(): void
     {
         $container = include self::$fixturesPath.'/containers/container14.php';
         $dumper = new GraphvizDumper($container);
         $this->assertStringEqualsGeneratedFile('services14.dot', $dumper->dump(), '->dump() dumps services');
     }
 
-    public function testDumpWithUnresolvedParameter()
+    public function testDumpWithUnresolvedParameter(): void
     {
         $container = include self::$fixturesPath.'/containers/container17.php';
         $dumper = new GraphvizDumper($container);
@@ -74,7 +74,7 @@ class GraphvizDumperTest extends TestCase
         $this->assertStringEqualsGeneratedFile('services17.dot', $dumper->dump(), '->dump() dumps services');
     }
 
-    public function testDumpWithInlineDefinition()
+    public function testDumpWithInlineDefinition(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', 'stdClass')->addArgument(

@@ -23,7 +23,7 @@ use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 
 class DebugFirewallCommandTest extends TestCase
 {
-    public function testFirewallListOutputMatchesFixture()
+    public function testFirewallListOutputMatchesFixture(): void
     {
         $firewallNames = ['main', 'api'];
 
@@ -38,7 +38,7 @@ class DebugFirewallCommandTest extends TestCase
         $this->assertStringContainsString('To view details of a specific firewall', $tester->getDisplay());
     }
 
-    public function testFirewallNotFoundDisplaysError()
+    public function testFirewallNotFoundDisplaysError(): void
     {
         $firewallNames = ['main', 'api'];
 
@@ -58,7 +58,7 @@ class DebugFirewallCommandTest extends TestCase
         $this->assertStringContainsString('Available firewalls are: main, api', $tester->getDisplay());
     }
 
-    public function testFirewallMainOutputMatchesFixture()
+    public function testFirewallMainOutputMatchesFixture(): void
     {
         $firewallNames = ['main'];
 
@@ -93,7 +93,7 @@ class DebugFirewallCommandTest extends TestCase
         $this->assertEquals($this->getFixtureOutput('firewall_main_output.txt'), trim(str_replace(\PHP_EOL, "\n", $tester->getDisplay())));
     }
 
-    public function testFirewallWithEventsOutputMatchesFixture()
+    public function testFirewallWithEventsOutputMatchesFixture(): void
     {
         $firewallNames = ['main'];
 
@@ -134,7 +134,7 @@ class DebugFirewallCommandTest extends TestCase
         $this->assertEquals($this->getFixtureOutput('firewall_main_with_events_output.txt'), trim(str_replace(\PHP_EOL, "\n", $tester->getDisplay())));
     }
 
-    public function testFirewallWithSwitchUserDisplaysSection()
+    public function testFirewallWithSwitchUserDisplaysSection(): void
     {
         $firewallNames = ['main'];
 

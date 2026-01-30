@@ -18,7 +18,7 @@ use Symfony\Component\AssetMapper\ImportMap\PackageUpdateInfo;
 class PackageUpdateInfoTest extends TestCase
 {
     #[DataProvider('provideValidConstructorArguments')]
-    public function testConstructor($importName, $currentVersion, $latestVersion, $updateType)
+    public function testConstructor($importName, $currentVersion, $latestVersion, $updateType): void
     {
         $packageUpdateInfo = new PackageUpdateInfo(
             packageName: $importName,
@@ -44,7 +44,7 @@ class PackageUpdateInfoTest extends TestCase
     }
 
     #[DataProvider('provideHasUpdateArguments')]
-    public function testHasUpdate($updateType, $expectUpdate)
+    public function testHasUpdate($updateType, $expectUpdate): void
     {
         $packageUpdateInfo = new PackageUpdateInfo(
             packageName: 'packageName',

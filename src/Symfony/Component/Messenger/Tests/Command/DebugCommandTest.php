@@ -45,7 +45,7 @@ class DebugCommandTest extends TestCase
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
-    public function testOutput()
+    public function testOutput(): void
     {
         $command = new DebugCommand([
             'command_bus' => [
@@ -132,7 +132,7 @@ class DebugCommandTest extends TestCase
         );
     }
 
-    public function testOutputWithoutMessages()
+    public function testOutputWithoutMessages(): void
     {
         $command = new DebugCommand(['command_bus' => [], 'query_bus' => []]);
 
@@ -160,7 +160,7 @@ class DebugCommandTest extends TestCase
         );
     }
 
-    public function testExceptionOnUnknownBusArgument()
+    public function testExceptionOnUnknownBusArgument(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Bus "unknown_bus" does not exist. Known buses are "command_bus", "query_bus".');
@@ -171,7 +171,7 @@ class DebugCommandTest extends TestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $command = new DebugCommand(['command_bus' => [], 'query_bus' => []]);
         $application = new Application();

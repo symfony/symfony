@@ -20,7 +20,7 @@ class UrlTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         return $this->factory->create(UrlType::class, null, $options);
     }
 
-    public function testInvalidMessage()
+    public function testInvalidMessage(): void
     {
         $form = $this->createForm();
 

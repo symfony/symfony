@@ -44,7 +44,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
  */
 class CheckTypeDeclarationsPassTest extends TestCase
 {
-    public function testProcessThrowsExceptionOnInvalidTypesConstructorArguments()
+    public function testProcessThrowsExceptionOnInvalidTypesConstructorArguments(): void
     {
         $container = new ContainerBuilder();
 
@@ -58,7 +58,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessThrowsExceptionOnInvalidTypesMethodCallArguments()
+    public function testProcessThrowsExceptionOnInvalidTypesMethodCallArguments(): void
     {
         $container = new ContainerBuilder();
 
@@ -72,7 +72,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessFailsWhenPassingNullToRequiredArgument()
+    public function testProcessFailsWhenPassingNullToRequiredArgument(): void
     {
         $container = new ContainerBuilder();
 
@@ -85,7 +85,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessThrowsExceptionWhenMissingArgumentsInConstructor()
+    public function testProcessThrowsExceptionWhenMissingArgumentsInConstructor(): void
     {
         $container = new ContainerBuilder();
 
@@ -97,7 +97,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessSuccessWhenPassingTooManyArgumentInConstructor()
+    public function testProcessSuccessWhenPassingTooManyArgumentInConstructor(): void
     {
         $container = new ContainerBuilder();
 
@@ -111,7 +111,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessRegisterWithClassName()
+    public function testProcessRegisterWithClassName(): void
     {
         $container = new ContainerBuilder();
 
@@ -122,7 +122,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->assertInstanceOf(Foo::class, $container->get(Foo::class));
     }
 
-    public function testProcessThrowsExceptionWhenMissingArgumentsInMethodCall()
+    public function testProcessThrowsExceptionWhenMissingArgumentsInMethodCall(): void
     {
         $container = new ContainerBuilder();
 
@@ -137,7 +137,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessVariadicFails()
+    public function testProcessVariadicFails(): void
     {
         $container = new ContainerBuilder();
 
@@ -156,7 +156,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessVariadicFailsOnPassingBadTypeOnAnotherArgument()
+    public function testProcessVariadicFailsOnPassingBadTypeOnAnotherArgument(): void
     {
         $container = new ContainerBuilder();
 
@@ -172,7 +172,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessVariadicSuccess()
+    public function testProcessVariadicSuccess(): void
     {
         $container = new ContainerBuilder();
 
@@ -189,7 +189,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->assertInstanceOf(Foo::class, $container->get('bar')->foo);
     }
 
-    public function testProcessSuccessWhenNotUsingOptionalArgument()
+    public function testProcessSuccessWhenNotUsingOptionalArgument(): void
     {
         $container = new ContainerBuilder();
 
@@ -204,7 +204,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->assertInstanceOf(Foo::class, $container->get('bar')->foo);
     }
 
-    public function testProcessSuccessWhenUsingOptionalArgumentWithGoodType()
+    public function testProcessSuccessWhenUsingOptionalArgumentWithGoodType(): void
     {
         $container = new ContainerBuilder();
 
@@ -220,7 +220,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->assertInstanceOf(Foo::class, $container->get('bar')->foo);
     }
 
-    public function testProcessFailsWhenUsingOptionalArgumentWithBadType()
+    public function testProcessFailsWhenUsingOptionalArgumentWithBadType(): void
     {
         $container = new ContainerBuilder();
 
@@ -238,7 +238,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessSuccessWhenPassingNullToOptional()
+    public function testProcessSuccessWhenPassingNullToOptional(): void
     {
         $container = new ContainerBuilder();
 
@@ -250,7 +250,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->assertNull($container->get('bar')->foo);
     }
 
-    public function testProcessSuccessWhenPassingNullToOptionalThatDoesNotAcceptNull()
+    public function testProcessSuccessWhenPassingNullToOptionalThatDoesNotAcceptNull(): void
     {
         $container = new ContainerBuilder();
 
@@ -263,7 +263,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessFailsWhenPassingBadTypeToOptional()
+    public function testProcessFailsWhenPassingBadTypeToOptional(): void
     {
         $container = new ContainerBuilder();
 
@@ -276,7 +276,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessSuccessScalarType()
+    public function testProcessSuccessScalarType(): void
     {
         $container = new ContainerBuilder();
 
@@ -291,7 +291,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->assertInstanceOf(BarMethodCall::class, $container->get('bar'));
     }
 
-    public function testProcessFailsOnPassingScalarTypeToConstructorTypedWithClass()
+    public function testProcessFailsOnPassingScalarTypeToConstructorTypedWithClass(): void
     {
         $container = new ContainerBuilder();
 
@@ -304,7 +304,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessFailsOnPassingScalarTypeToMethodTypedWithClass()
+    public function testProcessFailsOnPassingScalarTypeToMethodTypedWithClass(): void
     {
         $container = new ContainerBuilder();
 
@@ -319,7 +319,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessFailsOnPassingClassToScalarTypedParameter()
+    public function testProcessFailsOnPassingClassToScalarTypedParameter(): void
     {
         $container = new ContainerBuilder();
 
@@ -336,7 +336,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessSuccessOnPassingBadScalarType()
+    public function testProcessSuccessOnPassingBadScalarType(): void
     {
         $container = new ContainerBuilder();
 
@@ -351,7 +351,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->assertInstanceOf(BarMethodCall::class, $container->get('bar'));
     }
 
-    public function testProcessSuccessPassingBadScalarTypeOptionalArgument()
+    public function testProcessSuccessPassingBadScalarTypeOptionalArgument(): void
     {
         $container = new ContainerBuilder();
 
@@ -367,7 +367,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->assertInstanceOf(BarMethodCall::class, $container->get('bar'));
     }
 
-    public function testProcessSuccessWhenPassingArray()
+    public function testProcessSuccessWhenPassingArray(): void
     {
         $container = new ContainerBuilder();
 
@@ -379,7 +379,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->assertInstanceOf(BarMethodCall::class, $container->get('bar'));
     }
 
-    public function testProcessSuccessWhenPassingIntegerToArrayTypedParameter()
+    public function testProcessSuccessWhenPassingIntegerToArrayTypedParameter(): void
     {
         $container = new ContainerBuilder();
 
@@ -392,7 +392,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessSuccessWhenPassingAnIteratorArgumentToIterable()
+    public function testProcessSuccessWhenPassingAnIteratorArgumentToIterable(): void
     {
         $container = new ContainerBuilder();
 
@@ -404,7 +404,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessSuccessWhenPassingDefinitionForObjectType()
+    public function testProcessSuccessWhenPassingDefinitionForObjectType(): void
     {
         $container = new ContainerBuilder();
 
@@ -416,7 +416,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessFactory()
+    public function testProcessFactory(): void
     {
         $container = new ContainerBuilder();
 
@@ -436,7 +436,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->assertInstanceOf(Bar::class, $container->get('bar'));
     }
 
-    public function testProcessFactoryFailsOnInvalidParameterType()
+    public function testProcessFactoryFailsOnInvalidParameterType(): void
     {
         $container = new ContainerBuilder();
 
@@ -454,7 +454,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessFactoryFailsOnInvalidParameterTypeOptional()
+    public function testProcessFactoryFailsOnInvalidParameterTypeOptional(): void
     {
         $container = new ContainerBuilder();
 
@@ -474,7 +474,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessFactorySuccessOnValidTypes()
+    public function testProcessFactorySuccessOnValidTypes(): void
     {
         $container = new ContainerBuilder();
 
@@ -493,7 +493,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessFactoryCallbackSuccessOnValidType()
+    public function testProcessFactoryCallbackSuccessOnValidType(): void
     {
         $container = new ContainerBuilder();
 
@@ -505,7 +505,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->assertInstanceOf(\DateTimeImmutable::class, $container->get('bar'));
     }
 
-    public function testProcessDoesNotLoadCodeByDefault()
+    public function testProcessDoesNotLoadCodeByDefault(): void
     {
         $container = new ContainerBuilder();
 
@@ -523,7 +523,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessFactoryDoesNotLoadCodeByDefault()
+    public function testProcessFactoryDoesNotLoadCodeByDefault(): void
     {
         $container = new ContainerBuilder();
 
@@ -539,7 +539,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessFactoryForTypeSameAsClass()
+    public function testProcessFactoryForTypeSameAsClass(): void
     {
         $container = new ContainerBuilder();
 
@@ -557,7 +557,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessFactoryForIterableTypeAndArrayClass()
+    public function testProcessFactoryForIterableTypeAndArrayClass(): void
     {
         $container = new ContainerBuilder();
 
@@ -575,7 +575,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessPassingBuiltinTypeDoesNotLoadCodeByDefault()
+    public function testProcessPassingBuiltinTypeDoesNotLoadCodeByDefault(): void
     {
         $container = new ContainerBuilder();
 
@@ -587,7 +587,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessDoesNotThrowsExceptionOnValidTypes()
+    public function testProcessDoesNotThrowsExceptionOnValidTypes(): void
     {
         $container = new ContainerBuilder();
 
@@ -600,7 +600,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $container->get('bar')->foo);
     }
 
-    public function testProcessThrowsOnIterableTypeWhenScalarPassed()
+    public function testProcessThrowsOnIterableTypeWhenScalarPassed(): void
     {
         $container = new ContainerBuilder();
 
@@ -613,7 +613,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessResolveExpressions()
+    public function testProcessResolveExpressions(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('ccc', ['array']);
@@ -627,7 +627,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessSuccessWhenExpressionReturnsObject()
+    public function testProcessSuccessWhenExpressionReturnsObject(): void
     {
         $container = new ContainerBuilder();
 
@@ -642,7 +642,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessHandleMixedEnvPlaceholder()
+    public function testProcessHandleMixedEnvPlaceholder(): void
     {
         $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
             'ccc' => '%env(FOO)%',
@@ -658,7 +658,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessHandleMultipleEnvPlaceholder()
+    public function testProcessHandleMultipleEnvPlaceholder(): void
     {
         $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
             'ccc' => '%env(FOO)%',
@@ -675,7 +675,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testProcessHandleExistingEnvPlaceholder()
+    public function testProcessHandleExistingEnvPlaceholder(): void
     {
         putenv('ARRAY={"foo":"bar"}');
 
@@ -695,7 +695,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         putenv('ARRAY=');
     }
 
-    public function testProcessHandleNotFoundEnvPlaceholder()
+    public function testProcessHandleNotFoundEnvPlaceholder(): void
     {
         $container = new ContainerBuilder(new EnvPlaceholderParameterBag([
             'ccc' => '%env(json:ARRAY)%',
@@ -711,7 +711,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessSkipSkippedIds()
+    public function testProcessSkipSkippedIds(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -723,7 +723,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessSkipsDeprecatedDefinitions()
+    public function testProcessSkipsDeprecatedDefinitions(): void
     {
         $container = new ContainerBuilder();
         $container
@@ -736,7 +736,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessHandleClosureForCallable()
+    public function testProcessHandleClosureForCallable(): void
     {
         $closureDefinition = new Definition(\Closure::class);
         $closureDefinition->setFactory([\Closure::class, 'fromCallable']);
@@ -752,7 +752,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessSuccessWhenPassingServiceClosureArgumentToCallable()
+    public function testProcessSuccessWhenPassingServiceClosureArgumentToCallable(): void
     {
         $container = new ContainerBuilder();
 
@@ -764,7 +764,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessSuccessWhenPassingServiceClosureArgumentToClosure()
+    public function testProcessSuccessWhenPassingServiceClosureArgumentToClosure(): void
     {
         $container = new ContainerBuilder();
 
@@ -776,7 +776,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testExpressionLanguageWithSyntheticService()
+    public function testExpressionLanguageWithSyntheticService(): void
     {
         $container = new ContainerBuilder();
 
@@ -792,7 +792,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testProcessResolveParameters()
+    public function testProcessResolveParameters(): void
     {
         putenv('ARRAY={"foo":"bar"}');
 
@@ -818,7 +818,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         putenv('ARRAY=');
     }
 
-    public function testUnionTypePassesWithReference()
+    public function testUnionTypePassesWithReference(): void
     {
         $container = new ContainerBuilder();
 
@@ -831,7 +831,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testUnionTypePassesWithBuiltin()
+    public function testUnionTypePassesWithBuiltin(): void
     {
         $container = new ContainerBuilder();
 
@@ -843,7 +843,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testUnionTypePassesWithFalse()
+    public function testUnionTypePassesWithFalse(): void
     {
         $container = new ContainerBuilder();
 
@@ -856,7 +856,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testUnionTypePassesWithTrue()
+    public function testUnionTypePassesWithTrue(): void
     {
         $container = new ContainerBuilder();
 
@@ -873,7 +873,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testUnionTypeFailsWithReference()
+    public function testUnionTypeFailsWithReference(): void
     {
         $container = new ContainerBuilder();
 
@@ -887,7 +887,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testUnionTypeFailsWithBuiltin()
+    public function testUnionTypeFailsWithBuiltin(): void
     {
         $container = new ContainerBuilder();
 
@@ -900,7 +900,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testUnionTypeWithFalseFailsWithReference()
+    public function testUnionTypeWithFalseFailsWithReference(): void
     {
         $container = new ContainerBuilder();
 
@@ -915,7 +915,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testUnionTypeWithFalseFailsWithTrue()
+    public function testUnionTypeWithFalseFailsWithTrue(): void
     {
         $container = new ContainerBuilder();
 
@@ -930,7 +930,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testReferencePassesMixed()
+    public function testReferencePassesMixed(): void
     {
         $container = new ContainerBuilder();
 
@@ -944,7 +944,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testIntersectionTypePassesWithReference()
+    public function testIntersectionTypePassesWithReference(): void
     {
         $container = new ContainerBuilder();
 
@@ -957,7 +957,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testIntersectionTypeFailsWithReference()
+    public function testIntersectionTypeFailsWithReference(): void
     {
         $container = new ContainerBuilder();
 
@@ -971,7 +971,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         (new CheckTypeDeclarationsPass(true))->process($container);
     }
 
-    public function testCallableClass()
+    public function testCallableClass(): void
     {
         $container = new ContainerBuilder();
         $definition = $container->register('foo', CallableClass::class);
@@ -982,7 +982,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testStaticCallableClass()
+    public function testStaticCallableClass(): void
     {
         $container = new ContainerBuilder();
         $container->register('foo', StaticCallableClass::class)
@@ -993,7 +993,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testIgnoreDefinitionFactoryArgument()
+    public function testIgnoreDefinitionFactoryArgument(): void
     {
         $container = new ContainerBuilder();
         $container->register('bar', Bar::class)
@@ -1007,7 +1007,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testErroredDefinitionsAreNotChecked()
+    public function testErroredDefinitionsAreNotChecked(): void
     {
         $container = new ContainerBuilder();
         $container->register('errored_dependency', BarErroredDependency::class)
@@ -1021,7 +1021,7 @@ class CheckTypeDeclarationsPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testCheckTypeDeclarationsSkipsSubsequentNamedArguments()
+    public function testCheckTypeDeclarationsSkipsSubsequentNamedArguments(): void
     {
         $container = new ContainerBuilder();
         $container->register('service', ServiceWithTwoInts::class)
@@ -1036,14 +1036,14 @@ class CheckTypeDeclarationsPassTest extends TestCase
 
 class CallableClass
 {
-    public function __call($name, $arguments)
+    public function __call($name, $arguments): void
     {
     }
 }
 
 class StaticCallableClass
 {
-    public static function __callStatic($name, $arguments)
+    public static function __callStatic($name, $arguments): void
     {
     }
 }

@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\MessageBird\MessageBirdOptions;
 
 class MessageBirdOptionsTest extends TestCase
 {
-    public function testMessageBirdOptions()
+    public function testMessageBirdOptions(): void
     {
         $messageBirdOptions = (new MessageBirdOptions())
             ->type('test_type')

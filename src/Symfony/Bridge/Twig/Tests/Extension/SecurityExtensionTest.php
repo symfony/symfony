@@ -35,7 +35,7 @@ class SecurityExtensionTest extends TestCase
     }
 
     #[DataProvider('provideObjectFieldAclCases')]
-    public function testIsGrantedCreatesFieldVoteObjectWhenFieldNotNull($object, $field, $expectedSubject)
+    public function testIsGrantedCreatesFieldVoteObjectWhenFieldNotNull($object, $field, $expectedSubject): void
     {
         $securityChecker = $this->createMock(AuthorizationCheckerInterface::class);
         $securityChecker
@@ -48,7 +48,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertTrue($securityExtension->isGranted('ROLE', $object, $field));
     }
 
-    public function testIsGrantedThrowsWhenFieldNotNullAndFieldVoteClassDoesNotExist()
+    public function testIsGrantedThrowsWhenFieldNotNullAndFieldVoteClassDoesNotExist(): void
     {
         if (!interface_exists(UserAuthorizationCheckerInterface::class)) {
             $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
@@ -64,7 +64,7 @@ class SecurityExtensionTest extends TestCase
     }
 
     #[DataProvider('provideObjectFieldAclCases')]
-    public function testIsGrantedForUserCreatesFieldVoteObjectWhenFieldNotNull($object, $field, $expectedSubject)
+    public function testIsGrantedForUserCreatesFieldVoteObjectWhenFieldNotNull($object, $field, $expectedSubject): void
     {
         if (!interface_exists(UserAuthorizationCheckerInterface::class)) {
             $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
@@ -97,7 +97,7 @@ class SecurityExtensionTest extends TestCase
         ];
     }
 
-    public function testIsGrantedForUserThrowsWhenFieldNotNullAndFieldVoteClassDoesNotExist()
+    public function testIsGrantedForUserThrowsWhenFieldNotNullAndFieldVoteClassDoesNotExist(): void
     {
         if (!interface_exists(UserAuthorizationCheckerInterface::class)) {
             $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
@@ -114,7 +114,7 @@ class SecurityExtensionTest extends TestCase
         $securityExtension->isGrantedForUser(new InMemoryUser('john', 'password'), 'ROLE', 'object', 'bar');
     }
 
-    public function testAccessDecision()
+    public function testAccessDecision(): void
     {
         if (!class_exists(AccessDecision::class)) {
             $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
@@ -138,7 +138,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertTrue($accessDecision->isGranted);
     }
 
-    public function testAccessDecisionWithField()
+    public function testAccessDecisionWithField(): void
     {
         if (!class_exists(AccessDecision::class)) {
             $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
@@ -162,7 +162,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertFalse($accessDecision->isGranted);
     }
 
-    public function testAccessDecisionThrowsWhenAccessDecisionClassDoesNotExist()
+    public function testAccessDecisionThrowsWhenAccessDecisionClassDoesNotExist(): void
     {
         ClassExistsMock::withMockedClasses([AccessDecision::class => false]);
 
@@ -173,7 +173,7 @@ class SecurityExtensionTest extends TestCase
         $securityExtension->getAccessDecision('ROLE', 'object');
     }
 
-    public function testAccessDecisionForUser()
+    public function testAccessDecisionForUser(): void
     {
         if (!interface_exists(UserAuthorizationCheckerInterface::class) || !class_exists(AccessDecision::class)) {
             $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
@@ -192,7 +192,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertSame('object', $securityChecker->subject);
     }
 
-    public function testAccessDecisionForUserWithField()
+    public function testAccessDecisionForUserWithField(): void
     {
         if (!interface_exists(UserAuthorizationCheckerInterface::class) || !class_exists(AccessDecision::class)) {
             $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
@@ -211,7 +211,7 @@ class SecurityExtensionTest extends TestCase
         $this->assertEquals(new FieldVote('object', 'field'), $securityChecker->subject);
     }
 
-    public function testAccessDecisionForUserThrowsWhenAccessDecisionClassDoesNotExist()
+    public function testAccessDecisionForUserThrowsWhenAccessDecisionClassDoesNotExist(): void
     {
         if (!interface_exists(UserAuthorizationCheckerInterface::class)) {
             $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');

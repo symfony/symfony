@@ -46,7 +46,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
     }
 
     #[DataProvider('provideTestMode')]
-    public function testTestMode(int $expected, bool $testMode)
+    public function testTestMode(int $expected, bool $testMode): void
     {
         $message = new SmsMessage('0037012345678', 'Hello World');
 

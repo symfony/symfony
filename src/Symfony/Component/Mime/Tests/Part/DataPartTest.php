@@ -23,7 +23,7 @@ use Symfony\Component\Process\Process;
 
 class DataPartTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $p = new DataPart('content');
         $this->assertEquals('content', $p->getBody());
@@ -39,7 +39,7 @@ class DataPartTest extends TestCase
         $this->assertEquals('html', $p->getMediaSubType());
     }
 
-    public function testConstructorWithResource()
+    public function testConstructorWithResource(): void
     {
         $f = fopen('php://memory', 'r+', false);
         fwrite($f, 'content');
@@ -51,13 +51,13 @@ class DataPartTest extends TestCase
         fclose($f);
     }
 
-    public function testConstructorWithNonStringOrResource()
+    public function testConstructorWithNonStringOrResource(): void
     {
         $this->expectException(\TypeError::class);
         new DataPart(new \stdClass());
     }
 
-    public function testHeaders()
+    public function testHeaders(): void
     {
         $p = new DataPart('content');
         $this->assertEquals(new Headers(
@@ -74,7 +74,7 @@ class DataPartTest extends TestCase
         ), $p->getPreparedHeaders());
     }
 
-    public function testAsInline()
+    public function testAsInline(): void
     {
         $p = new DataPart('content', 'photo.jpg', 'text/html');
         $p->asInline();
@@ -85,7 +85,7 @@ class DataPartTest extends TestCase
         ), $p->getPreparedHeaders());
     }
 
-    public function testAsInlineWithCID()
+    public function testAsInlineWithCID(): void
     {
         $p = new DataPart('content', 'photo.jpg', 'text/html');
         $p->asInline();
@@ -98,7 +98,7 @@ class DataPartTest extends TestCase
         ), $p->getPreparedHeaders());
     }
 
-    public function testFromPath()
+    public function testFromPath(): void
     {
         $p = DataPart::fromPath($file = __DIR__.'/../Fixtures/mimetypes/test.gif');
         $content = file_get_contents($file);
@@ -114,7 +114,7 @@ class DataPartTest extends TestCase
         ), $p->getPreparedHeaders());
     }
 
-    public function testFromPathWithMeta()
+    public function testFromPathWithMeta(): void
     {
         $p = DataPart::fromPath($file = __DIR__.'/../Fixtures/mimetypes/test.gif', 'photo.gif', 'image/jpeg');
         $content = file_get_contents($file);
@@ -130,13 +130,13 @@ class DataPartTest extends TestCase
         ), $p->getPreparedHeaders());
     }
 
-    public function testFromPathWithNotAFile()
+    public function testFromPathWithNotAFile(): void
     {
         $this->expectException(InvalidArgumentException::class);
         DataPart::fromPath(__DIR__.'/../Fixtures/mimetypes/');
     }
 
-    public function testFromPathWithUrl()
+    public function testFromPathWithUrl(): void
     {
         if (!\in_array('http', stream_get_wrappers(), true)) {
             $this->markTestSkipped('"http" stream wrapper is not enabled.');
@@ -169,7 +169,7 @@ class DataPartTest extends TestCase
         }
     }
 
-    public function testHasContentId()
+    public function testHasContentId(): void
     {
         $p = new DataPart('content');
         $this->assertFalse($p->hasContentId());
@@ -177,7 +177,7 @@ class DataPartTest extends TestCase
         $this->assertTrue($p->hasContentId());
     }
 
-    public function testSetContentId()
+    public function testSetContentId(): void
     {
         $p = new DataPart('content');
         $p->setContentId('test@test');
@@ -185,7 +185,7 @@ class DataPartTest extends TestCase
         $this->assertSame('test@test', $p->getContentId());
     }
 
-    public function testSetContentIdInvalid()
+    public function testSetContentIdInvalid(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -193,7 +193,7 @@ class DataPartTest extends TestCase
         $p->setContentId('test');
     }
 
-    public function testGetFilename()
+    public function testGetFilename(): void
     {
         $p = new DataPart('content', null);
         self::assertNull($p->getFilename());
@@ -202,7 +202,7 @@ class DataPartTest extends TestCase
         self::assertSame('filename', $p->getFilename());
     }
 
-    public function testGetContentType()
+    public function testGetContentType(): void
     {
         $p = new DataPart('content');
         self::assertSame('application/octet-stream', $p->getContentType());
@@ -211,7 +211,7 @@ class DataPartTest extends TestCase
         self::assertSame('application/pdf', $p->getContentType());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $r = fopen('php://memory', 'r+', false);
         fwrite($r, 'Text content');

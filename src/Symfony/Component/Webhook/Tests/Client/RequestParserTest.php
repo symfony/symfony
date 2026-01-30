@@ -18,7 +18,7 @@ use Symfony\Component\Webhook\Exception\RejectWebhookException;
 
 class RequestParserTest extends TestCase
 {
-    public function testParseDoesNotMatch()
+    public function testParseDoesNotMatch(): void
     {
         $this->expectException(RejectWebhookException::class);
         (new RequestParser())->parse(new Request(), '$ecret');

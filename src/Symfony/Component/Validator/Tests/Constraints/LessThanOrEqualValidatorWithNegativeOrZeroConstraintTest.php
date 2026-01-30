@@ -60,33 +60,33 @@ class LessThanOrEqualValidatorWithNegativeOrZeroConstraintTest extends AbstractC
     }
 
     #[DataProvider('provideInvalidConstraintOptions')]
-    public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options)
+    public function testThrowsConstraintExceptionIfNoValueOrPropertyPath($options): void
     {
         $this->markTestSkipped('Value option always set for NegativeOrZero constraint');
     }
 
-    public function testThrowsConstraintExceptionIfBothValueAndPropertyPath()
+    public function testThrowsConstraintExceptionIfBothValueAndPropertyPath(): void
     {
         $this->markTestSkipped('Value option is set for NegativeOrZero constraint automatically');
     }
 
-    public function testNoViolationOnNullObjectWithPropertyPath()
+    public function testNoViolationOnNullObjectWithPropertyPath(): void
     {
         $this->markTestSkipped('PropertyPath option is not used in NegativeOrZero constraint');
     }
 
-    public function testInvalidValuePath()
+    public function testInvalidValuePath(): void
     {
         $this->markTestSkipped('PropertyPath option is not used in NegativeOrZero constraint');
     }
 
     #[DataProvider('provideValidComparisonsToPropertyPath')]
-    public function testValidComparisonToPropertyPath($comparedValue)
+    public function testValidComparisonToPropertyPath($comparedValue): void
     {
         $this->markTestSkipped('PropertyPath option is not used in NegativeOrZero constraint');
     }
 
-    public function testInvalidComparisonToPropertyPathAddsPathAsParameter()
+    public function testInvalidComparisonToPropertyPathAddsPathAsParameter(): void
     {
         $this->markTestSkipped('PropertyPath option is not used in NegativeOrZero constraint');
     }

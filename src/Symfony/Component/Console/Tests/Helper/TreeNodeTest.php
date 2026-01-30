@@ -16,14 +16,14 @@ use Symfony\Component\Console\Helper\TreeNode;
 
 class TreeNodeTest extends TestCase
 {
-    public function testNodeInitialization()
+    public function testNodeInitialization(): void
     {
         $node = new TreeNode('Root');
         $this->assertSame('Root', $node->getValue());
         $this->assertSame(0, iterator_count($node->getChildren()));
     }
 
-    public function testAddingChildren()
+    public function testAddingChildren(): void
     {
         $root = new TreeNode('Root');
         $child = new TreeNode('Child');
@@ -34,7 +34,7 @@ class TreeNodeTest extends TestCase
         $this->assertSame($child, iterator_to_array($root->getChildren())[0]);
     }
 
-    public function testAddingChildrenAsString()
+    public function testAddingChildrenAsString(): void
     {
         $root = new TreeNode('Root');
 
@@ -52,7 +52,7 @@ class TreeNodeTest extends TestCase
         $this->assertSame('Child 2', $children[1]->getValue());
     }
 
-    public function testAddingChildrenWithGenerators()
+    public function testAddingChildrenWithGenerators(): void
     {
         $root = new TreeNode('Root');
 
@@ -69,7 +69,7 @@ class TreeNodeTest extends TestCase
         $this->assertSame('Generated Child 2', $children[1]->getValue());
     }
 
-    public function testRecursiveStructure()
+    public function testRecursiveStructure(): void
     {
         $root = new TreeNode('Root');
         $child1 = new TreeNode('Child 1');

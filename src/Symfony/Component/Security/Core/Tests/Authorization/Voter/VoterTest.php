@@ -71,7 +71,7 @@ class VoterTest extends TestCase
     }
 
     #[DataProvider('getTests')]
-    public function testVote(VoterInterface $voter, array $attributes, $expectedVote, $object, $message, ?Vote $vote = null)
+    public function testVote(VoterInterface $voter, array $attributes, $expectedVote, $object, $message, ?Vote $vote = null): void
     {
         $this->assertSame($expectedVote, $voter->vote($this->token, $object, $attributes, $vote), $message);
 
@@ -80,7 +80,7 @@ class VoterTest extends TestCase
         }
     }
 
-    public function testVoteWithTypeError()
+    public function testVoteWithTypeError(): void
     {
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessage('Should error');

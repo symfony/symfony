@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class TimezoneTest extends TestCase
 {
-    public function testValidTimezoneConstraints()
+    public function testValidTimezoneConstraints(): void
     {
         new Timezone();
         new Timezone(zone: \DateTimeZone::ALL);
@@ -36,7 +36,7 @@ class TimezoneTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testExceptionForGroupedTimezonesByCountryWithWrongZone()
+    public function testExceptionForGroupedTimezonesByCountryWithWrongZone(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         new Timezone(
@@ -45,14 +45,14 @@ class TimezoneTest extends TestCase
         );
     }
 
-    public function testExceptionForGroupedTimezonesByCountryWithoutZone()
+    public function testExceptionForGroupedTimezonesByCountryWithoutZone(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         new Timezone(countryCode: 'AR');
     }
 
     #[DataProvider('provideInvalidZones')]
-    public function testExceptionForInvalidGroupedTimezones(int $zone)
+    public function testExceptionForInvalidGroupedTimezones(int $zone): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         new Timezone(zone: $zone);
@@ -65,7 +65,7 @@ class TimezoneTest extends TestCase
         yield [\DateTimeZone::ALL_WITH_BC + 1];
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(TimezoneDummy::class);
         self::assertTrue((new AttributeLoader())->loadClassMetadata($metadata));

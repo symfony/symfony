@@ -21,7 +21,7 @@ use Twig\Loader\ArrayLoader;
  */
 class TemplateControllerTest extends TestCase
 {
-    public function testMethodSignaturesMatch()
+    public function testMethodSignaturesMatch(): void
     {
         $ref = new \ReflectionClass(TemplateController::class);
 
@@ -34,7 +34,7 @@ class TemplateControllerTest extends TestCase
         );
     }
 
-    public function testTwig()
+    public function testTwig(): void
     {
         $twig = $this->createMock(Environment::class);
         $twig->expects($this->exactly(2))->method('render')->willReturn('bar');
@@ -45,7 +45,7 @@ class TemplateControllerTest extends TestCase
         $this->assertEquals('bar', $controller('mytemplate')->getContent());
     }
 
-    public function testNoTwigTemplateActionMethod()
+    public function testNoTwigTemplateActionMethod(): void
     {
         $controller = new TemplateController();
 
@@ -55,7 +55,7 @@ class TemplateControllerTest extends TestCase
         $controller->templateAction('mytemplate')->getContent();
     }
 
-    public function testNoTwigInvokeMethod()
+    public function testNoTwigInvokeMethod(): void
     {
         $controller = new TemplateController();
 
@@ -65,7 +65,7 @@ class TemplateControllerTest extends TestCase
         $controller('mytemplate')->getContent();
     }
 
-    public function testContext()
+    public function testContext(): void
     {
         $templateName = 'template_controller.html.twig';
         $context = [
@@ -83,7 +83,7 @@ class TemplateControllerTest extends TestCase
         $this->assertEquals($expected, $controller($templateName, null, null, null, $context)->getContent());
     }
 
-    public function testStatusCode()
+    public function testStatusCode(): void
     {
         $templateName = 'template_controller.html.twig';
         $statusCode = 201;
@@ -101,7 +101,7 @@ class TemplateControllerTest extends TestCase
         $this->assertSame(200, $controller($templateName)->getStatusCode());
     }
 
-    public function testHeaders()
+    public function testHeaders(): void
     {
         $templateName = 'image.svg.twig';
 

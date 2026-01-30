@@ -16,7 +16,7 @@ use Symfony\Component\HtmlSanitizer\Parser\NativeParser;
 
 class NativeParserTest extends TestCase
 {
-    public function testParseValid()
+    public function testParseValid(): void
     {
         $node = (new NativeParser())->parse('<div></div>');
         $this->assertInstanceOf(\Dom\Node::class, $node);
@@ -25,7 +25,7 @@ class NativeParserTest extends TestCase
         $this->assertSame('DIV', $node->childNodes->item(0)->nodeName);
     }
 
-    public function testParseHtml()
+    public function testParseHtml(): void
     {
         $html = '<div><p>Hello <strong>World</strong>!</p></div>';
         $node = (new NativeParser())->parse($html);

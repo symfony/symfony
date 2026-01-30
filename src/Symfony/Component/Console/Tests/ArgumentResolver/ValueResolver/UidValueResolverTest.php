@@ -28,7 +28,7 @@ use Symfony\Component\Uid\UuidV4;
 
 class UidValueResolverTest extends TestCase
 {
-    public function testResolveUuidArgument()
+    public function testResolveUuidArgument(): void
     {
         $resolver = new UidValueResolver();
         $uuid = '550e8400-e29b-41d4-a716-446655440000';
@@ -41,7 +41,7 @@ class UidValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 Uuid $id,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -55,7 +55,7 @@ class UidValueResolverTest extends TestCase
         $this->assertSame($uuid, (string) $result[0]);
     }
 
-    public function testResolveUlidArgument()
+    public function testResolveUlidArgument(): void
     {
         $resolver = new UidValueResolver();
         $ulid = '01ARZ3NDEKTSV4RRFFQ69G5FAV';
@@ -68,7 +68,7 @@ class UidValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 Ulid $id,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -82,7 +82,7 @@ class UidValueResolverTest extends TestCase
         $this->assertSame($ulid, (string) $result[0]);
     }
 
-    public function testResolveUuidOption()
+    public function testResolveUuidOption(): void
     {
         $resolver = new UidValueResolver();
         $uuid = '550e8400-e29b-41d4-a716-446655440000';
@@ -95,7 +95,7 @@ class UidValueResolverTest extends TestCase
             public function __invoke(
                 #[Option]
                 ?Uuid $id = null,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -109,7 +109,7 @@ class UidValueResolverTest extends TestCase
         $this->assertSame($uuid, (string) $result[0]);
     }
 
-    public function testArgumentThrowsOnInvalidUid()
+    public function testArgumentThrowsOnInvalidUid(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The uid for the "id" argument is invalid.');
@@ -124,7 +124,7 @@ class UidValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 Uuid $id,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -134,7 +134,7 @@ class UidValueResolverTest extends TestCase
         iterator_to_array($resolver->resolve('id', $input, $member));
     }
 
-    public function testOptionThrowsOnInvalidUid()
+    public function testOptionThrowsOnInvalidUid(): void
     {
         $this->expectException(InvalidOptionException::class);
         $this->expectExceptionMessage('The uid for the "--id" option is invalid.');
@@ -149,7 +149,7 @@ class UidValueResolverTest extends TestCase
             public function __invoke(
                 #[Option]
                 ?Uuid $id = null,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -159,7 +159,7 @@ class UidValueResolverTest extends TestCase
         iterator_to_array($resolver->resolve('id', $input, $member));
     }
 
-    public function testReturnsNullWhenArgumentIsNull()
+    public function testReturnsNullWhenArgumentIsNull(): void
     {
         $resolver = new UidValueResolver();
 
@@ -171,7 +171,7 @@ class UidValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 ?Uuid $id = null,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -183,7 +183,7 @@ class UidValueResolverTest extends TestCase
         $this->assertSame([null], $result);
     }
 
-    public function testDoesNotResolveNonUidType()
+    public function testDoesNotResolveNonUidType(): void
     {
         $resolver = new UidValueResolver();
 
@@ -195,7 +195,7 @@ class UidValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 string $id,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');
@@ -207,7 +207,7 @@ class UidValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testDoesNotResolveWithoutAttribute()
+    public function testDoesNotResolveWithoutAttribute(): void
     {
         $resolver = new UidValueResolver();
 
@@ -225,7 +225,7 @@ class UidValueResolverTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testResolveSpecificUuidVersion()
+    public function testResolveSpecificUuidVersion(): void
     {
         $resolver = new UidValueResolver();
         $uuid = '550e8400-e29b-41d4-a716-446655440000';
@@ -238,7 +238,7 @@ class UidValueResolverTest extends TestCase
             public function __invoke(
                 #[Argument]
                 UuidV4 $id,
-            ) {
+            ): void {
             }
         };
         $reflection = new \ReflectionMethod($command, '__invoke');

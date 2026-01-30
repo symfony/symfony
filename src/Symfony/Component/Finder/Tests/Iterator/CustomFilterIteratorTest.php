@@ -16,14 +16,14 @@ use Symfony\Component\Finder\Iterator\CustomFilterIterator;
 
 class CustomFilterIteratorTest extends IteratorTestCase
 {
-    public function testWithInvalidFilter()
+    public function testWithInvalidFilter(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new CustomFilterIterator(new Iterator(), ['foo']);
     }
 
     #[DataProvider('getAcceptData')]
-    public function testAccept($filters, $expected)
+    public function testAccept($filters, $expected): void
     {
         $inner = new Iterator(['test.php', 'test.py', 'foo.php']);
 

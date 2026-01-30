@@ -16,7 +16,7 @@ use Symfony\Component\Scheduler\Trigger\CallbackTrigger;
 
 class CallbackTriggerTest extends TestCase
 {
-    public function testToString()
+    public function testToString(): void
     {
         $trigger = new CallbackTrigger(static fn () => null);
         $this->assertMatchesRegularExpression('/^[\da-f]{32}$/', (string) $trigger);

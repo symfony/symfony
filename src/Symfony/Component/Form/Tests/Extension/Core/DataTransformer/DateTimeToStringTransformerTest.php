@@ -66,7 +66,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
     }
 
     #[DataProvider('dataProvider')]
-    public function testTransform($format, $output, $input)
+    public function testTransform($format, $output, $input): void
     {
         $transformer = new DateTimeToStringTransformer('UTC', 'UTC', $format);
 
@@ -75,14 +75,14 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
         $this->assertEquals($output, $transformer->transform($input));
     }
 
-    public function testTransformEmpty()
+    public function testTransformEmpty(): void
     {
         $transformer = new DateTimeToStringTransformer();
 
         $this->assertSame('', $transformer->transform(null));
     }
 
-    public function testTransformWithDifferentTimezones()
+    public function testTransformWithDifferentTimezones(): void
     {
         $transformer = new DateTimeToStringTransformer('Asia/Hong_Kong', 'America/New_York', 'Y-m-d H:i:s');
 
@@ -93,7 +93,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
         $this->assertEquals($output, $transformer->transform($input));
     }
 
-    public function testTransformDateTimeImmutable()
+    public function testTransformDateTimeImmutable(): void
     {
         $transformer = new DateTimeToStringTransformer('Asia/Hong_Kong', 'America/New_York', 'Y-m-d H:i:s');
 
@@ -104,7 +104,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
         $this->assertEquals($output, $transformer->transform($input));
     }
 
-    public function testTransformExpectsDateTime()
+    public function testTransformExpectsDateTime(): void
     {
         $transformer = new DateTimeToStringTransformer();
 
@@ -114,7 +114,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
     }
 
     #[DataProvider('dataProvider')]
-    public function testReverseTransform($format, $input, $output)
+    public function testReverseTransform($format, $input, $output): void
     {
         $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format);
 
@@ -123,14 +123,14 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
         $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
-    public function testReverseTransformEmpty()
+    public function testReverseTransformEmpty(): void
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
         $this->assertNull($reverseTransformer->reverseTransform(''));
     }
 
-    public function testReverseTransformWithNullBytes()
+    public function testReverseTransformWithNullBytes(): void
     {
         $transformer = new DateTimeToStringTransformer();
 
@@ -143,7 +143,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
         $transformer->reverseTransform($value);
     }
 
-    public function testReverseTransformWithDifferentTimezones()
+    public function testReverseTransformWithDifferentTimezones(): void
     {
         $reverseTransformer = new DateTimeToStringTransformer('America/New_York', 'Asia/Hong_Kong', 'Y-m-d H:i:s');
 
@@ -154,7 +154,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
         $this->assertEquals($output, $reverseTransformer->reverseTransform($input));
     }
 
-    public function testReverseTransformExpectsString()
+    public function testReverseTransformExpectsString(): void
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
@@ -163,7 +163,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
         $reverseTransformer->reverseTransform(1234);
     }
 
-    public function testReverseTransformExpectsValidDateString()
+    public function testReverseTransformExpectsValidDateString(): void
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 
@@ -172,7 +172,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
         $reverseTransformer->reverseTransform('2010-2010-2010');
     }
 
-    public function testReverseTransformWithNonExistingDate()
+    public function testReverseTransformWithNonExistingDate(): void
     {
         $reverseTransformer = new DateTimeToStringTransformer();
 

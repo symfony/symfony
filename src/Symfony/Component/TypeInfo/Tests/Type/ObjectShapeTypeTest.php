@@ -17,7 +17,7 @@ use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 
 class ObjectShapeTypeTest extends TestCase
 {
-    public function testAccepts()
+    public function testAccepts(): void
     {
         $type = new ObjectShapeType([
             'foo' => ['type' => Type::bool(), 'optional' => false],
@@ -35,7 +35,7 @@ class ObjectShapeTypeTest extends TestCase
         $this->assertTrue($type->accepts((object) ['foo' => true, 'bar' => 'string']));
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $type = new ObjectShapeType([1 => ['type' => Type::bool(), 'optional' => false]]);
         $this->assertSame("object{'1': bool}", (string) $type);

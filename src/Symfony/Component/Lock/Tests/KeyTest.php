@@ -20,7 +20,7 @@ use Symfony\Component\Lock\Key;
  */
 class KeyTest extends TestCase
 {
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $key = new Key(__METHOD__);
         $key->reduceLifetime(1);
@@ -31,7 +31,7 @@ class KeyTest extends TestCase
         $this->assertEqualsWithDelta($key->getRemainingLifetime(), $copy->getRemainingLifetime(), 0.001);
     }
 
-    public function testLegacyPayloadCanBeUnserialized()
+    public function testLegacyPayloadCanBeUnserialized(): void
     {
         $serialized = base64_decode('TzoyNjoiU3ltZm9ueVxDb21wb25lbnRcTG9ja1xLZXkiOjM6e3M6MzY6IgBTeW1mb255XENvbXBvbmVudFxMb2NrXEtleQByZXNvdXJjZSI7czo2OiJsZWdhY3kiO3M6NDA6IgBTeW1mb255XENvbXBvbmVudFxMb2NrXEtleQBleHBpcmluZ1RpbWUiO047czozMzoiAFN5bWZvbnlcQ29tcG9uZW50XExvY2tcS2V5AHN0YXRlIjthOjA6e319', true);
 
@@ -42,7 +42,7 @@ class KeyTest extends TestCase
         $this->assertNull($key->getRemainingLifetime());
     }
 
-    public function testUnserialize()
+    public function testUnserialize(): void
     {
         $key = new Key(__METHOD__);
         $key->markUnserializable();

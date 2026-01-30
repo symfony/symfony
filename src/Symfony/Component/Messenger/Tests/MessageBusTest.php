@@ -26,14 +26,14 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 class MessageBusTest extends TestCase
 {
-    public function testItHasTheRightInterface()
+    public function testItHasTheRightInterface(): void
     {
         $bus = new MessageBus();
 
         $this->assertInstanceOf(MessageBusInterface::class, $bus);
     }
 
-    public function testItCallsMiddleware()
+    public function testItCallsMiddleware(): void
     {
         $message = new DummyMessage('Hello');
         $envelope = new Envelope($message);
@@ -59,7 +59,7 @@ class MessageBusTest extends TestCase
         $bus->dispatch($message);
     }
 
-    public function testThatAMiddlewareCanAddSomeStampsToTheEnvelope()
+    public function testThatAMiddlewareCanAddSomeStampsToTheEnvelope(): void
     {
         $message = new DummyMessage('Hello');
         $envelope = new Envelope($message, [new ReceivedStamp('transport')]);
@@ -93,7 +93,7 @@ class MessageBusTest extends TestCase
         $bus->dispatch($envelope);
     }
 
-    public function testThatAMiddlewareCanUpdateTheMessageWhileKeepingTheEnvelopeStamps()
+    public function testThatAMiddlewareCanUpdateTheMessageWhileKeepingTheEnvelopeStamps(): void
     {
         $message = new DummyMessage('Hello');
         $envelope = new Envelope($message, $stamps = [new ReceivedStamp('transport')]);
@@ -122,13 +122,13 @@ class MessageBusTest extends TestCase
         $bus->dispatch($envelope);
     }
 
-    public function testItAddsTheStamps()
+    public function testItAddsTheStamps(): void
     {
         $finalEnvelope = (new MessageBus())->dispatch(new \stdClass(), [new DelayStamp(5), new BusNameStamp('bar')]);
         $this->assertCount(2, $finalEnvelope->all());
     }
 
-    public function testItAddsTheStampsToEnvelope()
+    public function testItAddsTheStampsToEnvelope(): void
     {
         $finalEnvelope = (new MessageBus())->dispatch(new Envelope(new \stdClass()), [new DelayStamp(5), new BusNameStamp('bar')]);
         $this->assertCount(2, $finalEnvelope->all());
@@ -153,7 +153,7 @@ class MessageBusTest extends TestCase
     }
 
     #[DataProvider('provideConstructorDataStucture')]
-    public function testConstructDataStructure(iterable $dataStructure)
+    public function testConstructDataStructure(iterable $dataStructure): void
     {
         $bus = new MessageBus($dataStructure);
         $envelope = new Envelope(new DummyMessage('Hello'));

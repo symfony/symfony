@@ -37,7 +37,7 @@ class ProxyAdapterTest extends AdapterTestCase
         return new ProxyAdapter(new ArrayAdapter(), '', $defaultLifetime);
     }
 
-    public function testProxyfiedItem()
+    public function testProxyfiedItem(): void
     {
         $item = new CacheItem();
         $pool = new ProxyAdapter(new TestingArrayAdapter($item));

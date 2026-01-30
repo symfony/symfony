@@ -18,13 +18,13 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class InMemoryUserTest extends TestCase
 {
-    public function testConstructorException()
+    public function testConstructorException(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         new InMemoryUser('', 'superpass');
     }
 
-    public function testGetRoles()
+    public function testGetRoles(): void
     {
         $user = new InMemoryUser('fabien', 'superpass');
         $this->assertEquals([], $user->getRoles());
@@ -33,19 +33,19 @@ class InMemoryUserTest extends TestCase
         $this->assertEquals(['ROLE_ADMIN'], $user->getRoles());
     }
 
-    public function testGetPassword()
+    public function testGetPassword(): void
     {
         $user = new InMemoryUser('fabien', 'superpass');
         $this->assertEquals('superpass', $user->getPassword());
     }
 
-    public function testGetUserIdentifier()
+    public function testGetUserIdentifier(): void
     {
         $user = new InMemoryUser('fabien', 'superpass');
         $this->assertEquals('fabien', $user->getUserIdentifier());
     }
 
-    public function testIsEnabled()
+    public function testIsEnabled(): void
     {
         $user = new InMemoryUser('mathilde', 'k');
         $this->assertTrue($user->isEnabled());
@@ -54,7 +54,7 @@ class InMemoryUserTest extends TestCase
         $this->assertFalse($user->isEnabled());
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $user = new InMemoryUser('fabien', 'superpass');
         $this->assertEquals('fabien', (string) $user);
@@ -66,7 +66,7 @@ class InMemoryUserTest extends TestCase
      * @param UserInterface $b
      */
     #[DataProvider('isEqualToData')]
-    public function testIsEqualTo($expectation, $a, $b)
+    public function testIsEqualTo($expectation, $a, $b): void
     {
         $this->assertSame($expectation, $a->isEqualTo($b));
         $this->assertSame($expectation, $b->isEqualTo($a));
@@ -83,7 +83,7 @@ class InMemoryUserTest extends TestCase
         ];
     }
 
-    public function testIsEqualToWithDifferentUser()
+    public function testIsEqualToWithDifferentUser(): void
     {
         $user = new InMemoryUser('username', 'password');
         $this->assertFalse($user->isEqualTo($this->createStub(UserInterface::class)));

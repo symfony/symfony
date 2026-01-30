@@ -22,7 +22,7 @@ use Symfony\Component\Routing\RouteCollection;
 
 class UrlMatcherTest extends TestCase
 {
-    public function testZero()
+    public function testZero(): void
     {
         $coll = new RouteCollection();
         $coll->add('index', new Route('/'));
@@ -33,7 +33,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('0');
     }
 
-    public function testNoMethodSoAllowed()
+    public function testNoMethodSoAllowed(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo'));
@@ -42,7 +42,7 @@ class UrlMatcherTest extends TestCase
         $this->assertIsArray($matcher->match('/foo'));
     }
 
-    public function testMethodNotAllowed()
+    public function testMethodNotAllowed(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', [], [], [], '', [], ['post']));
@@ -57,7 +57,7 @@ class UrlMatcherTest extends TestCase
         }
     }
 
-    public function testMethodNotAllowedOnRoot()
+    public function testMethodNotAllowedOnRoot(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/', [], [], [], '', [], ['GET']));
@@ -72,7 +72,7 @@ class UrlMatcherTest extends TestCase
         }
     }
 
-    public function testHeadAllowedWhenRequirementContainsGet()
+    public function testHeadAllowedWhenRequirementContainsGet(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo', [], [], [], '', [], ['get']));
@@ -81,7 +81,7 @@ class UrlMatcherTest extends TestCase
         $this->assertIsArray($matcher->match('/foo'));
     }
 
-    public function testMethodNotAllowedAggregatesAllowedMethods()
+    public function testMethodNotAllowedAggregatesAllowedMethods(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo1', new Route('/foo', [], [], [], '', [], ['post']));
@@ -97,7 +97,7 @@ class UrlMatcherTest extends TestCase
         }
     }
 
-    public function testPatternMatchAndParameterReturn()
+    public function testPatternMatchAndParameterReturn(): void
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo/{bar}'));
@@ -111,7 +111,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'foo', 'bar' => 'baz'], $matcher->match('/foo/baz'));
     }
 
-    public function testDefaultsAreMerged()
+    public function testDefaultsAreMerged(): void
     {
         // test that defaults are merged
         $collection = new RouteCollection();
@@ -120,7 +120,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'foo', 'bar' => 'baz', 'def' => 'test'], $matcher->match('/foo/baz'));
     }
 
-    public function testMethodIsIgnoredIfNoMethodGiven()
+    public function testMethodIsIgnoredIfNoMethodGiven(): void
     {
         // test that route "method" is ignored if no method is given in the context
         $collection = new RouteCollection();
@@ -143,7 +143,7 @@ class UrlMatcherTest extends TestCase
         $this->assertIsArray($matcher->match('/foo'));
     }
 
-    public function testRouteWithOptionalVariableAsFirstSegment()
+    public function testRouteWithOptionalVariableAsFirstSegment(): void
     {
         $collection = new RouteCollection();
         $collection->add('bar', new Route('/{bar}/foo', ['bar' => 'bar'], ['bar' => 'foo|bar']));
@@ -158,7 +158,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'bar', 'bar' => 'bar'], $matcher->match('/'));
     }
 
-    public function testRouteWithOnlyOptionalVariables()
+    public function testRouteWithOnlyOptionalVariables(): void
     {
         $collection = new RouteCollection();
         $collection->add('bar', new Route('/{foo}/{bar}', ['foo' => 'foo', 'bar' => 'bar'], []));
@@ -168,7 +168,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'bar', 'foo' => 'a', 'bar' => 'b'], $matcher->match('/a/b'));
     }
 
-    public function testMatchWithPrefixes()
+    public function testMatchWithPrefixes(): void
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/{foo}'));
@@ -179,7 +179,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'foo', 'foo' => 'foo'], $matcher->match('/a/b/foo'));
     }
 
-    public function testMatchWithDynamicPrefix()
+    public function testMatchWithDynamicPrefix(): void
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/{foo}'));
@@ -190,7 +190,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_locale' => 'fr', '_route' => 'foo', 'foo' => 'foo'], $matcher->match('/fr/b/foo'));
     }
 
-    public function testMatchSpecialRouteName()
+    public function testMatchSpecialRouteName(): void
     {
         $collection = new RouteCollection();
         $collection->add('$péß^a|', new Route('/bar'));
@@ -199,7 +199,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => '$péß^a|'], $matcher->match('/bar'));
     }
 
-    public function testMatchImportantVariable()
+    public function testMatchImportantVariable(): void
     {
         $collection = new RouteCollection();
         $collection->add('index', new Route('/index.{!_format}', ['_format' => 'xml']));
@@ -208,7 +208,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'index', '_format' => 'xml'], $matcher->match('/index.xml'));
     }
 
-    public function testShortPathDoesNotMatchImportantVariable()
+    public function testShortPathDoesNotMatchImportantVariable(): void
     {
         $collection = new RouteCollection();
         $collection->add('index', new Route('/index.{!_format}', ['_format' => 'xml']));
@@ -220,7 +220,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/index');
     }
 
-    public function testTrailingEncodedNewlineIsNotOverlooked()
+    public function testTrailingEncodedNewlineIsNotOverlooked(): void
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));
@@ -232,7 +232,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo%0a');
     }
 
-    public function testMatchNonAlpha()
+    public function testMatchNonAlpha(): void
     {
         $collection = new RouteCollection();
         $chars = '!"$%éà &\'()*+,./:;<=>@ABCDEFGHIJKLMNOPQRSTUVWXYZ\\[]^_`abcdefghijklmnopqrstuvwxyz{|}~-';
@@ -243,7 +243,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'foo', 'foo' => $chars], $matcher->match('/'.strtr($chars, ['%' => '%25']).'/bar'));
     }
 
-    public function testMatchWithDotMetacharacterInRequirements()
+    public function testMatchWithDotMetacharacterInRequirements(): void
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/{foo}/bar', [], ['foo' => '.+']));
@@ -252,7 +252,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'foo', 'foo' => "\n"], $matcher->match('/'.urlencode("\n").'/bar'), 'linefeed character is matched');
     }
 
-    public function testMatchOverriddenRoute()
+    public function testMatchOverriddenRoute(): void
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo'));
@@ -269,7 +269,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals([], $matcher->match('/foo'));
     }
 
-    public function testMatchRegression()
+    public function testMatchRegression(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}'));
@@ -288,7 +288,7 @@ class UrlMatcherTest extends TestCase
         }
     }
 
-    public function testMultipleParams()
+    public function testMultipleParams(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo1', new Route('/foo/{a}/{b}'));
@@ -300,7 +300,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals('foo2', $route);
     }
 
-    public function testDefaultRequirementForOptionalVariables()
+    public function testDefaultRequirementForOptionalVariables(): void
     {
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{page}.{_format}', ['page' => 'index', '_format' => 'html']));
@@ -309,7 +309,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['page' => 'my-page', '_format' => 'xml', '_route' => 'test'], $matcher->match('/my-page.xml'));
     }
 
-    public function testMatchingIsEager()
+    public function testMatchingIsEager(): void
     {
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{foo}-{bar}-', [], ['foo' => '.+', 'bar' => '.+']));
@@ -318,7 +318,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['foo' => 'text1-text2-text3', 'bar' => 'text4', '_route' => 'test'], $matcher->match('/text1-text2-text3-text4-'));
     }
 
-    public function testAdjacentVariables()
+    public function testAdjacentVariables(): void
     {
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{w}{x}{y}{z}.{_format}', ['z' => 'default-z', '_format' => 'html'], ['y' => 'y|Y']));
@@ -338,7 +338,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/wxy.html');
     }
 
-    public function testOptionalVariableWithNoRealSeparator()
+    public function testOptionalVariableWithNoRealSeparator(): void
     {
         $coll = new RouteCollection();
         $coll->add('test', new Route('/get{what}', ['what' => 'All']));
@@ -353,7 +353,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/ge');
     }
 
-    public function testRequiredVariableWithNoRealSeparator()
+    public function testRequiredVariableWithNoRealSeparator(): void
     {
         $coll = new RouteCollection();
         $coll->add('test', new Route('/get{what}Suffix'));
@@ -362,7 +362,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['what' => 'Sites', '_route' => 'test'], $matcher->match('/getSitesSuffix'));
     }
 
-    public function testDefaultRequirementOfVariable()
+    public function testDefaultRequirementOfVariable(): void
     {
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{page}.{_format}'));
@@ -371,7 +371,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['page' => 'index', '_format' => 'mobile.html', '_route' => 'test'], $matcher->match('/index.mobile.html'));
     }
 
-    public function testDefaultRequirementOfVariableDisallowsSlash()
+    public function testDefaultRequirementOfVariableDisallowsSlash(): void
     {
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{page}.{_format}'));
@@ -382,7 +382,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/index.sl/ash');
     }
 
-    public function testDefaultRequirementOfVariableDisallowsNextSeparator()
+    public function testDefaultRequirementOfVariableDisallowsNextSeparator(): void
     {
         $coll = new RouteCollection();
         $coll->add('test', new Route('/{page}.{_format}', [], ['_format' => 'html|xml']));
@@ -393,7 +393,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/do.t.html');
     }
 
-    public function testMissingTrailingSlash()
+    public function testMissingTrailingSlash(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/'));
@@ -405,7 +405,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo');
     }
 
-    public function testExtraTrailingSlash()
+    public function testExtraTrailingSlash(): void
     {
         $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
@@ -415,7 +415,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo/');
     }
 
-    public function testMissingTrailingSlashForNonSafeMethod()
+    public function testMissingTrailingSlashForNonSafeMethod(): void
     {
         $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
@@ -427,7 +427,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo');
     }
 
-    public function testExtraTrailingSlashForNonSafeMethod()
+    public function testExtraTrailingSlashForNonSafeMethod(): void
     {
         $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
@@ -439,7 +439,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo/');
     }
 
-    public function testSchemeRequirement()
+    public function testSchemeRequirement(): void
     {
         $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
@@ -448,7 +448,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo');
     }
 
-    public function testSchemeRequirementForNonSafeMethod()
+    public function testSchemeRequirementForNonSafeMethod(): void
     {
         $this->expectException(ResourceNotFoundException::class);
         $coll = new RouteCollection();
@@ -460,7 +460,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo');
     }
 
-    public function testSamePathWithDifferentScheme()
+    public function testSamePathWithDifferentScheme(): void
     {
         $coll = new RouteCollection();
         $coll->add('https_route', new Route('/', [], [], [], '', ['https']));
@@ -469,7 +469,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'http_route'], $matcher->match('/'));
     }
 
-    public function testCondition()
+    public function testCondition(): void
     {
         $coll = new RouteCollection();
         $route = new Route('/foo');
@@ -482,7 +482,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo');
     }
 
-    public function testRequestCondition()
+    public function testRequestCondition(): void
     {
         $coll = new RouteCollection();
         $route = new Route('/foo/{bar}');
@@ -495,7 +495,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['bar' => 'bar', '_route' => 'foo'], $matcher->match('/foo/bar'));
     }
 
-    public function testRouteParametersCondition()
+    public function testRouteParametersCondition(): void
     {
         $coll = new RouteCollection();
         $route = new Route('/foo');
@@ -526,7 +526,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo/3000');
     }
 
-    public function testDecodeOnce()
+    public function testDecodeOnce(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}'));
@@ -535,7 +535,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['foo' => 'bar%23', '_route' => 'foo'], $matcher->match('/foo/bar%2523'));
     }
 
-    public function testCannotRelyOnPrefix()
+    public function testCannotRelyOnPrefix(): void
     {
         $coll = new RouteCollection();
 
@@ -551,7 +551,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'bar'], $matcher->match('/new'));
     }
 
-    public function testWithHost()
+    public function testWithHost(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}', [], [], [], '{locale}.example.com'));
@@ -560,7 +560,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['foo' => 'bar', '_route' => 'foo', 'locale' => 'en'], $matcher->match('/foo/bar'));
     }
 
-    public function testWithHostOnRouteCollection()
+    public function testWithHostOnRouteCollection(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}'));
@@ -574,7 +574,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['foo' => 'bar', '_route' => 'bar', 'locale' => 'en'], $matcher->match('/bar/bar'));
     }
 
-    public function testVariationInTrailingSlashWithHosts()
+    public function testVariationInTrailingSlashWithHosts(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/', [], [], [], 'foo.example.com'));
@@ -587,7 +587,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'bar'], $matcher->match('/foo'));
     }
 
-    public function testVariationInTrailingSlashWithHostsInReverse()
+    public function testVariationInTrailingSlashWithHostsInReverse(): void
     {
         // The order should not matter
         $coll = new RouteCollection();
@@ -601,7 +601,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'bar'], $matcher->match('/foo'));
     }
 
-    public function testVariationInTrailingSlashWithHostsAndVariable()
+    public function testVariationInTrailingSlashWithHostsAndVariable(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/{foo}/', [], [], [], 'foo.example.com'));
@@ -614,7 +614,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['foo' => 'bar', '_route' => 'bar'], $matcher->match('/bar'));
     }
 
-    public function testVariationInTrailingSlashWithHostsAndVariableInReverse()
+    public function testVariationInTrailingSlashWithHostsAndVariableInReverse(): void
     {
         // The order should not matter
         $coll = new RouteCollection();
@@ -628,7 +628,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['foo' => 'bar', '_route' => 'bar'], $matcher->match('/bar'));
     }
 
-    public function testVariationInTrailingSlashWithMethods()
+    public function testVariationInTrailingSlashWithMethods(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/', [], [], [], '', [], ['POST']));
@@ -641,7 +641,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'bar'], $matcher->match('/foo'));
     }
 
-    public function testVariationInTrailingSlashWithMethodsInReverse()
+    public function testVariationInTrailingSlashWithMethodsInReverse(): void
     {
         // The order should not matter
         $coll = new RouteCollection();
@@ -655,7 +655,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'bar'], $matcher->match('/foo'));
     }
 
-    public function testVariableVariationInTrailingSlashWithMethods()
+    public function testVariableVariationInTrailingSlashWithMethods(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/{foo}/', [], [], [], '', [], ['POST']));
@@ -668,7 +668,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['foo' => 'bar', '_route' => 'bar'], $matcher->match('/bar'));
     }
 
-    public function testVariableVariationInTrailingSlashWithMethodsInReverse()
+    public function testVariableVariationInTrailingSlashWithMethodsInReverse(): void
     {
         // The order should not matter
         $coll = new RouteCollection();
@@ -682,7 +682,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['foo' => 'bar', '_route' => 'bar'], $matcher->match('/bar'));
     }
 
-    public function testMixOfStaticAndVariableVariationInTrailingSlashWithHosts()
+    public function testMixOfStaticAndVariableVariationInTrailingSlashWithHosts(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/', [], [], [], 'foo.example.com'));
@@ -695,7 +695,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['foo' => 'bar', '_route' => 'bar'], $matcher->match('/bar'));
     }
 
-    public function testMixOfStaticAndVariableVariationInTrailingSlashWithMethods()
+    public function testMixOfStaticAndVariableVariationInTrailingSlashWithMethods(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/', [], [], [], '', [], ['POST']));
@@ -709,7 +709,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['foo' => 'foo', '_route' => 'bar'], $matcher->match('/foo'));
     }
 
-    public function testWithOutHostHostDoesNotMatch()
+    public function testWithOutHostHostDoesNotMatch(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/foo/{foo}', [], [], [], '{locale}.example.com'));
@@ -721,7 +721,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/foo/bar');
     }
 
-    public function testPathIsCaseSensitive()
+    public function testPathIsCaseSensitive(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/locale', [], ['locale' => 'EN|FR|DE']));
@@ -733,7 +733,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/en');
     }
 
-    public function testHostIsCaseInsensitive()
+    public function testHostIsCaseInsensitive(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/', [], ['locale' => 'EN|FR|DE'], [], '{locale}.example.com'));
@@ -742,7 +742,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'foo', 'locale' => 'en'], $matcher->match('/'));
     }
 
-    public function testNoConfiguration()
+    public function testNoConfiguration(): void
     {
         $coll = new RouteCollection();
 
@@ -753,7 +753,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/');
     }
 
-    public function testNestedCollections()
+    public function testNestedCollections(): void
     {
         $coll = new RouteCollection();
 
@@ -777,7 +777,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'buz'], $matcher->match('/prefix/buz'));
     }
 
-    public function testSchemeAndMethodMismatch()
+    public function testSchemeAndMethodMismatch(): void
     {
         $coll = new RouteCollection();
         $coll->add('foo', new Route('/', [], [], [], null, ['https'], ['POST']));
@@ -790,7 +790,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/');
     }
 
-    public function testSiblingRoutes()
+    public function testSiblingRoutes(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', (new Route('/a{a}'))->setMethods('POST'));
@@ -805,7 +805,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'f', 'b' => 'b', 'a' => 'a'], $matcher->match('/ba'));
     }
 
-    public function testUnicodeRoute()
+    public function testUnicodeRoute(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/{a}', [], ['a' => '.'], ['utf8' => false]));
@@ -815,7 +815,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'b', 'a' => 'é'], $matcher->match('/é'));
     }
 
-    public function testRequirementWithCapturingGroup()
+    public function testRequirementWithCapturingGroup(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/{a}/{b}', [], ['a' => '(a|b)']));
@@ -824,7 +824,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'a', 'a' => 'a', 'b' => 'b'], $matcher->match('/a/b'));
     }
 
-    public function testDotAllWithCatchAll()
+    public function testDotAllWithCatchAll(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/{id}.html', [], ['id' => '.+']));
@@ -834,7 +834,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'a', 'id' => 'foo/bar'], $matcher->match('/foo/bar.html'));
     }
 
-    public function testHostPattern()
+    public function testHostPattern(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/{app}/{action}/{unused}', [], [], [], '{host}'));
@@ -850,7 +850,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals($expected, $matcher->match('/an_app/an_action/unused'));
     }
 
-    public function testUtf8Prefix()
+    public function testUtf8Prefix(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/é{foo}', [], [], ['utf8' => true]));
@@ -860,7 +860,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals('a', $matcher->match('/éo')['_route']);
     }
 
-    public function testUtf8AndMethodMatching()
+    public function testUtf8AndMethodMatching(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/admin/api/list/{shortClassName}/{id}.{_format}', [], [], ['utf8' => true], '', [], ['PUT']));
@@ -871,7 +871,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals('c', $matcher->match('/admin/api/package.json')['_route']);
     }
 
-    public function testHostWithDot()
+    public function testHostWithDot(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/foo', [], [], [], 'foo.example.com'));
@@ -881,7 +881,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals('b', $matcher->match('/bar/abc.123')['_route']);
     }
 
-    public function testSlashVariant()
+    public function testSlashVariant(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/foo/{bar}', [], ['bar' => '.*']));
@@ -890,7 +890,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals('a', $matcher->match('/foo/')['_route']);
     }
 
-    public function testSlashVariant2()
+    public function testSlashVariant2(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/foo/{bär}/', [], ['bär' => '.*'], ['utf8' => true]));
@@ -899,7 +899,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'a', 'bär' => 'bar'], $matcher->match('/foo/bar/'));
     }
 
-    public function testSlashWithVerb()
+    public function testSlashWithVerb(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/{foo}', [], [], [], '', [], ['put', 'delete']));
@@ -919,7 +919,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals($expected, $matcher->match('/dav/files/bar/'));
     }
 
-    public function testSlashAndVerbPrecedence()
+    public function testSlashAndVerbPrecedence(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/api/customers/{customerId}/contactpersons/', [], [], [], '', [], ['post']));
@@ -944,7 +944,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals($expected, $matcher->match('/api/customers/123/contactpersons'));
     }
 
-    public function testGreedyTrailingRequirement()
+    public function testGreedyTrailingRequirement(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/{a}', [], ['a' => '.+']));
@@ -955,7 +955,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'a', 'a' => 'foo/'], $matcher->match('/foo/'));
     }
 
-    public function testTrailingRequirementWithDefault()
+    public function testTrailingRequirementWithDefault(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/fr-fr/{a}', ['a' => 'aaa'], ['a' => '.+']));
@@ -969,7 +969,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'b', 'b' => 'BBB'], $matcher->match('/en-en/BBB'));
     }
 
-    public function testTrailingRequirementWithDefaultA()
+    public function testTrailingRequirementWithDefaultA(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/fr-fr/{a}', ['a' => 'aaa'], ['a' => '.+']));
@@ -980,7 +980,7 @@ class UrlMatcherTest extends TestCase
         $matcher->match('/fr-fr/');
     }
 
-    public function testTrailingRequirementWithDefaultB()
+    public function testTrailingRequirementWithDefaultB(): void
     {
         $coll = new RouteCollection();
         $coll->add('b', new Route('/en-en/{b}', ['b' => 'bbb'], ['b' => '.*']));
@@ -990,7 +990,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'b', 'b' => ''], $matcher->match('/en-en/'));
     }
 
-    public function testRestrictiveTrailingRequirementWithStaticRouteAfter()
+    public function testRestrictiveTrailingRequirementWithStaticRouteAfter(): void
     {
         $coll = new RouteCollection();
         $coll->add('a', new Route('/hello{_}', [], ['_' => '/(?!/)']));
@@ -1001,7 +1001,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'a', '_' => '/'], $matcher->match('/hello/'));
     }
 
-    public function testUtf8VarName()
+    public function testUtf8VarName(): void
     {
         $collection = new RouteCollection();
         $collection->add('foo', new Route('/foo/{bär}/{bäz?foo}', [], [], ['utf8' => true]));
@@ -1011,7 +1011,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals(['_route' => 'foo', 'bär' => 'baz', 'bäz' => 'foo'], $matcher->match('/foo/baz'));
     }
 
-    public function testParameterWithRequirementWithDefault()
+    public function testParameterWithRequirementWithDefault(): void
     {
         $collection = new RouteCollection();
 
@@ -1035,7 +1035,7 @@ class UrlMatcherTest extends TestCase
         $this->assertSame('foo-', $result['foo']);
     }
 
-    public function testMapping()
+    public function testMapping(): void
     {
         $collection = new RouteCollection();
         $collection->add('a', new Route('/conference/{slug:conference}'));
@@ -1052,7 +1052,7 @@ class UrlMatcherTest extends TestCase
         $this->assertEquals($expected, $matcher->match('/conference/vienna-2024'));
     }
 
-    public function testMappingwithAlias()
+    public function testMappingwithAlias(): void
     {
         $collection = new RouteCollection();
         $collection->add('a', new Route('/conference/{conferenceSlug:conference.slug}'));

@@ -20,7 +20,7 @@ class SocketCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    public function testCastSocket()
+    public function testCastSocket(): void
     {
         $socket = socket_create(\AF_INET, \SOCK_DGRAM, \SOL_UDP);
         @socket_connect($socket, '127.0.0.1', 80);
@@ -37,7 +37,7 @@ class SocketCasterTest extends TestCase
         );
     }
 
-    public function testCastSocketIpV6()
+    public function testCastSocketIpV6(): void
     {
         $socket = socket_create(\AF_INET6, \SOCK_STREAM, \SOL_TCP);
         @socket_connect($socket, '::1', 80);
@@ -55,7 +55,7 @@ class SocketCasterTest extends TestCase
         );
     }
 
-    public function testCastUnixSocket()
+    public function testCastUnixSocket(): void
     {
         $socket = socket_create(\AF_UNIX, \SOCK_STREAM, 0);
         @socket_connect($socket, '/tmp/socket.sock');

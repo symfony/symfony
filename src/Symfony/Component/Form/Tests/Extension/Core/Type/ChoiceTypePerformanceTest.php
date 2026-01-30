@@ -24,7 +24,7 @@ class ChoiceTypePerformanceTest extends FormPerformanceTestCase
      * row contains the same choice field.
      */
     #[Group('benchmark')]
-    public function testSameChoiceFieldCreatedMultipleTimes()
+    public function testSameChoiceFieldCreatedMultipleTimes(): void
     {
         $this->setMaxRunningTime(1);
         $choices = range(1, 300);

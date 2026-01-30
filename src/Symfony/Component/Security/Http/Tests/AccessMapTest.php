@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\AccessMap;
 
 class AccessMapTest extends TestCase
 {
-    public function testReturnsFirstMatchedPattern()
+    public function testReturnsFirstMatchedPattern(): void
     {
         $request = new Request();
         $requestMatcher1 = $this->getRequestMatcher($request, false);
@@ -31,7 +31,7 @@ class AccessMapTest extends TestCase
         $this->assertSame([['ROLE_USER'], 'https'], $map->getPatterns($request));
     }
 
-    public function testReturnsEmptyPatternIfNoneMatched()
+    public function testReturnsEmptyPatternIfNoneMatched(): void
     {
         $request = new Request();
         $requestMatcher = $this->getRequestMatcher($request, false);

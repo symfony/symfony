@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 
 class DoctrineSenderTest extends TestCase
 {
-    public function testSend()
+    public function testSend(): void
     {
         $envelope = new Envelope(new DummyMessage('Oy'));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
@@ -42,7 +42,7 @@ class DoctrineSenderTest extends TestCase
         $this->assertSame('15', $transportMessageIdStamp->getId());
     }
 
-    public function testSendWithDelay()
+    public function testSendWithDelay(): void
     {
         $envelope = (new Envelope(new DummyMessage('Oy')))->with(new DelayStamp(500));
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];

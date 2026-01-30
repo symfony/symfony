@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class SwitchUserTokenTest extends TestCase
 {
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $originalToken = new UsernamePasswordToken(new InMemoryUser('user', 'foo', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']), 'provider-key', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
         $token = new SwitchUserToken(new InMemoryUser('admin', 'bar', ['ROLE_USER']), 'provider-key', ['ROLE_USER'], $originalToken, 'https://symfony.com/blog');
@@ -40,7 +40,7 @@ class SwitchUserTokenTest extends TestCase
         $this->assertEquals(['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH'], $unserializedOriginalToken->getRoleNames());
     }
 
-    public function testSerializeNullImpersonateUrl()
+    public function testSerializeNullImpersonateUrl(): void
     {
         $originalToken = new UsernamePasswordToken(new InMemoryUser('user', 'foo', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']), 'provider-key', ['ROLE_ADMIN', 'ROLE_ALLOWED_TO_SWITCH']);
         $token = new SwitchUserToken(new InMemoryUser('admin', 'bar', ['ROLE_USER']), 'provider-key', ['ROLE_USER'], $originalToken);
@@ -69,7 +69,7 @@ class SwitchUserTokenTest extends TestCase
      *     )
      * )
      */
-    public function testUnserializeOldToken()
+    public function testUnserializeOldToken(): void
     {
         /** @var SwitchUserToken $token */
         $token = unserialize(file_get_contents(__DIR__.'/Fixtures/switch-user-token-4.4.txt'));

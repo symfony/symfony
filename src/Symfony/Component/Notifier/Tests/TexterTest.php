@@ -29,7 +29,7 @@ class TexterTest extends TestCase
         $this->transport = $this->createMock(TransportInterface::class);
     }
 
-    public function testSendWithoutBus()
+    public function testSendWithoutBus(): void
     {
         $message = new DummyMessage();
         $sentMessage = new SentMessage($message, 'any');
@@ -45,7 +45,7 @@ class TexterTest extends TestCase
         $this->assertSame($message, $sentMessage->getOriginalMessage());
     }
 
-    public function testSendWithBus()
+    public function testSendWithBus(): void
     {
         $message = new DummyMessage();
 

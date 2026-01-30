@@ -39,7 +39,7 @@ class DateCasterTest extends TestCase
     }
 
     #[DataProvider('provideDateTimes')]
-    public function testDumpDateTime($time, $timezone, $xDate, $xTimestamp, $xInfos)
+    public function testDumpDateTime($time, $timezone, $xDate, $xTimestamp, $xInfos): void
     {
         $date = new \DateTime($time, new \DateTimeZone($timezone));
 
@@ -53,7 +53,7 @@ class DateCasterTest extends TestCase
     }
 
     #[DataProvider('provideDateTimes')]
-    public function testDumpDateTimeImmutable($time, $timezone, $xDate, $xTimestamp, $xInfos)
+    public function testDumpDateTimeImmutable($time, $timezone, $xDate, $xTimestamp, $xInfos): void
     {
         $date = new \DateTimeImmutable($time, new \DateTimeZone($timezone));
 
@@ -67,7 +67,7 @@ class DateCasterTest extends TestCase
     }
 
     #[DataProvider('provideDateTimes')]
-    public function testCastDateTime($time, $timezone, $xDate, $xTimestamp, $xInfos)
+    public function testCastDateTime($time, $timezone, $xDate, $xTimestamp, $xInfos): void
     {
         $stub = new Stub();
         $date = new \DateTimeImmutable($time, new \DateTimeZone($timezone));
@@ -114,7 +114,7 @@ class DateCasterTest extends TestCase
     }
 
     #[DataProvider('provideNoTimezoneDateTimes')]
-    public function testCastDateTimeNoTimezone($time, $xDate, $xInfos)
+    public function testCastDateTimeNoTimezone($time, $xDate, $xInfos): void
     {
         date_default_timezone_set('UTC');
 
@@ -159,7 +159,7 @@ class DateCasterTest extends TestCase
         ];
     }
 
-    public function testCastDateTimeWithAdditionalChildProperty()
+    public function testCastDateTimeWithAdditionalChildProperty(): void
     {
         $stub = new Stub();
         $date = new DateTimeChild('2020-02-13 00:00:00.123456', new \DateTimeZone('Europe/Paris'));
@@ -194,7 +194,7 @@ class DateCasterTest extends TestCase
     }
 
     #[DataProvider('provideIntervals')]
-    public function testDumpInterval($intervalSpec, $ms, $invert, $expected, $xSeconds)
+    public function testDumpInterval($intervalSpec, $ms, $invert, $expected, $xSeconds): void
     {
         $interval = $this->createInterval($intervalSpec, $ms, $invert);
 
@@ -208,7 +208,7 @@ class DateCasterTest extends TestCase
     }
 
     #[DataProvider('provideIntervals')]
-    public function testDumpIntervalExcludingVerbosity($intervalSpec, $ms, $invert, $expected, $xSeconds)
+    public function testDumpIntervalExcludingVerbosity($intervalSpec, $ms, $invert, $expected, $xSeconds): void
     {
         $interval = $this->createInterval($intervalSpec, $ms, $invert);
 
@@ -222,7 +222,7 @@ class DateCasterTest extends TestCase
     }
 
     #[DataProvider('provideIntervals')]
-    public function testCastInterval($intervalSpec, $ms, $invert, $xInterval, $xSeconds)
+    public function testCastInterval($intervalSpec, $ms, $invert, $xInterval, $xSeconds): void
     {
         $interval = $this->createInterval($intervalSpec, $ms, $invert);
         $stub = new Stub();
@@ -291,7 +291,7 @@ class DateCasterTest extends TestCase
     }
 
     #[DataProvider('provideTimeZones')]
-    public function testDumpTimeZone($timezone, $expected, $xRegion)
+    public function testDumpTimeZone($timezone, $expected, $xRegion): void
     {
         $timezone = new \DateTimeZone($timezone);
 
@@ -305,7 +305,7 @@ class DateCasterTest extends TestCase
     }
 
     #[DataProvider('provideTimeZones')]
-    public function testDumpTimeZoneExcludingVerbosity($timezone, $expected, $xRegion)
+    public function testDumpTimeZoneExcludingVerbosity($timezone, $expected, $xRegion): void
     {
         $timezone = new \DateTimeZone($timezone);
 
@@ -319,7 +319,7 @@ class DateCasterTest extends TestCase
     }
 
     #[DataProvider('provideTimeZones')]
-    public function testCastTimeZone($timezone, $xTimezone, $xRegion)
+    public function testCastTimeZone($timezone, $xTimezone, $xRegion): void
     {
         $timezone = new \DateTimeZone($timezone);
         $stub = new Stub();
@@ -378,7 +378,7 @@ class DateCasterTest extends TestCase
     }
 
     #[DataProvider('providePeriods')]
-    public function testDumpPeriod($start, $interval, $end, $options, $expected, $xDates)
+    public function testDumpPeriod($start, $interval, $end, $options, $expected, $xDates): void
     {
         $p = new \DatePeriod(new \DateTimeImmutable($start), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end), $options);
 
@@ -392,7 +392,7 @@ class DateCasterTest extends TestCase
     }
 
     #[DataProvider('providePeriods')]
-    public function testCastPeriod($start, $interval, $end, $options, $xPeriod, $xDates)
+    public function testCastPeriod($start, $interval, $end, $options, $xPeriod, $xDates): void
     {
         $p = new \DatePeriod(new \DateTimeImmutable($start, new \DateTimeZone('UTC')), new \DateInterval($interval), \is_int($end) ? $end : new \DateTimeImmutable($end, new \DateTimeZone('UTC')), $options);
         $stub = new Stub();

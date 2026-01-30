@@ -21,7 +21,7 @@ final class ColorTypeTest extends BaseTypeTestCase
     public const TESTED_TYPE = ColorType::class;
 
     #[DataProvider('validationShouldPassProvider')]
-    public function testValidationShouldPass(bool $html5, ?string $submittedValue)
+    public function testValidationShouldPass(bool $html5, ?string $submittedValue): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'html5' => $html5,
@@ -53,7 +53,7 @@ final class ColorTypeTest extends BaseTypeTestCase
     }
 
     #[DataProvider('validationShouldFailProvider')]
-    public function testValidationShouldFail(string $expectedValueParameterValue, ?string $submittedValue, bool $trim = true)
+    public function testValidationShouldFail(string $expectedValueParameterValue, ?string $submittedValue, bool $trim = true): void
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'html5' => true,
@@ -81,7 +81,7 @@ final class ColorTypeTest extends BaseTypeTestCase
         ];
     }
 
-    public function testSubmitNull($expected = null, $norm = null, $view = null)
+    public function testSubmitNull($expected = null, $norm = null, $view = null): void
     {
         parent::testSubmitNull($expected, $norm, '');
     }

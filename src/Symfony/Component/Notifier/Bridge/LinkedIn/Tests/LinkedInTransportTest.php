@@ -48,7 +48,7 @@ final class LinkedInTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendWithEmptyArrayResponseThrowsTransportException()
+    public function testSendWithEmptyArrayResponseThrowsTransportException(): void
     {
         $client = new MockHttpClient(new MockResponse('[]', ['http_code' => 500]));
 
@@ -59,7 +59,7 @@ final class LinkedInTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithErrorResponseThrowsTransportException()
+    public function testSendWithErrorResponseThrowsTransportException(): void
     {
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('testErrorCode');
@@ -71,7 +71,7 @@ final class LinkedInTransportTest extends TransportTestCase
         $transport->send(new ChatMessage('testMessage'));
     }
 
-    public function testSendWithOptions()
+    public function testSendWithOptions(): void
     {
         $message = 'testMessage';
 
@@ -104,7 +104,7 @@ final class LinkedInTransportTest extends TransportTestCase
         $transport->send(new ChatMessage($message));
     }
 
-    public function testSendWithNotification()
+    public function testSendWithNotification(): void
     {
         $message = 'testMessage';
 
@@ -141,7 +141,7 @@ final class LinkedInTransportTest extends TransportTestCase
         $transport->send($chatMessage);
     }
 
-    public function testSendWithInvalidOptions()
+    public function testSendWithInvalidOptions(): void
     {
         $this->expectException(LogicException::class);
 

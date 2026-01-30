@@ -48,7 +48,7 @@ class AmazonSnsTransportTest extends TransportTestCase
         yield [new ChatMessage('hello', new TestOptions())];
     }
 
-    public function testSmsMessageWithFrom()
+    public function testSmsMessageWithFrom(): void
     {
         $transport = $this->createTransport();
 
@@ -58,7 +58,7 @@ class AmazonSnsTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('0600000000', 'test', 'foo'));
     }
 
-    public function testSmsMessageOptions()
+    public function testSmsMessageOptions(): void
     {
         $response = $this->createMock(PublishResponse::class);
         $response
@@ -80,7 +80,7 @@ class AmazonSnsTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('0600000000', 'test'));
     }
 
-    public function testChatMessageOptions()
+    public function testChatMessageOptions(): void
     {
         $response = $this->createMock(PublishResponse::class);
         $response

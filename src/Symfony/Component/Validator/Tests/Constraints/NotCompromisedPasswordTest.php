@@ -21,14 +21,14 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
  */
 class NotCompromisedPasswordTest extends TestCase
 {
-    public function testDefaultValues()
+    public function testDefaultValues(): void
     {
         $constraint = new NotCompromisedPassword();
         $this->assertSame(1, $constraint->threshold);
         $this->assertFalse($constraint->skipOnError);
     }
 
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(NotCompromisedPasswordDummy::class);
         $loader = new AttributeLoader();

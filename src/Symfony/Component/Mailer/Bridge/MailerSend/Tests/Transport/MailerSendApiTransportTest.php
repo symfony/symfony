@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class MailerSendApiTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(MailerSendApiTransport $transport, string $expected)
+    public function testToString(MailerSendApiTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -49,7 +49,7 @@ class MailerSendApiTransportTest extends TestCase
         ];
     }
 
-    public function testSendBasicEmail()
+    public function testSendBasicEmail(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -87,7 +87,7 @@ class MailerSendApiTransportTest extends TestCase
         $this->assertSame('test_message_id', $message->getMessageId());
     }
 
-    public function testSendEmailWithAttachment()
+    public function testSendEmailWithAttachment(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -126,7 +126,7 @@ class MailerSendApiTransportTest extends TestCase
         $this->assertSame('test_message_id', $message->getMessageId());
     }
 
-    public function testSendThrowsForErrorResponse()
+    public function testSendThrowsForErrorResponse(): void
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['message' => 'i\'m a teapot'], [
             'http_code' => 418,
@@ -145,7 +145,7 @@ class MailerSendApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testSendThrowsForAllSuppressed()
+    public function testSendThrowsForAllSuppressed(): void
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse([
             'message' => 'There are some warnings for your request.',
@@ -171,7 +171,7 @@ class MailerSendApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testSendThrowsForBadResponse()
+    public function testSendThrowsForBadResponse(): void
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new MockResponse('test', [
             'http_code' => 202,

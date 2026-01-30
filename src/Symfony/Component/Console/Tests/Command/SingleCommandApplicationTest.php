@@ -19,7 +19,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class SingleCommandApplicationTest extends TestCase
 {
-    public function testRun()
+    public function testRun(): void
     {
         $command = new class extends SingleCommandApplication {
             protected function execute(InputInterface $input, OutputInterface $output): int

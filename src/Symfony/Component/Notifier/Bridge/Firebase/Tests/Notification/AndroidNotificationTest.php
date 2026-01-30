@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Firebase\Notification\AndroidNotification;
 
 final class AndroidNotificationTest extends TestCase
 {
-    public function testAndroidNotificationOptions()
+    public function testAndroidNotificationOptions(): void
     {
         $notification = new AndroidNotification('device_token', [
             'title' => 'Test Title',
@@ -35,7 +35,7 @@ final class AndroidNotificationTest extends TestCase
         $this->assertSame('device_token', $notification->getRecipientId());
     }
 
-    public function testAndroidNotificationWithAllOptions()
+    public function testAndroidNotificationWithAllOptions(): void
     {
         $notification = (new AndroidNotification('device_token', []))
             ->title('New Title')
@@ -74,7 +74,7 @@ final class AndroidNotificationTest extends TestCase
         $this->assertSame($expected, $notification->toArray());
     }
 
-    public function testAndroidNotificationChaining()
+    public function testAndroidNotificationChaining(): void
     {
         $notification = new AndroidNotification('device_token', []);
 

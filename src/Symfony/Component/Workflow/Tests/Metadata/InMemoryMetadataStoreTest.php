@@ -42,37 +42,37 @@ class InMemoryMetadataStoreTest extends TestCase
         $this->store = new InMemoryMetadataStore($workflowMetadata, $placesMetadata, $transitionsMetadata);
     }
 
-    public function testGetWorkflowMetadata()
+    public function testGetWorkflowMetadata(): void
     {
         $metadataBag = $this->store->getWorkflowMetadata();
         $this->assertSame('workflow title', $metadataBag['title']);
     }
 
-    public function testGetUnexistingPlaceMetadata()
+    public function testGetUnexistingPlaceMetadata(): void
     {
         $metadataBag = $this->store->getPlaceMetadata('place_b');
         $this->assertSame([], $metadataBag);
     }
 
-    public function testGetExistingPlaceMetadata()
+    public function testGetExistingPlaceMetadata(): void
     {
         $metadataBag = $this->store->getPlaceMetadata('place_a');
         $this->assertSame('place_a title', $metadataBag['title']);
     }
 
-    public function testGetUnexistingTransitionMetadata()
+    public function testGetUnexistingTransitionMetadata(): void
     {
         $metadataBag = $this->store->getTransitionMetadata(new Transition('transition_2', [], []));
         $this->assertSame([], $metadataBag);
     }
 
-    public function testGetExistingTransitionMetadata()
+    public function testGetExistingTransitionMetadata(): void
     {
         $metadataBag = $this->store->getTransitionMetadata($this->transition);
         $this->assertSame('transition_1 title', $metadataBag['title']);
     }
 
-    public function testGetMetadata()
+    public function testGetMetadata(): void
     {
         $this->assertSame('workflow title', $this->store->getMetadata('title'));
         $this->assertNull($this->store->getMetadata('description'));

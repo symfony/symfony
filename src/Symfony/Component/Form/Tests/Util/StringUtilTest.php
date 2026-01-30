@@ -26,13 +26,13 @@ class StringUtilTest extends TestCase
     }
 
     #[DataProvider('trimProvider')]
-    public function testTrim($data, $expectedData)
+    public function testTrim($data, $expectedData): void
     {
         $this->assertSame($expectedData, StringUtil::trim($data));
     }
 
     #[DataProvider('spaceProvider')]
-    public function testTrimUtf8Separators($hex)
+    public function testTrimUtf8Separators($hex): void
     {
         // Convert hexadecimal representation into binary
         // H: hex string, high nibble first (UCS-2BE)
@@ -85,7 +85,7 @@ class StringUtilTest extends TestCase
     }
 
     #[DataProvider('normalizeNewlinesProvider')]
-    public function testNormalizeNewlines($data, $expectedData)
+    public function testNormalizeNewlines($data, $expectedData): void
     {
         $this->assertSame($expectedData, StringUtil::normalizeNewlines($data));
     }
@@ -104,7 +104,7 @@ class StringUtilTest extends TestCase
     }
 
     #[DataProvider('fqcnToBlockPrefixProvider')]
-    public function testFqcnToBlockPrefix($fqcn, $expectedBlockPrefix)
+    public function testFqcnToBlockPrefix($fqcn, $expectedBlockPrefix): void
     {
         $blockPrefix = StringUtil::fqcnToBlockPrefix($fqcn);
 

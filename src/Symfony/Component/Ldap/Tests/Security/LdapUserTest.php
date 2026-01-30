@@ -17,7 +17,7 @@ use Symfony\Component\Ldap\Security\LdapUser;
 
 class LdapUserTest extends TestCase
 {
-    public function testIsEqualToWorksOnUnserializedUser()
+    public function testIsEqualToWorksOnUnserializedUser(): void
     {
         $user = new LdapUser(new Entry('uid=jonhdoe,ou=MyBusiness,dc=symfony,dc=com', []), 'jonhdoe', 'p455w0rd');
         $unserializedUser = unserialize(serialize($user));

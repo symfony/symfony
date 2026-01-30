@@ -36,7 +36,7 @@ class CompiledAssetMapperConfigReaderTest extends TestCase
         $this->filesystem->remove($this->writableRoot);
     }
 
-    public function testConfigExists()
+    public function testConfigExists(): void
     {
         $reader = new CompiledAssetMapperConfigReader($this->writableRoot);
         $this->assertFalse($reader->configExists('foo.json'));
@@ -44,21 +44,21 @@ class CompiledAssetMapperConfigReaderTest extends TestCase
         $this->assertTrue($reader->configExists('foo.json'));
     }
 
-    public function testLoadConfig()
+    public function testLoadConfig(): void
     {
         $reader = new CompiledAssetMapperConfigReader($this->writableRoot);
         $this->filesystem->dumpFile($this->writableRoot.'/foo.json', '{"foo": "bar"}');
         $this->assertEquals(['foo' => 'bar'], $reader->loadConfig('foo.json'));
     }
 
-    public function testSaveConfig()
+    public function testSaveConfig(): void
     {
         $reader = new CompiledAssetMapperConfigReader($this->writableRoot);
         $this->assertEquals($this->writableRoot.\DIRECTORY_SEPARATOR.'foo.json', realpath($reader->saveConfig('foo.json', ['foo' => 'bar'])));
         $this->assertEquals(['foo' => 'bar'], json_decode($this->filesystem->readFile($this->writableRoot.'/foo.json'), true));
     }
 
-    public function testRemoveConfig()
+    public function testRemoveConfig(): void
     {
         $reader = new CompiledAssetMapperConfigReader($this->writableRoot);
         $this->filesystem->touch($this->writableRoot.'/foo.json');

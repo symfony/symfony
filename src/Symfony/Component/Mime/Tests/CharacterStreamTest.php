@@ -16,7 +16,7 @@ use Symfony\Component\Mime\CharacterStream;
 
 class CharacterStreamTest extends TestCase
 {
-    public function testReadCharactersAreInTact()
+    public function testReadCharactersAreInTact(): void
     {
         $stream = new CharacterStream(pack('C*', 0xD0, 0x94, 0xD0, 0xB6, 0xD0, 0xBE));
         $stream->write(pack('C*',
@@ -34,7 +34,7 @@ class CharacterStreamTest extends TestCase
         $this->assertNull($stream->read(1));
     }
 
-    public function testCharactersCanBeReadAsByteArrays()
+    public function testCharactersCanBeReadAsByteArrays(): void
     {
         $stream = new CharacterStream(pack('C*', 0xD0, 0x94, 0xD0, 0xB6, 0xD0, 0xBE));
         $stream->write(pack('C*',
@@ -52,21 +52,21 @@ class CharacterStreamTest extends TestCase
         $this->assertNull($stream->readBytes(1));
     }
 
-    public function testRequestingLargeCharCountPastEndOfStream()
+    public function testRequestingLargeCharCountPastEndOfStream(): void
     {
         $stream = new CharacterStream(pack('C*', 0xD0, 0x94, 0xD0, 0xB6, 0xD0, 0xBE));
         $this->assertSame(pack('C*', 0xD0, 0x94, 0xD0, 0xB6, 0xD0, 0xBE), $stream->read(100));
         $this->assertNull($stream->read(1));
     }
 
-    public function testRequestingByteArrayCountPastEndOfStream()
+    public function testRequestingByteArrayCountPastEndOfStream(): void
     {
         $stream = new CharacterStream(pack('C*', 0xD0, 0x94, 0xD0, 0xB6, 0xD0, 0xBE));
         $this->assertEquals([0xD0, 0x94, 0xD0, 0xB6, 0xD0, 0xBE], $stream->readBytes(100));
         $this->assertNull($stream->readBytes(1));
     }
 
-    public function testPointerOffsetCanBeSet()
+    public function testPointerOffsetCanBeSet(): void
     {
         $stream = new CharacterStream(pack('C*', 0xD0, 0x94, 0xD0, 0xB6, 0xD0, 0xBE));
         $this->assertSame(pack('C*', 0xD0, 0x94), $stream->read(1));
@@ -76,7 +76,7 @@ class CharacterStreamTest extends TestCase
         $this->assertSame(pack('C*', 0xD0, 0xBE), $stream->read(1));
     }
 
-    public function testAlgorithmWithFixedWidthCharsets()
+    public function testAlgorithmWithFixedWidthCharsets(): void
     {
         $stream = new CharacterStream(pack('C*', 0xD1, 0x8D, 0xD0, 0xBB, 0xD0, 0xB0));
         $this->assertSame(pack('C*', 0xD1, 0x8D), $stream->read(1));

@@ -20,7 +20,7 @@ use Symfony\Component\Mime\Part\MessagePart;
 
 class MessagePartTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $p = new MessagePart((new Email())->from('fabien@symfony.com')->to('you@example.com')->text('content'));
         $this->assertStringContainsString('content', $p->getBody());
@@ -30,7 +30,7 @@ class MessagePartTest extends TestCase
         $this->assertEquals('rfc822', $p->getMediaSubType());
     }
 
-    public function testHeaders()
+    public function testHeaders(): void
     {
         $p = new MessagePart((new Email())->from('fabien@symfony.com')->text('content')->subject('Subject'));
         $this->assertEquals(new Headers(
@@ -40,7 +40,7 @@ class MessagePartTest extends TestCase
         ), $p->getPreparedHeaders());
     }
 
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $email = (new Email())->from('fabien@symfony.com')->to('you@example.com')->text('content');
         $email->getHeaders()->addIdHeader('Message-ID', $email->generateMessageId());

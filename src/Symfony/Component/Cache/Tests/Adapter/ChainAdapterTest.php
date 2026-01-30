@@ -44,21 +44,21 @@ class ChainAdapterTest extends AdapterTestCase
         (new Filesystem())->remove(sys_get_temp_dir().'/symfony-cache');
     }
 
-    public function testEmptyAdaptersException()
+    public function testEmptyAdaptersException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('At least one adapter must be specified.');
         new ChainAdapter([]);
     }
 
-    public function testInvalidAdapterException()
+    public function testInvalidAdapterException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The class "stdClass" does not implement');
         new ChainAdapter([new \stdClass()]);
     }
 
-    public function testPrune()
+    public function testPrune(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
@@ -79,7 +79,7 @@ class ChainAdapterTest extends AdapterTestCase
         $this->assertFalse($cache->prune());
     }
 
-    public function testMultipleCachesExpirationWhenCommonTtlIsNotSet()
+    public function testMultipleCachesExpirationWhenCommonTtlIsNotSet(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
@@ -135,7 +135,7 @@ class ChainAdapterTest extends AdapterTestCase
         $this->assertFalse($item->isHit());
     }
 
-    public function testMultipleCachesExpirationWhenCommonTtlIsSet()
+    public function testMultipleCachesExpirationWhenCommonTtlIsSet(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
@@ -197,7 +197,7 @@ class ChainAdapterTest extends AdapterTestCase
         $this->assertFalse($item->isHit());
     }
 
-    public function testExpirationOnAllAdapters()
+    public function testExpirationOnAllAdapters(): void
     {
         if (isset($this->skippedTests[__FUNCTION__])) {
             $this->markTestSkipped($this->skippedTests[__FUNCTION__]);
@@ -262,7 +262,7 @@ class ChainAdapterTest extends AdapterTestCase
         return $pruneable;
     }
 
-    public function testSetCallbackWrapperPropagation()
+    public function testSetCallbackWrapperPropagation(): void
     {
         $adapter1 = new ArrayAdapter();
         $adapter2 = new FilesystemAdapter();

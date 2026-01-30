@@ -18,7 +18,7 @@ use Symfony\Component\Scheduler\Schedule;
 
 class ScheduleTest extends TestCase
 {
-    public function testCannotAddDuplicateMessage()
+    public function testCannotAddDuplicateMessage(): void
     {
         $schedule = new Schedule();
         $schedule->add(RecurringMessage::cron('* * * * *', new \stdClass()));

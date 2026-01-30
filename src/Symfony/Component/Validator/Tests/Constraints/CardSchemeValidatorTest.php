@@ -23,14 +23,14 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
         return new CardSchemeValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new CardScheme(schemes: []));
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new CardScheme(schemes: []));
 
@@ -38,7 +38,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidNumbers')]
-    public function testValidNumbers($scheme, $number)
+    public function testValidNumbers($scheme, $number): void
     {
         $this->validator->validate($number, new CardScheme(schemes: $scheme));
 
@@ -46,7 +46,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidNumbers')]
-    public function testValidNumbersWithNewLine($scheme, $number)
+    public function testValidNumbersWithNewLine($scheme, $number): void
     {
         $this->validator->validate($number."\n", new CardScheme(schemes: $scheme, message: 'myMessage'));
 
@@ -56,7 +56,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testValidNumberWithOrderedArguments()
+    public function testValidNumberWithOrderedArguments(): void
     {
         $this->validator->validate(
             '5555555555554444',
@@ -67,7 +67,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidNumbers')]
-    public function testInvalidNumbers($scheme, $number, $code)
+    public function testInvalidNumbers($scheme, $number, $code): void
     {
         $constraint = new CardScheme(
             schemes: $scheme,
@@ -82,7 +82,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidNumberNamedArguments()
+    public function testInvalidNumberNamedArguments(): void
     {
         $this->validator->validate(
             '2721001234567890',

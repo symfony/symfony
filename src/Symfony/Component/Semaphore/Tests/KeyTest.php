@@ -21,7 +21,7 @@ use Symfony\Component\Semaphore\Store\RedisStore;
  */
 class KeyTest extends TestCase
 {
-    public function testSerialize()
+    public function testSerialize(): void
     {
         $key = new Key(__METHOD__, 5, 2);
         $key->setState(RedisStore::class, base64_encode(random_bytes(32)));
@@ -33,7 +33,7 @@ class KeyTest extends TestCase
         $this->assertEqualsWithDelta($key->getRemainingLifetime(), $copy->getRemainingLifetime(), 0.001);
     }
 
-    public function testCannotSerializeUnserializableKey()
+    public function testCannotSerializeUnserializableKey(): void
     {
         $key = new Key(__METHOD__, 1);
         $key->markUnserializable();

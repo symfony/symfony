@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AddSessionDomainConstraintPassTest extends TestCase
 {
-    public function testSessionCookie()
+    public function testSessionCookie(): void
     {
         $container = $this->createContainer(['cookie_domain' => '.symfony.com.', 'cookie_secure' => true, 'cookie_samesite' => 'lax']);
 
@@ -39,7 +39,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
     }
 
-    public function testSessionNoDomain()
+    public function testSessionNoDomain(): void
     {
         $container = $this->createContainer(['cookie_secure' => true, 'cookie_samesite' => 'lax']);
 
@@ -54,7 +54,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
     }
 
-    public function testSessionNoSecure()
+    public function testSessionNoSecure(): void
     {
         $container = $this->createContainer(['cookie_domain' => '.symfony.com.', 'cookie_samesite' => 'lax']);
 
@@ -69,7 +69,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
     }
 
-    public function testSessionNoSecureAndNoDomain()
+    public function testSessionNoSecureAndNoDomain(): void
     {
         $container = $this->createContainer([]);
 
@@ -85,7 +85,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://localhost/'));
     }
 
-    public function testNoSession()
+    public function testNoSession(): void
     {
         $container = $this->createContainer(null);
 
@@ -100,7 +100,7 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $this->assertTrue($utils->createRedirectResponse($request, 'http://pirate.com/foo')->isRedirect('http://pirate.com/foo'));
     }
 
-    public function testSessionAutoSecure()
+    public function testSessionAutoSecure(): void
     {
         $container = $this->createContainer(['cookie_domain' => '.symfony.com.', 'cookie_secure' => 'auto', 'cookie_samesite' => 'lax']);
 

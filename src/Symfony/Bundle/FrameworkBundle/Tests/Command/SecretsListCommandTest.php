@@ -21,7 +21,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 class SecretsListCommandTest extends TestCase
 {
     #[BackupGlobals(true)]
-    public function testExecute()
+    public function testExecute(): void
     {
         $vault = $this->createStub(AbstractVault::class);
         $vault->method('list')->willReturn(['A' => 'a', 'B' => 'b', 'C' => null, 'D' => null, 'E' => null]);

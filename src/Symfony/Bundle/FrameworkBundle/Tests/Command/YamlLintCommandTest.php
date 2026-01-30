@@ -30,7 +30,7 @@ class YamlLintCommandTest extends TestCase
 {
     private array $files;
 
-    public function testLintCorrectFile()
+    public function testLintCorrectFile(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('foo: bar');
@@ -44,7 +44,7 @@ class YamlLintCommandTest extends TestCase
         $this->assertStringContainsString('OK', trim($tester->getDisplay()));
     }
 
-    public function testLintIncorrectFile()
+    public function testLintIncorrectFile(): void
     {
         $incorrectContent = '
 foo:
@@ -58,7 +58,7 @@ bar';
         $this->assertStringContainsString('Unable to parse at line 3 (near "bar").', trim($tester->getDisplay()));
     }
 
-    public function testLintFileNotReadable()
+    public function testLintFileNotReadable(): void
     {
         $tester = $this->createCommandTester();
         $filename = $this->createFile('');
@@ -69,7 +69,7 @@ bar';
         $tester->execute(['filename' => $filename], ['decorated' => false]);
     }
 
-    public function testGetHelp()
+    public function testGetHelp(): void
     {
         $command = new YamlLintCommand();
         $expected = <<<EOF
@@ -81,7 +81,7 @@ bar';
         $this->assertStringContainsString($expected, $command->getHelp());
     }
 
-    public function testLintFilesFromBundleDirectory()
+    public function testLintFilesFromBundleDirectory(): void
     {
         $tester = $this->createCommandTester($this->getKernelAwareApplicationMock());
         $tester->execute(

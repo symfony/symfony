@@ -34,7 +34,7 @@ class ClockBeforeClassTest extends TestCase
         self::$clock = null;
     }
 
-    public function testMockClock()
+    public function testMockClock(): void
     {
         $this->assertInstanceOf(MockClock::class, self::$clock);
         $this->assertInstanceOf(NativeClock::class, Clock::get());

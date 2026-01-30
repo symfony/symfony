@@ -52,7 +52,7 @@ class LoginThrottlingListenerTest extends TestCase
         $this->listener = new LoginThrottlingListener($this->requestStack, $limiter);
     }
 
-    public function testPreventsLoginWhenOverLocalThreshold()
+    public function testPreventsLoginWhenOverLocalThreshold(): void
     {
         $request = $this->createRequest();
         $passport = $this->createPassport('wouter');
@@ -68,7 +68,7 @@ class LoginThrottlingListenerTest extends TestCase
         $this->listener->checkPassport($this->createCheckPassportEvent($passport));
     }
 
-    public function testPreventsLoginWithMultipleCase()
+    public function testPreventsLoginWithMultipleCase(): void
     {
         $request = $this->createRequest();
         $passports = [$this->createPassport('wouter'), $this->createPassport('Wouter'), $this->createPassport('wOuter')];
@@ -84,7 +84,7 @@ class LoginThrottlingListenerTest extends TestCase
         $this->listener->checkPassport($this->createCheckPassportEvent($passports[0]));
     }
 
-    public function testPreventsLoginWhenOverGlobalThreshold()
+    public function testPreventsLoginWhenOverGlobalThreshold(): void
     {
         $request = $this->createRequest();
         $passports = [$this->createPassport('wouter'), $this->createPassport('ryan')];

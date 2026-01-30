@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class UlidTest extends TestCase
 {
-    public function testAttributes()
+    public function testAttributes(): void
     {
         $metadata = new ClassMetadata(UlidDummy::class);
         $loader = new AttributeLoader();
@@ -35,7 +35,7 @@ class UlidTest extends TestCase
         self::assertSame('some attached data', $cConstraint->payload);
     }
 
-    public function testUnexpectedValidationFormat()
+    public function testUnexpectedValidationFormat(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The "invalid" validation format is not supported.');

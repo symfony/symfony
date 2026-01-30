@@ -44,7 +44,7 @@ class TemplateManagerTest extends TestCase
         $this->templateManager = new TemplateManager($this->profiler, $twigEnvironment, $templates);
     }
 
-    public function testGetNameOfInvalidTemplate()
+    public function testGetNameOfInvalidTemplate(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->templateManager->getName(new Profile('token'), 'notexistingpanel');
@@ -53,7 +53,7 @@ class TemplateManagerTest extends TestCase
     /**
      * if template exists in both profile and profiler then its name should be returned.
      */
-    public function testGetNameValidTemplate()
+    public function testGetNameValidTemplate(): void
     {
         $this->profiler
             ->method('has')

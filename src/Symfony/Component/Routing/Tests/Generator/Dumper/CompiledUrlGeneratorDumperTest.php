@@ -45,7 +45,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         @unlink($this->largeTestTmpFilepath);
     }
 
-    public function testDumpWithRoutes()
+    public function testDumpWithRoutes(): void
     {
         $this->routeCollection->add('Test', new Route('/testing/{foo}'));
         $this->routeCollection->add('Test2', new Route('/testing2'));
@@ -65,7 +65,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->assertEquals('/app.php/testing2', $relativeUrlWithoutParameter);
     }
 
-    public function testDumpWithSimpleLocalizedRoutes()
+    public function testDumpWithSimpleLocalizedRoutes(): void
     {
         $this->routeCollection->add('test', new Route('/foo'));
         $this->routeCollection->add('test.en', (new Route('/testing/is/fun'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'test')->setRequirement('_locale', 'en'));
@@ -97,7 +97,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->assertEquals('/app.php/foo', $projectUrlGenerator->generate('test'));
     }
 
-    public function testDumpWithRouteNotFoundLocalizedRoutes()
+    public function testDumpWithRouteNotFoundLocalizedRoutes(): void
     {
         $this->routeCollection->add('test.en', (new Route('/testing/is/fun'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'test')->setRequirement('_locale', 'en'));
 
@@ -112,7 +112,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $projectUrlGenerator->generate('test');
     }
 
-    public function testDumpWithFallbackLocaleLocalizedRoutes()
+    public function testDumpWithFallbackLocaleLocalizedRoutes(): void
     {
         $this->routeCollection->add('test.en', (new Route('/testing/is/fun'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'test')->setRequirement('_locale', 'en'));
         $this->routeCollection->add('test.nl', (new Route('/testen/is/leuk'))->setDefault('_locale', 'nl')->setDefault('_canonical_route', 'test')->setRequirement('_locale', 'nl'));
@@ -135,7 +135,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->assertEquals('/app.php/tester/est/amusant', $projectUrlGenerator->generate('test'));
     }
 
-    public function testDumpWithTooManyRoutes()
+    public function testDumpWithTooManyRoutes(): void
     {
         $this->routeCollection->add('Test', new Route('/testing/{foo}'));
         for ($i = 0; $i < 32769; ++$i) {
@@ -158,7 +158,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->assertEquals('/app.php/testing2', $relativeUrlWithoutParameter);
     }
 
-    public function testDumpWithoutRoutes()
+    public function testDumpWithoutRoutes(): void
     {
         file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
 
@@ -169,7 +169,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $projectUrlGenerator->generate('Test', []);
     }
 
-    public function testGenerateNonExistingRoute()
+    public function testGenerateNonExistingRoute(): void
     {
         $this->routeCollection->add('Test', new Route('/test'));
 
@@ -182,7 +182,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $projectUrlGenerator->generate('NonExisting', []);
     }
 
-    public function testDumpForRouteWithDefaults()
+    public function testDumpForRouteWithDefaults(): void
     {
         $this->routeCollection->add('Test', new Route('/testing/{foo}', ['foo' => 'bar']));
 
@@ -194,7 +194,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->assertEquals('/testing', $url);
     }
 
-    public function testDumpWithSchemeRequirement()
+    public function testDumpWithSchemeRequirement(): void
     {
         $this->routeCollection->add('Test1', new Route('/testing', [], [], [], '', ['ftp', 'https']));
 
@@ -217,7 +217,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->assertEquals('/app.php/testing', $relativeUrl);
     }
 
-    public function testDumpWithLocalizedRoutesPreserveTheGoodLocaleInTheUrl()
+    public function testDumpWithLocalizedRoutesPreserveTheGoodLocaleInTheUrl(): void
     {
         $this->routeCollection->add('foo.en', (new Route('/{_locale}/fork'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'en'));
         $this->routeCollection->add('foo.fr', (new Route('/{_locale}/fourchette'))->setDefault('_locale', 'fr')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'fr'));
@@ -242,7 +242,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->assertSame('/amusant', $compiledUrlGenerator->generate('fun.fr', ['_locale' => 'en']));
     }
 
-    public function testAliases()
+    public function testAliases(): void
     {
         $subCollection = new RouteCollection();
         $subCollection->add('a', new Route('/sub'));
@@ -265,7 +265,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->assertSame('/sub', $compiledUrlGenerator->generate('sub_c'));
     }
 
-    public function testTargetAliasNotExisting()
+    public function testTargetAliasNotExisting(): void
     {
         $this->routeCollection->add('not-existing', new Route('/not-existing'));
         $this->routeCollection->addAlias('alias', 'not-existing');
@@ -281,7 +281,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $compiledUrlGenerator->generate('a');
     }
 
-    public function testTargetAliasWithNamePrefixNotExisting()
+    public function testTargetAliasWithNamePrefixNotExisting(): void
     {
         $subCollection = new RouteCollection();
         $subCollection->add('not-existing', new Route('/not-existing'));
@@ -301,7 +301,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $compiledUrlGenerator->generate('sub_alias');
     }
 
-    public function testCircularReferenceShouldThrowAnException()
+    public function testCircularReferenceShouldThrowAnException(): void
     {
         $this->routeCollection->addAlias('a', 'b');
         $this->routeCollection->addAlias('b', 'a');
@@ -312,7 +312,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->generatorDumper->dump();
     }
 
-    public function testDeepCircularReferenceShouldThrowAnException()
+    public function testDeepCircularReferenceShouldThrowAnException(): void
     {
         $this->routeCollection->addAlias('a', 'b');
         $this->routeCollection->addAlias('b', 'c');
@@ -324,7 +324,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->generatorDumper->dump();
     }
 
-    public function testIndirectCircularReferenceShouldThrowAnException()
+    public function testIndirectCircularReferenceShouldThrowAnException(): void
     {
         $this->routeCollection->addAlias('a', 'b');
         $this->routeCollection->addAlias('b', 'c');
@@ -337,7 +337,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
     }
 
     #[IgnoreDeprecations]
-    public function testDeprecatedAlias()
+    public function testDeprecatedAlias(): void
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: The "b" route alias is deprecated. You should stop using it, as it will be removed in the future.');
 
@@ -353,7 +353,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
     }
 
     #[IgnoreDeprecations]
-    public function testDeprecatedAliasWithCustomMessage()
+    public function testDeprecatedAliasWithCustomMessage(): void
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: foo b.');
 
@@ -369,7 +369,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
     }
 
     #[IgnoreDeprecations]
-    public function testTargettingADeprecatedAliasShouldTriggerDeprecation()
+    public function testTargettingADeprecatedAliasShouldTriggerDeprecation(): void
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: foo b.');
 

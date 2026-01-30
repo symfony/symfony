@@ -19,7 +19,7 @@ use Symfony\Component\Form\Extension\Core\DataTransformer\IntlTimeZoneToStringTr
 #[RequiresPhpExtension('intl')]
 class IntlTimeZoneToStringTransformerTest extends TestCase
 {
-    public function testSingle()
+    public function testSingle(): void
     {
         $transformer = new IntlTimeZoneToStringTransformer();
 
@@ -30,7 +30,7 @@ class IntlTimeZoneToStringTransformerTest extends TestCase
         $this->assertEquals(\IntlTimeZone::createTimeZone('Europe/Amsterdam'), $transformer->reverseTransform('Europe/Amsterdam'));
     }
 
-    public function testMultiple()
+    public function testMultiple(): void
     {
         $transformer = new IntlTimeZoneToStringTransformer(true);
 
@@ -41,13 +41,13 @@ class IntlTimeZoneToStringTransformerTest extends TestCase
         $this->assertEquals([\IntlTimeZone::createTimeZone('Europe/Amsterdam')], $transformer->reverseTransform(['Europe/Amsterdam']));
     }
 
-    public function testInvalidTimezone()
+    public function testInvalidTimezone(): void
     {
         $this->expectException(TransformationFailedException::class);
         (new IntlTimeZoneToStringTransformer())->transform(1);
     }
 
-    public function testUnknownTimezone()
+    public function testUnknownTimezone(): void
     {
         $this->expectException(TransformationFailedException::class);
         (new IntlTimeZoneToStringTransformer(true))->reverseTransform(['Foo/Bar']);

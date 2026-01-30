@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
 
 final class ChainUserCheckerTest extends TestCase
 {
-    public function testForwardsPreAuthToAllUserCheckers()
+    public function testForwardsPreAuthToAllUserCheckers(): void
     {
         $user = new InMemoryUser('John', 'password');
 
@@ -40,7 +40,7 @@ final class ChainUserCheckerTest extends TestCase
         (new ChainUserChecker([$checker1, $checker2, $checker3]))->checkPreAuth($user);
     }
 
-    public function testForwardsPostAuthToAllUserCheckers()
+    public function testForwardsPostAuthToAllUserCheckers(): void
     {
         $user = new InMemoryUser('John', 'password');
 

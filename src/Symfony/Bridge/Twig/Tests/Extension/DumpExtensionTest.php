@@ -23,7 +23,7 @@ use Twig\Loader\ArrayLoader;
 class DumpExtensionTest extends TestCase
 {
     #[DataProvider('getDumpTags')]
-    public function testDumpTag($template, $debug, $expectedOutput, $expectedDumped)
+    public function testDumpTag($template, $debug, $expectedOutput, $expectedDumped): void
     {
         $extension = new DumpExtension(new VarCloner());
         $twig = new Environment(new ArrayLoader(['template' => $template]), [
@@ -35,7 +35,7 @@ class DumpExtensionTest extends TestCase
 
         $dumped = null;
         $exception = null;
-        $prevDumper = VarDumper::setHandler(static function ($var) use (&$dumped) { $dumped = $var; });
+        $prevDumper = VarDumper::setHandler(static function ($var) use (&$dumped): void { $dumped = $var; });
 
         try {
             $this->assertEquals($expectedOutput, $twig->render('template'));
@@ -61,7 +61,7 @@ class DumpExtensionTest extends TestCase
     }
 
     #[DataProvider('getDumpArgs')]
-    public function testDump($context, $args, $expectedOutput, $debug = true)
+    public function testDump($context, $args, $expectedOutput, $debug = true): void
     {
         $extension = new DumpExtension(new VarCloner());
         $twig = new Environment(new ArrayLoader(), [
@@ -106,10 +106,10 @@ class DumpExtensionTest extends TestCase
         ];
     }
 
-    public function testCustomDumper()
+    public function testCustomDumper(): void
     {
         $output = '';
-        $lineDumper = static function ($line) use (&$output) {
+        $lineDumper = static function ($line) use (&$output): void {
             $output .= $line;
         };
 

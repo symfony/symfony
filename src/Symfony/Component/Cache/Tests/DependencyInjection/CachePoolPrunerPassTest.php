@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class CachePoolPrunerPassTest extends TestCase
 {
-    public function testCompilerPassReplacesCommandArgument()
+    public function testCompilerPassReplacesCommandArgument(): void
     {
         $container = new ContainerBuilder();
         $container->register('console.command.cache_pool_prune')->addArgument([]);
@@ -44,7 +44,7 @@ class CachePoolPrunerPassTest extends TestCase
         $this->assertEquals($expected, $argument->getValues());
     }
 
-    public function testCompilePassIsIgnoredIfCommandDoesNotExist()
+    public function testCompilePassIsIgnoredIfCommandDoesNotExist(): void
     {
         $container = new ContainerBuilder();
 
@@ -59,7 +59,7 @@ class CachePoolPrunerPassTest extends TestCase
         $this->assertCount($aliasesBefore, $container->getAliases());
     }
 
-    public function testNonPruneablePoolsAreNotAdded()
+    public function testNonPruneablePoolsAreNotAdded(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);
@@ -87,7 +87,7 @@ class CachePoolPrunerPassTest extends TestCase
         $this->assertArrayHasKey('cache.fs', $values);
     }
 
-    public function testPruneableAttributeOverridesInterfaceCheck()
+    public function testPruneableAttributeOverridesInterfaceCheck(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.debug', false);

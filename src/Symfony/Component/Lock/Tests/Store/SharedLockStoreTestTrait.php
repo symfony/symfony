@@ -26,7 +26,7 @@ trait SharedLockStoreTestTrait
      */
     abstract protected function getStore(): PersistingStoreInterface;
 
-    public function testSharedLockReadFirst()
+    public function testSharedLockReadFirst(): void
     {
         $store = $this->getStore();
 
@@ -77,7 +77,7 @@ trait SharedLockStoreTestTrait
         $this->assertFalse($store->exists($key3));
     }
 
-    public function testSharedLockWriteFirst()
+    public function testSharedLockWriteFirst(): void
     {
         $store = $this->getStore();
         $key1 = new Key(__METHOD__);
@@ -110,7 +110,7 @@ trait SharedLockStoreTestTrait
         $this->assertFalse($store->exists($key2));
     }
 
-    public function testSharedLockPromote()
+    public function testSharedLockPromote(): void
     {
         $store = $this->getStore();
 
@@ -129,7 +129,7 @@ trait SharedLockStoreTestTrait
         }
     }
 
-    public function testSharedLockPromoteAllowed()
+    public function testSharedLockPromoteAllowed(): void
     {
         $store = $this->getStore();
 
@@ -153,7 +153,7 @@ trait SharedLockStoreTestTrait
         $this->assertTrue($store->exists($key2));
     }
 
-    public function testSharedLockDemote()
+    public function testSharedLockDemote(): void
     {
         $store = $this->getStore();
 

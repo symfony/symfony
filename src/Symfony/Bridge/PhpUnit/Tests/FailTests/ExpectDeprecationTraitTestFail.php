@@ -34,7 +34,7 @@ final class ExpectDeprecationTraitTestFail extends TestCase
      * @group legacy
      */
     #[Group('legacy')]
-    public function testOne()
+    public function testOne(): void
     {
         $this->expectDeprecation('foo');
         @trigger_error('bar', \E_USER_DEPRECATED);
@@ -49,7 +49,7 @@ final class ExpectDeprecationTraitTestFail extends TestCase
      */
     #[Group('legacy')]
     #[RunInSeparateProcess]
-    public function testOneInIsolation()
+    public function testOneInIsolation(): void
     {
         $this->expectDeprecation('foo');
         @trigger_error('bar', \E_USER_DEPRECATED);

@@ -25,7 +25,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class TraceableEventDispatcherTest extends TestCase
 {
-    public function testStopwatchSections()
+    public function testStopwatchSections(): void
     {
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), $stopwatch = new Stopwatch());
         $kernel = $this->getHttpKernel($dispatcher);
@@ -45,7 +45,7 @@ class TraceableEventDispatcherTest extends TestCase
         ], array_keys($events));
     }
 
-    public function testStopwatchCheckControllerOnRequestEvent()
+    public function testStopwatchCheckControllerOnRequestEvent(): void
     {
         $stopwatch = $this->getMockBuilder(Stopwatch::class)
             ->onlyMethods(['isStarted'])
@@ -61,7 +61,7 @@ class TraceableEventDispatcherTest extends TestCase
         $kernel->handle($request);
     }
 
-    public function testStopwatchStopControllerOnRequestEvent()
+    public function testStopwatchStopControllerOnRequestEvent(): void
     {
         $stopwatch = $this->getMockBuilder(Stopwatch::class)
             ->onlyMethods(['isStarted', 'stop'])
@@ -79,14 +79,14 @@ class TraceableEventDispatcherTest extends TestCase
         $kernel->handle($request);
     }
 
-    public function testAddListenerNested()
+    public function testAddListenerNested(): void
     {
         $called1 = false;
         $called2 = false;
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $dispatcher->addListener('my-event', static function () use ($dispatcher, &$called1, &$called2) {
+        $dispatcher->addListener('my-event', static function () use ($dispatcher, &$called1, &$called2): void {
             $called1 = true;
-            $dispatcher->addListener('my-event', static function () use (&$called2) {
+            $dispatcher->addListener('my-event', static function () use (&$called2): void {
                 $called2 = true;
             });
         });
@@ -97,14 +97,14 @@ class TraceableEventDispatcherTest extends TestCase
         $this->assertTrue($called2);
     }
 
-    public function testListenerCanRemoveItselfWhenExecuted()
+    public function testListenerCanRemoveItselfWhenExecuted(): void
     {
         $eventDispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $listener1 = static function () use ($eventDispatcher, &$listener1) {
+        $listener1 = static function () use ($eventDispatcher, &$listener1): void {
             $eventDispatcher->removeListener('foo', $listener1);
         };
         $eventDispatcher->addListener('foo', $listener1);
-        $eventDispatcher->addListener('foo', static function () {});
+        $eventDispatcher->addListener('foo', static function (): void {});
         $eventDispatcher->dispatch(new Event(), 'foo');
 
         $this->assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');

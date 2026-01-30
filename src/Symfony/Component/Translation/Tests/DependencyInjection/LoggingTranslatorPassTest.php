@@ -19,7 +19,7 @@ use Symfony\Component\Translation\Translator;
 
 class LoggingTranslatorPassTest extends TestCase
 {
-    public function testProcess()
+    public function testProcess(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('translator.logging', true);
@@ -46,7 +46,7 @@ class LoggingTranslatorPassTest extends TestCase
         );
     }
 
-    public function testThatCompilerPassIsIgnoredIfThereIsNotLoggerDefinition()
+    public function testThatCompilerPassIsIgnoredIfThereIsNotLoggerDefinition(): void
     {
         $container = new ContainerBuilder();
         $container->register('identity_translator');
@@ -63,7 +63,7 @@ class LoggingTranslatorPassTest extends TestCase
         $this->assertCount($aliasesBefore, $container->getAliases());
     }
 
-    public function testThatCompilerPassIsIgnoredIfThereIsNotTranslatorDefinition()
+    public function testThatCompilerPassIsIgnoredIfThereIsNotTranslatorDefinition(): void
     {
         $container = new ContainerBuilder();
         $container->register('monolog.logger');

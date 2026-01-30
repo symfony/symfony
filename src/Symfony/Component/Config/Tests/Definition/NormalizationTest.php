@@ -20,7 +20,7 @@ use Symfony\Component\Config\Definition\NodeInterface;
 class NormalizationTest extends TestCase
 {
     #[DataProvider('getEncoderTests')]
-    public function testNormalizeEncoders($denormalized)
+    public function testNormalizeEncoders($denormalized): void
     {
         $tb = new TreeBuilder('root_name', 'array');
         $tree = $tb
@@ -91,7 +91,7 @@ class NormalizationTest extends TestCase
     }
 
     #[DataProvider('getAnonymousKeysTests')]
-    public function testAnonymousKeysArray($denormalized)
+    public function testAnonymousKeysArray($denormalized): void
     {
         $tb = new TreeBuilder('root', 'array');
         $tree = $tb
@@ -135,7 +135,7 @@ class NormalizationTest extends TestCase
     }
 
     #[DataProvider('getNumericKeysTests')]
-    public function testNumericKeysAsAttributes($denormalized)
+    public function testNumericKeysAsAttributes($denormalized): void
     {
         $normalized = [
             'thing' => [42 => ['foo', 'bar'], 1337 => ['baz', 'qux']],
@@ -163,7 +163,7 @@ class NormalizationTest extends TestCase
         return array_map(static fn ($v) => [$v], $configs);
     }
 
-    public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet()
+    public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet(): void
     {
         $denormalized = [
             'thing' => [
@@ -177,7 +177,7 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($this->getNumericKeysTestTree(), $denormalized, []);
     }
 
-    public function testAssociativeArrayPreserveKeys()
+    public function testAssociativeArrayPreserveKeys(): void
     {
         $tb = new TreeBuilder('root', 'array');
         $tree = $tb
@@ -196,7 +196,7 @@ class NormalizationTest extends TestCase
         $this->assertNormalized($tree, $data, $data);
     }
 
-    public function testFloatLikeValueAsMapKeyAttribute()
+    public function testFloatLikeValueAsMapKeyAttribute(): void
     {
         $tree = (new TreeBuilder('root'))
             ->getRootNode()
@@ -222,7 +222,7 @@ class NormalizationTest extends TestCase
         ]);
     }
 
-    public static function assertNormalized(NodeInterface $tree, $denormalized, $normalized)
+    public static function assertNormalized(NodeInterface $tree, $denormalized, $normalized): void
     {
         self::assertSame($normalized, $tree->normalize($denormalized));
     }

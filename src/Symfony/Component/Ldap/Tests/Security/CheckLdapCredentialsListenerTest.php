@@ -38,7 +38,7 @@ use Symfony\Contracts\Service\ServiceLocatorTrait;
 class CheckLdapCredentialsListenerTest extends TestCase
 {
     #[DataProvider('provideShouldNotCheckPassport')]
-    public function testShouldNotCheckPassport($authenticator, $passport)
+    public function testShouldNotCheckPassport($authenticator, $passport): void
     {
         $ldap = $this->createMock(LdapInterface::class);
         $ldap->expects($this->never())->method('bind');
@@ -58,7 +58,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         yield [new TestAuthenticator(), new Passport(new UserBadge('test'), new PasswordCredentials('s3cret'), [$badge])];
     }
 
-    public function testPasswordCredentialsAlreadyResolvedThrowsException()
+    public function testPasswordCredentialsAlreadyResolvedThrowsException(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('LDAP authentication password verification cannot be completed because something else has already resolved the PasswordCredentials.');
@@ -71,7 +71,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport(new CheckPassportEvent(new TestAuthenticator(), $passport));
     }
 
-    public function testInvalidLdapServiceId()
+    public function testInvalidLdapServiceId(): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot check credentials using the "not_existing_ldap_service" ldap service, as such service is not found. Did you maybe forget to add the "ldap" service tag to this service?');
@@ -81,7 +81,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
     }
 
     #[DataProvider('provideWrongPassportData')]
-    public function testWrongPassport($passport)
+    public function testWrongPassport($passport): void
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('LDAP authentication requires a passport containing password credentials, authenticator "'.TestAuthenticator::class.'" does not fulfill these requirements.');
@@ -96,7 +96,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         yield [new SelfValidatingPassport(new UserBadge('test'), [new LdapBadge('app.ldap')])];
     }
 
-    public function testEmptyPasswordShouldThrowAnException()
+    public function testEmptyPasswordShouldThrowAnException(): void
     {
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The presented password cannot be empty.');
@@ -105,7 +105,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport($this->createEvent(''));
     }
 
-    public function testBindFailureShouldThrowAnException()
+    public function testBindFailureShouldThrowAnException(): void
     {
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The presented password is invalid.');
@@ -118,7 +118,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport($this->createEvent());
     }
 
-    public function testQueryForDn()
+    public function testQueryForDn(): void
     {
         $collection = new class([new Entry('')]) extends \ArrayObject implements CollectionInterface {
             public function toArray(): array
@@ -133,7 +133,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $ldap = $this->createMock(LdapInterface::class);
         $ldap
             ->method('bind')
-            ->willReturnCallback(function (...$args) {
+            ->willReturnCallback(function (...$args): void {
                 static $series = [
                     ['elsa', 'test1234A$'],
                     ['', 's3cr3t'],
@@ -149,7 +149,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', '{user_identifier}', 'elsa', 'test1234A$', '{user_identifier}_test')));
     }
 
-    public function testEmptyQueryResultShouldThrowAnException()
+    public function testEmptyQueryResultShouldThrowAnException(): void
     {
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The presented user identifier is invalid.');
@@ -162,7 +162,7 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $ldap = $this->createMock(LdapInterface::class);
         $ldap
             ->method('bind')
-            ->willReturnCallback(function (...$args) {
+            ->willReturnCallback(function (...$args): void {
                 static $series = [
                     ['elsa', 'test1234A$'],
                     ['', 's3cr3t'],

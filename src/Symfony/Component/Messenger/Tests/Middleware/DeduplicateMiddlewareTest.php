@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 
 final class DeduplicateMiddlewareTest extends MiddlewareTestCase
 {
-    public function testDeduplicateMiddlewareIgnoreIfMessageIsNotLockable()
+    public function testDeduplicateMiddlewareIgnoreIfMessageIsNotLockable(): void
     {
         $message = new DummyMessage('Hello');
         $envelope = new Envelope($message);
@@ -36,7 +36,7 @@ final class DeduplicateMiddlewareTest extends MiddlewareTestCase
         $decorator->handle($envelope, $this->getStackMock(true));
     }
 
-    public function testDeduplicateMiddlewareIfMessageHasKey()
+    public function testDeduplicateMiddlewareIfMessageHasKey(): void
     {
         $message = new DummyMessage('Hello');
         $envelope = new Envelope($message, [new DeduplicateStamp('id')]);

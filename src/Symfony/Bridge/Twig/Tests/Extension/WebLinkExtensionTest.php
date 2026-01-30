@@ -35,7 +35,7 @@ class WebLinkExtensionTest extends TestCase
         $this->extension = new WebLinkExtension($requestStack);
     }
 
-    public function testLink()
+    public function testLink(): void
     {
         $this->assertEquals('/foo.css', $this->extension->link('/foo.css', 'preload', ['as' => 'style', 'nopush' => true]));
 
@@ -43,7 +43,7 @@ class WebLinkExtensionTest extends TestCase
         $this->assertEquals([$link], array_values($this->request->attributes->get('_links')->getLinks()));
     }
 
-    public function testPreload()
+    public function testPreload(): void
     {
         $this->assertEquals('/foo.css', $this->extension->preload('/foo.css', ['as' => 'style', 'crossorigin' => true]));
 
@@ -51,7 +51,7 @@ class WebLinkExtensionTest extends TestCase
         $this->assertEquals([$link], array_values($this->request->attributes->get('_links')->getLinks()));
     }
 
-    public function testDnsPrefetch()
+    public function testDnsPrefetch(): void
     {
         $this->assertEquals('/foo.css', $this->extension->dnsPrefetch('/foo.css', ['as' => 'style', 'crossorigin' => true]));
 
@@ -59,7 +59,7 @@ class WebLinkExtensionTest extends TestCase
         $this->assertEquals([$link], array_values($this->request->attributes->get('_links')->getLinks()));
     }
 
-    public function testPreconnect()
+    public function testPreconnect(): void
     {
         $this->assertEquals('/foo.css', $this->extension->preconnect('/foo.css', ['as' => 'style', 'crossorigin' => true]));
 
@@ -67,7 +67,7 @@ class WebLinkExtensionTest extends TestCase
         $this->assertEquals([$link], array_values($this->request->attributes->get('_links')->getLinks()));
     }
 
-    public function testPrefetch()
+    public function testPrefetch(): void
     {
         $this->assertEquals('/foo.css', $this->extension->prefetch('/foo.css', ['as' => 'style', 'crossorigin' => true]));
 
@@ -75,7 +75,7 @@ class WebLinkExtensionTest extends TestCase
         $this->assertEquals([$link], array_values($this->request->attributes->get('_links')->getLinks()));
     }
 
-    public function testPrerender()
+    public function testPrerender(): void
     {
         $this->assertEquals('/foo.css', $this->extension->prerender('/foo.css', ['as' => 'style', 'crossorigin' => true]));
 

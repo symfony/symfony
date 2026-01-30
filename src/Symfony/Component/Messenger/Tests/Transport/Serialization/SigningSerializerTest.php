@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 
 class SigningSerializerTest extends TestCase
 {
-    public function testEncodeAddsSignatureHeadersWhenTypeIsSigned()
+    public function testEncodeAddsSignatureHeadersWhenTypeIsSigned(): void
     {
         $serializer = $this->createSerializer([DummyMessage::class]);
         $envelope = new Envelope(new DummyMessage('hello'));
@@ -37,7 +37,7 @@ class SigningSerializerTest extends TestCase
         $this->assertNotEmpty($encoded['headers']['Body-Sign']);
     }
 
-    public function testEncodeDoesNotAddSignatureForUnsignedType()
+    public function testEncodeDoesNotAddSignatureForUnsignedType(): void
     {
         $serializer = $this->createSerializer([]);
         $envelope = new Envelope(new DummyMessage('hello'));
@@ -47,7 +47,7 @@ class SigningSerializerTest extends TestCase
         $this->assertArrayNotHasKey('headers', $encoded);
     }
 
-    public function testDecodeAcceptsValidSignature()
+    public function testDecodeAcceptsValidSignature(): void
     {
         $serializer = $this->createSerializer([DummyMessage::class]);
         $envelope = new Envelope(new DummyMessage('hello'));
@@ -58,7 +58,7 @@ class SigningSerializerTest extends TestCase
         $this->assertInstanceOf(DummyMessage::class, $decoded->getMessage());
     }
 
-    public function testDecodeRejectsMissingSignature()
+    public function testDecodeRejectsMissingSignature(): void
     {
         $serializer = $this->createSerializer([DummyMessage::class]);
         $inner = new PhpSerializer();
@@ -69,7 +69,7 @@ class SigningSerializerTest extends TestCase
         $serializer->decode($encoded);
     }
 
-    public function testDecodeRejectsInvalidSignature()
+    public function testDecodeRejectsInvalidSignature(): void
     {
         $serializer = $this->createSerializer([DummyMessage::class]);
         $envelope = new Envelope(new DummyMessage('hello'));
@@ -80,7 +80,7 @@ class SigningSerializerTest extends TestCase
         $serializer->decode($encoded);
     }
 
-    public function testEncodeSignsWhenSignedTypeIsInterfaceImplementedByMessage()
+    public function testEncodeSignsWhenSignedTypeIsInterfaceImplementedByMessage(): void
     {
         $serializer = $this->createSerializer([DummyMessageInterface::class]);
         $envelope = new Envelope(new DummyMessage('hello'));
@@ -92,7 +92,7 @@ class SigningSerializerTest extends TestCase
         $this->assertArrayHasKey('Sign-Algo', $encoded['headers']);
     }
 
-    public function testDecodeVerifiesWhenSignedTypeIsParentClassOfMessage()
+    public function testDecodeVerifiesWhenSignedTypeIsParentClassOfMessage(): void
     {
         $serializer = $this->createSerializer([DummyMessage::class]);
         $inner = new PhpSerializer();

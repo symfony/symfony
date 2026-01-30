@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 class SetupTransportsCommandTest extends TestCase
 {
-    public function testReceiverNames()
+    public function testReceiverNames(): void
     {
         $command = new SetupTransportsCommand(new ServiceLocator([
             'amqp' => fn () => $this->createStub(SetupableTransportInterface::class),
@@ -37,7 +37,7 @@ class SetupTransportsCommandTest extends TestCase
         $this->assertStringContainsString('The "other_transport" transport does not support setup.', $display);
     }
 
-    public function testReceiverNameArgument()
+    public function testReceiverNameArgument(): void
     {
         $command = new SetupTransportsCommand(new ServiceLocator(['amqp' => fn () => $this->createStub(SetupableTransportInterface::class)]), ['amqp', 'other_transport']);
         $tester = new CommandTester($command);
@@ -47,7 +47,7 @@ class SetupTransportsCommandTest extends TestCase
         $this->assertStringContainsString('The "amqp" transport was set up successfully.', $display);
     }
 
-    public function testReceiverNameArgumentNotFound()
+    public function testReceiverNameArgumentNotFound(): void
     {
         $command = new SetupTransportsCommand(new ServiceLocator([]), ['amqp', 'other_transport']);
         $tester = new CommandTester($command);
@@ -57,7 +57,7 @@ class SetupTransportsCommandTest extends TestCase
         $tester->execute(['transport' => 'not_found']);
     }
 
-    public function testThrowsExceptionOnTransportSetup()
+    public function testThrowsExceptionOnTransportSetup(): void
     {
         // mock a setupable-transport, that throws
         $amqpTransport = $this->createMock(SetupableTransportInterface::class);
@@ -74,7 +74,7 @@ class SetupTransportsCommandTest extends TestCase
     }
 
     #[DataProvider('provideCompletionSuggestions')]
-    public function testComplete(array $input, array $expectedSuggestions)
+    public function testComplete(array $input, array $expectedSuggestions): void
     {
         $command = new SetupTransportsCommand(new Container(), ['amqp', 'other_transport']);
         $tester = new CommandCompletionTester($command);

@@ -38,23 +38,23 @@ class FormErrorNormalizerTest extends TestCase
             );
     }
 
-    public function testSupportsNormalizationWithWrongClass()
+    public function testSupportsNormalizationWithWrongClass(): void
     {
         $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
     }
 
-    public function testSupportsNormalizationWithNotSubmittedForm()
+    public function testSupportsNormalizationWithNotSubmittedForm(): void
     {
         $form = $this->createStub(FormInterface::class);
         $this->assertFalse($this->normalizer->supportsNormalization($form));
     }
 
-    public function testSupportsNormalizationWithValidForm()
+    public function testSupportsNormalizationWithValidForm(): void
     {
         $this->assertTrue($this->normalizer->supportsNormalization($this->form));
     }
 
-    public function testNormalize()
+    public function testNormalize(): void
     {
         $expected = [
             'code' => null,
@@ -75,7 +75,7 @@ class FormErrorNormalizerTest extends TestCase
         $this->assertEquals($expected, $this->normalizer->normalize($this->form));
     }
 
-    public function testNormalizeWithChildren()
+    public function testNormalizeWithChildren(): void
     {
         $expected = [
             'code' => null,

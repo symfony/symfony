@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 class ParameterBagTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $bag = new ParameterBag($parameters = [
             'foo' => 'foo',
@@ -33,7 +33,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals($parameters, $bag->all(), '__construct() takes an array of parameters as its first argument');
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $bag = new ParameterBag($parameters = [
             'foo' => 'foo',
@@ -43,7 +43,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals([], $bag->all(), '->clear() removes all parameters');
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $bag = new ParameterBag([
             'foo' => 'foo',
@@ -53,7 +53,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(['bar' => 'bar'], $bag->all(), '->remove() removes a parameter');
     }
 
-    public function testRemoveWithDeprecation()
+    public function testRemoveWithDeprecation(): void
     {
         $bag = new ParameterBag([
             'foo' => 'foo',
@@ -65,7 +65,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals([], $bag->allDeprecated());
     }
 
-    public function testGetSet()
+    public function testGetSet(): void
     {
         $bag = new ParameterBag(['foo' => 'bar']);
         $bag->set('bar', 'foo');
@@ -85,7 +85,7 @@ class ParameterBagTest extends TestCase
 
     #[TestWith([1001])]
     #[TestWith([10.0])]
-    public function testSetNumericName(int|float $name)
+    public function testSetNumericName(int|float $name): void
     {
         $bag = new ParameterBag();
 
@@ -97,7 +97,7 @@ class ParameterBagTest extends TestCase
 
     #[TestWith([1001])]
     #[TestWith([10.0])]
-    public function testConstructorNumericName(int|float $name)
+    public function testConstructorNumericName(int|float $name): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('The parameter name "%s" cannot be numeric.', $name));
@@ -106,7 +106,7 @@ class ParameterBagTest extends TestCase
     }
 
     #[DataProvider('provideGetThrowParameterNotFoundExceptionData')]
-    public function testGetThrowParameterNotFoundException($parameterKey, $exceptionMessage)
+    public function testGetThrowParameterNotFoundException($parameterKey, $exceptionMessage): void
     {
         $bag = new ParameterBag([
             'foo' => 'foo',
@@ -137,7 +137,7 @@ class ParameterBagTest extends TestCase
      * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
     #[IgnoreDeprecations]
-    public function testDeprecate()
+    public function testDeprecate(): void
     {
         $bag = new ParameterBag(['foo' => 'bar']);
 
@@ -152,7 +152,7 @@ class ParameterBagTest extends TestCase
      * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
     #[IgnoreDeprecations]
-    public function testDeprecateWithMessage()
+    public function testDeprecateWithMessage(): void
     {
         $bag = new ParameterBag(['foo' => 'bar']);
 
@@ -167,7 +167,7 @@ class ParameterBagTest extends TestCase
      * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
     #[IgnoreDeprecations]
-    public function testDeprecationIsTriggeredWhenResolved()
+    public function testDeprecationIsTriggeredWhenResolved(): void
     {
         $bag = new ParameterBag(['foo' => '%bar%', 'bar' => 'baz']);
 
@@ -178,7 +178,7 @@ class ParameterBagTest extends TestCase
         $bag->resolve();
     }
 
-    public function testDeprecateThrowsWhenParameterIsUndefined()
+    public function testDeprecateThrowsWhenParameterIsUndefined(): void
     {
         $bag = new ParameterBag();
 
@@ -188,7 +188,7 @@ class ParameterBagTest extends TestCase
         $bag->deprecate('foo', 'symfony/test', '6.3');
     }
 
-    public function testGetMissingRequiredParameter()
+    public function testGetMissingRequiredParameter(): void
     {
         $bag = new ParameterBag();
 
@@ -200,7 +200,7 @@ class ParameterBagTest extends TestCase
         $bag->get('bar');
     }
 
-    public function testGetNonEmptyParameterThrowsWhenNullValue()
+    public function testGetNonEmptyParameterThrowsWhenNullValue(): void
     {
         $bag = new ParameterBag();
         $bag->set('bar', null);
@@ -212,7 +212,7 @@ class ParameterBagTest extends TestCase
         $bag->get('bar');
     }
 
-    public function testGetNonEmptyParameterThrowsWhenEmptyStringValue()
+    public function testGetNonEmptyParameterThrowsWhenEmptyStringValue(): void
     {
         $bag = new ParameterBag();
         $bag->set('bar', '');
@@ -224,7 +224,7 @@ class ParameterBagTest extends TestCase
         $bag->get('bar');
     }
 
-    public function testGetNonEmptyParameterThrowsWhenEmptyArrayValue()
+    public function testGetNonEmptyParameterThrowsWhenEmptyArrayValue(): void
     {
         $bag = new ParameterBag();
         $bag->set('bar', []);
@@ -236,14 +236,14 @@ class ParameterBagTest extends TestCase
         $bag->get('bar');
     }
 
-    public function testHas()
+    public function testHas(): void
     {
         $bag = new ParameterBag(['foo' => 'bar']);
         $this->assertTrue($bag->has('foo'), '->has() returns true if a parameter is defined');
         $this->assertFalse($bag->has('bar'), '->has() returns false if a parameter is not defined');
     }
 
-    public function testMixedCase()
+    public function testMixedCase(): void
     {
         $bag = new ParameterBag([
             'foo' => 'foo',
@@ -259,7 +259,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals('baz1', $bag->get('Foo'));
     }
 
-    public function testResolveValue()
+    public function testResolveValue(): void
     {
         $bag = new ParameterBag([]);
         $this->assertEquals('foo', $bag->resolveValue('foo'), '->resolveValue() returns its argument unmodified if no placeholders are found');
@@ -326,7 +326,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals('foo.bar:1337', $bag->resolveValue('%host%:%port%'));
     }
 
-    public function testResolveIndicatesWhyAParameterIsNeeded()
+    public function testResolveIndicatesWhyAParameterIsNeeded(): void
     {
         $bag = new ParameterBag(['foo' => '%bar%']);
 
@@ -345,7 +345,7 @@ class ParameterBagTest extends TestCase
         }
     }
 
-    public function testResolveUnescapesValue()
+    public function testResolveUnescapesValue(): void
     {
         $bag = new ParameterBag([
             'foo' => ['bar' => ['ding' => 'I\'m a bar %%foo %%bar']],
@@ -358,7 +358,7 @@ class ParameterBagTest extends TestCase
         $this->assertEquals(['bar' => ['ding' => 'I\'m a bar %foo %bar']], $bag->get('foo'), '->resolveValue() supports % escaping by doubling it');
     }
 
-    public function testEscapeValue()
+    public function testEscapeValue(): void
     {
         $bag = new ParameterBag();
 
@@ -372,7 +372,7 @@ class ParameterBagTest extends TestCase
     }
 
     #[DataProvider('stringsWithSpacesProvider')]
-    public function testResolveStringWithSpacesReturnsString($expected, $test, $description)
+    public function testResolveStringWithSpacesReturnsString($expected, $test, $description): void
     {
         $bag = new ParameterBag(['foo' => 'bar']);
 

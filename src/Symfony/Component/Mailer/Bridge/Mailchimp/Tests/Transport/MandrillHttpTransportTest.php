@@ -26,7 +26,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 class MandrillHttpTransportTest extends TestCase
 {
     #[DataProvider('getTransportData')]
-    public function testToString(MandrillHttpTransport $transport, string $expected)
+    public function testToString(MandrillHttpTransport $transport, string $expected): void
     {
         $this->assertSame($expected, (string) $transport);
     }
@@ -49,7 +49,7 @@ class MandrillHttpTransportTest extends TestCase
         ];
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -85,7 +85,7 @@ class MandrillHttpTransportTest extends TestCase
         $this->assertSame('foobar', $message->getMessageId());
     }
 
-    public function testSendThrowsForErrorResponse()
+    public function testSendThrowsForErrorResponse(): void
     {
         $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['status' => 'error', 'message' => 'i\'m a teapot', 'code' => 418], [
             'http_code' => 418,
@@ -104,7 +104,7 @@ class MandrillHttpTransportTest extends TestCase
         $transport->send($mail);
     }
 
-    public function testTagAndMetadataHeaders()
+    public function testTagAndMetadataHeaders(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');

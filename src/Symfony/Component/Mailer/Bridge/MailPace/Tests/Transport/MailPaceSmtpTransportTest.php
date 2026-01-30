@@ -18,7 +18,7 @@ use Symfony\Component\Mime\Email;
 
 final class MailPaceSmtpTransportTest extends TestCase
 {
-    public function testCustomHeader()
+    public function testCustomHeader(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');
@@ -31,7 +31,7 @@ final class MailPaceSmtpTransportTest extends TestCase
         $this->assertSame('foo: bar', $email->getHeaders()->get('FOO')->toString());
     }
 
-    public function testTagAndMetadataHeaders()
+    public function testTagAndMetadataHeaders(): void
     {
         $email = new Email();
         $email->getHeaders()->addTextHeader('foo', 'bar');

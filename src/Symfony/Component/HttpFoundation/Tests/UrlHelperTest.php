@@ -22,7 +22,7 @@ use Symfony\Component\Routing\RequestContextAwareInterface;
 class UrlHelperTest extends TestCase
 {
     #[DataProvider('getGenerateAbsoluteUrlData')]
-    public function testGenerateAbsoluteUrl($expected, $path, $pathinfo)
+    public function testGenerateAbsoluteUrl($expected, $path, $pathinfo): void
     {
         $stack = new RequestStack();
         $stack->push(Request::create($pathinfo));
@@ -55,7 +55,7 @@ class UrlHelperTest extends TestCase
     }
 
     #[DataProvider('getGenerateAbsoluteUrlRequestContextData')]
-    public function testGenerateAbsoluteUrlWithRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
+    public function testGenerateAbsoluteUrlWithRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected): void
     {
         if (!class_exists(RequestContext::class)) {
             $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
@@ -69,7 +69,7 @@ class UrlHelperTest extends TestCase
     }
 
     #[DataProvider('getGenerateAbsoluteUrlRequestContextData')]
-    public function testGenerateAbsoluteUrlWithRequestContextAwareInterface($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
+    public function testGenerateAbsoluteUrlWithRequestContextAwareInterface($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected): void
     {
         if (!class_exists(RequestContext::class)) {
             $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
@@ -99,7 +99,7 @@ class UrlHelperTest extends TestCase
     }
 
     #[DataProvider('getGenerateAbsoluteUrlRequestContextData')]
-    public function testGenerateAbsoluteUrlWithoutRequestAndRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected)
+    public function testGenerateAbsoluteUrlWithoutRequestAndRequestContext($path, $baseUrl, $host, $scheme, $httpPort, $httpsPort, $expected): void
     {
         if (!class_exists(RequestContext::class)) {
             $this->markTestSkipped('The Routing component is needed to run tests that depend on its request context.');
@@ -124,7 +124,7 @@ class UrlHelperTest extends TestCase
         ];
     }
 
-    public function testGenerateAbsoluteUrlWithScriptFileName()
+    public function testGenerateAbsoluteUrlWithScriptFileName(): void
     {
         $request = Request::create('http://localhost/app/web/app_dev.php');
         $request->server->set('SCRIPT_FILENAME', '/var/www/app/web/app_dev.php');
@@ -140,7 +140,7 @@ class UrlHelperTest extends TestCase
     }
 
     #[DataProvider('getGenerateRelativePathData')]
-    public function testGenerateRelativePath($expected, $path, $pathinfo)
+    public function testGenerateRelativePath($expected, $path, $pathinfo): void
     {
         $stack = new RequestStack();
         $stack->push(Request::create($pathinfo));

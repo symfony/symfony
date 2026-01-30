@@ -35,7 +35,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
 
 final class ConnectionTest extends TestCase
 {
-    public function testFromInvalidDsn()
+    public function testFromInvalidDsn(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The given Beanstalkd DSN is invalid.');
@@ -43,7 +43,7 @@ final class ConnectionTest extends TestCase
         Connection::fromDsn('beanstalkd://');
     }
 
-    public function testFromDsn()
+    public function testFromDsn(): void
     {
         $this->assertEquals(
             $connection = new Connection([], Pheanstalk::create('127.0.0.1', 11300)),
@@ -71,7 +71,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame('default', $connection->getTube());
     }
 
-    public function testFromDsnWithOptions()
+    public function testFromDsnWithOptions(): void
     {
         $this->assertEquals(
             $connectionWithOptions = Connection::fromDsn('beanstalkd://localhost', ['tube_name' => 'foo', 'timeout' => 10, 'ttr' => 5000, 'bury_on_reject' => true]),
@@ -95,7 +95,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame('foo', $connectionWithOptions->getTube());
     }
 
-    public function testFromDsnOptionsArrayWinsOverOptionsFromDsn()
+    public function testFromDsnOptionsArrayWinsOverOptionsFromDsn(): void
     {
         $options = [
             'tube_name' => 'bar',
@@ -118,19 +118,19 @@ final class ConnectionTest extends TestCase
         $this->assertSame($options['tube_name'], $connection->getTube());
     }
 
-    public function testItThrowsAnExceptionIfAnExtraOptionIsDefined()
+    public function testItThrowsAnExceptionIfAnExtraOptionIsDefined(): void
     {
         $this->expectException(MessengerInvalidArgumentException::class);
         Connection::fromDsn('beanstalkd://127.0.0.1', ['new_option' => 'woops']);
     }
 
-    public function testItThrowsAnExceptionIfAnExtraOptionIsDefinedInDSN()
+    public function testItThrowsAnExceptionIfAnExtraOptionIsDefinedInDSN(): void
     {
         $this->expectException(MessengerInvalidArgumentException::class);
         Connection::fromDsn('beanstalkd://127.0.0.1?new_option=woops');
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $id = '1234';
         $id2 = '1235';
@@ -168,7 +168,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame($beanstalkdEnvelope['headers'], $envelope['headers']);
     }
 
-    public function testGetOnReconnect()
+    public function testGetOnReconnect(): void
     {
         $id = '1234';
         $beanstalkdEnvelope = [
@@ -199,7 +199,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame($beanstalkdEnvelope['headers'], $envelope['headers']);
     }
 
-    public function testGetWhenThereIsNoJobInTheTube()
+    public function testGetWhenThereIsNoJobInTheTube(): void
     {
         $tube = 'baz';
         $timeout = 44;
@@ -215,7 +215,7 @@ final class ConnectionTest extends TestCase
         $this->assertNull($connection->get());
     }
 
-    public function testGetWhenABeanstalkdExceptionOccurs()
+    public function testGetWhenABeanstalkdExceptionOccurs(): void
     {
         $tube = 'baz';
         $timeout = 44;
@@ -234,7 +234,7 @@ final class ConnectionTest extends TestCase
         $connection->get();
     }
 
-    public function testAck()
+    public function testAck(): void
     {
         $id = '123456';
 
@@ -249,7 +249,7 @@ final class ConnectionTest extends TestCase
         $connection->ack($id);
     }
 
-    public function testAckWhenABeanstalkdExceptionOccurs()
+    public function testAckWhenABeanstalkdExceptionOccurs(): void
     {
         $id = '123456';
 
@@ -270,7 +270,7 @@ final class ConnectionTest extends TestCase
     #[TestWith([false, false])]
     #[TestWith([false, true])]
     #[TestWith([true, true])]
-    public function testReject(bool $buryOnReject, bool $forceDelete)
+    public function testReject(bool $buryOnReject, bool $forceDelete): void
     {
         $id = '123456';
 
@@ -285,7 +285,7 @@ final class ConnectionTest extends TestCase
         $connection->reject($id, null, $forceDelete);
     }
 
-    public function testRejectWithBury()
+    public function testRejectWithBury(): void
     {
         $id = '123456';
 
@@ -300,7 +300,7 @@ final class ConnectionTest extends TestCase
         $connection->reject($id);
     }
 
-    public function testRejectWithBuryAndPriority()
+    public function testRejectWithBuryAndPriority(): void
     {
         $id = '123456';
         $priority = 2;
@@ -316,7 +316,7 @@ final class ConnectionTest extends TestCase
         $connection->reject($id, $priority);
     }
 
-    public function testRejectWhenABeanstalkdExceptionOccurs()
+    public function testRejectWhenABeanstalkdExceptionOccurs(): void
     {
         $id = '123456';
 
@@ -334,7 +334,7 @@ final class ConnectionTest extends TestCase
         $connection->reject($id);
     }
 
-    public function testMessageCount()
+    public function testMessageCount(): void
     {
         $tube = 'baz';
 
@@ -351,7 +351,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame($count, $connection->getMessageCount());
     }
 
-    public function testMessageCountWhenABeanstalkdExceptionOccurs()
+    public function testMessageCountWhenABeanstalkdExceptionOccurs(): void
     {
         $tube = 'baz1234';
 
@@ -366,7 +366,7 @@ final class ConnectionTest extends TestCase
         $connection->getMessageCount();
     }
 
-    public function testMessagePriority()
+    public function testMessagePriority(): void
     {
         $id = '123456';
         $priority = 51;
@@ -383,7 +383,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame($priority, $connection->getMessagePriority($id));
     }
 
-    public function testMessagePriorityWhenABeanstalkdExceptionOccurs()
+    public function testMessagePriorityWhenABeanstalkdExceptionOccurs(): void
     {
         $id = '123456';
 
@@ -400,7 +400,7 @@ final class ConnectionTest extends TestCase
         $connection->getMessagePriority($id);
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $tube = 'xyz';
 
@@ -442,7 +442,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame($id2, $returnedId);
     }
 
-    public function testSendOnReconnect()
+    public function testSendOnReconnect(): void
     {
         $tube = 'xyz';
 
@@ -479,7 +479,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame($id, $returnedId);
     }
 
-    public function testSendWithPriority()
+    public function testSendWithPriority(): void
     {
         $tube = 'xyz';
 
@@ -514,7 +514,7 @@ final class ConnectionTest extends TestCase
         $this->assertSame($id, $returnedId);
     }
 
-    public function testSendWhenABeanstalkdExceptionOccurs()
+    public function testSendWhenABeanstalkdExceptionOccurs(): void
     {
         $tube = 'xyz';
 
@@ -548,7 +548,7 @@ final class ConnectionTest extends TestCase
         $connection->send($body, $headers, $delay);
     }
 
-    public function testKeepalive()
+    public function testKeepalive(): void
     {
         $id = '123456';
 
@@ -563,7 +563,7 @@ final class ConnectionTest extends TestCase
         $connection->keepalive($id);
     }
 
-    public function testKeepaliveWhenABeanstalkdExceptionOccurs()
+    public function testKeepaliveWhenABeanstalkdExceptionOccurs(): void
     {
         $id = '123456';
 
@@ -581,7 +581,7 @@ final class ConnectionTest extends TestCase
         $connection->keepalive($id);
     }
 
-    public function testSendWithRoundedDelay()
+    public function testSendWithRoundedDelay(): void
     {
         $tube = 'xyz';
         $body = 'foo';

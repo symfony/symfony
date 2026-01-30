@@ -20,13 +20,13 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class InputArgumentTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $argument = new InputArgument('foo');
         $this->assertSame('foo', $argument->getName(), '__construct() takes a name as its first argument');
     }
 
-    public function testModes()
+    public function testModes(): void
     {
         $argument = new InputArgument('foo');
         $this->assertFalse($argument->isRequired(), '__construct() gives a "InputArgument::OPTIONAL" mode by default');
@@ -41,7 +41,7 @@ class InputArgumentTest extends TestCase
         $this->assertTrue($argument->isRequired(), '__construct() can take "InputArgument::REQUIRED" as its mode');
     }
 
-    public function testInvalidModes()
+    public function testInvalidModes(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Argument mode "-1" is not valid.');
@@ -49,7 +49,7 @@ class InputArgumentTest extends TestCase
         new InputArgument('foo', '-1');
     }
 
-    public function testIsArray()
+    public function testIsArray(): void
     {
         $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
         $this->assertTrue($argument->isArray(), '->isArray() returns true if the argument can be an array');
@@ -59,19 +59,19 @@ class InputArgumentTest extends TestCase
         $this->assertFalse($argument->isArray(), '->isArray() returns false if the argument cannot be an array');
     }
 
-    public function testGetDescription()
+    public function testGetDescription(): void
     {
         $argument = new InputArgument('foo', null, 'Some description');
         $this->assertSame('Some description', $argument->getDescription(), '->getDescription() return the message description');
     }
 
-    public function testGetDefault()
+    public function testGetDefault(): void
     {
         $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', 'default');
         $this->assertSame('default', $argument->getDefault(), '->getDefault() return the default value');
     }
 
-    public function testSetDefault()
+    public function testSetDefault(): void
     {
         $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', 'default');
         $argument->setDefault(null);
@@ -84,7 +84,7 @@ class InputArgumentTest extends TestCase
         $this->assertSame([1, 2], $argument->getDefault(), '->setDefault() changes the default value');
     }
 
-    public function testSetDefaultWithObject()
+    public function testSetDefaultWithObject(): void
     {
         $default = new \DateTimeImmutable('2024-01-01');
         $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', $default);
@@ -95,7 +95,7 @@ class InputArgumentTest extends TestCase
         $this->assertSame($newDefault, $argument->getDefault(), '->setDefault() changes the default value to an object');
     }
 
-    public function testSetDefaultWithRequiredArgument()
+    public function testSetDefaultWithRequiredArgument(): void
     {
         $argument = new InputArgument('foo', InputArgument::REQUIRED);
 
@@ -105,7 +105,7 @@ class InputArgumentTest extends TestCase
         $argument->setDefault('default');
     }
 
-    public function testSetDefaultWithRequiredArrayArgument()
+    public function testSetDefaultWithRequiredArrayArgument(): void
     {
         $argument = new InputArgument('foo', InputArgument::REQUIRED | InputArgument::IS_ARRAY);
 
@@ -115,7 +115,7 @@ class InputArgumentTest extends TestCase
         $argument->setDefault([]);
     }
 
-    public function testSetDefaultWithArrayArgument()
+    public function testSetDefaultWithArrayArgument(): void
     {
         $argument = new InputArgument('foo', InputArgument::IS_ARRAY);
 
@@ -125,7 +125,7 @@ class InputArgumentTest extends TestCase
         $argument->setDefault('default');
     }
 
-    public function testCompleteArray()
+    public function testCompleteArray(): void
     {
         $values = ['foo', 'bar'];
         $argument = new InputArgument('foo', null, '', null, $values);
@@ -135,7 +135,7 @@ class InputArgumentTest extends TestCase
         $this->assertSame($values, array_map(static fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
     }
 
-    public function testCompleteClosure()
+    public function testCompleteClosure(): void
     {
         $values = ['foo', 'bar'];
         $argument = new InputArgument('foo', null, '', null, static fn (CompletionInput $input): array => $values);
@@ -145,7 +145,7 @@ class InputArgumentTest extends TestCase
         $this->assertSame($values, array_map(static fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
     }
 
-    public function testCompleteClosureReturnIncorrectType()
+    public function testCompleteClosureReturnIncorrectType(): void
     {
         $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', null, static fn (CompletionInput $input) => 'invalid');
 

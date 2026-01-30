@@ -39,7 +39,7 @@ use Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutV
 
 class YamlFileLoaderTest extends TestCase
 {
-    public function testLoadClassMetadataReturnsFalseIfEmpty()
+    public function testLoadClassMetadataReturnsFalseIfEmpty(): void
     {
         $loader = new YamlFileLoader(__DIR__.'/empty-mapping.yml');
         $metadata = new ClassMetadata(Entity::class);
@@ -51,7 +51,7 @@ class YamlFileLoaderTest extends TestCase
     }
 
     #[DataProvider('provideInvalidYamlFiles')]
-    public function testInvalidYamlFiles($path)
+    public function testInvalidYamlFiles($path): void
     {
         $loader = new YamlFileLoader(__DIR__.'/'.$path);
         $metadata = new ClassMetadata(Entity::class);
@@ -72,7 +72,7 @@ class YamlFileLoaderTest extends TestCase
     /**
      * @see https://github.com/symfony/symfony/pull/12158
      */
-    public function testDoNotModifyStateIfExceptionIsThrown()
+    public function testDoNotModifyStateIfExceptionIsThrown(): void
     {
         $loader = new YamlFileLoader(__DIR__.'/nonvalid-mapping.yml');
         $metadata = new ClassMetadata(Entity::class);
@@ -85,7 +85,7 @@ class YamlFileLoaderTest extends TestCase
         }
     }
 
-    public function testLoadClassMetadataReturnsTrueIfSuccessful()
+    public function testLoadClassMetadataReturnsTrueIfSuccessful(): void
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
         $metadata = new ClassMetadata(Entity::class);
@@ -93,7 +93,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertTrue($loader->loadClassMetadata($metadata));
     }
 
-    public function testLoadClassMetadataReturnsFalseIfNotSuccessful()
+    public function testLoadClassMetadataReturnsFalseIfNotSuccessful(): void
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
         $metadata = new ClassMetadata(\stdClass::class);
@@ -101,7 +101,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertFalse($loader->loadClassMetadata($metadata));
     }
 
-    public function testLoadClassMetadata()
+    public function testLoadClassMetadata(): void
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
         $metadata = new ClassMetadata(Entity::class);
@@ -138,7 +138,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
-    public function testLoadClassMetadataWithConstants()
+    public function testLoadClassMetadataWithConstants(): void
     {
         $loader = new YamlFileLoader(__DIR__.'/mapping-with-constants.yml');
         $metadata = new ClassMetadata(Entity::class);
@@ -151,7 +151,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
-    public function testLoadClassMetadataWithRequiredArguments()
+    public function testLoadClassMetadataWithRequiredArguments(): void
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping-required-arg.yml');
         $metadata = new ClassMetadata(Entity_81::class);
@@ -164,7 +164,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
-    public function testLoadGroupSequenceProvider()
+    public function testLoadGroupSequenceProvider(): void
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
         $metadata = new ClassMetadata(GroupSequenceProviderEntity::class);
@@ -177,7 +177,7 @@ class YamlFileLoaderTest extends TestCase
         $this->assertEquals($expected, $metadata);
     }
 
-    public function testLoadGroupProvider()
+    public function testLoadGroupProvider(): void
     {
         $loader = new YamlFileLoader(__DIR__.'/constraint-mapping.yml');
         $metadata = new ClassMetadata(GroupProviderDto::class);

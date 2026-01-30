@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\ExpressionRequestMatcher;
 class ExpressionRequestMatcherTest extends TestCase
 {
     #[DataProvider('provideExpressions')]
-    public function testMatchesWhenParentMatchesIsTrue($expression, $expected)
+    public function testMatchesWhenParentMatchesIsTrue($expression, $expected): void
     {
         $request = Request::create('/foo');
         $expressionRequestMatcher = new ExpressionRequestMatcher(new ExpressionLanguage(), $expression);

@@ -65,7 +65,7 @@ class CrowdinProviderTest extends ProviderTestCase
         ];
     }
 
-    public function testCompleteWriteProcessAddFiles()
+    public function testCompleteWriteProcessAddFiles(): void
     {
         $this->xliffFileDumper = new XliffFileDumper();
 
@@ -167,7 +167,7 @@ class CrowdinProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testWriteAddFileServerError()
+    public function testWriteAddFileServerError(): void
     {
         $this->xliffFileDumper = new XliffFileDumper();
 
@@ -238,7 +238,7 @@ class CrowdinProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testWriteUpdateFileServerError()
+    public function testWriteUpdateFileServerError(): void
     {
         $this->xliffFileDumper = new XliffFileDumper();
 
@@ -350,7 +350,7 @@ class CrowdinProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testWriteUploadTranslationsServerError()
+    public function testWriteUploadTranslationsServerError(): void
     {
         $this->xliffFileDumper = new XliffFileDumper();
 
@@ -493,7 +493,7 @@ class CrowdinProviderTest extends ProviderTestCase
         $provider->write($translatorBag);
     }
 
-    public function testCompleteWriteProcessUpdateFiles()
+    public function testCompleteWriteProcessUpdateFiles(): void
     {
         $this->xliffFileDumper = new XliffFileDumper();
 
@@ -601,7 +601,7 @@ class CrowdinProviderTest extends ProviderTestCase
     }
 
     #[DataProvider('getResponsesForProcessAddFileAndUploadTranslations')]
-    public function testCompleteWriteProcessAddFileAndUploadTranslations(TranslatorBag $translatorBag, string $expectedLocale, string $expectedMessagesTranslationsContent)
+    public function testCompleteWriteProcessAddFileAndUploadTranslations(TranslatorBag $translatorBag, string $expectedLocale, string $expectedMessagesTranslationsContent): void
     {
         $this->xliffFileDumper = new XliffFileDumper();
 
@@ -826,7 +826,7 @@ class CrowdinProviderTest extends ProviderTestCase
     }
 
     #[DataProvider('getResponsesForOneLocaleAndOneDomain')]
-    public function testReadForOneLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag, string $expectedTargetLanguageId)
+    public function testReadForOneLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag, string $expectedTargetLanguageId): void
     {
         $responses = [
             'listFiles' => function (string $method, string $url): ResponseInterface {
@@ -950,7 +950,7 @@ class CrowdinProviderTest extends ProviderTestCase
     }
 
     #[DataProvider('getResponsesForDefaultLocaleAndOneDomain')]
-    public function testReadForDefaultLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag)
+    public function testReadForDefaultLocaleAndOneDomain(string $locale, string $domain, string $responseContent, TranslatorBag $expectedTranslatorBag): void
     {
         $responses = [
             'listFiles' => function (string $method, string $url): ResponseInterface {
@@ -1043,7 +1043,7 @@ class CrowdinProviderTest extends ProviderTestCase
         ];
     }
 
-    public function testReadServerException()
+    public function testReadServerException(): void
     {
         $responses = [
             'listFiles' => function (string $method, string $url): ResponseInterface {
@@ -1092,7 +1092,7 @@ class CrowdinProviderTest extends ProviderTestCase
         $crowdinProvider->read(['messages'], ['fr']);
     }
 
-    public function testReadDownloadServerException()
+    public function testReadDownloadServerException(): void
     {
         $responses = [
             'listFiles' => function (string $method, string $url): ResponseInterface {
@@ -1147,7 +1147,7 @@ class CrowdinProviderTest extends ProviderTestCase
         $crowdinProvider->read(['messages'], ['fr']);
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         $responses = [
             'listFiles' => function (string $method, string $url): ResponseInterface {
@@ -1210,7 +1210,7 @@ class CrowdinProviderTest extends ProviderTestCase
         $provider->delete($translatorBag);
     }
 
-    public function testDeleteListStringServerException()
+    public function testDeleteListStringServerException(): void
     {
         $responses = [
             'listFiles' => function (string $method, string $url): ResponseInterface {
@@ -1252,7 +1252,7 @@ class CrowdinProviderTest extends ProviderTestCase
         $provider->delete($translatorBag);
     }
 
-    public function testDeleteDeleteStringServerException()
+    public function testDeleteDeleteStringServerException(): void
     {
         $responses = [
             'listFiles' => function (string $method, string $url): ResponseInterface {

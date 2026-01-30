@@ -21,19 +21,19 @@ class SubmitTypeTest extends ButtonTypeTest
 {
     public const TESTED_TYPE = SubmitType::class;
 
-    public function testCreateSubmitButtonInstances()
+    public function testCreateSubmitButtonInstances(): void
     {
         $this->assertInstanceOf(SubmitButton::class, $this->factory->create(static::TESTED_TYPE));
     }
 
-    public function testNotClickedByDefault()
+    public function testNotClickedByDefault(): void
     {
         $button = $this->factory->create(static::TESTED_TYPE);
 
         $this->assertFalse($button->isClicked());
     }
 
-    public function testNotClickedIfSubmittedWithNull()
+    public function testNotClickedIfSubmittedWithNull(): void
     {
         $button = $this->factory->create(static::TESTED_TYPE);
         $button->submit(null);
@@ -41,7 +41,7 @@ class SubmitTypeTest extends ButtonTypeTest
         $this->assertFalse($button->isClicked());
     }
 
-    public function testClickedIfSubmittedWithEmptyString()
+    public function testClickedIfSubmittedWithEmptyString(): void
     {
         $button = $this->factory->create(static::TESTED_TYPE);
         $button->submit('');
@@ -49,7 +49,7 @@ class SubmitTypeTest extends ButtonTypeTest
         $this->assertTrue($button->isClicked());
     }
 
-    public function testClickedIfSubmittedWithUnemptyString()
+    public function testClickedIfSubmittedWithUnemptyString(): void
     {
         $button = $this->factory->create(static::TESTED_TYPE);
         $button->submit('foo');
@@ -57,7 +57,7 @@ class SubmitTypeTest extends ButtonTypeTest
         $this->assertTrue($button->isClicked());
     }
 
-    public function testSubmitCanBeAddedToForm()
+    public function testSubmitCanBeAddedToForm(): void
     {
         $form = $this->factory
             ->createBuilder(FormTypeTest::TESTED_TYPE)
@@ -66,7 +66,7 @@ class SubmitTypeTest extends ButtonTypeTest
         $this->assertSame($form, $form->add('send', static::TESTED_TYPE));
     }
 
-    public function testFormNoValidate()
+    public function testFormNoValidate(): void
     {
         $this->assertTrue($this->factory->create(static::TESTED_TYPE, null, [
             'validate' => false,

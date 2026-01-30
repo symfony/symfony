@@ -30,7 +30,7 @@ use Symfony\Component\Messenger\Exception\TransportException;
 
 class ConnectionTest extends TestCase
 {
-    public function testExtraOptions()
+    public function testExtraOptions(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         Connection::fromDsn('sqs://default/queue', [
@@ -38,13 +38,13 @@ class ConnectionTest extends TestCase
         ]);
     }
 
-    public function testExtraParamsInQuery()
+    public function testExtraParamsInQuery(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         Connection::fromDsn('sqs://default/queue?extra_param=some_value');
     }
 
-    public function testConfigureWithCredentials()
+    public function testConfigureWithCredentials(): void
     {
         $awsKey = 'some_aws_access_key_value';
         $awsSecret = 'some_aws_secret_value';
@@ -60,7 +60,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testConfigureWithTemporaryCredentials()
+    public function testConfigureWithTemporaryCredentials(): void
     {
         $awsKey = 'some_aws_access_key_value';
         $awsSecret = 'some_aws_secret_value';
@@ -78,7 +78,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromInvalidDsn()
+    public function testFromInvalidDsn(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The given Amazon SQS DSN is invalid.');
@@ -86,7 +86,7 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('sqs://');
     }
 
-    public function testFromDsn()
+    public function testFromDsn(): void
     {
         $httpClient = new MockHttpClient();
         $this->assertEquals(
@@ -95,7 +95,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testDsnPrecedence()
+    public function testDsnPrecedence(): void
     {
         $httpClient = new MockHttpClient();
         $this->assertEquals(
@@ -104,7 +104,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithRegion()
+    public function testFromDsnWithRegion(): void
     {
         $httpClient = new MockHttpClient();
         $this->assertEquals(
@@ -113,7 +113,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnAsQueueUrl()
+    public function testFromDsnAsQueueUrl(): void
     {
         $httpClient = new MockHttpClient();
         $this->assertEquals(
@@ -122,7 +122,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithCustomEndpoint()
+    public function testFromDsnWithCustomEndpoint(): void
     {
         $httpClient = new MockHttpClient();
         $this->assertEquals(
@@ -131,7 +131,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithSslMode()
+    public function testFromDsnWithSslMode(): void
     {
         $httpClient = new MockHttpClient();
         $this->assertEquals(
@@ -140,7 +140,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithSslModeOnDefault()
+    public function testFromDsnWithSslModeOnDefault(): void
     {
         $httpClient = new MockHttpClient();
         $this->assertEquals(
@@ -149,7 +149,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithCustomEndpointAndPort()
+    public function testFromDsnWithCustomEndpointAndPort(): void
     {
         $httpClient = new MockHttpClient();
         $this->assertEquals(
@@ -158,7 +158,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithOptions()
+    public function testFromDsnWithOptions(): void
     {
         $httpClient = new MockHttpClient();
         $this->assertEquals(
@@ -167,7 +167,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithQueryOptions()
+    public function testFromDsnWithQueryOptions(): void
     {
         $httpClient = new MockHttpClient();
         $this->assertEquals(
@@ -176,7 +176,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithQueueNameOption()
+    public function testFromDsnWithQueueNameOption(): void
     {
         $httpClient = new MockHttpClient();
 
@@ -191,7 +191,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithAccountAndEndpointOption()
+    public function testFromDsnWithAccountAndEndpointOption(): void
     {
         $httpClient = new MockHttpClient();
 
@@ -201,7 +201,7 @@ class ConnectionTest extends TestCase
         );
     }
 
-    public function testFromDsnWithInvalidQueryString()
+    public function testFromDsnWithInvalidQueryString(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('|Unknown option found in DSN: \[foo\]\. Allowed options are \[buffer_size, |');
@@ -209,7 +209,7 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('sqs://default?foo=foo');
     }
 
-    public function testFromDsnWithInvalidOption()
+    public function testFromDsnWithInvalidOption(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('|Unknown option found: \[bar\]\. Allowed options are \[buffer_size, |');
@@ -217,7 +217,7 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('sqs://default', ['bar' => 'bar']);
     }
 
-    public function testFromDsnWithInvalidQueryStringAndOption()
+    public function testFromDsnWithInvalidQueryStringAndOption(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('|Unknown option found: \[bar\]\. Allowed options are \[buffer_size, |');
@@ -225,7 +225,7 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('sqs://default?foo=foo', ['bar' => 'bar']);
     }
 
-    public function testKeepGettingPendingMessages()
+    public function testKeepGettingPendingMessages(): void
     {
         $client = $this->createMock(SqsClient::class);
         $client->expects($this->any())
@@ -270,7 +270,7 @@ class ConnectionTest extends TestCase
         $this->assertNull($connection->get());
     }
 
-    public function testUnexpectedSqsError()
+    public function testUnexpectedSqsError(): void
     {
         $this->expectException(HttpException::class);
         $this->expectExceptionMessage('SQS error happens');
@@ -286,7 +286,7 @@ class ConnectionTest extends TestCase
     }
 
     #[DataProvider('provideQueueUrl')]
-    public function testInjectQueueUrl(string $dsn, string $queueUrl)
+    public function testInjectQueueUrl(string $dsn, string $queueUrl): void
     {
         $connection = Connection::fromDsn($dsn);
 
@@ -304,7 +304,7 @@ class ConnectionTest extends TestCase
     }
 
     #[DataProvider('provideNotQueueUrl')]
-    public function testNotInjectQueueUrl(string $dsn)
+    public function testNotInjectQueueUrl(string $dsn): void
     {
         $connection = Connection::fromDsn($dsn);
 
@@ -321,7 +321,7 @@ class ConnectionTest extends TestCase
         yield ['sqs://default/queue'];
     }
 
-    public function testGetQueueUrlNotCalled()
+    public function testGetQueueUrlNotCalled(): void
     {
         $client = $this->createMock(SqsClient::class);
         $connection = new Connection(['queue_name' => 'ab1-MyQueue-A2BCDEF3GHI4', 'account' => '123456789012'], $client, 'https://sqs.us-east-2.amazonaws.com/123456789012/ab1-MyQueue-A2BCDEF3GHI4');
@@ -332,7 +332,7 @@ class ConnectionTest extends TestCase
         $connection->delete('id');
     }
 
-    public function testLoggerWithoutDebugOption()
+    public function testLoggerWithoutDebugOption(): void
     {
         $client = new MockHttpClient([$this->getMockedQueueUrlResponse(), $this->getMockedReceiveMessageResponse()]);
         $logger = $this->getMockBuilder(NullLogger::class)
@@ -344,7 +344,7 @@ class ConnectionTest extends TestCase
         $connection->get();
     }
 
-    public function testLoggerWithDebugOption()
+    public function testLoggerWithDebugOption(): void
     {
         $client = new MockHttpClient([$this->getMockedQueueUrlResponse(), $this->getMockedReceiveMessageResponse()]);
         $logger = $this->getMockBuilder(NullLogger::class)
@@ -356,7 +356,7 @@ class ConnectionTest extends TestCase
         $connection->get();
     }
 
-    public function testKeepalive()
+    public function testKeepalive(): void
     {
         $expectedParams = [
             'QueueUrl' => $queueUrl = 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
@@ -371,7 +371,7 @@ class ConnectionTest extends TestCase
         $connection->keepalive($id);
     }
 
-    public function testDeleteOnReject()
+    public function testDeleteOnReject(): void
     {
         $expectedParams = [
             'QueueUrl' => $queueUrl = 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
@@ -385,7 +385,7 @@ class ConnectionTest extends TestCase
         $connection->reject($id);
     }
 
-    public function testDoNotDeleteOnRejection()
+    public function testDoNotDeleteOnRejection(): void
     {
         $expectedParams = [
             'QueueUrl' => $queueUrl = 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
@@ -400,7 +400,7 @@ class ConnectionTest extends TestCase
         $connection->reject($id);
     }
 
-    public function testDoNotDeleteOnRejectionWithRetryDelay()
+    public function testDoNotDeleteOnRejectionWithRetryDelay(): void
     {
         $expectedParams = [
             'QueueUrl' => $queueUrl = 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
@@ -415,7 +415,7 @@ class ConnectionTest extends TestCase
         $connection->reject($id);
     }
 
-    public function testKeepaliveWithTooSmallTtl()
+    public function testKeepaliveWithTooSmallTtl(): void
     {
         $client = $this->createMock(SqsClient::class);
         $client->expects($this->never())->method($this->anything());
@@ -427,7 +427,7 @@ class ConnectionTest extends TestCase
         $connection->keepalive('123', 2);
     }
 
-    public function testQueueAttributesAndTags()
+    public function testQueueAttributesAndTags(): void
     {
         $queueName = 'queueName.fifo';
         $queueAttributes = [
@@ -447,7 +447,7 @@ class ConnectionTest extends TestCase
         $connection->setup();
     }
 
-    public function testQueueAttributesAndTagsFromDsn()
+    public function testQueueAttributesAndTagsFromDsn(): void
     {
         $httpClient = new MockHttpClient();
 

@@ -17,13 +17,13 @@ use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 class PasswordStrengthTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $constraint = new PasswordStrength();
         $this->assertSame(2, $constraint->minScore);
     }
 
-    public function testConstructorWithParameters()
+    public function testConstructorWithParameters(): void
     {
         $constraint = new PasswordStrength(minScore: PasswordStrength::STRENGTH_STRONG, message: 'This password should be strong.');
 
@@ -31,14 +31,14 @@ class PasswordStrengthTest extends TestCase
         $this->assertSame('This password should be strong.', $constraint->message);
     }
 
-    public function testInvalidScoreOfZero()
+    public function testInvalidScoreOfZero(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The parameter "minScore" of the "Symfony\Component\Validator\Constraints\PasswordStrength" constraint must be an integer between 1 and 4.');
         new PasswordStrength(minScore: PasswordStrength::STRENGTH_VERY_WEAK);
     }
 
-    public function testInvalidScoreOfFive()
+    public function testInvalidScoreOfFive(): void
     {
         $this->expectException(ConstraintDefinitionException::class);
         $this->expectExceptionMessage('The parameter "minScore" of the "Symfony\Component\Validator\Constraints\PasswordStrength" constraint must be an integer between 1 and 4.');

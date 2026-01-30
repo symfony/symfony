@@ -20,7 +20,7 @@ use Symfony\Component\Workflow\Validator\StateMachineValidator;
 
 class StateMachineValidatorTest extends TestCase
 {
-    public function testWithMultipleTransitionWithSameNameShareInput()
+    public function testWithMultipleTransitionWithSameNameShareInput(): void
     {
         $this->expectException(InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition from a place/state must have an unique name.');
@@ -44,7 +44,7 @@ class StateMachineValidatorTest extends TestCase
         //  +----+     +----+
     }
 
-    public function testWithMultipleTos()
+    public function testWithMultipleTos(): void
     {
         $this->expectException(InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition in StateMachine can only have one output.');
@@ -67,7 +67,7 @@ class StateMachineValidatorTest extends TestCase
         //           +----+
     }
 
-    public function testWithMultipleFroms()
+    public function testWithMultipleFroms(): void
     {
         $this->expectException(InvalidDefinitionException::class);
         $this->expectExceptionMessage('A transition in StateMachine can only have one input.');
@@ -90,7 +90,7 @@ class StateMachineValidatorTest extends TestCase
         //           +----+
     }
 
-    public function testValid()
+    public function testValid(): void
     {
         $places = ['a', 'b', 'c'];
         $transitions[] = new Transition('t1', 'a', 'b');
@@ -115,7 +115,7 @@ class StateMachineValidatorTest extends TestCase
         // +----+     +----+
     }
 
-    public function testWithTooManyInitialPlaces()
+    public function testWithTooManyInitialPlaces(): void
     {
         $places = range('a', 'c');
         $transitions = [];
@@ -127,7 +127,7 @@ class StateMachineValidatorTest extends TestCase
         (new StateMachineValidator())->validate($definition, 'foo');
     }
 
-    public function testWithArcInFromTooHeavy()
+    public function testWithArcInFromTooHeavy(): void
     {
         $places = ['a', 'b'];
         $transitions = [
@@ -141,7 +141,7 @@ class StateMachineValidatorTest extends TestCase
         (new StateMachineValidator())->validate($definition, 'foo');
     }
 
-    public function testWithArcInToTooHeavy()
+    public function testWithArcInToTooHeavy(): void
     {
         $places = ['a', 'b'];
         $transitions = [

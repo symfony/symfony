@@ -66,7 +66,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         ]);
     }
 
-    public function testCreateIndex()
+    public function testCreateIndex(): void
     {
         $store = $this->getStore();
         $store->createTtlIndex();
@@ -82,7 +82,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
     }
 
     #[DataProvider('provideConstructorArgs')]
-    public function testConstructionMethods($mongo, array $options)
+    public function testConstructionMethods($mongo, array $options): void
     {
         $key = new Key(__METHOD__);
 
@@ -103,7 +103,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         yield ['mongodb://localhost/', ['database' => 'test', 'collection' => 'lock']];
     }
 
-    public function testConstructWithClient()
+    public function testConstructWithClient(): void
     {
         $client = $this->createMock(Client::class);
         $client->expects($this->once())
@@ -113,7 +113,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         $this->testConstructionMethods($client, ['database' => 'test', 'collection' => 'lock']);
     }
 
-    public function testConstructWithDatabase()
+    public function testConstructWithDatabase(): void
     {
         $database = $this->createMock(Database::class);
         $database->expects($this->once())
@@ -126,7 +126,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         $this->testConstructionMethods($database, ['collection' => 'lock']);
     }
 
-    public function testConstructWithCollection()
+    public function testConstructWithCollection(): void
     {
         $collection = $this->createMock(Collection::class);
         $collection->expects($this->once())
@@ -142,7 +142,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
         $this->testConstructionMethods($collection, []);
     }
 
-    public function testUriPrecedence()
+    public function testUriPrecedence(): void
     {
         $store = new MongoDbStore('mongodb://localhost/test_uri?collection=lock_uri', [
             'database' => 'test_option',
@@ -158,7 +158,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
     }
 
     #[DataProvider('provideInvalidConstructorArgs')]
-    public function testInvalidConstructionMethods($mongo, array $options)
+    public function testInvalidConstructionMethods($mongo, array $options): void
     {
         $this->expectException(InvalidArgumentException::class);
 
@@ -177,7 +177,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
     }
 
     #[DataProvider('provideUriCollectionStripArgs')]
-    public function testUriCollectionStrip(string $uri, array $options, string $driverUri)
+    public function testUriCollectionStrip(string $uri, array $options, string $driverUri): void
     {
         $store = new MongoDbStore($uri, $options);
         $storeReflection = new \ReflectionObject($store);

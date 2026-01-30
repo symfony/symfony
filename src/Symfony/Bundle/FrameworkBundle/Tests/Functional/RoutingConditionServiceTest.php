@@ -16,7 +16,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class RoutingConditionServiceTest extends AbstractWebTestCase
 {
     #[DataProvider('provideRoutes')]
-    public function testCondition(int $code, string $path)
+    public function testCondition(int $code, string $path): void
     {
         $client = static::createClient(['test_case' => 'RoutingConditionService']);
 

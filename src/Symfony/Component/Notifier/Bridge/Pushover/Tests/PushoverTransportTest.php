@@ -45,7 +45,7 @@ final class PushoverTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    public function testSendWithOptions()
+    public function testSendWithOptions(): void
     {
         $messageSubject = 'testMessageSubject';
         $messageContent = 'testMessageContent';
@@ -71,7 +71,7 @@ final class PushoverTransportTest extends TransportTestCase
         $this->assertSame('uuid', $sentMessage->getMessageId());
     }
 
-    public function testSendWithNotification()
+    public function testSendWithNotification(): void
     {
         $messageSubject = 'testMessageSubject';
         $messageContent = 'testMessageContent';

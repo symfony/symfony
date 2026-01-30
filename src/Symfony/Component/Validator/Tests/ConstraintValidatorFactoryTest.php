@@ -18,13 +18,13 @@ use Symfony\Component\Validator\Tests\Fixtures\DummyConstraintValidator;
 
 class ConstraintValidatorFactoryTest extends TestCase
 {
-    public function testGetInstance()
+    public function testGetInstance(): void
     {
         $factory = new ConstraintValidatorFactory();
         $this->assertInstanceOf(DummyConstraintValidator::class, $factory->getInstance(new DummyConstraint()));
     }
 
-    public function testPredefinedGetInstance()
+    public function testPredefinedGetInstance(): void
     {
         $validator = new DummyConstraintValidator();
         $factory = new ConstraintValidatorFactory([DummyConstraintValidator::class => $validator]);

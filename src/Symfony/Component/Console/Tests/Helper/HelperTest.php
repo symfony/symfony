@@ -63,13 +63,13 @@ class HelperTest extends TestCase
     }
 
     #[DataProvider('formatTimeProvider')]
-    public function testFormatTime(int|float $secs, string $expectedFormat, int $precision)
+    public function testFormatTime(int|float $secs, string $expectedFormat, int $precision): void
     {
         $this->assertEquals($expectedFormat, Helper::formatTime($secs, $precision));
     }
 
     #[DataProvider('decoratedTextProvider')]
-    public function testRemoveDecoration(string $decoratedText, string $undecoratedText)
+    public function testRemoveDecoration(string $decoratedText, string $undecoratedText): void
     {
         $this->assertEquals($undecoratedText, Helper::removeDecoration(new OutputFormatter(), $decoratedText));
     }

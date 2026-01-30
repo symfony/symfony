@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Smsmode\SmsmodeOptions;
 
 class SmsmodeOptionsTest extends TestCase
 {
-    public function testSmsmodeOptions()
+    public function testSmsmodeOptions(): void
     {
         $smsmodeOptions = (new SmsmodeOptions())
             ->refClient('test_ref_client')

@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Discord\Embeds\DiscordAuthorEmbedObject;
 
 final class DiscordAuthorEmbedObjectTest extends TestCase
 {
-    public function testCanBeInstantiated()
+    public function testCanBeInstantiated(): void
     {
         $author = (new DiscordAuthorEmbedObject())
             ->name('Doe')

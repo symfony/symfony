@@ -24,28 +24,28 @@ class DateValidatorTest extends ConstraintValidatorTestCase
         return new DateValidator();
     }
 
-    public function testNullIsValid()
+    public function testNullIsValid(): void
     {
         $this->validator->validate(null, new Date());
 
         $this->assertNoViolation();
     }
 
-    public function testEmptyStringIsValid()
+    public function testEmptyStringIsValid(): void
     {
         $this->validator->validate('', new Date());
 
         $this->assertNoViolation();
     }
 
-    public function testExpectsStringCompatibleType()
+    public function testExpectsStringCompatibleType(): void
     {
         $this->expectException(UnexpectedValueException::class);
         $this->validator->validate(new \stdClass(), new Date());
     }
 
     #[DataProvider('getValidDates')]
-    public function testValidDates($date)
+    public function testValidDates($date): void
     {
         $this->validator->validate($date, new Date());
 
@@ -53,7 +53,7 @@ class DateValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getValidDates')]
-    public function testValidDatesWithNewLine(string $date)
+    public function testValidDatesWithNewLine(string $date): void
     {
         $this->validator->validate($date."\n", new Date(message: 'myMessage'));
 
@@ -73,7 +73,7 @@ class DateValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidDates')]
-    public function testInvalidDates($date, $code)
+    public function testInvalidDates($date, $code): void
     {
         $constraint = new Date(message: 'myMessage');
 
@@ -85,7 +85,7 @@ class DateValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testInvalidDateNamed()
+    public function testInvalidDateNamed(): void
     {
         $constraint = new Date(message: 'myMessage');
 

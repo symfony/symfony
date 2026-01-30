@@ -23,7 +23,7 @@ use Symfony\Component\VarDumper\Tests\Fixtures\VirtualProperty;
  */
 class HtmlDumperTest extends TestCase
 {
-    public function testGet()
+    public function testGet(): void
     {
         if (\ini_get('xdebug.file_link_format') || get_cfg_var('xdebug.file_link_format')) {
             $this->markTestSkipped('A custom file_link_format is defined.');
@@ -118,7 +118,7 @@ class HtmlDumperTest extends TestCase
         );
     }
 
-    public function testVirtualProperties()
+    public function testVirtualProperties(): void
     {
         $dumper = new HtmlDumper('php://output');
         $dumper->setDumpHeader('<foo></foo>');
@@ -141,7 +141,7 @@ class HtmlDumperTest extends TestCase
         );
     }
 
-    public function testCharset()
+    public function testCharset(): void
     {
         $var = mb_convert_encoding('Словарь', 'CP1251', 'UTF-8');
 
@@ -163,7 +163,7 @@ class HtmlDumperTest extends TestCase
         );
     }
 
-    public function testAppend()
+    public function testAppend(): void
     {
         $out = fopen('php://memory', 'r+');
 
@@ -189,7 +189,7 @@ class HtmlDumperTest extends TestCase
     }
 
     #[DataProvider('varToDumpProvider')]
-    public function testDumpString($var, $needle)
+    public function testDumpString($var, $needle): void
     {
         $dumper = new HtmlDumper();
         $cloner = new VarCloner();

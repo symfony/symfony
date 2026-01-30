@@ -39,7 +39,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         parent::__construct($eventDispatcher ?? new EventDispatcher(), $this, null, $this);
     }
 
-    public function assert(\Closure $callback)
+    public function assert(\Closure $callback): void
     {
         $trustedConfig = [Request::getTrustedProxies(), Request::getTrustedHeaderSet()];
 
@@ -95,7 +95,7 @@ class TestHttpKernel extends HttpKernel implements ControllerResolverInterface, 
         return $this->called;
     }
 
-    public function reset()
+    public function reset(): void
     {
         $this->called = false;
     }

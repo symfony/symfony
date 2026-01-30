@@ -25,7 +25,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 class ExpressionVoterTest extends TestCase
 {
     #[DataProvider('getVoteTests')]
-    public function testVoteWithTokenThatReturnsRoleNames($roles, $attributes, $expected, $tokenExpectsGetRoles = true, $expressionLanguageExpectsEvaluate = true)
+    public function testVoteWithTokenThatReturnsRoleNames($roles, $attributes, $expected, $tokenExpectsGetRoles = true, $expressionLanguageExpectsEvaluate = true): void
     {
         $voter = new ExpressionVoter($this->createExpressionLanguage($expressionLanguageExpectsEvaluate), $this->createTrustResolver(), $this->createAuthorizationChecker());
 

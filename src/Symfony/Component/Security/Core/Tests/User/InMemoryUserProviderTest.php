@@ -18,7 +18,7 @@ use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 
 class InMemoryUserProviderTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $provider = $this->createProvider();
 
@@ -28,7 +28,7 @@ class InMemoryUserProviderTest extends TestCase
         $this->assertFalse($user->isEnabled());
     }
 
-    public function testRefresh()
+    public function testRefresh(): void
     {
         $user = new InMemoryUser('fabien', 'bar');
 
@@ -51,7 +51,7 @@ class InMemoryUserProviderTest extends TestCase
         ]);
     }
 
-    public function testCreateUser()
+    public function testCreateUser(): void
     {
         $provider = new InMemoryUserProvider();
         $provider->createUser(new InMemoryUser('fabien', 'foo'));
@@ -60,7 +60,7 @@ class InMemoryUserProviderTest extends TestCase
         $this->assertEquals('foo', $user->getPassword());
     }
 
-    public function testCreateUserAlreadyExist()
+    public function testCreateUserAlreadyExist(): void
     {
         $provider = new InMemoryUserProvider();
         $provider->createUser(new InMemoryUser('fabien', 'foo'));
@@ -70,7 +70,7 @@ class InMemoryUserProviderTest extends TestCase
         $provider->createUser(new InMemoryUser('fabien', 'foo'));
     }
 
-    public function testLoadUserByIdentifierDoesNotExist()
+    public function testLoadUserByIdentifierDoesNotExist(): void
     {
         $this->expectException(UserNotFoundException::class);
         (new InMemoryUserProvider())->loadUserByIdentifier('fabien');

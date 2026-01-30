@@ -29,7 +29,7 @@ class XmlEncoderContextBuilderTest extends TestCase
     }
 
     #[DataProvider('withersDataProvider')]
-    public function testWithers(array $values)
+    public function testWithers(array $values): void
     {
         $context = $this->contextBuilder
             ->withAsCollection($values[XmlEncoder::AS_COLLECTION])

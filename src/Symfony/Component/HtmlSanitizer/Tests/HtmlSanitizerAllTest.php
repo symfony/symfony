@@ -33,7 +33,7 @@ class HtmlSanitizerAllTest extends TestCase
     }
 
     #[DataProvider('provideSanitizeHead')]
-    public function testSanitizeHead(string $input, string $expected)
+    public function testSanitizeHead(string $input, string $expected): void
     {
         $this->assertSame($expected, $this->createSanitizer()->sanitizeFor('head', $input));
     }
@@ -64,7 +64,7 @@ class HtmlSanitizerAllTest extends TestCase
     }
 
     #[DataProvider('provideSanitizeBody')]
-    public function testSanitizeBody(string $input, string $expected)
+    public function testSanitizeBody(string $input, string $expected): void
     {
         $this->assertSame($expected, $this->createSanitizer()->sanitize($input));
     }
@@ -535,7 +535,7 @@ class HtmlSanitizerAllTest extends TestCase
     }
 
     #[DataProvider('provideSanitizeTable')]
-    public function testSanitizeTable(string $input, string $expected)
+    public function testSanitizeTable(string $input, string $expected): void
     {
         $this->assertSame($expected, $this->createSanitizer()->sanitizeFor('table', $input));
     }
@@ -575,7 +575,7 @@ class HtmlSanitizerAllTest extends TestCase
     }
 
     #[DataProvider('provideSanitizeHtml')]
-    public function testSanitizeHtml(string $input, string $expected)
+    public function testSanitizeHtml(string $input, string $expected): void
     {
         $this->assertSame($expected, $this->createSanitizer()->sanitizeFor('html', $input));
     }
@@ -590,7 +590,7 @@ class HtmlSanitizerAllTest extends TestCase
         ];
     }
 
-    public function testIFrameDefaultsAreSafe()
+    public function testIFrameDefaultsAreSafe(): void
     {
         $sanitizer = new HtmlSanitizer((new HtmlSanitizerConfig())
             ->allowElement('iframe', '*')
@@ -607,7 +607,7 @@ class HtmlSanitizerAllTest extends TestCase
         $this->assertSame('<iframe srcdoc="&lt;script&gt;alert()&lt;/script&gt;" sandbox>XSS-prevented by sandbox</iframe>', $sanitizer->sanitize($input));
     }
 
-    public function testUnlimitedLength()
+    public function testUnlimitedLength(): void
     {
         $sanitizer = new HtmlSanitizer((new HtmlSanitizerConfig())->withMaxInputLength(-1));
 
@@ -618,7 +618,7 @@ class HtmlSanitizerAllTest extends TestCase
         $this->assertSame(\strlen($input), \strlen($sanitized));
     }
 
-    public function testBlockByDefault()
+    public function testBlockByDefault(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->defaultAction(HtmlSanitizerAction::Block)
@@ -628,7 +628,7 @@ class HtmlSanitizerAllTest extends TestCase
         self::assertSame('<p>Hello</p>', $sanitizer->sanitize('<foo><div><p><a target="_blank">Hello</a></p></div></foo>'));
     }
 
-    public function testAllowByDefault()
+    public function testAllowByDefault(): void
     {
         $config = (new HtmlSanitizerConfig())
             ->defaultAction(HtmlSanitizerAction::Allow)

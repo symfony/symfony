@@ -19,7 +19,7 @@ use Symfony\Component\Translation\Translator;
 
 class DataCollectorTranslatorTest extends TestCase
 {
-    public function testCollectMessages()
+    public function testCollectMessages(): void
     {
         $collector = $this->createCollector();
         $collector->setFallbackLocales(['fr', 'ru']);
@@ -85,7 +85,7 @@ class DataCollectorTranslatorTest extends TestCase
         $this->assertEquals($expectedMessages, $collector->getCollectedMessages());
     }
 
-    public function testGetGlobalParameters()
+    public function testGetGlobalParameters(): void
     {
         $translatable = new TranslatableMessage('url.front');
 

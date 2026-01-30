@@ -16,7 +16,7 @@ use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 
 class AlternativePartTest extends TestCase
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $a = new AlternativePart();
         $this->assertEquals('multipart', $a->getMediaType());

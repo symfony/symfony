@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 
 class AttributeMetadataPassTest extends TestCase
 {
-    public function testProcessWithNoAttributeLoader()
+    public function testProcessWithNoAttributeLoader(): void
     {
         $container = new ContainerBuilder();
 
@@ -29,7 +29,7 @@ class AttributeMetadataPassTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
-    public function testProcessWithAttributeLoaderButNoTaggedServices()
+    public function testProcessWithAttributeLoaderButNoTaggedServices(): void
     {
         $container = new ContainerBuilder();
         $container->register('serializer.mapping.attribute_loader', AttributeLoader::class)
@@ -42,7 +42,7 @@ class AttributeMetadataPassTest extends TestCase
         $this->assertSame([false, []], $arguments);
     }
 
-    public function testProcessWithTaggedServices()
+    public function testProcessWithTaggedServices(): void
     {
         $container = new ContainerBuilder();
         $container->setParameter('user_entity.class', 'App\Entity\User');
@@ -73,7 +73,7 @@ class AttributeMetadataPassTest extends TestCase
         $this->assertSame([false, $expectedClasses], $arguments);
     }
 
-    public function testProcessWithForOptionAndMatchingMembers()
+    public function testProcessWithForOptionAndMatchingMembers(): void
     {
         $sourceClass = _AttrMeta_Source::class;
         $targetClass = _AttrMeta_Target::class;
@@ -91,7 +91,7 @@ class AttributeMetadataPassTest extends TestCase
         $this->assertSame([false, [$targetClass => [$sourceClass]]], $arguments);
     }
 
-    public function testProcessWithForOptionAndMissingMemberThrows()
+    public function testProcessWithForOptionAndMissingMemberThrows(): void
     {
         $sourceClass = _AttrMeta_BadSource::class;
         $targetClass = _AttrMeta_Target::class;
@@ -112,7 +112,7 @@ class _AttrMeta_Source
 {
     public string $name;
 
-    public function getName()
+    public function getName(): void
     {
     }
 }
@@ -121,7 +121,7 @@ class _AttrMeta_Target
 {
     public string $name;
 
-    public function getName()
+    public function getName(): void
     {
     }
 }

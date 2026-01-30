@@ -23,7 +23,7 @@ class CacheDataCollectorTest extends TestCase
 {
     private const INSTANCE_NAME = 'test';
 
-    public function testEmptyDataCollector()
+    public function testEmptyDataCollector(): void
     {
         $statistics = $this->getCacheDataCollectorStatisticsFromEvents([]);
 
@@ -34,7 +34,7 @@ class CacheDataCollectorTest extends TestCase
         $this->assertSame(0, $statistics[self::INSTANCE_NAME]['writes'], 'writes');
     }
 
-    public function testOneEventDataCollector()
+    public function testOneEventDataCollector(): void
     {
         $traceableAdapterEvent = new \stdClass();
         $traceableAdapterEvent->name = 'getItem';
@@ -51,7 +51,7 @@ class CacheDataCollectorTest extends TestCase
         $this->assertSame(0, $statistics[self::INSTANCE_NAME]['writes'], 'writes');
     }
 
-    public function testHitedEventDataCollector()
+    public function testHitedEventDataCollector(): void
     {
         $traceableAdapterEvent = new \stdClass();
         $traceableAdapterEvent->name = 'hasItem';
@@ -70,7 +70,7 @@ class CacheDataCollectorTest extends TestCase
         $this->assertSame(0, $statistics[self::INSTANCE_NAME]['writes'], 'writes');
     }
 
-    public function testSavedEventDataCollector()
+    public function testSavedEventDataCollector(): void
     {
         $traceableAdapterEvent = new \stdClass();
         $traceableAdapterEvent->name = 'save';
@@ -86,7 +86,7 @@ class CacheDataCollectorTest extends TestCase
         $this->assertSame(1, $statistics[self::INSTANCE_NAME]['writes'], 'writes');
     }
 
-    public function testSaveDeferredEventWithoutExplicitCommitDataCollector()
+    public function testSaveDeferredEventWithoutExplicitCommitDataCollector(): void
     {
         $traceableAdapterEvent = new \stdClass();
         $traceableAdapterEvent->name = 'saveDeferred';
@@ -102,7 +102,7 @@ class CacheDataCollectorTest extends TestCase
         $this->assertSame(1, $statistics[self::INSTANCE_NAME]['writes'], 'writes');
     }
 
-    public function testSaveDeferredEventWithExplicitCommitDataCollector()
+    public function testSaveDeferredEventWithExplicitCommitDataCollector(): void
     {
         $traceableAdapterSaveDeferredEvent = new \stdClass();
         $traceableAdapterSaveDeferredEvent->name = 'saveDeferred';
@@ -126,7 +126,7 @@ class CacheDataCollectorTest extends TestCase
         $this->assertSame(1, $statistics[self::INSTANCE_NAME]['writes'], 'writes');
     }
 
-    public function testCollectBeforeEnd()
+    public function testCollectBeforeEnd(): void
     {
         $adapter = new TraceableAdapter(new NullAdapter());
 
@@ -145,7 +145,7 @@ class CacheDataCollectorTest extends TestCase
         $this->assertSame(1, $stats[self::INSTANCE_NAME]['misses'], 'misses');
     }
 
-    public function testLateCollect()
+    public function testLateCollect(): void
     {
         $adapter = new TraceableAdapter(new NullAdapter());
 

@@ -16,7 +16,7 @@ use Symfony\Component\Notifier\Bridge\Discord\Embeds\DiscordFieldEmbedObject;
 
 final class DiscordFieldEmbedObjectTest extends TestCase
 {
-    public function testCanBeInstantiated()
+    public function testCanBeInstantiated(): void
     {
         $field = (new DiscordFieldEmbedObject())
             ->name('foo')

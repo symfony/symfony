@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by jprivet-dev at 2026-01-30T08:56:04Z
+
+My apologies for the misunderstanding @nicolas-grekas .
+
+For the public methods `clearCookies()`, `persistStrategy()` and `onKernelResponse()` of the `SameOriginCsrfTokenManager` class:
+
+* They are duplicated in the `SameOriginCsrfListener` class and are all private.
+* They are no longer intended for use and may be removed in version `9.0`.
+
+In version `8.1`, the method `SameOriginCsrfTokenManager::onKernelResponse()` is no longer tagged in the file `security_csrf.php` and is no longer used automatically. It remains available only to developers who have used it directly in their implementations.
+
+Are we in agreement on this approach?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-30T08:59:04Z
+
+We are :)

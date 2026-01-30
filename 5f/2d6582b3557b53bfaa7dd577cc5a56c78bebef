@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-07-19T07:06:46Z
+
+I am afraid that this could lead to security issues, what about combining this flag with kernel debug parameter? Does that make sense? 🤔
+
+---------------------------------------------------------------------------
+
+by ahmedghanem00 at 2024-07-19T16:05:02Z
+
+> I am afraid that this could lead to security issues
+
+Agree, but usually this "API server" is hosted internally within the same infrastruture/server, so it might not be a big risk in that case? Maybe when it hosted on a remote server and the communication will flow over the internet, a TLS-termination server may be used in combination with it, to secure the data and keep the transmition happens on `https`?
+
+We also may add an explicit caution in the readme file about this?
+
+---------------------------------------------------------------------------
+
+by ahmedghanem00 at 2024-07-19T16:17:25Z
+
+> what about combining this flag with kernel debug parameter? Does that make sense? 🤔
+
+Not sure, but usually I see options of other bridges being controlled via DSN only.
+
+---------------------------------------------------------------------------
+
+by ahmedghanem00 at 2025-02-08T19:21:41Z
+
+@nicolas-grekas @OskarStark, Hola guys, can this PR get some review on here, whether it will be accepted or rejected😅? Thanks

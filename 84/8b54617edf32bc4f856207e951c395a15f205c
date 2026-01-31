@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-06-12T06:55:17Z
+
+Did you check
+* https://github.com/symfony/symfony/pull/53749
+
+?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2024-06-15T11:11:19Z
+
+`Yaml` constraint was merged, so please rebase
+
+---------------------------------------------------------------------------
+
+by sfmok at 2024-06-17T14:06:41Z
+
+I've made the following changes:
+
+- Removed format abstraction
+- Removed the `Yaml` constraint from this PR since it has already been merged
+- Reverted the `Json` constraint changes to prevent breaking the translation
+- Remove the `Jwt` constraint for now, as verifying the signature requires extensive work. I will likely push a separate PR for it later.
+- Adjusted the `Xml` constraint to support only the modern method of defining constraints
+
+---------------------------------------------------------------------------
+
+by sfmok at 2024-06-27T19:01:13Z
+
+> Asserting that a file is XML is pretty weak as a check: one always expectes some structure in the XML. It'd be natural to me to allow passing an XSD, isn't it? Up to improve the PR in this direction?
+
+@nicolas-grekas Thank you for your feedback. The constraint is intended to assert a string value rather than a file.
+I'm not sure about allowing XSD checks, but I will consider supporting it if we receive more positive feedback either before or after merging the PR
+
+---------------------------------------------------------------------------
+
+by sfmok at 2024-11-05T14:06:17Z
+
+Any updates?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-02-26T07:44:08Z
+
+> > Asserting that a file is XML is pretty weak as a check: one always expectes some structure in the XML. It'd be natural to me to allow passing an XSD, isn't it? Up to improve the PR in this direction?
+>
+> @nicolas-grekas Thank you for your feedback. The constraint is intended to assert a string value rather than a file. I'm not sure about allowing XSD checks, but I will consider supporting it if we receive more positive feedback either before or after merging the PR
+
+I also think that supporting validating the XML content against a schema would make this feature more useful.
+
+---------------------------------------------------------------------------
+
+by sfmok at 2025-03-28T21:10:25Z
+
+@nicolas-grekas Yes, I'll work on it when I have some free time.
+
+---------------------------------------------------------------------------
+
+by sfmok at 2025-04-18T07:45:21Z
+
+@nicolas-grekas & @fabpot: Thanks again for the feedback. XSD schema validation is now supported.

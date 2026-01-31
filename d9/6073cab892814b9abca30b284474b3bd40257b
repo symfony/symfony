@@ -1,0 +1,36 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2024-11-01T14:59:29Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "5.4" but it seems your PR description refers to branch "5.4, 6.4, and 7.1 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-04T10:20:45Z
+
+Thanks for the PR. Since this is a new feature, it should target 7.2
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2024-11-04T10:58:54Z
+
+>  Merge branch '7.2' into issue-54269
+
+Please rebase instead, we don't merge PRs with merge commits, sorry.
+
+---------------------------------------------------------------------------
+
+by moonraking at 2024-11-04T11:20:16Z
+
+Sorry first PR!
+
+Some tests are failing, but pretty sure they are not mine!
+
+I hope that is ok now.

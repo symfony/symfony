@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-01-17T10:49:01Z
+
+As this method is `@internal`, I don't think it is the solution to the use case anyway.
+
+---------------------------------------------------------------------------
+
+by norkunas at 2024-01-17T10:50:11Z
+
+> As this method is `@internal`, I don't think it is the solution to the use case anyway.
+
+What would you suggest then? Can we remove `@internal` to allow people simulate this behavior?

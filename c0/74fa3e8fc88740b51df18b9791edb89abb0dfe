@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by alexndlm at 2024-11-24T14:40:14Z
+
+@nicolas-grekas Could you have a look?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-01-13T16:08:34Z
+
+Looks like the tests must be updated to not trigger the deprecation.
+
+---------------------------------------------------------------------------
+
+by alexndlm at 2025-01-13T17:41:02Z
+
+@mtarld I have done with your comments.

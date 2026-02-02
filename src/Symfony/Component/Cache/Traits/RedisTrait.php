@@ -50,6 +50,7 @@ trait RedisTrait
         'cluster_command_timeout' => 0,
         'cluster_relay_context' => [],
         'sentinel' => null,
+        'sentinel_auth' => false,
         'dbindex' => 0,
         'failover' => 'none',
         'ssl' => null, // see https://php.net/context.ssl
@@ -199,7 +200,7 @@ trait RedisTrait
             throw new CacheException('Redis Sentinel support requires one of: "predis/predis", "ext-redis >= 6.1", "ext-relay".');
         }
 
-        foreach (['lazy', 'persistent', 'cluster'] as $option) {
+        foreach (['lazy', 'persistent', 'cluster', 'sentinel_auth'] as $option) {
             if (!\is_bool($params[$option] ?? false)) {
                 $params[$option] = filter_var($params[$option], \FILTER_VALIDATE_BOOLEAN);
             }
@@ -243,7 +244,7 @@ trait RedisTrait
                 do {
                     $host = $hosts[$hostIndex]['host'] ?? $hosts[$hostIndex]['path'];
                     $port = $hosts[$hostIndex]['port'] ?? 0;
-                    $passAuth = null !== $params['auth'] && (!$isRedisExt || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL'));
+                    $passAuth = $params['sentinel_auth'] && null !== $params['auth'] && (!$isRedisExt || \defined('Redis::OPT_NULL_MULTIBULK_AS_NULL'));
                     $address = false;
 
                     if (isset($hosts[$hostIndex]['host']) && $tls) {
@@ -292,7 +293,7 @@ trait RedisTrait
                         'stream' => self::filterSslOptions($params['ssl'] ?? []) ?: null,
                     ];
 
-                    if (null !== $params['auth']) {
+                    if ($params['sentinel_auth'] && null !== $params['auth']) {
                         $extra['auth'] = $params['auth'];
                     }
                     @$redis->{$connect}($host, $port, (float) $params['timeout'], (string) $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...\defined('Redis::SCAN_PREFIX') || !$isRedisExt ? [$extra] : []);

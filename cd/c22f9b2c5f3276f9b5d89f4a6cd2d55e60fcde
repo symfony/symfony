@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-27T15:17:48Z
+
+I suppose we should also update the cache attribute, see #62939
+but: `args.post` works isn't it?
+
+---------------------------------------------------------------------------
+
+by valtzu at 2026-01-27T16:41:02Z
+
+> I suppose we should also update the cache attribute, see https://github.com/symfony/symfony/pull/62939
+
+Hmm, I'm not familiar with the cache attribute so I have no take on it, but if you think so, I can try.
+
+> but: `args.post` works isn't it?
+
+If you meant this whole `this` isn't needed – no, using `args.post` does not work, it results in
+
+```
+Uncaught PHP Exception RuntimeException: "Unable to get property "post" of non-object "args"." at GetAttrNode.php line 86
+```
+
+---
+
+As described in #62446, `new Expression('request.attributes.get("_mounted_component").getComponent().post')` works, but looks hideous and may be a bit hard to understand that it refers to the same class.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-27T16:50:25Z
+
+Reading a value from an array is `args['post']`, not `args.post`.
+
+Unlike Twig where the dot operator is abstracting away the way to access a property, a getter or an array value, the ExpressionLanguage component has separate operators (due to the constraint of being able to compile the expression into a PHP expression with no runtime dependency on the component).
+The `.` in ExpressionLanguage maps to the `->` operator in PHP, which is also not valid for PHP arrays.
+
+---------------------------------------------------------------------------
+
+by valtzu at 2026-01-27T16:52:31Z
+
+Thanks @stof, but even with `args['post']` the result is `Uncaught PHP Exception ErrorException: "Warning: Undefined array key "post"" at GetAttrNode.php line 133`.
+
+As I know `args` only contains the arguments for the controller function, not the properties from the controller class instance.
+
+---------------------------------------------------------------------------
+
+by valtzu at 2026-02-01T14:15:13Z
+
+> This currently works only with public properties. I'd bet many will want to access all properties in the current scope.
+
+True, however, you could argue the same that `this.foo` in `new Assert\When('this.foo == "bar"')` in DTOs should also resolve private properties (which it doesn't).
+
+> anything better other than this since this name cannot be used in the closure case
+
+The names of closure arguments are not described within Symfony _(at least in the code)_, so not sure if huge issue.
+
+The cache attribute exposes all controller arguments as top-level variables in EL evaluation, I'm a bit worried that using anything else than `this` may be already in use by someone's app/bundle logic. Because it's not possible to define `$this` as an argument for a method/function, it is guaranteed that no one is using it.
+
+> It might be interesting to improve the EL component to make it able to run an expression with a scope set.
+
+If we use `this` now, implementing this EL improvement later would mean we don't need to introduce any new variables / migrate from `self` to `this` etc.
+
+---
+
+I did think about other possible solutions for this: e.g. implement & register `live_component()` EL function in `symfony/ux` which would return the component instance or `live_props()` that returns live props etc. Those would have much narrower scope.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-02T09:49:34Z
+
+I ported this to #58273 if you wanna have a look.

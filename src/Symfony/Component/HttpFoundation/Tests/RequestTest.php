@@ -2670,6 +2670,7 @@ class RequestTest extends TestCase
             ["https\x80://example.com", 'Invalid URI: Scheme is malformed.'],
             ['http>://example.com', 'Invalid URI: Scheme is malformed.'],
             ['0http://example.com', 'Invalid URI: Scheme is malformed.'],
+            [':path', 'Invalid URI: Path is malformed.'],
         ];
     }
 
@@ -2698,7 +2699,6 @@ class RequestTest extends TestCase
             ['http://[2001:db8::1]/path'],
             ['http://[::1]'],
             ['http://example.com/path'],
-            [':path'],
         ];
     }
 }

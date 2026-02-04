@@ -1,0 +1,96 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-08-19T08:21:10Z
+
+This is not marking the parameters as deprecated to warn places using them.
+
+---------------------------------------------------------------------------
+
+by stollr at 2025-08-19T09:49:55Z
+
+You mean that the `!isset($config['default_uri'])` should be removed from the condition? Or is there a better way?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-08-19T09:56:53Z
+
+I mean actually deprecating the parameters: https://symfony.com/blog/new-in-symfony-6-3-dependency-injection-improvements#deprecating-container-parameters
+
+---------------------------------------------------------------------------
+
+by stollr at 2025-08-19T10:37:52Z
+
+Thanks for the hint. I have updated the patch.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-19T12:50:32Z
+
+I wouldn't deprecate `router.request_context.base_url` (the others I would).
+Instead, I'd fix it this way:
+
+```diff
+--- a/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
++++ b/src/Symfony/Bundle/FrameworkBundle/DependencyInjection/FrameworkExtension.php
+@@ -1334,8 +1334,7 @@ class FrameworkExtension extends Extension
+         $container->setParameter('request_listener.https_port', $config['https_port']);
+
+         if (null !== $config['default_uri']) {
+-            $container->getDefinition('router.request_context')
+-                ->replaceArgument(0, $config['default_uri']);
++            $container->setParameter('router.request_context.base_url', $config['default_uri']);
+         }
+     }
+```
+
+---------------------------------------------------------------------------
+
+by stollr at 2025-08-20T06:13:36Z
+
+Wouldn't this be a potential source of confusion? If a user sets `router.request_context.base_url` to "example.com", the `default_url` (maybe via an ENV variable) to something else and at the end, `base_url` will have another value than what he defined?
+
+And what would be the advantage?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-20T06:31:51Z
+
+The advantage is not breaking things (deprecating first but still) and allowing bundles to read the value also.
+The confusion would be the responsibility of the app, not ours.
+
+---------------------------------------------------------------------------
+
+by stollr at 2025-08-20T06:48:40Z
+
+Historically the `router.request_context.base_url` was used to specify only the URL path (for example [here](https://stackoverflow.com/a/26219739/1119601) or in the older version of the [symfony doc](https://symfony.com/doc/4.x/routing.html#generating-urls-in-commands)).
+
+Imho overwriting the base_url with the default_uri, which is always an absolute URI containing scheme and host, could lead to a hidden BC break.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-20T06:54:29Z
+
+This was later improved to support full URI, see https://github.com/symfony/symfony/pull/36651
+This also matches the fact that the config value is injected at the same position as the param, which means that today already, one can set `router.request_context.base_url` and basically configure the default_uri
+
+---------------------------------------------------------------------------
+
+by stollr at 2025-08-20T08:06:36Z
+
+Okay, I have applied your suggestion ;-)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-08-22T11:21:08Z
+
+After looking at the test failures, I realize `request_listener.http_port` and `request_listener.https_port` should likely also be deprecated, alongside with the corresponding config options.
+I'm also not sure how to fix deprecations, since we of course have to still use these parameters for BC.
+Any ideas?
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by stollr at 2025-08-25T06:24:17Z
+
+Where do we have to use these parameters and why can't `framework.router.default_uri` be used to fix the deprecations?

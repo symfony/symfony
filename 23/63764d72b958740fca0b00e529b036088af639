@@ -1,0 +1,158 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-01-09T19:56:59Z
+
+Handling different attributes based on the order of attributes on usage is totally different than the current system where listeners choose the priority, which allows defining cases where we know one kind of rule must be applied before another one.
+
+And this actually means that your PR could be changing the behavior of existing attributes on controllers if the attribute order does not match the priority of listeners.
+Changing the implementation of existing attributes like that without an opt-in looks very risky to me.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-09T20:10:00Z
+
+And for attributes for which we support using them at the class level, `Symfony\Component\HttpKernel\Event\ControllerEvent::getAttributes` merges the class-level and the method-level attributes, we don't have full control over the definition order either.
+
+> When a controller has several attributes, the events are triggered in declaration order on `kernel.controller_arguments`, and on reverse order for `kernel.response`.
+
+this is also confusing for repeated attributes. The order is based on the first attribute of each class due to the way it is implemented, which is not explicit in this description.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-09T20:11:20Z
+
+Also, this assumes that the priority `-10` on `kernel.response` is fine for the logic done by your attribute, compared to other listeners. This might not be true.
+
+---------------------------------------------------------------------------
+
+by Koc at 2026-01-12T15:45:28Z
+
+Wow, does it mean that I can use this in #49518 to call my listener only when controller tagged with an attribute?
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-12T15:48:24Z
+
+@Koc no. Your PR relies on the `kernel.view` event, not on the `kernel.response`
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-15T08:59:53Z
+
+@stof @Koc thanks for the review. I rewrote the implementation on top of #63092. Please read the PR description again, I rewrote it to the new patch. This should address most of the points you raised.
+
+---------------------------------------------------------------------------
+
+by xuey490 at 2026-01-15T14:17:49Z
+
+Following the discussion in PR [#62074](https://github.com/symfony/symfony/pull/62074), I implemented more useful routing annotations by means of annotation scanning in the class encapsulated based on Symfony Router.All my annotations are implemented relying on middlewares. The Router scans to detect annotations and writes them into attributes.
+
+```php
+// 1. Perform reflection scanning
+$scannedData = $this->scanForMiddlewareAndAttributes($controller, $method);
+
+// 2. Construct standard attributes
+$attributes = array_merge($params, [
+    '_controller' => $controller . '::' . $method,
+    '_route'      => 'auto_route_' . md5($controller . $method),
+
+    // 🔥 No longer an empty array here, but filled with scanned results
+    '_middleware' => $scannedData['middleware'],
+    '_auth'       => $scannedData['auth'],
+    '_roles'      => $scannedData['roles'],
+    '_attributes' => $scannedData['attributesMap'],
+]);
+
+$request->attributes->add($attributes);
+```
+
+In the middleware dispatcher:
+```php
+$rawRouteMiddleware = $request->attributes->get('_middleware', []);
+        $flattenedRouteMiddleware = $this->flattenArray($rawRouteMiddleware);
+
+            $middlewareChain = function ($req) use ($middleware, $middlewareChain) {
+                return $middleware->handle($req, $middlewareChain);
+            };
+```
+
+Some sample code:
+
+```php
+
+use Attribute;
+use App\Middlewares\CacheMiddleware;
+
+/**
+ * @Cache
+
+ *
+ * 示例：
+ * #[Cache] // 默认缓存 60秒
+ * #[Cache(ttl: 300)] // 缓存 5分钟
+ * #[Cache(ttl: 600, key: 'home_page_data')] // 自定义 Key
+ */
+#[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD)]
+class Cache implements MiddlewareProviderInterface
+{
+    /**
+     * @param int         $ttl  缓存有效期（秒），默认 60 秒
+     * @param string|null $key  自定义缓存 Key，留空则根据 URL 自动生成
+     */
+    public function __construct(
+        public int $ttl = 60,
+        public ?string $key = null
+    ) {}
+
+    public function getMiddleware(): string|array
+    {
+        return CacheMiddleware::class;
+    }
+}
+```
+
+Controllers   function annotations ：
+```php
+#[Route(prefix: '/vvv1/admins', group: 'apssi', middleware: [\App\Middlewares\AuthMiddleware::class, \App\Middlewares\LogMiddleware::class])]
+
+class Admins  extends BaseController
+{
+
+    #[Autowire]
+    protected UserService $userService;
+
+    #[Inject(id: 'App\Services\FileLogger')]
+    protected LoggerInterface $logger;
+
+    #[Inject(id: 'db')]
+    protected DatabaseFactory $db;
+
+    #[Context('request')]
+    protected Request $req;
+
+    #[Cache(ttl: 60)]
+	#[Route(path: '/caches', auth: true, roles: ['admin'], methods: ['GET'], name: 'demoaa1.caches')] //注解路由的auth roles
+    public function getHotList(): JsonResponse
+    {
+
+        // demo data
+        $data = ['item1', 'item2', 'item3', date('Y-m-d H:i:s')];
+        return new JsonResponse($data);
+    }
+```
+<img width="300" height="100" alt="9c0e4c92-21fe-42a9-9248-ff2ae5b1bfc1" src="https://github.com/user-attachments/assets/61adac4b-fa9a-4b22-a6c9-57492cadd1a4" />
+
+Final the All whole Router info like below:
+```php
+		$currentRouteName = $request->attributes->get('_route' , null);
+		dump($currentRouteName);
+```
+<img width="300" height="210" alt="664ea947-d395-41ab-94db-f5374b2a43f9" src="https://github.com/user-attachments/assets/909c4744-0eb3-468f-bedd-c86c6c647d33" />
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-15T14:32:33Z
+
+@stof thanks for the review, comments addressed.
+
+@xuey490 thanks for sharing. This proposal will allow implementing attributes not inside Route, but as sibling attributes, like the Cache one for example. Feel free to give this PR a try to see if you manage to make it work to your needs.

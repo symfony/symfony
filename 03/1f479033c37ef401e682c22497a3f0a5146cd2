@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by thiagomp at 2026-02-01T19:02:43Z
+
+I noticed the `Unit Tests (8.4, high-deps)` check failed, but the error appears to be in `JsonStreamerTest` (InvalidParameterTypeException) and seems unrelated to my changes in `BrowserKitAssertionsTrait`. Let me know if there's any change I can do to help.

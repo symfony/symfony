@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation;
 
+use BackedEnum;
 use Symfony\Component\Config\ConfigCacheFactory;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\Config\ConfigCacheInterface;
@@ -198,6 +199,12 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         foreach ($parameters as $key => $value) {
             if ($value instanceof TranslatableInterface) {
                 $parameters[$key] = $value->trans($this, $locale);
+
+                continue;
+            }
+
+            if ($value instanceof BackedEnum) {
+                $parameters[$key] = $value->value;
             }
         }
 

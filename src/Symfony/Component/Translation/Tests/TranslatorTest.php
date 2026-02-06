@@ -14,6 +14,7 @@ namespace Symfony\Component\Translation\Tests;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Stub\Enum\AwesomeEnum;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Symfony\Component\Translation\Exception\RuntimeException;
@@ -455,6 +456,7 @@ class TranslatorTest extends TestCase
         return [
             ['Symfony est super !', 'Symfony is great!', 'Symfony est super !', [], 'fr', ''],
             ['Symfony est awesome !', 'Symfony is %what%!', 'Symfony est %what% !', ['%what%' => 'awesome'], 'fr', ''],
+            ['Symfony est awesome !', 'Symfony is %what%!', 'Symfony est %what% !', ['%what%' => AwesomeEnum::Awesome], 'fr', ''],
             ['Symfony est Symfony est awesome ! !', 'Symfony is %what%!', 'Symfony est %what% !', ['%what%' => $param], 'fr', ''],
             ['Symfony est super !', new StringClass('Symfony is great!'), 'Symfony est super !', [], 'fr', ''],
             ['', null, '', [], 'fr', ''],

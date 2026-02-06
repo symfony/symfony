@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by dmiedev at 2026-02-05T13:37:30Z
+
+I'm no contributor of Symfony (sorry for any potential confusion), but shouldn't this be also included as a fix for older Symfony versions? (after all, https://github.com/symfony/symfony/pull/62872 may have introduced unintended logic into 6.4 for some people)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-05T20:37:02Z
+
+I agree we might prefer reverting the behavior on 6.4 and introduce this on 8.1 with the current code. And we might prefer also keep the previous behavior by default, aka idle timeout = 0. Up to follow this idea?
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-02-05T21:15:07Z
+
+@nicolas-grekas Yes, I think this makes sense. The old behavior is even mentioned in [the docs](https://symfony.com/doc/6.4/messenger.html#process-messages-by-batches), which I didn't notice before:
+
+> By default, pending batches are flushed when the worker is **idle** as well as when it is stopped.
+
+I'll open a PR to revert #62872 and reintroduce this behavior in 8.1 as you suggested.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-06T07:14:37Z
+
+Rebase unlocked
+
+---------------------------------------------------------------------------
+
+by HypeMC at 2026-02-06T12:33:43Z
+
+> Rebase unlocked
+
+@nicolas-grekas Done

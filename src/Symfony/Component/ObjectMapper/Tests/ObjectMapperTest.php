@@ -70,6 +70,9 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Source;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Target;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapTargetToSource\A as MapTargetToSourceA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapTargetToSource\B as MapTargetToSourceB;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleSourceProperty\A as MultipleSourcePropertyA;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleSourceProperty\B as MultipleSourcePropertyB;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleSourceProperty\C as MultipleSourcePropertyC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\A as MultipleTargetPropertyA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\B as MultipleTargetPropertyB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\C as MultipleTargetPropertyC;
@@ -424,6 +427,22 @@ final class ObjectMapperTest extends TestCase
         $this->assertEquals('test', $c->bar);
         $this->assertEquals('donotmap', $c->foo);
         $this->assertEquals('foo', $c->doesNotExistInTargetB);
+    }
+
+    public function testMultipleSourceMapProperty()
+    {
+        $b = new MultipleSourcePropertyB();
+        $c = new MultipleSourcePropertyC();
+        $mapper = new ObjectMapper();
+
+        $a1 = $mapper->map($b, MultipleSourcePropertyA::class);
+        $this->assertInstanceOf(MultipleSourcePropertyA::class, $a1);
+        $this->assertEquals('test', $a1->something);
+
+        $a2 = $mapper->map($c, MultipleSourcePropertyA::class);
+        $this->assertInstanceOf(MultipleSourcePropertyA::class, $a2);
+        $this->assertEquals('TEST', $a2->something);
+        $this->assertEquals('foo', $a2->doesNotExistInSourceB);
     }
 
     public function testDefaultValueStdClass()

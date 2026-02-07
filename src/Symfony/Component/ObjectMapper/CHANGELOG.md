@@ -8,6 +8,7 @@ CHANGELOG
  * Merge nested properties when targeting the same class
  * Add a `targetClass` option to `MapCollection`
  * Add a `TransformObjectMapperAwareInterface` to inject the current object mapper instance to transformers
+ * Add a `SourceClass` condition callable to condition map rules based on source class
 
 7.4
 ---

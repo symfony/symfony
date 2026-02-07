@@ -1,6 +1,9 @@
 CHANGELOG
 =========
+8.1
+---
 
+ * Add option to `Process::getOutput()` to strip trailing line break
 
 7.3
 ---

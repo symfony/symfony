@@ -450,6 +450,10 @@ class ProcessTest extends TestCase
 
         $p->run();
         $this->assertEquals(3, preg_match_all('/foo/', $p->getOutput(), $matches));
+
+        $p = Process::fromShellCommandline('date');
+        $p->run();
+        $this->assertFalse(1 === preg_match('/\n/', $p->getOutput(true)));
     }
 
     public function testFlushOutput()

@@ -610,14 +610,20 @@ class Process implements \IteratorAggregate
     /**
      * Returns the current output of the process (STDOUT).
      *
+     * @param bool $stripTrailingLineBreak Strip trailing line break from output
+     *
      * @throws LogicException in case the output has been disabled
      * @throws LogicException In case the process is not started
      */
-    public function getOutput(): string
+    public function getOutput(bool $stripTrailingLineBreak = false): string
     {
         $this->readPipesForOutput(__FUNCTION__);
 
         if (false === $ret = stream_get_contents($this->stdout, -1, 0)) {
+            return '';
+        }
+
+        if ($stripTrailingLineBreak && !is_string($ret = preg_replace('/\n$/', '', $ret))) {
             return '';
         }
 

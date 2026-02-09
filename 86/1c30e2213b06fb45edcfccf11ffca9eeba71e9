@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-11-05T19:50:19Z
+
+You could see also HttpClientDataCollector which implements such "Copy as curl" as well.
+
+---------------------------------------------------------------------------
+
+by darkweak at 2025-11-05T20:00:47Z
+
+Thank you for these feedback. I'm unsure about where to implement the collector, so where would you put the PHP class in the WebProfiler bundle codebase?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-11-05T20:26:59Z
+
+you don't need to implement a new collector. You need to add a new method in the RequestCollector (as you are adding that logic in the request panel, i.e. the panel associated to the RequestCollector)
+
+---------------------------------------------------------------------------
+
+by darkweak at 2025-11-05T21:34:31Z
+
+Okay, I have updated the RequestDataCollector class and I have something working in the template that is cleaner. 👍

@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by javiereguiluz at 2026-02-06T13:59:13Z
+
+I like this proposal ... but using the exception icon is confusing to me. Given that this is about log error messages, I'd use the logger icon. This is how it'd look:
+
+![profiler-results-logger](https://github.com/user-attachments/assets/bde5a8f3-eebc-4ed7-a966-7351fb18c9ae)
+
+If you agree, the needed changes are:
+
+```diff
+diff --git a/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/results.html.twig b/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/results.html.twig
+index b9b9d59dbf9..178bd4292eb 100644
+--- a/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/results.html.twig
++++ b/src/Symfony/Bundle/WebProfilerBundle/Resources/views/Profiler/results.html.twig
+@@ -35,10 +35,12 @@
+             right: -10px;
+             top: 50%;
+             transform: translateY(-50%);
++            display: flex;
++            padding: 3px 4px;
+         }
+         #search-results .exception-indicator svg {
+-            width: 12px;
+-            height: 12px;
++            width: 18px;
++            height: 18px;
+         }
+     </style>
+ {% endblock %}
+@@ -124,7 +126,7 @@
+                             <span class="status-with-indicator">
+                                 <span class="label {{ css_class }}">{{ result.status_code|default('n/a') }}</span>
+                                 {%- if has_errors -%}
+-                                    <span class="label status-error exception-indicator">{{ source('@WebProfiler/Icon/exception.svg') }}</span>
++                                    <span class="label status-error exception-indicator">{{ source('@WebProfiler/Icon/logger.svg') }}</span>
+                                 {%- endif -%}
+                             </span>
+                         </td>
+```

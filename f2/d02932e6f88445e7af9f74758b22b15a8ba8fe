@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-30T07:48:54Z
+
+Thanks fore the PR.
+This looks like an improvement to me, which means this should target 8.1. Can you please rebase/retarget?
+
+---------------------------------------------------------------------------
+
+by bhdnb at 2026-01-30T16:08:05Z
+
+@nicolas-grekas, I've rebased the branch onto 8.1. @welcoMattic, messages were also updated, please take a look when you have a chance

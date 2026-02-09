@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by Orkin at 2026-01-27T09:41:02Z
+
+@nicolas-grekas do I need to create an issue to not forget to remove unused / deprecated params for 8.4 and 9.0 ?
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-28T12:50:30Z
+
+-1 for this. This PR is adding new features to give a special meaning to some header names in the ResendTransport, which are not part of the symfony/mailer abstraction. We already rejected similar attempts in the past for other bridges when trying to turn them into SDKs supporting all features of the API:
+
+- it creates hidden restrictions on a specific bridge in code instead of properly using symfony/mailer in the intended way
+- it creates a maintenance nightmare as those specific features of a bridge would still have a BC impact (and they could have an impact on the component itself due to the way they hack their features into the abstraction)
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-28T13:49:54Z
+
+Thus, this PR is not actually fixing a bug. It implements a new feature by adding a special meaning for some header names that were handled as normal headers until now.
+
+---------------------------------------------------------------------------
+
+by Orkin at 2026-01-28T14:54:57Z
+
+I'm sorry but for me it's a bug fix, the tests assume that there is a `params` and `templateid`. It was just not put in the right place. In Resend api documentation there is no need for `templateid` and `params` as string in the headers.
+
+That's why for me it's a bugfix because providing them do nothing
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-28T15:01:26Z
+
+The tests don't assume that those work to configure the `template` setting of the Resend API. The existing test assertion is covering the fact that you can submit such *header*.
+
+There has never been a version of Symfony shipping a working way to configure the `template` setting of Resend. And such template support is **not** in the contract of transports in mailer (it is even explicitly out of scope).
+Adding a hacky way to configure the `template` setting by repurposing headers (and so forbidding to send an email with a header with that name) is definitely not a bugfix to me.
+
+---------------------------------------------------------------------------
+
+by Orkin at 2026-01-28T16:40:23Z
+
+@stof Ok I understand, so maybe it could be interesting to rename the name of thoses parameters to avoid misunderstanding from the `template` parameter name that match provider feature ?
+
+I can make a PR to change that
+
+---------------------------------------------------------------------------
+
+by stof at 2026-01-28T16:54:13Z
+
+I suggest changing the test to use names than don't cause confusion about whether this feature is supported or no indeed. This is a test about covering custom headers, as said by the test name.

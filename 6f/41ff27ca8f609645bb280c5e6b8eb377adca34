@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by Spomky at 2025-12-04T17:43:38Z
+
+That's look powerful e.g. to decorate cache warmer ✨.
+
+> When a tag collide with an existing service id/alias, it will not decorate the tag, but instead will decorate the service.
+
+Let say I have an interface `App\Acme\MyInterface` that holds the `#[AutoconfigureTag]` attribute. In this case there is the possibility to have
+* tag = `App\Acme\MyInterface`
+* alias = `App\Acme\MyInterface`
+
+I understand this avoids breaks. Am I right?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-12-04T17:50:17Z
+
+This is very fragile as defining a service with that id in the future will suddenly change what is decorated.
+
+If we want to add such feature, we should have a dedicated configuring setting dedicated to tags, to avoid any ambiguous meaning of `getDecoratedService`.
+
+Thus, decorating a tag rather than a service means that your original definition is more or less used as an parent definition to create *other* services (except that's not how it is implemented, so there might be subtle differences) and the original definition is removed from the container (so anything referencing its id is invalid)
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-12-05T10:04:12Z
+
+To make the usage more clear, I updated the `Definition` to add a `setDecoratedTag` method.
+
+The usage will be:
+```php
+#[AsTagDecorator(decoratesTag: 'my_tag', priority: 10)]
+class MyDecorator implements MyInterface {
+    public function __construct(
+        #[AutowireDecorated] MyInterface $inner
+    ) {}
+}
+```
+```yaml
+services:
+    my_decorator:
+        class: MyDecorator
+        decorates_tag: my_tag
+        decoration_priority: 10
+```
+```php
+$services->set('my_decorator', MyDecorator::class)
+    ->decorateTag('my_tag', priority: 10);
+```
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-09T19:40:35Z
+
+Please rebase, #63336 should help get green tests.

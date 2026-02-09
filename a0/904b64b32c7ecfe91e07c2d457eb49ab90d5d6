@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by ktherage at 2026-01-27T16:58:12Z
+
+@stof
+
+So, I shall :
+1. target 8.1
+2. add a BC Layer
+
+Have I understood correctly ?
+
+---------------------------------------------------------------------------
+
+by ktherage at 2026-01-28T08:32:59Z
+
+So, I did rebase on 8.1 and made `ViolationMapperInterface` optionnal with a deprecation notice.
+CI is red, I'll need a bit of help to fix it.

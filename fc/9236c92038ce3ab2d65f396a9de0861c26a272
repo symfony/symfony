@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-08T21:22:38Z
+
+Why don't you pass auth as a param explicitly? This should work without changing the code, isn't it?

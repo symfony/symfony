@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-01-17T17:05:39Z
+
+This is a feature and should target 7.3
+
+---------------------------------------------------------------------------
+
+by wuchen90 at 2025-01-17T17:19:30Z
+
+@OskarStark
+
+> This is a feature and should target 7.3
+
+I don't know if this is really a feature because it works well with `@var` annotation.
+Only, when we document a method, we usually use `@param` and not `@var`.
+
+Beside, this code below points out that we support promoted properties:
+https://github.com/symfony/symfony/blob/02db9c2146fc916d4431acb61035b345d55e0fdf/src/Symfony/Component/PropertyInfo/Extractor/PhpDocExtractor.php#L239
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-01-17T17:25:58Z
+
+Looking at your code change this seems like it wasn't implemented before, there is no wrong behavior, the feature is just not existent, so a feature to me.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-01-17T17:27:49Z
+
+I think the implementation would now read `@param` in docblock of any properties, not just for the case of reading the constructor docblock for a promoted property.
+
+---------------------------------------------------------------------------
+
+by mtarld at 2025-01-20T10:31:07Z
+
+Indeed, forgot about it, you can keep `null !== $paramDescription && '' !== $paramDescription` then :slightly_smiling_face:

@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2026-02-06T18:12:40Z
+
+I've pushed a new version that also allows non-virtual properties, e.g. for caching:
+
+```php
+#[SubscribedService]
+public MyDependency $myCachedDependency {
+    get => $this->myCachedDependency ??= $this->container->get(__METHOD__);
+}
+```
+
+I'd personally probably leave caching the dependency up to the container, but I didn't feel like I should forbid using a backed property.

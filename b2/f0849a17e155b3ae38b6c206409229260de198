@@ -1,0 +1,89 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-10-29T15:06:53Z
+
+Hey!
+
+I think @deguif has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2022-11-10T13:59:14Z
+
+@nicolas-grekas Even though this is includes a logic change, shouldn't it be considered a bug fix as at multiple queues (which just means prioritizing messages) is kind of broken at the moment?
+@d-ph I'm having the same issue in my project and would love to use this fix. Any way I can support you on it?
+
+---------------------------------------------------------------------------
+
+by d-ph at 2022-11-14T17:58:59Z
+
+Hi Christian,
+
+> Any way I can support you on it?
+
+I'm waiting for someone to say "yes/ok" to the points: 2, 3 (to allow an addition of the getter), 6 (to include the "additional" improvement in the scope of this PR), and 7. When I get an approval (or at least an interest in principle), then I'll go ahead and complete this PR (but I might have some further questions about unit testing, and online documentation). So if it's in your ability to obtain this, then please do.
+
+The PR contains a running and working code (but note the "sibling" PR for DoctrineBundle), however at present it only includes the code for problem 1, mentioned in #46862. Feel free to fork the 2 git repositories, and install them via composer in your app. The code is obviously not unit-tested, so it may break between Messenger minor/major updates, but it does work at present.
+
+Not much else I can say in that regard. At the very least, I'm not going to invest my time in finishing this PR, if I don't see any interest from the Symfony maintainers. I might at some point write a separate Postgres(Messenger)Transport with the changes mentioned in the github ticket, just for my own use.
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2022-11-14T20:51:59Z
+
+@d-ph Unfortunately that's not going to be me as I'm not part of that group. But @nicolas-grekas marked it for the next milestone. Isn't that kind of an confirmation?
+
+---------------------------------------------------------------------------
+
+by d-ph at 2022-11-16T17:59:09Z
+
+Chris,
+
+I'm not going to play a "what the poet meant" regarding milestones assignment.
+
+I don't think I ask for much, considering the fact that I'm going to be doing the heavy-lifting.
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2022-11-16T21:02:16Z
+
+I'm sorry. That wasn't meant as a push but rather as "I just realized, did you see that". I also don't know what it means ether, and hoped you might.
+You're definitively not asking for too much.
+@nicolas-grekas Can you confirm the scope that is tackled here and that this approach would be merged and supported?
+
+---------------------------------------------------------------------------
+
+by bendavies at 2022-12-08T15:08:36Z
+
+this PR needs to take https://github.com/symfony/symfony/pull/47209 into account
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2024-05-08T11:45:29Z
+
+@nicolas-grekas This PR was moved to different milestones twice, but the author is still waiting on a confirmation / guidance from you before finalizing the PR. Otherwise I guess this will be moved to the next milestone again 😞
+
+---------------------------------------------------------------------------
+
+by christian-kolb at 2025-01-10T07:14:35Z
+
+@nicolas-grekas @fabpot This PR was moved to different milestones again, but the author is still waiting on a confirmation / guidance from you before finalizing the PR. Otherwise I guess this will be moved to the next milestone again.
+
+---------------------------------------------------------------------------
+
+by keichinger at 2025-12-21T18:14:18Z
+
+We're running into the same issues with PostgreSQL's `LISTEN/NOTIFY` feature not correctly working when starting a message consumer with multiple queues. It works as expected with a single queue name, though we'd prefer for sake of simplicity to keep a single message worker instead of N workers.
+
+@nicolas-grekas @fabpot could one of you please have a look at @d-ph's questions from the initial comment, so we could hopefully ( 🤞 ) get this PR moving forward? :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-12T14:58:25Z
+
+I patched these files recently in #62990 and #62988
+This means this PR needs a rebase, and also maybe checking if the issue still exists after the changes?

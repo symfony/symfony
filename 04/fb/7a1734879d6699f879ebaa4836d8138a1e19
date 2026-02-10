@@ -1,0 +1,206 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-02-06T12:01:55Z
+
+Just tested you example, on Mac OS 26.2. It works with iTerm2 (with a confirmation popup) , Ghostty and default Terminal app (paste the complete file path); not in the PHPStorm integrated terminal (pastes the filename without its path).
+That does not work with copied image contents.
+
+Also when providing the file path to the command, I get an error that show that it's not converted from `string` to `PastedFile`:
+```
+bin/console app:analyze-image /Users/jerome/Pictures/spirgrips.jpg
+
+Fatal error: Uncaught TypeError: App\Command\AnalyzeImageCommand::__invoke(): Argument #2 ($image) must be of type Symfony\Component\Console\Input\File\PastedFile, string given
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2026-02-06T12:04:08Z
+
+This probably needs a value resolver to handle the non-interactive case.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-02-06T12:07:23Z
+
+@GromNaN Thanks, will try reproducing the error. Is it PHPStorm integrated term as well?
+
+@stof indeed a value resolver is planed for future scope.
+
+Thanks for the reviews
+
+---------------------------------------------------------------------------
+
+by stof at 2026-02-06T12:11:34Z
+
+@chalasr the value resolver is what you need to solve the error reported by @GromNaN when providing a file path in a non-interactive way. So it has to be in the initial scope IMO.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-02-06T12:13:28Z
+
+Right, initial scope it will be.
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-02-08T17:32:00Z
+
+Added an `InputFileValueResolver` and resolved other comments. About PHPStorm's integrated termina it's a known issue on their side: https://youtrack.jetbrains.com/issue/IDEA-127494, https://youtrack.jetbrains.com/issue/IJPL-196803. PR ready for another round of review
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-02-09T20:04:03Z
+
+> Would it be simpler to support only InputFile?
+
+👍 SplFileInfo support removed, PR description updated. Thanks for reviewing!
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-02-10T14:45:32Z
+
+Fixed the CS, removed outdated fixtures and more useless comments and added the missing service definition for the resolver
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-02-10T14:56:38Z
+
+Test failure on windows minimal-exts is related to this PR.
+
+<details>
+<summary>
+InputFileValueResolverTest failure
+</summary>
+
+```
+1) Symfony\Component\Console\Tests\ArgumentResolver\ValueResolver\InputFileValueResolverTest::testResolvesInputFileFromPath
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734675.404.302149106/test.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\ArgumentResolver\ValueResolver\InputFileValueResolver.php:58
+D:\a\symfony\symfony\src\Symfony\Component\Console\ArgumentResolver\ValueResolver\InputFileValueResolver.php:34
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\ArgumentResolver\ValueResolver\InputFileValueResolverTest.php:101
+
+2) Symfony\Component\Console\Tests\ArgumentResolver\ValueResolver\InputFileValueResolverTest::testWithOption
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734675.438.1483755469/test.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\ArgumentResolver\ValueResolver\InputFileValueResolver.php:58
+D:\a\symfony\symfony\src\Symfony\Component\Console\ArgumentResolver\ValueResolver\InputFileValueResolver.php:38
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\ArgumentResolver\ValueResolver\InputFileValueResolverTest.php:171
+
+3) Symfony\Component\Console\Tests\ArgumentResolver\ValueResolver\InputFileValueResolverTest::testAlreadyResolvedInputFile
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734675.4612.559954385/test.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\ArgumentResolver\ValueResolver\InputFileValueResolverTest.php:182
+
+4) Symfony\Component\Console\Tests\ArgumentResolver\ValueResolver\InputFileValueResolverTest::testArgumentResolverResolvesInputFile
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734675.4696.1787275050/test.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\ArgumentResolver\ValueResolver\InputFileValueResolver.php:58
+D:\a\symfony\symfony\src\Symfony\Component\Console\ArgumentResolver\ValueResolver\InputFileValueResolver.php:34
+D:\a\symfony\symfony\src\Symfony\Component\Console\ArgumentResolver\ArgumentResolver.php:92
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\ArgumentResolver\ValueResolver\InputFileValueResolverTest.php:243
+
+5) Symfony\Component\Console\Tests\ArgumentResolver\ValueResolver\InputFileValueResolverTest::testResolvesInputFileInNonInteractiveMode
+Symfony\Component\Console\Exception\InvalidFileException: File "D:asymfonysymfonysrcSymfonyComponentConsoleTestsArgumentResolverValueResolverInputFileValueResolverTest.php" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\ArgumentResolver\ValueResolver\InputFileValueResolver.php:58
+D:\a\symfony\symfony\src\Symfony\Component\Console\ArgumentResolver\ValueResolver\InputFileValueResolver.php:34
+D:\a\symfony\symfony\src\Symfony\Component\Console\ArgumentResolver\ArgumentResolver.php:92
+D:\a\symfony\symfony\src\Symfony\Component\Console\Command\InvokableCommand.php:172
+D:\a\symfony\symfony\src\Symfony\Component\Console\Command\InvokableCommand.php:61
+D:\a\symfony\symfony\src\Symfony\Component\Console\Command\Command.php:281
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tester\CommandTester.php:75
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\ArgumentResolver\ValueResolver\InputFileValueResolverTest.php:253
+
+6) Symfony\Component\Console\Tests\Input\File\InputFileTest::testFromPathWithExistingFile
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734742.6714.328900738/test.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\Input\File\InputFileTest.php:61
+
+7) Symfony\Component\Console\Tests\Input\File\InputFileTest::testFromPathWithSpacesInName
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734742.6805.1029353344/my file with spaces.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\Input\File\InputFileTest.php:81
+
+8) Symfony\Component\Console\Tests\Input\File\InputFileTest::testFromPathWithDoubleQuotes
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734742.685.141088190/quoted file.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\Input\File\InputFileTest.php:93
+
+9) Symfony\Component\Console\Tests\Input\File\InputFileTest::testFromPathWithSingleQuotes
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734742.6897.1903180190/quoted file.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\Input\File\InputFileTest.php:105
+
+10) Symfony\Component\Console\Tests\Input\File\InputFileTest::testFromPathWithEscapedSpaces
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734742.6946.1285207756/escaped file.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\Input\File\InputFileTest.php:118
+
+11) Symfony\Component\Console\Tests\Input\File\InputFileTest::testFromPathWithFileUri
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734742.6998.3028251/uri file.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\Input\File\InputFileTest.php:130
+
+12) Symfony\Component\Console\Tests\Input\File\InputFileTest::testFromPathWithFileUriAndEncodedSpaces
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734742.7048.7688552/uri encoded file.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\Input\File\InputFileTest.php:143
+
+13) Symfony\Component\Console\Tests\Input\File\InputFileTest::testGetMimeType
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734742.7094.1168519391/test.png" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\Input\File\InputFileTest.php:156
+
+14) Symfony\Component\Console\Tests\Input\File\InputFileTest::testGuessExtension
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734742.7145.320735324/test.png" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\Input\File\InputFileTest.php:168
+
+15) Symfony\Component\Console\Tests\Input\File\InputFileTest::testMoveNonTemporaryFileCopies
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734742.728.109941950/original.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\Input\File\InputFileTest.php:195
+
+16) Symfony\Component\Console\Tests\Input\File\InputFileTest::testCleanupDoesNothingForNonTempFile
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734742.757.1461644672/permanent.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\Input\File\InputFileTest.php:258
+
+17) Symfony\Component\Console\Tests\Input\File\InputFileTest::testIsValid
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734742.7629.111451401/valid.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\Input\File\InputFileTest.php:269
+
+18) Symfony\Component\Console\Tests\Input\File\InputFileTest::testGetContentsThrowsForInvalidFile
+Symfony\Component\Console\Exception\InvalidFileException: File "C:UsersRUNNER~1AppDataLocalTemp/1770734743.4366.1206017926/to_delete.txt" does not exist.
+
+D:\a\symfony\symfony\src\Symfony\Component\Console\Input\File\InputFile.php:77
+D:\a\symfony\symfony\src\Symfony\Component\Console\Tests\Input\File\InputFileTest.php:290
+
+```
+</details>
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-02-10T16:05:03Z
+
+@GromNaN Windows issues fixed, thanks for noticing. Hopefully good to go now

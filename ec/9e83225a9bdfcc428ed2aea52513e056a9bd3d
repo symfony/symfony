@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-02-10T17:33:49Z
+
+The 7.3 branch only receives security fixes now. We will merge this in 7.4 (we can rebase it with our merge tool if you don't do it yourselves)
+
+---------------------------------------------------------------------------
+
+by lacatoire at 2026-02-10T17:42:34Z
+
+Sorry for the ping maintainers, i missed up

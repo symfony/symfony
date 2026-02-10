@@ -11,6 +11,7 @@ CHANGELOG
  * Allow environment variables with `.` in them
  * Add argument `exclude` to `ContainerConfigurator::import()`
  * Add `target` parameter to `#[AsAlias]` to create target-specific autowiring aliases
+ * Add attribute auto-configuration from class interfaces 
 
 8.0
 ---

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2024-11-14T15:30:52Z
+
+by "user timezone", you mean the timezone that the browser is using when performing the client-side validation ? There is no way to get it as it is something that is not sent to the server.
+
+---------------------------------------------------------------------------
+
+by stof at 2024-11-14T15:31:08Z
+
+btw, a *date* does not have a timezone

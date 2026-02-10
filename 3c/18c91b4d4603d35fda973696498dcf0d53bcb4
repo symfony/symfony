@@ -1,0 +1,35 @@
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2025-01-28T12:54:37Z
+
+@jderusse if you have some free time maybe you can have a relook at the changes we did since your last review as you are I think most familiar with semaphore component.
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2025-03-26T20:03:22Z
+
+@jderusse what I'm stuck of how we can make the framework bundle integration for this.
+
+---------------------------------------------------------------------------
+
+by Toflar at 2025-05-13T08:23:39Z
+
+I really like this proposal! Is @jderusse's feedback to https://github.com/symfony/symfony/pull/59202#issuecomment-2755625927 the only blocker?
+
+---------------------------------------------------------------------------
+
+by alexander-schranz at 2025-08-04T12:52:13Z
+
+Yes would be nice to get some feedback from @jderusse specially not sure how we can create the `Store` in the Framework integration where the Semaphore Store is created via the `createStore` method which sadly is currently a `static` method here:
+
+https://github.com/symfony/symfony/blob/aafbe05721e228eba5d40fe8a2465ec95fd069a0/src/Symfony/Component/Semaphore/Store/StoreFactory.php#L26
+
+And the new `Store` `lock://` requires the `LockFactory` to be injected. The idea was something like:
+
+```php
+framework:
+    lock: '%env(LOCK_DSN)%'
+    semaphore: 'lock://'
+```
+
+but doesn't work aslong as the factories are static methods.

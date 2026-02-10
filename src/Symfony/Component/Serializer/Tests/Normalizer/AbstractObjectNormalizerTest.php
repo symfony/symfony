@@ -205,6 +205,20 @@ class AbstractObjectNormalizerTest extends TestCase
         $this->assertSame('notfoo', $test->notfoo);
     }
 
+    public function testRemoveNestedValueHandlesNullIntermediateValues()
+    {
+        $normalizer = new AbstractObjectNormalizerWithMetadata();
+        $r = new \ReflectionMethod($normalizer, 'removeNestedValue');
+
+        // When intermediate value is null, the method should return data unchanged
+        $data = ['entity' => null, 'other' => 'keep'];
+        $this->assertSame($data, $r->invoke($normalizer, ['entity', 'id'], $data));
+
+        // When intermediate value is a scalar, the method should return data unchanged
+        $data = ['entity' => 'scalar', 'other' => 'keep'];
+        $this->assertSame($data, $r->invoke($normalizer, ['entity', 'id'], $data));
+    }
+
     public function testDenormalizeWithNestedAttributesDuplicateKeys()
     {
         $this->expectException(LogicException::class);

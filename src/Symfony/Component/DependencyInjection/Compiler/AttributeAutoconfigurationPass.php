@@ -144,7 +144,15 @@ final class AttributeAutoconfigurationPass extends AbstractRecursivePass
             return;
         }
 
-        foreach ($reflector->getAttributes() as $attribute) {
+        $attributes = $reflector->getAttributes();
+
+        if ($reflector instanceof \ReflectionClass) {
+            foreach ($reflector->getInterfaces() as $interface) {
+                $attributes = array_merge($attributes, $interface->getAttributes());
+            }
+        }
+
+        foreach ($attributes as $attribute) {
             foreach ($this->findConfigurators($configurators, $attribute->getName()) as $configurator) {
                 $configurator($conditionals, $attribute->newInstance(), $reflector);
             }

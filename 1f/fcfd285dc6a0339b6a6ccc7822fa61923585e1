@@ -1,0 +1,62 @@
+---------------------------------------------------------------------------
+
+by xammmue at 2026-02-11T16:02:12Z
+
+So if I understand that change correctly @nicolas-grekas , the idea is to either set the `queues` option to `[]` or `false` to prevent the default binding.
+
+With the adaption, this exchange would then still behave as before when configured like this:
+```
+            test_exchange_out:
+                dsn: '%messenger_transport_dsn%'
+                options:
+                    exchange:
+                        name: 'SENDING_EXCHANGE'
+                        type: fanout
+                    auto_setup: false
+```
+
+While these 2 configurations would lead to the `messages` queue not being created.
+- with empty array
+```
+            test_exchange_out:
+                dsn: '%messenger_transport_dsn%'
+                options:
+                    exchange:
+                        name: 'SENDING_EXCHANGE'
+                        type: fanout
+                    auto_setup: false
+                    queues: []
+```
+- with false
+```
+            test_exchange_out:
+                dsn: '%messenger_transport_dsn%'
+                options:
+                    exchange:
+                        name: 'SENDING_EXCHANGE'
+                        type: fanout
+                    auto_setup: false
+                    queues: false
+```
+
+I had something similar in mind as well, but wasn't entirely sure whether this could possibly considered a BC breaking change.
+
+But if its not I am happy to make the adaption. Already tried it out and it seems to work just as well as the additional configuration parameter.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-11T17:56:46Z
+
+You've got it right @xammmue
+To me that's totally fine and legit.
+I made the change already and pushed on your fork. Can you please have a look and update the PR description if that works for you?
+
+---------------------------------------------------------------------------
+
+by xammmue at 2026-02-11T18:19:43Z
+
+Thank you @nicolas-grekas
+
+I updated the description as well as the accompanying documentation PR now.
+
+Looks like one of the tests you've added is failing. Are you going to adapt that or shall I try to adapt it?

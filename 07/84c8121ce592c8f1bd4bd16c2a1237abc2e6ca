@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by tarjei at 2023-10-24T10:53:38Z
+
+@nicolas-grekas  I'll fix the last tests if you like the direction of the PR :)
+
+---------------------------------------------------------------------------
+
+by tarjei at 2024-05-12T18:24:12Z
+
+Ok, i've now updated this PR to separate out mock_client from mock_response_factory and also add tests and handling of overriding the options in scoped clients.
+
+Example config:
+
+```
+    http_client:
+        default_options: ~
+        mock_client: true
+        scoped_clients:
+            notMocked:
+                base_uri : https://symfony.com
+                mock_client : false
+            mocked:
+                base_uri: https://symfony.com
+            mocked_with_factory:
+                base_uri: https://symfony.com
+                mock_response_factory: 'my_response_factory'
+
+```
+
+Note: Today mock_response_factory is directly under the http_client key. Maybe it both should be moved under the `default_options`  key to correspond better with the other options of the http client?
+
+---------------------------------------------------------------------------
+
+by tarjei at 2024-05-14T11:16:52Z
+
+@Neirda24 do the changes satisfy your concerns? :)

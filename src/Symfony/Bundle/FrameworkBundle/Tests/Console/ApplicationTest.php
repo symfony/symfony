@@ -271,12 +271,10 @@ class ApplicationTest extends TestCase
         $kernel = $this->createMock(KernelInterface::class);
         $kernel->expects($this->once())->method('boot');
         $kernel
-            ->expects($this->any())
             ->method('getBundles')
             ->willReturn($bundles)
         ;
         $kernel
-            ->expects($this->any())
             ->method('getContainer')
             ->willReturn($container)
         ;

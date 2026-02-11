@@ -184,6 +184,7 @@ class TranslationExtractCommandTest extends TestCase
         // Preparing mock
         $operation = $this->createMock(MessageCatalogueInterface::class);
         $operation
+            ->expects($this->once())
             ->method('all')
             ->with('messages')
             ->willReturn($messages);

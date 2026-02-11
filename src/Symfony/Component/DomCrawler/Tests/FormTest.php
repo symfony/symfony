@@ -888,7 +888,6 @@ class FormTest extends TestCase
         ;
 
         $field
-            ->expects($this->any())
             ->method('getValue')
             ->willReturn($value)
         ;

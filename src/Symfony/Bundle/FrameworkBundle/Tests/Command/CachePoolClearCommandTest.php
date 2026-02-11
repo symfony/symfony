@@ -48,7 +48,6 @@ class CachePoolClearCommandTest extends TestCase
     {
         $kernel = $this->createMock(KernelInterface::class);
         $kernel
-            ->expects($this->any())
             ->method('getContainer')
             ->willReturn(new Container());
 

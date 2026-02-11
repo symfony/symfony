@@ -98,7 +98,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         }
 
         $tokenProvider = $this->createMock(TokenProviderInterface::class);
-        $tokenProvider->expects($this->any())
+        $tokenProvider->expects($this->once())
             ->method('loadTokenBySeries')
             ->with('series1')
             ->willReturn($persistentToken)
@@ -199,7 +199,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         }
 
         $tokenProvider = $this->createMock(TokenProviderInterface::class);
-        $tokenProvider->expects($this->any())
+        $tokenProvider->expects($this->once())
             ->method('loadTokenBySeries')
             ->with('series1')
             ->willReturn($persistentToken);
@@ -220,7 +220,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         }
 
         $tokenProvider = $this->createMock(TokenProviderInterface::class);
-        $tokenProvider->expects($this->any())
+        $tokenProvider->expects($this->once())
             ->method('loadTokenBySeries')
             ->with('series1')
             ->willReturn($persistentToken);
@@ -242,7 +242,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         }
 
         $tokenProvider = $this->createMock(TokenProviderInterface::class);
-        $tokenProvider->expects($this->any())
+        $tokenProvider->expects($this->once())
             ->method('loadTokenBySeries')
             ->with('series1')
             ->willReturn($persistentToken)
@@ -266,7 +266,7 @@ class PersistentRememberMeHandlerTest extends TestCase
         }
 
         $tokenProvider = $this->createMock(TokenProviderInterface::class);
-        $tokenProvider->expects($this->any())
+        $tokenProvider->expects($this->once())
             ->method('loadTokenBySeries')
             ->with('series1')
             ->willReturn($persistentToken)

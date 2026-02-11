@@ -70,7 +70,7 @@ class ImportMapManagerTest extends TestCase
             })
         ;
 
-        $this->configReader->expects($this->any())
+        $this->configReader
             ->method('convertPathToFilesystemPath')
             ->willReturnCallback(function ($path) {
                 if (str_ends_with($path, 'some_file.js')) {
@@ -79,7 +79,7 @@ class ImportMapManagerTest extends TestCase
 
                 throw new \Exception(\sprintf('Unexpected path "%s"', $path));
             });
-        $this->configReader->expects($this->any())
+        $this->configReader
             ->method('convertFilesystemPathToPath')
             ->willReturnCallback(function ($path) {
                 return match ($path) {
@@ -404,7 +404,7 @@ class ImportMapManagerTest extends TestCase
         $this->remotePackageDownloader ??= $this->createStub(RemotePackageDownloader::class);
 
         // mock this to behave like normal
-        $this->configReader->expects($this->any())
+        $this->configReader
             ->method('createRemoteEntry')
             ->willReturnCallback(function (string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint) {
                 $path = '/path/to/vendor/'.$packageModuleSpecifier.'.js';
@@ -431,7 +431,7 @@ class ImportMapManagerTest extends TestCase
 
     private function mockImportMap(array $importMapEntries): void
     {
-        $this->configReader->expects($this->any())
+        $this->configReader
             ->method('getEntries')
             ->willReturn(new ImportMapEntries($importMapEntries))
         ;

@@ -337,7 +337,7 @@ class EntityValueResolverTest extends TestCase
                 ['title' => 'foo'] => $article,
             });
 
-        $manager->expects($this->any())
+        $manager
             ->method('getRepository')
             ->willReturn($repository);
 

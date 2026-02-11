@@ -528,7 +528,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->method('findRootImportMapEntry')
             ->with('@popperjs/core')
             ->willReturn(ImportMapEntry::createRemote('@popperjs/core', ImportMapType::JS, './vendor/@popperjs/core.js', '1.2.3', 'could_be_anything', false));
-        $importMapConfigReader->expects($this->any())
+        $importMapConfigReader->expects($this->once())
             ->method('convertPathToFilesystemPath')
             ->with('./vendor/@popperjs/core.js')
             ->willReturn('/path/to/vendor/@popperjs/core.js');
@@ -555,7 +555,7 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->method('findRootImportMapEntry')
             ->with('foobar')
             ->willReturn(ImportMapEntry::createRemote('foobar', ImportMapType::JS, 'foo.js', '1.2.3', 'foobar', false));
-        $importMapConfigReader->expects($this->any())
+        $importMapConfigReader->expects($this->once())
             ->method('convertPathToFilesystemPath')
             ->with('foo.js')
             ->willReturn('foo.js');

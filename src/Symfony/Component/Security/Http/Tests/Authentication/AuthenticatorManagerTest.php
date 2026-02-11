@@ -171,7 +171,7 @@ class AuthenticatorManagerTest extends TestCase
         $authenticator = $this->createMock(TestInteractiveAuthenticator::class);
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter')));
+        $authenticator->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter')));
 
         $authenticator->expects($this->once())->method('onAuthenticationFailure')->with($this->anything(), $this->callback(fn ($exception) => 'Authentication failed; Some badges marked as required by the firewall config are not available on the passport: "'.CsrfTokenBadge::class.'".' === $exception->getMessage()));
 
@@ -186,8 +186,8 @@ class AuthenticatorManagerTest extends TestCase
 
         $csrfBadge = new CsrfTokenBadge('csrfid', 'csrftoken');
         $csrfBadge->markResolved();
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter'), [$csrfBadge]));
-        $authenticator->expects($this->any())->method('createToken')->willReturn(new UsernamePasswordToken($this->user, 'main'));
+        $authenticator->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter'), [$csrfBadge]));
+        $authenticator->method('createToken')->willReturn(new UsernamePasswordToken($this->user, 'main'));
 
         $authenticator->expects($this->once())->method('onAuthenticationSuccess');
 

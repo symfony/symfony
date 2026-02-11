@@ -27,7 +27,7 @@ class CacheStorageTest extends TestCase
         $cacheItem = $this->createMock(CacheItemInterface::class);
         $cacheItem->expects($this->exactly(2))->method('expiresAfter')->with(10);
 
-        $pool->expects($this->any())->method('getItem')->with(sha1('test'))->willReturn($cacheItem);
+        $pool->expects($this->exactly(2))->method('getItem')->with(sha1('test'))->willReturn($cacheItem);
         $pool->expects($this->exactly(2))->method('save')->with($cacheItem);
 
         $window = new Window('test', 10, 20);

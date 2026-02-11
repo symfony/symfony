@@ -25,7 +25,7 @@ class LockFactoryTest extends TestCase
     public function testCreateLock()
     {
         $store = $this->createMock(PersistingStoreInterface::class);
-        $store->expects($this->any())->method('exists')->willReturn(false);
+        $store->method('exists')->willReturn(false);
 
         $keys = [];
         $store
@@ -53,7 +53,7 @@ class LockFactoryTest extends TestCase
     public function testCreateLockFromKey()
     {
         $store = $this->createMock(PersistingStoreInterface::class);
-        $store->expects($this->any())->method('exists')->willReturn(false);
+        $store->method('exists')->willReturn(false);
 
         $keys = [];
         $store

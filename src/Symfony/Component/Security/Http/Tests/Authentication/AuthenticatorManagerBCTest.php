@@ -164,7 +164,7 @@ class AuthenticatorManagerBCTest extends TestCase
         $authenticator = $this->createMock(TestInteractiveBCAuthenticator::class);
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new Passport(new UserBadge('wouter', fn () => $this->user), new PasswordCredentials('pass')));
+        $authenticator->method('authenticate')->willReturn(new Passport(new UserBadge('wouter', fn () => $this->user), new PasswordCredentials('pass')));
 
         $authenticator->expects($this->once())
             ->method('onAuthenticationFailure')
@@ -181,7 +181,7 @@ class AuthenticatorManagerBCTest extends TestCase
         $authenticator = $this->createMock(TestInteractiveBCAuthenticator::class);
         $this->request->attributes->set('_security_authenticators', [$authenticator]);
 
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter')));
+        $authenticator->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter')));
 
         $authenticator->expects($this->once())->method('onAuthenticationFailure')->with($this->anything(), $this->callback(fn ($exception) => 'Authentication failed; Some badges marked as required by the firewall config are not available on the passport: "'.CsrfTokenBadge::class.'".' === $exception->getMessage()));
 
@@ -198,8 +198,8 @@ class AuthenticatorManagerBCTest extends TestCase
 
         $csrfBadge = new CsrfTokenBadge('csrfid', 'csrftoken');
         $csrfBadge->markResolved();
-        $authenticator->expects($this->any())->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter'), [$csrfBadge]));
-        $authenticator->expects($this->any())->method('createToken')->willReturn(new UsernamePasswordToken($this->user, 'main'));
+        $authenticator->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter'), [$csrfBadge]));
+        $authenticator->method('createToken')->willReturn(new UsernamePasswordToken($this->user, 'main'));
 
         $authenticator->expects($this->once())->method('onAuthenticationSuccess');
 
@@ -426,6 +426,7 @@ class AuthenticatorManagerBCTest extends TestCase
             ->willReturn($this->response);
 
         $authenticator
+            ->expects($this->once())
             ->method('onAuthenticationSuccess')
             ->with($this->anything(), $this->token, 'main')
             ->willReturn($this->response);

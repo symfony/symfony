@@ -181,7 +181,6 @@ class HttpUtilsTest extends TestCase
             ->willReturn('/foo/bar')
         ;
         $urlGenerator
-            ->expects($this->any())
             ->method('getContext')
             ->willReturn(new RequestContext())
         ;

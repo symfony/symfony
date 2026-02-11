@@ -9,6 +9,7 @@ if (!getenv('SYMFONY_PHPUNIT_VERSION')) {
     if (\PHP_VERSION_ID >= 80300) {
         if (\PHP_VERSION_ID >= 80400) {
             putenv('SYMFONY_PHPUNIT_VERSION=13');
+            $_SERVER['argv'][] = '--fail-on-phpunit-deprecation';
         } else {
             putenv('SYMFONY_PHPUNIT_VERSION=12');
         }

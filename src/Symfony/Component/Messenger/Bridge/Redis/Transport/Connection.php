@@ -199,7 +199,7 @@ class Connection
         @$redis->{$connect}($host, $port, $params['timeout'], $params['persistent_id'], $params['retry_interval'], $params['read_timeout'], ...(\defined('Redis::SCAN_PREFIX') || \extension_loaded('relay')) ? [$extra] : []);
 
         $error = null;
-        set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
+        set_error_handler(static function ($type, $msg) use (&$error) { $error = $msg; });
 
         try {
             $isConnected = $redis->isConnected();
@@ -244,7 +244,7 @@ class Connection
                 $params['host'] = 'tls://'.$params['host'];
             }
         } else {
-            $dsnParams = array_map(function ($dsn) use (&$options) {
+            $dsnParams = array_map(static function ($dsn) use (&$options) {
                 return self::parseDsn($dsn, $options);
             }, explode(',', $dsn));
 
@@ -253,7 +253,7 @@ class Connection
             $tls = 'rediss' === $params['scheme'] || 'valkeys' === $params['scheme'];
 
             // Regroup all the hosts in an array interpretable by RedisCluster
-            $params['host'] = array_map(function ($params) use ($tls) {
+            $params['host'] = array_map(static function ($params) use ($tls) {
                 if (!isset($params['host'])) {
                     throw new InvalidArgumentException('Missing host in DSN, it must be defined when using Redis Cluster.');
                 }
@@ -361,7 +361,7 @@ class Connection
         }
 
         $auth = null;
-        $url = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', function ($m) use (&$auth) {
+        $url = preg_replace_callback('#^'.$scheme.':(//)?(?:(?:(?<user>[^:@]*+):)?(?<password>[^@]*+)@)?#', static function ($m) use (&$auth) {
             if (isset($m['password'])) {
                 if (!\in_array($m['user'], ['', 'default'], true)) {
                     $auth['user'] = rawurldecode($m['user']);

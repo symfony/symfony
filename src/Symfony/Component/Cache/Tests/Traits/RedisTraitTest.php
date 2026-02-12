@@ -70,7 +70,7 @@ class RedisTraitTest extends TestCase
 
     public static function provideCreateConnection(): array
     {
-        $hosts = array_map(fn ($host) => \sprintf('host[%s]', $host), explode(' ', getenv('REDIS_CLUSTER_HOSTS') ?: ''));
+        $hosts = array_map(static fn ($host) => \sprintf('host[%s]', $host), explode(' ', getenv('REDIS_CLUSTER_HOSTS') ?: ''));
 
         return [
             [

@@ -66,9 +66,12 @@ final class DotenvDumpCommand extends Command
             $projectDir = \dirname($projectDir);
         }
 
-        $composerFile = $projectDir.'/composer.json';
-        $config += (is_file($composerFile) ? json_decode(file_get_contents($composerFile), true) : [])['extra']['runtime'] ?? [];
-        $dotenvPath = $projectDir.'/'.($config['dotenv_path'] ?? '.env');
+        if (null === $dotenvPath = $_SERVER['SYMFONY_DOTENV_PATH'] ?? null) {
+            $composerFile = $projectDir.'/composer.json';
+            $config += (is_file($composerFile) ? json_decode(file_get_contents($composerFile), true) : [])['extra']['runtime'] ?? [];
+            $dotenvPath = $projectDir.'/'.($config['dotenv_path'] ?? '.env');
+        }
+
         $env = $input->getArgument('env') ?? $this->defaultEnv;
         $envKey = $config['env_var_name'] ?? 'APP_ENV';
 
@@ -90,7 +93,7 @@ final class DotenvDumpCommand extends Command
             EOF;
         file_put_contents($dotenvPath.'.local.php', $vars, \LOCK_EX);
 
-        $output->writeln(\sprintf('Successfully dumped .env files in <info>.env.local.php</> for the <info>%s</> environment.', $env));
+        $output->writeln(\sprintf('Successfully dumped .env files in <info>%s.local.php</> for the <info>%s</> environment.', basename($dotenvPath), $env));
 
         return 0;
     }

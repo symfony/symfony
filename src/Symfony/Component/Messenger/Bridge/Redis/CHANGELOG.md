@@ -5,7 +5,7 @@ CHANGELOG
 ---
 
  * Bump ext-redis to 6.1 and ext-relay to 0.12 minimum
- * Allow separate passwords for Sentinel and master hosts
+ * Allow separate authenticate for Sentinel and master hosts
 
 7.3
 ---

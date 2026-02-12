@@ -515,7 +515,7 @@ class ConnectionTest extends TestCase
         $password = 'wr0ngpassword';
         $dsn = 'redis:?'.implode('&', $hosts).'&auth='.urlencode($password);
 
-        $redis = $this->createRedisMock();
+        $redis = $this->createMock(\Redis::class);
         $redis->expects($this->never())
             ->method('auth');
 

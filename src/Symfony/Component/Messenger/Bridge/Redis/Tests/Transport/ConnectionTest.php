@@ -401,6 +401,56 @@ class ConnectionTest extends TestCase
         yield '100ms delay' => ['/^[A-Z\d\/+]+$/i', 100, 'rawCommand', '1'];
     }
 
+    #[DataProvider('provideDsnWithOptionsForAuthResolution')]
+    public function testFromDsnReturnsConnectionWithCorrectAuthResolution(string $dsn, array $options, mixed $expectedMasterAuth, mixed $expectedSentinelAuth)
+    {
+        $redis = $this->createStub(\Redis::class);
+        $connection = Connection::fromDsn($dsn, ['lazy' => true] + $options, $redis);
+
+        $initializer = (new \ReflectionProperty(Connection::class, 'redisInitializer'))->getValue($connection);
+        $vars = (new \ReflectionFunction($initializer))->getStaticVariables();
+
+        $this->assertSame($expectedMasterAuth, $vars['masterAuth']);
+        $this->assertSame($expectedSentinelAuth, $vars['sentinelAuth']);
+    }
+
+    public static function provideDsnWithOptionsForAuthResolution(): \Generator
+    {
+        yield 'no sentinel: auth from DSN user-info' => [
+            'redis://password@localhost/queue', [],
+            'password', null,
+        ];
+        yield 'no sentinel: auth option wins over DSN user-info' => [
+            'redis://password1@localhost/queue', ['auth' => 'password2'],
+            'password2', null,
+        ];
+        yield 'no sentinel: auth from options only' => [
+            'redis://localhost/queue', ['auth' => 'password'],
+            'password', null,
+        ];
+        yield 'no sentinel: user and password from DSN' => [
+            'redis://user:password@localhost/queue', [],
+            ['user', 'password'], null,
+        ];
+
+        yield 'with sentinel: DSN user-info for master, auth param for sentinel' => [
+            'redis:masterPass@?host[127.0.0.1:26379]&auth=sentinelPass', ['sentinel' => 'myMaster'],
+            'masterPass', 'sentinelPass',
+        ];
+        yield 'with sentinel: same auth for both (only auth param)' => [
+            'redis:?host[127.0.0.1:26379]&auth=sharedPass', ['sentinel' => 'myMaster'],
+            'sharedPass', 'sharedPass',
+        ];
+        yield 'with sentinel: DSN user-info only, no auth param' => [
+            'redis:masterPass@?host[127.0.0.1:26379]', ['sentinel' => 'myMaster'],
+            'masterPass', null,
+        ];
+        yield 'with sentinel: user:pass in DSN, auth param for sentinel' => [
+            'redis:user:masterPass@?host[127.0.0.1:26379]&auth=sentinelPass', ['sentinel' => 'myMaster'],
+            ['user', 'masterPass'], 'sentinelPass',
+        ];
+    }
+
     #[Group('integration')]
     #[DataProvider('successSentinelAuthDsnDataProvider')]
     public function testSentinelSuccessfulAuthentication(string $dsn)
@@ -443,10 +493,8 @@ class ConnectionTest extends TestCase
 
     public static function successSentinelAuthDsnDataProvider(): \Generator
     {
-        yield 'auth via master_auth & sentinel_auth' => ['redis:?{hosts}&master_auth={master_auth}&sentinel_auth={sentinel_auth}'];
-        yield 'auth via master_auth & old auth options' => ['redis:?{hosts}&master_auth={master_auth}&auth={sentinel_auth}'];
-        yield 'auth via old auth param & sentinel_auth' => ['redis:{master_auth}@?{hosts}&sentinel_auth={sentinel_auth}'];
-        yield 'fallback on BC: old auth param & old auth options' => ['redis:{master_auth}@?{hosts}&auth={sentinel_auth}'];
+        yield 'master auth via DSN user-info, sentinel auth via param' => ['redis:{master_auth}@?{hosts}&auth={sentinel_auth}'];
+        yield 'same auth for both (only auth param)' => ['redis:?{hosts}&auth={master_auth}'];
     }
 
     #[Group('integration')]
@@ -465,7 +513,7 @@ class ConnectionTest extends TestCase
 
         $hosts = array_map(static fn ($host) => \sprintf('host[%s]', $host), explode(' ', $hosts));
         $password = 'wr0ngpassword';
-        $dsn = 'redis:?'.implode('&', $hosts).'&sentinel_auth='.urlencode($password);
+        $dsn = 'redis:?'.implode('&', $hosts).'&auth='.urlencode($password);
 
         $redis = $this->createRedisMock();
         $redis->expects($this->never())

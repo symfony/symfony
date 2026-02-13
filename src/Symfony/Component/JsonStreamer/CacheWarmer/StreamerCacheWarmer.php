@@ -14,6 +14,7 @@ namespace Symfony\Component\JsonStreamer\CacheWarmer;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 use Symfony\Component\JsonStreamer\Exception\ExceptionInterface;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
@@ -40,8 +41,8 @@ final class StreamerCacheWarmer implements CacheWarmerInterface
         private iterable $streamable,
         PropertyMetadataLoaderInterface $streamWriterPropertyMetadataLoader,
         PropertyMetadataLoaderInterface $streamReaderPropertyMetadataLoader,
-        string $streamWritersDir,
-        string $streamReadersDir,
+        private string $streamWritersDir,
+        private string $streamReadersDir,
         private LoggerInterface $logger = new NullLogger(),
         ?ConfigCacheFactoryInterface $configCacheFactory = null,
     ) {
@@ -51,6 +52,10 @@ final class StreamerCacheWarmer implements CacheWarmerInterface
 
     public function warmUp(string $cacheDir, ?string $buildDir = null): array
     {
+        $fs = new Filesystem();
+        $fs->remove($this->streamWritersDir);
+        $fs->remove($this->streamReadersDir);
+
         foreach ($this->streamable as $className => $streamable) {
             if ($streamable['object']) {
                 $type = Type::object($className);
@@ -72,7 +77,7 @@ final class StreamerCacheWarmer implements CacheWarmerInterface
 
     public function isOptional(): bool
     {
-        return true;
+        return false;
     }
 
     private function warmUpStreamWriter(Type $type): void

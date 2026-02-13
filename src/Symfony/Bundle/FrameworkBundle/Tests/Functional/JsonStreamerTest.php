@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\Dto\Dummy;
+use Symfony\Component\Config\Resource\ReflectionClassResource;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\JsonStreamer\StreamerDumper;
 use Symfony\Component\JsonStreamer\StreamReaderInterface;
@@ -65,11 +66,53 @@ class JsonStreamerTest extends AbstractWebTestCase
         $this->assertFileExists($streamWritersDir);
 
         if (!class_exists(StreamerDumper::class)) {
-            $this->assertCount(2, glob($streamWritersDir.'/*'));
+            $this->assertCount(2, glob($streamWritersDir.'*'));
         } else {
-            $this->assertCount(2, glob($streamWritersDir.'/*.php'));
-            $this->assertCount(2, glob($streamWritersDir.'/*.php.meta'));
-            $this->assertCount(2, glob($streamWritersDir.'/*.php.meta.json'));
+            $this->assertCount(2, glob($streamWritersDir.'*.php'));
+            $this->assertCount(2, glob($streamWritersDir.'*.php.meta'));
+            $this->assertCount(2, glob($streamWritersDir.'*.php.meta.json'));
         }
+    }
+
+    public function testCacheInvalidationResources()
+    {
+        if (!class_exists(StreamerDumper::class)) {
+            $this->markTestSkipped('StreamerDumper is required for cache invalidation.');
+        }
+
+        /** @var Filesystem $fs */
+        $fs = static::getContainer()->get('filesystem');
+
+        $streamWritersDir = \sprintf('%s/json_streamer/stream_writer/', static::getContainer()->getParameter('kernel.cache_dir'));
+        if ($fs->exists($streamWritersDir)) {
+            $fs->remove($streamWritersDir);
+        }
+
+        $streamReadersDir = \sprintf('%s/json_streamer/stream_reader/', static::getContainer()->getParameter('kernel.cache_dir'));
+        if ($fs->exists($streamReadersDir)) {
+            $fs->remove($streamReadersDir);
+        }
+
+        static::getContainer()->get('json_streamer.cache_warmer.streamer.alias')->warmUp(static::getContainer()->getParameter('kernel.cache_dir'));
+
+        $writeMeta = array_map(static fn (string $f): mixed => json_decode(file_get_contents($f), true), glob($streamWritersDir.'*.php.meta.json'));
+
+        $dummyResources = $writeMeta[0]['resources'];
+        $this->assertSame(ReflectionClassResource::class, $dummyResources[0]['@type']);
+        $this->assertSame(Dummy::class, $dummyResources[0]['className']);
+
+        $dummyListResources = $writeMeta[1]['resources'];
+        $this->assertSame(ReflectionClassResource::class, $dummyListResources[0]['@type']);
+        $this->assertSame(Dummy::class, $dummyListResources[0]['className']);
+
+        $readMeta = array_map(static fn (string $f): mixed => json_decode(file_get_contents($f), true), glob($streamReadersDir.'*.php.meta.json'));
+
+        $dummyResources = $readMeta[0]['resources'];
+        $this->assertSame(ReflectionClassResource::class, $dummyResources[0]['@type']);
+        $this->assertSame(Dummy::class, $dummyResources[0]['className']);
+
+        $dummyListResources = $readMeta[1]['resources'];
+        $this->assertSame(ReflectionClassResource::class, $dummyListResources[0]['@type']);
+        $this->assertSame(Dummy::class, $dummyListResources[0]['className']);
     }
 }

@@ -48,7 +48,7 @@ class StreamerDumperTest extends TestCase
         $path = $this->cacheDir.'/streamer.php';
 
         $dumper = new StreamerDumper($this->createStub(PropertyMetadataLoaderInterface::class), $this->cacheDir, new ConfigCacheFactory(true));
-        $dumper->dump(Type::int(), $path, fn () => 'CONTENT');
+        $dumper->dump(Type::int(), $path, static fn () => 'CONTENT');
 
         $this->assertFileExists($path);
         $this->assertFileExists($path.'.meta');
@@ -62,7 +62,7 @@ class StreamerDumperTest extends TestCase
         $path = $this->cacheDir.'/streamer.php';
 
         $dumper = new StreamerDumper($this->createStub(PropertyMetadataLoaderInterface::class), $this->cacheDir);
-        $dumper->dump(Type::int(), $path, fn () => 'CONTENT');
+        $dumper->dump(Type::int(), $path, static fn () => 'CONTENT');
 
         $this->assertFileExists($path);
         $this->assertStringEqualsFile($path, 'CONTENT');
@@ -71,16 +71,16 @@ class StreamerDumperTest extends TestCase
     /**
      * @param list<class-string> $expectedClassNames
      */
-    #[DataProvider('getCacheResourcesDataProvider')]
-    public function testGetCacheResources(Type $type, array $expectedClassNames)
+    #[DataProvider('tracksTypeClassesDataProvider')]
+    public function testTracksTypeClasses(Type $type, array $expectedClassNames)
     {
         $path = $this->cacheDir.'/streamer.php';
 
         $dumper = new StreamerDumper(new PropertyMetadataLoader(TypeResolver::create()), $this->cacheDir, new ConfigCacheFactory(true));
-        $dumper->dump($type, $path, fn () => 'CONTENT');
+        $dumper->dump($type, $path, static fn () => 'CONTENT');
 
         $resources = json_decode(file_get_contents($path.'.meta.json'), true)['resources'];
-        $classNames = array_column($resources, 'className');
+        $classNames = array_values(array_filter(array_column($resources, 'className')));
 
         $this->assertSame($expectedClassNames, $classNames);
     }
@@ -88,7 +88,7 @@ class StreamerDumperTest extends TestCase
     /**
      * @return iterable<array{0: Type, 1: list<class-string>}>
      */
-    public static function getCacheResourcesDataProvider(): iterable
+    public static function tracksTypeClassesDataProvider(): iterable
     {
         yield 'scalar' => [Type::int(), []];
         yield 'enum' => [Type::enum(DummyBackedEnum::class), [DummyBackedEnum::class]];

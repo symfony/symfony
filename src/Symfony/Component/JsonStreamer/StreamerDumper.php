@@ -47,11 +47,12 @@ final class StreamerDumper
             $this->cacheFactory->cache(
                 $path,
                 function (ConfigCacheInterface $cache) use ($generateContent, $type) {
-                    $resourceClasses = $this->getResourceClassNames($type);
-                    $cache->write(
-                        $generateContent(),
-                        array_map(fn (string $c) => new ReflectionClassResource(new \ReflectionClass($c)), $resourceClasses),
-                    );
+                    $resources = [];
+                    foreach ($this->getResourceClassNames($type) as $className) {
+                        $resources[] = new ReflectionClassResource(new \ReflectionClass($className));
+                    }
+
+                    $cache->write($generateContent(), $resources);
                 },
             );
 

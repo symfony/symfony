@@ -29,16 +29,6 @@ class StreamerCacheWarmerTest extends TestCase
 
         $this->streamWritersDir = \sprintf('%s/symfony_json_streamer_test/stream_writer', sys_get_temp_dir());
         $this->streamReadersDir = \sprintf('%s/symfony_json_streamer_test/stream_reader', sys_get_temp_dir());
-
-        if (is_dir($this->streamWritersDir)) {
-            array_map('unlink', glob($this->streamWritersDir.'/*'));
-            rmdir($this->streamWritersDir);
-        }
-
-        if (is_dir($this->streamReadersDir)) {
-            array_map('unlink', glob($this->streamReadersDir.'/*'));
-            rmdir($this->streamReadersDir);
-        }
     }
 
     public function testWarmUp()

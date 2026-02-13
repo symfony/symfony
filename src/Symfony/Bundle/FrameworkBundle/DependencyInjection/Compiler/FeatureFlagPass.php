@@ -89,7 +89,7 @@ class FeatureFlagPass implements CompilerPassInterface
                 continue;
             }
 
-            return $definition->getClass();
+            return $container->getParameterBag()->resolveValue($definition->getClass());
         }
     }
 }

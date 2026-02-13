@@ -3657,7 +3657,7 @@ class FrameworkExtension extends Extension
 
                 if ($reflector instanceof \ReflectionClass) {
                     $className = $reflector->getName();
-                    $method = $attribute->method;
+                    $method = $attribute->method ?? '__invoke';
 
                     $featureName ??= $className;
                 } else {

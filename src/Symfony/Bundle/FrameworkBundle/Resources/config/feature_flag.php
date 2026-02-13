@@ -22,19 +22,19 @@ return static function (ContainerConfigurator $container) {
 
         ->set('feature_flag.provider.in_memory', InMemoryProvider::class)
             ->args([
-                '$features' => abstract_arg('Defined in FeatureFlagPass.'),
+                abstract_arg('Closures collected from "feature_flag.feature" tag'),
             ])
             ->tag('feature_flag.provider')
 
         ->set('feature_flag.provider', ChainProvider::class)
             ->args([
-                '$providers' => tagged_iterator('feature_flag.provider'),
+                tagged_iterator('feature_flag.provider'),
             ])
             ->alias(ProviderInterface::class, 'feature_flag.provider')
 
         ->set('feature_flag.feature_checker', FeatureChecker::class)
             ->args([
-                '$provider' => service('feature_flag.provider'),
+                service('feature_flag.provider'),
             ])
             ->tag('kernel.reset', ['method' => 'reset'])
             ->alias(FeatureCheckerInterface::class, 'feature_flag.feature_checker')

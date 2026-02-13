@@ -17,7 +17,7 @@ namespace Symfony\Component\FeatureFlag\Provider;
 final class ChainProvider implements ProviderInterface
 {
     public function __construct(
-        /** @var list<ProviderInterface> */
+        /** @var iterable<ProviderInterface> */
         private readonly iterable $providers = [],
     ) {
     }

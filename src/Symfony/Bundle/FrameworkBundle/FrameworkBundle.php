@@ -219,7 +219,7 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, TransformerPass::class);
         $this->addCompilerPassIfExists($container, ReverseMappingPass::class);
         $this->addCompilerPassIfExists($container, JsonPathPass::class);
-        $container->addCompilerPass(new FeatureFlagPass());
+        $this->addCompilerPassIfExists($container, FeatureFlagPass::class);
 
         if ($container->getParameter('kernel.debug')) {
             if ($container->hasParameter('.kernel.config_dir') && $container->hasParameter('.kernel.bundles_definition')) {

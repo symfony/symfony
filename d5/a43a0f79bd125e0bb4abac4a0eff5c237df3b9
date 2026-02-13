@@ -1,0 +1,80 @@
+---------------------------------------------------------------------------
+
+by yceruto at 2023-02-27T17:36:02Z
+
+This test is failing https://github.com/symfony/symfony/actions/runs/4272061115/jobs/7436960556#step:7:8239
+
+You probably have to add `symfony/serializer` as a dev dependency of the http-kernel component.
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-02-27T20:17:39Z
+
+yes, thanx, it was added in #49138. I've not added it here to prevent merge conflicts. Also I want extend functional tests added in mentioned PR with new Attribute
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-04-07T06:54:18Z
+
+For what it's worth, I'm personally not convinced we should merge this. The reason is that the resulting behavior is very limited and resorting to explicit code comes very quickly - as soon as one needs more precise control over the resulting response for example. In the end, this saves two/three lines that are legit to have in a controller/similar to me.
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-04-07T08:39:06Z
+
+Exactly, this can save few lines in the Controller and reduce boilerplate. Of course it can't cover all needs for an every project, but same applicable for other stuff provided by Framework. 80/20 rule in action. We have few microservices that uses only `#[Serialize]` Attribute without any kind of additional control for the Response.
+
+We can go further and build OpenApi documentation based on Controller return type + Attribute existence via [NelmioApiDocBundle](https://github.com/nelmio/NelmioApiDocBundle). It will reduce even more boilerplate code for some projects.
+
+---------------------------------------------------------------------------
+
+by Koc at 2023-04-22T10:49:09Z
+
+Rebased, renamed `context` to `serializationContext` for consistency for `Map*` attributes. Test failures looks unrelated.
+
+@nicolas-grekas please review :pray:
+
+---------------------------------------------------------------------------
+
+by Koc at 2024-01-29T16:35:08Z
+
+I've rebased PR one more time + fixed tests + actualized changelog.
+
+And as I've already mentioned - this feature needed not only for reducing boilerplate of serialization but also for simplification of the OpenApi spec generation via NelmioApiDocBundle. They already [successfully adopted](https://symfony.com/bundles/NelmioApiDocBundle/current/symfony_attributes.html) `#[MapRequestPayload/MapQueryString]`. So, introduction of this attribute can be a good step forward in same direction.
+
+---------------------------------------------------------------------------
+
+by Koc at 2025-12-08T01:20:58Z
+
+rebased above 8.1, fixed conflicts, actualized tests (including functional) :heavy_check_mark:
+
+---------------------------------------------------------------------------
+
+by Koc at 2026-02-05T23:01:07Z
+
+@nicolas-grekas I've updated current PR to take into account your recent changes from #63032.
+
+In general most of the pipelines pass (there is a failed unrelated test in Console suite). But [few](https://github.com/symfony/symfony/actions/runs/21731286342/job/62686243373?pr=49518) of them are failed with an error:
+
+```
+1) Symfony\Component\HttpKernel\Tests\EventListener\SerializeControllerResultListenerTest::testSerializeAttribute
+TypeError: Symfony\Component\HttpKernel\EventListener\SerializeControllerResultAttributeListener::onView():
+Argument #1 ($event) must be of type Symfony\Component\HttpKernel\Event\ControllerAttributeEvent,
+Symfony\Component\HttpKernel\Event\ViewEvent given, called in /home/runner/work/symfony/symfony/src/Symfony/Component/HttpKernel/Tests/EventListener/SerializeControllerResultListenerTest.php on line 54
+
+/home/runner/work/symfony/symfony/src/Symfony/Component/HttpKernel/EventListener/SerializeControllerResultAttributeListener.php:31
+/home/runner/work/symfony/symfony/src/Symfony/Component/HttpKernel/Tests/EventListener/SerializeControllerResultListenerTest.php:54
+/home/runner/work/symfony/symfony/.phpunit/phpunit-12-0/phpunit:104
+/home/runner/work/symfony/symfony/vendor/symfony/phpunit-bridge/bin/simple-phpunit.php:458
+/home/runner/work/symfony/symfony/vendor/symfony/phpunit-bridge/bin/simple-phpunit:13
+```
+
+Should I apply same stuff line in other attribute listeners `if (!class_exists(ControllerAttributesListener::class, false)) {`? I thought that if my listeners was introduced in the version 8.1 - no need to add such workarounds as `ControllerAttributeEvent` will be always available :thinking: .
+
+Upd: newermind, this failure was in my test, not in code :smiley:
+
+---------------------------------------------------------------------------
+
+by Koc at 2026-02-13T00:51:00Z
+
+Test failures in console component looks unrelated :face_with_diagonal_mouth:

@@ -12,28 +12,40 @@
 namespace Symfony\Component\FeatureFlag\Tests\Provider;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\FeatureFlag\Provider\ChainProvider;
 use Symfony\Component\FeatureFlag\Provider\InMemoryProvider;
 
-class InMemoryProviderTests extends TestCase
+class ChainProviderTest extends TestCase
 {
-    private InMemoryProvider $provider;
+    private ChainProvider $provider;
 
     protected function setUp(): void
     {
-        $this->provider = new InMemoryProvider([
-            'first' => fn () => true,
-            'second' => fn () => 42,
-            'exception' => fn () => throw new \LogicException('Should not be called.'),
+        $this->provider = new ChainProvider([
+            new InMemoryProvider([
+                'first' => fn () => true,
+            ]),
+            new InMemoryProvider([
+                'second' => fn () => 42,
+            ]),
+            new InMemoryProvider([
+                'exception' => fn () => throw new \LogicException('Should not be called.'),
+            ]),
         ]);
     }
 
     public function testGet()
     {
         $feature = $this->provider->get('first');
+
         $this->assertIsCallable($feature);
         $this->assertTrue($feature());
+    }
 
+    public function testGetFallback()
+    {
         $feature = $this->provider->get('second');
+
         $this->assertIsCallable($feature);
         $this->assertSame(42, $feature());
     }

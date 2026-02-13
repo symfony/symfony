@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-02-13T13:38:59Z
+
+> Using immutable datetime DBAL types for messenger_messages timestamps can cause endless schema diffs/migrations after upgrading to DBAL 4.
+
+this looks suspicious to me. Both DBAL types provide the same column definition in SQL, so the platform-aware diffing should not generate diffs between them.

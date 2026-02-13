@@ -17,7 +17,7 @@ use Symfony\Contracts\Service\ResetInterface;
 /**
  * @experimental
  */
-final class TraceableFeatureChecker implements FeatureCheckerInterface, ResetInterface
+final class TraceableFeatureChecker implements FeatureCheckerInterface
 {
     /** @var array<string, array{status: 'resolved'|'enabled'|'disabled', value: mixed, calls: int}> */
     private array $resolvedValues = [];
@@ -65,7 +65,7 @@ final class TraceableFeatureChecker implements FeatureCheckerInterface, ResetInt
     public function reset(): void
     {
         $this->resolvedValues = [];
-        if ($this->decorated instanceof ResetInterface) {
+        if ($this->decorated instanceof ResetInterface || method_exists($this->decorated, 'reset')) {
             $this->decorated->reset();
         }
     }

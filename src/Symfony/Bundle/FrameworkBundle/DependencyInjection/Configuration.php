@@ -2961,7 +2961,6 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('feature_flag')
                     ->info('FeatureFlag configuration')
                     ->{$enableIfStandalone('symfony/feature-flag', FeatureCheckerInterface::class)}()
-                    ->fixXmlConfig('feature_flag')
                 ->end()
             ->end();
     }

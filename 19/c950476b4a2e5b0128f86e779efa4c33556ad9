@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by natepage at 2021-03-10T07:17:32Z
+
+@xabbuh Hi, not sure why `Tests/Integration (7.4)` is failing, any idea what I could have done wrong?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-16T08:42:11Z
+
+Can you please add a few more test cases to cover all the branches?
+
+---------------------------------------------------------------------------
+
+by natepage at 2021-03-17T23:57:13Z
+
+@nicolas-grekas Thank you for your reply, sorry I just want to clarify.. What do you mean by "cover all the branches"?
+
+- Are you talking about repo branches for different versions of symfony? (e.g. 4.4, 5.0, 5.1, 5.2)
+- Or, are you talking about "code branches/paths" and improve the coverage?
+
+Thank you
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2021-03-18T07:46:57Z
+
+> Or, are you talking about "code branches/paths" and improve the coverage?
+
+that yes :)
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-03-18T07:52:28Z
+
+@natepage You can ignore that build failure. It's not related to your changes.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2021-03-26T07:56:49Z
+
+@natepage Do you need help with writing a test? :)
+
+---------------------------------------------------------------------------
+
+by natepage at 2021-03-28T22:04:53Z
+
+@xabbuh I should be ok for the test, any tips on raising a kid? 😄
+
+Sorry I had a few concurrent priorities just after creating the PR.
+
+Having a look at the code, I've realised there was a difference between scalar and tagged values regarding trailing newlines so I've updated the code to match, and reused your test `testDumpTrailingNewlineInMultiLineLiteralBlocks()` but with TaggedValues and make sure the result is consistent.
+
+@nicolas-grekas The Dumper is now 100% covered.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2021-08-01T17:30:14Z
+
+@xabbuh @stof open for a final review? CI is green
+
+---------------------------------------------------------------------------
+
+by fabpot at 2021-08-26T06:57:38Z
+
+As this is a new feature, this should target the main branch (5.4 as of today).
+
+---------------------------------------------------------------------------
+
+by natepage at 2021-08-26T21:57:38Z
+
+@fabpot Thank you for your feedback, I've changed the base branch to 5.4
+
+---------------------------------------------------------------------------
+
+by fabpot at 2023-04-08T16:56:55Z
+
+@xabbuh Can you have a look at this one please?
+
+---------------------------------------------------------------------------
+
+by dmitryuk at 2025-07-28T09:10:21Z
+
+Any chance to merge or close PR?

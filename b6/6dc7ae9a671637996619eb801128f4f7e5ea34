@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by ro0NL at 2026-02-07T11:42:16Z
+
+Shouldn't this be default behavior when there's a decoration stack?
+
+---------------------------------------------------------------------------
+
+by ro0NL at 2026-02-07T11:46:45Z
+
+https://github.com/symfony/symfony/pull/59225
+
+---------------------------------------------------------------------------
+
+by ayyoub-afwallah at 2026-02-08T11:36:20Z
+
+> Shouldn't this be default behavior when there's a decoration stack?
+
+my intention was to make this as less noisy as possible, but now that im aware of #59225 i think we should follow the same pattern here for consistency.
+
+the decoration stack only shows when decorators exist anyway, so no noise for regular services. ill update the PR.
+
+Thanks for te feedback @ro0NL

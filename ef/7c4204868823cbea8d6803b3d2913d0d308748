@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by franckranaivo at 2023-08-23T12:04:00Z
+
+I added relevant tests here and fixed some issues. What else should be done here ?
+
+---------------------------------------------------------------------------
+
+by franckranaivo at 2023-09-04T09:32:12Z
+
+I rebased to 6.4 and removed unused method. For Psalm, idk why it is complaining about  unused `getRelativeCombinationTranslators` method as it is used in Translator class (Xpath namespace). Maybe I missed something here, if so please tell me what to do.
+
+Should I keep this PR open?
+
+Friendly ping @stof
+
+---------------------------------------------------------------------------
+
+by Bilge at 2023-12-22T22:03:00Z
+
+Why has this stalled? Very unfortunate if this misses the 6.x cutoff.
+
+---------------------------------------------------------------------------
+
+by Bilge at 2025-02-03T12:36:31Z
+
+Where are we with this? Is this ready to merge?

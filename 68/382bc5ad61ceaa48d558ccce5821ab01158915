@@ -1,0 +1,65 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-09T09:27:48Z
+
+I'm seeing many other calls to `NotNormalizableValueException::createForUnexpectedDataType()` which works the same as the patched line.
+This makes wonder if the concern would apply there also.
+
+Note that this wouldn't be a bugfix but an improvement, thus for branch 8.1
+
+---------------------------------------------------------------------------
+
+by VBelozyorov at 2026-02-09T10:02:46Z
+
+> I'm seeing many other calls to `NotNormalizableValueException::createForUnexpectedDataType()` which works the same as the patched line. This makes wonder if the concern would apply there also.
+
+For example, these three calls of `NotNormalizableValueException::createForUnexpectedDataType()`:
+https://github.com/symfony/symfony/blob/5063fee4265f5be0830d865526af0268b17fe144/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php#L508-L529
+
+are inside `validateAndDenormalize()`, and `$data` there is the `$value` inside `denormalize()`:
+https://github.com/symfony/symfony/blob/5063fee4265f5be0830d865526af0268b17fe144/src/Symfony/Component/Serializer/Normalizer/AbstractObjectNormalizer.php#L402
+
+---------------------------------------------------------------------------
+
+by VBelozyorov at 2026-02-09T10:09:01Z
+
+> Note that this wouldn't be a bugfix but an improvement, thus for branch 8.1
+
+Could you please elaborate a bit why this isn't a bugfix? Do you see any BC breaks?
+I'm not trying to argue, just want to understand for myself 🙂
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-13T09:46:54Z
+
+> why this isn't a bugfix?
+
+because it improves something, as noted in the PR title - making the error message better ;)
+
+---------------------------------------------------------------------------
+
+by VBelozyorov at 2026-02-13T10:26:30Z
+
+> > why this isn't a bugfix?
+>
+> because it improves something, as noted in the PR title - making the error message better ;)
+
+Perhaps it's my inaccuracy in the commit message and the PR title.
+
+As you can see, before this change, the exception was already about a particular attribute, but its `getCurrentType()` method simply returned the wrong type — not the attribute’s type, but the type of the attribute’s parent structure.
+
+```php
+$exception = NotNormalizableValueException::createForUnexpectedDataType(
+    \sprintf(
+        'Failed to denormalize attribute "%s" value for class "%s": '.$e->getMessage(),
+        $attribute, // <-- attribute's name
+        $type
+    ),
+    $data,
+    ['unknown'],
+    $attributeContext['deserialization_path'] ?? null, // <-- attribute's path
+    false,
+    $e->getCode(),
+    $e
+);
+```

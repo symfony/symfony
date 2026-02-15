@@ -50,6 +50,16 @@ class NumericNode extends ScalarNode
         return $value;
     }
 
+    public function getMin(): float|int|null
+    {
+        return $this->min;
+    }
+
+    public function getMax(): float|int|null
+    {
+        return $this->max;
+    }
+
     protected function isValueEmpty(mixed $value): bool
     {
         // a numeric value cannot be empty

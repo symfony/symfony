@@ -19,8 +19,8 @@ class HttplugPromiseTest extends TestCase
 {
     public function testComplexNesting()
     {
-        $mkPromise = function ($result): HttplugPromise {
-            $guzzlePromise = new Promise(function () use (&$guzzlePromise, $result) {
+        $mkPromise = static function ($result): HttplugPromise {
+            $guzzlePromise = new Promise(static function () use (&$guzzlePromise, $result) {
                 $guzzlePromise->resolve($result);
             });
 
@@ -29,7 +29,7 @@ class HttplugPromiseTest extends TestCase
 
         $promise1 = $mkPromise('result');
         $promise2 = $promise1->then($mkPromise);
-        $promise3 = $promise2->then(fn ($result) => $result);
+        $promise3 = $promise2->then(static fn ($result) => $result);
 
         $this->assertSame('result', $promise3->wait());
     }

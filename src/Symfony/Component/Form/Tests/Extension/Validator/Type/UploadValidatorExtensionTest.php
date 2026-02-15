@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Validator\Type\UploadValidatorExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\OptionsResolver\Options;
@@ -20,13 +21,20 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class UploadValidatorExtensionTest extends TypeTestCase
 {
+    protected function setUp(): void
+    {
+        $this->dispatcher = new EventDispatcher();
+
+        parent::setUp();
+    }
+
     public function testPostMaxSizeTranslation()
     {
         $extension = new UploadValidatorExtension(new DummyTranslator());
 
         $resolver = new OptionsResolver();
         $resolver->setDefault('post_max_size_message', 'old max {{ max }}!');
-        $resolver->setDefault('upload_max_size_message', fn (Options $options) => fn () => $options['post_max_size_message']);
+        $resolver->setDefault('upload_max_size_message', static fn (Options $options) => static fn () => $options['post_max_size_message']);
 
         $extension->configureOptions($resolver);
         $options = $resolver->resolve();

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
@@ -43,65 +42,30 @@ class Regex extends Constraint
      * @param bool|null     $match       Whether to validate the value matches the configured pattern or not (defaults to true)
      * @param string[]|null $groups
      */
-    #[HasNamedArguments]
     public function __construct(
-        string|array|null $pattern,
+        ?string $pattern,
         ?string $message = null,
         ?string $htmlPattern = null,
         ?bool $match = null,
         ?callable $normalizer = null,
         ?array $groups = null,
         mixed $payload = null,
-        ?array $options = null,
     ) {
-        if (null === $pattern && !isset($options['pattern'])) {
+        if (null === $pattern) {
             throw new MissingOptionsException(\sprintf('The options "pattern" must be set for constraint "%s".', self::class), ['pattern']);
         }
 
-        if (\is_array($pattern)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        parent::__construct(null, $groups, $payload);
 
-            $options = array_merge($pattern, $options ?? []);
-            $pattern = $options['pattern'] ?? null;
-        } elseif (\is_array($options)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-        }
-
-        parent::__construct($options, $groups, $payload);
-
-        $this->pattern = $pattern ?? $this->pattern;
+        $this->pattern = $pattern;
         $this->message = $message ?? $this->message;
-        $this->htmlPattern = $htmlPattern ?? $this->htmlPattern;
+        $this->htmlPattern = $htmlPattern;
         $this->match = $match ?? $this->match;
-        $this->normalizer = $normalizer ?? $this->normalizer;
+        $this->normalizer = $normalizer;
 
         if (null !== $this->normalizer && !\is_callable($this->normalizer)) {
             throw new InvalidArgumentException(\sprintf('The "normalizer" option must be a valid callable ("%s" given).', get_debug_type($this->normalizer)));
         }
-    }
-
-    /**
-     * @deprecated since Symfony 7.4
-     */
-    public function getDefaultOption(): ?string
-    {
-        if (0 === \func_num_args() || func_get_arg(0)) {
-            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
-        }
-
-        return 'pattern';
-    }
-
-    /**
-     * @deprecated since Symfony 7.4
-     */
-    public function getRequiredOptions(): array
-    {
-        if (0 === \func_num_args() || func_get_arg(0)) {
-            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
-        }
-
-        return ['pattern'];
     }
 
     /**

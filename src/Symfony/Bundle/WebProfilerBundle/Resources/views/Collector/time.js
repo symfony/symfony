@@ -445,8 +445,8 @@ class Theme {
 
     // copied from https://github.com/darkskyapp/string-hash
     hash(string) {
-        var hash = 5381;
-        var i = string.length;
+        let hash = 5381;
+        let i = string.length;
 
         while(i) {
             hash = (hash * 33) ^ string.charCodeAt(--i);

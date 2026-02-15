@@ -72,7 +72,12 @@ class Application extends BaseApplication
             $this->renderRegistrationErrors($input, $output);
         }
 
-        $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
+        $container = $this->kernel->getContainer();
+        $this->setDispatcher($container->get('event_dispatcher'));
+
+        if ($container->has('console.argument_resolver')) {
+            $this->setArgumentResolver($container->get('console.argument_resolver'));
+        }
 
         return parent::doRun($input, $output);
     }
@@ -159,27 +164,9 @@ class Application extends BaseApplication
         return parent::getLongVersion().\sprintf(' (env: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false');
     }
 
-    /**
-     * @deprecated since Symfony 7.4, use Application::addCommand() instead
-     */
-    public function add(Command $command): ?Command
-    {
-        trigger_deprecation('symfony/framework-bundle', '7.4', 'The "%s()" method is deprecated and will be removed in Symfony 8.0, use "%s::addCommand()" instead.', __METHOD__, self::class);
-
-        return $this->addCommand($command);
-    }
-
     public function addCommand(callable|Command $command): ?Command
     {
         $this->registerCommands();
-
-        if (!method_exists(BaseApplication::class, 'addCommand')) {
-            if (!$command instanceof Command) {
-                throw new \LogicException('Using callables as commands requires symfony/console 7.4 or higher.');
-            }
-
-            return parent::add($command);
-        }
 
         return parent::addCommand($command);
     }

@@ -14,7 +14,6 @@ namespace Symfony\Bundle\TwigBundle\DependencyInjection;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Mime\HtmlToTextConverter\HtmlToTextConverterInterface;
 
 /**
@@ -34,18 +33,7 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->docUrl('https://symfony.com/doc/{version:major}.{version:minor}/reference/configuration/twig.html', 'symfony/twig-bundle')
-            ->beforeNormalization()
-            ->ifTrue(fn ($v) => \is_array($v) && \array_key_exists('exception_controller', $v))
-            ->then(function ($v) {
-                if (isset($v['exception_controller'])) {
-                    throw new InvalidConfigurationException('Option "exception_controller" under "twig" must be null or unset, use "error_controller" under "framework" instead.');
-                }
-
-                unset($v['exception_controller']);
-
-                return $v;
-            })
-        ->end();
+        ;
 
         $this->addFormThemesSection($rootNode);
         $this->addGlobalsSection($rootNode);
@@ -65,8 +53,8 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')->defaultValue('form_div_layout.html.twig')->end()
                     ->example(['@My/form.html.twig'])
                     ->validate()
-                        ->ifTrue(fn ($v) => !\in_array('form_div_layout.html.twig', $v, true))
-                        ->then(fn ($v) => array_merge(['form_div_layout.html.twig'], $v))
+                        ->ifTrue(static fn ($v) => !\in_array('form_div_layout.html.twig', $v, true))
+                        ->then(static fn ($v) => array_merge(['form_div_layout.html.twig'], $v))
                     ->end()
                 ->end()
             ->end()
@@ -84,8 +72,8 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->normalizeKeys(false)
                         ->beforeNormalization()
-                            ->ifTrue(fn ($v) => \is_string($v) && str_starts_with($v, '@'))
-                            ->then(function ($v) {
+                            ->ifTrue(static fn ($v) => \is_string($v) && str_starts_with($v, '@'))
+                            ->then(static function ($v) {
                                 if (str_starts_with($v, '@@')) {
                                     return substr($v, 1);
                                 }
@@ -94,7 +82,7 @@ class Configuration implements ConfigurationInterface
                             })
                         ->end()
                         ->beforeNormalization()
-                            ->ifTrue(function ($v) {
+                            ->ifTrue(static function ($v) {
                                 if (\is_array($v)) {
                                     $keys = array_keys($v);
                                     sort($keys);
@@ -104,7 +92,7 @@ class Configuration implements ConfigurationInterface
 
                                 return true;
                             })
-                            ->then(fn ($v) => ['value' => $v])
+                            ->then(static fn ($v) => ['value' => $v])
                         ->end()
                         ->children()
                             ->scalarNode('id')->end()
@@ -128,11 +116,6 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->scalarNode('autoescape_service')->defaultNull()->end()
                 ->scalarNode('autoescape_service_method')->defaultNull()->end()
-                ->scalarNode('base_template_class')
-                    ->setDeprecated('symfony/twig-bundle', '7.1')
-                    ->example('Twig\Template')
-                    ->cannotBeEmpty()
-                ->end()
                 ->scalarNode('cache')->defaultTrue()->end()
                 ->scalarNode('charset')->defaultValue('%kernel.charset%')->end()
                 ->booleanNode('debug')->defaultValue('%kernel.debug%')->end()
@@ -146,10 +129,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('file_name_pattern')
                     ->example('*.twig')
                     ->info('Pattern of file name used for cache warmer and linter.')
-                    ->beforeNormalization()
-                        ->ifString()
-                            ->then(fn ($value) => [$value])
-                        ->end()
+                    ->acceptAndWrap(['string'])
                     ->prototype('scalar')->end()
                 ->end()
                 ->arrayNode('paths', 'path')
@@ -157,7 +137,7 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('paths')
                     ->beforeNormalization()
                         ->ifArray()
-                        ->then(function ($paths) {
+                        ->then(static function ($paths) {
                             $normalized = [];
                             foreach ($paths as $path => $namespace) {
                                 if (\is_array($namespace)) {

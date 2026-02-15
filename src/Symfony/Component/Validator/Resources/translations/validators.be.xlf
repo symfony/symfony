@@ -20,7 +20,7 @@
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
-                <target>Абранае вамі значэнне не сапраўднае.</target>
+                <target>Выбранае вамі значэнне не з’яўляецца сапраўдным.</target>
             </trans-unit>
             <trans-unit id="6">
                 <source>You must select at least {{ limit }} choice.|You must select at least {{ limit }} choices.</source>
@@ -32,7 +32,7 @@
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
-                <target>Адзін або некалькі пазначаных значэнняў з'яўляецца несапраўдным.</target>
+                <target>Адно або некалькі з зададзеных значэнняў не з’яўляюцца сапраўднымі.</target>
             </trans-unit>
             <trans-unit id="9">
                 <source>This field was not expected.</source>
@@ -76,15 +76,15 @@
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
-                <target>Значэнне занадта доўгае. Яно павінна мець {{ limit }} сімвал або менш.|Значэнне занадта доўгае. Яно павінна мець {{ limit }} сімвалаў або менш.</target>
+                <target>Значэнне занадта доўгае. Яно павінна мець не больш за {{ limit }} сімвал.|Значэнне занадта доўгае. Яно павінна мець не больш за {{ limit }} сімвалаў.</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more.</source>
-                <target>Значэнне павінна быць {{ limit }} або больш.</target>
+                <target>Значэнне павінна быць не менш за {{ limit }}.</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
-                <target>Значэнне занадта кароткае. Яно павінна мець прынамсі {{ limit }} сімвал.|Значэнне занадта кароткае. Яно павінна мець прынамсі {{ limit }} сімвалаў.</target>
+                <target>Значэнне занадта кароткае. Яно павінна мець не менш за {{ limit }} сімвал.|Значэнне занадта кароткае. Яно павінна мець не менш за {{ limit }} сімвалаў.</target>
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank.</source>
@@ -100,7 +100,7 @@
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
-                <target>Значэнне з'яўляецца не сапраўдным.</target>
+                <target>Значэнне не з'яўляецца сапраўдным.</target>
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
@@ -112,7 +112,7 @@
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
-                <target>Абодва значэнні павінны быць аднолькавымі.</target>
+                <target>Абодва значэнні павінны супадаць.</target>
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
@@ -140,7 +140,7 @@
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>Значэнне не з'яўляецца сапраўдным мовай.</target>
+                <target>Значэнне не з'яўляецца сапраўднай мовай.</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
@@ -168,11 +168,11 @@
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target>Гэты выява занадта вялікая ({{ width }}px). Дазваляецца максімальная вышыня {{ max_width }}px.</target>
+                <target>Гэтая выява занадта высокая ({{ height }}px). Дазваляецца максімальная вышыня — {{ max_height }}px.</target>
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>Гэта выява занадта маленькая ({{ width }}px). Дазваляецца мінімальная вышыня {{ min_width }}px.</target>
+                <target>Гэтая выява занадта нізкая ({{ height }}px). Дазваляецца мінімальная вышыня — {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user's current password.</source>
@@ -204,11 +204,11 @@
             </trans-unit>
             <trans-unit id="54">
                 <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
-                <target>Калекцыя павінна змяшчаць прынамсі {{ limit }} элемент.|Калекцыя павінна змяшчаць прынамсі {{ limit }} элементаў.</target>
+                <target>Калекцыя павінна змяшчаць не менш за {{ limit }} элемент.|Калекцыя павінна змяшчаць не менш за {{ limit }} элементаў.</target>
             </trans-unit>
             <trans-unit id="55">
                 <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
-                <target>Калекцыя павінна змяшчаць {{ limit }} або менш элемент.|Калекцыя павінна змяшчаць {{ limit }} або менш элементаў.</target>
+                <target>Калекцыя павінна змяшчаць не больш за {{ limit }} элемент.|Калекцыя павінна змяшчаць не больш за {{ limit }} элементаў.</target>
             </trans-unit>
             <trans-unit id="56">
                 <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
@@ -236,7 +236,7 @@
             </trans-unit>
             <trans-unit id="62">
                 <source>This value is neither a valid ISBN-10 nor a valid ISBN-13.</source>
-                <target>Гэта значэнне не з'яўляецца сапраўдным ISBN-10 або ISBN-13.</target>
+                <target>Гэта значэнне не з'яўляецца ні сапраўдным ISBN-10, ні сапраўдным ISBN-13.</target>
             </trans-unit>
             <trans-unit id="63">
                 <source>This value is not a valid ISSN.</source>
@@ -252,11 +252,11 @@
             </trans-unit>
             <trans-unit id="66">
                 <source>This value should be greater than {{ compared_value }}.</source>
-                <target>Значэнне павінна быць больш чым {{ compared_value }}.</target>
+                <target>Значэнне павінна быць больш за {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="67">
                 <source>This value should be greater than or equal to {{ compared_value }}.</source>
-                <target>Значэнне павінна быць больш чым або раўняцца {{ compared_value }}.</target>
+                <target>Значэнне павінна быць больш за або роўнае {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="68">
                 <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
@@ -264,11 +264,11 @@
             </trans-unit>
             <trans-unit id="69">
                 <source>This value should be less than {{ compared_value }}.</source>
-                <target>Значэнне павінна быць менш чым {{ compared_value }}.</target>
+                <target>Значэнне павінна быць менш за {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="70">
                 <source>This value should be less than or equal to {{ compared_value }}.</source>
-                <target>Значэнне павінна быць менш чым або раўняцца {{ compared_value }}.</target>
+                <target>Значэнне павінна быць менш за або роўнае {{ compared_value }}.</target>
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>
@@ -280,11 +280,11 @@
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target>Суадносіны бакоў выявы з'яўляецца занадта вялікім ({{ ratio }}). Дазваляецца максімальныя суадносіны {{max_ratio}} .</target>
+                <target>Суадносіны бакоў выявы занадта вялікія ({{ ratio }}). Дазваляецца максімальныя суадносіны {{max_ratio}} .</target>
             </trans-unit>
             <trans-unit id="74">
                 <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target>Суадносіны бакоў выявы з'яўляецца занадта маленькімі ({{ ratio }}). Дазваляецца мінімальныя суадносіны {{ min_ratio }}.</target>
+                <target>Суадносіны бакоў выявы занадта малыя ({{ ratio }}). Дазваляецца мінімальныя суадносіны {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="75">
                 <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
@@ -304,7 +304,7 @@
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
-                <target>Не магчыма знайсці імя хоста.</target>
+                <target>Не магчыма вызначыць імя хоста.</target>
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
@@ -344,7 +344,7 @@
             </trans-unit>
             <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
-                <target>Значэнне павінна быць дадатным ці нуль.</target>
+                <target>Значэнне павінна быць або дадатным, або роўным нулю.</target>
             </trans-unit>
             <trans-unit id="90">
                 <source>This value should be negative.</source>
@@ -352,7 +352,7 @@
             </trans-unit>
             <trans-unit id="91">
                 <source>This value should be either negative or zero.</source>
-                <target>Значэнне павінна быць адмоўным ці нуль.</target>
+                <target>Значэнне павінна быць або адмоўным, або роўным нулю.</target>
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
@@ -368,11 +368,11 @@
             </trans-unit>
             <trans-unit id="95">
                 <source>This value is not a valid hostname.</source>
-                <target>Значэнне не з'яўляецца карэктным імем хаста.</target>
+                <target>Значэнне не з'яўляецца сапраўднай/карэктнай назвай хоста.</target>
             </trans-unit>
             <trans-unit id="96">
                 <source>The number of elements in this collection should be a multiple of {{ compared_value }}.</source>
-                <target>Колькасць элементаў у гэтай калекцыі павінна быць кратным {{compared_value}}.</target>
+                <target>Колькасць элементаў у гэтай калекцыі павінна быць кратнай {{compared_value}}.</target>
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
@@ -388,7 +388,7 @@
             </trans-unit>
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
-                <target>Значэнне не з'яўляецца сапраўдным выразам.</target>
+                <target>Значэнне павінна быць сапраўдным выразам.</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
@@ -404,7 +404,7 @@
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target>Назва файла занадта доўгая. Ён павінен мець {{ filename_max_length }} сімвал або менш.|Назва файла занадта доўгая. Ён павінен мець {{ filename_max_length }} сімвалы або менш.|Назва файла занадта доўгая. Ён павінен мець {{ filename_max_length }} сімвалаў або менш.</target>
+                <target>Назва файла занадта доўгая. Яна павинна мець {{ filename_max_length }} сімвал або менш.|Назва файла занадта доўгая. Яна павінна мець {{ filename_max_length }} сімвалы або менш.|Назва файла занадта доўгая. Яна павінна мець {{ filename_max_length }} сімвалаў або менш.</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
@@ -420,7 +420,7 @@
             </trans-unit>
             <trans-unit id="108">
                 <source>Mixing numbers from different scripts is not allowed.</source>
-                <target>Змешванне лікаў з розных алфавітаў не дапускаецца.</target>
+                <target>Змешванне лічбаў з розных алфавітаў не дапускаецца.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
@@ -440,7 +440,7 @@
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
-                <target>Гэтаму URL бракуе дамен верхняга ўзроўню.</target>
+                <target>У гэтым URL няма дамена верхняга ўзроўню.</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
@@ -472,87 +472,87 @@
             </trans-unit>
             <trans-unit id="122">
                 <source>This file is not a valid video.</source>
-                <target state="needs-review-translation">Гэты файл не з'яўляецца сапраўдным відэа.</target>
+                <target>Гэты файл не з'яўляецца сапраўдным відэа.</target>
             </trans-unit>
             <trans-unit id="123">
                 <source>The size of the video could not be detected.</source>
-                <target state="needs-review-translation">Не ўдалося вызначыць памер відэа.</target>
+                <target>Не ўдалося вызначыць памер відэа.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target state="needs-review-translation">Шырыня відэа занадта вялікая ({{ width }}px). Дапушчальная максімальная шырыня — {{ max_width }}px.</target>
+                <target>Шырыня відэа занадта вялікая ({{ width }}px). Дапушчальная максімальная шырыня — {{ max_width }}px.</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target state="needs-review-translation">Шырыня відэа занадта малая ({{ width }}px). Мінімальная чаканая шырыня — {{ min_width }}px.</target>
+                <target>Шырыня відэа занадта малая ({{ width }}px). Мінімальная чаканая шырыня — {{ min_width }}px.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target state="needs-review-translation">Вышыня відэа занадта вялікая ({{ height }}px). Дазволеная максімальная вышыня — {{ max_height }}px.</target>
+                <target>Вышыня відэа занадта вялікая ({{ height }}px). Дазволеная максімальная вышыня — {{ max_height }}px.</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target state="needs-review-translation">Вышыня відэа занадта малая ({{ height }}px). Чаканая мінімальная вышыня — {{ min_height }}px.</target>
+                <target>Вышыня відэа занадта малая ({{ height }}px). Чаканая мінімальная вышыня — {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">Відэа мае занадта мала пікселяў ({{ pixels }}). Мінімальная колькасць чакаецца {{ min_pixels }}.</target>
+                <target>Відэа мае занадта мала пікселяў ({{ pixels }}). Мінімальная колькасць чакаецца {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">Відэа мае занадта шмат пікселяў ({{ pixels }}). Максімальна дапушчальная колькасць — {{ max_pixels }}.</target>
+                <target>Відэа мае занадта шмат пікселяў ({{ pixels }}). Максімальна дапушчальная колькасць — {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target state="needs-review-translation">Суадносіны відэа занадта вялікія ({{ ratio }}). Дапушчальна максімальнае суадносіны — {{ max_ratio }}.</target>
+                <target>Суадносіны відэа занадта вялікія ({{ ratio }}). Дапушчальнае максімальнае суадносіна — {{ max_ratio }}.</target>
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target state="needs-review-translation">Суадносіны відэа занадта малыя ({{ ratio }}). Мінімальнае чаканае суадносіны — {{ min_ratio }}.</target>
+                <target>Суадносіны відэа занадта малыя ({{ ratio }}). Мінімальнае чаканае суадносіна — {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
-                <target state="needs-review-translation">Відэа квадратнае ({{ width }}x{{ height }}px). Квадратныя відэа не дазволены.</target>
+                <target>Відэа квадратнае ({{ width }}x{{ height }}px). Квадратныя відэа не дазваляюцца.</target>
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target state="needs-review-translation">Відэа ў ландшафтнай арыентацыі ({{ width }}x{{ height }} пікс.). Ландшафтныя відэа не дазваляюцца.</target>
+                <target>Відэа ў ландшафтнай арыентацыі ({{ width }}x{{ height }} px). Ландшафтныя відэа не дазваляюцца.</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target state="needs-review-translation">Відэа ў партрэтнай арыентацыі ({{ width }}x{{ height }}px). Відэа ў партрэтнай арыентацыі не дазваляюцца.</target>
+                <target>Відэа ў партрэтнай арыентацыі ({{ width }}x{{ height }}px). Відэа ў партрэтнай арыентацыі не дазваляюцца.</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
-                <target state="needs-review-translation">Відэафайл пашкоджаны.</target>
+                <target>Відэафайл пашкоджаны.</target>
             </trans-unit>
             <trans-unit id="136">
                 <source>The video contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">Відэа змяшчае некалькі патокаў. Дазволены толькі адзін паток.</target>
+                <target>Відэа змяшчае некалькі патокаў. Дазволены толькі адзін паток.</target>
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target state="needs-review-translation">Непадтрымліваемы відэакодэк «{{ codec }}».</target>
+                <target>Непадтрымліваемы відэакодэк «{{ codec }}».</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target state="needs-review-translation">Непадтрымліваемы кантэйнер відэа "{{ container }}".</target>
+                <target>Непадтрымліваемы кантэйнер відэа "{{ container }}".</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
-                <target state="needs-review-translation">Файл выявы пашкоджаны.</target>
+                <target>Файл выявы пашкоджаны.</target>
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">У выяве занадта мала пікселяў ({{ pixels }}). Чакаемы мінімум — {{ min_pixels }}.</target>
+                <target>У выяве занадта мала пікселяў ({{ pixels }}). Мінімальная колькасць — {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">Малюнак мае занадта шмат пікселяў ({{ pixels }}). Чаканая максімальная колькасць {{ max_pixels }}.</target>
+                <target>Малюнак мае занадта шмат пікселяў ({{ pixels }}). Максімальная дапушчальная колькасць {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
-                <target state="needs-review-translation">Гэта назва файла не адпавядае чаканаму набору знакаў.</target>
+                <target>Гэта назва файла не адпавядае чаканаму набору знакаў.</target>
             </trans-unit>
         </body>
     </file>

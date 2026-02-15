@@ -63,7 +63,7 @@ class OptionsResolverIntrospectorTest extends TestCase
     {
         $resolver = new OptionsResolver();
         $closures = [];
-        $resolver->setDefault($option = 'foo', $closures[] = function (Options $options) {});
+        $resolver->setDefault($option = 'foo', $closures[] = static function (Options $options) {});
 
         $debug = new OptionsResolverIntrospector($resolver);
         $this->assertSame($closures, $debug->getLazyClosures($option));
@@ -156,7 +156,7 @@ class OptionsResolverIntrospectorTest extends TestCase
     {
         $resolver = new OptionsResolver();
         $resolver->setDefined($option = 'foo');
-        $resolver->setNormalizer($option = 'foo', $normalizer = function () {});
+        $resolver->setNormalizer($option = 'foo', $normalizer = static function () {});
 
         $debug = new OptionsResolverIntrospector($resolver);
         $this->assertSame($normalizer, $debug->getNormalizer($option));
@@ -187,8 +187,8 @@ class OptionsResolverIntrospectorTest extends TestCase
     {
         $resolver = new OptionsResolver();
         $resolver->setDefined('foo');
-        $resolver->addNormalizer('foo', $normalizer1 = function () {});
-        $resolver->addNormalizer('foo', $normalizer2 = function () {});
+        $resolver->addNormalizer('foo', $normalizer1 = static function () {});
+        $resolver->addNormalizer('foo', $normalizer2 = static function () {});
 
         $debug = new OptionsResolverIntrospector($resolver);
         $this->assertSame([$normalizer1, $normalizer2], $debug->getNormalizers('foo'));
@@ -233,7 +233,7 @@ class OptionsResolverIntrospectorTest extends TestCase
     {
         $resolver = new OptionsResolver();
         $resolver->setDefined('foo');
-        $resolver->setDeprecated('foo', 'vendor/package', '1.1', $closure = function (Options $options, $value) {});
+        $resolver->setDeprecated('foo', 'vendor/package', '1.1', $closure = static function (Options $options, $value) {});
 
         $debug = new OptionsResolverIntrospector($resolver);
         $this->assertSame([
@@ -267,7 +267,7 @@ class OptionsResolverIntrospectorTest extends TestCase
     public function testGetClosureNested()
     {
         $resolver = new OptionsResolver();
-        $resolver->setOptions('foo', $closure = function (OptionsResolver $resolver) {});
+        $resolver->setOptions('foo', $closure = static function (OptionsResolver $resolver) {});
 
         $debug = new OptionsResolverIntrospector($resolver);
         $this->assertSame([$closure], $debug->getNestedOptions('foo'));

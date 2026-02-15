@@ -28,7 +28,7 @@ class DoctrineCasterTest extends TestCase
     {
         $classMetadata = new ClassMetadata(__CLASS__);
 
-        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
         $entityManagerClass = $entityManager::class;
         $collection = new PersistentCollection($entityManager, $classMetadata, new ArrayCollection(['test']));
 

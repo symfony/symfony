@@ -12,13 +12,11 @@
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
-use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
@@ -28,11 +26,11 @@ use Symfony\Component\DependencyInjection\Compiler\AutowirePass;
 use Symfony\Component\DependencyInjection\Compiler\AutowireRequiredMethodsPass;
 use Symfony\Component\DependencyInjection\Compiler\DecoratorServicePass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
+use Symfony\Component\DependencyInjection\Compiler\TagDecoratorPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\BarInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\CaseSensitiveClass;
@@ -404,7 +402,6 @@ class AutowirePassTest extends TestCase
     }
 
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testOptionalParameter()
     {
         $container = new ContainerBuilder();
@@ -989,18 +986,6 @@ class AutowirePassTest extends TestCase
         }
     }
 
-    public function testInlineServicesAreNotCandidates()
-    {
-        $container = new ContainerBuilder();
-        $loader = new XmlFileLoader($container, new FileLocator(realpath(__DIR__.'/../Fixtures/xml')));
-        $loader->load('services_inline_not_candidate.xml');
-
-        $pass = new AutowirePass();
-        $pass->process($container);
-
-        $this->assertSame([], $container->getDefinition('autowired')->getArguments());
-    }
-
     public function testAutowireDecorator()
     {
         $container = new ContainerBuilder();
@@ -1368,6 +1353,32 @@ class AutowirePassTest extends TestCase
         $this->assertSame($barDecoratorName.'.inner', (string) $container->getDefinition($barDecoratorName)->getArgument(1));
     }
 
+    public function testAsTagDecoratorAttribute()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register(AsTagDecoratorFoo::class)->addTag('test.tag');
+        $container->register(AsTagDecoratorBar::class)->addTag('test.tag');
+        $container->register(AsTagDecoratorService::class, AsTagDecoratorService::class)->setAutowired(true);
+
+        (new AutowirePass())->process($container);
+        (new AutowireAsDecoratorPass())->process($container);
+        (new TagDecoratorPass())->process($container);
+        (new DecoratorServicePass())->process($container);
+
+        $tagDecoratorTemplate = '.tag_decorator.test.tag.'.AsTagDecoratorService::class;
+        $this->assertFalse($container->has($tagDecoratorTemplate));
+
+        $fooDecorator = '.decorator.'.AsTagDecoratorFoo::class.'.'.$tagDecoratorTemplate;
+        $barDecorator = '.decorator.'.AsTagDecoratorBar::class.'.'.$tagDecoratorTemplate;
+
+        $this->assertTrue($container->has($fooDecorator));
+        $this->assertTrue($container->has($barDecorator));
+
+        $this->assertSame($fooDecorator, (string) $container->getAlias(AsTagDecoratorFoo::class));
+        $this->assertSame($barDecorator, (string) $container->getAlias(AsTagDecoratorBar::class));
+    }
+
     public function testTypeSymbolExcluded()
     {
         $container = new ContainerBuilder();
@@ -1460,5 +1471,72 @@ class AutowirePassTest extends TestCase
 
         $this->assertSame('%env(bool:ENABLED)%', $container->resolveEnvPlaceholders($definition->getArguments()[0]));
         $this->assertSame('%env(default::OPTIONAL)%', $container->resolveEnvPlaceholders($definition->getArguments()[1]));
+    }
+
+    public function testLazyProxyForInterfaceWithFinalImplementation()
+    {
+        $container = new ContainerBuilder();
+        $container->register('final_impl', FinalLazyProxyImplementation::class);
+        $container->setAlias(LazyProxyTestInterface::class, 'final_impl');
+
+        $container->register(LazyProxyInterfaceConsumer::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true)
+            ->setPublic(true);
+
+        $container->compile();
+
+        $service = $container->get(LazyProxyInterfaceConsumer::class);
+        $this->assertInstanceOf(LazyProxyInterfaceConsumer::class, $service);
+
+        // Trigger lazy load
+        $dep = $service->getDep()->getSelf();
+        $this->assertInstanceOf(FinalLazyProxyImplementation::class, $dep);
+    }
+
+    public function testLazyProxyWithClassInheritance()
+    {
+        $container = new ContainerBuilder();
+        $container->register(BaseLazyProxyClass::class, ExtendedLazyProxyClass::class);
+
+        $container->register(LazyProxyInheritanceConsumer::class)
+            ->setAutoconfigured(true)
+            ->setAutowired(true)
+            ->setPublic(true);
+
+        $container->compile();
+
+        $service = $container->get(LazyProxyInheritanceConsumer::class);
+        $this->assertInstanceOf(LazyProxyInheritanceConsumer::class, $service);
+
+        // Trigger lazy load
+        $dep = $service->getDependency()->getSelf();
+        $this->assertInstanceOf(ExtendedLazyProxyClass::class, $dep);
+    }
+
+    public function testLazyProxyForDecoratedService()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('some_service', SomeServiceClass::class)
+            ->setPublic(true);
+
+        $container->register('some_service.decorated', DecoratedSomeServiceClass::class)
+            ->setDecoratedService('some_service')
+            ->addArgument(new Reference('.inner'));
+
+        $container->register(LazyDecoratedServiceConsumer::class)
+            ->setAutowired(true)
+            ->setPublic(true);
+
+        $container->setAlias(SomeServiceInterface::class, 'some_service');
+
+        $container->compile();
+
+        $service = $container->get(LazyDecoratedServiceConsumer::class);
+        $this->assertInstanceOf(LazyDecoratedServiceConsumer::class, $service);
+
+        $result = $service->getValue();
+        $this->assertSame('decorated:original', $result);
     }
 }

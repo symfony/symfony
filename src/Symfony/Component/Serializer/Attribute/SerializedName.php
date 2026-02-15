@@ -29,14 +29,4 @@ class SerializedName
             throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a non-empty string.', self::class));
         }
     }
-
-    #[\Deprecated('Use the "serializedName" property instead', 'symfony/serializer:7.4')]
-    public function getSerializedName(): string
-    {
-        return $this->serializedName;
-    }
-}
-
-if (!class_exists(\Symfony\Component\Serializer\Annotation\SerializedName::class, false)) {
-    class_alias(SerializedName::class, \Symfony\Component\Serializer\Annotation\SerializedName::class);
 }

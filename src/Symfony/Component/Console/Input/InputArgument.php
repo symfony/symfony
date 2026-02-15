@@ -41,13 +41,13 @@ class InputArgument
     public const IS_ARRAY = 4;
 
     private int $mode;
-    private string|int|bool|array|float|null $default;
+    private mixed $default;
 
     /**
      * @param string                                                                        $name            The argument name
      * @param int-mask-of<InputArgument::*>|null                                            $mode            The argument mode: a bit mask of self::REQUIRED, self::OPTIONAL and self::IS_ARRAY
      * @param string                                                                        $description     A description text
-     * @param string|bool|int|float|array|null                                              $default         The default value (for self::OPTIONAL mode only)
+     * @param mixed                                                                         $default         The default value (for self::OPTIONAL mode only)
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      *
      * @throws InvalidArgumentException When argument mode is not valid
@@ -56,7 +56,7 @@ class InputArgument
         private string $name,
         ?int $mode = null,
         private string $description = '',
-        string|bool|int|float|array|null $default = null,
+        mixed $default = null,
         private \Closure|array $suggestedValues = [],
     ) {
         if (null === $mode) {
@@ -101,7 +101,7 @@ class InputArgument
     /**
      * Sets the default value.
      */
-    public function setDefault(string|bool|int|float|array|null $default): void
+    public function setDefault(mixed $default): void
     {
         if ($this->isRequired() && null !== $default) {
             throw new LogicException('Cannot set a default value except for InputArgument::OPTIONAL mode.');
@@ -121,7 +121,7 @@ class InputArgument
     /**
      * Returns the default value.
      */
-    public function getDefault(): string|bool|int|float|array|null
+    public function getDefault(): mixed
     {
         return $this->default;
     }

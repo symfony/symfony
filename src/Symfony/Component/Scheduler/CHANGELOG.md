@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `--sort` option to `debug:command` to order recurring messages by next run date
+
 7.3
 ---
 

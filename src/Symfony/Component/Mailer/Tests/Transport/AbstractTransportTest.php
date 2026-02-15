@@ -85,8 +85,8 @@ class AbstractTransportTest extends TestCase
     public function testRejectMessage()
     {
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(MessageEvent::class, fn (MessageEvent $event) => $event->reject(), 255);
-        $dispatcher->addListener(MessageEvent::class, fn () => throw new \RuntimeException('Should never be called.'));
+        $dispatcher->addListener(MessageEvent::class, static fn (MessageEvent $event) => $event->reject(), 255);
+        $dispatcher->addListener(MessageEvent::class, static fn () => throw new \RuntimeException('Should never be called.'));
 
         $transport = new class($dispatcher, $this) extends AbstractTransport {
             public function __construct(EventDispatcherInterface $dispatcher, private TestCase $test)

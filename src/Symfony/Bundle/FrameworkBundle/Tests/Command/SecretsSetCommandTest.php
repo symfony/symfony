@@ -22,9 +22,9 @@ class SecretsSetCommandTest extends TestCase
     #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        $vault = $this->createMock(AbstractVault::class);
+        $vault = $this->createStub(AbstractVault::class);
         $vault->method('list')->willReturn(['SECRET' => null, 'OTHER_SECRET' => null]);
-        $localVault = $this->createMock(AbstractVault::class);
+        $localVault = $this->createStub(AbstractVault::class);
         $command = new SecretsSetCommand($vault, $localVault);
         $tester = new CommandCompletionTester($command);
         $suggestions = $tester->complete($input);

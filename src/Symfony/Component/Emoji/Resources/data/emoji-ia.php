@@ -312,7 +312,7 @@ return [
     '😃' => 'grande surriso con grande oculos',
     '😄' => 'grande surriso con oculos surridente',
     '😁' => 'visage radiante con oculos surridente',
-    '😆' => 'grande surriso con oculos clause',
+    '😆' => 'grande surriso con oculos semiclaudite',
     '😅' => 'grande surriso con gutta de sudor',
     '🤣' => 'rolante se per terra de rider',
     '😂' => 'visage plorante de riso',

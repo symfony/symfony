@@ -166,4 +166,14 @@ class NoSuspiciousCharactersValidatorTest extends ConstraintValidatorTestCase
         $this->assertSame(\Spoofchecker::MINIMALLY_RESTRICTIVE, NoSuspiciousCharacters::RESTRICTION_LEVEL_MINIMAL);
         $this->assertSame(\Spoofchecker::UNRESTRICTIVE, NoSuspiciousCharacters::RESTRICTION_LEVEL_NONE);
     }
+
+    public function testValidatorFiltersEmptyDefaultLocales()
+    {
+        $validator = new NoSuspiciousCharactersValidator(['en', '', 'fr', null, 'de']);
+        $validator->initialize($this->context);
+
+        $validator->validate('abc', new NoSuspiciousCharacters());
+
+        $this->assertNoViolation();
+    }
 }

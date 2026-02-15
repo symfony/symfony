@@ -36,7 +36,7 @@ class LazyServiceInstantiatorTest extends TestCase
         $definition = (new Definition(AbstractSayClass::class))
             ->setLazy(true);
 
-        $proxy = $instantiator->instantiateProxy(new Container(), $definition, 'foo', fn () => $instance);
+        $proxy = $instantiator->instantiateProxy(new Container(), $definition, 'foo', static fn () => $instance);
 
         $this->assertSame(0, $instance->calls);
         $this->assertSame('Hello from the abstract class!', $proxy->say());

@@ -137,7 +137,7 @@ class AuthenticatedVoterTest extends TestCase
         }
 
         if ('impersonated' === $authenticated) {
-            return $this->getMockBuilder(SwitchUserToken::class)->disableOriginalConstructor()->getMock();
+            return new SwitchUserToken(new InMemoryUser('John', 'password'), 'main', ['ROLE_USER'], new NullToken());
         }
 
         if ('offline' === $authenticated) {

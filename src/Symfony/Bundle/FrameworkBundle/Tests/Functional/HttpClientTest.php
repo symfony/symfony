@@ -11,6 +11,10 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+
 class HttpClientTest extends AbstractWebTestCase
 {
     public function testHttpClientAssertions()
@@ -29,5 +33,16 @@ class HttpClientTest extends AbstractWebTestCase
         $this->assertNotHttpClientRequest('https://laravel.com', httpClientId: 'symfony.http_client');
 
         $this->assertHttpClientRequestCount(6, 'symfony.http_client');
+    }
+
+    public function testHttpClientCanBeOverriddenInWebTestCase()
+    {
+        $browser = $this->createClient(['test_case' => 'HttpClient', 'root_config' => 'config.yml', 'debug' => true]);
+        $mockedContent = 'Request Mocked successfully!';
+        static::getContainer()->set(HttpClientInterface::class, new MockHttpClient(new MockResponse($mockedContent)));
+
+        $browser->request('GET', '/http_client_mock');
+
+        self::assertSame($mockedContent, $browser->getResponse()->getContent());
     }
 }

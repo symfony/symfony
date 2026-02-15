@@ -147,7 +147,7 @@ class PhpDumper extends Dumper
             'inline_class_loader' => null,
             'preload_classes' => [],
             'service_locator_tag' => 'container.service_locator',
-            'build_time' => time(),
+            'build_time' => filter_var($_SERVER['SOURCE_DATE_EPOCH'] ?? null, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE) ?? time(),
         ], $options);
 
         $this->addGetService = false;
@@ -443,7 +443,7 @@ class PhpDumper extends Dumper
         foreach ($edges as $edge) {
             $node = $edge->getDestNode();
             $id = $node->getId();
-            if ($sourceId === $id || !$node->getValue() instanceof Definition || $edge->isWeak()) {
+            if (($sourceId === $id && !$edge->isLazy()) || !$node->getValue() instanceof Definition || $edge->isWeak()) {
                 continue;
             }
 
@@ -684,7 +684,6 @@ class PhpDumper extends Dumper
 
         $asGhostObject = false;
         $isProxyCandidate = $this->isProxyCandidate($definition, $asGhostObject, $id);
-        $instantiation = '';
 
         $lastWitherIndex = null;
         foreach ($definition->getMethodCalls() as $k => $call) {
@@ -693,20 +692,26 @@ class PhpDumper extends Dumper
             }
         }
 
-        if (!$isProxyCandidate && $definition->isShared() && !isset($this->singleUsePrivateIds[$id]) && null === $lastWitherIndex) {
-            $instantiation = \sprintf('$container->%s[%s] = %s', $this->container->getDefinition($id)->isPublic() ? 'services' : 'privates', $this->doExport($id), $isSimpleInstance ? '' : '$instance');
-        } elseif (!$isSimpleInstance) {
-            $instantiation = '$instance';
+        $shouldShareInline = !$isProxyCandidate && $definition->isShared() && !isset($this->singleUsePrivateIds[$id]) && null === $lastWitherIndex;
+        $serviceAccessor = \sprintf('$container->%s[%s]', $this->container->getDefinition($id)->isPublic() ? 'services' : 'privates', $this->doExport($id));
+        $return = match (true) {
+            $shouldShareInline && !isset($this->circularReferences[$id]) && $isSimpleInstance => 'return '.$serviceAccessor.' = ',
+            $shouldShareInline && !isset($this->circularReferences[$id]) => $serviceAccessor.' = $instance = ',
+            $shouldShareInline || !$isSimpleInstance => '$instance = ',
+            default => 'return ',
+        };
+
+        $code = $this->addNewInstance($definition, '        '.$return, $id, $asGhostObject);
+
+        if ($shouldShareInline && isset($this->circularReferences[$id])) {
+            $code .= \sprintf(
+                "\n        if (isset(%s)) {\n            return %1\$s;\n        }\n\n        %s%1\$s = \$instance;\n",
+                $serviceAccessor,
+                $isSimpleInstance ? 'return ' : ''
+            );
         }
 
-        $return = '';
-        if ($isSimpleInstance) {
-            $return = 'return ';
-        } else {
-            $instantiation .= ' = ';
-        }
-
-        return $this->addNewInstance($definition, '        '.$return.$instantiation, $id, $asGhostObject);
+        return $code;
     }
 
     private function isTrivialInstance(Definition $definition): bool
@@ -931,7 +936,7 @@ class PhpDumper extends Dumper
             $c = $this->addServiceInclude($id, $definition, null !== $isProxyCandidate);
 
             if ('' !== $c && $isProxyCandidate && !$definition->isShared()) {
-                $c = implode("\n", array_map(fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
+                $c = implode("\n", array_map(static fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
                 $code .= "        static \$include = true;\n\n";
                 $code .= "        if (\$include) {\n";
                 $code .= $c;
@@ -944,7 +949,7 @@ class PhpDumper extends Dumper
             $c = $this->addInlineService($id, $definition);
 
             if (!$isProxyCandidate && !$definition->isShared()) {
-                $c = implode("\n", array_map(fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
+                $c = implode("\n", array_map(static fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
                 $lazyloadInitialization = $definition->isLazy() ? ', $lazyLoad = true' : '';
 
                 $c = \sprintf("        %s = function (\$container%s) {\n%s        };\n\n        return %1\$s(\$container);\n", $factory, $lazyloadInitialization, $c);
@@ -1013,7 +1018,7 @@ class PhpDumper extends Dumper
         $name = $this->getNextVariableName();
         $this->referenceVariables[$targetId] = new Variable($name);
 
-        $reference = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE >= $behavior ? new Reference($targetId, $behavior) : null;
+        $reference = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $behavior ? new Reference($targetId, $behavior) : null;
         $code .= \sprintf("        \$%s = %s;\n", $name, $this->getServiceCall($targetId, $reference));
 
         if (!$hasSelfRef || !$forConstructor) {
@@ -1037,7 +1042,7 @@ class PhpDumper extends Dumper
         $code = '';
 
         if ($isSimpleInstance = $isRootInstance = null === $inlineDef) {
-            foreach ($this->serviceCalls as $targetId => [$callCount, $behavior, $byConstructor]) {
+            foreach ($this->serviceCalls as $targetId => [, , $byConstructor]) {
                 if ($byConstructor && isset($this->circularReferences[$id][$targetId]) && !$this->circularReferences[$id][$targetId] && !($this->hasProxyDumper && $definition->isLazy())) {
                     $code .= $this->addInlineReference($id, $definition, $targetId, $forConstructor);
                 }
@@ -1189,6 +1194,7 @@ class PhpDumper extends Dumper
                 || ($callable[0] instanceof Definition && !$this->definitionVariables->offsetExists($callable[0]))
             ))) {
                 $initializer = 'fn () => '.$this->dumpValue($callable[0]);
+                $this->preload[LazyClosure::class] = LazyClosure::class;
 
                 return $return.LazyClosure::getCode($initializer, $callable, $class, $this->container, $id).$tail;
             }
@@ -1279,7 +1285,7 @@ class PhpDumper extends Dumper
             if (null !== $r
                 && (null !== $constructor = $r->getConstructor())
                 && 0 === $constructor->getNumberOfRequiredParameters()
-                && Container::class !== $constructor->getDeclaringClass()->name
+                && Container::class !== $constructor->class
             ) {
                 $code .= "        parent::__construct();\n";
                 $code .= "        \$this->parameterBag = null;\n\n";
@@ -1598,7 +1604,7 @@ class PhpDumper extends Dumper
             $export = $this->exportParameters([$value], '', 12, $hasEnum);
             $export = explode('0 => ', substr(rtrim($export, " ]\n"), 2, -1), 2);
 
-            if ($hasEnum || preg_match("/\\\$container->(?:getEnv\('(?:[-.\w\\\\]*+:)*+\w*+'\)|targetDir\.'')/", $export[1])) {
+            if ($hasEnum || preg_match("/\\\$container->(?:getEnv\('(?:[-.\w\\\\]*+:)*+[\w.]*+'\)|targetDir\.'')/", $export[1])) {
                 $dynamicPhp[$key] = \sprintf('%s%s => %s,', $export[0], $this->export($key), $export[1]);
                 $this->dynamicParameters[$key] = true;
             } else {
@@ -1615,18 +1621,16 @@ class PhpDumper extends Dumper
                         trigger_deprecation(...self::DEPRECATED_PARAMETERS[$name]);
                     }
 
-                    if (isset($this->buildParameters[$name])) {
+                    if (\array_key_exists($name, $this->buildParameters)) {
                         return $this->buildParameters[$name];
-                    }
-
-                    if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
-                        throw new ParameterNotFoundException($name, extraMessage: self::NONEMPTY_PARAMETERS[$name] ?? null);
                     }
 
                     if (isset($this->loadedDynamicParameters[$name])) {
                         $value = $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
-                    } else {
+                    } elseif (\array_key_exists($name, $this->parameters) && '.' !== ($name[0] ?? '')) {
                         $value = $this->parameters[$name];
+                    } else {
+                        throw new ParameterNotFoundException($name, extraMessage: self::NONEMPTY_PARAMETERS[$name] ?? null);
                     }
 
                     if (isset(self::NONEMPTY_PARAMETERS[$name]) && (null === $value || '' === $value || [] === $value)) {
@@ -1638,11 +1642,11 @@ class PhpDumper extends Dumper
 
                 public function hasParameter(string $name): bool
                 {
-                    if (isset($this->buildParameters[$name])) {
+                    if (\array_key_exists($name, $this->buildParameters)) {
                         return true;
                     }
 
-                    return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters);
+                    return \array_key_exists($name, $this->parameters) || isset($this->loadedDynamicParameters[$name]);
                 }
 
                 public function setParameter(string $name, $value): void
@@ -1766,7 +1770,7 @@ class PhpDumper extends Dumper
         }
 
         // re-indent the wrapped code
-        $code = implode("\n", array_map(fn ($line) => $line ? '    '.$line : $line, explode("\n", $code)));
+        $code = implode("\n", array_map(static fn ($line) => $line ? '    '.$line : $line, explode("\n", $code)));
 
         return \sprintf("        if (%s) {\n%s        }\n", $condition, $code);
     }
@@ -1859,7 +1863,15 @@ class PhpDumper extends Dumper
 
                     $returnedType = '';
                     if ($value instanceof TypedReference) {
-                        $returnedType = \sprintf(': %s\%s', ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE >= $value->getInvalidBehavior() ? '' : '?', str_replace(['|', '&'], ['|\\', '&\\'], $value->getType()));
+                        $type = $value->getType();
+                        $nullable = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE >= $value->getInvalidBehavior() ? '' : '?';
+
+                        if ('?' === ($type[0] ?? '')) {
+                            $type = substr($type, 1);
+                            $nullable = '?';
+                        }
+
+                        $returnedType = \sprintf(': %s\%s', $nullable, str_replace(['|', '&'], ['|\\', '&\\'], $type));
                     }
 
                     $attribute = '';
@@ -2191,7 +2203,7 @@ class PhpDumper extends Dumper
             if (!$value = $edge->getSourceNode()->getValue()) {
                 continue;
             }
-            if ($edge->isLazy() || !$value instanceof Definition || !$value->isShared()) {
+            if ($edge->isLazy() || !$value instanceof Definition || !$value->isShared() || $edge->isFromMultiUseArgument()) {
                 return false;
             }
 
@@ -2248,7 +2260,7 @@ class PhpDumper extends Dumper
         }
         if (\is_string($value) && str_contains($value, "\n")) {
             $cleanParts = explode("\n", $value);
-            $cleanParts = array_map(fn ($part) => var_export($part, true), $cleanParts);
+            $cleanParts = array_map(static fn ($part) => var_export($part, true), $cleanParts);
             $export = implode('."\n".', $cleanParts);
         } else {
             $export = var_export($value, true);

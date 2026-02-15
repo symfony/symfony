@@ -24,7 +24,7 @@ final class IsCsrfTokenValid
         /**
          * Sets the id, or an Expression evaluated to the id, used when generating the token.
          */
-        public string|Expression $id,
+        public string|Expression|\Closure $id,
 
         /**
          * Sets the key of the request that contains the actual token value that should be validated.

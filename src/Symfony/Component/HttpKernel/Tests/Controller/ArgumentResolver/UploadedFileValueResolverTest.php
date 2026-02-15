@@ -43,7 +43,7 @@ class UploadedFileValueResolverTest extends TestCase
             [$attribute::class => $attribute]
         );
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             static function () {},
             $resolver->resolve($request, $argument),
             $request,
@@ -73,7 +73,45 @@ class UploadedFileValueResolverTest extends TestCase
             [$attribute::class => $attribute]
         );
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
+            static function () {},
+            $resolver->resolve($request, $argument),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST
+        );
+
+        $this->expectException(HttpException::class);
+
+        $resolver->onKernelControllerArguments($event);
+    }
+
+    public function testEmptyArrayUploadedFileArgument()
+    {
+        $resolver = new RequestPayloadValueResolver(
+            new Serializer(),
+            (new ValidatorBuilder())->getValidator()
+        );
+        $request = Request::create(
+            '/',
+            'POST',
+            files: [
+                'qux' => [],
+            ],
+            server: ['HTTP_CONTENT_TYPE' => 'multipart/form-data']
+        );
+
+        $attribute = new MapUploadedFile();
+        $argument = new ArgumentMetadata(
+            'qux',
+            UploadedFile::class,
+            false,
+            false,
+            null,
+            false,
+            [$attribute::class => $attribute]
+        );
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
             static function () {},
             $resolver->resolve($request, $argument),
             $request,
@@ -99,7 +137,7 @@ class UploadedFileValueResolverTest extends TestCase
             [$attribute::class => $attribute]
         );
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             static function () {},
             $resolver->resolve($request, $argument),
             $request,
@@ -126,7 +164,7 @@ class UploadedFileValueResolverTest extends TestCase
             [$attribute::class => $attribute]
         );
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             static function () {},
             $resolver->resolve($request, $argument),
             $request,
@@ -156,7 +194,7 @@ class UploadedFileValueResolverTest extends TestCase
             [$attribute::class => $attribute]
         );
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             static function () {},
             $resolver->resolve($request, $argument),
             $request,
@@ -186,7 +224,7 @@ class UploadedFileValueResolverTest extends TestCase
             [$attribute::class => $attribute]
         );
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             static function () {},
             $resolver->resolve($request, $argument),
             $request,
@@ -213,7 +251,7 @@ class UploadedFileValueResolverTest extends TestCase
             [$attribute::class => $attribute]
         );
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             static function () {},
             $resolver->resolve($request, $argument),
             $request,
@@ -245,7 +283,7 @@ class UploadedFileValueResolverTest extends TestCase
             [$attribute::class => $attribute]
         );
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             static function () {},
             $resolver->resolve($request, $argument),
             $request,
@@ -256,6 +294,36 @@ class UploadedFileValueResolverTest extends TestCase
         $this->expectExceptionMessageMatches('/^The file is too large/');
 
         $resolver->onKernelControllerArguments($event);
+    }
+
+    #[DataProvider('provideContext')]
+    public function testSingleFileVariadic(RequestPayloadValueResolver $resolver, Request $request)
+    {
+        $attribute = new MapUploadedFile();
+        $argument = new ArgumentMetadata(
+            'foo',
+            UploadedFile::class,
+            true,
+            false,
+            null,
+            false,
+            [$attribute::class => $attribute]
+        );
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            static function () {},
+            $resolver->resolve($request, $argument),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST
+        );
+        $resolver->onKernelControllerArguments($event);
+
+        /** @var UploadedFile[] $data */
+        $data = $event->getArguments();
+
+        $this->assertCount(1, $data);
+        $this->assertSame('file-small.txt', $data[0]->getFilename());
+        $this->assertSame(36, $data[0]->getSize());
     }
 
     #[DataProvider('provideContext')]
@@ -272,7 +340,7 @@ class UploadedFileValueResolverTest extends TestCase
             [$attribute::class => $attribute]
         );
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             static function () {},
             $resolver->resolve($request, $argument),
             $request,
@@ -281,7 +349,7 @@ class UploadedFileValueResolverTest extends TestCase
         $resolver->onKernelControllerArguments($event);
 
         /** @var UploadedFile[] $data */
-        $data = $event->getArguments()[0];
+        $data = $event->getArguments();
 
         $this->assertCount(2, $data);
         $this->assertSame('file-small.txt', $data[0]->getFilename());
@@ -304,7 +372,7 @@ class UploadedFileValueResolverTest extends TestCase
             [$attribute::class => $attribute]
         );
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             static function () {},
             $resolver->resolve($request, $argument),
             $request,
@@ -331,7 +399,7 @@ class UploadedFileValueResolverTest extends TestCase
             [$attribute::class => $attribute]
         );
         /** @var HttpKernelInterface&MockObject $httpKernel */
-        $httpKernel = $this->createMock(HttpKernelInterface::class);
+        $httpKernel = $this->createStub(HttpKernelInterface::class);
         $event = new ControllerArgumentsEvent(
             $httpKernel,
             static function () {},
@@ -359,7 +427,7 @@ class UploadedFileValueResolverTest extends TestCase
             [$attribute::class => $attribute]
         );
         /** @var HttpKernelInterface&MockObject $httpKernel */
-        $httpKernel = $this->createMock(HttpKernelInterface::class);
+        $httpKernel = $this->createStub(HttpKernelInterface::class);
         $event = new ControllerArgumentsEvent(
             $httpKernel,
             static function () {},
@@ -387,7 +455,7 @@ class UploadedFileValueResolverTest extends TestCase
             [$attribute::class => $attribute]
         );
         /** @var HttpKernelInterface&MockObject $httpKernel */
-        $httpKernel = $this->createMock(HttpKernelInterface::class);
+        $httpKernel = $this->createStub(HttpKernelInterface::class);
         $event = new ControllerArgumentsEvent(
             $httpKernel,
             static function () {},

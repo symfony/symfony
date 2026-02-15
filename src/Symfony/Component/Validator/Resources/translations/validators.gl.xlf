@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target state="needs-review-translation">Este valor non é un enderezo IP válido.</target>
+                <target>Este valor non é un enderezo IP válido.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -224,7 +224,7 @@
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
-                <target state="needs-review-translation">Este valor non é un Número de Conta Bancaria Internacional (IBAN) válido.</target>
+                <target>Este valor non é un Número de Conta Bancaria Internacional (IBAN) válido.</target>
             </trans-unit>
             <trans-unit id="60">
                 <source>This value is not a valid ISBN-10.</source>
@@ -312,7 +312,7 @@
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target state="needs-review-translation">Este valor non é un Código de Identificación de Negocios (BIC) válido.</target>
+                <target>Este valor non é un Código de Identificación de Negocios (BIC) válido.</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -320,7 +320,7 @@
             </trans-unit>
             <trans-unit id="83" resname="This is not a valid UUID.">
                 <source>This value is not a valid UUID.</source>
-                <target state="needs-review-translation">Este valor non é un UUID válido.</target>
+                <target>Este valor non é un UUID válido.</target>
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
@@ -404,155 +404,155 @@
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target state="needs-review-translation">O nome do ficheiro é demasiado longo. Debe ter {{ filename_max_length }} caracteres ou menos.</target>
+                <target>O nome do ficheiro é demasiado longo. Debe ter {{ filename_max_length }} caracteres ou menos.</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
-                <target state="needs-review-translation">A forza do contrasinal é demasiado baixa. Utilice un contrasinal máis forte.</target>
+                <target>O contrasinal é demasiado débil. Utilice un contrasinal máis seguro.</target>
             </trans-unit>
             <trans-unit id="106">
                 <source>This value contains characters that are not allowed by the current restriction-level.</source>
-                <target state="needs-review-translation">Este valor contén caracteres que non están permitidos polo nivel de restrición actual.</target>
+                <target>Este valor contén caracteres que non están permitidos polo nivel de restrición actual.</target>
             </trans-unit>
             <trans-unit id="107">
                 <source>Using invisible characters is not allowed.</source>
-                <target state="needs-review-translation">Non se permite usar caracteres invisibles.</target>
+                <target>Non se permite usar caracteres invisíbeis.</target>
             </trans-unit>
             <trans-unit id="108">
                 <source>Mixing numbers from different scripts is not allowed.</source>
-                <target state="needs-review-translation">Non se permite mesturar números de diferentes scripts.</target>
+                <target>Non se permite mesturar números de diferentes scripts.</target>
             </trans-unit>
             <trans-unit id="109">
                 <source>Using hidden overlay characters is not allowed.</source>
-                <target state="needs-review-translation">Non se permite usar caracteres de superposición ocultos.</target>
+                <target>Non se permite usar caracteres de superposición ocultos.</target>
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target state="needs-review-translation">A extensión do ficheiro non é válida ({{ extension }}). As extensións permitidas son {{ extensions }}.</target>
+                <target>A extensión do ficheiro non é válida ({{ extension }}). As extensións permitidas son {{ extensions }}.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target state="needs-review-translation">A codificación de caracteres detectada non é válida ({{ detected }}). As codificacións permitidas son {{ encodings }}.</target>
+                <target>A codificación de caracteres detectada non é válida ({{ detected }}). As codificacións permitidas son {{ encodings }}.</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
-                <target state="needs-review-translation">Este valor non é un enderezo MAC válido.</target>
+                <target>Este valor non é un enderezo MAC válido.</target>
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
-                <target state="needs-review-translation">Esta URL non contén un dominio de nivel superior.</target>
+                <target>A esta URL fáltalle un dominio de nivel superior.</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
-                <target state="needs-review-translation">Este valor é demasiado curto. Debe conter polo menos unha palabra.|Este valor é demasiado curto. Debe conter polo menos {{ min }} palabras.</target>
+                <target>Este valor é curto de máis. Debe conter polo menos unha palabra.|Este valor é curto de máis. Debe conter polo menos {{ min }} palabras.</target>
             </trans-unit>
             <trans-unit id="115">
                 <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
-                <target state="needs-review-translation">Este valor é demasiado longo. Debe conter só unha palabra.|Este valor é demasiado longo. Debe conter {{ max }} palabras ou menos.</target>
+                <target>Este valor é longo de máis. Debe conter só unha palabra.|Este valor é longo de máis. Debe conter {{ max }} palabras ou menos.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
-                <target state="needs-review-translation">Este valor non representa unha semana válida no formato ISO 8601.</target>
+                <target>Este valor non representa unha semana válida no formato ISO 8601.</target>
             </trans-unit>
             <trans-unit id="117">
                 <source>This value is not a valid week.</source>
-                <target state="needs-review-translation">Este valor non é unha semana válida.</target>
+                <target>Este valor non é unha semana válida.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
-                <target state="needs-review-translation">Este valor non debe ser anterior á semana "{{ min }}".</target>
+                <target>Este valor non debe ser anterior á semana "{{ min }}".</target>
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target state="needs-review-translation">Este valor non debe estar despois da semana "{{ max }}".</target>
+                <target>Este valor non debe estar despois da semana "{{ max }}".</target>
             </trans-unit>
             <trans-unit id="121">
                 <source>This value is not a valid Twig template.</source>
-                <target state="needs-review-translation">Este valor non é un modelo Twig válido.</target>
+                <target>Este valor non é un modelo Twig válido.</target>
             </trans-unit>
             <trans-unit id="122">
                 <source>This file is not a valid video.</source>
-                <target state="needs-review-translation">Este ficheiro non é un vídeo válido.</target>
+                <target>Este ficheiro non é un vídeo válido.</target>
             </trans-unit>
             <trans-unit id="123">
                 <source>The size of the video could not be detected.</source>
-                <target state="needs-review-translation">Non se puido detectar o tamaño do vídeo.</target>
+                <target>Non se puido detectar o tamaño do vídeo.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target state="needs-review-translation">A largura do vídeo é demasiado grande ({{ width }}px). A largura máxima permitida é {{ max_width }}px.</target>
+                <target>A anchura do vídeo é demasiado grande ({{ width }}px). A anchura máxima permitida é {{ max_width }}px.</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target state="needs-review-translation">A largura do vídeo é demasiado pequena ({{ width }}px). A largura mínima agardada é {{ min_width }}px.</target>
+                <target>A anchura do vídeo é demasiado pequena ({{ width }}px). A anchura mínima agardada é {{ min_width }}px.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target state="needs-review-translation">A altura do vídeo é demasiado grande ({{ height }}px). A altura máxima permitida é {{ max_height }}px.</target>
+                <target>A altura do vídeo é demasiado grande ({{ height }}px). A altura máxima permitida é {{ max_height }}px.</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target state="needs-review-translation">A altura do vídeo é demasiado pequena ({{ height }}px). A altura mínima agardada é {{ min_height }}px.</target>
+                <target>A altura do vídeo é demasiado pequena ({{ height }}px). A altura mínima agardada é {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">O vídeo ten moi poucos píxeles ({{ pixels }}). A cantidade mínima agardada é {{ min_pixels }}.</target>
+                <target>O vídeo ten moi poucos píxeles ({{ pixels }}). A cantidade mínima agardada é {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">O vídeo ten demasiados píxeles ({{ pixels }}). A cantidade máxima agardada é {{ max_pixels }}.</target>
+                <target>O vídeo ten demasiados píxeles ({{ pixels }}). A cantidade máxima agardada é {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target state="needs-review-translation">A relación do vídeo é demasiado grande ({{ ratio }}). A relación máxima permitida é {{ max_ratio }}.</target>
+                <target>A relación do vídeo é demasiado grande ({{ ratio }}). A relación máxima permitida é {{ max_ratio }}.</target>
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target state="needs-review-translation">A relación do vídeo é demasiado pequena ({{ ratio }}). A relación mínima agardada é {{ min_ratio }}.</target>
+                <target>A relación do vídeo é demasiado pequena ({{ ratio }}). A relación mínima agardada é {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
-                <target state="needs-review-translation">O vídeo é cadrado ({{ width }}x{{ height }}px). Non se permiten vídeos cadrados.</target>
+                <target>O vídeo é cadrado ({{ width }}x{{ height }}px). Non se permiten vídeos cadrados.</target>
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target state="needs-review-translation">O vídeo está en orientación horizontal ({{ width }}x{{ height }} px). Non se permiten vídeos en horizontal.</target>
+                <target>O vídeo está en orientación horizontal ({{ width }}x{{ height }} px). Non se permiten vídeos en horizontal.</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target state="needs-review-translation">O vídeo está en orientación vertical ({{ width }}x{{ height }} px). Non se permiten vídeos en orientación vertical.</target>
+                <target>O vídeo está en orientación vertical ({{ width }}x{{ height }} px). Non se permiten vídeos en orientación vertical.</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
-                <target state="needs-review-translation">O ficheiro de vídeo está danado.</target>
+                <target>O ficheiro de vídeo está danado.</target>
             </trans-unit>
             <trans-unit id="136">
                 <source>The video contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">O vídeo contén múltiples fluxos. Só se permite un fluxo.</target>
+                <target>O vídeo contén múltiples fluxos. Só se permite un fluxo.</target>
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target state="needs-review-translation">Códec de vídeo non compatible «{{ codec }}».</target>
+                <target>Códec de vídeo non compatible «{{ codec }}».</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target state="needs-review-translation">Contedor de vídeo non compatible "{{ container }}".</target>
+                <target>Contedor de vídeo non compatible "{{ container }}".</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
-                <target state="needs-review-translation">O ficheiro de imaxe está danado.</target>
+                <target>O ficheiro de imaxe está danado.</target>
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">A imaxe ten moi poucos píxeles ({{ pixels }}). A cantidade mínima esperada é {{ min_pixels }}.</target>
+                <target>A imaxe ten moi poucos píxeles ({{ pixels }}). A cantidade mínima esperada é {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">A imaxe ten demasiados píxeles ({{ pixels }}). A cantidade máxima esperada é {{ max_pixels }}.</target>
+                <target>A imaxe ten demasiados píxeles ({{ pixels }}). A cantidade máxima esperada é {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
-                <target state="needs-review-translation">Este nome de ficheiro non coincide co conxunto de caracteres agardado.</target>
+                <target>Este nome de ficheiro non coincide co charset agardado.</target>
             </trans-unit>
         </body>
     </file>

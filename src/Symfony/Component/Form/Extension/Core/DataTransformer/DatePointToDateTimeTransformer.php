@@ -22,13 +22,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 final class DatePointToDateTimeTransformer implements DataTransformerInterface
 {
-    /**
-     * Transforms a DatePoint into a DateTime object.
-     *
-     * @param DatePoint|null $value A DatePoint object
-     *
-     * @throws TransformationFailedException If the given value is not a DatePoint
-     */
     public function transform(mixed $value): ?\DateTime
     {
         if (null === $value) {
@@ -42,13 +35,6 @@ final class DatePointToDateTimeTransformer implements DataTransformerInterface
         return \DateTime::createFromImmutable($value);
     }
 
-    /**
-     * Transforms a DateTime object into a DatePoint object.
-     *
-     * @param \DateTime|null $value A DateTime object
-     *
-     * @throws TransformationFailedException If the given value is not a \DateTime
-     */
     public function reverseTransform(mixed $value): ?DatePoint
     {
         if (null === $value) {

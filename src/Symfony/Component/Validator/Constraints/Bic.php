@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Intl\Countries;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
@@ -39,10 +38,6 @@ class Bic extends Constraint
 
     public const INVALID_LENGTH_ERROR = '66dad313-af0b-4214-8566-6c799be9789c';
     public const INVALID_CHARACTERS_ERROR = 'f424c529-7add-4417-8f2d-4b656e4833e2';
-    /**
-     * @deprecated since Symfony 7.1, to be removed in 8.0
-     */
-    public const INVALID_BANK_CODE_ERROR = '00559357-6170-4f29-aebd-d19330aa19cf';
     public const INVALID_COUNTRY_CODE_ERROR = '1ce76f8d-3c1f-451c-9e62-fe9c3ed486ae';
     public const INVALID_CASE_ERROR = '11884038-3312-4ae5-9d04-699f782130c7';
     public const INVALID_IBAN_COUNTRY_CODE_ERROR = '29a2c3bb-587b-4996-b6f5-53081364cea5';
@@ -50,7 +45,6 @@ class Bic extends Constraint
     protected const ERROR_NAMES = [
         self::INVALID_LENGTH_ERROR => 'INVALID_LENGTH_ERROR',
         self::INVALID_CHARACTERS_ERROR => 'INVALID_CHARACTERS_ERROR',
-        self::INVALID_BANK_CODE_ERROR => 'INVALID_BANK_CODE_ERROR',
         self::INVALID_COUNTRY_CODE_ERROR => 'INVALID_COUNTRY_CODE_ERROR',
         self::INVALID_CASE_ERROR => 'INVALID_CASE_ERROR',
     ];
@@ -70,7 +64,6 @@ class Bic extends Constraint
      * @param string[]|null                $groups
      * @param self::VALIDATION_MODE_*|null $mode             The mode used to validate the BIC; pass null to use the default mode (strict)
      */
-    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $message = null,
@@ -84,23 +77,21 @@ class Bic extends Constraint
         if (!class_exists(Countries::class)) {
             throw new LogicException('The Intl component is required to use the Bic constraint. Try running "composer require symfony/intl".');
         }
-        if (\is_array($options) && \array_key_exists('mode', $options) && !\in_array($options['mode'], self::VALIDATION_MODES, true)) {
-            throw new InvalidArgumentException('The "mode" parameter value is not valid.');
+
+        if (null !== $options) {
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
         }
+
         if (null !== $mode && !\in_array($mode, self::VALIDATION_MODES, true)) {
             throw new InvalidArgumentException('The "mode" parameter value is not valid.');
         }
 
-        if (\is_array($options)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-        }
-
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->message = $message ?? $this->message;
         $this->ibanMessage = $ibanMessage ?? $this->ibanMessage;
-        $this->iban = $iban ?? $this->iban;
-        $this->ibanPropertyPath = $ibanPropertyPath ?? $this->ibanPropertyPath;
+        $this->iban = $iban;
+        $this->ibanPropertyPath = $ibanPropertyPath;
         $this->mode = $mode ?? $this->mode;
 
         if (null !== $this->iban && null !== $this->ibanPropertyPath) {

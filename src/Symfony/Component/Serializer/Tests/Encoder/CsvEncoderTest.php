@@ -12,8 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -312,6 +310,15 @@ class CsvEncoderTest extends TestCase
 
         $this->assertSame(<<<'CSV'
             0
+            "'
+            line feed"
+
+            CSV,
+            $this->encoder->encode(["\nline feed"], 'csv')
+        );
+
+        $this->assertSame(<<<'CSV'
+            0
             "'=1+2"";=1+2"
 
             CSV,
@@ -434,6 +441,17 @@ class CsvEncoderTest extends TestCase
 
             CSV,
             $this->encoder->encode(["\ttab"], 'csv', [
+                CsvEncoder::ESCAPE_FORMULAS_KEY => true,
+            ])
+        );
+
+        $this->assertSame(<<<'CSV'
+            0
+            "'
+            line feed"
+
+            CSV,
+            $this->encoder->encode(["\nline feed"], 'csv', [
                 CsvEncoder::ESCAPE_FORMULAS_KEY => true,
             ])
         );
@@ -782,27 +800,6 @@ class CsvEncoderTest extends TestCase
         yield 'array' => [$data];
         yield 'array iterator' => [new \ArrayIterator($data)];
         yield 'iterator aggregate' => [new \IteratorIterator(new \ArrayIterator($data))];
-        yield 'generator' => [(fn (): \Generator => yield from $data)()];
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testPassingNonEmptyEscapeCharIsDeprecated()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/serializer 7.2: Setting the "csv_escape_char" option is deprecated. The option will be removed in 8.0.');
-        $encoder = new CsvEncoder(['csv_escape_char' => '@']);
-
-        $this->assertSame(
-            [[
-                'A, B@"' => 'D',
-                'C' => 'E',
-            ]],
-            $encoder->decode(<<<'CSV'
-                "A, B@"", "C"
-                "D", "E"
-                CSV,
-                'csv'
-            )
-        );
+        yield 'generator' => [(static fn (): \Generator => yield from $data)()];
     }
 }

@@ -57,14 +57,13 @@ final class SecretsEncryptFromLocalCommand extends Command
         }
 
         foreach ($this->vault->list(true) as $name => $value) {
-            $localValue = $this->localVault->reveal($name);
+            if (null === $localValue = $this->localVault->reveal($name)) {
+                continue;
+            }
 
-            if (null !== $localValue && $value !== $localValue) {
+            if ($value !== $localValue) {
                 $this->vault->seal($name, $localValue);
-            } elseif (null !== $message = $this->localVault->getLastMessage()) {
-                $io->error($message);
-
-                return 1;
+                $io->note($this->vault->getLastMessage());
             }
         }
 

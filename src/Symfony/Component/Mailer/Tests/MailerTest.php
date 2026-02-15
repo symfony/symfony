@@ -21,8 +21,8 @@ use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mailer\Transport\NullTransport;
-use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\Mime\Address;
@@ -35,7 +35,7 @@ class MailerTest extends TestCase
     {
         $this->expectException(LogicException::class);
 
-        $transport = new Mailer($this->createMock(TransportInterface::class), $this->createMock(MessageBusInterface::class), $this->createMock(EventDispatcherInterface::class));
+        $transport = new Mailer(new DummyTransport('localhost'), new MessageBus(), new EventDispatcher());
         $transport->send(new RawMessage('Some raw email message'));
     }
 
@@ -54,7 +54,7 @@ class MailerTest extends TestCase
             }
         };
 
-        $stamp = $this->createMock(StampInterface::class);
+        $stamp = new class implements StampInterface {};
 
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
         $dispatcher->expects($this->once())
@@ -89,8 +89,8 @@ class MailerTest extends TestCase
         $this->expectNotToPerformAssertions();
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(MessageEvent::class, fn (MessageEvent $event) => $event->reject(), 255);
-        $dispatcher->addListener(MessageEvent::class, fn () => throw new \RuntimeException('Should never be called.'));
+        $dispatcher->addListener(MessageEvent::class, static fn (MessageEvent $event) => $event->reject(), 255);
+        $dispatcher->addListener(MessageEvent::class, static fn () => throw new \RuntimeException('Should never be called.'));
 
         $transport = new class($dispatcher, $this) extends AbstractTransport {
             public function __construct(EventDispatcherInterface $dispatcher, private TestCase $test)

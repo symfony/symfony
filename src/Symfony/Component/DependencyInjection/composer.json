@@ -16,22 +16,19 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "psr/container": "^1.1|^2.0",
         "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/service-contracts": "^3.6",
-        "symfony/var-exporter": "^6.4.20|^7.2.5|^8.0"
+        "symfony/var-exporter": "^7.4|^8.0"
     },
     "require-dev": {
-        "symfony/yaml": "^6.4|^7.0|^8.0",
-        "symfony/config": "^6.4|^7.0|^8.0",
-        "symfony/expression-language": "^6.4|^7.0|^8.0"
+        "symfony/config": "^7.4|^8.0",
+        "symfony/expression-language": "^7.4|^8.0",
+        "symfony/yaml": "^7.4|^8.0"
     },
     "conflict": {
-        "ext-psr": "<1.1|>=2",
-        "symfony/config": "<6.4",
-        "symfony/finder": "<6.4",
-        "symfony/yaml": "<6.4"
+        "ext-psr": "<1.1|>=2"
     },
     "provide": {
         "psr/container-implementation": "1.1|2.0",

@@ -38,9 +38,7 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $url = "pdo-pgsql://postgres:password@$host";
         $params = (new DsnParser())->parse($url);
         $config = new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         $this->driverConnection = DriverManager::getConnection($params, $config);
         $this->connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $this->driverConnection);

@@ -425,9 +425,7 @@ class ContainerTest extends TestCase
         $container = new Container();
         $container->setParameter('env(FOO)', null);
         $container->set('container.env_var_processors_locator', new ServiceLocator([
-            'string' => static function () use ($container): EnvVarProcessor {
-                return new EnvVarProcessor($container);
-            },
+            'string' => static fn (): EnvVarProcessor => new EnvVarProcessor($container),
         ]));
         $container->compile();
 

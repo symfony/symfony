@@ -19,6 +19,7 @@ use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\UserAuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class SecurityExtensionTest extends TestCase
@@ -53,14 +54,12 @@ class SecurityExtensionTest extends TestCase
             $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
         }
 
-        $securityChecker = $this->createMock(AuthorizationCheckerInterface::class);
-
         ClassExistsMock::withMockedClasses([FieldVote::class => false]);
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Passing a $field to the "is_granted()" function requires symfony/acl.');
 
-        $securityExtension = new SecurityExtension($securityChecker);
+        $securityExtension = new SecurityExtension($this->createStub(AuthorizationCheckerInterface::class));
         $securityExtension->isGranted('ROLE', 'object', 'bar');
     }
 
@@ -71,7 +70,7 @@ class SecurityExtensionTest extends TestCase
             $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
         }
 
-        $user = $this->createMock(UserInterface::class);
+        $user = new InMemoryUser('john', 'password');
         $securityChecker = $this->createMockAuthorizationChecker();
 
         $securityExtension = new SecurityExtension($securityChecker);
@@ -112,7 +111,7 @@ class SecurityExtensionTest extends TestCase
         $this->expectExceptionMessage('Passing a $field to the "is_granted_for_user()" function requires symfony/acl.');
 
         $securityExtension = new SecurityExtension($securityChecker);
-        $securityExtension->isGrantedForUser($this->createMock(UserInterface::class), 'ROLE', 'object', 'bar');
+        $securityExtension->isGrantedForUser(new InMemoryUser('john', 'password'), 'ROLE', 'object', 'bar');
     }
 
     public function testAccessDecision()
@@ -126,7 +125,7 @@ class SecurityExtensionTest extends TestCase
             ->expects($this->once())
             ->method('isGranted')
             ->with('ROLE', 'object', $this->isInstanceOf(AccessDecision::class))
-            ->willReturnCallback(function ($attribute, $subject, $accessDecision) {
+            ->willReturnCallback(static function ($attribute, $subject, $accessDecision) {
                 $accessDecision->isGranted = true;
 
                 return true;
@@ -150,7 +149,7 @@ class SecurityExtensionTest extends TestCase
             ->expects($this->once())
             ->method('isGranted')
             ->with('ROLE', $this->isInstanceOf(FieldVote::class), $this->isInstanceOf(AccessDecision::class))
-            ->willReturnCallback(function ($attribute, $subject, $accessDecision) {
+            ->willReturnCallback(static function ($attribute, $subject, $accessDecision) {
                 $accessDecision->isGranted = false;
 
                 return false;
@@ -167,12 +166,10 @@ class SecurityExtensionTest extends TestCase
     {
         ClassExistsMock::withMockedClasses([AccessDecision::class => false]);
 
-        $securityChecker = $this->createMock(AuthorizationCheckerInterface::class);
-
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Using the "access_decision()" function requires symfony/security-core >= 7.3. Try running "composer update symfony/security-core".');
 
-        $securityExtension = new SecurityExtension($securityChecker);
+        $securityExtension = new SecurityExtension($this->createStub(AuthorizationCheckerInterface::class));
         $securityExtension->getAccessDecision('ROLE', 'object');
     }
 
@@ -182,7 +179,7 @@ class SecurityExtensionTest extends TestCase
             $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
         }
 
-        $user = $this->createMock(UserInterface::class);
+        $user = new InMemoryUser('john', 'password');
         $securityChecker = $this->createMockAuthorizationChecker();
 
         $securityExtension = new SecurityExtension($securityChecker);
@@ -201,7 +198,7 @@ class SecurityExtensionTest extends TestCase
             $this->markTestSkipped('This test requires symfony/security-core 7.3 or superior.');
         }
 
-        $user = $this->createMock(UserInterface::class);
+        $user = new InMemoryUser('john', 'password');
         $securityChecker = $this->createMockAuthorizationChecker();
 
         $securityExtension = new SecurityExtension($securityChecker);
@@ -228,7 +225,7 @@ class SecurityExtensionTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Using the "access_decision_for_user()" function requires symfony/security-core >= 7.3. Try running "composer update symfony/security-core".');
 
-        $securityExtension->getAccessDecisionForUser($this->createMock(UserInterface::class), 'ROLE', 'object');
+        $securityExtension->getAccessDecisionForUser(new InMemoryUser('john', 'password'), 'ROLE', 'object');
     }
 
     private function createMockAuthorizationChecker(): AuthorizationCheckerInterface&UserAuthorizationCheckerInterface

@@ -90,7 +90,7 @@ interface ConstraintViolationBuilderInterface
      *
      * @return $this
      *
-     * @see \Symfony\Contracts\Translation\TranslatorInterface::trans()
+     * @see TranslatorInterface::trans()
      */
     public function setPlural(int $number): static;
 

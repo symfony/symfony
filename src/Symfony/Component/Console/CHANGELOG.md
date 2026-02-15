@@ -1,6 +1,31 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * [BC BREAK] Add `object` support to input options and arguments' default by changing the `$default` type to `mixed` in `InputArgument`, `InputOption`, `#[Argument]` and `#[Option]`
+ * Add support for pasting images with `#[Ask]` on `InputFile` types, supporting Kitty Graphics and iTerm2 protocols
+ * Add `FileQuestion`, `InputFile`, `InputFileValueResolver`, and `SymfonyStyle::askFile()` for file input handling
+ * Add `Question::setConstraints()` and `ValidateQuestionInputListener` to validate question input using Validator constraints
+ * Add `#[AskChoice]` attribute for interactive choice questions in invokable commands
+ * Add support for method-based commands with `#[AsCommand]` attribute
+ * Add argument resolver support
+ * Add `BackedEnum` and `DateTimeInterface` support to `#[MapInput]`
+ * Add `TesterTrait::assertCommandFailed()` to test command
+ * Add `TesterTrait::assertCommandIsInvalid()` to test command
+ * Add a result-based testing API with `CommandTester::run()`, `ExecutionResult`, and `ConsoleAssertionsTrait` to assert output and error streams together
+
+8.0
+---
+
+ * Make `AsCommand` attribute class `final`
+ * Remove methods `Command::getDefaultName()` and `Command::getDefaultDescription()` in favor of the `#[AsCommand]` attribute
+ * Ensure closures set via `Command::setCode()` method have proper parameter and return types
+ * Add method `isSilent()` to `OutputInterface`
+ * Remove deprecated `Symfony\Component\Console\Application::add()` method in favor of `Symfony\Component\Console\Application::addCommand()`
+ * Add argument `$finishedIndicator` to `ProgressIndicator::finish()`
+
 7.4
 ---
 
@@ -11,8 +36,10 @@ CHANGELOG
  * Add `BackedEnum` support with `#[Argument]` and `#[Option]` inputs in invokable commands
  * Allow Usages to be specified via `#[AsCommand]` attribute.
  * Allow passing invokable commands to `Symfony\Component\Console\Tester\CommandTester`
- * Add `#[Input]` attribute to support DTOs in commands
+ * Add `#[MapInput]` attribute to support DTOs in commands
  * Add optional timeout for interaction in `QuestionHelper`
+ * Add support for interactive invokable commands with `#[Interact]` and `#[Ask]` attributes
+ * Add support for `Cursor` helper in invokable commands
 
 7.3
 ---

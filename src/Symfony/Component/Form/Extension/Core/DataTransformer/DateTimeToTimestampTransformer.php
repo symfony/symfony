@@ -23,13 +23,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
 {
-    /**
-     * Transforms a DateTime object into a timestamp in the configured timezone.
-     *
-     * @param \DateTimeInterface $dateTime A DateTimeInterface object
-     *
-     * @throws TransformationFailedException If the given value is not a \DateTimeInterface
-     */
     public function transform(mixed $dateTime): ?int
     {
         if (null === $dateTime) {
@@ -43,14 +36,6 @@ class DateTimeToTimestampTransformer extends BaseDateTimeTransformer
         return $dateTime->getTimestamp();
     }
 
-    /**
-     * Transforms a timestamp in the configured timezone into a DateTime object.
-     *
-     * @param string $value A timestamp
-     *
-     * @throws TransformationFailedException If the given value is not a timestamp
-     *                                       or if the given timestamp is invalid
-     */
     public function reverseTransform(mixed $value): ?\DateTime
     {
         if (null === $value) {

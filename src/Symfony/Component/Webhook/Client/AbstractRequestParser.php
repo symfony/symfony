@@ -29,24 +29,23 @@ abstract class AbstractRequestParser implements RequestParserInterface
         return $this->doParse($request, $secret);
     }
 
-    /**
-     * @param Request|null $request The original request that was received by the webhook controller
-     */
-    public function createSuccessfulResponse(/* ?Request $request = null */): Response
+    public function createSuccessfulResponse(?Request $request = null): Response
     {
         return new Response('', 202);
     }
 
-    /**
-     * @param Request|null $request The original request that was received by the webhook controller
-     */
-    public function createRejectedResponse(string $reason/* , ?Request $request = null */): Response
+    public function createRejectedResponse(string $reason, ?Request $request = null): Response
     {
         return new Response($reason, 406);
     }
 
     abstract protected function getRequestMatcher(): RequestMatcherInterface;
 
+    /**
+     * @return RemoteEvent|RemoteEvent[]|null
+     *
+     * @throws RejectWebhookException When the payload is rejected (signature issue, parse issue, ...)
+     */
     abstract protected function doParse(Request $request, #[\SensitiveParameter] string $secret): RemoteEvent|array|null;
 
     protected function validate(Request $request): void

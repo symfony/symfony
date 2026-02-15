@@ -45,12 +45,12 @@ class MongoDbSessionHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->manager = new Manager('mongodb://'.getenv('MONGODB_HOST'));
+        $this->manager = new Manager(getenv('MONGODB_URI'));
 
         try {
             $this->manager->executeCommand(self::DABASE_NAME, new Command(['ping' => 1]));
         } catch (ConnectionException $e) {
-            $this->markTestSkipped(\sprintf('MongoDB Server "%s" not running: %s', getenv('MONGODB_HOST'), $e->getMessage()));
+            $this->markTestSkipped(\sprintf('MongoDB Server "%s" not running: %s', getenv('MONGODB_URI'), $e->getMessage()));
         }
 
         $this->options = [

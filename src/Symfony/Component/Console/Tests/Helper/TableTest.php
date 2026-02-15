@@ -2065,8 +2065,6 @@ class TableTest extends TestCase
             ->setHeaders(['Title', 'Author'])
             ->setRows([
                 ['🎭 💫 ☯ Divine Comedy', 'Dante Alighieri'],
-                // the snowflake (e2 9d 84 ef b8 8f) has a variant selector
-                ['👑 ❄️  🗡 Game of Thrones', 'George R.R. Martin'],
                 // the snowflake in text style (e2 9d 84 ef b8 8e) has a variant selector
                 ['❄︎❄︎❄︎ snowflake in text style ❄︎❄︎❄︎', ''],
                 ['And a very long line to show difference in previous lines', ''],
@@ -2075,14 +2073,13 @@ class TableTest extends TestCase
         $table->render();
 
         $this->assertSame(<<<TABLE
-            +---------------------------------- Test Title -------------+--------------------+
-            | Title                                                     | Author             |
-            +-----------------------------------------------------------+--------------------+
-            | 🎭 💫 ☯ Divine Comedy                                     | Dante Alighieri    |
-            | 👑 ❄️  🗡 Game of Thrones                                   | George R.R. Martin |
-            | ❄︎❄︎❄︎ snowflake in text style ❄︎❄︎❄︎                           |                    |
-            | And a very long line to show difference in previous lines |                    |
-            +-----------------------------------------------------------+--------------------+
+            +-------------------------------- Test Title ---------------+-----------------+
+            | Title                                                     | Author          |
+            +-----------------------------------------------------------+-----------------+
+            | 🎭 💫 ☯ Divine Comedy                                     | Dante Alighieri |
+            | ❄︎❄︎❄︎ snowflake in text style ❄︎❄︎❄︎                           |                 |
+            | And a very long line to show difference in previous lines |                 |
+            +-----------------------------------------------------------+-----------------+
 
             TABLE,
             $this->getOutputContent($output)

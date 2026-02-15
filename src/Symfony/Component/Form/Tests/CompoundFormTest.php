@@ -407,7 +407,7 @@ class CompoundFormTest extends TestCase
         $child = $this->getBuilder('child')
             ->setCompound(true)
             ->setDataMapper(new DataMapper())
-            ->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($form, $childToBeAdded) {
+            ->addEventListener(FormEvents::PRE_SET_DATA, static function (FormEvent $event) use ($form, $childToBeAdded) {
                 $form->remove('removed');
                 $form->add($childToBeAdded);
             })
@@ -477,7 +477,7 @@ class CompoundFormTest extends TestCase
         $childToBeRemoved = $this->createForm('removed');
         $childToBeAdded = $this->createForm('added');
         $child = $this->getBuilder('child')
-            ->addEventListener(FormEvents::PRE_SUBMIT, function () use ($form, $childToBeAdded) {
+            ->addEventListener(FormEvents::PRE_SUBMIT, static function () use ($form, $childToBeAdded) {
                 $form->remove('removed');
                 $form->add($childToBeAdded);
             })
@@ -913,8 +913,8 @@ class CompoundFormTest extends TestCase
     public function testCreateViewWithChildren()
     {
         $type = $this->createMock(ResolvedFormTypeInterface::class);
-        $type1 = $this->createMock(ResolvedFormTypeInterface::class);
-        $type2 = $this->createMock(ResolvedFormTypeInterface::class);
+        $type1 = $this->createStub(ResolvedFormTypeInterface::class);
+        $type2 = $this->createStub(ResolvedFormTypeInterface::class);
         $options = ['a' => 'Foo', 'b' => 'Bar'];
         $field1 = $this->getBuilder('foo')
             ->setType($type1)

@@ -11,11 +11,9 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authentication\Token;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class RememberMeTokenTest extends TestCase
 {
@@ -29,25 +27,8 @@ class RememberMeTokenTest extends TestCase
         $this->assertSame($user, $token->getUser());
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testSecret()
-    {
-        $user = $this->getUser();
-        $token = new RememberMeToken($user, 'fookey', 'foo');
-
-        $this->assertEquals('foo', $token->getSecret());
-    }
-
     protected function getUser($roles = ['ROLE_FOO'])
     {
-        $user = $this->createMock(UserInterface::class);
-        $user
-            ->expects($this->any())
-            ->method('getRoles')
-            ->willReturn($roles)
-        ;
-
-        return $user;
+        return new InMemoryUser('John', 'password', $roles);
     }
 }

@@ -43,7 +43,6 @@ class ContainerDebugCommand extends Command
         $this
             ->setDefinition([
                 new InputArgument('name', InputArgument::OPTIONAL, 'A service name (foo)'),
-                new InputOption('show-arguments', null, InputOption::VALUE_NONE, 'Show arguments in services'),
                 new InputOption('show-hidden', null, InputOption::VALUE_NONE, 'Show hidden (internal) services'),
                 new InputOption('tag', null, InputOption::VALUE_REQUIRED, 'Show all services with a specific tag'),
                 new InputOption('tags', null, InputOption::VALUE_NONE, 'Display tagged services for an application'),
@@ -68,10 +67,6 @@ class ContainerDebugCommand extends Command
                 To get specific information about a service, specify its name:
 
                   <info>php %command.full_name% validator</info>
-
-                To get specific information about a service including all its arguments, use the <info>--show-arguments</info> flag:
-
-                  <info>php %command.full_name% validator --show-arguments</info>
 
                 To see available types that can be used for autowiring, use the <info>--types</info> flag:
 
@@ -151,10 +146,6 @@ class ContainerDebugCommand extends Command
             $tag = $this->findProperTagName($input, $errorIo, $object, $tag);
             $options = ['tag' => $tag];
         } elseif ($name = $input->getArgument('name')) {
-            if ($input->getOption('show-arguments')) {
-                $errorIo->warning('The "--show-arguments" option is deprecated.');
-            }
-
             $name = $this->findProperServiceName($input, $errorIo, $object, $name, $input->getOption('show-hidden'));
             $options = ['id' => $name];
         } elseif ($input->getOption('deprecations')) {

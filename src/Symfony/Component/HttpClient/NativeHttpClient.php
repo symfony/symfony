@@ -80,9 +80,6 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
             if (str_starts_with($options['bindto'], 'host!')) {
                 $options['bindto'] = substr($options['bindto'], 5);
             }
-            if ((\PHP_VERSION_ID < 80223 || 80300 <= \PHP_VERSION_ID && 80311 < \PHP_VERSION_ID) && '\\' === \DIRECTORY_SEPARATOR && '[' === $options['bindto'][0]) {
-                $options['bindto'] = preg_replace('{^\[[^\]]++\]}', '[$0]', $options['bindto']);
-            }
         }
 
         $hasContentLength = isset($options['normalized_headers']['content-length']);
@@ -204,6 +201,9 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
         if (0 < $options['max_duration']) {
             $options['timeout'] = min($options['max_duration'], $options['timeout']);
         }
+        if (\PHP_INT_SIZE === 4 && 2147 < $options['timeout']) {
+            $options['timeout'] = 2147; // fopen() on x86 doesn't support longer timeouts
+        }
 
         switch ($cryptoMethod = $options['crypto_method']) {
             case \STREAM_CRYPTO_METHOD_TLSv1_0_CLIENT:
@@ -225,7 +225,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                 'curl_verify_ssl_peer' => $options['verify_peer'],
                 'curl_verify_ssl_host' => $options['verify_host'],
                 'auto_decode' => false, // Disable dechunk filter, it's incompatible with stream_select()
-                'timeout' => $options['timeout'],
+                'timeout' => 0 < $options['max_connect_duration'] ? min($options['timeout'], $options['max_connect_duration']) : $options['timeout'],
                 'follow_location' => false, // We follow redirects ourselves - the native logic is too limited
             ],
             'ssl' => array_filter([
@@ -429,11 +429,7 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
                     $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], $filterContentHeaders);
                     $redirectHeaders['with_auth'] = array_filter($redirectHeaders['with_auth'], $filterContentHeaders);
 
-                    if (\PHP_VERSION_ID >= 80300) {
-                        stream_context_set_options($context, ['http' => $options]);
-                    } else {
-                        stream_context_set_option($context, ['http' => $options]);
-                    }
+                    stream_context_set_options($context, ['http' => $options]);
                 }
             }
 

@@ -313,4 +313,18 @@ class SendgridApiTransportTest extends TestCase
 
         $this->assertSame([1, 2, 3, 4, 5], $payload['asm']['groups_to_display']);
     }
+
+    public function testSendAtHeader()
+    {
+        $email = new Email();
+        $email->getHeaders()->addDateHeader('Send-At', new \DateTime('2025-05-07 16:00:00', new \DateTimeZone('Europe/Paris')));
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new SendgridApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(SendgridApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('send_at', $payload);
+        $this->assertSame(1746626400, $payload['send_at']);
+    }
 }

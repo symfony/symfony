@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\SmsBiuras\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\SmsBiuras\SmsBiurasTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -49,15 +50,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
     {
         $message = new SmsMessage('0037012345678', 'Hello World');
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->atLeast(1))
-            ->method('getStatusCode')
-            ->willReturn(200);
-        $response->expects($this->atLeast(1))
-            ->method('getContent')
-            ->willReturn('OK: 519545');
-
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response, $message, $expected): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($message, $expected): ResponseInterface {
             $this->assertSame('GET', $method);
             $this->assertSame(\sprintf(
                 'https://savitarna.smsbiuras.lt/api?uid=uid&apikey=api_key&message=%s&from=from&test=%s&to=%s',
@@ -67,10 +60,7 @@ final class SmsBiurasTransportTest extends TransportTestCase
             ), $url);
             $this->assertSame($expected, $options['query']['test']);
 
-            $this->assertSame(200, $response->getStatusCode());
-            $this->assertSame('OK: 519545', $response->getContent());
-
-            return $response;
+            return new MockResponse('OK: 519545');
         });
 
         $transport = new SmsBiurasTransport('uid', 'api_key', 'from', $testMode, $client);

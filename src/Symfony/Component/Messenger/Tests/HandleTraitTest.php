@@ -61,7 +61,7 @@ class HandleTraitTest extends TestCase
     {
         $bus = $this->createMock(MessageBus::class);
         $queryBus = new TestQueryBus($bus);
-        $stamp = $this->createMock(StampInterface::class);
+        $stamp = $this->createStub(StampInterface::class);
 
         $query = new DummyMessage('Hello');
         $bus->expects($this->once())->method('dispatch')->with($query, [$stamp])->willReturn(

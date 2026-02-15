@@ -11,25 +11,11 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Compound;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 class CompoundTest extends TestCase
 {
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testItCannotRedefineConstraintsOption()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        $this->expectExceptionMessage('You can\'t redefine the "constraints" option. Use the "Symfony\Component\Validator\Constraints\Compound::getConstraints()" method instead.');
-        new EmptyCompound(['constraints' => [new NotBlank()]]);
-    }
-
     public function testGroupsAndPayload()
     {
         $payload = new \stdClass();
@@ -38,26 +24,6 @@ class CompoundTest extends TestCase
         $this->assertSame(['my-group', 'my-other-group'], $compound->groups);
         $this->assertSame($payload, $compound->payload);
     }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testGroupsAndPayloadInOptionsArray()
-    {
-        $payload = new \stdClass();
-        $compound = new EmptyCompound(['groups' => ['my-group', 'my-other-group'], 'payload' => $payload]);
-
-        $this->assertSame(['my-group', 'my-other-group'], $compound->groups);
-        $this->assertSame($payload, $compound->payload);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testCanDependOnNormalizedOptions()
-    {
-        $constraint = new ForwardingOptionCompound($min = 3);
-
-        $this->assertSame($min, $constraint->constraints[0]->min);
-    }
 }
 
 class EmptyCompound extends Compound
@@ -65,22 +31,5 @@ class EmptyCompound extends Compound
     protected function getConstraints(array $options): array
     {
         return [];
-    }
-}
-
-class ForwardingOptionCompound extends Compound
-{
-    public $min;
-
-    public function getDefaultOption(): ?string
-    {
-        return 'min';
-    }
-
-    protected function getConstraints(array $options): array
-    {
-        return [
-            new Length(min: $options['min'] ?? null),
-        ];
     }
 }

@@ -55,10 +55,6 @@ use Symfony\Component\Routing\RouteCollection;
  */
 abstract class AttributeClassLoader implements LoaderInterface
 {
-    /**
-     * @deprecated since Symfony 7.2, use "setRouteAttributeClass()" instead.
-     */
-    protected string $routeAnnotationClass = RouteAttribute::class;
     private string $routeAttributeClass = RouteAttribute::class;
     protected int $defaultRouteIndex = 0;
 
@@ -68,23 +64,10 @@ abstract class AttributeClassLoader implements LoaderInterface
     }
 
     /**
-     * @deprecated since Symfony 7.2, use "setRouteAttributeClass(string $class)" instead
-     *
-     * Sets the annotation class to read route properties from.
-     */
-    public function setRouteAnnotationClass(string $class): void
-    {
-        trigger_deprecation('symfony/routing', '7.2', 'The "%s()" method is deprecated, use "%s::setRouteAttributeClass()" instead.', __METHOD__, self::class);
-
-        $this->setRouteAttributeClass($class);
-    }
-
-    /**
      * Sets the attribute class to read route properties from.
      */
     public function setRouteAttributeClass(string $class): void
     {
-        $this->routeAnnotationClass = $class;
         $this->routeAttributeClass = $class;
     }
 
@@ -219,11 +202,11 @@ abstract class AttributeClassLoader implements LoaderInterface
                 continue;
             }
             foreach ($paths as $locale => $path) {
-                if (preg_match(\sprintf('/\{%s(?:<.*?>)?\}/', preg_quote($param->name)), $path)) {
+                if (preg_match(\sprintf('/\{(?|([^\}:<]++):%s(?:\.[^\}<]++)?|(%1$s))(?:<.*?>)?\}/', preg_quote($param->name)), $path, $matches)) {
                     if (\is_scalar($defaultValue = $param->getDefaultValue()) || null === $defaultValue) {
-                        $defaults[$param->name] = $defaultValue;
+                        $defaults[$matches[1]] = $defaultValue;
                     } elseif ($defaultValue instanceof \BackedEnum) {
-                        $defaults[$param->name] = $defaultValue->value;
+                        $defaults[$matches[1]] = $defaultValue->value;
                     }
                     break;
                 }
@@ -273,10 +256,8 @@ abstract class AttributeClassLoader implements LoaderInterface
 
     /**
      * Gets the default route name for a class method.
-     *
-     * @return string
      */
-    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method)
+    protected function getDefaultRouteName(\ReflectionClass $class, \ReflectionMethod $method): string
     {
         $name = str_replace('\\', '_', $class->name).'_'.$method->name;
         $name = \function_exists('mb_strtolower') && preg_match('//u', $name) ? mb_strtolower($name, 'UTF-8') : strtolower($name);
@@ -295,8 +276,7 @@ abstract class AttributeClassLoader implements LoaderInterface
     {
         $globals = $this->resetGlobals();
 
-        // to be replaced in Symfony 8.0 by $this->routeAttributeClass
-        if ($attribute = $class->getAttributes($this->routeAnnotationClass, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null) {
+        if ($attribute = $class->getAttributes($this->routeAttributeClass, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null) {
             $attr = $attribute->newInstance();
 
             if (null !== $attr->name) {
@@ -376,18 +356,15 @@ abstract class AttributeClassLoader implements LoaderInterface
 
     /**
      * @param RouteAttribute $attr or an object that exposes a similar interface
-     *
-     * @return void
      */
-    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr);
+    abstract protected function configureRoute(Route $route, \ReflectionClass $class, \ReflectionMethod $method, object $attr): void;
 
     /**
      * @return iterable<int, RouteAttribute>
      */
     private function getAttributes(\ReflectionClass|\ReflectionMethod $reflection): iterable
     {
-        // to be replaced in Symfony 8.0 by $this->routeAttributeClass
-        foreach ($reflection->getAttributes($this->routeAnnotationClass, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
+        foreach ($reflection->getAttributes($this->routeAttributeClass, \ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
             yield $attribute->newInstance();
         }
     }

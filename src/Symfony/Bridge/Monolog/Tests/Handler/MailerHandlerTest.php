@@ -38,7 +38,7 @@ class MailerHandlerTest extends TestCase
         $this->mailer
             ->expects($this->once())
             ->method('send')
-            ->with($this->callback(fn (Email $email) => 'Alert: WARNING message' === $email->getSubject() && null === $email->getHtmlBody()))
+            ->with($this->callback(static fn (Email $email) => 'Alert: WARNING message' === $email->getSubject() && null === $email->getHtmlBody()))
         ;
         $handler->handle($this->getRecord(Level::Warning, 'message'));
     }
@@ -50,7 +50,7 @@ class MailerHandlerTest extends TestCase
         $this->mailer
             ->expects($this->once())
             ->method('send')
-            ->with($this->callback(fn (Email $email) => 'Alert: ERROR error' === $email->getSubject() && null === $email->getHtmlBody()))
+            ->with($this->callback(static fn (Email $email) => 'Alert: ERROR error' === $email->getSubject() && null === $email->getHtmlBody()))
         ;
         $handler->handleBatch($this->getMultipleRecords());
     }
@@ -62,7 +62,7 @@ class MailerHandlerTest extends TestCase
             ->method('send')
         ;
 
-        $callback = function () {
+        $callback = static function () {
             throw new \RuntimeException('Email creation callback should not have been called in this test');
         };
         $handler = new MailerHandler($this->mailer, $callback, Level::Alert);
@@ -81,7 +81,7 @@ class MailerHandlerTest extends TestCase
         $this->mailer
             ->expects($this->once())
             ->method('send')
-            ->with($this->callback(fn (Email $email) => 'Alert: WARNING message' === $email->getSubject() && null === $email->getTextBody()))
+            ->with($this->callback(static fn (Email $email) => 'Alert: WARNING message' === $email->getSubject() && null === $email->getTextBody()))
         ;
         $handler->handle($this->getRecord(Level::Warning, 'message'));
     }

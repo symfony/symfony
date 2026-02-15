@@ -22,6 +22,31 @@ final class SlackActionsBlockTest extends TestCase
         $actions->button('first button text', 'https://example.org', null, 'test-value')
             ->button('second button text', 'https://example.org/slack', 'danger')
             ->button('third button text', null, null, 'test-value-3')
+            ->button(
+                'fourth button text',
+                null,
+                null,
+                'test-value-4',
+                [
+                    'title' => [
+                        'type' => 'plain_text',
+                        'text' => 'test-confirm-title-4',
+                    ],
+                    'text' => [
+                        'type' => 'plain_text',
+                        'text' => 'test-confirm-text-4',
+                    ],
+                    'confirm' => [
+                        'type' => 'plain_text',
+                        'text' => 'test-confirm-confirm-4',
+                    ],
+                    'deny' => [
+                        'type' => 'plain_text',
+                        'text' => 'test-confirm-deny-4',
+                    ],
+                    'style' => 'danger',
+                ]
+            )
         ;
 
         $this->assertSame([
@@ -52,6 +77,33 @@ final class SlackActionsBlockTest extends TestCase
                         'text' => 'third button text',
                     ],
                     'value' => 'test-value-3',
+                ],
+                [
+                    'type' => 'button',
+                    'text' => [
+                        'type' => 'plain_text',
+                        'text' => 'fourth button text',
+                    ],
+                    'value' => 'test-value-4',
+                    'confirm' => [
+                        'title' => [
+                            'type' => 'plain_text',
+                            'text' => 'test-confirm-title-4',
+                        ],
+                        'text' => [
+                            'type' => 'plain_text',
+                            'text' => 'test-confirm-text-4',
+                        ],
+                        'confirm' => [
+                            'type' => 'plain_text',
+                            'text' => 'test-confirm-confirm-4',
+                        ],
+                        'deny' => [
+                            'type' => 'plain_text',
+                            'text' => 'test-confirm-deny-4',
+                        ],
+                        'style' => 'danger',
+                    ],
                 ],
             ],
         ], $actions->toArray());

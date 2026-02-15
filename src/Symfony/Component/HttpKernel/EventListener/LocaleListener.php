@@ -36,6 +36,7 @@ class LocaleListener implements EventSubscriberInterface
         private bool $useAcceptLanguageHeader = false,
         private array $enabledLocales = [],
     ) {
+        $this->enabledLocales = array_filter($enabledLocales);
     }
 
     public function setDefaultLocale(KernelEvent $event): void

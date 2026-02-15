@@ -57,18 +57,8 @@ class UriSigner
      *
      * The expiration is added as a query string parameter.
      */
-    public function sign(string $uri/* , \DateTimeInterface|\DateInterval|int|null $expiration = null */): string
+    public function sign(string $uri, \DateTimeInterface|\DateInterval|int|null $expiration = null): string
     {
-        $expiration = null;
-
-        if (1 < \func_num_args()) {
-            $expiration = func_get_arg(1);
-        }
-
-        if (null !== $expiration && !$expiration instanceof \DateTimeInterface && !$expiration instanceof \DateInterval && !\is_int($expiration)) {
-            throw new \TypeError(\sprintf('The second argument of "%s()" must be an instance of "%s" or "%s", an integer or null (%s given).', __METHOD__, \DateTimeInterface::class, \DateInterval::class, get_debug_type($expiration)));
-        }
-
         $url = parse_url($uri);
         $params = [];
 

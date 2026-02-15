@@ -283,17 +283,21 @@ class DebugCommandTest extends TestCase
 
         $command = new DebugCommand($env, $projectDirectory);
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
         $tester = new CommandCompletionTester($application->get('debug:dotenv'));
         $this->assertSame(['FOO', 'TEST'], $tester->complete(['']));
     }
 
     private function executeCommand(string $projectDirectory, string $env, array $input = [], ?string $dotenvPath = null): string
     {
+        if (null === $dotenvPath) {
+            unset($_SERVER['APP_RUNTIME_OPTIONS']);
+        } elseif (str_starts_with($dotenvPath, $projectDirectory.'/')) {
+            $_SERVER['APP_RUNTIME_OPTIONS'] = ['dotenv_path' => substr($dotenvPath, \strlen($projectDirectory) + 1)];
+        } else {
+            $_SERVER['APP_RUNTIME_OPTIONS'] = ['dotenv_path' => $dotenvPath];
+        }
+
         $_SERVER['TEST_ENV_KEY'] = $env;
         (new Dotenv('TEST_ENV_KEY'))->bootEnv($dotenvPath ?? $projectDirectory.'/.env');
 

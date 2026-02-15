@@ -85,10 +85,10 @@ class VarExporterTest extends TestCase
     {
         yield [hash_init('md5')];
         yield [new \ReflectionClass(\stdClass::class)];
-        yield [(new \ReflectionFunction(function (): int {}))->getReturnType()];
-        yield [new \ReflectionGenerator((function () { yield 123; })())];
-        yield [function () {}];
-        yield [function () { yield 123; }];
+        yield [(new \ReflectionFunction(static function (): int {}))->getReturnType()];
+        yield [new \ReflectionGenerator((static function () { yield 123; })())];
+        yield [static function () {}];
+        yield [static function () { yield 123; }];
         yield [new \SplFileInfo(__FILE__)];
         yield [$h = fopen(__FILE__, 'r')];
         yield [[$h]];
@@ -249,10 +249,6 @@ class VarExporterTest extends TestCase
 
         yield ['named-closure-method', (new TestClass())->testMethod(...)];
         yield ['named-closure-static', TestClass::testStaticMethod(...), true];
-
-        if (\PHP_VERSION_ID < 80400) {
-            return;
-        }
 
         yield ['backed-property', new BackedProperty('name')];
 

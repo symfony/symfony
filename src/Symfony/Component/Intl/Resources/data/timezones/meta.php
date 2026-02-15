@@ -98,6 +98,7 @@ return [
         'America/Coral_Harbour',
         'America/Cordoba',
         'America/Costa_Rica',
+        'America/Coyhaique',
         'America/Creston',
         'America/Cuiaba',
         'America/Curacao',
@@ -539,6 +540,7 @@ return [
         'America/Coral_Harbour' => 'CA',
         'America/Cordoba' => 'AR',
         'America/Costa_Rica' => 'CR',
+        'America/Coyhaique' => 'CL',
         'America/Creston' => 'CA',
         'America/Cuiaba' => 'BR',
         'America/Curacao' => 'CW',
@@ -1087,6 +1089,7 @@ return [
             'Pacific/Rarotonga',
         ],
         'CL' => [
+            'America/Coyhaique',
             'America/Punta_Arenas',
             'America/Santiago',
             'Pacific/Easter',

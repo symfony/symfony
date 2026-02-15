@@ -39,7 +39,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
             ->willReturn(true);
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeWithClosureController(), 'foo'],
             [],
             new Request(),
@@ -55,7 +55,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
             ->willReturn(true);
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeWithClosureController(), 'bar'],
             [],
             new Request(),
@@ -73,7 +73,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
             ->method('isGranted');
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeMethodsWithClosureController(), 'noAttribute'],
             [],
             new Request(),
@@ -93,7 +93,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
             ->willReturn(true);
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeMethodsWithClosureController(), 'admin'],
             [],
             new Request(),
@@ -114,7 +114,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
             ->willReturn(true);
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeMethodsWithClosureController(), 'withSubject'],
             ['arg1Value', 'arg2Value'],
             new Request(),
@@ -139,7 +139,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
             ->willReturn(true);
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeMethodsWithClosureController(), 'withSubjectArray'],
             ['arg1Value', 'arg2Value'],
             new Request(),
@@ -160,7 +160,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
             ->willReturn(true);
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeMethodsWithClosureController(), 'withSubject'],
             ['arg1Value', null],
             new Request(),
@@ -183,7 +183,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
             ->willReturn(true);
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeMethodsWithClosureController(), 'withSubjectArray'],
             ['arg1Value', null],
             new Request(),
@@ -196,10 +196,10 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
 
     public function testExceptionWhenMissingSubjectAttribute()
     {
-        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker = $this->createStub(AuthorizationCheckerInterface::class);
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeMethodsWithClosureController(), 'withMissingSubject'],
             [],
             new Request(),
@@ -216,7 +216,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
     #[DataProvider('getAccessDeniedMessageTests')]
     public function testAccessDeniedMessages(string|array|null $subject, string $method, int $numOfArguments, string $expectedMessage)
     {
-        $authChecker = new AuthorizationChecker(new TokenStorage(), new AccessDecisionManager((function () use (&$authChecker) {
+        $authChecker = new AuthorizationChecker(new TokenStorage(), new AccessDecisionManager((static function () use (&$authChecker) {
             yield new ClosureVoter($authChecker);
         })()));
 
@@ -225,7 +225,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
         $listener = new IsGrantedAttributeListener($authChecker);
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeMethodsWithClosureController(), $method],
             $arguments,
             new Request(),
@@ -257,13 +257,13 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
 
     public function testNotFoundHttpException()
     {
-        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $authChecker->expects($this->any())
+        $authChecker = $this->createStub(AuthorizationCheckerInterface::class);
+        $authChecker
             ->method('isGranted')
             ->willReturn(false);
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeMethodsWithClosureController(), 'notFound'],
             [],
             new Request(),
@@ -289,7 +289,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
             ->willReturn(true);
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeMethodsWithClosureController(), 'withClosureAsSubject'],
             ['postVal'],
             $request,
@@ -311,7 +311,7 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
             ->willReturn(true);
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeMethodsWithClosureController(), 'withNestArgsInSubject'],
             ['postVal', 'bar'],
             $request,
@@ -324,13 +324,13 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
 
     public function testHttpExceptionWithExceptionCode()
     {
-        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $authChecker->expects($this->any())
+        $authChecker = $this->createStub(AuthorizationCheckerInterface::class);
+        $authChecker
             ->method('isGranted')
             ->willReturn(false);
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeMethodsWithClosureController(), 'exceptionCodeInHttpException'],
             [],
             new Request(),
@@ -348,13 +348,13 @@ class IsGrantedAttributeWithClosureListenerTest extends TestCase
 
     public function testAccessDeniedExceptionWithExceptionCode()
     {
-        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
-        $authChecker->expects($this->any())
+        $authChecker = $this->createStub(AuthorizationCheckerInterface::class);
+        $authChecker
             ->method('isGranted')
             ->willReturn(false);
 
         $event = new ControllerArgumentsEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             [new IsGrantedAttributeMethodsWithClosureController(), 'exceptionCodeInAccessDeniedException'],
             [],
             new Request(),

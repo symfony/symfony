@@ -1,11 +1,26 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add option `uid_format` to `EntityType`
+ * Deprecate setting an `$aliasMap` in `RegisterMappingsPass`. Namespace aliases are no longer supported in Doctrine.
+
+8.0
+---
+
+ * Remove support for auto-mapping Doctrine entities to controller arguments; use explicit mapping instead
+ * Make `ProxyCacheWarmer` class `final`
+ * Remove `AbstractDoctrineExtension`, the code is incorporated into the extension classes of Doctrine bundles
+
 7.4
 ---
 
  * Deprecate `UniqueEntity::getRequiredOptions()` and `UniqueEntity::getDefaultOption()`
  * Use a single table named `_schema_subscriber_check` in schema listeners to detect same database connections
+ * Add support for `Symfony\Component\Clock\DatePoint` as `DayPointType` and `TimePointType` Doctrine type
+ * Deprecate the `AbstractDoctrineExtension` class; its code is incorporated into the extension classes of Doctrine bundles
 
 7.3
 ---

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -30,30 +29,19 @@ class JsonSerializableNormalizerTest extends TestCase
 {
     use CircularReferenceTestTrait;
 
-    private JsonSerializableNormalizer $normalizer;
-    private MockObject&JsonSerializerNormalizer $serializer;
-
-    protected function setUp(): void
-    {
-        $this->createNormalizer();
-    }
-
-    private function createNormalizer(array $defaultContext = [])
-    {
-        $this->serializer = $this->createMock(JsonSerializerNormalizer::class);
-        $this->normalizer = new JsonSerializableNormalizer(null, null, $defaultContext);
-        $this->normalizer->setSerializer($this->serializer);
-    }
-
     public function testSupportNormalization()
     {
-        $this->assertTrue($this->normalizer->supportsNormalization(new JsonSerializableDummy()));
-        $this->assertFalse($this->normalizer->supportsNormalization(new \stdClass()));
+        $normalizer = new JsonSerializableNormalizer();
+        $normalizer->setSerializer($this->createStub(JsonSerializerNormalizer::class));
+
+        $this->assertTrue($normalizer->supportsNormalization(new JsonSerializableDummy()));
+        $this->assertFalse($normalizer->supportsNormalization(new \stdClass()));
     }
 
     public function testNormalize()
     {
-        $this->serializer
+        $serializer = $this->createMock(JsonSerializerNormalizer::class);
+        $serializer
             ->expects($this->once())
             ->method('normalize')
             ->willReturnCallback(function ($data) {
@@ -62,27 +50,31 @@ class JsonSerializableNormalizerTest extends TestCase
                 return 'string_object';
             })
         ;
+        $normalizer = new JsonSerializableNormalizer();
+        $normalizer->setSerializer($serializer);
 
-        $this->assertEquals('string_object', $this->normalizer->normalize(new JsonSerializableDummy()));
+        $this->assertEquals('string_object', $normalizer->normalize(new JsonSerializableDummy()));
     }
 
     public function testCircularNormalize()
     {
-        $this->createNormalizer([JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
+        $normalizer = new JsonSerializableNormalizer(null, null, [JsonSerializableNormalizer::CIRCULAR_REFERENCE_LIMIT => 1]);
 
         $this->expectException(CircularReferenceException::class);
 
-        $this->serializer
+        $serializer = $this->createMock(JsonSerializerNormalizer::class);
+        $serializer
             ->expects($this->once())
             ->method('normalize')
-            ->willReturnCallback(function ($data, $format, $context) {
-                $this->normalizer->normalize($data['qux'], $format, $context);
+            ->willReturnCallback(static function ($data, $format, $context) use ($normalizer) {
+                $normalizer->normalize($data['qux'], $format, $context);
 
                 return 'string_object';
             })
         ;
+        $normalizer->setSerializer($serializer);
 
-        $this->assertEquals('string_object', $this->normalizer->normalize(new JsonSerializableDummy()));
+        $this->assertEquals('string_object', $normalizer->normalize(new JsonSerializableDummy()));
     }
 
     protected function getNormalizerForCircularReference(array $defaultContext): JsonSerializableNormalizer
@@ -100,9 +92,12 @@ class JsonSerializableNormalizerTest extends TestCase
 
     public function testInvalidDataThrowException()
     {
+        $normalizer = new JsonSerializableNormalizer();
+        $normalizer->setSerializer($this->createStub(JsonSerializerNormalizer::class));
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The object must implement "JsonSerializable".');
-        $this->normalizer->normalize(new \stdClass());
+        $normalizer->normalize(new \stdClass());
     }
 }
 

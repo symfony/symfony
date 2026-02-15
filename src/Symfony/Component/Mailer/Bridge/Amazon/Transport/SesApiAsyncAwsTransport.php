@@ -100,7 +100,7 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
         }
         if ($header = $email->getHeaders()->get('X-SES-LIST-MANAGEMENT-OPTIONS')) {
             if (preg_match('/^(contactListName=)*(?<ContactListName>[^;]+)(;\s?topicName=(?<TopicName>.+))?$/ix', $header->getBodyAsString(), $listManagementOptions)) {
-                $request['ListManagementOptions'] = array_filter($listManagementOptions, fn ($e) => \in_array($e, ['ContactListName', 'TopicName'], true), \ARRAY_FILTER_USE_KEY);
+                $request['ListManagementOptions'] = array_filter($listManagementOptions, static fn ($e) => \in_array($e, ['ContactListName', 'TopicName'], true), \ARRAY_FILTER_USE_KEY);
             }
         }
         if ($email->getReturnPath()) {
@@ -124,7 +124,7 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
     {
         $emailRecipients = array_merge($email->getCc(), $email->getBcc());
 
-        return array_filter($envelope->getRecipients(), fn (Address $address) => !\in_array($address, $emailRecipients, true));
+        return array_filter($envelope->getRecipients(), static fn (Address $address) => !\in_array($address, $emailRecipients, true));
     }
 
     private function getCustomHeaders(Headers $headers): array
@@ -141,9 +141,18 @@ class SesApiAsyncAwsTransport extends SesHttpAsyncAwsTransport
                 continue;
             }
 
+            $value = $header->getBodyAsString();
+
+            // AWS SES Simple message headers only accept printable ASCII (char codes 32-126).
+            // getBodyAsString() may produce encoded words with \r\n line folding, so we
+            // re-encode using RFC 2047 base64 encoding when non-printable characters are present.
+            if (preg_match('/[^\x20-\x7E]/', $value)) {
+                $value = '=?UTF-8?B?'.base64_encode($header->getBody()).'?=';
+            }
+
             $headersPrepared[] = [
                 'Name' => $header->getName(),
-                'Value' => $header->getBodyAsString(),
+                'Value' => $value,
             ];
         }
 

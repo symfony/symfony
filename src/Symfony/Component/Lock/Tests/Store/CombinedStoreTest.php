@@ -12,7 +12,6 @@
 namespace Symfony\Component\Lock\Tests\Store;
 
 use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Lock\BlockingStoreInterface;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
@@ -54,81 +53,69 @@ class CombinedStoreTest extends AbstractStoreTestCase
         return new CombinedStore([new RedisStore($redis)], new UnanimousStrategy());
     }
 
-    private MockObject&StrategyInterface $strategy;
-    private MockObject&BlockingStoreInterface $store1;
-    private MockObject&BlockingStoreInterface $store2;
-    private CombinedStore $store;
-
-    protected function setUp(): void
-    {
-        $this->strategy = $this->createMock(StrategyInterface::class);
-        $this->store1 = $this->createMock(BlockingStoreInterface::class);
-        $this->store2 = $this->createMock(BlockingStoreInterface::class);
-
-        $this->store = new CombinedStore([$this->store1, $this->store2], $this->strategy);
-    }
-
     public function testSaveThrowsExceptionOnFailure()
     {
         $this->expectException(LockConflictedException::class);
         $key = new Key(__METHOD__);
 
-        $this->store1
+        $store1 = $this->createMock(BlockingStoreInterface::class);
+        $store1
             ->expects($this->once())
             ->method('save')
             ->with($key)
             ->willThrowException(new LockConflictedException());
-        $this->store2
+        $store2 = $this->createMock(BlockingStoreInterface::class);
+        $store2
             ->expects($this->once())
             ->method('save')
             ->with($key)
             ->willThrowException(new LockConflictedException());
 
-        $this->strategy
-            ->expects($this->any())
+        $strategy = $this->createStub(StrategyInterface::class);
+        $strategy
             ->method('canBeMet')
             ->willReturn(true);
-        $this->strategy
-            ->expects($this->any())
+        $strategy
             ->method('isMet')
             ->willReturn(false);
 
-        $this->store->save($key);
+        $this->createCombinedStore($store1, $store2, $strategy)->save($key);
     }
 
     public function testSaveCleanupOnFailure()
     {
         $key = new Key(__METHOD__);
 
-        $this->store1
+        $store1 = $this->createMock(BlockingStoreInterface::class);
+        $store1
             ->expects($this->once())
             ->method('save')
             ->with($key)
             ->willThrowException(new LockConflictedException());
-        $this->store2
+        $store2 = $this->createMock(BlockingStoreInterface::class);
+        $store2
             ->expects($this->once())
             ->method('save')
             ->with($key)
             ->willThrowException(new LockConflictedException());
 
-        $this->store1
+        $store1
             ->expects($this->once())
             ->method('delete');
-        $this->store2
+        $store2
             ->expects($this->once())
             ->method('delete');
 
-        $this->strategy
-            ->expects($this->any())
+        $strategy = $this->createStub(StrategyInterface::class);
+        $strategy
             ->method('canBeMet')
             ->willReturn(true);
-        $this->strategy
-            ->expects($this->any())
+        $strategy
             ->method('isMet')
             ->willReturn(false);
 
         try {
-            $this->store->save($key);
+            $this->createCombinedStore($store1, $store2, $strategy)->save($key);
         } catch (LockConflictedException $e) {
             // Catch the exception given this is not what we want to assert in this tests
         }
@@ -138,26 +125,29 @@ class CombinedStoreTest extends AbstractStoreTestCase
     {
         $key = new Key(__METHOD__);
 
-        $this->store1
+        $store1 = $this->createMock(BlockingStoreInterface::class);
+        $store1
             ->expects($this->once())
             ->method('save')
             ->with($key)
             ->willThrowException(new LockConflictedException());
-        $this->store2
+        $store2 = $this->createMock(BlockingStoreInterface::class);
+        $store2
             ->expects($this->never())
             ->method('save');
 
-        $this->strategy
+        $strategy = $this->createMock(StrategyInterface::class);
+        $strategy
             ->expects($this->once())
             ->method('canBeMet')
             ->willReturn(false);
-        $this->strategy
+        $strategy
             ->expects($this->any())
             ->method('isMet')
             ->willReturn(false);
 
         try {
-            $this->store->save($key);
+            $this->createCombinedStore($store1, $store2, $strategy)->save($key);
         } catch (LockConflictedException $e) {
             // Catch the exception given this is not what we want to assert in this tests
         }
@@ -169,27 +159,28 @@ class CombinedStoreTest extends AbstractStoreTestCase
         $key = new Key(__METHOD__);
         $ttl = random_int(1, 10);
 
-        $this->store1
+        $store1 = $this->createMock(BlockingStoreInterface::class);
+        $store1
             ->expects($this->once())
             ->method('putOffExpiration')
             ->with($key, $this->lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
-        $this->store2
+        $store2 = $this->createMock(BlockingStoreInterface::class);
+        $store2
             ->expects($this->once())
             ->method('putOffExpiration')
             ->with($key, $this->lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
 
-        $this->strategy
-            ->expects($this->any())
+        $strategy = $this->createStub(StrategyInterface::class);
+        $strategy
             ->method('canBeMet')
             ->willReturn(true);
-        $this->strategy
-            ->expects($this->any())
+        $strategy
             ->method('isMet')
             ->willReturn(false);
 
-        $this->store->putOffExpiration($key, $ttl);
+        $this->createCombinedStore($store1, $store2, $strategy)->putOffExpiration($key, $ttl);
     }
 
     public function testputOffExpirationCleanupOnFailure()
@@ -197,35 +188,36 @@ class CombinedStoreTest extends AbstractStoreTestCase
         $key = new Key(__METHOD__);
         $ttl = random_int(1, 10);
 
-        $this->store1
+        $store1 = $this->createMock(BlockingStoreInterface::class);
+        $store1
             ->expects($this->once())
             ->method('putOffExpiration')
             ->with($key, $this->lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
-        $this->store2
+        $store2 = $this->createMock(BlockingStoreInterface::class);
+        $store2
             ->expects($this->once())
             ->method('putOffExpiration')
             ->with($key, $this->lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
 
-        $this->store1
+        $store1
             ->expects($this->once())
             ->method('delete');
-        $this->store2
+        $store2
             ->expects($this->once())
             ->method('delete');
 
-        $this->strategy
-            ->expects($this->any())
+        $strategy = $this->createStub(StrategyInterface::class);
+        $strategy
             ->method('canBeMet')
             ->willReturn(true);
-        $this->strategy
-            ->expects($this->any())
+        $strategy
             ->method('isMet')
             ->willReturn(false);
 
         try {
-            $this->store->putOffExpiration($key, $ttl);
+            $this->createCombinedStore($store1, $store2, $strategy)->putOffExpiration($key, $ttl);
         } catch (LockConflictedException $e) {
             // Catch the exception given this is not what we want to assert in this tests
         }
@@ -236,26 +228,29 @@ class CombinedStoreTest extends AbstractStoreTestCase
         $key = new Key(__METHOD__);
         $ttl = random_int(1, 10);
 
-        $this->store1
+        $store1 = $this->createMock(BlockingStoreInterface::class);
+        $store1
             ->expects($this->once())
             ->method('putOffExpiration')
             ->with($key, $this->lessThanOrEqual($ttl))
             ->willThrowException(new LockConflictedException());
-        $this->store2
+        $store2 = $this->createMock(BlockingStoreInterface::class);
+        $store2
             ->expects($this->never())
             ->method('putOffExpiration');
 
-        $this->strategy
+        $strategy = $this->createMock(StrategyInterface::class);
+        $strategy
             ->expects($this->once())
             ->method('canBeMet')
             ->willReturn(false);
-        $this->strategy
+        $strategy
             ->expects($this->any())
             ->method('isMet')
             ->willReturn(false);
 
         try {
-            $this->store->putOffExpiration($key, $ttl);
+            $this->createCombinedStore($store1, $store2, $strategy)->putOffExpiration($key, $ttl);
         } catch (LockConflictedException $e) {
             // Catch the exception given this is not what we want to assert in this tests
         }
@@ -263,19 +258,20 @@ class CombinedStoreTest extends AbstractStoreTestCase
 
     public function testPutOffExpirationIgnoreNonExpiringStorage()
     {
-        $store1 = $this->createMock(PersistingStoreInterface::class);
-        $store2 = $this->createMock(PersistingStoreInterface::class);
+        $store1 = $this->createStub(PersistingStoreInterface::class);
+        $store2 = $this->createStub(PersistingStoreInterface::class);
+        $strategy = $this->createMock(StrategyInterface::class);
 
-        $store = new CombinedStore([$store1, $store2], $this->strategy);
+        $store = new CombinedStore([$store1, $store2], $strategy);
 
         $key = new Key(__METHOD__);
         $ttl = random_int(1, 10);
 
-        $this->strategy
+        $strategy
             ->expects($this->any())
             ->method('canBeMet')
             ->willReturn(true);
-        $this->strategy
+        $strategy
             ->expects($this->once())
             ->method('isMet')
             ->with(2, 2)
@@ -288,92 +284,101 @@ class CombinedStoreTest extends AbstractStoreTestCase
     {
         $key = new Key(__METHOD__);
 
-        $this->store1
-            ->expects($this->any())
+        $store1 = $this->createMock(BlockingStoreInterface::class);
+        $store1
+            ->expects($this->once())
             ->method('exists')
             ->with($key)
             ->willReturn(false);
-        $this->store2
+        $store2 = $this->createMock(BlockingStoreInterface::class);
+        $store2
             ->expects($this->never())
             ->method('exists');
 
-        $this->strategy
+        $strategy = $this->createMock(StrategyInterface::class);
+        $strategy
             ->expects($this->any())
             ->method('canBeMet')
             ->willReturn(true);
-        $this->strategy
+        $strategy
             ->expects($this->once())
             ->method('isMet')
             ->willReturn(true);
 
-        $this->assertTrue($this->store->exists($key));
+        $this->assertTrue($this->createCombinedStore($store1, $store2, $strategy)->exists($key));
     }
 
     public function testExistsAbortWhenStrategyCantBeMet()
     {
         $key = new Key(__METHOD__);
 
-        $this->store1
-            ->expects($this->any())
+        $store1 = $this->createMock(BlockingStoreInterface::class);
+        $store1
+            ->expects($this->once())
             ->method('exists')
             ->with($key)
             ->willReturn(false);
-        $this->store2
+        $store2 = $this->createMock(BlockingStoreInterface::class);
+        $store2
             ->expects($this->never())
             ->method('exists');
 
-        $this->strategy
+        $strategy = $this->createMock(StrategyInterface::class);
+        $strategy
             ->expects($this->once())
             ->method('canBeMet')
             ->willReturn(false);
-        $this->strategy
+        $strategy
             ->expects($this->once())
             ->method('isMet')
             ->willReturn(false);
 
-        $this->assertFalse($this->store->exists($key));
+        $this->assertFalse($this->createCombinedStore($store1, $store2, $strategy)->exists($key));
     }
 
     public function testDeleteDontStopOnFailure()
     {
         $key = new Key(__METHOD__);
 
-        $this->store1
+        $store1 = $this->createMock(BlockingStoreInterface::class);
+        $store1
             ->expects($this->once())
             ->method('delete')
             ->with($key)
             ->willThrowException(new \Exception());
-        $this->store2
+        $store2 = $this->createMock(BlockingStoreInterface::class);
+        $store2
             ->expects($this->once())
             ->method('delete')
             ->with($key);
 
-        $this->store->delete($key);
+        $this->createCombinedStore($store1, $store2)->delete($key);
     }
 
     public function testExistsDontStopOnFailure()
     {
         $key = new Key(__METHOD__);
 
-        $this->strategy
-            ->expects($this->any())
+        $strategy = $this->createStub(StrategyInterface::class);
+        $strategy
             ->method('canBeMet')
             ->willReturn(true);
-        $this->strategy
-            ->expects($this->any())
+        $strategy
             ->method('isMet')
             ->willReturn(false);
-        $this->store1
+        $store1 = $this->createMock(BlockingStoreInterface::class);
+        $store1
             ->expects($this->once())
             ->method('exists')
             ->willThrowException(new \Exception());
-        $this->store2
+        $store2 = $this->createMock(BlockingStoreInterface::class);
+        $store2
             ->expects($this->once())
             ->method('exists')
             ->with($key)
             ->willReturn(false);
 
-        $this->assertFalse($this->store->exists($key));
+        $this->assertFalse($this->createCombinedStore($store1, $store2, $strategy)->exists($key));
     }
 
     public function testSaveReadWithCompatibleStore()
@@ -388,5 +393,10 @@ class CombinedStoreTest extends AbstractStoreTestCase
         $store = new CombinedStore([$goodStore], new UnanimousStrategy());
 
         $store->saveRead($key);
+    }
+
+    private function createCombinedStore(?BlockingStoreInterface $store1 = null, ?BlockingStoreInterface $store2 = null, ?StrategyInterface $strategy = null): CombinedStore
+    {
+        return new CombinedStore([$store1 ?? $this->createStub(BlockingStoreInterface::class), $store2 ?? $this->createStub(BlockingStoreInterface::class)], $strategy ?? $this->createStub(StrategyInterface::class));
     }
 }

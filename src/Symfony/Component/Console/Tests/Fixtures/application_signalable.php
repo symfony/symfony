@@ -19,7 +19,7 @@ require $vendor.'/vendor/autoload.php';
 
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false
     {
-        exit(0);
+        exit(254);
     }
 })
     ->setCode(function(InputInterface $input, OutputInterface $output): int {

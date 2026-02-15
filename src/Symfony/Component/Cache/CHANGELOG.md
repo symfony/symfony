@@ -1,10 +1,15 @@
 CHANGELOG
 =========
 
+8.0
+---
+
+ * Remove `CouchbaseBucketAdapter`, use `CouchbaseCollectionAdapter` instead
+
 7.4
 ---
 
- * Bump ext-redis to 6.2 and ext-relay to 0.11 minimum
+ * Bump ext-redis to 6.1 and ext-relay to 0.12 minimum
 
 7.3
 ---

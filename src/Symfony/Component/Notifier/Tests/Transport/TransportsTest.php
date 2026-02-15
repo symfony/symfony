@@ -71,7 +71,7 @@ class TransportsTest extends TestCase
 
         $message = new ChatMessage('subject');
 
-        $one->method('supports')->with($message)->willReturn(false);
+        $one->expects($this->once())->method('supports')->with($message)->willReturn(false);
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('None of the available transports support the given message (available transports: "one"');
@@ -89,8 +89,8 @@ class TransportsTest extends TestCase
         $message = new ChatMessage('subject');
         $message->transport('one');
 
-        $one->method('supports')->with($message)->willReturn(false);
-        $two->method('supports')->with($message)->willReturn(true);
+        $one->expects($this->once())->method('supports')->with($message)->willReturn(false);
+        $two->expects($this->never())->method('supports');
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('The "one" transport does not support the given message.');
@@ -107,7 +107,7 @@ class TransportsTest extends TestCase
         $message = new ChatMessage('subject');
         $message->transport('two');
 
-        $one->method('supports')->with($message)->willReturn(false);
+        $one->expects($this->never())->method('supports');
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The "two" transport does not exist (available transports: "one").');

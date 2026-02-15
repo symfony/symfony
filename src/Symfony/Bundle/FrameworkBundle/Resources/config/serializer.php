@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer;
 use Symfony\Component\Cache\Adapter\PhpArrayAdapter;
+use Symfony\Component\ErrorHandler\ErrorRenderer\ErrorRendererInterface;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\ErrorHandler\ErrorRenderer\SerializerErrorRenderer;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
@@ -218,7 +219,10 @@ return static function (ContainerConfigurator $container) {
                 inline_service()
                     ->factory([SerializerErrorRenderer::class, 'getPreferredFormat'])
                     ->args([service('request_stack')]),
-                service('error_renderer.html'),
+                inline_service(ErrorRendererInterface::class)
+                    ->factory([\Closure::class, 'fromCallable'])
+                    ->args([[service('error_renderer.default'), 'render']])
+                    ->lazy(),
                 inline_service()
                     ->factory([HtmlErrorRenderer::class, 'isDebug'])
                     ->args([service('request_stack'), param('kernel.debug')]),

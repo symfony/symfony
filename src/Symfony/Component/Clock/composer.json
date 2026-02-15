@@ -19,9 +19,8 @@
         "psr/clock-implementation": "1.0"
     },
     "require": {
-        "php": ">=8.2",
-        "psr/clock": "^1.0",
-        "symfony/polyfill-php83": "^1.28"
+        "php": ">=8.4",
+        "psr/clock": "^1.0"
     },
     "autoload": {
         "files": [ "Resources/now.php" ],

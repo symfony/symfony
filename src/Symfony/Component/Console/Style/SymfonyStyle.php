@@ -24,6 +24,7 @@ use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Helper\TreeHelper;
 use Symfony\Component\Console\Helper\TreeNode;
 use Symfony\Component\Console\Helper\TreeStyle;
+use Symfony\Component\Console\Input\File\InputFile;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
@@ -31,8 +32,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\TrimmedBufferOutput;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Question\FileQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Terminal;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Output decorator helpers for the Symfony Style Guide.
@@ -51,6 +54,7 @@ class SymfonyStyle extends OutputStyle
     public function __construct(
         private InputInterface $input,
         private OutputInterface $output,
+        private ?EventDispatcherInterface $dispatcher = null,
     ) {
         $this->bufferedOutput = new TrimmedBufferOutput(\DIRECTORY_SEPARATOR === '\\' ? 4 : 2, $output->getVerbosity(), false, clone $output->getFormatter());
         // Windows cmd wraps lines as soon as the terminal width is reached, whether there are following chars or not.
@@ -95,7 +99,7 @@ class SymfonyStyle extends OutputStyle
     public function listing(array $elements): void
     {
         $this->autoPrependText();
-        $elements = array_map(fn ($element) => \sprintf(' * %s', $element), $elements);
+        $elements = array_map(static fn ($element) => \sprintf(' * %s', $element), $elements);
 
         $this->writeln($elements);
         $this->newLine();
@@ -247,6 +251,11 @@ class SymfonyStyle extends OutputStyle
         return $this->askQuestion($questionChoice);
     }
 
+    public function askFile(string $question): ?InputFile
+    {
+        return $this->askQuestion(new FileQuestion($question));
+    }
+
     public function progressStart(int $max = 0): void
     {
         $this->progressBar = $this->createProgressBar($max);
@@ -302,7 +311,7 @@ class SymfonyStyle extends OutputStyle
             $this->autoPrependBlock();
         }
 
-        $this->questionHelper ??= new SymfonyQuestionHelper();
+        $this->questionHelper ??= new SymfonyQuestionHelper($this->dispatcher);
 
         $answer = $this->questionHelper->ask($this->input, $this, $question);
 
@@ -437,12 +446,14 @@ class SymfonyStyle extends OutputStyle
                 $message = OutputFormatter::escape($message);
             }
 
+            $message = str_replace("\r\n", "\n", $message);
+
             $lines = array_merge(
                 $lines,
-                explode(\PHP_EOL, $outputWrapper->wrap(
+                explode("\n", $outputWrapper->wrap(
                     $message,
                     $this->lineLength - $prefixLength - $indentLength,
-                    \PHP_EOL
+                    "\n"
                 ))
             );
 

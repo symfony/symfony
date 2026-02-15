@@ -27,6 +27,19 @@ $result = $crawler->find('$.store.book[?match(@.author, "[A-Z].*el.+")]');
 $result = $crawler->find("$.store.book[?(@.category == 'fiction')].title");
 ```
 
+Updating the Compliance Test Suite
+----------------------------------
+
+The compliance test suite is gathered from the [JSONPath Test Suite](https://github.com/jsonpath-standard/jsonpath-compliance-test-suite).
+
+When new commits are pushed to the upstream repository, it is necessary to gather them by following these steps:
+
+ * Update the `reference` field of `composer.json` to the latest commit hash of the `jsonpath-standard/jsonpath-compliance-test-suite` package
+ * Update the `version` field to the date of the commit
+ * Repeat the steps above for the `composer.json` file present at the root level of the `symfony/symfony` repository
+ * Run `composer update`
+ * Ensure the tests pass
+
 Resources
 ---------
 

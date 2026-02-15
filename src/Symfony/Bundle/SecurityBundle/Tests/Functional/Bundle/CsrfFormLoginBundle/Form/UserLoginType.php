@@ -52,7 +52,7 @@ class UserLoginType extends AbstractType
          * request; however, we can match the expected behavior by checking the
          * session for an authentication error and last username.
          */
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($request) {
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, static function (FormEvent $event) use ($request) {
             if ($request->attributes->has(SecurityRequestAttributes::AUTHENTICATION_ERROR)) {
                 $error = $request->attributes->get(SecurityRequestAttributes::AUTHENTICATION_ERROR);
             } else {

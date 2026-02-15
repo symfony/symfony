@@ -21,8 +21,8 @@ namespace Symfony\Component\ErrorHandler\Tests\Fixtures;
  * @method unknownType|string invalidInterfaceMethodNoBraces
  *
  * Complex
- * @method              complexInterfaceMethod($arg, ...$args)
- * @method string[]|int complexInterfaceMethodTyped($arg, int ...$args) Description ...
+ * @method                                 complexInterfaceMethod($arg, ...$args)
+ * @method array<string, int>|string[]|int complexInterfaceMethodTyped($arg, int ...$args) Description ...
  *
  * Static
  * @method static Foo&Bar staticMethod()

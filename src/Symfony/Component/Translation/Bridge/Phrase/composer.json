@@ -16,11 +16,14 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "psr/cache": "^3.0",
-        "symfony/http-client": "^6.4|^7.0|^8.0",
-        "symfony/mime": "^6.4|^7.0|^8.0",
-        "symfony/translation": "^7.2|^8.0"
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/mime": "^7.4|^8.0",
+        "symfony/translation": "^7.4|^8.0"
+    },
+    "require-dev": {
+        "symfony/cache": "^6.4|^7.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Translation\\Bridge\\Phrase\\": "" },

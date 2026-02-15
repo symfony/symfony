@@ -25,7 +25,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
     {
         $client = $this->createClient($options);
 
-        $this->callInRequestContext($client, function () {
+        $this->callInRequestContext($client, static function () {
             static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
         });
 
@@ -60,7 +60,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
     {
         $client = $this->createClient($options);
 
-        $this->callInRequestContext($client, function () {
+        $this->callInRequestContext($client, static function () {
             static::getContainer()->get('security.csrf.token_storage')->setToken('foo', 'bar');
         });
 
@@ -127,7 +127,7 @@ class CsrfFormLoginTest extends AbstractWebTestCase
     {
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
-        $wrappedCallable = function (RequestEvent $event) use (&$callable) {
+        $wrappedCallable = static function (RequestEvent $event) use (&$callable) {
             $callable();
             $event->setResponse(new Response(''));
             $event->stopPropagation();

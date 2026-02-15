@@ -54,13 +54,6 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
         $this->fields = $fields ?? ['years', 'months', 'days', 'hours', 'minutes', 'seconds', 'invert'];
     }
 
-    /**
-     * Transforms a normalized date interval into an interval array.
-     *
-     * @param \DateInterval $dateInterval Normalized date interval
-     *
-     * @throws UnexpectedTypeException if the given value is not a \DateInterval instance
-     */
     public function transform(mixed $dateInterval): array
     {
         if (null === $dateInterval) {
@@ -97,14 +90,6 @@ class DateIntervalToArrayTransformer implements DataTransformerInterface
         return array_intersect_key($result, array_flip($this->fields));
     }
 
-    /**
-     * Transforms an interval array into a normalized date interval.
-     *
-     * @param array $value Interval array
-     *
-     * @throws UnexpectedTypeException       if the given value is not an array
-     * @throws TransformationFailedException if the value could not be transformed
-     */
     public function reverseTransform(mixed $value): ?\DateInterval
     {
         if (null === $value) {

@@ -43,5 +43,6 @@ class ClearSiteDataLogoutListenerTest extends TestCase
     {
         yield [['*'], '"*"'];
         yield [['cache', 'cookies', 'storage', 'executionContexts'], '"cache", "cookies", "storage", "executionContexts"'];
+        yield [['clientHints', 'executionContexts', 'prefetchCache', 'prerenderCache'], '"clientHints", "executionContexts", "prefetchCache", "prerenderCache"'];
     }
 }

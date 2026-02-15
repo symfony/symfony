@@ -25,7 +25,7 @@ class StackMiddlewareTest extends TestCase
         $middleware1
             ->expects($this->once())
             ->method('handle')
-            ->willReturnCallback(function (Envelope $envelope, StackInterface $stack): Envelope {
+            ->willReturnCallback(static function (Envelope $envelope, StackInterface $stack): Envelope {
                 $fork = clone $stack;
 
                 $stack->next()->handle($envelope, $stack);
@@ -39,7 +39,7 @@ class StackMiddlewareTest extends TestCase
         $middleware2
             ->expects($this->exactly(2))
             ->method('handle')
-            ->willReturnCallback(fn (Envelope $envelope, StackInterface $stack): Envelope => $envelope)
+            ->willReturnCallback(static fn (Envelope $envelope, StackInterface $stack): Envelope => $envelope)
         ;
 
         $bus = new MessageBus([$middleware1, $middleware2]);

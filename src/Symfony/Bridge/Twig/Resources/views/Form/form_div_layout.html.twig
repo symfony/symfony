@@ -285,7 +285,7 @@
                 '%name%': name,
                 '%id%': id,
             }) %}
-        {%- else -%}
+        {%- elseif 'button' not in block_prefixes or label is not same as(false) -%}
             {% set label = name|humanize %}
         {%- endif -%}
     {%- endif -%}
@@ -344,17 +344,32 @@
 {%- endblock repeated_row -%}
 
 {%- block form_row -%}
-    {%- set widget_attr = {} -%}
+    {%- set attr = {} -%}
+    {%- set aria_describedby = [] -%}
     {%- if help -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~ '_help'}} -%}
+        {%- set aria_describedby = aria_describedby|merge([id ~ '_help']) -%}
     {%- endif -%}
+    {%- if errors|length > 0 -%}
+        {%- set aria_describedby = aria_describedby|merge(errors|map((_, index) => id ~ '_error' ~ (index + 1))) -%}
+    {%- endif -%}
+    {%- if aria_describedby|length > 0 -%}
+        {%- set attr = attr|merge({'aria-describedby': aria_describedby|join(' ')}) -%}
+    {%- endif -%}
+    {%- if errors|length > 0 -%}
+        {%- set attr = attr|merge({'aria-invalid': 'true'}) -%}
+    {%- endif -%}
+    {%- set widget_attr = {attr: attr} -%}
+    {{- block('form_row_render') -}}
+{%- endblock form_row -%}
+
+{%- block form_row_render -%}
     <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
         {{- form_label(form) -}}
         {{- form_errors(form) -}}
         {{- form_widget(form, widget_attr) -}}
         {{- form_help(form) -}}
     </div>
-{%- endblock form_row -%}
+{%- endblock form_row_render -%}
 
 {%- block button_row -%}
     <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
@@ -399,7 +414,7 @@
     {%- if errors|length > 0 -%}
     <ul>
         {%- for error in errors -%}
-            <li>{{ error.message }}</li>
+            <li id="{{ id ~ '_error' ~ loop.index }}">{{ error.message }}</li>
         {%- endfor -%}
     </ul>
     {%- endif -%}

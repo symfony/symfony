@@ -61,7 +61,7 @@ final class ElasticsearchLogstashHandler extends AbstractHandler
         bool $bubble = true,
         private string $elasticsearchVersion = '1.0.0',
     ) {
-        if (!interface_exists(HttpClientInterface::class)) {
+        if (!$client && !class_exists(HttpClient::class)) {
             throw new \LogicException(\sprintf('The "%s" handler needs an HTTP client. Try running "composer require symfony/http-client".', __CLASS__));
         }
 

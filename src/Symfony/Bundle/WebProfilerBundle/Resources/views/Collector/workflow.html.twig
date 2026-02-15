@@ -83,7 +83,7 @@
             font-size: .85em;
         }
 
-        dialog menu {
+        dialog .dialog-buttons {
             display: none;
         }
 
@@ -148,7 +148,7 @@
                     fontSize: 'var(--font-size-body)',
                     // the properties below don't support CSS variables
                     primaryColor: isDarkMode ? 'lightsteelblue' : 'aliceblue',
-                    primaryTextColor: isDarkMode ? '#000' : '#000',
+                    primaryTextColor: isDarkMode ? '#fff' : '#000',
                     primaryBorderColor: isDarkMode ? 'steelblue' : 'lightsteelblue',
                     lineColor: isDarkMode ? '#939393' : '#d4d4d4',
                     secondaryColor: isDarkMode ? 'lightyellow' : 'lightyellow',
@@ -243,7 +243,7 @@
                 dialog.dataset.processed = true;
             };
             // We do not load all mermaid diagrams at once, but only when the tab is opened
-            // This is because mermaid diagrams are in a tab, and cannot be renderer with a
+            // This is because mermaid diagrams are in a tab, and cannot be rendered with a
             // "good size" if they are not visible
             document.addEventListener('DOMContentLoaded', () => {
                 document.querySelectorAll('.tab').forEach((el) => {
@@ -335,8 +335,8 @@
         </div>
     {% endif %}
 
-    <dialog id="detailsDialog">
-        <h2>
+    <dialog id="detailsDialog" aria-labelledby="workflow-dialog-title">
+        <h2 id="workflow-dialog-title">
             Event listeners
             <i class="cancel">×</i>
         </h2>
@@ -351,9 +351,9 @@
             <tbody>
             </tbody>
         </table>
-        <menu>
+        <footer class="dialog-buttons">
             <small><i>⌨</i> <kbd>esc</kbd></small>
             <button class="btn btn-sm cancel">Close</button>
-        </menu>
+        </footer>
     </dialog>
 {% endblock %}

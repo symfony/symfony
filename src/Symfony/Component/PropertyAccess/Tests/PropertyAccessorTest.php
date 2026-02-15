@@ -12,7 +12,6 @@
 namespace Symfony\Component\PropertyAccess\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
@@ -34,6 +33,7 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassMagicGet;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassSetValue;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypedProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestClassTypeErrorInsideCall;
+use Symfony\Component\PropertyAccess\Tests\Fixtures\TestIgnoreVoidAccessor;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestPublicPropertyDynamicallyCreated;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestPublicPropertyGetterOnObject;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\TestPublicPropertyGetterOnObjectMagicGet;
@@ -43,7 +43,6 @@ use Symfony\Component\PropertyAccess\Tests\Fixtures\TypeHinted;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedObjectProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedPrivateProperty;
 use Symfony\Component\PropertyAccess\Tests\Fixtures\UninitializedProperty;
-use Symfony\Component\VarExporter\ProxyHelper;
 
 class PropertyAccessorTest extends TestCase
 {
@@ -52,6 +51,21 @@ class PropertyAccessorTest extends TestCase
     protected function setUp(): void
     {
         $this->propertyAccessor = new PropertyAccessor();
+    }
+
+    public function testPrefersPropertyOverMethodWithSameNameAndRequiredArgs()
+    {
+        $obj = new class {
+            public bool $loaded = true;
+
+            // Same name as property, but requires an argument: must NOT be called for reading
+            public function loaded(string $arg): bool
+            {
+                throw new \RuntimeException('Method should not be invoked during property read');
+            }
+        };
+
+        $this->assertTrue($this->propertyAccessor->getValue($obj, 'loaded'));
     }
 
     public static function getPathsWithMissingProperty()
@@ -965,6 +979,31 @@ class PropertyAccessorTest extends TestCase
         $this->propertyAccessor->getValue(new UninitializedObjectProperty(), 'privateUninitialized');
     }
 
+    #[DataProvider('voidAccessorProvider')]
+    public function testIgnoreVoidAccessor(string $property, mixed $value)
+    {
+        $object = new TestIgnoreVoidAccessor();
+        if (null === $value) {
+            $this->expectException(NoSuchPropertyException::class);
+        }
+
+        $this->assertSame(
+            $value,
+            $this->propertyAccessor->getValue($object, $property),
+        );
+    }
+
+    public static function voidAccessorProvider()
+    {
+        return [
+            ['setValue', false],
+            ['setterValue', false],
+            ['neverValue', false],
+            ['normalValue', false],
+            ['undefinedValue', null],
+        ];
+    }
+
     public function testGetValuePropertyThrowsExceptionIfUninitializedWithLazyGhost()
     {
         $this->expectException(UninitializedPropertyException::class);
@@ -994,27 +1033,9 @@ class PropertyAccessorTest extends TestCase
 
     private function createUninitializedObjectPropertyGhost(): UninitializedObjectProperty
     {
-        if (\PHP_VERSION_ID < 80400) {
-            if (!class_exists(ProxyHelper::class)) {
-                $this->markTestSkipped(\sprintf('Class "%s" is required to run this test.', ProxyHelper::class));
-            }
-
-            $class = 'UninitializedObjectPropertyGhost';
-
-            if (!class_exists($class)) {
-                eval('class '.$class.ProxyHelper::generateLazyGhost(new \ReflectionClass(UninitializedObjectProperty::class)));
-            }
-
-            $this->assertTrue(class_exists($class));
-
-            return $class::createLazyGhost(initializer: function ($instance) {
-            });
-        }
-
-        return (new \ReflectionClass(UninitializedObjectProperty::class))->newLazyGhost(fn () => null);
+        return new \ReflectionClass(UninitializedObjectProperty::class)->newLazyGhost(static fn () => null);
     }
 
-    #[RequiresPhp('>=8.4')]
     public function testIsWritableWithAsymmetricVisibility()
     {
         $object = new AsymmetricVisibility();
@@ -1026,7 +1047,6 @@ class PropertyAccessorTest extends TestCase
         $this->assertFalse($this->propertyAccessor->isWritable($object, 'virtualNoSetHook'));
     }
 
-    #[RequiresPhp('>=8.4')]
     public function testIsReadableWithAsymmetricVisibility()
     {
         $object = new AsymmetricVisibility();
@@ -1038,7 +1058,6 @@ class PropertyAccessorTest extends TestCase
         $this->assertTrue($this->propertyAccessor->isReadable($object, 'virtualNoSetHook'));
     }
 
-    #[RequiresPhp('>=8.4')]
     #[DataProvider('setValueWithAsymmetricVisibilityDataProvider')]
     public function testSetValueWithAsymmetricVisibility(string $propertyPath, ?string $expectedException)
     {

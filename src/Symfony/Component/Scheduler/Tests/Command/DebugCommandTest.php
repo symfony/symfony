@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Scheduler\Command\DebugCommand;
@@ -45,7 +46,7 @@ class DebugCommandTest extends TestCase
     public function testExecuteWithScheduleWithoutTriggerDoesNotDisplayMessage()
     {
         $schedule = new Schedule();
-        $schedule->add(RecurringMessage::trigger(new CallbackTrigger(fn () => null, 'test'), new \stdClass()));
+        $schedule->add(RecurringMessage::trigger(new CallbackTrigger(static fn () => null, 'test'), new \stdClass()));
 
         $schedules = $this->createMock(ServiceProviderInterface::class);
         $schedules
@@ -80,7 +81,7 @@ class DebugCommandTest extends TestCase
     public function testExecuteWithScheduleWithoutTriggerShowingNoNextRunWithAllOption()
     {
         $schedule = new Schedule();
-        $schedule->add(RecurringMessage::trigger(new CallbackTrigger(fn () => null, 'test'), new \stdClass()));
+        $schedule->add(RecurringMessage::trigger(new CallbackTrigger(static fn () => null, 'test'), new \stdClass()));
 
         $schedules = $this->createMock(ServiceProviderInterface::class);
         $schedules
@@ -149,5 +150,76 @@ class DebugCommandTest extends TestCase
             "  every first day of next month   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
             " ------------------------------- ---------- --------------------------------- \n".
             "\n/", $tester->getDisplay(true));
+    }
+
+    #[DataProvider('provideSorting')]
+    public function testExecuteWithScheduleAndSortOption(bool $sorted, string $expected)
+    {
+        $schedule = new Schedule();
+        $schedule
+            ->add(RecurringMessage::every('3 minutes', new \stdClass()))
+            ->add(RecurringMessage::every('1 minute', new \stdClass()))
+            ->add(RecurringMessage::every('2 minutes', new \stdClass()))
+        ;
+
+        $schedules = $this->createMock(ServiceProviderInterface::class);
+        $schedules
+            ->expects($this->once())
+            ->method('getProvidedServices')
+            ->willReturn(['schedule_name' => $schedule])
+        ;
+        $schedules
+            ->expects($this->once())
+            ->method('get')
+            ->willReturn($schedule)
+        ;
+
+        $command = new DebugCommand($schedules);
+        $tester = new CommandTester($command);
+
+        $tester->execute(['--sort' => $sorted], ['decorated' => false]);
+
+        $this->assertMatchesRegularExpression($expected, $tester->getDisplay(true));
+    }
+
+    public static function provideSorting(): iterable
+    {
+        yield 'Not sorted results' => [
+            false,
+            "/\n".
+            "Scheduler\n".
+            "=========\n".
+            "\n".
+            "schedule_name\n".
+            "-------------\n".
+            "\n".
+            " ----------------- ---------- --------------------------------- \n".
+            "  Trigger           Provider   Next Run                         \n".
+            " ----------------- ---------- --------------------------------- \n".
+            "  every 3 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
+            "  every 1 minute    stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
+            "  every 2 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
+            " ----------------- ---------- --------------------------------- \n".
+            "\n/",
+        ];
+
+        yield 'Sorted results' => [
+            true,
+            "/\n".
+            "Scheduler\n".
+            "=========\n".
+            "\n".
+            "schedule_name\n".
+            "-------------\n".
+            "\n".
+            " ----------------- ---------- --------------------------------- \n".
+            "  Trigger           Provider   Next Run                         \n".
+            " ----------------- ---------- --------------------------------- \n".
+            "  every 1 minute    stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
+            "  every 2 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
+            "  every 3 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
+            " ----------------- ---------- --------------------------------- \n".
+            "\n/",
+        ];
     }
 }

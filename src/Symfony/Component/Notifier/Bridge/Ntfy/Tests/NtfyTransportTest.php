@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Ntfy\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Ntfy\NtfyTransport;
 use Symfony\Component\Notifier\Message\PushMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
@@ -63,19 +64,11 @@ final class NtfyTransportTest extends TransportTestCase
 
     public function testSend()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['id' => '2BYIwRmvBKcv', 'event' => 'message']));
-
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
             $expectedBody = json_encode(['topic' => 'test', 'title' => 'Hello', 'message' => 'World']);
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
 
-            return $response;
+            return new MockResponse(json_encode(['id' => '2BYIwRmvBKcv', 'event' => 'message']));
         });
 
         $transport = $this->createTransport($client);
@@ -87,21 +80,13 @@ final class NtfyTransportTest extends TransportTestCase
 
     public function testSendWithPassword()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['id' => '2BYIwRmvBKcv', 'event' => 'message']));
-
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
             $expectedBody = json_encode(['topic' => 'test', 'title' => 'Hello', 'message' => 'World']);
             $expectedAuthorization = 'Authorization: Bearer testtokentesttoken';
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
             $this->assertTrue(\in_array($expectedAuthorization, $options['headers'], true));
 
-            return $response;
+            return new MockResponse(json_encode(['id' => '2BYIwRmvBKcv', 'event' => 'message']));
         });
 
         $transport = $this->createTransport($client)->setPassword('testtokentesttoken');
@@ -113,21 +98,13 @@ final class NtfyTransportTest extends TransportTestCase
 
     public function testSendWithUserAndPassword()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['id' => '2BYIwRmvBKcv', 'event' => 'message']));
-
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
             $expectedBody = json_encode(['topic' => 'test', 'title' => 'Hello', 'message' => 'World']);
             $expectedAuthorization = 'Authorization: Basic dGVzdF91c2VyOnRlc3RfcGFzc3dvcmQ';
             $this->assertJsonStringEqualsJsonString($expectedBody, $options['body']);
             $this->assertTrue(\in_array($expectedAuthorization, $options['headers'], true));
 
-            return $response;
+            return new MockResponse(json_encode(['id' => '2BYIwRmvBKcv', 'event' => 'message']));
         });
 
         $transport = $this->createTransport($client)->setUser('test_user')->setPassword('test_password');

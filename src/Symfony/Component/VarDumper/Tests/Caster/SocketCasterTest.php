@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
@@ -21,7 +20,6 @@ class SocketCasterTest extends TestCase
 {
     use VarDumperTestTrait;
 
-    #[RequiresPhp('>=8.3')]
     public function testCastSocket()
     {
         $socket = socket_create(\AF_INET, \SOCK_DGRAM, \SOL_UDP);
@@ -39,24 +37,6 @@ class SocketCasterTest extends TestCase
         );
     }
 
-    #[RequiresPhp('<8.3')]
-    public function testCastSocketPriorToPhp83()
-    {
-        $socket = socket_create(\AF_INET, \SOCK_DGRAM, \SOL_UDP);
-        @socket_connect($socket, '127.0.0.1', 80);
-
-        $this->assertDumpMatchesFormat(
-            <<<'EODUMP'
-                Socket {
-                  timed_out: false
-                  blocked: true
-                }
-                EODUMP,
-            $socket
-        );
-    }
-
-    #[RequiresPhp('>=8.3')]
     public function testCastSocketIpV6()
     {
         $socket = socket_create(\AF_INET6, \SOCK_STREAM, \SOL_TCP);
@@ -75,25 +55,6 @@ class SocketCasterTest extends TestCase
         );
     }
 
-    #[RequiresPhp('<8.3')]
-    public function testCastSocketIpV6PriorToPhp83()
-    {
-        $socket = socket_create(\AF_INET6, \SOCK_STREAM, \SOL_TCP);
-        @socket_connect($socket, '::1', 80);
-
-        $this->assertDumpMatchesFormat(
-            <<<'EODUMP'
-                Socket {
-                  timed_out: false
-                  blocked: true
-                  last_error: SOCKET_ECONNREFUSED
-                }
-                EODUMP,
-            $socket
-        );
-    }
-
-    #[RequiresPhp('>=8.3')]
     public function testCastUnixSocket()
     {
         $socket = socket_create(\AF_UNIX, \SOCK_STREAM, 0);
@@ -103,24 +64,6 @@ class SocketCasterTest extends TestCase
             <<<'EODUMP'
                 Socket {
                   uri: "unix://"
-                  timed_out: false
-                  blocked: true
-                  last_error: SOCKET_ENOENT
-                }
-                EODUMP,
-            $socket
-        );
-    }
-
-    #[RequiresPhp('<8.3')]
-    public function testCastUnixSocketPriorToPhp83()
-    {
-        $socket = socket_create(\AF_UNIX, \SOCK_STREAM, 0);
-        @socket_connect($socket, '/tmp/socket.sock');
-
-        $this->assertDumpMatchesFormat(
-            <<<'EODUMP'
-                Socket {
                   timed_out: false
                   blocked: true
                   last_error: SOCKET_ENOENT

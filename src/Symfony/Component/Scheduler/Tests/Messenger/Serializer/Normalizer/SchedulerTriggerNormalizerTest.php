@@ -35,7 +35,7 @@ class SchedulerTriggerNormalizerTest extends TestCase
 
     public static function normalizeProvider(): iterable
     {
-        yield 'CallbackTrigger' => [new CallbackTrigger(fn () => null, 'test1'), 'test1'];
+        yield 'CallbackTrigger' => [new CallbackTrigger(static fn () => null, 'test1'), 'test1'];
         yield 'PeriodicalTrigger' => [new PeriodicalTrigger(5), 'every 5 seconds'];
     }
 
@@ -47,8 +47,8 @@ class SchedulerTriggerNormalizerTest extends TestCase
 
     public static function supportsNormalizationProvider(): iterable
     {
-        yield 'CallbackTrigger, messenger context' => [new CallbackTrigger(fn () => null, 'test1'), ['messenger_serialization' => true], true];
-        yield 'CallbackTrigger, normal context' => [new CallbackTrigger(fn () => null, 'test1'), [], false];
+        yield 'CallbackTrigger, messenger context' => [new CallbackTrigger(static fn () => null, 'test1'), ['messenger_serialization' => true], true];
+        yield 'CallbackTrigger, normal context' => [new CallbackTrigger(static fn () => null, 'test1'), [], false];
         yield 'PeriodicalTrigger, messenger context' => [new PeriodicalTrigger(5), ['messenger_serialization' => true], true];
         yield 'PeriodicalTrigger, normal context' => [new PeriodicalTrigger(5), [], false];
         yield 'stdClass, messenger context' => [new \stdClass(), ['messenger_serialization' => true], false];

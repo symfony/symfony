@@ -1,15 +1,46 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add support for decorating all services with a specific tag using the `container.tag_decorator` resource tag or `#[AsTagDecorator]`
+ * Add support for `SOURCE_DATE_EPOCH` environment variable
+ * Deprecate configuring options `alias`, `parent`, `synthetic`, `file`, `arguments`, `properties`, `configurator` or `calls` when using `from_callable`
+ * Deprecate default index/priority methods when defining tagged locators/iterators; use the `#[AsTaggedItem]` attribute instead
+ * Allow environment variables with `.` in them
+ * Add argument `exclude` to `ContainerConfigurator::import()`
+ * Add `target` parameter to `#[AsAlias]` to create target-specific autowiring aliases
+
+8.0
+---
+
+ * Remove support for using `$this` or the loader's internal scope from PHP config files; use the `$loader` variable instead
+ * Remove `ExtensionInterface::getXsdValidationBasePath()` and `getNamespace()` without alternatives, the XML configuration format is no longer supported
+ * Add argument `$throwOnAbstract` to `ContainerBuilder::findTaggedResourceIds()`
+ * Registering a service without a class when its id is a non-existing FQCN throws an error
+ * Remove `#[TaggedIterator]` and `#[TaggedLocator]` attributes, replaced by `#[AutowireLocator]` and `#[AutowireIterator]`
+ * Remove `ContainerBuilder::getAutoconfiguredAttributes()`, replaced by `ContainerBuilder::getAttributeAutoconfigurators()`
+ * Remove `!tagged` tag, use `!tagged_iterator` instead
+ * Add argument `$target` to `ContainerBuilder::registerAliasForArgument()`
+ * Remove support for the XML configuration format
+ * Remove the fluent PHP format for semantic configuration, instantiate builders inline with the config array as argument and return them instead
+
 7.4
 ---
 
+ * [BC BREAK] Throw when using `$this` or its internal scope from PHP config files; use the `$loader` variable instead
  * Allow adding resource tags using any config format
  * Allow `#[AsAlias]` to be extended
  * Parse attributes found on abstract classes for resource definitions
  * Add argument `$target` to `ContainerBuilder::registerAliasForArgument()`
  * Deprecate registering a service without a class when its id is a non-existing FQCN
  * Allow multiple `#[AsDecorator]` attributes
+ * Handle declaring services using PHP arrays that follow the same shape as corresponding yaml files
+ * Add `AppReference` to help writing PHP configs using yaml-like array-shapes
+ * Deprecate XML configuration format, use YAML or PHP instead
+ * Deprecate `ExtensionInterface::getXsdValidationBasePath()` and `getNamespace()`
+ * Deprecate the fluent PHP format for semantic configuration, use `$container->extension()` or return an array instead
 
 7.3
 ---

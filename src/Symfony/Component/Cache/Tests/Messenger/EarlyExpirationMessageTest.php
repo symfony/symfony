@@ -57,4 +57,58 @@ class EarlyExpirationMessageTest extends TestCase
         $this->assertSame('@computation_service', $msg->getCallback());
         $this->assertSame($computationService, $msg->findCallback($reverseContainer));
     }
+
+    public function testCreateWithNonAnonymousClosureBoundToInstance()
+    {
+        $pool = new ArrayAdapter();
+        $item = $pool->getItem('foo');
+        $item->set(234);
+
+        $computationService = new class {
+            public function compute(CacheItem $item)
+            {
+                return 123;
+            }
+
+            public static function staticCompute(CacheItem $item)
+            {
+                return 123;
+            }
+        };
+
+        $container = new Container();
+        $container->set('computation_service', $computationService);
+        $container->set('cache_pool', $pool);
+
+        $reverseContainer = new ReverseContainer($container, new ServiceLocator([]));
+
+        $closure = $computationService->compute(...);
+        $msg = EarlyExpirationMessage::create($reverseContainer, $closure, $item, $pool);
+        $this->assertSame(['@computation_service', 'compute'], $msg->getCallback());
+
+        $closure = $computationService::staticCompute(...);
+        $msg = EarlyExpirationMessage::create($reverseContainer, $closure, $item, $pool);
+        $this->assertSame([$computationService::class, 'staticCompute'], $msg->getCallback());
+
+        $msg = EarlyExpirationMessage::create($reverseContainer, var_dump(...), $item, $pool);
+        $this->assertSame('var_dump', $msg->getCallback());
+
+        $this->assertSame('cache_pool', $msg->getPool());
+    }
+
+    public function testCreateWithAnonymousClosure()
+    {
+        $pool = new ArrayAdapter();
+        $item = $pool->getItem('foo');
+        $item->set(234);
+
+        $container = new Container();
+        $container->set('cache_pool', $pool);
+
+        $reverseContainer = new ReverseContainer($container, new ServiceLocator([]));
+
+        $msg = EarlyExpirationMessage::create($reverseContainer, static fn () => 123, $item, $pool);
+
+        $this->assertNull($msg);
+    }
 }

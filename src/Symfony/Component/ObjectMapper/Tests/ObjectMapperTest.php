@@ -12,39 +12,57 @@
 namespace Symfony\Component\ObjectMapper\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\ObjectMapper\Exception\MappingException;
 use Symfony\Component\ObjectMapper\Exception\MappingTransformException;
+use Symfony\Component\ObjectMapper\Exception\NoSuchCallableException;
 use Symfony\Component\ObjectMapper\Exception\NoSuchPropertyException;
 use Symfony\Component\ObjectMapper\Metadata\Mapping;
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
+use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\A;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\B;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\C;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Cost;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Quote;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\QuoteRequestView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassWithoutTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ConditionalConstructorArgument\InputSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ConditionalSourceMap\Address as ConditionalSourceMapAddress;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ConditionalSourceMap\User as ConditionalSourceMapUser;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ConditionalSourceMap\UserDto as ConditionalSourceMapUserDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\D;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DeeperRecursion\Recursive;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DeeperRecursion\RecursiveDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DeeperRecursion\Relation;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DeeperRecursion\RelationDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultLazy\OrderSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultLazy\OrderTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultLazy\UserSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultLazy\UserTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\DefaultValueStdClass\TargetDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\Address;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\User as UserEmbeddedMapping;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\EmbeddedMapping\UserDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\TargetUser;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\User;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\UserProfile;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\HydrateObject\SourceOnly;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InitializedConstructor\A as InitializedConstructorA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InitializedConstructor\B as InitializedConstructorB;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InitializedConstructor\C as InitializedConstructorC;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InitializedConstructor\D as InitializedConstructorD;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InstanceCallback\A as InstanceCallbackA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InstanceCallback\B as InstanceCallbackB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InstanceCallbackWithArguments\A as InstanceCallbackWithArgumentsA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InstanceCallbackWithArguments\B as InstanceCallbackWithArgumentsB;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InvalidConfiguration;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\LazyFoo;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\AToBMapper;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\MapStructMapperMetadataFactory;
@@ -58,20 +76,37 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\C as Mu
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargets\A as MultipleTargetsA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargets\C as MultipleTargetsC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MyProxy;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedCollectionMapping\LineItemSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedCollectionMapping\LineItemTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedCollectionMapping\OrderSource as NestedCollectionOrderSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedCollectionMapping\OrderTarget as NestedCollectionOrderTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMapping\NestedBankDataDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMapping\NestedBankDataResource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMapping\NestedBankDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PartialInput\FinalInput;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PartialInput\PartialInput;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PromotedConstructor\Source as PromotedConstructorSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PromotedConstructor\Target as PromotedConstructorTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PromotedConstructorWithMetadata\Source as PromotedConstructorWithMetadataSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PromotedConstructorWithMetadata\Target as PromotedConstructorWithMetadataTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ReadOnlyPromotedProperty\ReadOnlyPromotedPropertyA;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ReadOnlyPromotedProperty\ReadOnlyPromotedPropertyAMapped;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ReadOnlyPromotedProperty\ReadOnlyPromotedPropertyB;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ReadOnlyPromotedProperty\ReadOnlyPromotedPropertyBMapped;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Recursion\AB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Recursion\Dto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLoadedValue\LoadedValueService;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLoadedValue\ServiceLoadedValueTransformer;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLoadedValue\ValueToMap;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLoadedValue\ValueToMapRelation;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\A as ServiceLocatorA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\B as ServiceLocatorB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\ConditionCallable;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ServiceLocator\TransformCallable;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetTransform\SourceEntity;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TargetTransform\TargetDto as TargetTransformTargetDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\Transform\TransformToStdClass;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\Transform\TransformToString;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionC;
@@ -84,7 +119,13 @@ final class ObjectMapperTest extends TestCase
     public function testMap($expect, $args, array $deps = [])
     {
         $mapper = new ObjectMapper(...$deps);
-        $this->assertEquals($expect, $mapper->map(...$args));
+        $mapped = $mapper->map(...$args);
+
+        if (isset($mapped->relation) && $mapped->relation instanceof D) {
+            $mapped->relation->baz;
+        }
+
+        $this->assertEquals($expect, $mapped);
     }
 
     /**
@@ -175,6 +216,36 @@ final class ObjectMapperTest extends TestCase
         $b = $mapper->map($a, InitializedConstructorB::class);
         $this->assertInstanceOf(InitializedConstructorB::class, $b);
         $this->assertEquals($b->tags, ['foo', 'bar']);
+    }
+
+    public function testMapReliesOnConstructorsOwnInitialization()
+    {
+        $expected = 'bar';
+
+        $mapper = new ObjectMapper(propertyAccessor: PropertyAccess::createPropertyAccessor());
+
+        $source = new \stdClass();
+        $source->bar = $expected;
+
+        $c = $mapper->map($source, InitializedConstructorC::class);
+
+        $this->assertInstanceOf(InitializedConstructorC::class, $c);
+        $this->assertEquals($expected, $c->bar);
+    }
+
+    public function testMapConstructorArgumentsDifferFromClassFields()
+    {
+        $expected = 'bar';
+
+        $mapper = new ObjectMapper(propertyAccessor: PropertyAccess::createPropertyAccessor());
+
+        $source = new \stdClass();
+        $source->bar = $expected;
+
+        $actual = $mapper->map($source, InitializedConstructorD::class);
+
+        $this->assertInstanceOf(InitializedConstructorD::class, $actual);
+        $this->assertStringContainsStringIgnoringCase($expected, $actual->barUpperCase);
     }
 
     public function testMapToWithInstanceHook()
@@ -299,10 +370,18 @@ final class ObjectMapperTest extends TestCase
         $u = new \stdClass();
         $u->foo = 'bar';
 
-        $metadata = $this->createStub(ObjectMapperMetadataFactoryInterface::class);
-        $metadata->method('create')->with($u)->willReturn([new Mapping(target: \stdClass::class, transform: fn () => 'str')]);
+        $metadata = $this->createMock(ObjectMapperMetadataFactoryInterface::class);
+        $metadata->method('create')->with($u)->willReturn([new Mapping(target: \stdClass::class, transform: new TransformToString())]);
         $mapper = new ObjectMapper($metadata);
         $mapper->map($u);
+    }
+
+    public function testHasInvalidTransformValue()
+    {
+        $this->expectException(NoSuchCallableException::class);
+        $this->expectExceptionMessage('"wrongMethod" is not a valid callable. If you use a class, make sure it implements "Symfony\Component\ObjectMapper\TransformCallableInterface".');
+
+        (new ObjectMapper())->map(new InvalidConfiguration('foo', 'bar'));
     }
 
     public function testTransformToWrongObject()
@@ -313,8 +392,8 @@ final class ObjectMapperTest extends TestCase
         $u = new \stdClass();
         $u->foo = 'bar';
 
-        $metadata = $this->createStub(ObjectMapperMetadataFactoryInterface::class);
-        $metadata->method('create')->with($u)->willReturn([new Mapping(target: ClassWithoutTarget::class, transform: fn () => new \stdClass())]);
+        $metadata = $this->createMock(ObjectMapperMetadataFactoryInterface::class);
+        $metadata->method('create')->with($u)->willReturn([new Mapping(target: ClassWithoutTarget::class, transform: new TransformToStdClass())]);
         $mapper = new ObjectMapper($metadata);
         $mapper->map($u);
     }
@@ -393,8 +472,6 @@ final class ObjectMapperTest extends TestCase
         yield [new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), PropertyAccess::createPropertyAccessor())];
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testMapInitializesLazyObject()
     {
         $lazy = new LazyFoo();
@@ -403,11 +480,10 @@ final class ObjectMapperTest extends TestCase
         $this->assertTrue($lazy->isLazyObjectInitialized());
     }
 
-    #[RequiresPhp('>=8.4')]
     public function testMapInitializesNativePhp84LazyObject()
     {
         $initialized = false;
-        $initializer = function () use (&$initialized) {
+        $initializer = static function () use (&$initialized) {
             $initialized = true;
 
             $p = new MyProxy();
@@ -429,31 +505,27 @@ final class ObjectMapperTest extends TestCase
     {
         $mapper = new ObjectMapper();
         $myMapper = new class($mapper) implements ObjectMapperInterface {
-            private ?\SplObjectStorage $embededMap = null;
-
-            public function __construct(private readonly ObjectMapperInterface $mapper)
+            public function __construct(private ObjectMapperInterface $mapper)
             {
-                $this->embededMap = new \SplObjectStorage();
+                $this->mapper = $mapper->withObjectMapper($this);
             }
 
             public function map(object $source, object|string|null $target = null): object
             {
-                if (isset($this->embededMap[$source])) {
-                    $target = $this->embededMap[$source];
-                }
-
                 $mapped = $this->mapper->map($source, $target);
-                $this->embededMap[$source] = $mapped;
+
+                if ($source instanceof C) {
+                    $mapped->baz = 'got decorated';
+                }
 
                 return $mapped;
             }
         };
 
-        $mapper = $mapper->withObjectMapper($myMapper);
-
         $d = new D(baz: 'foo', bat: 'bar');
         $c = new C(foo: 'foo', bar: 'bar');
         $myNewD = $myMapper->map($c);
+        $this->assertSame('got decorated', $myNewD->baz);
 
         $a = new A();
         $a->foo = 'test';
@@ -463,8 +535,8 @@ final class ObjectMapperTest extends TestCase
         $a->relation = $c;
         $a->relationNotMapped = $d;
 
-        $b = $mapper->map($a);
-        $this->assertSame($myNewD, $b->relation);
+        $b = $myMapper->map($a);
+        $this->assertSame('got decorated', $b->relation->baz);
     }
 
     #[DataProvider('validPartialInputProvider')]
@@ -530,5 +602,228 @@ final class ObjectMapperTest extends TestCase
         $transformed = $mapper->map($u, TransformCollectionB::class);
 
         $this->assertEquals([new TransformCollectionD('a'), new TransformCollectionD('b')], $transformed->foo);
+    }
+
+    public function testMapCollectionWithTargetClass()
+    {
+        $source = new NestedCollectionOrderSource();
+        $source->items = [
+            new LineItemSource('Product A', 2, 19.99),
+            new LineItemSource('Product B', 1, 49.99),
+        ];
+
+        $mapper = new ObjectMapper();
+        $target = $mapper->map($source);
+
+        $this->assertInstanceOf(NestedCollectionOrderTarget::class, $target);
+        $this->assertCount(2, $target->items);
+        $this->assertInstanceOf(LineItemTarget::class, $target->items[0]);
+        $this->assertInstanceOf(LineItemTarget::class, $target->items[1]);
+        $this->assertSame('Product A', $target->items[0]->productName);
+        $this->assertSame(2, $target->items[0]->quantity);
+        $this->assertSame(19.99, $target->items[0]->amount);
+        $this->assertSame('Product B', $target->items[1]->productName);
+        $this->assertSame(1, $target->items[1]->quantity);
+        $this->assertSame(49.99, $target->items[1]->amount);
+    }
+
+    public function testEmbedsAreLazyLoadedByDefault()
+    {
+        $mapper = new ObjectMapper();
+        $source = new OrderSource();
+        $source->id = 123;
+        $source->user = new UserSource();
+        $source->user->name = 'Test User';
+        $target = $mapper->map($source, OrderTarget::class);
+        $this->assertInstanceOf(OrderTarget::class, $target);
+        $this->assertSame(123, $target->id);
+        $this->assertInstanceOf(UserTarget::class, $target->user);
+        $refl = new \ReflectionClass(UserTarget::class);
+        $this->assertTrue($refl->isUninitializedLazyObject($target->user));
+        $this->assertSame('Test User', $target->user->name);
+        $this->assertFalse($refl->isUninitializedLazyObject($target->user));
+    }
+
+    public function testSkipLazyGhostWithClassTransform()
+    {
+        $service = new LoadedValueService();
+        $service->load();
+
+        $metadataFactory = new ReflectionObjectMapperMetadataFactory();
+        $mapper = new ObjectMapper(
+            metadataFactory: $metadataFactory,
+            transformCallableLocator: $this->getServiceLocator([ServiceLoadedValueTransformer::class => new ServiceLoadedValueTransformer($service, $metadataFactory)])
+        );
+
+        $value = new ValueToMap();
+        $value->relation = new ValueToMapRelation('test');
+
+        $result = $mapper->map($value);
+        $refl = new \ReflectionClass($result->relation);
+        $this->assertFalse($refl->isUninitializedLazyObject($result->relation));
+        $this->assertSame($result->relation, $service->get());
+        $this->assertSame($result->relation->name, 'loaded');
+    }
+
+    public function testMapEmbeddedProperties()
+    {
+        $dto = new UserDto(
+            userAddressZipcode: '12345',
+            userAddressCity: 'Test City',
+            name: 'John Doe'
+        );
+
+        $mapper = new ObjectMapper(propertyAccessor: PropertyAccess::createPropertyAccessor());
+        $user = $mapper->map($dto, UserEmbeddedMapping::class);
+
+        $this->assertInstanceOf(UserEmbeddedMapping::class, $user);
+        $this->assertSame('John Doe', $user->name);
+        $this->assertInstanceOf(Address::class, $user->address);
+        $this->assertSame('12345', $user->address->zipcode);
+        $this->assertSame('Test City', $user->address->city);
+    }
+
+    public function testConditionalMapSource()
+    {
+        $dto = new ConditionalSourceMapUserDto(
+            userAddressZipcode: '12345',
+            userAddressCity: 'Test City',
+            name: 'John Doe'
+        );
+
+        $mapper = new ObjectMapper(propertyAccessor: PropertyAccess::createPropertyAccessor());
+        $mappedUser = $mapper->map($dto, ConditionalSourceMapUser::class);
+        $reverseMappedUserDTO = $mapper->map($mappedUser, $dto);
+
+        $this->assertInstanceOf(ConditionalSourceMapUser::class, $mappedUser);
+        $this->assertSame('John Doe', $mappedUser->name);
+
+        $this->assertInstanceOf(ConditionalSourceMapAddress::class, $mappedUser->address);
+        $this->assertSame('12345', $mappedUser->address->zipcode);
+        $this->assertSame('Test City', $mappedUser->address->city);
+
+        $this->assertInstanceOf(ConditionalSourceMapUserDto::class, $reverseMappedUserDTO);
+        $this->assertSame('John Doe', $reverseMappedUserDTO->name);
+        $this->assertSame('12345', $reverseMappedUserDTO->userAddressZipcode);
+        $this->assertSame('Test City', $reverseMappedUserDTO->userAddressCity);
+    }
+
+    public function testBugReportLazyLoadingPromotedReadonlyProperty()
+    {
+        $source = new ReadOnlyPromotedPropertyA(
+            b: new ReadOnlyPromotedPropertyB(
+                var2: 'bar',
+            ),
+            var1: 'foo',
+        );
+
+        $mapper = new ObjectMapper();
+        $out = $mapper->map($source);
+
+        $this->assertInstanceOf(ReadOnlyPromotedPropertyAMapped::class, $out);
+        $this->assertInstanceOf(ReadOnlyPromotedPropertyBMapped::class, $out->b);
+        $this->assertSame('foo', $out->var1);
+        $this->assertSame('bar', $out->b->var2);
+    }
+
+    public function testClassMap()
+    {
+        $classMap = [
+            Quote::class => QuoteRequestView::class,
+            Cost::class => CostRequestView::class,
+        ];
+
+        $quote = new Quote('foo', new Cost(10, 20));
+
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), $classMap));
+
+        $quoteRequestView = $mapper->map($quote);
+
+        $this->assertInstanceOf(QuoteRequestView::class, $quoteRequestView);
+        $this->assertInstanceOf(CostRequestView::class, $quoteRequestView->cost);
+        $this->assertEquals(10, $quoteRequestView->cost->amount);
+        $this->assertEquals(20, $quoteRequestView->cost->tax);
+    }
+
+    public function testClassMapWithSourceAttribute()
+    {
+        $classMap = [
+            Cost::class => CostRequestWithSourceView::class,
+        ];
+
+        $cost = new Cost(10, 20, 'bar');
+
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), $classMap));
+
+        $costRequestView = $mapper->map($cost);
+
+        $this->assertInstanceOf(CostRequestWithSourceView::class, $costRequestView);
+        $this->assertEquals('bar', $costRequestView->foo);
+    }
+
+    public function testMissingSourcePropertiesAreIgnored()
+    {
+        $mapper = new ObjectMapper();
+        $source = new class {
+            public string $name = 'test';
+        };
+        $target = $mapper->map($source, new class {
+            public string $name;
+            public bool $withDefault = true;
+            public string $withoutDefault;
+        });
+
+        $this->assertSame('test', $target->name);
+        $this->assertTrue($target->withDefault);
+
+        $this->assertFalse(
+            (new \ReflectionProperty($target, 'withoutDefault'))->isInitialized($target),
+            'Property without default value should remain uninitialized'
+        );
+    }
+
+    public function testMultipleTargetsWithoutConditionThrowsExceptionWhenNoTargetProvided()
+    {
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('Ambiguous mapping');
+
+        $source = new MultipleTargetPropertyA();
+        $mapper = new ObjectMapper();
+        $mapper->map($source);
+    }
+
+    public function testConditionalMappingAppliedToConstructorArguments()
+    {
+        $mapper = new ObjectMapper();
+
+        $sourceWithNull = new InputSource();
+        $targetWithNull = $mapper->map($sourceWithNull);
+        $this->assertFalse((new \ReflectionProperty($targetWithNull, 'name'))->isInitialized($targetWithNull));
+
+        $sourceWithValue = new InputSource();
+        $sourceWithValue->name = 'test';
+        $targetWithValue = $mapper->map($sourceWithValue);
+        $this->assertSame('test', $targetWithValue->name);
+    }
+
+    public function testNestedBankDataMapping()
+    {
+        $bankDto = new NestedBankDto();
+        $bankDto->bic = 'BIC123';
+        $bankDto->code = 'BANK001';
+        $bankDto->name = 'Test Bank';
+
+        $bankDataDto = new NestedBankDataDto();
+        $bankDataDto->iban = 'IBAN12345';
+        $bankDataDto->bank = $bankDto;
+
+        $mapper = new ObjectMapper();
+        $bankDataResource = $mapper->map($bankDataDto, NestedBankDataResource::class);
+
+        $this->assertInstanceOf(NestedBankDataResource::class, $bankDataResource);
+        $this->assertSame('IBAN12345', $bankDataResource->iban);
+        $this->assertSame('BIC123', $bankDataResource->bic);
+        $this->assertSame('BANK001', $bankDataResource->bankCode);
+        $this->assertSame('Test Bank', $bankDataResource->bankName);
     }
 }

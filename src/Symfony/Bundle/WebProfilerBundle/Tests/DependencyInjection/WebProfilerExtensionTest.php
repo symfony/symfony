@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\WebProfilerBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\WebProfilerBundle\DependencyInjection\WebProfilerExtension;
 use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -35,7 +34,7 @@ use Twig\Loader\ArrayLoader;
 
 class WebProfilerExtensionTest extends TestCase
 {
-    private MockObject&KernelInterface $kernel;
+    private KernelInterface $kernel;
     private ?ContainerBuilder $container;
 
     public static function assertSaneContainer(Container $container)
@@ -58,7 +57,7 @@ class WebProfilerExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->kernel = $this->createMock(KernelInterface::class);
+        $this->kernel = $this->createStub(KernelInterface::class);
 
         $this->container = new ContainerBuilder();
         $this->container->register('data_collector.dump', DumpDataCollector::class)->setPublic(true);

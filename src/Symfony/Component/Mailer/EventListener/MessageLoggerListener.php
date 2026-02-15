@@ -25,9 +25,8 @@ class MessageLoggerListener implements EventSubscriberInterface, ResetInterface
 {
     private MessageEvents $events;
 
-    public function __construct(
-        protected ?\Closure $disabled = null,
-    ) {
+    public function __construct()
+    {
         $this->events = new MessageEvents();
     }
 
@@ -38,10 +37,6 @@ class MessageLoggerListener implements EventSubscriberInterface, ResetInterface
 
     public function onMessage(MessageEvent $event): void
     {
-        if ($this->disabled?->__invoke()) {
-            return;
-        }
-
         $this->events->add($event);
     }
 

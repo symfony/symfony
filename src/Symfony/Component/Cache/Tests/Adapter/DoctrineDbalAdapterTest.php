@@ -22,7 +22,6 @@ use Doctrine\DBAL\Schema\Schema;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
-use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 
@@ -54,11 +53,8 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         }
 
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $this->getDbalConfig());
-        if (!interface_exists(Middleware::class)) {
-            $this->markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
-        }
 
-        $middleware = $this->createMock(Middleware::class);
+        $middleware = $this->createStub(Middleware::class);
         $middleware
             ->method('wrap')
             ->willReturn(new class($connection->getDriver()) extends AbstractDriverMiddleware {});
@@ -86,7 +82,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         $schema = new Schema();
 
         $adapter = new DoctrineDbalAdapter($connection);
-        $adapter->configureSchema($schema, $connection, fn () => true);
+        $adapter->configureSchema($schema, $connection, static fn () => true);
         $this->assertTrue($schema->hasTable('cache_items'));
     }
 
@@ -96,11 +92,11 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
             @unlink(self::$dbFile);
         }
 
-        $otherConnection = $this->createConnectionMock();
+        $otherConnection = $this->createConnection();
         $schema = new Schema();
 
         $adapter = $this->createCachePool();
-        $adapter->configureSchema($schema, $otherConnection, fn () => false);
+        $adapter->configureSchema($schema, $otherConnection, static fn () => false);
         $this->assertFalse($schema->hasTable('cache_items'));
     }
 
@@ -115,7 +111,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         $schema->createTable('cache_items');
 
         $adapter = new DoctrineDbalAdapter($connection);
-        $adapter->configureSchema($schema, $connection, fn () => true);
+        $adapter->configureSchema($schema, $connection, static fn () => true);
         $table = $schema->getTable('cache_items');
         $this->assertSame([], $table->getColumns(), 'The table was not overwritten');
     }
@@ -176,11 +172,11 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         return 1 !== (int) $result->fetchOne();
     }
 
-    private function createConnectionMock(): Connection&MockObject
+    private function createConnection(): Connection
     {
-        $connection = $this->createMock(Connection::class);
-        $driver = $this->createMock(AbstractMySQLDriver::class);
-        $connection->expects($this->any())
+        $connection = $this->createStub(Connection::class);
+        $driver = $this->createStub(AbstractMySQLDriver::class);
+        $connection
             ->method('getDriver')
             ->willReturn($driver);
 

@@ -23,11 +23,28 @@ class RoleHierarchyTest extends TestCase
             'ROLE_SUPER_ADMIN' => ['ROLE_ADMIN', 'ROLE_FOO'],
         ]);
 
-        $this->assertEqualsCanonicalizing(['ROLE_USER'], $role->getReachableRoleNames(['ROLE_USER']));
-        $this->assertEqualsCanonicalizing(['ROLE_FOO'], $role->getReachableRoleNames(['ROLE_FOO']));
-        $this->assertEqualsCanonicalizing(['ROLE_ADMIN', 'ROLE_USER'], $role->getReachableRoleNames(['ROLE_ADMIN']));
-        $this->assertEqualsCanonicalizing(['ROLE_FOO', 'ROLE_ADMIN', 'ROLE_USER'], $role->getReachableRoleNames(['ROLE_FOO', 'ROLE_ADMIN']));
-        $this->assertEqualsCanonicalizing(['ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_FOO', 'ROLE_USER'], $role->getReachableRoleNames(['ROLE_SUPER_ADMIN']));
-        $this->assertEqualsCanonicalizing(['ROLE_SUPER_ADMIN', 'ROLE_ADMIN', 'ROLE_FOO', 'ROLE_USER'], $role->getReachableRoleNames(['ROLE_SUPER_ADMIN', 'ROLE_SUPER_ADMIN']));
+        $this->assertEqualsCanonicalizing(['ROLE_USER' => 'ROLE_USER'], $role->getReachableRoleNames(['ROLE_USER']));
+        $this->assertEqualsCanonicalizing(['ROLE_FOO' => 'ROLE_FOO'], $role->getReachableRoleNames(['ROLE_FOO']));
+        $this->assertEqualsCanonicalizing(['ROLE_ADMIN' => 'ROLE_ADMIN', 'ROLE_USER' => 'ROLE_USER'], $role->getReachableRoleNames(['ROLE_ADMIN']));
+        $this->assertEqualsCanonicalizing(['ROLE_FOO' => 'ROLE_FOO', 'ROLE_ADMIN' => 'ROLE_ADMIN', 'ROLE_USER' => 'ROLE_USER'], $role->getReachableRoleNames(['ROLE_FOO', 'ROLE_ADMIN']));
+        $this->assertEqualsCanonicalizing(['ROLE_SUPER_ADMIN' => 'ROLE_SUPER_ADMIN', 'ROLE_ADMIN' => 'ROLE_ADMIN', 'ROLE_FOO' => 'ROLE_FOO', 'ROLE_USER' => 'ROLE_USER'], $role->getReachableRoleNames(['ROLE_SUPER_ADMIN']));
+        $this->assertEqualsCanonicalizing(['ROLE_SUPER_ADMIN' => 'ROLE_SUPER_ADMIN', 'ROLE_ADMIN' => 'ROLE_ADMIN', 'ROLE_FOO' => 'ROLE_FOO', 'ROLE_USER' => 'ROLE_USER'], $role->getReachableRoleNames(['ROLE_SUPER_ADMIN', 'ROLE_SUPER_ADMIN']));
+    }
+
+    public function testGetParentRoleNames()
+    {
+        $role = new RoleHierarchy([
+            'ROLE_ADMIN' => ['ROLE_USER'],
+            'ROLE_SUPER_ADMIN' => ['ROLE_ADMIN', 'ROLE_FOO'],
+            'ROLE_USER' => ['ROLE_BAR'],
+        ]);
+
+        $this->assertEquals(['ROLE_SUPER_ADMIN' => 'ROLE_SUPER_ADMIN'], $role->getParentRoleNames(['ROLE_SUPER_ADMIN']));
+        $this->assertEquals(['ROLE_ADMIN' => 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN' => 'ROLE_SUPER_ADMIN'], $role->getParentRoleNames(['ROLE_ADMIN']));
+        $this->assertEquals(['ROLE_USER' => 'ROLE_USER', 'ROLE_ADMIN' => 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN' => 'ROLE_SUPER_ADMIN'], $role->getParentRoleNames(['ROLE_USER']));
+        $this->assertEquals(['ROLE_BAR' => 'ROLE_BAR', 'ROLE_ADMIN' => 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN' => 'ROLE_SUPER_ADMIN', 'ROLE_USER' => 'ROLE_USER'], $role->getParentRoleNames(['ROLE_BAR']));
+        $this->assertEquals(['ROLE_SUPER_ADMIN' => 'ROLE_SUPER_ADMIN'], $role->getParentRoleNames(['ROLE_SUPER_ADMIN', 'ROLE_SUPER_ADMIN']));
+        $this->assertEquals(['ROLE_SUPER_ADMIN' => 'ROLE_SUPER_ADMIN', 'ROLE_USER' => 'ROLE_USER', 'ROLE_ADMIN' => 'ROLE_ADMIN'], $role->getParentRoleNames(['ROLE_SUPER_ADMIN', 'ROLE_USER']));
+        $this->assertEquals(['ROLE_BAR' => 'ROLE_BAR', 'ROLE_FOO' => 'ROLE_FOO', 'ROLE_ADMIN' => 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN' => 'ROLE_SUPER_ADMIN', 'ROLE_USER' => 'ROLE_USER'], $role->getParentRoleNames(['ROLE_BAR', 'ROLE_FOO']));
     }
 }

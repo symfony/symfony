@@ -82,7 +82,7 @@ return [
         'Atlantic/Faroe' => 'पश्चिमी यूरोपीय समय (Faeroe)',
         'Europe/Istanbul' => 'Turkiye समय (इस्तांबुल)',
         'Indian/Reunion' => 'Reunion Time',
-        'Pacific/Honolulu' => 'हवाई–आल्यूशन समय (Honolulu)',
+        'Pacific/Honolulu' => 'हवाई–आल्यूशन मानक समय (Honolulu)',
         'Pacific/Ponape' => 'पोनापे समय (Ponape)',
         'Pacific/Pohnpei' => 'पोनापे समय (Ponape)',
         'Pacific/Truk' => 'चुक समय (Truk)',

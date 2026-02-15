@@ -22,7 +22,7 @@ class ImportMapOutdatedCommandTest extends TestCase
     #[DataProvider('provideNoOutdatedPackageCases')]
     public function testCommandWhenNoOutdatedPackages(string $display, ?string $format = null)
     {
-        $updateChecker = $this->createMock(ImportMapUpdateChecker::class);
+        $updateChecker = $this->createStub(ImportMapUpdateChecker::class);
         $command = new ImportMapOutdatedCommand($updateChecker);
 
         $commandTester = new CommandTester($command);

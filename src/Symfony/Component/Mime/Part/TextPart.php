@@ -25,9 +25,6 @@ class TextPart extends AbstractPart
 {
     private const DEFAULT_ENCODERS = ['quoted-printable', 'base64', '8bit'];
 
-    /** @internal, to be removed in 8.0 */
-    protected Headers $_headers;
-
     private static array $encoders = [];
 
     /** @var resource|string|File */
@@ -240,127 +237,38 @@ class TextPart extends AbstractPart
 
     public function __serialize(): array
     {
-        if (self::class === (new \ReflectionMethod($this, '__sleep'))->class || self::class !== (new \ReflectionMethod($this, '__serialize'))->class) {
-            // convert resources to strings for serialization
-            if (null !== $this->seekable) {
-                $this->body = $this->getBody();
-                $this->seekable = null;
-            }
-
-            return [
-                '_headers' => $this->getHeaders(),
-                'body' => $this->body,
-                'charset' => $this->charset,
-                'subtype' => $this->subtype,
-                'disposition' => $this->disposition,
-                'name' => $this->name,
-                'encoding' => $this->encoding,
-            ];
-        }
-
-        trigger_deprecation('symfony/mime', '7.4', 'Implementing "%s::__sleep()" is deprecated, use "__serialize()" instead.', get_debug_type($this));
-
-        $data = [];
-        foreach ($this->__sleep() as $key) {
-            try {
-                if (($r = new \ReflectionProperty($this, $key))->isInitialized($this)) {
-                    $data[$key] = $r->getValue($this);
-                }
-            } catch (\ReflectionException) {
-                $data[$key] = $this->$key;
-            }
-        }
-
-        return $data;
-    }
-
-    public function __unserialize(array $data): void
-    {
-        if ($wakeup = self::class !== (new \ReflectionMethod($this, '__wakeup'))->class && self::class === (new \ReflectionMethod($this, '__unserialize'))->class) {
-            trigger_deprecation('symfony/mime', '7.4', 'Implementing "%s::__wakeup()" is deprecated, use "__unserialize()" instead.', get_debug_type($this));
-        }
-
-        if ($headers = $data['_headers'] ?? $data["\0*\0_headers"] ?? null) {
-            unset($data['_headers'], $data["\0*\0_headers"]);
-            parent::__unserialize(['headers' => $headers]);
-        }
-
-        if (['body', 'charset', 'subtype', 'disposition', 'name', 'encoding'] === array_keys($data)) {
-            parent::__unserialize(['headers' => $headers]);
-            $this->body = $data['body'];
-            $this->charset = $data['charset'];
-            $this->subtype = $data['subtype'];
-            $this->disposition = $data['disposition'];
-            $this->name = $data['name'];
-            $this->encoding = $data['encoding'];
-
-            if ($wakeup) {
-                $this->__wakeup();
-            } elseif (!\is_string($this->body) && !$this->body instanceof File) {
-                throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-            }
-
-            return;
-        }
-
-        if (["\0".self::class."\0body", "\0".self::class."\0charset", "\0".self::class."\0subtype", "\0".self::class."\0disposition", "\0".self::class."\0name", "\0".self::class."\0encoding"] === array_keys($data)) {
-            $this->body = $data["\0".self::class."\0body"];
-            $this->charset = $data["\0".self::class."\0charset"];
-            $this->subtype = $data["\0".self::class."\0subtype"];
-            $this->disposition = $data["\0".self::class."\0disposition"];
-            $this->name = $data["\0".self::class."\0name"];
-            $this->encoding = $data["\0".self::class."\0encoding"];
-
-            if ($wakeup) {
-                $this->_headers = $headers;
-                $this->__wakeup();
-            } elseif (!\is_string($this->body) && !$this->body instanceof File) {
-                throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-            }
-
-            return;
-        }
-
-        trigger_deprecation('symfony/mime', '7.4', 'Passing extra keys to "%s::__unserialize()" is deprecated, populate properties in "%s::__unserialize()" instead.', self::class, get_debug_type($this));
-
-        \Closure::bind(function ($data) use ($wakeup) {
-            foreach ($data as $key => $value) {
-                $this->{("\0" === $key[0] ?? '') ? substr($key, 1 + strrpos($key, "\0")) : $key} = $value;
-            }
-
-            if ($wakeup) {
-                $this->__wakeup();
-            }
-        }, $this, static::class)($data);
-    }
-
-    /**
-     * @deprecated since Symfony 7.4, will be replaced by `__serialize()` in 8.0
-     */
-    public function __sleep(): array
-    {
-        trigger_deprecation('symfony/mime', '7.4', 'Calling "%s::__sleep()" is deprecated, use "__serialize()" instead.', get_debug_type($this));
-
         // convert resources to strings for serialization
         if (null !== $this->seekable) {
             $this->body = $this->getBody();
             $this->seekable = null;
         }
 
-        $this->_headers = $this->getHeaders();
-
-        return ['_headers', 'body', 'charset', 'subtype', 'disposition', 'name', 'encoding'];
+        return [
+            '_headers' => $this->getHeaders(),
+            'body' => $this->body,
+            'charset' => $this->charset,
+            'subtype' => $this->subtype,
+            'disposition' => $this->disposition,
+            'name' => $this->name,
+            'encoding' => $this->encoding,
+        ];
     }
 
-    /**
-     * @deprecated since Symfony 7.4, will be replaced by `__unserialize()` in 8.0
-     */
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
-        trigger_deprecation('symfony/mime', '7.4', 'Calling "%s::__wakeup()" is deprecated, use "__unserialize()" instead.', get_debug_type($this));
+        if ($headers = $data['_headers'] ?? $data["\0*\0_headers"] ?? null) {
+            parent::__unserialize(['headers' => $headers]);
+        }
 
-        $r = new \ReflectionProperty(AbstractPart::class, 'headers');
-        $r->setValue($this, $this->_headers);
-        unset($this->_headers);
+        $this->body = $data['body'] ?? $data["\0".self::class."\0body"];
+        $this->charset = $data['charset'] ?? $data["\0".self::class."\0charset"] ?? null;
+        $this->subtype = $data['subtype'] ?? $data["\0".self::class."\0subtype"];
+        $this->disposition = $data['disposition'] ?? $data["\0".self::class."\0disposition"] ?? null;
+        $this->name = $data['name'] ?? $data["\0".self::class."\0name"] ?? null;
+        $this->encoding = $data['encoding'] ?? $data["\0".self::class."\0encoding"];
+
+        if (!\is_string($this->body) && !$this->body instanceof File) {
+            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+        }
     }
 }

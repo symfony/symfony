@@ -52,6 +52,7 @@ class ValidatorBuilder
     private ?CacheItemPoolInterface $mappingCache = null;
     private ?TranslatorInterface $translator = null;
     private string|false|null $translationDomain = null;
+    private bool $propertyMetadataExistenceCheck = false;
 
     /**
      * Adds an object initializer to the validator.
@@ -325,6 +326,22 @@ class ValidatorBuilder
     }
 
     /**
+     * Enables checking that a property has metadata when using
+     * validateProperty() or validatePropertyValue().
+     *
+     * When enabled, a ValidatorException is thrown if no metadata is found for
+     * the given property in the validated class.
+     *
+     * @return $this
+     */
+    public function enablePropertyMetadataExistenceCheck(): static
+    {
+        $this->propertyMetadataExistenceCheck = true;
+
+        return $this;
+    }
+
+    /**
      * @return $this
      */
     public function addLoader(LoaderInterface $loader): static
@@ -396,6 +413,6 @@ class ValidatorBuilder
 
         $contextFactory = new ExecutionContextFactory($translator, $this->translationDomain);
 
-        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers, $this->groupProviderLocator);
+        return new RecursiveValidator($contextFactory, $metadataFactory, $validatorFactory, $this->initializers, $this->groupProviderLocator, $this->propertyMetadataExistenceCheck);
     }
 }

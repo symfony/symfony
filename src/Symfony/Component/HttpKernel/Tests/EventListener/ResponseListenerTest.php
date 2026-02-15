@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,7 +23,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class ResponseListenerTest extends TestCase
 {
     private EventDispatcher $dispatcher;
-    private MockObject&HttpKernelInterface $kernel;
+    private HttpKernelInterface $kernel;
 
     protected function setUp(): void
     {
@@ -32,7 +31,7 @@ class ResponseListenerTest extends TestCase
         $listener = new ResponseListener('UTF-8');
         $this->dispatcher->addListener(KernelEvents::RESPONSE, $listener->onKernelResponse(...));
 
-        $this->kernel = $this->createMock(HttpKernelInterface::class);
+        $this->kernel = $this->createStub(HttpKernelInterface::class);
     }
 
     public function testFilterDoesNothingForSubRequests()

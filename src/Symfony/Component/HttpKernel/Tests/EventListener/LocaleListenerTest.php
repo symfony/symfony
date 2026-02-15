@@ -97,7 +97,7 @@ class LocaleListenerTest extends TestCase
         $subRequest = new Request();
         $requestStack->push($subRequest);
 
-        $event = new FinishRequestEvent($this->createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::MAIN_REQUEST);
+        $event = new FinishRequestEvent($this->createStub(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST);
 
         $listener = new LocaleListener($requestStack, 'fr', $router);
         $listener->onKernelFinishRequest($event);
@@ -215,8 +215,22 @@ class LocaleListenerTest extends TestCase
         $this->assertEquals('it', $request->getLocale());
     }
 
+    public function testEnabledLocalesFiltersEmptyValues()
+    {
+        $request = Request::create('/');
+        $request->headers->set('Accept-Language', 'es,fr;q=0.8,en;q=0.5');
+
+        $listener = new LocaleListener(new RequestStack(), 'de', null, true, ['', null, 'en', 'fr']);
+        $event = $this->getEvent($request);
+
+        $listener->setDefaultLocale($event);
+        $listener->onKernelRequest($event);
+
+        $this->assertSame('fr', $request->getLocale());
+    }
+
     private function getEvent(Request $request): RequestEvent
     {
-        return new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        return new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
     }
 }

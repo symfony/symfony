@@ -18,7 +18,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  *
  * @final
  *
- * @internal since Symfony 7.3
+ * @internal
  */
 class MemcachedCaster
 {

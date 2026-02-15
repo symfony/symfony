@@ -16,20 +16,16 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 require __DIR__.'/autoload.php';
 
-return function (array $context) {
+return static function (array $context) {
     $command = new Command('go');
-    $command->setCode(function (InputInterface $input, OutputInterface $output) use ($context): int {
+    $command->setCode(static function (InputInterface $input, OutputInterface $output) use ($context): int {
         $output->write('OK Application '.$context['SOME_VAR']);
 
         return 0;
     });
 
     $app = new Application();
-    if (method_exists($app, 'addCommand')) {
-        $app->addCommand($command);
-    } else {
-        $app->add($command);
-    }
+    $app->addCommand($command);
     $app->setDefaultCommand('go', true);
 
     return $app;

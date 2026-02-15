@@ -13,12 +13,16 @@ namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Compiler;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Compiler\AddSecurityVotersPass;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class AddSecurityVotersPassTest extends TestCase
 {
@@ -149,5 +153,63 @@ class AddSecurityVotersPassTest extends TestCase
         ;
         $compilerPass = new AddSecurityVotersPass();
         $compilerPass->process($container);
+    }
+
+    public function testVotersWithAsTaggedItemAndTagPriorities()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.debug', false);
+
+        $container
+            ->register('security.access.decision_manager', AccessDecisionManager::class)
+            ->addArgument([])
+        ;
+
+        // Voter with AsTaggedItem attribute priority (highest)
+        $container
+            ->register('voter_with_attribute', VoterWithAsTaggedItem::class)
+            ->setAutoconfigured(true)
+            ->addTag('security.voter')
+        ;
+
+        // Voter with tag-based priority (middle)
+        $container
+            ->register('voter_with_tag', Voter::class)
+            ->addTag('security.voter', ['priority' => 100])
+        ;
+
+        // Voter with AsTaggedItem attribute priority (lowest)
+        $container
+            ->register('voter_with_low_attribute', VoterWithLowAsTaggedItem::class)
+            ->setAutoconfigured(true)
+            ->addTag('security.voter')
+        ;
+
+        $compilerPass = new AddSecurityVotersPass();
+        $compilerPass->process($container);
+
+        $argument = $container->getDefinition('security.access.decision_manager')->getArgument(0);
+        $refs = $argument->getValues();
+        $this->assertCount(3, $refs);
+        // Priority order: 200 (attribute) > 100 (tag) > 50 (attribute)
+        $this->assertEquals(new Reference('voter_with_attribute'), $refs[0]);
+        $this->assertEquals(new Reference('voter_with_tag'), $refs[1]);
+        $this->assertEquals(new Reference('voter_with_low_attribute'), $refs[2]);
+    }
+}
+
+#[AsTaggedItem(priority: 200)]
+final class VoterWithAsTaggedItem implements VoterInterface
+{
+    public function vote(TokenInterface $token, $subject, array $attributes, ?Vote $vote = null): int
+    {
+    }
+}
+
+#[AsTaggedItem(priority: 50)]
+final class VoterWithLowAsTaggedItem implements VoterInterface
+{
+    public function vote(TokenInterface $token, $subject, array $attributes, ?Vote $vote = null): int
+    {
     }
 }

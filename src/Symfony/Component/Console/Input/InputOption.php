@@ -53,12 +53,12 @@ class InputOption
     private string $name;
     private ?string $shortcut;
     private int $mode;
-    private string|int|bool|array|float|null $default;
+    private mixed $default;
 
     /**
      * @param string|array|null                                                             $shortcut        The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
      * @param int-mask-of<InputOption::*>|null                                              $mode            The option mode: One of the VALUE_* constants
-     * @param string|bool|int|float|array|null                                              $default         The default value (must be null for self::VALUE_NONE)
+     * @param mixed                                                                         $default         The default value (must be null for self::VALUE_NONE)
      * @param array|\Closure(CompletionInput,CompletionSuggestions):list<string|Suggestion> $suggestedValues The values used for input completion
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
@@ -68,7 +68,7 @@ class InputOption
         string|array|null $shortcut = null,
         ?int $mode = null,
         private string $description = '',
-        string|bool|int|float|array|null $default = null,
+        mixed $default = null,
         private array|\Closure $suggestedValues = [],
     ) {
         if (str_starts_with($name, '--')) {
@@ -188,7 +188,7 @@ class InputOption
     /**
      * Sets the default value.
      */
-    public function setDefault(string|bool|int|float|array|null $default): void
+    public function setDefault(mixed $default): void
     {
         if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
             throw new LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');
@@ -208,7 +208,7 @@ class InputOption
     /**
      * Returns the default value.
      */
-    public function getDefault(): string|bool|int|float|array|null
+    public function getDefault(): mixed
     {
         return $this->default;
     }

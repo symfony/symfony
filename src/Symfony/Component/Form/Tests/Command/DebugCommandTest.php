@@ -196,11 +196,7 @@ class DebugCommandTest extends TestCase
         $formRegistry = new FormRegistry([], new ResolvedFormTypeFactory());
         $command = new DebugCommand($formRegistry);
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
         $tester = new CommandCompletionTester($application->get('debug:form'));
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }
@@ -273,7 +269,7 @@ class DebugCommandTest extends TestCase
         $coreExtension = new CoreExtension();
         $loadTypesRefMethod = (new \ReflectionObject($coreExtension))->getMethod('loadTypes');
         $coreTypes = $loadTypesRefMethod->invoke($coreExtension);
-        $coreTypes = array_map(fn (FormTypeInterface $type) => $type::class, $coreTypes);
+        $coreTypes = array_map(static fn (FormTypeInterface $type) => $type::class, $coreTypes);
         sort($coreTypes);
 
         return $coreTypes;
@@ -284,11 +280,7 @@ class DebugCommandTest extends TestCase
         $formRegistry = new FormRegistry([], new ResolvedFormTypeFactory());
         $command = new DebugCommand($formRegistry, $namespaces, $types);
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
 
         return new CommandTester($application->find('debug:form'));
     }
@@ -301,14 +293,18 @@ class FooType extends AbstractType
         $resolver->setRequired('foo');
         $resolver->setDefined('bar');
         $resolver->setDeprecated('bar', 'vendor/package', '1.1');
-        $resolver->setDefault('empty_data', function (Options $options) {
+        $resolver->setDefault('empty_data', static function (Options $options) {
             $foo = $options['foo'];
 
-            return fn (FormInterface $form) => $form->getConfig()->getCompound() ? [$foo] : $foo;
+            return static fn (FormInterface $form) => $form->getConfig()->getCompound() ? [$foo] : $foo;
         });
         $resolver->setAllowedTypes('foo', 'string');
         $resolver->setAllowedValues('foo', ['bar', 'baz']);
-        $resolver->setNormalizer('foo', fn (Options $options, $value) => (string) $value);
+        $resolver->setNormalizer('foo', function (Options $options, $value) {
+            \assert(null !== $this); // explicitly test non-static normalizer
+
+            return (string) $value;
+        });
         $resolver->setInfo('foo', 'Info');
     }
 }

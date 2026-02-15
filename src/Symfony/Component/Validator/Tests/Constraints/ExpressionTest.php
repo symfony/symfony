@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Expression;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
@@ -51,36 +49,6 @@ class ExpressionTest extends TestCase
         $this->expectExceptionMessage(\sprintf('The options "expression" must be set for constraint "%s".', Expression::class));
 
         new Expression(null);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testMissingPatternDoctrineStyle()
-    {
-        $this->expectException(MissingOptionsException::class);
-        $this->expectExceptionMessage(\sprintf('The options "expression" must be set for constraint "%s".', Expression::class));
-
-        new Expression([]);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInitializeWithOptionsArray()
-    {
-        $constraint = new Expression([
-            'expression' => '!this.getParent().get("field2").getData()',
-        ]);
-
-        $this->assertSame('!this.getParent().get("field2").getData()', $constraint->expression);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testExpressionInOptionsArray()
-    {
-        $constraint = new Expression(null, options: ['expression' => '!this.getParent().get("field2").getData()']);
-
-        $this->assertSame('!this.getParent().get("field2").getData()', $constraint->expression);
     }
 }
 

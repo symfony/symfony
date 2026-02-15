@@ -82,6 +82,13 @@ class Request
     protected static bool $httpMethodParameterOverride = false;
 
     /**
+     * The HTTP methods that can be overridden.
+     *
+     * @var uppercase-string[]|null
+     */
+    protected static ?array $allowedHttpMethodOverride = null;
+
+    /**
      * Custom parameters.
      */
     public ParameterBag $attributes;
@@ -278,16 +285,18 @@ class Request
      */
     public static function createFromGlobals(): static
     {
-        $request = self::createRequestFromFactory($_GET, $_POST, [], $_COOKIE, $_FILES, $_SERVER);
-
-        if (str_starts_with($request->headers->get('CONTENT_TYPE', ''), 'application/x-www-form-urlencoded')
-            && \in_array(strtoupper($request->server->get('REQUEST_METHOD', 'GET')), ['PUT', 'DELETE', 'PATCH', 'QUERY'], true)
-        ) {
-            parse_str($request->getContent(), $data);
-            $request->request = new InputBag($data);
+        if (!\in_array($_SERVER['REQUEST_METHOD'] ?? null, ['PUT', 'DELETE', 'PATCH', 'QUERY'], true)) {
+            return self::createRequestFromFactory($_GET, $_POST, [], $_COOKIE, $_FILES, $_SERVER);
         }
 
-        return $request;
+        try {
+            [$post, $files] = request_parse_body();
+        } catch (\RequestParseBodyException) {
+            $post = $_POST;
+            $files = $_FILES;
+        }
+
+        return self::createRequestFromFactory($_GET, $post, [], $_COOKIE, $files, $_SERVER);
     }
 
     /**
@@ -327,10 +336,21 @@ class Request
         $server['PATH_INFO'] = '';
         $server['REQUEST_METHOD'] = strtoupper($method);
 
+        if (($i = strcspn($uri, ':/?#')) && ':' === ($uri[$i] ?? null) && (strspn($uri, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+-.') !== $i || strcspn($uri, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'))) {
+            throw new BadRequestException('Invalid URI: Scheme is malformed.');
+        }
         if (false === $components = parse_url(\strlen($uri) !== strcspn($uri, '?#') ? $uri : $uri.'#')) {
             throw new BadRequestException('Invalid URI.');
         }
 
+        $part = ($components['user'] ?? '').':'.($components['pass'] ?? '');
+
+        if (':' !== $part && \strlen($part) !== strcspn($part, '[]')) {
+            throw new BadRequestException('Invalid URI: Userinfo is malformed.');
+        }
+        if (($part = $components['host'] ?? '') && !self::isHostValid($part)) {
+            throw new BadRequestException('Invalid URI: Host is malformed.');
+        }
         if (false !== ($i = strpos($uri, '\\')) && $i < strcspn($uri, '?#')) {
             throw new BadRequestException('Invalid URI: A URI cannot contain a backslash.');
         }
@@ -369,8 +389,16 @@ class Request
             $server['PHP_AUTH_PW'] = $components['pass'];
         }
 
-        if (!isset($components['path'])) {
+        if ('' === $path = $components['path'] ?? '') {
             $components['path'] = '/';
+        } elseif (!isset($components['scheme']) && !isset($components['host']) && '/' !== $path[0]) {
+            if (false !== $pos = strpos($path, '/')) {
+                $path = substr($path, 0, $pos);
+            }
+
+            if (str_contains($path, ':')) {
+                throw new BadRequestException('Invalid URI: Path is malformed.');
+            }
         }
 
         switch (strtoupper($method)) {
@@ -468,8 +496,8 @@ class Request
         $dup->method = null;
         $dup->format = null;
 
-        if (!$dup->get('_format') && $this->get('_format')) {
-            $dup->attributes->set('_format', $this->get('_format'));
+        if (!$dup->attributes->has('_format') && $this->attributes->has('_format')) {
+            $dup->attributes->set('_format', $this->attributes->get('_format'));
         }
 
         if (!$dup->getRequestFormat(null)) {
@@ -613,7 +641,7 @@ class Request
      */
     public static function setTrustedHosts(array $hostPatterns): void
     {
-        self::$trustedHostPatterns = array_map(fn ($hostPattern) => \sprintf('{%s}i', $hostPattern), $hostPatterns);
+        self::$trustedHostPatterns = array_map(static fn ($hostPattern) => \sprintf('{%s}i', $hostPattern), $hostPatterns);
         // we need to reset trusted hosts on trusted host patterns change
         self::$trustedHosts = [];
     }
@@ -671,31 +699,31 @@ class Request
     }
 
     /**
-     * Gets a "parameter" value from any bag.
+     * Sets the list of HTTP methods that can be overridden.
      *
-     * This method is mainly useful for libraries that want to provide some flexibility. If you don't need the
-     * flexibility in controllers, it is better to explicitly get request parameters from the appropriate
-     * public property instead (attributes, query, request).
+     * Set to null to allow all methods to be overridden (default). Set to an
+     * empty array to disallow overrides entirely. Otherwise, provide the list
+     * of uppercased method names that are allowed.
      *
-     * Order of precedence: PATH (routing placeholders or custom attributes), GET, POST
-     *
-     * @internal use explicit input sources instead
+     * @param uppercase-string[]|null $methods
      */
-    public function get(string $key, mixed $default = null): mixed
+    public static function setAllowedHttpMethodOverride(?array $methods): void
     {
-        if ($this !== $result = $this->attributes->get($key, $this)) {
-            return $result;
+        if (array_intersect($methods ?? [], ['GET', 'HEAD', 'CONNECT', 'TRACE'])) {
+            throw new \InvalidArgumentException('The HTTP methods "GET", "HEAD", "CONNECT", and "TRACE" cannot be overridden.');
         }
 
-        if ($this->query->has($key)) {
-            return $this->query->all()[$key];
-        }
+        self::$allowedHttpMethodOverride = $methods;
+    }
 
-        if ($this->request->has($key)) {
-            return $this->request->all()[$key];
-        }
-
-        return $default;
+    /**
+     * Gets the list of HTTP methods that can be overridden.
+     *
+     * @return uppercase-string[]|null
+     */
+    public static function getAllowedHttpMethodOverride(): ?array
+    {
+        return self::$allowedHttpMethodOverride;
     }
 
     /**
@@ -814,7 +842,7 @@ class Request
      *
      * Suppose this request is instantiated from /mysite on localhost:
      *
-     *  * http://localhost/mysite              returns an empty string
+     *  * http://localhost/mysite              returns '/'
      *  * http://localhost/mysite/about        returns '/about'
      *  * http://localhost/mysite/enco%20ded   returns '/enco%20ded'
      *  * http://localhost/mysite/about?var=1  returns '/about'
@@ -1109,20 +1137,16 @@ class Request
     {
         if ($this->isFromTrustedProxy() && $host = $this->getTrustedValues(self::HEADER_X_FORWARDED_HOST)) {
             $host = $host[0];
-        } elseif (!$host = $this->headers->get('HOST')) {
-            if (!$host = $this->server->get('SERVER_NAME')) {
-                $host = $this->server->get('SERVER_ADDR', '');
-            }
+        } else {
+            $host = $this->headers->get('HOST') ?: $this->server->get('SERVER_NAME') ?: $this->server->get('SERVER_ADDR', '');
         }
 
         // trim and remove port number from host
         // host is lowercase as per RFC 952/2181
         $host = strtolower(preg_replace('/:\d+$/', '', trim($host)));
 
-        // as the host can come from the user (HTTP_HOST and depending on the configuration, SERVER_NAME too can come from the user)
-        // check that it does not contain forbidden characters (see RFC 952 and RFC 2181)
-        // use preg_replace() instead of preg_match() to prevent DoS attacks with long host names
-        if ($host && '' !== preg_replace('/(?:^\[)?[a-zA-Z0-9-:\]_]+\.?/', '', $host)) {
+        // the host can come from the user (HTTP_HOST and depending on the configuration, SERVER_NAME too can come from the user)
+        if ($host && !self::isHostValid($host)) {
             if (!$this->isHostValid) {
                 return '';
             }
@@ -1187,7 +1211,7 @@ class Request
 
         $this->method = strtoupper($this->server->get('REQUEST_METHOD', 'GET'));
 
-        if ('POST' !== $this->method) {
+        if ('POST' !== $this->method || !(self::$allowedHttpMethodOverride ?? true)) {
             return $this->method;
         }
 
@@ -1203,11 +1227,15 @@ class Request
 
         $method = strtoupper($method);
 
-        if (\in_array($method, ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'PATCH', 'PURGE', 'TRACE', 'QUERY'], true)) {
-            return $this->method = $method;
+        if (\in_array($method, ['GET', 'HEAD', 'CONNECT', 'TRACE'], true)) {
+            return $this->method;
         }
 
-        if (!preg_match('/^[A-Z]++$/D', $method)) {
+        if (self::$allowedHttpMethodOverride && !\in_array($method, self::$allowedHttpMethodOverride, true)) {
+            return $this->method;
+        }
+
+        if (\strlen($method) !== strspn($method, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')) {
             throw new SuspiciousOperationException('Invalid HTTP method override.');
         }
 
@@ -1265,9 +1293,8 @@ class Request
      * @param string|null $mimeType        The mime type to check
      * @param bool        $subtypeFallback Whether to fall back to the subtype if no exact match is found
      */
-    public function getFormat(?string $mimeType/* , bool $subtypeFallback = false */): ?string
+    public function getFormat(?string $mimeType, bool $subtypeFallback = false): ?string
     {
-        $subtypeFallback = 2 <= \func_num_args() ? func_get_arg(1) : false;
         $canonicalMimeType = null;
         if ($mimeType && false !== $pos = strpos($mimeType, ';')) {
             $canonicalMimeType = trim(substr($mimeType, 0, $pos));
@@ -1277,13 +1304,20 @@ class Request
             static::initializeFormats();
         }
 
+        $exactFormat = null;
+        $canonicalFormat = null;
+
         foreach (static::$formats as $format => $mimeTypes) {
-            if (\in_array($mimeType, (array) $mimeTypes, true)) {
-                return $format;
+            if (\in_array($mimeType, $mimeTypes, true)) {
+                $exactFormat = $format;
             }
-            if (null !== $canonicalMimeType && \in_array($canonicalMimeType, (array) $mimeTypes, true)) {
-                return $format;
+            if (null !== $canonicalMimeType && \in_array($canonicalMimeType, $mimeTypes, true)) {
+                $canonicalFormat = $format;
             }
+        }
+
+        if ($format = $exactFormat ?? $canonicalFormat) {
+            return $format;
         }
 
         if (!$canonicalMimeType ??= $mimeType) {
@@ -1315,13 +1349,13 @@ class Request
      *
      * @param string|string[] $mimeTypes The associated mime types (the preferred one must be the first as it will be used as the content type)
      */
-    public function setFormat(?string $format, string|array $mimeTypes): void
+    public function setFormat(string $format, string|array $mimeTypes): void
     {
         if (null === static::$formats) {
             static::initializeFormats();
         }
 
-        static::$formats[$format] = \is_array($mimeTypes) ? $mimeTypes : [$mimeTypes];
+        static::$formats[$format] = (array) $mimeTypes;
     }
 
     /**
@@ -1467,10 +1501,8 @@ class Request
      */
     public function getContent(bool $asResource = false)
     {
-        $currentContentIsResource = \is_resource($this->content);
-
-        if (true === $asResource) {
-            if ($currentContentIsResource) {
+        if ($asResource) {
+            if (\is_resource($this->content)) {
                 rewind($this->content);
 
                 return $this->content;
@@ -1490,7 +1522,7 @@ class Request
             return fopen('php://input', 'r');
         }
 
-        if ($currentContentIsResource) {
+        if (\is_resource($this->content)) {
             rewind($this->content);
 
             return stream_get_contents($this->content);
@@ -1954,9 +1986,8 @@ class Request
         }
 
         $pathInfo = substr($requestUri, \strlen($baseUrl));
-        if ('' === $pathInfo) {
-            // If substr() returns false then PATH_INFO is set to an empty string
-            return '/';
+        if ('' === $pathInfo || '/' !== $pathInfo[0]) {
+            return '/'.$pathInfo;
         }
 
         return $pathInfo;
@@ -2170,5 +2201,22 @@ class Request
         }
 
         return $this->isIisRewrite;
+    }
+
+    /**
+     * See https://url.spec.whatwg.org/.
+     */
+    private static function isHostValid(string $host): bool
+    {
+        if ('[' === $host[0]) {
+            return ']' === $host[-1] && filter_var(substr($host, 1, -1), \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV6);
+        }
+
+        if (preg_match('/\.[0-9]++\.?$/D', $host)) {
+            return null !== filter_var($host, \FILTER_VALIDATE_IP, \FILTER_FLAG_IPV4 | \FILTER_NULL_ON_FAILURE);
+        }
+
+        // use preg_replace() instead of preg_match() to prevent DoS attacks with long host names
+        return '' === preg_replace('/[-a-zA-Z0-9_]++\.?/', '', $host);
     }
 }

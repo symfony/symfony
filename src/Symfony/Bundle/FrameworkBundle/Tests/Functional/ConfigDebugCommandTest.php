@@ -233,6 +233,16 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
         yield 'option --format, debug' => [true, ['--format', ''], ['yaml', 'json']];
     }
 
+    public function testDumpPathDeepIntoScalar()
+    {
+        $tester = $this->createCommandTester(true);
+
+        $tester->execute(['name' => 'framework', 'path' => 'secret.foo']);
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $this->assertStringContainsString('Unable to find configuration for "framework.secret.foo"', $tester->getDisplay());
+    }
+
     private function createCommandTester(bool $debug): CommandTester
     {
         $command = $this->createApplication($debug)->find('debug:config');

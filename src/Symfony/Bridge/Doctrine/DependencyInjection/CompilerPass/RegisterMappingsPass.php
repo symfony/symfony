@@ -65,8 +65,12 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
         private readonly string $registerAliasMethodName = '',
         private readonly array $aliasMap = [],
     ) {
-        if ($aliasMap && (!$configurationPattern || !$registerAliasMethodName)) {
-            throw new \InvalidArgumentException('configurationPattern and registerAliasMethodName are required to register namespace alias.');
+        if ($aliasMap) {
+            trigger_deprecation('symfony/doctrine-bridge', '8.1', 'The property RegisterMappingsPass::$aliasMap is deprecated and will be removed in 9.0. Namespace alias are no longer supported.');
+
+            if (!$configurationPattern || !$registerAliasMethodName) {
+                throw new \InvalidArgumentException('configurationPattern and registerAliasMethodName are required to register namespace alias.');
+            }
         }
     }
 
@@ -103,7 +107,7 @@ abstract class RegisterMappingsPass implements CompilerPassInterface
      * Get the service name of the metadata chain driver that the mappings
      * should be registered with.
      *
-     * @throws InvalidArgumentException if non of the managerParameters has a
+     * @throws InvalidArgumentException if none of the managerParameters has a
      *                                  non-empty value
      */
     protected function getChainDriverServiceName(ContainerBuilder $container): string

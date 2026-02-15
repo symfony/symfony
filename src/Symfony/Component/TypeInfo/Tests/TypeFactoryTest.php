@@ -12,8 +12,6 @@
 namespace Symfony\Component\TypeInfo\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyBackedEnum;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyEnum;
@@ -26,6 +24,7 @@ use Symfony\Component\TypeInfo\Type\EnumType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\NullableType;
+use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
@@ -179,6 +178,24 @@ class TypeFactoryTest extends TestCase
         $this->assertEquals(new UnionType(new BuiltinType(TypeIdentifier::INT), new BuiltinType(TypeIdentifier::STRING)), Type::union(Type::int(), Type::union(Type::int(), Type::string())));
     }
 
+    public function testUnionWithNestedNullTypeIsProperlyNullable()
+    {
+        $nestedUnion = Type::union(Type::int(), Type::string(), Type::null());
+        $result = Type::union($nestedUnion, Type::float());
+
+        $this->assertInstanceOf(NullableType::class, $result);
+
+        $wrappedType = $result->getWrappedType();
+        $this->assertInstanceOf(UnionType::class, $wrappedType);
+
+        $types = $wrappedType->getTypes();
+        $this->assertCount(3, $types);
+
+        $typeStrings = array_map(static fn ($t) => (string) $t, $types);
+        sort($typeStrings);
+        $this->assertSame(['float', 'int', 'string'], $typeStrings);
+    }
+
     public function testCreateIntersection()
     {
         $this->assertEquals(new IntersectionType(new ObjectType(\DateTime::class), new ObjectType(self::class)), Type::intersection(Type::object(\DateTime::class), Type::object(self::class)));
@@ -224,6 +241,19 @@ class TypeFactoryTest extends TestCase
             extraKeyType: Type::string(),
             extraValueType: Type::bool(),
         ), Type::arrayShape(['foo' => Type::bool()], extraKeyType: Type::string(), extraValueType: Type::bool()));
+    }
+
+    public function testCreateArrayShapeWithCallableKey()
+    {
+        $arrayShape = new ArrayShapeType(['substr' => ['type' => Type::string(), 'optional' => false]]);
+        $this->assertEquals(Type::string(), $arrayShape->getCollectionKeyType());
+    }
+
+    public function testCreateObjectShape()
+    {
+        $this->assertEquals(new ObjectShapeType(['foo' => ['type' => Type::bool(), 'optional' => true]]), Type::objectShape(['foo' => ['type' => Type::bool(), 'optional' => true]]));
+        $this->assertEquals(new ObjectShapeType(['foo' => ['type' => Type::bool(), 'optional' => false]]), Type::objectShape(['foo' => Type::bool()]));
+        $this->assertEquals(new ObjectShapeType(['substr' => ['type' => Type::bool(), 'optional' => false]]), Type::objectShape(['substr' => Type::bool()]));
     }
 
     public function testCreateArrayKey()
@@ -286,15 +316,7 @@ class TypeFactoryTest extends TestCase
         yield [Type::array(Type::string()), [1 => 'foo', 'bar' => 'baz']];
         yield [Type::array(Type::nullable(Type::bool()), Type::int()), [1 => true, 2 => null, 3 => false]];
         yield [Type::collection(Type::object(\ArrayIterator::class), Type::mixed(), Type::arrayKey()), new \ArrayIterator()];
-        yield [Type::collection(Type::object(\Generator::class), Type::string(), Type::int()), (fn (): iterable => yield 'string')()];
+        yield [Type::collection(Type::object(\Generator::class), Type::string(), Type::int()), (static fn (): iterable => yield 'string')()];
         yield [Type::collection(Type::object($arrayAccess::class)), $arrayAccess];
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testCannotCreateIterableList()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/type-info 7.3: The third argument of "Symfony\Component\TypeInfo\TypeFactoryTrait::iterable()" is deprecated. Use the "Symfony\Component\TypeInfo\Type::list()" method to create a list instead.');
-        Type::iterable(key: Type::int(), asList: true);
     }
 }

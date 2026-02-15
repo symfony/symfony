@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Middleware\ValidationMiddleware;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -32,7 +33,7 @@ class ValidationMiddlewareTest extends MiddlewareTestCase
             ->expects($this->once())
             ->method('validate')
             ->with($message)
-            ->willReturn($this->createMock(ConstraintViolationListInterface::class))
+            ->willReturn(new ConstraintViolationList())
         ;
 
         (new ValidationMiddleware($validator))->handle($envelope, $this->getStackMock());
@@ -47,7 +48,7 @@ class ValidationMiddlewareTest extends MiddlewareTestCase
             ->expects($this->once())
             ->method('validate')
             ->with($message, null, $groups)
-            ->willReturn($this->createMock(ConstraintViolationListInterface::class))
+            ->willReturn(new ConstraintViolationList())
         ;
 
         (new ValidationMiddleware($validator))->handle($envelope, $this->getStackMock());

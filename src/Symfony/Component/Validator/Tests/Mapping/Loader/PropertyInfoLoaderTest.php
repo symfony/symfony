@@ -39,7 +39,7 @@ class PropertyInfoLoaderTest extends TestCase
 {
     public function testLoadClassMetadata()
     {
-        $propertyListExtractor = $this->createMock(PropertyListExtractorInterface::class);
+        $propertyListExtractor = $this->createStub(PropertyListExtractorInterface::class);
         $propertyListExtractor
             ->method('getProperties')
             ->willReturn([
@@ -112,7 +112,7 @@ class PropertyInfoLoaderTest extends TestCase
             }
         };
 
-        $propertyAccessExtractor = $this->createMock(PropertyAccessExtractorInterface::class);
+        $propertyAccessExtractor = $this->createStub(PropertyAccessExtractorInterface::class);
         $propertyAccessExtractor
             ->method('isWritable')
             ->willReturn(
@@ -228,7 +228,7 @@ class PropertyInfoLoaderTest extends TestCase
     #[DataProvider('regexpProvider')]
     public function testClassValidator(bool $expected, ?string $classValidatorRegexp = null)
     {
-        $propertyListExtractor = $this->createMock(PropertyListExtractorInterface::class);
+        $propertyListExtractor = $this->createStub(PropertyListExtractorInterface::class);
         $propertyListExtractor
             ->method('getProperties')
             ->willReturn(['string'])
@@ -246,7 +246,7 @@ class PropertyInfoLoaderTest extends TestCase
             }
         };
 
-        $propertyAccessExtractor = $this->createMock(PropertyAccessExtractorInterface::class);
+        $propertyAccessExtractor = $this->createStub(PropertyAccessExtractorInterface::class);
 
         $propertyInfoLoader = new PropertyInfoLoader($propertyListExtractor, $propertyTypeExtractor, $propertyAccessExtractor, $classValidatorRegexp);
 
@@ -267,7 +267,7 @@ class PropertyInfoLoaderTest extends TestCase
     public function testClassNoAutoMapping(?PropertyTypeExtractorInterface $propertyListExtractor = null)
     {
         if (null === $propertyListExtractor) {
-            $propertyListExtractor = $this->createMock(PropertyListExtractorInterface::class);
+            $propertyListExtractor = $this->createStub(PropertyListExtractorInterface::class);
             $propertyListExtractor
                 ->method('getProperties')
                 ->willReturn(['string', 'autoMappingExplicitlyEnabled'])
@@ -286,7 +286,7 @@ class PropertyInfoLoaderTest extends TestCase
             };
         }
 
-        $propertyAccessExtractor = $this->createMock(PropertyAccessExtractorInterface::class);
+        $propertyAccessExtractor = $this->createStub(PropertyAccessExtractorInterface::class);
 
         $propertyInfoLoader = new PropertyInfoLoader($propertyListExtractor, $propertyTypeExtractor, $propertyAccessExtractor, '{.*}');
         $validator = Validation::createValidatorBuilder()

@@ -25,9 +25,9 @@ class ChoiceQuestion extends Question
     private string $errorMessage = 'Value "%s" is invalid';
 
     /**
-     * @param string                     $question The question to ask to the user
-     * @param array                      $choices  The list of available choices
-     * @param string|bool|int|float|null $default  The default answer to return
+     * @param string                                   $question The question to ask to the user
+     * @param array<string|bool|int|float|\Stringable> $choices  The list of available choices
+     * @param string|bool|int|float|null               $default  The default answer to return
      */
     public function __construct(
         string $question,
@@ -45,7 +45,7 @@ class ChoiceQuestion extends Question
     }
 
     /**
-     * Returns available choices.
+     * @return array<string|bool|int|float|\Stringable>
      */
     public function getChoices(): array
     {

@@ -117,14 +117,6 @@ class LoginThrottlingFactory implements AuthenticatorFactoryInterface
         $limiterConfig['id'] = $name;
         $limiter->replaceArgument(0, $limiterConfig);
 
-        $factoryAlias = $container->registerAliasForArgument($limiterId, RateLimiterFactory::class, $name.'.limiter');
-
-        if (interface_exists(RateLimiterFactoryInterface::class)) {
-            $container->registerAliasForArgument($limiterId, RateLimiterFactoryInterface::class, $name.'.limiter', $name);
-
-            $factoryAlias->setDeprecated('symfony/security-bundle', '7.4', 'The "%alias_id%" autowiring alias is deprecated and will be removed in 8.0, use "RateLimiterFactoryInterface" instead.');
-            $container->getAlias(\sprintf('.%s $%s.limiter', RateLimiterFactory::class, $name))
-                ->setDeprecated('symfony/security-bundle', '7.4', 'The "%alias_id%" autowiring alias is deprecated and will be removed in 8.0, use "RateLimiterFactoryInterface" instead.');
-        }
+        $container->registerAliasForArgument($limiterId, RateLimiterFactoryInterface::class, $name.'.limiter', $name);
     }
 }

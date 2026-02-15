@@ -12,7 +12,7 @@
 namespace Symfony\Component\Semaphore\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Semaphore\Key;
 use Symfony\Component\Semaphore\PersistingStoreInterface;
 use Symfony\Component\Semaphore\SemaphoreFactory;
@@ -31,15 +31,14 @@ class SemaphoreFactoryTest extends TestCase
         $store
             ->expects($this->exactly(2))
             ->method('save')
-            ->with($this->callback(function ($key) use (&$keys) {
+            ->with($this->callback(static function ($key) use (&$keys) {
                 $keys[] = $key;
 
                 return true;
             }));
 
-        $logger = $this->createMock(LoggerInterface::class);
         $factory = new SemaphoreFactory($store);
-        $factory->setLogger($logger);
+        $factory->setLogger(new NullLogger());
 
         $semaphore1 = $factory->createSemaphore('foo', 4);
         $semaphore2 = $factory->createSemaphore('foo', 4);
@@ -59,15 +58,14 @@ class SemaphoreFactoryTest extends TestCase
         $store
             ->expects($this->exactly(2))
             ->method('save')
-            ->with($this->callback(function ($key) use (&$keys) {
+            ->with($this->callback(static function ($key) use (&$keys) {
                 $keys[] = $key;
 
                 return true;
             }));
 
-        $logger = $this->createMock(LoggerInterface::class);
         $factory = new SemaphoreFactory($store);
-        $factory->setLogger($logger);
+        $factory->setLogger(new NullLogger());
 
         $key = new Key('foo', 4);
         $semaphore1 = $factory->createSemaphoreFromKey($key);

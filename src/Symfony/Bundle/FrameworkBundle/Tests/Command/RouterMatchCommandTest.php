@@ -57,13 +57,11 @@ class RouterMatchCommandTest extends TestCase
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
         $requestContext = new RequestContext();
-        $router = $this->createMock(RouterInterface::class);
+        $router = $this->createStub(RouterInterface::class);
         $router
-            ->expects($this->any())
             ->method('getRouteCollection')
             ->willReturn($routeCollection);
         $router
-            ->expects($this->any())
             ->method('getContext')
             ->willReturn($requestContext);
 

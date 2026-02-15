@@ -54,7 +54,7 @@ class ServicesResetterTest extends TestCase
         $proxyCode = ProxyHelper::generateLazyProxy(new \ReflectionClass(LazyResettableService::class));
         eval('class LazyResettableServiceProxy'.$proxyCode);
 
-        $lazyService = \LazyResettableServiceProxy::createLazyProxy(fn (): LazyResettableService => new LazyResettableService());
+        $lazyService = \LazyResettableServiceProxy::createLazyProxy(static fn (): LazyResettableService => new LazyResettableService());
 
         $resetter = new ServicesResetter(new \ArrayIterator([
             'lazy' => $lazyService,

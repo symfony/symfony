@@ -12,7 +12,6 @@
 namespace Symfony\Component\Routing\Tests\Generator;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -149,6 +148,7 @@ class UrlGeneratorTest extends TestCase
             'stdClass in nested stdClass' => ['?foo%5Bnested%5D%5Bbaz%5D=bar', 'foo', $nestedStdClass],
             'non stringable object' => ['', 'foo', new NonStringableObject()],
             'non stringable object but has public property' => ['?foo%5Bfoo%5D=property', 'foo', new NonStringableObjectWithPublicProperty()],
+            'numeric key' => ['?123=foo', '123', 'foo'],
         ];
     }
 
@@ -803,7 +803,6 @@ class UrlGeneratorTest extends TestCase
     }
 
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testDeprecatedAlias()
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: The "b" route alias is deprecated. You should stop using it, as it will be removed in the future.');
@@ -817,7 +816,6 @@ class UrlGeneratorTest extends TestCase
     }
 
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testDeprecatedAliasWithCustomMessage()
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: foo b.');
@@ -831,7 +829,6 @@ class UrlGeneratorTest extends TestCase
     }
 
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTargettingADeprecatedAliasShouldTriggerDeprecation()
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: foo b.');
@@ -1098,22 +1095,16 @@ class UrlGeneratorTest extends TestCase
         ]);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testQueryParametersWithScalarValue()
     {
         $routes = $this->getRoutes('user', new Route('/user/{id}'));
 
-        $this->expectUserDeprecationMessage(
-            'Since symfony/routing 7.4: Parameter "_query" is reserved for passing an array of query parameters. '.
-            'Passing a scalar value is deprecated and will throw an exception in Symfony 8.0.',
-        );
+        $this->expectException(InvalidParameterException::class);
 
-        $url = $this->getGenerator($routes)->generate('user', [
+        $this->getGenerator($routes)->generate('user', [
             'id' => '123',
             '_query' => 'foo',
         ]);
-        $this->assertSame('/app.php/user/123?_query=foo', $url);
     }
 
     protected function getGenerator(RouteCollection $routes, array $parameters = [], $logger = null, ?string $defaultLocale = null)

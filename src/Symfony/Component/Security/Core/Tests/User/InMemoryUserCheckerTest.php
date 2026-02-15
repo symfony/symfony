@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserChecker;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 class InMemoryUserCheckerTest extends TestCase
 {
@@ -23,7 +22,7 @@ class InMemoryUserCheckerTest extends TestCase
     {
         $checker = new InMemoryUserChecker();
 
-        $this->assertNull($checker->checkPostAuth($this->createMock(UserInterface::class)));
+        $this->assertNull($checker->checkPostAuth(new InMemoryUser('John', 'password')));
     }
 
     public function testCheckPostAuthPass()

@@ -145,7 +145,7 @@ class Exporter
                         $p = $parent->hasProperty($n) ? $parent->getProperty($n) : null;
                     } while (!$p && $parent = $parent->getParentClass());
 
-                    $c = $p && (!$p->isPublic() || (\PHP_VERSION_ID >= 80400 ? $p->isProtectedSet() || $p->isPrivateSet() : $p->isReadOnly())) ? $p->class : 'stdClass';
+                    $c = $p && (!$p->isPublic() || $p->isProtectedSet() || $p->isPrivateSet()) ? $p->class : 'stdClass';
                 } elseif ('*' === $n[1]) {
                     $n = substr($n, 3);
                     $c = $reflector->getProperty($n)->class;
@@ -241,7 +241,7 @@ class Exporter
         if (\is_string($value)) {
             $code = \sprintf("'%s'", addcslashes($value, "'\\"));
 
-            $code = preg_replace_callback("/((?:[\\0\\r\\n]|\u{202A}|\u{202B}|\u{202D}|\u{202E}|\u{2066}|\u{2067}|\u{2068}|\u{202C}|\u{2069})++)(.)/", function ($m) use ($subIndent) {
+            $code = preg_replace_callback("/((?:[\\0\\r\\n]|\u{202A}|\u{202B}|\u{202D}|\u{202E}|\u{2066}|\u{2067}|\u{2068}|\u{202C}|\u{2069})++)(.)/", static function ($m) use ($subIndent) {
                 $m[1] = \sprintf('\'."%s".\'', str_replace(
                     ["\0", "\r", "\n", "\u{202A}", "\u{202B}", "\u{202D}", "\u{202E}", "\u{2066}", "\u{2067}", "\u{2068}", "\u{202C}", "\u{2069}", '\n\\'],
                     ['\0', '\r', '\n', '\u{202A}', '\u{202B}', '\u{202D}', '\u{202E}', '\u{2066}', '\u{2067}', '\u{2068}', '\u{202C}', '\u{2069}', '\n"'."\n".$subIndent.'."\\'],

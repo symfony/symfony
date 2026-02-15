@@ -204,7 +204,7 @@ class FormTest extends TestCase
         $this->assertEquals(
             $values,
             array_map(
-                function ($field) {
+                static function ($field) {
                     $class = $field::class;
 
                     return [substr($class, strrpos($class, '\\') + 1), $field->getValue()];
@@ -882,7 +882,7 @@ class FormTest extends TestCase
         ;
 
         $field
-            ->expects($this->any())
+            ->expects($this->atLeastOnce())
             ->method('getName')
             ->willReturn($name)
         ;

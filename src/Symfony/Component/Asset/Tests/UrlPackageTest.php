@@ -89,8 +89,8 @@ class UrlPackageTest extends TestCase
 
     public function testVersionStrategyGivesAbsoluteURL()
     {
-        $versionStrategy = $this->createMock(VersionStrategyInterface::class);
-        $versionStrategy->expects($this->any())
+        $versionStrategy = $this->createStub(VersionStrategyInterface::class);
+        $versionStrategy
             ->method('applyVersion')
             ->willReturn('https://cdn.com/bar/main.css');
         $package = new UrlPackage('https://example.com', $versionStrategy);
@@ -121,8 +121,8 @@ class UrlPackageTest extends TestCase
 
     private function getContext($secure): ContextInterface
     {
-        $context = $this->createMock(ContextInterface::class);
-        $context->expects($this->any())->method('isSecure')->willReturn($secure);
+        $context = $this->createStub(ContextInterface::class);
+        $context->method('isSecure')->willReturn($secure);
 
         return $context;
     }

@@ -77,7 +77,6 @@ class LintCommandTest extends TestCase
      * When deprecations are not reported by the command, the testsuite reporter will catch them so we need to mark the test as ignoring deprecations.
      */
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testLintFileWithNotReportedDeprecation()
     {
         $tester = $this->createCommandTester();
@@ -173,16 +172,12 @@ class LintCommandTest extends TestCase
     {
         $environment = new Environment(new FilesystemLoader(\dirname(__DIR__).'/Fixtures/templates/'));
         $options = ['deprecation_info' => new DeprecatedCallableInfo('foo/bar', '1.1')];
-        $environment->addFilter(new TwigFilter('deprecated_filter', fn ($v) => $v, $options));
+        $environment->addFilter(new TwigFilter('deprecated_filter', static fn ($v) => $v, $options));
 
         $command = new LintCommand($environment);
 
         $application = new Application();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand($command);
 
         return $application->find('lint:twig');
     }

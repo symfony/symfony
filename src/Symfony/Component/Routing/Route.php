@@ -35,7 +35,7 @@ class Route implements \Serializable
      * Available options:
      *
      *  * compiler_class: A class name able to compile this route instance (RouteCompiler by default)
-     *  * utf8:           Whether UTF-8 matching is enforced ot not
+     *  * utf8:           Whether UTF-8 matching is enforced or not
      *
      * @param string                    $path         The path pattern to match
      * @param array                     $defaults     An array of default parameter values
@@ -426,7 +426,7 @@ class Route implements \Serializable
                 $this->setRequirement($m[2], substr($m[6], 1, -1));
             }
             if (isset($m[4][0])) {
-                $mapping[$m[2]] = isset($m[5][0]) ? [$m[4], substr($m[5], 1)] : $mapping[$m[2]] = [$m[4], $m[2]];
+                $mapping[$m[2]] = isset($m[5][0]) ? [$m[4], substr($m[5], 1)] : $m[4];
             }
 
             return '{'.$m[1].$m[2].'}';

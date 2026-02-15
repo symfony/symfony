@@ -21,14 +21,14 @@ class ImportMapVersionChecker
 {
     private const PACKAGE_METADATA_PATTERN = 'https://registry.npmjs.org/%package%/%version%';
 
-    private HttpClientInterface $httpClient;
+    private readonly HttpClientInterface $httpClient;
 
     public function __construct(
         private ImportMapConfigReader $importMapConfigReader,
         private RemotePackageDownloader $packageDownloader,
         ?HttpClientInterface $httpClient = null,
     ) {
-        $this->httpClient = $httpClient ?? HttpClient::create();
+        $this->httpClient = new BatchHttpClient($httpClient ?? HttpClient::create());
     }
 
     /**

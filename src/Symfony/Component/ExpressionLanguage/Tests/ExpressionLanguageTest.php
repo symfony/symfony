@@ -42,7 +42,7 @@ class ExpressionLanguageTest extends TestCase
         $cacheItemMock
             ->expects($this->exactly(2))
             ->method('get')
-            ->willReturnCallback(function () use (&$savedParsedExpression) {
+            ->willReturnCallback(static function () use (&$savedParsedExpression) {
                 return $savedParsedExpression;
             })
         ;
@@ -51,7 +51,7 @@ class ExpressionLanguageTest extends TestCase
             ->expects($this->exactly(1))
             ->method('set')
             ->with($this->isInstanceOf(ParsedExpression::class))
-            ->willReturnCallback(function ($parsedExpression) use (&$savedParsedExpression, $cacheItemMock) {
+            ->willReturnCallback(static function ($parsedExpression) use (&$savedParsedExpression, $cacheItemMock) {
                 $savedParsedExpression = $parsedExpression;
 
                 return $cacheItemMock;
@@ -153,7 +153,7 @@ class ExpressionLanguageTest extends TestCase
     public static function providerTestCases(): iterable
     {
         yield 'array' => [[new TestProvider()]];
-        yield 'Traversable' => [(function () {
+        yield 'Traversable' => [(static function () {
             yield new TestProvider();
         })()];
     }
@@ -258,7 +258,7 @@ class ExpressionLanguageTest extends TestCase
         $cacheItemMock
             ->expects($this->exactly(2))
             ->method('get')
-            ->willReturnCallback(function () use (&$savedParsedExpression) {
+            ->willReturnCallback(static function () use (&$savedParsedExpression) {
                 return $savedParsedExpression;
             })
         ;
@@ -267,7 +267,7 @@ class ExpressionLanguageTest extends TestCase
             ->expects($this->exactly(1))
             ->method('set')
             ->with($this->isInstanceOf(ParsedExpression::class))
-            ->willReturnCallback(function ($parsedExpression) use (&$savedParsedExpression, $cacheItemMock) {
+            ->willReturnCallback(static function ($parsedExpression) use (&$savedParsedExpression, $cacheItemMock) {
                 $savedParsedExpression = $parsedExpression;
 
                 return $cacheItemMock;
@@ -346,6 +346,8 @@ class ExpressionLanguageTest extends TestCase
         yield ['foo["bar"]?.baz()', ['bar' => null]];
         yield ['foo.bar()?.baz', $foo];
         yield ['foo.bar()?.baz()', $foo];
+        yield ['foo?.[0]', null];
+        yield ['foo?.[0].bar', null];
 
         yield ['foo?.bar.baz', null];
         yield ['foo?.bar["baz"]', null];
@@ -396,6 +398,7 @@ class ExpressionLanguageTest extends TestCase
         yield ['foo?.bar.baz', (object) ['bar' => null], 'Unable to get property "baz" of non-object "foo?.bar".'];
         yield ['foo?.bar["baz"]', (object) ['bar' => null], 'Unable to get an item of non-array "foo?.bar".'];
         yield ['foo?.bar["baz"].qux.quux', (object) ['bar' => ['baz' => null]], 'Unable to get property "qux" of non-object "foo?.bar["baz"]".'];
+        yield ['foo?.[0].bar', [null], 'Unable to get property "bar" of non-object "foo?.[0]".'];
     }
 
     #[DataProvider('provideNullCoalescing')]
@@ -507,17 +510,17 @@ class ExpressionLanguageTest extends TestCase
     {
         return [
             [
-                function (ExpressionLanguage $el) {
-                    $el->register('fn', function () {}, function () {});
+                static function (ExpressionLanguage $el) {
+                    $el->register('fn', static function () {}, static function () {});
                 },
             ],
             [
-                function (ExpressionLanguage $el) {
-                    $el->addFunction(new ExpressionFunction('fn', function () {}, function () {}));
+                static function (ExpressionLanguage $el) {
+                    $el->addFunction(new ExpressionFunction('fn', static function () {}, static function () {}));
                 },
             ],
             [
-                function (ExpressionLanguage $el) {
+                static function (ExpressionLanguage $el) {
                     $el->registerProvider(new TestProvider());
                 },
             ],

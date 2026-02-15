@@ -74,7 +74,7 @@ final class ImportMapOutdatedCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $packages = $input->getArgument('packages');
         $packagesUpdateInfos = $this->updateChecker->getAvailableUpdates($packages);
-        $packagesUpdateInfos = array_filter($packagesUpdateInfos, fn ($packageUpdateInfo) => $packageUpdateInfo->hasUpdate());
+        $packagesUpdateInfos = array_filter($packagesUpdateInfos, static fn ($packageUpdateInfo) => $packageUpdateInfo->hasUpdate());
         if (0 === \count($packagesUpdateInfos)) {
             if ('json' === $input->getOption('format')) {
                 $io->writeln('[]');
@@ -85,7 +85,7 @@ final class ImportMapOutdatedCommand extends Command
             return Command::SUCCESS;
         }
 
-        $displayData = array_map(fn (string $importName, PackageUpdateInfo $packageUpdateInfo) => [
+        $displayData = array_map(static fn (string $importName, PackageUpdateInfo $packageUpdateInfo) => [
             'name' => $importName,
             'current' => $packageUpdateInfo->currentVersion,
             'latest' => $packageUpdateInfo->latestVersion,

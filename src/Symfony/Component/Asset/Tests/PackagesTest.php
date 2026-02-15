@@ -24,8 +24,8 @@ class PackagesTest extends TestCase
     public function testGetterSetters()
     {
         $packages = new Packages();
-        $packages->setDefaultPackage($default = $this->createMock(PackageInterface::class));
-        $packages->addPackage('a', $a = $this->createMock(PackageInterface::class));
+        $packages->setDefaultPackage($default = $this->createStub(PackageInterface::class));
+        $packages->addPackage('a', $a = $this->createStub(PackageInterface::class));
 
         $this->assertSame($default, $packages->getPackage());
         $this->assertSame($a, $packages->getPackage('a'));

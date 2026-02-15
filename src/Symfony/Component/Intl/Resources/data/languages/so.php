@@ -29,6 +29,7 @@ return [
         'ay' => 'U dhashay Aymar',
         'az' => 'Asarbayjan',
         'ba' => 'Bashkir',
+        'bal' => 'Baluchi',
         'ban' => 'U dhashay Baline',
         'bas' => 'Basaa',
         'be' => 'Beleruusiyaan',

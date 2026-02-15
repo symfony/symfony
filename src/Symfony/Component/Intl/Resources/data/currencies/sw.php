@@ -650,6 +650,10 @@ return [
             'EC$',
             'Dola ya Karibi Mashariki',
         ],
+        'XCG' => [
+            'Cg.',
+            'Guilder ya Karibe',
+        ],
         'XOF' => [
             'F CFA',
             'Faranga ya Afrika Magharibi CFA',
@@ -677,6 +681,10 @@ return [
         'ZWD' => [
             'ZWD',
             'Dola ya Zimbabwe',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'Dhahabu ya Zimbabwe',
         ],
     ],
 ];

@@ -392,11 +392,33 @@ class Inline
                     // the value can be an array if a reference has been resolved to an array var
                     if (\is_string($value) && !$isQuoted && str_contains($value, ': ')) {
                         // embedded mapping?
-                        try {
-                            $pos = 0;
-                            $value = self::parseMapping('{'.$value.'}', $flags, $pos, $references);
-                        } catch (\InvalidArgumentException) {
-                            // no, it's not
+                        $j = $i;
+                        $mappingValue = $value;
+                        $mappingException = null;
+                        do {
+                            try {
+                                $pos = 0;
+                                $value = self::parseMapping('{'.$mappingValue.'}', $flags, $pos, $references);
+                                $i = $j;
+                                $mappingException = null;
+                                break;
+                            } catch (ParseException $exception) {
+                                $mappingException = $exception;
+                                if ($j >= $len) {
+                                    break;
+                                }
+
+                                $mappingValue .= $sequence[$j++];
+                                if ($j >= $len) {
+                                    break;
+                                }
+
+                                $mappingValue .= self::parseScalar($sequence, $flags, [',', ']'], $j, null === $tag, $references);
+                            }
+                        } while ($j < $len);
+
+                        if ($mappingException) {
+                            throw $mappingException;
                         }
                     }
 
@@ -714,6 +736,10 @@ class Inline
                 switch (true) {
                     case ctype_digit($scalar):
                     case '-' === $scalar[0] && ctype_digit(substr($scalar, 1)):
+                        if ($scalar < \PHP_INT_MIN || \PHP_INT_MAX < $scalar) {
+                            return $scalar;
+                        }
+
                         $cast = (int) $scalar;
 
                         return ($scalar === (string) $cast) ? $cast : $scalar;

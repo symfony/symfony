@@ -79,7 +79,7 @@ class Query
     }
 
     /**
-     * @return array<int, string|int|float}>
+     * @return array<int, string|int|float>
      */
     public function getParams(): array
     {

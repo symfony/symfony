@@ -17,7 +17,9 @@ use Doctrine\DBAL\Exception\DatabaseObjectExistsException;
 use Doctrine\DBAL\Exception\DatabaseObjectNotFoundException;
 use Doctrine\DBAL\Schema\Name\Identifier;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\NamedObject;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
@@ -26,13 +28,42 @@ abstract class AbstractSchemaListener
 {
     abstract public function postGenerateSchema(GenerateSchemaEventArgs $event): void;
 
+    protected function filterSchemaChanges(Schema $schema, Connection $connection, callable $configurator): void
+    {
+        $filter = $connection->getConfiguration()->getSchemaAssetsFilter();
+
+        if (null === $filter) {
+            $configurator();
+
+            return;
+        }
+
+        $getNames = static fn ($array) => array_map(static fn ($object) => $object instanceof NamedObject ? $object->getObjectName()->toString() : $object->getName(), $array);
+        $previousTableNames = $getNames($schema->getTables());
+        $previousSequenceNames = $getNames($schema->getSequences());
+
+        $configurator();
+
+        foreach (array_diff($getNames($schema->getTables()), $previousTableNames) as $addedTable) {
+            if (!$filter($addedTable)) {
+                $schema->dropTable($addedTable);
+            }
+        }
+
+        foreach (array_diff($getNames($schema->getSequences()), $previousSequenceNames) as $addedSequence) {
+            if (!$filter($addedSequence)) {
+                $schema->dropSequence($addedSequence);
+            }
+        }
+    }
+
     /**
      * @return \Closure(\Closure(string): mixed): bool
      */
     protected function getIsSameDatabaseChecker(Connection $connection): \Closure
     {
         return static function (\Closure $exec) use ($connection): bool {
-            $schemaManager = method_exists($connection, 'createSchemaManager') ? $connection->createSchemaManager() : $connection->getSchemaManager();
+            $schemaManager = $connection->createSchemaManager();
             $key = bin2hex(random_bytes(7));
             $table = new Table('_schema_subscriber_check');
             $table->addColumn('id', Types::INTEGER)
@@ -43,11 +74,7 @@ abstract class AbstractSchemaListener
                 ->setNotNull(true)
             ;
 
-            if (class_exists(PrimaryKeyConstraint::class)) {
-                $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('id'))], true));
-            } else {
-                $table->setPrimaryKey(['id']);
-            }
+            $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('id'))], true));
 
             try {
                 $schemaManager->createTable($table);
@@ -58,7 +85,7 @@ abstract class AbstractSchemaListener
 
             try {
                 $exec(\sprintf('DELETE FROM _schema_subscriber_check WHERE random_key = %s', $connection->getDatabasePlatform()->quoteStringLiteral($key)));
-            } catch (DatabaseObjectNotFoundException|ConnectionException) {
+            } catch (DatabaseObjectNotFoundException|ConnectionException|\PDOException) {
             }
 
             try {

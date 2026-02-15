@@ -149,7 +149,7 @@ class LoggerDataCollectorTest extends TestCase
         $this->assertEquals('logger', $c->getName());
         $this->assertEquals($nb, $c->countErrors());
 
-        $logs = array_map(function ($v) {
+        $logs = array_map(static function ($v) {
             if (isset($v['context']['exception'])) {
                 $e = &$v['context']['exception'];
                 $e = isset($e["\0*\0message"]) ? [$e["\0*\0message"], $e["\0*\0severity"]] : [$e["\0Symfony\Component\ErrorHandler\Exception\SilencedErrorContext\0severity"]];
@@ -183,10 +183,6 @@ class LoggerDataCollectorTest extends TestCase
             0,
             0,
         ];
-
-        if (!class_exists(SilencedErrorContext::class)) {
-            return;
-        }
 
         yield 'logs with some deprecations' => [
             1,

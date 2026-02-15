@@ -41,7 +41,7 @@ class SecretsEncryptFromLocalCommandTest extends TestCase
 
     public function testFailsWhenLocalVaultIsDisabled()
     {
-        $vault = $this->createMock(AbstractVault::class);
+        $vault = $this->createStub(AbstractVault::class);
         $command = new SecretsEncryptFromLocalCommand($vault, null);
         $tester = new CommandTester($command);
 
@@ -91,7 +91,7 @@ class SecretsEncryptFromLocalCommandTest extends TestCase
         $this->assertSame('same-value', $revealed);
     }
 
-    public function testFailsIfLocalSecretIsMissing()
+    public function testStillSucceedsIfLocalSecretIsMissing()
     {
         $vault = new SodiumVault($this->vaultDir);
         $vault->generateKeys();
@@ -104,7 +104,8 @@ class SecretsEncryptFromLocalCommandTest extends TestCase
         $command = new SecretsEncryptFromLocalCommand($vault, $localVault);
         $tester = new CommandTester($command);
 
-        $this->assertSame(1, $tester->execute([]));
-        $this->assertStringContainsString('Secret "MISSING_IN_LOCAL" not found', $tester->getDisplay());
+        $this->assertSame(0, $tester->execute([]));
+        $revealed = $vault->reveal('MISSING_IN_LOCAL');
+        $this->assertSame('prod-only', $revealed);
     }
 }

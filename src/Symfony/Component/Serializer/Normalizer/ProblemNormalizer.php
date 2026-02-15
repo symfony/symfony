@@ -65,13 +65,13 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
             $exception = $exception->getPrevious();
 
             if ($exception instanceof PartialDenormalizationException) {
-                $trans = $this->translator ? $this->translator->trans(...) : fn ($m, $p) => strtr($m, $p);
+                $trans = $this->translator ? $this->translator->trans(...) : static fn ($m, $p) => strtr($m, $p);
                 $template = 'This value should be of type {{ type }}.';
                 $error = [
                     self::TYPE => 'https://symfony.com/errors/validation',
                     self::TITLE => 'Validation Failed',
                     'violations' => array_map(
-                        fn ($e) => [
+                        static fn ($e) => [
                             'propertyPath' => $e->getPath(),
                             'title' => $trans($template, [
                                 '{{ type }}' => implode('|', $e->getExpectedTypes() ?? ['?']),
@@ -84,7 +84,7 @@ class ProblemNormalizer implements NormalizerInterface, SerializerAwareInterface
                         $exception->getErrors()
                     ),
                 ];
-                $error['detail'] = implode("\n", array_map(fn ($e) => $e['propertyPath'].': '.$e['title'], $error['violations']));
+                $error['detail'] = implode("\n", array_map(static fn ($e) => $e['propertyPath'].': '.$e['title'], $error['violations']));
             } elseif (($exception instanceof ValidationFailedException || $exception instanceof MessageValidationFailedException)
                 && $this->serializer instanceof NormalizerInterface
                 && $this->serializer->supportsNormalization($exception->getViolations(), $format, $context)

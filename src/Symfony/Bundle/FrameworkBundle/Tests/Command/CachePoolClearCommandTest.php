@@ -13,10 +13,10 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Command;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Bundle\FrameworkBundle\Command\CachePoolClearCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\CacheClearer\Psr6CacheClearer;
@@ -24,18 +24,11 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class CachePoolClearCommandTest extends TestCase
 {
-    private CacheItemPoolInterface $cachePool;
-
-    protected function setUp(): void
-    {
-        $this->cachePool = $this->createMock(CacheItemPoolInterface::class);
-    }
-
     #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $application = new Application($this->getKernel());
-        $application->addCommand(new CachePoolClearCommand(new Psr6CacheClearer(['foo' => $this->cachePool]), ['foo']));
+        $application->addCommand(new CachePoolClearCommand(new Psr6CacheClearer(['foo' => new ArrayAdapter()]), ['foo']));
         $tester = new CommandCompletionTester($application->get('cache:pool:clear'));
 
         $suggestions = $tester->complete($input);

@@ -199,20 +199,22 @@ class GraphvizDumper implements DumperInterface
         foreach ($definition->getTransitions() as $i => $transition) {
             $transitionName = $workflowMetadata->getMetadata('label', $transition) ?? $transition->getName();
 
-            foreach ($transition->getFroms() as $from) {
+            foreach ($transition->getFroms(true) as $arc) {
                 $dotEdges[] = [
-                    'from' => $from,
+                    'from' => $arc->place,
                     'to' => $transitionName,
                     'direction' => 'from',
                     'transition_number' => $i,
+                    'weight' => $arc->weight,
                 ];
             }
-            foreach ($transition->getTos() as $to) {
+            foreach ($transition->getTos(true) as $arc) {
                 $dotEdges[] = [
                     'from' => $transitionName,
-                    'to' => $to,
+                    'to' => $arc->place,
                     'direction' => 'to',
                     'transition_number' => $i,
+                    'weight' => $arc->weight,
                 ];
             }
         }
@@ -229,14 +231,16 @@ class GraphvizDumper implements DumperInterface
 
         foreach ($edges as $edge) {
             if ('from' === $edge['direction']) {
-                $code .= \sprintf("  place_%s -> transition_%s [style=\"solid\"];\n",
+                $code .= \sprintf("  place_%s -> transition_%s [style=\"solid\"%s];\n",
                     $this->dotize($edge['from']),
-                    $this->dotize($edge['transition_number'])
+                    $this->dotize($edge['transition_number']),
+                    $edge['weight'] > 1 ? \sprintf(',label="%s"', $this->escape($edge['weight'])) : '',
                 );
             } else {
-                $code .= \sprintf("  transition_%s -> place_%s [style=\"solid\"];\n",
+                $code .= \sprintf("  transition_%s -> place_%s [style=\"solid\"%s];\n",
                     $this->dotize($edge['transition_number']),
-                    $this->dotize($edge['to'])
+                    $this->dotize($edge['to']),
+                    $edge['weight'] > 1 ? \sprintf(',label="%s"', $this->escape($edge['weight'])) : '',
                 );
             }
         }

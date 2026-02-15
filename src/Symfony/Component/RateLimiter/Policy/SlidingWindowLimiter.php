@@ -91,7 +91,7 @@ final class SlidingWindowLimiter implements LimiterInterface
                 $reservation = new Reservation($now + $waitDuration, new RateLimit($this->getAvailableTokens($window->getHitCount()), \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->limit));
             }
 
-            if (0 < $tokens) {
+            if (0 !== $tokens) {
                 $this->storage->save($window);
             }
         } finally {

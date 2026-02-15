@@ -126,7 +126,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
             }
 
             $ser = preg_replace_callback('/;O:(\d+):"/', static fn ($m) => ';O:'.(9 + $m[1]).':"Tracking\\', $ser);
-            $ser = preg_replace_callback('/s:(\d+):"\0[^\0]++\0/', static fn ($m) => 's:'.($m[1] - \strlen($m[0]) + 6).':"', $ser);
+            $ser = preg_replace_callback('/s:(\d+):"(\0[^\0]++\0)/', static fn ($m) => 's:'.($m[1] - \strlen($m[2])).':"', $ser);
             $ser = unserialize($ser, ['allowed_classes' => false]);
             $ser = @json_encode($ser, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE) ?: [];
             $ser = str_replace('"__PHP_Incomplete_Class_Name":"Tracking\\\\', '"@type":"', $ser);
@@ -151,7 +151,7 @@ class ResourceCheckerConfigCache implements ConfigCacheInterface
         $content = (new Filesystem())->readFile($file);
         $signalingException = new \UnexpectedValueException();
         $prevUnserializeHandler = ini_set('unserialize_callback_func', self::class.'::handleUnserializeCallback');
-        $prevErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler, $signalingException) {
+        $prevErrorHandler = set_error_handler(static function ($type, $msg, $file, $line, $context = []) use (&$prevErrorHandler, $signalingException) {
             if (__FILE__ === $file && !\in_array($type, [\E_DEPRECATED, \E_USER_DEPRECATED], true)) {
                 throw $signalingException;
             }

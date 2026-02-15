@@ -92,7 +92,7 @@ class SodiumVaultTest extends TestCase
         $envVars['MY_SECRET'] = (string) $envVars['MY_SECRET'];
         $this->assertSame(['MY_SECRET' => ''], $envVars);
 
-        $vault = new SodiumVault($this->secretsDir, LazyString::fromCallable(fn () => ''), 'MY_SECRET');
+        $vault = new SodiumVault($this->secretsDir, LazyString::fromCallable(static fn () => ''), 'MY_SECRET');
         $envVars = $vault->loadEnvVars();
         $envVars['MY_SECRET'] = (string) $envVars['MY_SECRET'];
         $this->assertSame(['MY_SECRET' => ''], $envVars);

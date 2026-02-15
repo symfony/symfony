@@ -15,7 +15,7 @@ use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
-use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Provider\ProviderFactoryInterface;
 use Symfony\Component\Translation\Test\AbstractProviderFactoryTestCase;
 use Symfony\Component\Translation\Test\IncompleteDsnTestTrait;
@@ -55,6 +55,6 @@ class CrowdinProviderFactoryTest extends AbstractProviderFactoryTestCase
 
     public function createFactory(): ProviderFactoryInterface
     {
-        return new CrowdinProviderFactory(new MockHttpClient(), new NullLogger(), 'en', $this->createMock(LoaderInterface::class), $this->createMock(XliffFileDumper::class));
+        return new CrowdinProviderFactory(new MockHttpClient(), new NullLogger(), 'en', new ArrayLoader(), new XliffFileDumper());
     }
 }

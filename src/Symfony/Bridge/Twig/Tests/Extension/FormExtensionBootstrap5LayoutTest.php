@@ -18,7 +18,7 @@ use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\FormRenderer;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -67,7 +67,7 @@ class FormExtensionBootstrap5LayoutTest extends AbstractBootstrap5LayoutTestCase
             'bootstrap_5_layout.html.twig',
             'custom_widgets.html.twig',
         ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->getMockBuilder(CsrfTokenManagerInterface::class)->getMock());
+        $this->renderer = new FormRenderer($rendererEngine, new CsrfTokenManager());
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
 
         $view = $this->factory
@@ -75,7 +75,7 @@ class FormExtensionBootstrap5LayoutTest extends AbstractBootstrap5LayoutTestCase
             ->createView();
 
         self::assertSame(<<<'HTML'
-            <div class="input-group "><span class="input-group-text">&euro; </span><input type="text" id="name" name="name" required="required" class="form-control" /></div>
+            <div class="input-group "><span class="input-group-text">&euro; </span><input type="text" id="name" name="name" required="required" inputmode="decimal" class="form-control" /></div>
             HTML,
             trim($this->renderWidget($view))
         );

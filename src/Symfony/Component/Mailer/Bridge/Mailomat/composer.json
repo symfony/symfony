@@ -16,16 +16,16 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
-        "symfony/mailer": "^7.2|^8.0"
+        "php": ">=8.4",
+        "symfony/mailer": "^7.4|^8.0"
     },
     "require-dev": {
-        "symfony/http-client": "^6.4|^7.0|^8.0",
-        "symfony/http-foundation": "^7.1|^8.0",
-        "symfony/webhook": "^6.4|^7.0|^8.0"
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/webhook": "^7.4|^8.0"
     },
     "conflict": {
-        "symfony/http-foundation": "<7.1"
+        "symfony/http-foundation": "<7.4"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\Bridge\\Mailomat\\": "" },

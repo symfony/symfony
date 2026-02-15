@@ -78,7 +78,7 @@ return [
         'FJ' => 'Fidži',
         'FK' => 'Falklandski Otoci',
         'FM' => 'Mikronezija',
-        'FO' => 'Ovčji Otoci',
+        'FO' => 'Farski Otoci',
         'FR' => 'Francuska',
         'GA' => 'Gabon',
         'GB' => 'Ujedinjeno Kraljevstvo',

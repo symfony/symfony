@@ -43,26 +43,4 @@ class DiscriminatorMap
             throw new InvalidArgumentException(\sprintf('Default type "%s" given to "%s" must be present in "mapping" types.', $this->defaultType, static::class));
         }
     }
-
-    #[\Deprecated('Use the "typeProperty" property instead', 'symfony/serializer:7.4')]
-    public function getTypeProperty(): string
-    {
-        return $this->typeProperty;
-    }
-
-    #[\Deprecated('Use the "mapping" property instead', 'symfony/serializer:7.4')]
-    public function getMapping(): array
-    {
-        return $this->mapping;
-    }
-
-    #[\Deprecated('Use the "defaultType" property instead', 'symfony/serializer:7.4')]
-    public function getDefaultType(): ?string
-    {
-        return $this->defaultType;
-    }
-}
-
-if (!class_exists(\Symfony\Component\Serializer\Annotation\DiscriminatorMap::class, false)) {
-    class_alias(DiscriminatorMap::class, \Symfony\Component\Serializer\Annotation\DiscriminatorMap::class);
 }

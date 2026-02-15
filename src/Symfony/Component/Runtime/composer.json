@@ -16,18 +16,18 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "composer-plugin-api": "^1.0|^2.0"
     },
     "require-dev": {
         "composer/composer": "^2.6",
-        "symfony/console": "^6.4|^7.0|^8.0",
-        "symfony/dotenv": "^6.4|^7.0|^8.0",
-        "symfony/http-foundation": "^6.4|^7.0|^8.0",
-        "symfony/http-kernel": "^6.4|^7.0|^8.0"
+        "symfony/console": "^7.4|^8.0",
+        "symfony/dotenv": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0"
     },
     "conflict": {
-        "symfony/dotenv": "<6.4"
+        "symfony/error-handler": "<7.4"
     },
     "autoload": {
         "psr-4": {

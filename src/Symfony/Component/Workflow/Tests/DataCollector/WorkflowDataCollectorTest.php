@@ -15,10 +15,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
-use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Security\Core\Role\RoleHierarchy;
+use Symfony\Component\Validator\ValidatorBuilder;
 use Symfony\Component\Workflow\DataCollector\WorkflowDataCollector;
 use Symfony\Component\Workflow\EventListener\ExpressionLanguage;
 use Symfony\Component\Workflow\EventListener\GuardListener;
@@ -34,19 +34,19 @@ class WorkflowDataCollectorTest extends TestCase
         $workflow1 = new Workflow($this->createComplexWorkflowDefinition(), name: 'workflow1');
         $workflow2 = new Workflow($this->createSimpleWorkflowDefinition(), name: 'workflow2');
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener('workflow.workflow2.leave.a', fn () => true);
+        $dispatcher->addListener('workflow.workflow2.leave.a', static fn () => true);
         $dispatcher->addListener('workflow.workflow2.leave.a', [self::class, 'noop']);
         $dispatcher->addListener('workflow.workflow2.leave.a', [$this, 'noop']);
         $dispatcher->addListener('workflow.workflow2.leave.a', $this->noop(...));
         $dispatcher->addListener('workflow.workflow2.leave.a', 'var_dump');
         $guardListener = new GuardListener(
             ['workflow.workflow2.guard.t1' => ['my_expression']],
-            $this->createMock(ExpressionLanguage::class),
-            $this->createMock(TokenStorageInterface::class),
-            $this->createMock(AuthorizationCheckerInterface::class),
-            $this->createMock(AuthenticationTrustResolverInterface::class),
-            $this->createMock(RoleHierarchyInterface::class),
-            $this->createMock(ValidatorInterface::class)
+            new ExpressionLanguage(),
+            new TokenStorage(),
+            $this->createStub(AuthorizationCheckerInterface::class),
+            $this->createStub(AuthenticationTrustResolverInterface::class),
+            new RoleHierarchy([]),
+            (new ValidatorBuilder())->getValidator()
         );
         $dispatcher->addListener('workflow.workflow2.guard.t1', [$guardListener, 'onTransition']);
 

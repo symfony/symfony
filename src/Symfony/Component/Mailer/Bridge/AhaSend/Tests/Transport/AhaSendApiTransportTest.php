@@ -119,7 +119,7 @@ class AhaSendApiTransportTest extends TestCase
 
         $expectedEvent = (new AhaSendDeliveryEvent('someone@gmil.com: Invalid recipient'));
 
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher = $this->createStub(EventDispatcherInterface::class);
         $dispatcher
             ->method('dispatch')
             ->willReturnCallback(function ($event) use ($expectedEvent) {

@@ -20,7 +20,7 @@ class SingleMessageReceiverTest extends TestCase
 {
     public function testItReceivesOnlyOneMessage()
     {
-        $innerReceiver = $this->createMock(ReceiverInterface::class);
+        $innerReceiver = $this->createStub(ReceiverInterface::class);
         $envelope = new Envelope(new \stdClass());
 
         $receiver = new SingleMessageReceiver($innerReceiver, $envelope);

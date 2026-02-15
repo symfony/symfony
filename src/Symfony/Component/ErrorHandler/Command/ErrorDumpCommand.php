@@ -68,7 +68,7 @@ final class ErrorDumpCommand extends Command
     private function dump(SymfonyStyle $io, string $path, array $statusCodes, bool $force = false): void
     {
         if (!$statusCodes) {
-            $statusCodes = array_filter(array_keys(Response::$statusTexts), fn ($statusCode) => $statusCode >= 400);
+            $statusCodes = array_filter(array_keys(Response::$statusTexts), static fn ($statusCode) => $statusCode >= 400);
         }
 
         if ($force || ($this->filesystem->exists($path) && $io->confirm(\sprintf('The "%s" directory already exists. Do you want to remove it before dumping the error pages?', $path), false))) {

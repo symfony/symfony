@@ -32,7 +32,7 @@ class JsonCrawlerTest extends TestCase
     public function testInvalidInputJson()
     {
         $this->expectException(InvalidJsonStringInputException::class);
-        $this->expectExceptionMessage('Invalid JSON input: Syntax error.');
+        $this->expectExceptionMessage('Invalid JSON input: Syntax error');
 
         (new JsonCrawler('invalid'))->find('$..*');
     }

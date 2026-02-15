@@ -20,7 +20,7 @@ class LazyStringTest extends TestCase
     public function testLazyString()
     {
         $count = 0;
-        $s = LazyString::fromCallable(function () use (&$count) {
+        $s = LazyString::fromCallable(static function () use (&$count) {
             return ++$count;
         });
 
@@ -32,7 +32,7 @@ class LazyStringTest extends TestCase
     #[RunInSeparateProcess]
     public function testReturnTypeError()
     {
-        $s = LazyString::fromCallable(fn () => []);
+        $s = LazyString::fromCallable(static fn () => []);
 
         $this->expectException(\TypeError::class);
         $this->expectExceptionMessageMatches('{^Return value of .*\{closure.*\}\(\) passed to '.preg_quote(LazyString::class).'::fromCallable\(\) must be of the type string, array returned\.$}');
@@ -43,7 +43,7 @@ class LazyStringTest extends TestCase
     public function testLazyCallable()
     {
         $count = 0;
-        $s = LazyString::fromCallable([function () use (&$count) {
+        $s = LazyString::fromCallable([static function () use (&$count) {
             return new class($count) {
                 private int $count;
 

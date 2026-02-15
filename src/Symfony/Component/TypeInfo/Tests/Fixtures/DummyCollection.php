@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\TypeInfo\Tests\Fixtures;
 
+/**
+ * @template TKey of array-key
+ * @template TValue
+ */
 final class DummyCollection implements \IteratorAggregate
 {
     public function getIterator(): \Traversable

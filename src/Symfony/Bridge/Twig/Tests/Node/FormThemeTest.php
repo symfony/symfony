@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormRendererEngineInterface;
 use Twig\Compiler;
 use Twig\Environment;
-use Twig\Loader\LoaderInterface;
+use Twig\Loader\ArrayLoader;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\Variable\ContextVariable;
@@ -55,8 +55,8 @@ class FormThemeTest extends TestCase
 
         $node = new FormThemeNode($form, $resources, 0);
 
-        $environment = new Environment($this->createMock(LoaderInterface::class));
-        $formRenderer = new FormRenderer($this->createMock(FormRendererEngineInterface::class));
+        $environment = new Environment(new ArrayLoader());
+        $formRenderer = new FormRenderer($this->createStub(FormRendererEngineInterface::class));
         $this->registerTwigRuntimeLoader($environment, $formRenderer);
         $compiler = new Compiler($environment);
 

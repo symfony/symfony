@@ -79,7 +79,8 @@ class JsonDescriptor extends Descriptor
         if ($service instanceof Alias) {
             $this->describeContainerAlias($service, $options, $container);
         } elseif ($service instanceof Definition) {
-            $this->writeData($this->getContainerDefinitionData($service, isset($options['omit_tags']) && $options['omit_tags'], $container, $options['id']), $options);
+            $data = $this->getContainerDefinitionData($service, isset($options['omit_tags']) && $options['omit_tags'], $container, $options['id']);
+            $this->writeData($data, $options);
         } else {
             $this->writeData($service::class, $options);
         }
@@ -297,7 +298,7 @@ class JsonDescriptor extends Descriptor
 
         if (!$omitTags) {
             $data['tags'] = [];
-            foreach ($this->sortTagsByPriority($definition->getTags()) as $tagName => $tagData) {
+            foreach ($this->sortTagsByPriority($container ? $this->resolvePriorityServiceTags($container, $definition) : $definition->getTags()) as $tagName => $tagData) {
                 foreach ($tagData as $parameters) {
                     $data['tags'][] = ['name' => $tagName, 'parameters' => $parameters];
                 }
@@ -305,6 +306,13 @@ class JsonDescriptor extends Descriptor
         }
 
         $data['usages'] = null !== $container && null !== $id ? $this->getServiceEdges($container, $id) : [];
+
+        if ($container && $id) {
+            $decorationStack = $this->getDecorationStack($container, $id);
+            if (\count($decorationStack) > 1) {
+                $data['decoration_stack'] = $decorationStack;
+            }
+        }
 
         return $data;
     }
@@ -329,7 +337,7 @@ class JsonDescriptor extends Descriptor
                 $data[] = $l;
             }
         } else {
-            $registeredListeners = \array_key_exists('events', $options) ? array_combine($options['events'], array_map(fn ($event) => $eventDispatcher->getListeners($event), $options['events'])) : $eventDispatcher->getListeners();
+            $registeredListeners = \array_key_exists('events', $options) ? array_combine($options['events'], array_map(static fn ($event) => $eventDispatcher->getListeners($event), $options['events'])) : $eventDispatcher->getListeners();
             ksort($registeredListeners);
 
             foreach ($registeredListeners as $eventListened => $eventListeners) {

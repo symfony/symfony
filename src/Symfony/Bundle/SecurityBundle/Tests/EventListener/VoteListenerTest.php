@@ -21,7 +21,7 @@ class VoteListenerTest extends TestCase
 {
     public function testOnVoterVote()
     {
-        $voter = $this->createMock(VoterInterface::class);
+        $voter = $this->createStub(VoterInterface::class);
 
         $traceableAccessDecisionManager = $this
             ->getMockBuilder(TraceableAccessDecisionManager::class)

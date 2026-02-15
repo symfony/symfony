@@ -22,6 +22,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\LoginLink\Exception\ExpiredLoginLinkException;
 use Symfony\Component\Security\Http\LoginLink\Exception\InvalidLoginLinkException;
+use Symfony\Component\Security\Http\ParameterBagUtils;
 
 /**
  * @author Ryan Weaver <ryan@symfonycasts.com>
@@ -79,16 +80,16 @@ final class LoginLinkHandler implements LoginLinkHandlerInterface
 
     public function consumeLoginLink(Request $request): UserInterface
     {
-        $userIdentifier = $request->get('user');
+        $userIdentifier = ParameterBagUtils::getRequestParameterValue($request, 'user');
 
-        if (!$hash = $request->get('hash')) {
+        if (!$hash = ParameterBagUtils::getRequestParameterValue($request, 'hash')) {
             throw new InvalidLoginLinkException('Missing "hash" parameter.');
         }
         if (!\is_string($hash)) {
             throw new InvalidLoginLinkException('Invalid "hash" parameter.');
         }
 
-        if (!$expires = $request->get('expires')) {
+        if (!$expires = ParameterBagUtils::getRequestParameterValue($request, 'expires')) {
             throw new InvalidLoginLinkException('Missing "expires" parameter.');
         }
         if (!preg_match('/^\d+$/', $expires)) {

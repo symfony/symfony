@@ -1,9 +1,47 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `marshaller` option to cache pool configuration to allow per-pool marshaller services
+ * Add support for `lock://` DSN in semaphore configuration to use the Lock component as a semaphore store
+ * Add support for configuring JsonStreamer's `default_options`
+ * Add project-scoped `flock` and `semaphore` lock store services
+ * Add `createFormFlowBuilder` method to `AbstractController` and `ControllerHelper`
+ * Deprecate setting the `framework.profiler.collect_serializer_data` config option
+ * Add support for `framework.secrets.decryption_env_var` to contain dots
+ * Enable mocking non-shared services in tests
+ * Add support for setting `mock_response_factory` per scoped HTTP client
+ * Add `KernelTestCase::executeCommand()` to execute a command in functional tests
+ * Add `framework.html_sanitizer.sanitizers.*.default_action` config option
+ * Deprecate parameters `router.request_context.scheme` and `router.request_context.host`;
+   use the `router.request_context.base_url` parameter or the `framework.router.default_uri` config option instead
+ * Add decoration stack to `debug:container` command output
+
+8.0
+---
+
+ * Remove the `WorkflowDumpCommand` class; the `workflow:dump` command works the same as before but its class is now defined in the Workflow component
+ * Remove `errors.xml` and `webhook.xml` routing configuration files (use their PHP equivalent instead)
+ * Enable the property info constructor extractor by default
+ * Remove deprecated `Symfony\Bundle\FrameworkBundle\Console\Application::add()` method in favor of `Symfony\Bundle\FrameworkBundle\Console\Application::addCommand()`
+ * Make `Router` class `final`
+ * Make `SerializerCacheWarmer` class `final`
+ * Make `Translator` class `final`
+ * Make `TranslationsCacheWarmer` class `final`
+ * Make `ValidatorCacheWarmer` class `final`
+ * Remove autowiring aliases for `RateLimiterFactory`; use `RateLimiterFactoryInterface` instead
+ * Remove `session.sid_length` and `session.sid_bits_per_character` config options
+ * Remove the `router.cache_dir` config option
+ * Remove the `validation.cache` option
+ * Remove `TranslationUpdateCommand` in favor of `TranslationExtractCommand`
+ * Remove `ConfigBuilderCacheWarmer`, return PHP arrays from your config instead
+
 7.4
 ---
 
+ * Auto-generate `config/reference.php` to assist in writing and discovering app's configuration
  * Auto-register routes from attributes found on controller services
  * Add `ControllerHelper`; the helpers from AbstractController as a standalone service
  * Allow using their name without added suffix when using `#[Target]` for custom services
@@ -12,6 +50,14 @@ CHANGELOG
  * Add `framework.type_info.aliases` option
  * Add `KernelBrowser::getSession()`
  * Add support for configuring workflow places with glob patterns matching consts/backed enums
+ * Add support for configuring the `CachingHttpClient`
+ * Add support for weighted transitions in workflows
+ * Add support for union types with `Symfony\Component\EventDispatcher\Attribute\AsEventListener`
+ * Add `framework.allowed_http_method_override` option
+ * Initialize `router.request_context`'s `_locale` parameter to `%kernel.default_locale%`
+ * Deprecate `ConfigBuilderCacheWarmer`, return PHP arrays from your config instead
+ * Add support for selecting the appropriate error renderer based on the `APP_RUNTIME_MODE` env var
+ * Add `KernelInterface::getShareDir()`, `APP_SHARE_DIR` and `%kernel.share_dir%` to store application data that are shared between all front-end servers
 
 7.3
 ---
@@ -143,6 +189,7 @@ CHANGELOG
 
  * Add `HttpClientAssertionsTrait`
  * Add `AbstractController::renderBlock()` and `renderBlockView()`
+ * Remove call to `renderView()` in `AbstractController::render()`
  * Add native return type to `Translator` and to `Application::reset()`
  * Deprecate the integration of Doctrine annotations, either uninstall the `doctrine/annotations` package or disable the integration by setting `framework.annotations` to `false`
  * Enable `json_decode_detailed_errors` context for Serializer by default if `kernel.debug` is true and the `seld/jsonlint` package is installed

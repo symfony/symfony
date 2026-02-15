@@ -63,9 +63,7 @@ final class TraceableCommand extends Command
         parent::__construct($command->getName());
 
         // init below enables calling {@see parent::run()}
-        [$code, $processTitle, $ignoreValidationErrors] = \Closure::bind(function () {
-            return [$this->code, $this->processTitle, $this->ignoreValidationErrors];
-        }, $command, Command::class)();
+        [$code, $processTitle, $ignoreValidationErrors] = \Closure::bind(fn () => [$this->code, $this->processTitle, $this->ignoreValidationErrors], $command, Command::class)();
 
         if (\is_callable($code)) {
             $this->setCode($code);
@@ -169,9 +167,7 @@ final class TraceableCommand extends Command
     public function setCode(callable $code): static
     {
         if ($code instanceof InvokableCommand) {
-            $r = new \ReflectionFunction(\Closure::bind(function () {
-                return $this->code;
-            }, $code, InvokableCommand::class)());
+            $r = \Closure::bind(fn () => $this->invokable, $code, InvokableCommand::class)();
 
             $this->invokableCommandInfo = [
                 'class' => $r->getClosureScopeClass()->name,
@@ -322,7 +318,7 @@ final class TraceableCommand extends Command
 
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
-        if (!$this->isInteractive = Command::class !== (new \ReflectionMethod($this->command, 'interact'))->getDeclaringClass()->getName()) {
+        if (!$this->isInteractive = Command::class !== (new \ReflectionMethod($this->command, 'interact'))->class) {
             return;
         }
 

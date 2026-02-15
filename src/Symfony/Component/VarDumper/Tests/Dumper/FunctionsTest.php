@@ -89,7 +89,7 @@ class FunctionsTest extends TestCase
     {
         $cloner = new VarCloner();
         $dumper = new CliDumper('php://output');
-        VarDumper::setHandler(function ($var) use ($cloner, $dumper) {
+        VarDumper::setHandler(static function ($var) use ($cloner, $dumper) {
             $dumper->dump($cloner->cloneVar($var));
         });
     }

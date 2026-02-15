@@ -44,8 +44,6 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/Prototype/BadClasses/MissingParent.php'):
         case false !== strpos($file, '/src/Symfony/Component/DependencyInjection/Tests/Fixtures/php/'):
         case false !== strpos($file, '/src/Symfony/Component/ErrorHandler/Tests/Fixtures/'):
-        case false !== strpos($file, '/src/Symfony/Component/HttpClient/Internal/') && str_contains($file, 'V5'):
-        case false !== strpos($file, '/src/Symfony/Component/PropertyAccess/Tests/Fixtures/AsymmetricVisibility.php'):
         case false !== strpos($file, '/src/Symfony/Component/PropertyInfo/Tests/Fixtures/'):
         case false !== strpos($file, '/src/Symfony/Component/Runtime/Internal/ComposerPlugin.php'):
         case false !== strpos($file, '/src/Symfony/Component/Security/Http/Tests/Fixtures/IsGrantedAttributeMethodsWithClosureController.php'):
@@ -55,7 +53,6 @@ foreach ($loader->getClassMap() as $class => $file) {
         case false !== strpos($file, '/src/Symfony/Component/Validator/Tests/Constraints/Fixtures/WhenTestWithClosure.php'):
         case false !== strpos($file, '/src/Symfony/Component/Validator/Tests/Fixtures/NestedAttribute/Entity.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/NotLoadableClass.php'):
-        case false !== strpos($file, '/src/Symfony/Component/VarDumper/Tests/Fixtures/VirtualProperty.php'):
         case false !== strpos($file, '/src/Symfony/Component/VarExporter/Internal'):
         case false !== strpos($file, '/src/Symfony/Component/VarExporter/Tests/Fixtures/'):
         case false !== strpos($file, '/src/Symfony/Contracts/'):

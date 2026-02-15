@@ -440,119 +440,119 @@
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
-                <target state="needs-review-translation">Denna URL saknar en toppdomän.</target>
+                <target>Denna URL saknar en toppdomän.</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
-                <target state="needs-review-translation">Det här värdet är för kort. Det ska innehålla minst ett ord.|Det här värdet är för kort. Det ska innehålla minst {{ min }} ord.</target>
+                <target>Det här värdet är för kort. Det ska innehålla minst ett ord.|Det här värdet är för kort. Det ska innehålla minst {{ min }} ord.</target>
             </trans-unit>
             <trans-unit id="115">
                 <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
-                <target state="needs-review-translation">Det här värdet är för långt. Det ska innehålla endast ett ord.|Det här värdet är för långt. Det ska innehålla {{ max }} ord eller färre.</target>
+                <target>Det här värdet är för långt. Det ska innehålla endast ett ord.|Det här värdet är för långt. Det ska innehålla {{ max }} ord eller färre.</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
-                <target state="needs-review-translation">Det här värdet representerar inte en giltig vecka i ISO 8601-formatet.</target>
+                <target>Det här värdet representerar inte en giltig vecka i ISO 8601-formatet.</target>
             </trans-unit>
             <trans-unit id="117">
                 <source>This value is not a valid week.</source>
-                <target state="needs-review-translation">Det här värdet är inte en giltig vecka.</target>
+                <target>Det här värdet är inte en giltig vecka.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
-                <target state="needs-review-translation">Det här värdet bör inte vara före vecka "{{ min }}".</target>
+                <target>Det här värdet bör inte vara före vecka "{{ min }}".</target>
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target state="needs-review-translation">Det här värdet bör inte vara efter vecka "{{ max }}".</target>
+                <target>Det här värdet bör inte vara efter vecka "{{ max }}".</target>
             </trans-unit>
             <trans-unit id="121">
                 <source>This value is not a valid Twig template.</source>
-                <target state="needs-review-translation">Det här värdet är inte en giltig Twig-mall.</target>
+                <target>Det här värdet är inte en giltig Twig-mall.</target>
             </trans-unit>
             <trans-unit id="122">
                 <source>This file is not a valid video.</source>
-                <target state="needs-review-translation">Den här filen är inte en giltig video.</target>
+                <target>Den här filen är inte en giltig video.</target>
             </trans-unit>
             <trans-unit id="123">
                 <source>The size of the video could not be detected.</source>
-                <target state="needs-review-translation">Videons storlek kunde inte upptäckas.</target>
+                <target>Videons storlek kunde inte upptäckas.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target state="needs-review-translation">Videobredden är för stor ({{ width }}px). Tillåten maximal bredd är {{ max_width }}px.</target>
+                <target>Videobredden är för stor ({{ width }}px). Tillåten maximal bredd är {{ max_width }}px.</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target state="needs-review-translation">Videobredden är för liten ({{ width }}px). Förväntad minsta bredd är {{ min_width }}px.</target>
+                <target>Videobredden är för liten ({{ width }}px). Förväntad minsta bredd är {{ min_width }}px.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target state="needs-review-translation">Videons höjd är för stor ({{ height }}px). Tillåten maximal höjd är {{ max_height }}px.</target>
+                <target>Videons höjd är för stor ({{ height }}px). Tillåten maximal höjd är {{ max_height }}px.</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target state="needs-review-translation">Videohöjden är för liten ({{ height }}px). Förväntad minimihöjd är {{ min_height }}px.</target>
+                <target>Videohöjden är för liten ({{ height }}px). Förväntad minimihöjd är {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">Videon har för få pixlar ({{ pixels }}). Förväntad miniminivå är {{ min_pixels }}.</target>
+                <target>Videon har för få pixlar ({{ pixels }}). Förväntad miniminivå är {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">Videon har för många pixlar ({{ pixels }}). Förväntat maxantal är {{ max_pixels }}.</target>
+                <target>Videon har för många pixlar ({{ pixels }}). Förväntat maxantal är {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target state="needs-review-translation">Videons förhållande är för stort ({{ ratio }}). Tillåtet maxförhållande är {{ max_ratio }}.</target>
+                <target>Videons förhållande är för stort ({{ ratio }}). Tillåtet maxförhållande är {{ max_ratio }}.</target>
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target state="needs-review-translation">Videoförhållandet är för litet ({{ ratio }}). Förväntat minimiförhållande är {{ min_ratio }}.</target>
+                <target>Videoförhållandet är för litet ({{ ratio }}). Förväntat minimiförhållande är {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
-                <target state="needs-review-translation">Videon är kvadratisk ({{ width }}x{{ height }}px). Kvadratiska videor är inte tillåtna.</target>
+                <target>Videon är kvadratisk ({{ width }}x{{ height }}px). Kvadratiska videor är inte tillåtna.</target>
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target state="needs-review-translation">Videon är i liggande läge ({{ width }}x{{ height }} px). Liggande videor är inte tillåtna.</target>
+                <target>Videon är i liggande läge ({{ width }}x{{ height }}px). Liggande videor är inte tillåtna.</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target state="needs-review-translation">Videon är i porträttläge ({{ width }}x{{ height }}px). Videor i porträttläge är inte tillåtna.</target>
+                <target>Videon är i porträttläge ({{ width }}x{{ height }}px). Videor i porträttläge är inte tillåtna.</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
-                <target state="needs-review-translation">Videofilen är skadad.</target>
+                <target>Videofilen är skadad.</target>
             </trans-unit>
             <trans-unit id="136">
                 <source>The video contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">Videon innehåller flera strömmar. Endast en ström är tillåten.</target>
+                <target>Videon innehåller flera strömmar. Endast en ström är tillåten.</target>
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target state="needs-review-translation">Videokodek stöds inte ”{{ codec }}”.</target>
+                <target>Videokodek stöds inte "{{ codec }}".</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target state="needs-review-translation">Videokontainer stöds inte "{{ container }}".</target>
+                <target>Videokontainer stöds inte "{{ container }}".</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
-                <target state="needs-review-translation">Bildfilen är skadad.</target>
+                <target>Bildfilen är skadad.</target>
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">Bilden har för få pixlar ({{ pixels }}). Förväntat minimiantal är {{ min_pixels }}.</target>
+                <target>Bilden har för få pixlar ({{ pixels }}). Förväntat minimiantal är {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">Bilden har för många pixlar ({{ pixels }}). Förväntat maxantal är {{ max_pixels }}.</target>
+                <target>Bilden har för många pixlar ({{ pixels }}). Förväntat maxantal är {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
-                <target state="needs-review-translation">Detta filnamn stämmer inte med förväntad teckenuppsättning.</target>
+                <target>Detta filnamn stämmer inte med förväntad teckenuppsättning.</target>
             </trans-unit>
         </body>
     </file>

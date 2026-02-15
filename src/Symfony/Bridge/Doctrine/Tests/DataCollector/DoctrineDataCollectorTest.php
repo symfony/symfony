@@ -238,23 +238,19 @@ class DoctrineDataCollectorTest extends TestCase
 
     private function createCollector(array $queries): DoctrineDataCollector
     {
-        $connection = $this->getMockBuilder(Connection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $connection->expects($this->any())
+        $connection = $this->createStub(Connection::class);
+        $connection
             ->method('getDatabasePlatform')
             ->willReturn(new MySQLPlatform());
 
-        $registry = $this->createMock(ManagerRegistry::class);
+        $registry = $this->createStub(ManagerRegistry::class);
         $registry
-            ->expects($this->any())
             ->method('getConnectionNames')
             ->willReturn(['default' => 'doctrine.dbal.default_connection']);
         $registry
-            ->expects($this->any())
             ->method('getManagerNames')
             ->willReturn(['default' => 'doctrine.orm.default_entity_manager']);
-        $registry->expects($this->any())
+        $registry
             ->method('getConnection')
             ->willReturn($connection);
 

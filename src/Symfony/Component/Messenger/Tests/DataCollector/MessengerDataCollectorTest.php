@@ -39,7 +39,7 @@ class MessengerDataCollectorTest extends TestCase
         $envelope = new Envelope($message);
 
         $bus = $this->createMock(MessageBusInterface::class);
-        $bus->method('dispatch')->with($message)->willReturn($envelope);
+        $bus->expects($this->once())->method('dispatch')->with($message)->willReturn($envelope);
         $bus = new TraceableMessageBus($bus);
 
         $collector = new MessengerDataCollector();
@@ -80,7 +80,7 @@ class MessengerDataCollectorTest extends TestCase
         $message = new DummyMessage('dummy message');
 
         $bus = $this->createMock(MessageBusInterface::class);
-        $bus->method('dispatch')->with($message)->willThrowException(new \RuntimeException('foo'));
+        $bus->expects($this->once())->method('dispatch')->with($message)->willThrowException(new \RuntimeException('foo'));
         $bus = new TraceableMessageBus($bus);
 
         $collector = new MessengerDataCollector();
@@ -127,11 +127,11 @@ class MessengerDataCollectorTest extends TestCase
 
     public function testKeepsOrderedDispatchCalls()
     {
-        $firstBus = $this->createMock(MessageBusInterface::class);
+        $firstBus = $this->createStub(MessageBusInterface::class);
         $firstBus->method('dispatch')->willReturn(new Envelope(new \stdClass()));
         $firstBus = new TraceableMessageBus($firstBus);
 
-        $secondBus = $this->createMock(MessageBusInterface::class);
+        $secondBus = $this->createStub(MessageBusInterface::class);
         $secondBus->method('dispatch')->willReturn(new Envelope(new \stdClass()));
         $secondBus = new TraceableMessageBus($secondBus);
 

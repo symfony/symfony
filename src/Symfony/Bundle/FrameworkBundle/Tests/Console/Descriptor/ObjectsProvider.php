@@ -312,7 +312,7 @@ class ObjectsProvider
         $eventDispatcher = new EventDispatcher();
 
         $eventDispatcher->addListener('event1', 'var_dump', 255);
-        $eventDispatcher->addListener('event1', fn () => 'Closure', -1);
+        $eventDispatcher->addListener('event1', static fn () => 'Closure', -1);
         $eventDispatcher->addListener('event2', new CallableClass());
 
         return ['event_dispatcher_1' => $eventDispatcher];
@@ -325,7 +325,7 @@ class ObjectsProvider
             'callable_2' => ['Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass', 'staticMethod'],
             'callable_3' => [new CallableClass(), 'method'],
             'callable_4' => 'Symfony\\Bundle\\FrameworkBundle\\Tests\\Console\\Descriptor\\CallableClass::staticMethod',
-            'callable_6' => fn () => 'Closure',
+            'callable_6' => static fn () => 'Closure',
             'callable_7' => new CallableClass(),
             'callable_from_callable' => (new CallableClass())(...),
         ];

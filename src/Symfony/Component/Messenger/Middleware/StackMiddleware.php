@@ -37,7 +37,7 @@ class StackMiddleware implements MiddlewareInterface, StackInterface
         } elseif ($middlewareIterator instanceof MiddlewareInterface) {
             $this->stack->stack[] = $middlewareIterator;
         } else {
-            $this->stack->iterator = (function () use ($middlewareIterator) {
+            $this->stack->iterator = (static function () use ($middlewareIterator) {
                 yield from $middlewareIterator;
             })();
         }

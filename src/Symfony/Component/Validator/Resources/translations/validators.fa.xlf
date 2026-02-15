@@ -136,7 +136,7 @@
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target>این مقدار یه آدرس آی‌پی معتبر نمی‌باشد.</target>
+                <target>این مقدار یک آدرس آی‌پی معتبر نمی‌باشد.</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
@@ -472,87 +472,87 @@
             </trans-unit>
             <trans-unit id="122">
                 <source>This file is not a valid video.</source>
-                <target state="needs-review-translation">این فایل یک ویدیوی معتبر نیست.</target>
+                <target>این فایل یک ویدئوی معتبر نیست.</target>
             </trans-unit>
             <trans-unit id="123">
                 <source>The size of the video could not be detected.</source>
-                <target state="needs-review-translation">اندازه ویدئو قابل تشخیص نبود.</target>
+                <target>اندازه ویدئو قابل تشخیص نبود.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target state="needs-review-translation">عرض ویدئو خیلی زیاد است ({{ width }}px). حداکثر عرض مجاز {{ max_width }}px است.</target>
+                <target>عرض ویدئو خیلی زیاد است ({{ width }}px). حداکثر عرض مجاز {{ max_width }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target state="needs-review-translation">عرض ویدئو خیلی کم است ({{ width }}px). حداقل عرض مورد انتظار {{ min_width }} پیکسل است.</target>
+                <target>عرض ویدئو خیلی کم است ({{ width }}px). حداقل عرض مورد انتظار {{ min_width }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target state="needs-review-translation">ارتفاع ویدیو خیلی زیاد است ({{ height }}px). حداکثر ارتفاع مجاز {{ max_height }}px است.</target>
+                <target>ارتفاع ویدئو خیلی زیاد است ({{ height }}px). حداکثر ارتفاع مجاز {{ max_height }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target state="needs-review-translation">ارتفاع ویدیو خیلی کم است ({{ height }}px). حداقل ارتفاع مورد انتظار {{ min_height }}px است.</target>
+                <target>ارتفاع ویدئو خیلی کم است ({{ height }}px). حداقل ارتفاع مورد انتظار {{ min_height }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">ویدیو پیکسل‌های بسیار کمی دارد ({{ pixels }}). حداقل مقدار مورد انتظار {{ min_pixels }} است.</target>
+                <target>مقدار پیکسل‌های ویدئو خیلی کم است ({{ pixels }}px). حداقل مقدار مورد انتظار {{ min_pixels }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">ویدئو پیکسل‌های زیادی دارد ({{ pixels }}). حداکثر مقدار مورد انتظار {{ max_pixels }} است.</target>
+                <target>مقدار پیکسل‌های ویدئو خیلی زیاد است ({{ pixels }}px). حداکثر مقدار مورد انتظار {{ max_pixels }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target state="needs-review-translation">نسبت ویدیو خیلی بزرگ است ({{ ratio }}). حداکثر نسبت مجاز {{ max_ratio }} است.</target>
+                <target>نسبت ویدئو خیلی بزرگ است ({{ ratio }}). حداکثر نسبت مجاز {{ max_ratio }} است.</target>
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target state="needs-review-translation">نسبت ویدیو خیلی کوچک است ({{ ratio }}). نسبت حداقل مورد انتظار {{ min_ratio }} است.</target>
+                <target>نسبت ویدئو خیلی کوچک است ({{ ratio }}). نسبت حداقل مورد انتظار {{ min_ratio }} است.</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
-                <target state="needs-review-translation">ویدئو مربعی است ({{ width }}x{{ height }}px). ویدئوهای مربعی مجاز نیستند.</target>
+                <target>ویدئو مربعی است ({{ width }}x{{ height }}px). ویدئوهای مربعی مجاز نیستند.</target>
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target state="needs-review-translation">ویدیو به صورت افقی است ({{ width }}x{{ height }} پیکسل). ویدیوهای افقی مجاز نیستند.</target>
+                <target>ویدئو به صورت افقی است ({{ width }}x{{ height }} پیکسل). ویدئوهای افقی مجاز نیستند.</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target state="needs-review-translation">ویدیو با جهت عمودی است ({{ width }}x{{ height }}px). ویدیوهای با جهت عمودی مجاز نیستند.</target>
+                <target>ویدئو به صورت عمودی است ({{ width }}x{{ height }}px). ویدئوهای عمودی مجاز نیستند.</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
-                <target state="needs-review-translation">فایل ویدیو خراب است.</target>
+                <target>فایل ویدئو خراب است.</target>
             </trans-unit>
             <trans-unit id="136">
                 <source>The video contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">ویدئو شامل چندین استریم است. فقط یک استریم مجاز است.</target>
+                <target>ویدئو شامل چندین استریم است. در صورتی که فقط یک استریم مجاز است.</target>
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target state="needs-review-translation">کُدک ویدیویی پشتیبانی نمی‌شود «{{ codec }}».</target>
+                <target>قالب (کُدک) ویدئویی پشتیبانی نمی‌شود «{{ codec }}».</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target state="needs-review-translation">ظرف ویدئو پشتیبانی نمی‌شود "{{ container }}".</target>
+                <target>فرمت ویدئو پشتیبانی نمی‌شود "{{ container }}".</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
-                <target state="needs-review-translation">فایل تصویر خراب است.</target>
+                <target>فایل تصویر خراب است.</target>
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">تصویر پیکسل‌های بسیار کمی دارد ({{ pixels }}). حداقل مقدار مورد انتظار {{ min_pixels }} است.</target>
+                <target>تصویر پیکسل‌های خیلی کمی دارد ({{ pixels }}px). حداقل مقدار مورد انتظار {{ min_pixels }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">تصویر پیکسل‌های زیادی دارد ({{ pixels }}). حداکثر مقدار مورد انتظار {{ max_pixels }} است.</target>
+                <target>تصویر پیکسل‌های خیلی زیادی دارد ({{ pixels }}px). حداکثر مقدار مورد انتظار {{ max_pixels }}px می‌باشد.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
-                <target state="needs-review-translation">نام این فایل با مجموعه نویسه‌های مورد انتظار مطابقت ندارد.</target>
+                <target>نام فایل مجاز نیست.</target>
             </trans-unit>
         </body>
     </file>

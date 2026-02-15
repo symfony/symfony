@@ -65,7 +65,7 @@ class SwitchUserListener extends AbstractListener
     public function supports(Request $request): ?bool
     {
         // usernames can be falsy
-        $username = $request->get($this->usernameParameter);
+        $username = $request->query->get($this->usernameParameter) ?? (!\in_array($request->getMethod(), ['GET', 'HEAD'], true) ? $request->request->get($this->usernameParameter) : null);
 
         if (null === $username || '' === $username) {
             $username = $request->headers->get($this->usernameParameter);

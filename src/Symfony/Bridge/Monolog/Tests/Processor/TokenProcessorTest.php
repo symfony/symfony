@@ -14,7 +14,7 @@ namespace Symfony\Bridge\Monolog\Tests\Processor;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\TokenProcessor;
 use Symfony\Bridge\Monolog\Tests\RecordFactory;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
@@ -28,8 +28,8 @@ class TokenProcessorTest extends TestCase
     public function testProcessor()
     {
         $token = new UsernamePasswordToken(new InMemoryUser('user', 'password', ['ROLE_USER']), 'provider', ['ROLE_USER']);
-        $tokenStorage = $this->createMock(TokenStorageInterface::class);
-        $tokenStorage->method('getToken')->willReturn($token);
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken($token);
 
         $processor = new TokenProcessor($tokenStorage);
         $record = RecordFactory::create();

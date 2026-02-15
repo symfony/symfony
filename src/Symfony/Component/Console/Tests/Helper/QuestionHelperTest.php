@@ -13,6 +13,7 @@ namespace Symfony\Component\Console\Tests\Helper;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\MissingInputException;
@@ -28,6 +29,11 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Terminal;
 use Symfony\Component\Console\Tester\ApplicationTester;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Process\Exception\ProcessSignaledException;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Validator\Constraints\Url;
+use Symfony\Component\Validator\Validation;
 
 #[Group('tty')]
 class QuestionHelperTest extends AbstractQuestionHelperTestCase
@@ -318,14 +324,14 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         //
         // No effort is made to avoid irrelevant suggestions, as this is handled
         // by the autocomplete function.
-        $callback = function ($input) {
+        $callback = static function ($input) {
             $knownWords = ['Carrot', 'Creme', 'Curry', 'Parsnip', 'Pie', 'Potato', 'Tart'];
             $inputWords = explode(' ', $input);
             array_pop($inputWords);
             $suggestionBase = $inputWords ? implode(' ', $inputWords).' ' : '';
 
             return array_map(
-                fn ($word) => $suggestionBase.$word.' ',
+                static fn ($word) => $suggestionBase.$word.' ',
                 $knownWords
             );
         };
@@ -410,6 +416,24 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $question->setMaxAttempts(1);
 
         $this->assertSame($character, $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+    }
+
+    public function testAutocompleteWithSpaceAfterPartialMatch()
+    {
+        if (!Terminal::hasSttyAvailable()) {
+            $this->markTestSkipped('`stty` is required to test autocomplete functionality');
+        }
+
+        // a<SPACE><TAB><NEWLINE>
+        $inputStream = $this->getInputStream("a \t\n");
+
+        $dialog = new QuestionHelper();
+        $dialog->setHelperSet(new HelperSet([new FormatterHelper()]));
+
+        $question = new ChoiceQuestion('Please select a choice', ['a test', 'another choice']);
+        $question->setMaxAttempts(1);
+
+        $this->assertSame('a test', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
     }
 
     public function testAutocompleteWithTrailingBackslash()
@@ -599,7 +623,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $dialog->setHelperSet($helperSet);
 
         $error = 'This is not a color!';
-        $validator = function ($color) use ($error) {
+        $validator = static function ($color) use ($error) {
             if (!\in_array($color, ['white', 'black'], true)) {
                 throw new \InvalidArgumentException($error);
             }
@@ -788,7 +812,7 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $dialog = new QuestionHelper();
 
         $question = new Question('What\'s your name?');
-        $question->setValidator(function ($value) {
+        $question->setValidator(static function ($value) {
             if (!$value) {
                 throw new \Exception('A value is required.');
             }
@@ -806,9 +830,9 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $application = new Application();
         $application->setAutoExit(false);
         $application->register('question')
-            ->setCode(function (InputInterface $input, OutputInterface $output) use (&$tries): int {
+            ->setCode(static function (InputInterface $input, OutputInterface $output) use (&$tries): int {
                 $question = new Question('This is a promptable question');
-                $question->setValidator(function ($value) use (&$tries) {
+                $question->setValidator(static function ($value) use (&$tries) {
                     ++$tries;
                     if (!$value) {
                         throw new \Exception();
@@ -958,6 +982,26 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $this->assertStringEndsWith("\033[1D\033[K\033[2D\033[K\033[1D\033[K", stream_get_contents($stream));
     }
 
+    #[TestWith(['single'])]
+    #[TestWith(['multi'])]
+    public function testExitCommandOnInputSIGINT(string $mode)
+    {
+        if (!\function_exists('pcntl_signal')) {
+            $this->markTestSkipped('pcntl signals not available');
+        }
+
+        $p = new Process(
+            ['php', \dirname(__DIR__).'/Fixtures/application_test_sigint.php', $mode],
+            timeout: 2, // the process will auto shutdown if not killed by SIGINT, to prevent blocking
+        );
+        $p->setPty(true);
+        $p->start();
+
+        $this->expectException(ProcessSignaledException::class);
+        $this->expectExceptionMessage('The process has been signaled with signal "2".');
+        $p->wait();
+    }
+
     protected function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);
@@ -974,12 +1018,79 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
 
     protected function createInputInterfaceMock($interactive = true)
     {
-        $mock = $this->createMock(InputInterface::class);
-        $mock->expects($this->any())
+        $mock = $this->createStub(InputInterface::class);
+        $mock
             ->method('isInteractive')
             ->willReturn($interactive);
 
         return $mock;
+    }
+
+    public function testAskWithConstraintsWithoutDispatcherValidValue()
+    {
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Enter a URL');
+        $question->setConstraints([new Url()]);
+
+        $inputStream = $this->getInputStream("https://symfony.com\n");
+
+        $this->assertEquals('https://symfony.com', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question));
+    }
+
+    public function testAskWithConstraintsWithoutDispatcherInvalidThenValid()
+    {
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Enter a URL');
+        $question->setConstraints([new Url()]);
+
+        $inputStream = $this->getInputStream("not-a-url\nhttps://symfony.com\n");
+
+        $output = $this->createOutputInterface();
+        $this->assertEquals('https://symfony.com', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $output, $question));
+
+        rewind($output->getStream());
+        $outputContent = stream_get_contents($output->getStream());
+        $this->assertStringContainsString('This value is not a valid URL.', $outputContent);
+    }
+
+    public function testAskWithConstraintsWithoutDispatcherExceedsMaxAttempts()
+    {
+        $dialog = new QuestionHelper();
+
+        $question = new Question('Enter a URL');
+        $question->setConstraints([new Url()]);
+        $question->setMaxAttempts(1);
+
+        $inputStream = $this->getInputStream("not-a-url\n");
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('This value is not a valid URL.');
+
+        $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $this->createOutputInterface(), $question);
+    }
+
+    public function testAskWithConstraintsWithDispatcher()
+    {
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new \Symfony\Component\Console\EventListener\ValidateQuestionInputListener(
+            Validation::createValidator()
+        ));
+
+        $dialog = new QuestionHelper($dispatcher);
+
+        $question = new Question('Enter a URL');
+        $question->setConstraints([new Url()]);
+
+        $inputStream = $this->getInputStream("not-a-url\nhttps://symfony.com\n");
+
+        $output = $this->createOutputInterface();
+        $this->assertEquals('https://symfony.com', $dialog->ask($this->createStreamableInputInterfaceMock($inputStream), $output, $question));
+
+        rewind($output->getStream());
+        $outputContent = stream_get_contents($output->getStream());
+        $this->assertStringContainsString('This value is not a valid URL.', $outputContent);
     }
 }
 

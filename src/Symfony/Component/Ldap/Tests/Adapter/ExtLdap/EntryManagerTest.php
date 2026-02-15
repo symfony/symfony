@@ -25,10 +25,9 @@ class EntryManagerTest extends TestCase
     {
         $this->expectException(LdapException::class);
         $this->expectExceptionMessage('Entry "$$$$$$" malformed, could not parse RDN.');
-        $connection = $this->createMock(Connection::class);
 
         $entry = new Entry('$$$$$$');
-        $entryManager = new EntryManager($connection);
+        $entryManager = new EntryManager(new Connection());
         $entryManager->move($entry, 'a');
     }
 
@@ -52,10 +51,8 @@ class EntryManagerTest extends TestCase
     #[DataProvider('moveWithRFC4514DistinguishedNameProvider')]
     public function testMoveWithRFC4514DistinguishedName(string $dn, string $expectedRdn)
     {
-        $connection = $this->createMock(Connection::class);
-
         $entry = new Entry($dn);
-        $entryManager = new EntryManager($connection);
+        $entryManager = new EntryManager(new Connection());
 
         $method = (new \ReflectionClass(EntryManager::class))->getMethod('parseRdnFromEntry');
 

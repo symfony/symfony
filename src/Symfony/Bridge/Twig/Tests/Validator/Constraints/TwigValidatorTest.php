@@ -12,7 +12,6 @@
 namespace Symfony\Bridge\Twig\Tests\Validator\Constraints;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Bridge\Twig\Validator\Constraints\Twig;
 use Symfony\Bridge\Twig\Validator\Constraints\TwigValidator;
@@ -30,14 +29,10 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
     protected function createValidator(): TwigValidator
     {
         $environment = new Environment(new ArrayLoader());
-        $environment->addFilter(new TwigFilter('humanize_filter', fn ($v) => $v));
-        if (class_exists(DeprecatedCallableInfo::class)) {
-            $options = ['deprecation_info' => new DeprecatedCallableInfo('foo/bar', '1.1')];
-        } else {
-            $options = ['deprecated' => true];
-        }
+        $environment->addFilter(new TwigFilter('humanize_filter', static fn ($v) => $v));
+        $options = ['deprecation_info' => new DeprecatedCallableInfo('foo/bar', '1.1')];
 
-        $environment->addFilter(new TwigFilter('deprecated_filter', fn ($v) => $v, $options));
+        $environment->addFilter(new TwigFilter('deprecated_filter', static fn ($v) => $v, $options));
 
         return new TwigValidator($environment);
     }
@@ -68,7 +63,6 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
      * When deprecations are skipped by the validator, the testsuite reporter will catch them so we need to mark the test as ignoring deprecations.
      */
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTwigWithSkipDeprecation()
     {
         $constraint = new Twig(skipDeprecations: true);
@@ -84,15 +78,9 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
 
         $this->validator->validate('{{ name|deprecated_filter }}', $constraint);
 
-        $line = 1;
-        $error = 'Twig Filter "deprecated_filter" is deprecated in  at line 1 at line 1.';
-        if (class_exists(DeprecatedCallableInfo::class)) {
-            $line = 0;
-            $error = 'Since foo/bar 1.1: Twig Filter "deprecated_filter" is deprecated.';
-        }
         $this->buildViolation($constraint->message)
-            ->setParameter('{{ error }}', $error)
-            ->setParameter('{{ line }}', $line)
+            ->setParameter('{{ error }}', 'Since foo/bar 1.1: Twig Filter "deprecated_filter" is deprecated.')
+            ->setParameter('{{ line }}', 0)
             ->setCode(Twig::INVALID_TWIG_ERROR)
             ->assertRaised();
     }

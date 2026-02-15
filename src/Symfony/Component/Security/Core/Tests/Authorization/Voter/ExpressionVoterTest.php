@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\ExpressionLanguage;
 use Symfony\Component\Security\Core\Authorization\Voter\ExpressionVoter;
@@ -46,42 +47,44 @@ class ExpressionVoterTest extends TestCase
 
     protected function getTokenWithRoleNames(array $roles, $tokenExpectsGetRoles = true)
     {
-        $token = $this->createMock(AbstractToken::class);
-
         if ($tokenExpectsGetRoles) {
-            $token->expects($this->once())
+            $mock = $this->createMock(AbstractToken::class);
+            $mock->expects($this->once())
                 ->method('getRoleNames')
                 ->willReturn($roles);
+
+            return $mock;
         }
 
-        return $token;
+        return new NullToken();
     }
 
     protected function createExpressionLanguage($expressionLanguageExpectsEvaluate = true)
     {
-        $mock = $this->createMock(ExpressionLanguage::class);
-
         if ($expressionLanguageExpectsEvaluate) {
+            $mock = $this->createMock(ExpressionLanguage::class);
             $mock->expects($this->once())
                 ->method('evaluate')
                 ->willReturn(true);
+
+            return $mock;
         }
 
-        return $mock;
+        return new ExpressionLanguage();
     }
 
     protected function createTrustResolver()
     {
-        return $this->createMock(AuthenticationTrustResolverInterface::class);
+        return $this->createStub(AuthenticationTrustResolverInterface::class);
     }
 
     protected function createAuthorizationChecker()
     {
-        return $this->createMock(AuthorizationCheckerInterface::class);
+        return $this->createStub(AuthorizationCheckerInterface::class);
     }
 
     protected static function createExpression()
     {
-        return new Expression('');
+        return new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_MANAGER")');
     }
 }

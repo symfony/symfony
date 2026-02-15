@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
@@ -138,7 +137,6 @@ class ParameterBagTest extends TestCase
      * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testDeprecate()
     {
         $bag = new ParameterBag(['foo' => 'bar']);
@@ -154,7 +152,6 @@ class ParameterBagTest extends TestCase
      * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testDeprecateWithMessage()
     {
         $bag = new ParameterBag(['foo' => 'bar']);
@@ -170,7 +167,6 @@ class ParameterBagTest extends TestCase
      * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testDeprecationIsTriggeredWhenResolved()
     {
         $bag = new ParameterBag(['foo' => '%bar%', 'bar' => 'baz']);

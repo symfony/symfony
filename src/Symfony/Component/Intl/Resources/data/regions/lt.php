@@ -76,7 +76,7 @@ return [
         'ET' => 'Etiopija',
         'FI' => 'Suomija',
         'FJ' => 'Fidžis',
-        'FK' => 'Folklando Salos',
+        'FK' => 'Folklando salos',
         'FM' => 'Mikronezija',
         'FO' => 'Farerų Salos',
         'FR' => 'Prancūzija',

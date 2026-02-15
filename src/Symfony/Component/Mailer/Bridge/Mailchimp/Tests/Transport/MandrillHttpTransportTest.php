@@ -87,7 +87,7 @@ class MandrillHttpTransportTest extends TestCase
 
     public function testSendThrowsForErrorResponse()
     {
-        $client = new MockHttpClient(fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['status' => 'error', 'message' => 'i\'m a teapot', 'code' => 418], [
+        $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['status' => 'error', 'message' => 'i\'m a teapot', 'code' => 418], [
             'http_code' => 418,
         ]));
 

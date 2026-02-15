@@ -48,6 +48,6 @@ class PsrResponseListenerTest extends TestCase
 
     private function createEventMock(mixed $controllerResult): ViewEvent
     {
-        return new ViewEvent($this->createMock(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $controllerResult);
+        return new ViewEvent($this->createStub(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST, $controllerResult);
     }
 }

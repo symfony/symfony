@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Isendpro\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Isendpro\IsendproTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -19,7 +20,6 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class IsendproTransportTest extends TransportTestCase
 {
@@ -46,12 +46,7 @@ final class IsendproTransportTest extends TransportTestCase
 
     public function testSendWithErrorResponseThrowsTransportException()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(500);
-
-        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
+        $client = new MockHttpClient(new MockResponse('', ['http_code' => 500]));
 
         $transport = $this->createTransport($client);
 
@@ -63,15 +58,7 @@ final class IsendproTransportTest extends TransportTestCase
 
     public function testSendWithErrorResponseContainingDetailsThrowsTransportException()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(400);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['etat' => ['etat' => [['code' => '3', 'message' => 'Your credentials are incorrect']]]]));
-
-        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
+        $client = new MockHttpClient(new MockResponse(json_encode(['etat' => ['etat' => [['code' => '3', 'message' => 'Your credentials are incorrect']]]]), ['http_code' => 400]));
 
         $transport = $this->createTransport($client);
 
@@ -83,15 +70,7 @@ final class IsendproTransportTest extends TransportTestCase
 
     public function testSendWithSuccessfulResponseDispatchesMessageEvent()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['etat' => ['etat' => [['code' => 0]]]]));
-
-        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
+        $client = new MockHttpClient(new MockResponse(json_encode(['etat' => ['etat' => [['code' => 0]]]])));
 
         $transport = $this->createTransport($client);
 

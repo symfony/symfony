@@ -87,6 +87,21 @@ class ArrayShapeTypeTest extends TestCase
         $this->assertEquals(Type::bool(), $type->getCollectionValueType());
     }
 
+    public function testGetExtraKeyAndValueTypesReturnCorrectTypes()
+    {
+        $extraKeyType = Type::string();
+        $extraValueType = Type::int();
+
+        $type = new ArrayShapeType(
+            shape: ['foo' => ['type' => Type::bool(), 'optional' => false]],
+            extraKeyType: $extraKeyType,
+            extraValueType: $extraValueType,
+        );
+
+        $this->assertSame($extraKeyType, $type->getExtraKeyType());
+        $this->assertSame($extraValueType, $type->getExtraValueType());
+    }
+
     public function testAccepts()
     {
         $type = new ArrayShapeType([

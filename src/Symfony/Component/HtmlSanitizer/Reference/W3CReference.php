@@ -368,7 +368,7 @@ final class W3CReference
         'span' => true,
         'spellcheck' => true,
         'src' => true,
-        'srcdoc' => true,
+        // 'srcdoc' => false, // XSS vector if not properly sandboxed, should be enabled explicitly with ->allowAttribute('srcdoc', 'iframe')->forceAttribute('iframe', 'sandbox', '')
         'srclang' => true,
         'srcset' => true,
         'standby' => true,

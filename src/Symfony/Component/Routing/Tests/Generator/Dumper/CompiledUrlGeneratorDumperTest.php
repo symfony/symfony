@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Routing\Tests\Generator\Dumper;
 
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Exception\RouteCircularReferenceException;
@@ -338,7 +337,6 @@ class CompiledUrlGeneratorDumperTest extends TestCase
     }
 
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testDeprecatedAlias()
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: The "b" route alias is deprecated. You should stop using it, as it will be removed in the future.');
@@ -355,7 +353,6 @@ class CompiledUrlGeneratorDumperTest extends TestCase
     }
 
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testDeprecatedAliasWithCustomMessage()
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: foo b.');
@@ -372,7 +369,6 @@ class CompiledUrlGeneratorDumperTest extends TestCase
     }
 
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testTargettingADeprecatedAliasShouldTriggerDeprecation()
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: foo b.');

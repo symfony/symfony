@@ -48,7 +48,7 @@ final class JavascriptSequenceParser
         $this->contentEnd = \strlen($content);
 
         $this->pattern ??= '/'.implode('|', array_map(
-            fn (string $ch): string => preg_quote($ch, '/'),
+            static fn (string $ch): string => preg_quote($ch, '/'),
             self::COMMENT_SEPARATORS
         )).'/';
     }

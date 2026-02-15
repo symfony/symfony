@@ -65,7 +65,7 @@ class DeprecationErrorHandler
      *
      * @param int|string|false $mode The reporting mode, defaults to not allowing any deprecations
      */
-    public static function register($mode = 0)
+    public static function register($mode = 0): void
     {
         if (self::$isRegistered) {
             return;
@@ -93,10 +93,10 @@ class DeprecationErrorHandler
         }
     }
 
-    public static function collectDeprecations($outputFile)
+    public static function collectDeprecations($outputFile): void
     {
         $deprecations = [];
-        $previousErrorHandler = set_error_handler(function ($type, $msg, $file, $line, $context = []) use (&$deprecations, &$previousErrorHandler) {
+        $previousErrorHandler = set_error_handler(static function ($type, $msg, $file, $line, $context = []) use (&$deprecations, &$previousErrorHandler) {
             if (\E_USER_DEPRECATED !== $type && \E_DEPRECATED !== $type && (\E_WARNING !== $type || !str_contains($msg, '" targeting switch is equivalent to "break'))) {
                 if ($previousErrorHandler) {
                     return $previousErrorHandler($type, $msg, $file, $line, $context);
@@ -119,7 +119,7 @@ class DeprecationErrorHandler
             return null;
         });
 
-        register_shutdown_function(function () use ($outputFile, &$deprecations) {
+        register_shutdown_function(static function () use ($outputFile, &$deprecations) {
             file_put_contents($outputFile, serialize($deprecations));
         });
     }
@@ -194,7 +194,7 @@ class DeprecationErrorHandler
     /**
      * @internal
      */
-    public function shutdown()
+    public function shutdown(): void
     {
         $configuration = $this->getConfiguration();
 
@@ -242,7 +242,7 @@ class DeprecationErrorHandler
         });
     }
 
-    private function resetDeprecationGroups()
+    private function resetDeprecationGroups(): void
     {
         $this->deprecationGroups = [
             'unsilenced' => new DeprecationGroup(),
@@ -302,9 +302,7 @@ class DeprecationErrorHandler
      */
     private function displayDeprecations(array $groups, Configuration $configuration): void
     {
-        $cmp = function ($a, $b) {
-            return $b->count() - $a->count();
-        };
+        $cmp = static fn ($a, $b) => $b->count() - $a->count();
 
         if ($configuration->shouldWriteToLogFile()) {
             if (false === $handle = @fopen($file = $configuration->getLogFile(), 'a')) {
@@ -390,7 +388,7 @@ class DeprecationErrorHandler
                     $frame['object']->getConvertWarningsToExceptions()
                 );
             } elseif (ErrorHandler::class === $eh && $frame['object'] instanceof TestCase) {
-                return function (int $errorNumber, string $errorString, string $errorFile, int $errorLine) {
+                return static function (int $errorNumber, string $errorString, string $errorFile, int $errorLine) {
                     ErrorHandler::instance()($errorNumber, $errorString, $errorFile, $errorLine);
 
                     return true;
@@ -398,7 +396,7 @@ class DeprecationErrorHandler
             }
         }
 
-        return function () { return false; };
+        return static fn () => false;
     }
 
     /**

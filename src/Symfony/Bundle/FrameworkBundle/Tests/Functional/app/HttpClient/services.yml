@@ -5,5 +5,8 @@ services:
     Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\HttpClientController:
         tags: ['controller.service_arguments']
 
+    Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\HttpClientMockingController:
+        tags: ['controller.service_arguments']
+
     Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Tests\MockClientCallback:
         class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Tests\MockClientCallback

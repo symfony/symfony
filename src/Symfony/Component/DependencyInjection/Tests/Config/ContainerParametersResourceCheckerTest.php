@@ -45,14 +45,14 @@ class ContainerParametersResourceCheckerTest extends TestCase
 
     public static function isFreshProvider()
     {
-        yield 'not fresh on missing parameter' => [function (Container $container) {
+        yield 'not fresh on missing parameter' => [static function (Container $container) {
         }, false];
 
-        yield 'not fresh on different value' => [function (Container $container) {
+        yield 'not fresh on different value' => [static function (Container $container) {
             $container->setParameter('locales', ['nl', 'es']);
         }, false];
 
-        yield 'fresh on every identical parameters' => [function (Container $container) {
+        yield 'fresh on every identical parameters' => [static function (Container $container) {
             $container->setParameter('locales', ['fr', 'en']);
             $container->setParameter('default_locale', 'fr');
         }, true];

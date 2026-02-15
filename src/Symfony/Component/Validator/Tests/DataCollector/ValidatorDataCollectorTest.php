@@ -22,14 +22,14 @@ class ValidatorDataCollectorTest extends TestCase
 {
     public function testCollectsValidatorCalls()
     {
-        $originalValidator = $this->createMock(ValidatorInterface::class);
+        $originalValidator = $this->createStub(ValidatorInterface::class);
         $validator = new TraceableValidator($originalValidator);
 
         $collector = new ValidatorDataCollector($validator);
 
         $violations = new ConstraintViolationList([
-            $this->createMock(ConstraintViolation::class),
-            $this->createMock(ConstraintViolation::class),
+            $this->createStub(ConstraintViolation::class),
+            $this->createStub(ConstraintViolation::class),
         ]);
         $originalValidator->method('validate')->willReturn($violations);
 
@@ -52,14 +52,14 @@ class ValidatorDataCollectorTest extends TestCase
 
     public function testReset()
     {
-        $originalValidator = $this->createMock(ValidatorInterface::class);
+        $originalValidator = $this->createStub(ValidatorInterface::class);
         $validator = new TraceableValidator($originalValidator);
 
         $collector = new ValidatorDataCollector($validator);
 
         $violations = new ConstraintViolationList([
-            $this->createMock(ConstraintViolation::class),
-            $this->createMock(ConstraintViolation::class),
+            $this->createStub(ConstraintViolation::class),
+            $this->createStub(ConstraintViolation::class),
         ]);
         $originalValidator->method('validate')->willReturn($violations);
 

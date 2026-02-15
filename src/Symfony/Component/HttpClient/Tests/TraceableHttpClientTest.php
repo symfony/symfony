@@ -33,7 +33,6 @@ class TraceableHttpClientTest extends TestCase
     {
         $httpClient = $this->createMock(HttpClientInterface::class);
         $httpClient
-            ->expects($this->any())
             ->method('request')
             ->with(
                 'GET',
@@ -90,7 +89,7 @@ class TraceableHttpClientTest extends TestCase
     {
         $sut = new TraceableHttpClient(new MockHttpClient());
         $foo = 0;
-        $sut->request('GET', 'http://localhost:8057', ['on_progress' => function (int $dlNow, int $dlSize, array $info) use (&$foo) {
+        $sut->request('GET', 'http://localhost:8057', ['on_progress' => static function (int $dlNow, int $dlSize, array $info) use (&$foo) {
             ++$foo;
         }]);
         $this->assertCount(1, $tracedRequests = $sut->getTracedRequests());
@@ -123,7 +122,7 @@ class TraceableHttpClientTest extends TestCase
     {
         $this->expectException(ClientExceptionInterface::class);
 
-        $sut = new TraceableHttpClient(new MockHttpClient($responseFactory = fn (): MockResponse => new MockResponse('Errored.', ['http_code' => 400])));
+        $sut = new TraceableHttpClient(new MockHttpClient($responseFactory = static fn (): MockResponse => new MockResponse('Errored.', ['http_code' => 400])));
 
         $response = $sut->request('GET', 'https://example.com/foo/bar');
         $response->toArray();

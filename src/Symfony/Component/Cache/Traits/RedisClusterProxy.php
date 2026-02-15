@@ -24,6 +24,8 @@ class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
  */
 class RedisClusterProxy extends \RedisCluster implements ResetInterface, LazyObjectInterface
 {
+    use RedisCluster62ProxyTrait;
+    use RedisCluster63ProxyTrait;
     use RedisProxyTrait {
         resetLazyObject as reset;
     }
@@ -273,16 +275,6 @@ class RedisClusterProxy extends \RedisCluster implements ResetInterface, LazyObj
         return $this->initializeLazyObject()->expireat(...\func_get_args());
     }
 
-    public function expiremember($key, $field, $ttl, $unit = null): \Redis|false|int
-    {
-        return $this->initializeLazyObject()->expiremember(...\func_get_args());
-    }
-
-    public function expirememberat($key, $field, $timestamp): \Redis|false|int
-    {
-        return $this->initializeLazyObject()->expirememberat(...\func_get_args());
-    }
-
     public function expiretime($key): \RedisCluster|false|int
     {
         return $this->initializeLazyObject()->expiretime(...\func_get_args());
@@ -353,19 +345,9 @@ class RedisClusterProxy extends \RedisCluster implements ResetInterface, LazyObj
         return $this->initializeLazyObject()->get(...\func_get_args());
     }
 
-    public function getWithMeta($key): \RedisCluster|array|false
-    {
-        return $this->initializeLazyObject()->getWithMeta(...\func_get_args());
-    }
-
     public function getbit($key, $value): \RedisCluster|false|int
     {
         return $this->initializeLazyObject()->getbit(...\func_get_args());
-    }
-
-    public function getdel($key): mixed
-    {
-        return $this->initializeLazyObject()->getdel(...\func_get_args());
     }
 
     public function getex($key, $options = []): \RedisCluster|false|string

@@ -61,6 +61,13 @@ class Definition
      */
     public ?int $decorationOnInvalid = null;
 
+    /**
+     * @internal
+     *
+     * Used to store the priority of the decoration
+     */
+    public ?int $decorationPriority = null;
+
     public function __construct(?string $class = null, array $arguments = [])
     {
         if (null !== $class) {

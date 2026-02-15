@@ -100,8 +100,15 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
     ];
 
     private readonly string $publicPrefix;
+
+    /**
+     * @var array<string, string>
+     */
     private array $extensionsMap;
 
+    /**
+     * @param array<string, string> $extensionsMap
+     */
     public function __construct(
         private readonly AssetMapperInterface $assetMapper,
         string $publicPrefix = '/assets/',

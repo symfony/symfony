@@ -18,11 +18,14 @@ use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\Response\AsyncContext;
+use Symfony\Component\HttpClient\Response\AsyncResponse;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\Retry\RetryStrategyInterface;
 use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
 class RetryableHttpClientTest extends TestCase
@@ -420,5 +423,175 @@ class RetryableHttpClientTest extends TestCase
         $response = $client->request('GET', 'http://example.com/foo-bar');
 
         self::assertSame(504, $response->getStatusCode());
+    }
+
+    public function testRetryOnTimeoutWithAsyncDecorator()
+    {
+        $client = HttpClient::create();
+
+        TestHttpServer::start();
+
+        $strategy = new class implements RetryStrategyInterface {
+            public bool $isCalled = false;
+
+            public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool
+            {
+                $this->isCalled = true;
+
+                return false;
+            }
+
+            public function getDelay(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): int
+            {
+                return 0;
+            }
+        };
+        $client = new RetryableHttpClient($client, $strategy);
+
+        $client = new class($client) implements HttpClientInterface {
+            use \Symfony\Component\HttpClient\AsyncDecoratorTrait;
+
+            public function request(string $method, string $url, array $options = []): ResponseInterface
+            {
+                return new AsyncResponse($this->client, $method, $url, $options);
+            }
+        };
+
+        $response = $client->request('GET', 'http://localhost:8057/timeout-header', ['timeout' => 0.1]);
+
+        try {
+            $response->getStatusCode();
+            $this->fail(TransportException::class.' expected');
+        } catch (TransportException $e) {
+        }
+
+        $this->assertTrue($strategy->isCalled, 'The HTTP retry strategy should be called');
+    }
+
+    public function testRetryOnErrorWithAsyncDecorator()
+    {
+        $client = new MockHttpClient([
+            new MockResponse('', ['http_code' => 500]),
+            new MockResponse('OK', ['http_code' => 200]),
+        ]);
+
+        $client = new RetryableHttpClient($client, new GenericRetryStrategy([500], 0), 1);
+
+        $client = new class($client) implements HttpClientInterface {
+            use \Symfony\Component\HttpClient\AsyncDecoratorTrait;
+
+            public function request(string $method, string $url, array $options = []): ResponseInterface
+            {
+                return new AsyncResponse($this->client, $method, $url, $options);
+            }
+        };
+
+        $response = $client->request('GET', 'http://example.com/foo-bar');
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('OK', $response->getContent());
+    }
+
+    public function testRetryOnTimeoutWithMultipleAsyncDecorators()
+    {
+        $client = HttpClient::create();
+
+        TestHttpServer::start();
+
+        $strategy = new class implements RetryStrategyInterface {
+            public bool $isCalled = false;
+
+            public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool
+            {
+                $this->isCalled = true;
+
+                return false;
+            }
+
+            public function getDelay(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): int
+            {
+                return 0;
+            }
+        };
+
+        $client = new RetryableHttpClient($client, $strategy);
+
+        // Two nested async decorators without passthru around the RetryableHttpClient
+        $client = new class($client) implements HttpClientInterface {
+            use \Symfony\Component\HttpClient\AsyncDecoratorTrait;
+
+            public function request(string $method, string $url, array $options = []): ResponseInterface
+            {
+                return new AsyncResponse($this->client, $method, $url, $options);
+            }
+        };
+        $client = new class($client) implements HttpClientInterface {
+            use \Symfony\Component\HttpClient\AsyncDecoratorTrait;
+
+            public function request(string $method, string $url, array $options = []): ResponseInterface
+            {
+                return new AsyncResponse($this->client, $method, $url, $options);
+            }
+        };
+
+        $response = $client->request('GET', 'http://localhost:8057/timeout-header', ['timeout' => 0.1]);
+
+        try {
+            $response->getStatusCode();
+            $this->fail(TransportException::class.' expected');
+        } catch (TransportException $e) {
+        }
+
+        $this->assertTrue($strategy->isCalled, 'The HTTP retry strategy should be called with multiple decorators');
+    }
+
+    public function testRetryActuallyRetriesWithAsyncDecorator()
+    {
+        $client = HttpClient::create();
+
+        TestHttpServer::start();
+
+        $retryCount = 0;
+        $strategy = new class($retryCount) implements RetryStrategyInterface {
+            private int $retryCount;
+
+            public function __construct(int &$retryCount)
+            {
+                $this->retryCount = &$retryCount;
+            }
+
+            public function shouldRetry(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): ?bool
+            {
+                ++$this->retryCount;
+
+                return $this->retryCount < 2;
+            }
+
+            public function getDelay(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): int
+            {
+                return 0;
+            }
+        };
+
+        $client = new RetryableHttpClient($client, $strategy, 2);
+
+        $client = new class($client) implements HttpClientInterface {
+            use \Symfony\Component\HttpClient\AsyncDecoratorTrait;
+
+            public function request(string $method, string $url, array $options = []): ResponseInterface
+            {
+                return new AsyncResponse($this->client, $method, $url, $options);
+            }
+        };
+
+        $response = $client->request('GET', 'http://localhost:8057/timeout-header', ['timeout' => 0.1]);
+
+        try {
+            $response->getStatusCode();
+            $this->fail(TransportException::class.' expected');
+        } catch (TransportException $e) {
+        }
+
+        $this->assertSame(2, $retryCount, 'The request should have been retried once');
     }
 }

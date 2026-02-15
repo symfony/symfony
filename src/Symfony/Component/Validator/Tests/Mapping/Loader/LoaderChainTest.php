@@ -44,13 +44,13 @@ class LoaderChainTest extends TestCase
     {
         $metadata = new ClassMetadata('\stdClass');
 
-        $loader1 = $this->createMock(LoaderInterface::class);
-        $loader1->expects($this->any())
+        $loader1 = $this->createStub(LoaderInterface::class);
+        $loader1
             ->method('loadClassMetadata')
             ->willReturn(true);
 
-        $loader2 = $this->createMock(LoaderInterface::class);
-        $loader2->expects($this->any())
+        $loader2 = $this->createStub(LoaderInterface::class);
+        $loader2
             ->method('loadClassMetadata')
             ->willReturn(false);
 
@@ -66,13 +66,13 @@ class LoaderChainTest extends TestCase
     {
         $metadata = new ClassMetadata('\stdClass');
 
-        $loader1 = $this->createMock(LoaderInterface::class);
-        $loader1->expects($this->any())
+        $loader1 = $this->createStub(LoaderInterface::class);
+        $loader1
             ->method('loadClassMetadata')
             ->willReturn(false);
 
-        $loader2 = $this->createMock(LoaderInterface::class);
-        $loader2->expects($this->any())
+        $loader2 = $this->createStub(LoaderInterface::class);
+        $loader2
             ->method('loadClassMetadata')
             ->willReturn(false);
 

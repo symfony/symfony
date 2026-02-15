@@ -16,13 +16,13 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "ext-intl": "*"
     },
     "require-dev": {
-        "symfony/filesystem": "^7.1|^8.0",
-        "symfony/finder": "^6.4|^7.0|^8.0",
-        "symfony/var-exporter": "^6.4|^7.0|^8.0"
+        "symfony/filesystem": "^7.4|^8.0",
+        "symfony/finder": "^7.4|^8.0",
+        "symfony/var-exporter": "^7.4|^8.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Emoji\\": "" },

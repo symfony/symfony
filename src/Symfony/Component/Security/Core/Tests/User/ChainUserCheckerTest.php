@@ -13,14 +13,14 @@ namespace Symfony\Component\Security\Core\Tests\User;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\User\ChainUserChecker;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 final class ChainUserCheckerTest extends TestCase
 {
     public function testForwardsPreAuthToAllUserCheckers()
     {
-        $user = $this->createMock(UserInterface::class);
+        $user = new InMemoryUser('John', 'password');
 
         $checker1 = $this->createMock(UserCheckerInterface::class);
         $checker1->expects($this->once())
@@ -42,7 +42,7 @@ final class ChainUserCheckerTest extends TestCase
 
     public function testForwardsPostAuthToAllUserCheckers()
     {
-        $user = $this->createMock(UserInterface::class);
+        $user = new InMemoryUser('John', 'password');
 
         $checker1 = $this->createMock(UserCheckerInterface::class);
         $checker1->expects($this->once())

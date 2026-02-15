@@ -23,16 +23,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class WeekToArrayTransformer implements DataTransformerInterface
 {
-    /**
-     * Transforms a string containing an ISO 8601 week date into an array.
-     *
-     * @param string|null $value A week date string
-     *
-     * @return array{year: int|null, week: int|null}
-     *
-     * @throws TransformationFailedException If the given value is not a string,
-     *                                       or if the given value does not follow the right format
-     */
     public function transform(mixed $value): array
     {
         if (null === $value) {
@@ -53,16 +43,6 @@ class WeekToArrayTransformer implements DataTransformerInterface
         ];
     }
 
-    /**
-     * Transforms an array into a week date string.
-     *
-     * @param array{year: int|null, week: int|null} $value
-     *
-     * @return string|null A week date string following the format Y-\WW
-     *
-     * @throws TransformationFailedException If the given value cannot be merged in a valid week date string,
-     *                                       or if the obtained week date does not exists
-     */
     public function reverseTransform(mixed $value): ?string
     {
         if (null === $value || [] === $value) {

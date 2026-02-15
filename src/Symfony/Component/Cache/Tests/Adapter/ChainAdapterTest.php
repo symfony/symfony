@@ -66,7 +66,7 @@ class ChainAdapterTest extends AdapterTestCase
 
         $cache = new ChainAdapter([
             $this->getPruneableMock(),
-            $this->getNonPruneableMock(),
+            $this->createStub(AdapterInterface::class),
             $this->getPruneableMock(),
         ]);
         $this->assertTrue($cache->prune());
@@ -231,7 +231,7 @@ class ChainAdapterTest extends AdapterTestCase
             ->willReturn(true);
 
         $cache = new ChainAdapter([$adapter1, $adapter2], 6);
-        $cache->get('test_key', function (ItemInterface $item) {
+        $cache->get('test_key', static function (ItemInterface $item) {
             $item->expiresAfter(15);
 
             return 'chain';
@@ -262,8 +262,27 @@ class ChainAdapterTest extends AdapterTestCase
         return $pruneable;
     }
 
-    private function getNonPruneableMock(): AdapterInterface
+    public function testSetCallbackWrapperPropagation()
     {
-        return $this->createMock(AdapterInterface::class);
+        $adapter1 = new ArrayAdapter();
+        $adapter2 = new FilesystemAdapter();
+
+        $chain = new ChainAdapter([$adapter1, $adapter2]);
+
+        $callbackWrapperCalled = false;
+        $customWrapper = static function (callable $callback, CacheItem $item, bool &$save) use (&$callbackWrapperCalled) {
+            $callbackWrapperCalled = true;
+
+            return $callback($item, $save);
+        };
+
+        $chain->setCallbackWrapper($customWrapper);
+
+        $chain->delete('test-callback-wrapper');
+
+        $result = $chain->get('test-callback-wrapper', static fn () => 'computed-value');
+
+        $this->assertTrue($callbackWrapperCalled);
+        $this->assertSame('computed-value', $result);
     }
 }

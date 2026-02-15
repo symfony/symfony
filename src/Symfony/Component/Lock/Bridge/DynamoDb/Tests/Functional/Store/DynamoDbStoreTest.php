@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Lock\Bridge\DynamoDb\Tests\Functional\Store;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Lock\Bridge\DynamoDb\Store\DynamoDbStore;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Test\AbstractStoreTestCase;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 class DynamoDbStoreTest extends AbstractStoreTestCase
 {
     public static function setUpBeforeClass(): void

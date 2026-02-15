@@ -19,7 +19,6 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Tests\Extension\Core\DataTransformer\Traits\DateTimeEqualsTrait;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTestCase
@@ -131,7 +130,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC');
 
-        $this->assertMatchesRegularExpression('/^Feb 3, 2010, 4:05\s+AM$/u', $transformer->transform($this->dateTime));
+        $this->assertSame('Feb 3, 2010, 4:05 AM', $transformer->transform($this->dateTime));
     }
 
     public function testTransformEmpty()
@@ -235,10 +234,6 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
     public function testReverseTransformFromDifferentLocale()
     {
-        if (version_compare(Intl::getIcuVersion(), '71.1', '>')) {
-            $this->markTestSkipped('ICU version 71.1 or lower is required.');
-        }
-
         \Locale::setDefault('en_US');
 
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC');

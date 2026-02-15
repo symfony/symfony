@@ -36,7 +36,7 @@ class RouterTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('You should either pass a "Symfony\Component\DependencyInjection\ContainerInterface" instance or provide the $parameters argument of the "Symfony\Bundle\FrameworkBundle\Routing\Router::__construct" method');
-        new Router($this->createMock(ContainerInterface::class), 'foo');
+        new Router($this->createStub(ContainerInterface::class), 'foo');
     }
 
     public function testGenerateWithServiceParam()
@@ -607,10 +607,9 @@ class RouterTest extends TestCase
 
     private function getServiceContainer(RouteCollection $routes): Container
     {
-        $loader = $this->createMock(LoaderInterface::class);
+        $loader = $this->createStub(LoaderInterface::class);
 
         $loader
-            ->expects($this->any())
             ->method('load')
             ->willReturn($routes)
         ;
@@ -623,10 +622,9 @@ class RouterTest extends TestCase
 
     private function getPsr11ServiceContainer(RouteCollection $routes): ContainerInterface
     {
-        $loader = $this->createMock(LoaderInterface::class);
+        $loader = $this->createStub(LoaderInterface::class);
 
         $loader
-            ->expects($this->any())
             ->method('load')
             ->willReturn($routes)
         ;

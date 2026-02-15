@@ -45,7 +45,7 @@ class ArrayChoiceListTest extends AbstractChoiceListTestCase
 
     public function testCreateChoiceListWithValueCallback()
     {
-        $callback = fn ($choice) => ':'.$choice;
+        $callback = static fn ($choice) => ':'.$choice;
 
         $choiceList = new ArrayChoiceList([2 => 'foo', 7 => 'bar', 10 => 'baz'], $callback);
 
@@ -110,7 +110,7 @@ class ArrayChoiceListTest extends AbstractChoiceListTestCase
 
     public function testCompareChoicesByIdentityByDefault()
     {
-        $callback = fn ($choice) => $choice->value;
+        $callback = static fn ($choice) => $choice->value;
 
         $obj1 = (object) ['value' => 'value1'];
         $obj2 = (object) ['value' => 'value2'];

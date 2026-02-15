@@ -109,7 +109,7 @@ class HtmlSanitizerConfigTest extends TestCase
         $config = new HtmlSanitizerConfig();
         $config = $config->allowElement('div', '*');
         $this->assertSame(['div'], array_keys($config->getAllowedElements()));
-        $this->assertCount(211, $config->getAllowedElements()['div']);
+        $this->assertCount(210, $config->getAllowedElements()['div']);
         $this->assertSame([], $config->getBlockedElements());
     }
 

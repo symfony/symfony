@@ -12,12 +12,8 @@
 namespace Symfony\Component\JsonStreamer\Mapping\Write;
 
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
-use Symfony\Component\JsonStreamer\ValueTransformer\DateTimeToStringValueTransformer;
-use Symfony\Component\TypeInfo\Type\ObjectType;
 
 /**
- * Transforms DateTimeInterface to string for properties with DateTimeInterface type.
- *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
  * @internal
@@ -31,18 +27,6 @@ final class DateTimeTypePropertyMetadataLoader implements PropertyMetadataLoader
 
     public function load(string $className, array $options = [], array $context = []): array
     {
-        $result = $this->decorated->load($className, $options, $context);
-
-        foreach ($result as &$metadata) {
-            $type = $metadata->getType();
-
-            if ($type instanceof ObjectType && is_a($type->getClassName(), \DateTimeInterface::class, true)) {
-                $metadata = $metadata
-                    ->withType(DateTimeToStringValueTransformer::getStreamValueType())
-                    ->withAdditionalNativeToStreamValueTransformer('json_streamer.value_transformer.date_time_to_string');
-            }
-        }
-
-        return $result;
+        return $this->decorated->load($className, $options, $context);
     }
 }

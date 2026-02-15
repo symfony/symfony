@@ -21,7 +21,7 @@ error_reporting(-1);
 global $argv, $argc;
 $argv = $_SERVER['argv'] ?? [];
 $argc = $_SERVER['argc'] ?? 0;
-$getEnvVar = function ($name, $default = false) use ($argv) {
+$getEnvVar = static function ($name, $default = false) use ($argv) {
     if (false !== $value = getenv($name)) {
         return $value;
     }
@@ -29,19 +29,19 @@ $getEnvVar = function ($name, $default = false) use ($argv) {
     static $phpunitConfig = null;
     if (null === $phpunitConfig) {
         $phpunitConfigFilename = null;
-        $getPhpUnitConfig = function ($probableConfig) use (&$getPhpUnitConfig) {
+        $getPhpUnitConfig = static function ($probableConfig) use (&$getPhpUnitConfig) {
             if (!$probableConfig) {
                 return null;
             }
+
             if (is_dir($probableConfig)) {
-                return $getPhpUnitConfig($probableConfig.\DIRECTORY_SEPARATOR.'phpunit.xml');
+                return $getPhpUnitConfig($probableConfig.\DIRECTORY_SEPARATOR.'phpunit');
             }
 
-            if (file_exists($probableConfig)) {
-                return $probableConfig;
-            }
-            if (file_exists($probableConfig.'.dist')) {
-                return $probableConfig.'.dist';
+            foreach (['.xml', '.xml.dist', '.dist.xml'] as $suffix) {
+                if (file_exists($candidate = $probableConfig.$suffix)) {
+                    return $candidate;
+                }
             }
 
             return null;
@@ -67,7 +67,7 @@ $getEnvVar = function ($name, $default = false) use ($argv) {
             }
         }
 
-        $phpunitConfigFilename = $phpunitConfigFilename ?: $getPhpUnitConfig('phpunit.xml');
+        $phpunitConfigFilename = $phpunitConfigFilename ?: $getPhpUnitConfig('phpunit');
 
         if ($phpunitConfigFilename) {
             $phpunitConfig = new DOMDocument();
@@ -89,7 +89,7 @@ $getEnvVar = function ($name, $default = false) use ($argv) {
     return $default;
 };
 
-$passthruOrFail = function ($command) {
+$passthruOrFail = static function ($command) {
     passthru($command, $status);
 
     if ($status) {
@@ -218,9 +218,7 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         'requires' => ['php' => '*'],
     ];
 
-    $stableVersions = array_filter($info['versions'], function ($v) {
-        return !preg_match('/-dev$|^dev-/', $v);
-    });
+    $stableVersions = array_filter($info['versions'], static fn ($v) => !preg_match('/-dev$|^dev-/', $v));
 
     if (!$stableVersions) {
         $passthruOrFail("$COMPOSER create-project --ignore-platform-reqs --no-install --prefer-dist --no-scripts --no-plugins --no-progress -s dev phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
@@ -276,6 +274,7 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         if ($PHPUNIT_REMOVE_RETURN_TYPEHINT) {
             $alteredCode = preg_replace('/^    ((?:protected|public)(?: static)? function \w+\(\)): void/m', '    $1', $alteredCode);
         }
+        file_put_contents($alteredFile, $alteredCode);
 
         // Mutate Assert code
         $alteredCode = file_get_contents($alteredFile = './src/Framework/Assert.php');

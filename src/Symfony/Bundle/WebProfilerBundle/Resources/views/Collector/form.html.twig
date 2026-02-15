@@ -62,8 +62,11 @@
             text-decoration: none;
         }
 
+        .sf-profiler-form-col-property { width: 180px; }
+
+        .tree-wrapper { display: flex; gap: 0; }
+
         #tree-menu {
-            float: left;
             padding-right: 10px;
             width: 220px;
         }
@@ -84,8 +87,9 @@
         }
         #tree-details-container {
             border-left: 1px solid var(--table-border-color);
-            margin-left: 230px;
             padding-left: 20px;
+            flex: 1;
+            min-width: 0;
         }
         .tree-details {
             padding-bottom: 40px;
@@ -107,6 +111,8 @@
             position: relative;
             overflow: hidden;
             text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
         }
         .tree .toggle-button {
             width: 16px;
@@ -166,9 +172,8 @@
             margin-left: 6px;
         }
         .badge-error {
-            float: right;
             background: var(--background-error);
-            color: #FFF;
+            color: var(--base-0, #FFF);
             padding: 1px 4px;
             font-size: 10px;
             font-weight: bold;
@@ -182,7 +187,7 @@
         }
         .errors th {
             background: var(--background-error);
-            color: #FFF;
+            color: var(--base-0, #FFF);
         }
         .errors .toggle-icon {
             background-color: var(--background-error);
@@ -218,7 +223,7 @@
             #initTrees() {
                 const treeItems = document.querySelectorAll('.tree .tree-inner');
                 treeItems.forEach((treeItem) => {
-                    var targetId = treeItem.getAttribute('data-tab-target-id');
+                    const targetId = treeItem.getAttribute('data-tab-target-id');
                     const target = document.getElementById(targetId);
 
                     if (!target) {
@@ -379,18 +384,20 @@
     <h2>Forms</h2>
 
     {% if collector.data.forms|length %}
-        <div id="tree-menu" class="tree">
-            <ul>
-            {% for formName, formData in collector.data.forms %}
-                {{ _self.form_tree_entry(formName, formData, true) }}
-            {% endfor %}
-            </ul>
-        </div>
+        <div class="tree-wrapper">
+            <div id="tree-menu" class="tree">
+                <ul>
+                {% for formName, formData in collector.data.forms %}
+                    {{ _self.form_tree_entry(formName, formData, true) }}
+                {% endfor %}
+                </ul>
+            </div>
 
-        <div id="tree-details-container">
-            {% for formName, formData in collector.data.forms %}
-                {{ _self.form_tree_details(formName, formData, collector.data.forms_by_hash, loop.first) }}
-            {% endfor %}
+            <div id="tree-details-container">
+                {% for formName, formData in collector.data.forms %}
+                    {{ _self.form_tree_details(formName, formData, collector.data.forms_by_hash, loop.first) }}
+                {% endfor %}
+            </div>
         </div>
     {% else %}
         <div class="empty empty-panel">
@@ -548,7 +555,7 @@
         <table>
             <thead>
             <tr>
-                <th style="width: 180px">Property</th>
+                <th class="sf-profiler-form-col-property">Property</th>
                 <th>Value</th>
             </tr>
             </thead>
@@ -581,7 +588,7 @@
         </table>
     {% else %}
         <div class="empty">
-            <p>This form has default data defined.</p>
+            <p>No default data defined.</p>
         </div>
     {% endif %}
 {% endmacro %}
@@ -591,7 +598,7 @@
         <table>
             <thead>
             <tr>
-                <th style="width: 180px">Property</th>
+                <th class="sf-profiler-form-col-property">Property</th>
                 <th>Value</th>
             </tr>
             </thead>
@@ -634,7 +641,7 @@
         <table>
             <thead>
             <tr>
-                <th style="width: 180px">Option</th>
+                <th class="sf-profiler-form-col-property">Option</th>
                 <th>Passed Value</th>
                 <th>Resolved Value</th>
             </tr>
@@ -671,7 +678,7 @@
     <table>
         <thead>
         <tr>
-            <th style="width: 180px">Option</th>
+            <th class="sf-profiler-form-col-property">Option</th>
             <th>Value</th>
         </tr>
         </thead>
@@ -690,7 +697,7 @@
     <table>
         <thead>
         <tr>
-            <th style="width: 180px">Variable</th>
+            <th class="sf-profiler-form-col-property">Variable</th>
             <th>Value</th>
         </tr>
         </thead>

@@ -354,31 +354,50 @@ class PathTest extends TestCase
 
     public static function provideIsAbsolutePathTests(): \Generator
     {
+        // UNIX-style absolute paths
         yield ['/css/style.css', true];
         yield ['/', true];
         yield ['css/style.css', false];
         yield ['', false];
 
+        // UNIX-style absolute paths with backslashes
         yield ['\\css\\style.css', true];
         yield ['\\', true];
         yield ['css\\style.css', false];
 
+        // Windows-style absolute paths
         yield ['C:/css/style.css', true];
         yield ['D:/', true];
         yield ['C:///windows', true];
         yield ['C://test', true];
 
+        // Windows-style absolute paths with backslashes
         yield ['E:\\css\\style.css', true];
         yield ['F:\\', true];
 
-        yield ['phar:///css/style.css', true];
-        yield ['phar:///', true];
-
-        // Windows special case
+        // Windows special case (drive only)
         yield ['C:', true];
 
-        // Not considered absolute
-        yield ['C:css/style.css', false];
+        // URLs and stream wrappers are considered absolute
+        yield ['phar:///css/style.css', true];
+        yield ['phar:///', true];
+        yield ['http://example.com', true];
+        yield ['ftp://user@server/path', true];
+        yield ['vfs://root/file.txt', true];
+
+        // "C:" without a slash is treated as a scheme by parse_url()
+        yield ['C:css/style.css', true];
+
+        // Relative paths
+        yield ['/var/lib', true];
+        yield ['c:\\\\var\\lib', true]; // c:\\var\lib
+        yield ['\\var\\lib', true];
+        yield ['var/lib', false];
+        yield ['../var/lib', false];
+        yield ['', false];
+
+        // Empty path
+        yield ['', false];
     }
 
     #[DataProvider('provideIsAbsolutePathTests')]

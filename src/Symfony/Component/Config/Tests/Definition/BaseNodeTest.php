@@ -25,7 +25,7 @@ class BaseNodeTest extends TestCase
         $constructorArgs[] = $params[0];
 
         if (isset($params[1])) {
-            $parent = $this->createMock(NodeInterface::class);
+            $parent = $this->createStub(NodeInterface::class);
             $parent->method('getPath')->willReturn($params[1]);
 
             $constructorArgs[] = $parent;

@@ -30,7 +30,7 @@
       "description": "Defines application-wide parameters.",
       "$comment": "Values support scalars, arrays and objects.",
       "patternProperties": {
-        "^.*$": { "$ref": "#/$defs/parameterValue" }
+        "^.+$": { "$ref": "#/$defs/parameterValue" }
       },
       "additionalProperties": false
     },
@@ -203,7 +203,7 @@
       ]
     },
     "serviceShortSyntax": {
-      "$comment": "Short syntax: service defined as arguments array. YAML example: my.service: ['@dependency', 'literal', 123]",
+      "$comment": "Short syntax: service defined as arguments array. YAML example: App\\SomeService: ['@dependency', 'literal', 123]",
       "type": "array",
       "items": { "$ref": "#/$defs/parameterValue" }
     },

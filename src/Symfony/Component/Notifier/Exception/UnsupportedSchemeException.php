@@ -256,10 +256,6 @@ class UnsupportedSchemeException extends LogicException
             'class' => Bridge\Slack\SlackTransportFactory::class,
             'package' => 'symfony/slack-notifier',
         ],
-        'sms77' => [
-            'class' => Bridge\Sms77\Sms77TransportFactory::class,
-            'package' => 'symfony/sms77-notifier',
-        ],
         'smsapi' => [
             'class' => Bridge\Smsapi\SmsapiTransportFactory::class,
             'package' => 'symfony/smsapi-notifier',

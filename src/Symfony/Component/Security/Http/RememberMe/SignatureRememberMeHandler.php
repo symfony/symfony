@@ -47,7 +47,7 @@ final class SignatureRememberMeHandler extends AbstractRememberMeHandler
         $expires = time() + $this->options['lifetime'];
         $value = $this->signatureHasher->computeSignatureHash($user, $expires);
 
-        $details = new RememberMeDetails($user::class, $user->getUserIdentifier(), $expires, $value, false);
+        $details = new RememberMeDetails($user->getUserIdentifier(), $expires, $value);
         $this->createCookie($details);
     }
 

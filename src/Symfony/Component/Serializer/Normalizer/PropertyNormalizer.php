@@ -99,6 +99,10 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
+        if ($this->classDiscriminatorResolver?->getMappingForMappedObject($classOrObject)?->getTypeProperty() === $attribute) {
+            return true;
+        }
+
         try {
             $reflectionProperty = $this->getReflectionProperty($classOrObject, $attribute);
         } catch (\ReflectionException) {

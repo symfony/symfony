@@ -19,7 +19,7 @@ use Symfony\Component\CssSelector\XPath\XPathExpr;
  * XPath expression translator node extension.
  *
  * This component is a port of the Python cssselect library,
- * which is copyright Ian Bicking, @see https://github.com/SimonSapin/cssselect.
+ * which is copyright Ian Bicking, @see https://github.com/scrapy/cssselect.
  *
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  *
@@ -71,6 +71,7 @@ class NodeExtension extends AbstractExtension
             'Class' => $this->translateClass(...),
             'Hash' => $this->translateHash(...),
             'Element' => $this->translateElement(...),
+            'Relation' => $this->translateRelation(...),
         ];
     }
 
@@ -207,6 +208,13 @@ class NodeExtension extends AbstractExtension
         }
 
         return $xpath;
+    }
+
+    public function translateRelation(Node\RelationNode $node, Translator $translator): XPathExpr
+    {
+        $combinator = $node->getCombinator();
+
+        return $translator->addRelativeCombination($combinator, $node->getSelector(), $node->getSubSelector());
     }
 
     public function getName(): string

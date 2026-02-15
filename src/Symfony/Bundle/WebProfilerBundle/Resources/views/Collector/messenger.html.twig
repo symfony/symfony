@@ -4,6 +4,10 @@
     {{ parent() }}
 
     <style>
+        :root {
+            --messenger-error-color: #B0413E;
+        }
+
         .message-item thead th { position: relative; cursor: pointer; user-select: none; padding-right: 35px; }
         .message-item tbody tr td:first-child { width: 170px; }
 
@@ -15,7 +19,7 @@
         .message-item .sf-toggle-off .icon-close, .sf-toggle-on .icon-open { display: none; }
         .message-item .sf-toggle-off .icon-open, .sf-toggle-on .icon-close { display: block; }
 
-        .message-bus .badge.status-some-errors { line-height: 16px; border-bottom: 2px solid #B0413E; }
+        .message-bus .badge.status-some-errors { line-height: 16px; border-bottom: 2px solid var(--messenger-error-color); }
 
         .message-item tbody.sf-toggle-content.sf-toggle-visible { display: table-row-group; }
 

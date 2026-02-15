@@ -115,6 +115,17 @@ class ConfigDumpReferenceCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString('[ERROR] The "path" option is only available for the "yaml" format.', $tester->getDisplay());
     }
 
+    #[TestWith(['yaml'])]
+    #[TestWith(['xml'])]
+    public function testDumpFrameworkBundle(string $format)
+    {
+        $tester = $this->createCommandTester(true);
+        $ret = $tester->execute(['name' => 'framework', '--format' => $format]);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('%env(default::SYMFONY_TRUSTED_PROXIES)%', $tester->getDisplay());
+    }
+
     #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(bool $debug, array $input, array $expectedSuggestions)
     {

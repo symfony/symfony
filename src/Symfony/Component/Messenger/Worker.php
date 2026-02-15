@@ -176,7 +176,7 @@ class Worker
         if (!$acked && !$noAutoAckStamp) {
             $this->acks[] = [$transportName, $envelope, $e];
         } elseif ($noAutoAckStamp) {
-            $this->unacks[$noAutoAckStamp->getHandlerDescriptor()->getBatchHandler()] = [$envelope->withoutAll(AckStamp::class), $transportName];
+            $this->unacks[$noAutoAckStamp->getHandlerDescriptor()->getBatchHandler()] = [$envelope->withoutAll(AckStamp::class), $transportName, &$acked];
         }
 
         $this->ack();
@@ -269,13 +269,22 @@ class Worker
         $this->unacks = new \SplObjectStorage();
 
         foreach ($unacks as $batchHandler) {
-            [$envelope, $transportName] = $unacks[$batchHandler];
+            [$envelope, $transportName, $acked] = $unacks[$batchHandler];
             try {
+                $e = null;
                 $this->bus->dispatch($envelope->with(new FlushBatchHandlersStamp($force)));
-                unset($unacks[$batchHandler], $batchHandler);
             } catch (\Throwable $e) {
                 $envelope = $envelope->withoutAll(NoAutoAckStamp::class);
                 $this->acks[] = [$transportName, $envelope, $e];
+                continue;
+            }
+
+            $noAutoAckStamp = $envelope->last(NoAutoAckStamp::class);
+
+            if (!$acked && !$noAutoAckStamp) {
+                $this->acks[] = [$transportName, $envelope, $e];
+            } elseif ($noAutoAckStamp) {
+                $this->unacks[$noAutoAckStamp->getHandlerDescriptor()->getBatchHandler()] = [$envelope->withoutAll(AckStamp::class), $transportName, &$acked];
             }
         }
 

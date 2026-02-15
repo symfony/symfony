@@ -59,6 +59,7 @@ class TranslationExtractCommand extends Command
         private array $codePaths = [],
         private array $enabledLocales = [],
     ) {
+        $this->enabledLocales = array_filter($enabledLocales);
         parent::__construct();
 
         if (!method_exists($writer, 'getFormats')) {
@@ -228,8 +229,8 @@ class TranslationExtractCommand extends Command
 
                 $list = array_merge(
                     array_diff($allKeys, $newKeys),
-                    array_map(fn ($id) => \sprintf('<fg=green>%s</>', $id), $newKeys),
-                    array_map(fn ($id) => \sprintf('<fg=red>%s</>', $id), array_keys($operation->getObsoleteMessages($domain)))
+                    array_map(static fn ($id) => \sprintf('<fg=green>%s</>', $id), $newKeys),
+                    array_map(static fn ($id) => \sprintf('<fg=red>%s</>', $id), array_keys($operation->getObsoleteMessages($domain)))
                 );
 
                 $domainMessagesCount = \count($list);

@@ -42,6 +42,6 @@ final class AttributeServicesLoader extends Loader
 
     public function supports(mixed $resource, ?string $type = null): bool
     {
-        return 'tagged_services' === $type && 'attributes' === $resource;
+        return 'routing.controllers' === $resource;
     }
 }

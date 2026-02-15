@@ -26,8 +26,8 @@ class AttributeServicesLoaderTest extends TestCase
 
         $this->assertFalse($loader->supports('attributes', null));
         $this->assertFalse($loader->supports('attributes', 'attribute'));
-        $this->assertFalse($loader->supports('other', 'tagged_services'));
-        $this->assertTrue($loader->supports('attributes', 'tagged_services'));
+        $this->assertFalse($loader->supports('other', 'routing.controllers'));
+        $this->assertTrue($loader->supports('routing.controllers'));
     }
 
     public function testDelegatesToAttributeLoaderAndMergesCollections()
@@ -47,7 +47,7 @@ class AttributeServicesLoaderTest extends TestCase
         $attributeLoader->setResolver($resolver);
         $servicesLoader->setResolver($resolver);
 
-        $collection = $servicesLoader->load('attributes', 'tagged_services');
+        $collection = $servicesLoader->load('routing.controllers');
 
         $this->assertArrayHasKey('action', $collection->all());
         $this->assertArrayHasKey('put', $collection->all());

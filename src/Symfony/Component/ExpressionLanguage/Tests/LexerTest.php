@@ -102,6 +102,10 @@ class LexerTest extends TestCase
                 '"foo"',
             ],
             [
+                [new Token('string', 'foo"bar\\baz', 1)],
+                '"foo\"bar\\\\baz"',
+            ],
+            [
                 [new Token('number', 3, 1)],
                 '3',
             ],

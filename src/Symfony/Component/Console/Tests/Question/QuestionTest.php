@@ -60,7 +60,7 @@ class QuestionTest extends TestCase
     public function testSetHiddenWithAutocompleterCallback()
     {
         $this->question->setAutocompleterCallback(
-            fn (string $input): array => []
+            static fn (string $input): array => []
         );
 
         $this->expectException(\LogicException::class);
@@ -74,7 +74,7 @@ class QuestionTest extends TestCase
     public function testSetHiddenWithNoAutocompleterCallback()
     {
         $this->question->setAutocompleterCallback(
-            fn (string $input): array => []
+            static fn (string $input): array => []
         );
         $this->question->setAutocompleterCallback(null);
 
@@ -179,7 +179,7 @@ class QuestionTest extends TestCase
 
     public function testGetSetAutocompleterCallback()
     {
-        $callback = fn (string $input): array => [];
+        $callback = static fn (string $input): array => [];
 
         $this->question->setAutocompleterCallback($callback);
         self::assertSame($callback, $this->question->getAutocompleterCallback());
@@ -200,7 +200,7 @@ class QuestionTest extends TestCase
         );
 
         $this->question->setAutocompleterCallback(
-            fn (string $input): array => []
+            static fn (string $input): array => []
         );
     }
 
@@ -212,7 +212,7 @@ class QuestionTest extends TestCase
         $exception = null;
         try {
             $this->question->setAutocompleterCallback(
-                fn (string $input): array => []
+                static fn (string $input): array => []
             );
         } catch (\Exception $exception) {
             // Do nothing
@@ -224,7 +224,7 @@ class QuestionTest extends TestCase
     public static function providerGetSetValidator()
     {
         return [
-            [fn ($input) => $input],
+            [static fn ($input) => $input],
             [null],
         ];
     }
@@ -274,7 +274,7 @@ class QuestionTest extends TestCase
 
     public function testGetSetNormalizer()
     {
-        $normalizer = fn ($input) => $input;
+        $normalizer = static fn ($input) => $input;
         $this->question->setNormalizer($normalizer);
         self::assertSame($normalizer, $this->question->getNormalizer());
     }

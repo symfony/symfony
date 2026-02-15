@@ -28,7 +28,7 @@ class ChromePhpHandlerTest extends TestCase
         $request->headers->remove('User-Agent');
 
         $response = new Response('foo');
-        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response);
+        $event = new ResponseEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST, $response);
 
         $listener = new ChromePhpHandler();
         $listener->onKernelResponse($event);

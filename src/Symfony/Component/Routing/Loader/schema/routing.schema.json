@@ -62,7 +62,17 @@
         "locale": { "type": "string" },
         "format": { "type": "string" },
         "utf8": { "type": "boolean" },
-        "stateless": { "type": "boolean" }
+        "stateless": { "type": "boolean" },
+        "deprecated": {
+          "type": "object",
+          "properties": {
+            "package": { "type": "string" },
+            "version": { "type": "string" },
+            "message": { "type": "string" }
+          },
+          "required": ["package", "version"],
+          "additionalProperties": false
+        }
       },
       "required": ["path"],
       "additionalProperties": false
@@ -70,7 +80,22 @@
     "routeImport": {
       "type": "object",
       "properties": {
-        "resource": { "type": "string", "description": "Path to the resource to import." },
+        "resource": {
+          "description": "Path to the resource to import (commonly a string or {path, namespace}), array of paths, or custom value for loaders (additional properties allowed for extensions).",
+          "oneOf": [
+            { "type": "string" },
+            { "type": "array", "items": { "type": "string" } },
+            {
+              "type": "object",
+              "properties": {
+                "path": { "type": "string", "description": "The directory path to the resource." },
+                "namespace": { "type": "string", "description": "The namespace of the controllers in the imported resource (e.g., 'App\\Availability\\UserInterface\\Api')." }
+              },
+              "required": ["path"],
+              "additionalProperties": true
+            }
+          ]
+        },
         "type": {
           "type": "string",
           "description": "The type of the resource (e.g., 'attribute', 'annotation', 'yaml')."
@@ -78,7 +103,7 @@
         "prefix": {
           "oneOf": [
             { "type": "string" },
-            { "type": "object", "patternProperties": { "^.+$": { "type": "string" } } }
+            { "type": "object", "patternProperties": { "^.+$": { "type": "string" } }, "additionalProperties": false }
           ],
           "description": "A URL prefix to apply to all routes from the imported resource."
         },

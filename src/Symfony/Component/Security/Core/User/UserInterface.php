@@ -48,16 +48,6 @@ interface UserInterface
     public function getRoles(): array;
 
     /**
-     * Removes sensitive data from the user.
-     *
-     * This is important if, at any given point, sensitive information like
-     * the plain-text password is stored on this object.
-     *
-     * @deprecated since Symfony 7.3, erase credentials using the "__serialize()" method instead
-     */
-    public function eraseCredentials(): void;
-
-    /**
      * Returns the identifier for this user (e.g. username or email address).
      *
      * @return non-empty-string

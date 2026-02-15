@@ -11,23 +11,25 @@
 
 namespace Symfony\Component\Semaphore\Tests\Store;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Relay\Relay;
 
 #[RequiresPhpExtension('relay')]
+#[Group('integration')]
 class RelayStoreTest extends AbstractRedisStoreTestCase
 {
     protected function setUp(): void
     {
-        $this->getRedisConnection()->flushDB();
+        try {
+            $this->getRedisConnection()->flushDB();
+        } catch (\Relay\Exception $e) {
+            self::markTestSkipped($e->getMessage());
+        }
     }
 
     public static function setUpBeforeClass(): void
     {
-        if (\PHP_VERSION_ID <= 80500 && isset($_SERVER['GITHUB_ACTIONS'])) {
-            self::markTestSkipped('Test segfaults on PHP 8.5');
-        }
-
         try {
             new Relay(...explode(':', getenv('REDIS_HOST')));
         } catch (\Relay\Exception $e) {

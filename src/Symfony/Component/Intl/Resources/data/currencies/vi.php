@@ -1062,6 +1062,10 @@ return [
             'EC$',
             'Đô la Đông Caribê',
         ],
+        'XCG' => [
+            'Cg.',
+            'Guilder Caribe',
+        ],
         'XEU' => [
             'XEU',
             'Đơn vị Tiền Châu Âu',
@@ -1137,6 +1141,10 @@ return [
         'ZWD' => [
             'ZWD',
             'Đồng Đô la Zimbabwe (1980–2008)',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'Zimbabwean Gold',
         ],
         'ZWL' => [
             'ZWL',

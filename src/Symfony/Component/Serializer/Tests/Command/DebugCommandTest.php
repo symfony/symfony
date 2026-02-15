@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Serializer\Command\DebugCommand;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Tests\Dummy\DummyClassOne;
 use Symfony\Component\Serializer\Tests\Dummy\DummyClassWithDiscriminatorMap;
@@ -117,9 +116,7 @@ class DebugCommandTest extends TestCase
 
     public function testOutputWithInvalidClassArgument()
     {
-        $serializer = $this->createMock(ClassMetadataFactoryInterface::class);
-
-        $command = new DebugCommand($serializer);
+        $command = new DebugCommand(new ClassMetadataFactory(new AttributeLoader()));
 
         $tester = new CommandTester($command);
         $tester->execute(['class' => 'App\\NotFoundResource'], ['decorated' => false]);

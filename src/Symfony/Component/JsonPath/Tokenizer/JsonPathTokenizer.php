@@ -88,9 +88,8 @@ final class JsonPathTokenizer
             if ($inQuote) {
                 // literal control characters (U+0000 through U+001F) in quoted strings
                 // are not be allowed unless they are part of escape sequences
-                $ord = \ord($char);
                 if ($inBracket) {
-                    if ($ord <= 31) {
+                    if (\ord($char[0]) <= 31) {
                         if (!self::isEscaped($chars, $i)) {
                             throw new InvalidJsonPathException('control characters are not allowed in quoted strings.', $position);
                         }
@@ -356,7 +355,7 @@ final class JsonPathTokenizer
         $filterExpr = ltrim($expr, '?');
         $filterExpr = trim($filterExpr);
 
-        if (preg_match('/\b(True|False|Null)\b/', $filterExpr)) {
+        if (preg_match('/(?<!["\'])\b(True|False|Null)\b(?!["\'])/', $filterExpr)) {
             throw new InvalidJsonPathException('Incorrectly capitalized literal in filter expression.', $position);
         }
 

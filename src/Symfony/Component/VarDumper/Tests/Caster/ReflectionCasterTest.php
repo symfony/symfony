@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
@@ -87,7 +86,7 @@ class ReflectionCasterTest extends TestCase
     public function testClosureCaster()
     {
         $a = $b = 123;
-        $var = function ($x) use ($a, &$b) { var_dump($a, $b); };
+        $var = static function ($x) use ($a, &$b) { var_dump($a, $b); };
 
         $this->assertDumpMatchesFormat(
             <<<'EOTXT'
@@ -132,9 +131,11 @@ class ReflectionCasterTest extends TestCase
 
     public function testClosureCasterExcludingVerbosity()
     {
-        $var = function &($a = 5) {};
+        $var = function &($a = 123) {
+            \assert(null !== $this);
+        };
 
-        $this->assertDumpEquals('Closure&($a = 5) { …5}', $var, Caster::EXCLUDE_VERBOSE);
+        $this->assertDumpEquals('Closure&($a = 123) { …5}', $var, Caster::EXCLUDE_VERBOSE);
     }
 
     public function testReflectionParameter()
@@ -156,7 +157,7 @@ class ReflectionCasterTest extends TestCase
 
     public function testReflectionParameterScalar()
     {
-        $f = function (int $a) {};
+        $f = static function (int $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -173,7 +174,7 @@ class ReflectionCasterTest extends TestCase
 
     public function testReflectionParameterMixed()
     {
-        $f = function (mixed $a) {};
+        $f = static function (mixed $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -191,7 +192,7 @@ class ReflectionCasterTest extends TestCase
 
     public function testReflectionParameterUnion()
     {
-        $f = function (int|float $a) {};
+        $f = static function (int|float $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -208,7 +209,7 @@ class ReflectionCasterTest extends TestCase
 
     public function testReflectionParameterNullableUnion()
     {
-        $f = function (int|float|null $a) {};
+        $f = static function (int|float|null $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -226,7 +227,7 @@ class ReflectionCasterTest extends TestCase
 
     public function testReflectionParameterIntersection()
     {
-        $f = function (\Traversable&\Countable $a) {};
+        $f = static function (\Traversable&\Countable $a) {};
         $var = new \ReflectionParameter($f, 0);
 
         $this->assertDumpMatchesFormat(
@@ -371,7 +372,9 @@ class ReflectionCasterTest extends TestCase
 
     public function testReturnType()
     {
-        $f = function (): int {};
+        $f = function (): int {
+            \assert(null !== $this);
+        };
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -389,7 +392,9 @@ class ReflectionCasterTest extends TestCase
 
     public function testMixedReturnType()
     {
-        $f = function (): mixed {};
+        $f = function (): mixed {
+            \assert(null !== $this);
+        };
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -424,7 +429,9 @@ class ReflectionCasterTest extends TestCase
 
     public function testUnionReturnType()
     {
-        $f = function (): int|float {};
+        $f = function (): int|float {
+            \assert(null !== $this);
+        };
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -442,7 +449,9 @@ class ReflectionCasterTest extends TestCase
 
     public function testNullableUnionReturnType()
     {
-        $f = function (): int|float|null {};
+        $f = function (): int|float|null {
+            \assert(null !== $this);
+        };
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -458,80 +467,6 @@ class ReflectionCasterTest extends TestCase
         );
     }
 
-    #[RequiresPhp('<8.4')]
-    public function testGeneratorPriorTo84()
-    {
-        if (\extension_loaded('xdebug')) {
-            $this->markTestSkipped('xdebug is active');
-        }
-
-        $generator = new GeneratorDemo();
-        $generator = $generator->baz();
-
-        $expectedDump = <<<'EODUMP'
-            Generator {
-              this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
-              %s: {
-                %sGeneratorDemo.php:14 {
-                  Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo->baz()
-                  › {
-                  ›     yield from bar();
-                  › }
-                }
-            %A}
-              closed: false
-            }
-            EODUMP;
-
-        $this->assertDumpMatchesFormat($expectedDump, $generator);
-
-        foreach ($generator as $v) {
-            break;
-        }
-
-        $expectedDump = <<<'EODUMP'
-            array:2 [
-              0 => ReflectionGenerator {
-                this: Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo { …}
-                %s: {
-                  %s%eTests%eFixtures%eGeneratorDemo.php:%d {
-                    Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
-            %A      ›     yield 1;
-            %A    }
-                  %s%eTests%eFixtures%eGeneratorDemo.php:20 { …}
-                  %s%eTests%eFixtures%eGeneratorDemo.php:14 { …}
-            %A  }
-                closed: false
-              }
-              1 => Generator {
-                %s: {
-                  %s%eTests%eFixtures%eGeneratorDemo.php:%d {
-                    Symfony\Component\VarDumper\Tests\Fixtures\GeneratorDemo::foo()
-                    ›     yield 1;
-                    › }
-                    › 
-                  }
-            %A  }
-                closed: false
-              }
-            ]
-            EODUMP;
-
-        $r = new \ReflectionGenerator($generator);
-        $this->assertDumpMatchesFormat($expectedDump, [$r, $r->getExecutingGenerator()]);
-
-        foreach ($generator as $v) {
-        }
-
-        $expectedDump = <<<'EODUMP'
-            Generator {
-              closed: true
-            }
-            EODUMP;
-        $this->assertDumpMatchesFormat($expectedDump, $generator);
-    }
-
-    #[RequiresPhp('>=8.4')]
     public function testGenerator()
     {
         if (\extension_loaded('xdebug')) {
@@ -612,7 +547,9 @@ class ReflectionCasterTest extends TestCase
 
     public function testNewInInitializer()
     {
-        $f = function ($a = new \stdClass()) {};
+        $f = function ($a = new \stdClass()) {
+            \assert(null !== $this);
+        };
 
         $this->assertDumpMatchesFormat(
             <<<EOTXT
@@ -630,14 +567,13 @@ class ReflectionCasterTest extends TestCase
     public function testReflectionClassWithAttribute()
     {
         $var = new \ReflectionClass(LotsOfAttributes::class);
-        $dumpedAttributeNameProperty = (\PHP_VERSION_ID < 80400 ? '' : '+').'name';
 
         $this->assertDumpMatchesFormat(<<<EOTXT
             ReflectionClass {
               +name: "Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes"
             %A  attributes: array:1 [
                 0 => ReflectionAttribute {
-                  $dumpedAttributeNameProperty: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
+                  +name: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
                   arguments: []
                 }
               ]
@@ -651,7 +587,6 @@ class ReflectionCasterTest extends TestCase
     public function testReflectionMethodWithAttribute()
     {
         $var = new \ReflectionMethod(LotsOfAttributes::class, 'someMethod');
-        $dumpedAttributeNameProperty = (\PHP_VERSION_ID < 80400 ? '' : '+').'name';
 
         $this->assertDumpMatchesFormat(<<<EOTXT
             ReflectionMethod {
@@ -659,7 +594,7 @@ class ReflectionCasterTest extends TestCase
               +class: "Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes"
             %A  attributes: array:1 [
                 0 => ReflectionAttribute {
-                  $dumpedAttributeNameProperty: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
+                  +name: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
                   arguments: array:1 [
                     0 => "two"
                   ]
@@ -675,7 +610,6 @@ class ReflectionCasterTest extends TestCase
     public function testReflectionPropertyWithAttribute()
     {
         $var = new \ReflectionProperty(LotsOfAttributes::class, 'someProperty');
-        $dumpedAttributeNameProperty = (\PHP_VERSION_ID < 80400 ? '' : '+').'name';
 
         $this->assertDumpMatchesFormat(<<<EOTXT
             ReflectionProperty {
@@ -683,7 +617,7 @@ class ReflectionCasterTest extends TestCase
               +class: "Symfony\Component\VarDumper\Tests\Fixtures\LotsOfAttributes"
             %A  attributes: array:1 [
                 0 => ReflectionAttribute {
-                  $dumpedAttributeNameProperty: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
+                  +name: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
                   arguments: array:2 [
                     0 => "one"
                     "extra" => "hello"
@@ -699,7 +633,6 @@ class ReflectionCasterTest extends TestCase
     public function testReflectionClassConstantWithAttribute()
     {
         $var = new \ReflectionClassConstant(LotsOfAttributes::class, 'SOME_CONSTANT');
-        $dumpedAttributeNameProperty = (\PHP_VERSION_ID < 80400 ? '' : '+').'name';
 
         $this->assertDumpMatchesFormat(<<<EOTXT
             ReflectionClassConstant {
@@ -709,13 +642,13 @@ class ReflectionCasterTest extends TestCase
               value: "some value"
               attributes: array:2 [
                 0 => ReflectionAttribute {
-                  $dumpedAttributeNameProperty: "Symfony\Component\VarDumper\Tests\Fixtures\RepeatableAttribute"
+                  +name: "Symfony\Component\VarDumper\Tests\Fixtures\RepeatableAttribute"
                   arguments: array:1 [
                     0 => "one"
                   ]
                 }
                 1 => ReflectionAttribute {
-                  $dumpedAttributeNameProperty: "Symfony\Component\VarDumper\Tests\Fixtures\RepeatableAttribute"
+                  +name: "Symfony\Component\VarDumper\Tests\Fixtures\RepeatableAttribute"
                   arguments: array:1 [
                     0 => "two"
                   ]
@@ -730,7 +663,6 @@ class ReflectionCasterTest extends TestCase
     public function testReflectionParameterWithAttribute()
     {
         $var = new \ReflectionParameter([LotsOfAttributes::class, 'someMethod'], 'someParameter');
-        $dumpedAttributeNameProperty = (\PHP_VERSION_ID < 80400 ? '' : '+').'name';
 
         $this->assertDumpMatchesFormat(<<<EOTXT
             ReflectionParameter {
@@ -738,7 +670,7 @@ class ReflectionCasterTest extends TestCase
               position: 0
               attributes: array:1 [
                 0 => ReflectionAttribute {
-                  $dumpedAttributeNameProperty: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
+                  +name: "Symfony\Component\VarDumper\Tests\Fixtures\MyAttribute"
                   arguments: array:1 [
                     0 => "three"
                   ]

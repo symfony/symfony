@@ -28,6 +28,7 @@ class NullAdapter implements AdapterInterface, CacheInterface, NamespacedPoolInt
         self::$createCacheItem ??= \Closure::bind(
             static function ($key) {
                 $item = new CacheItem();
+                $item->isTaggable = true;
                 $item->key = $key;
                 $item->isHit = false;
 

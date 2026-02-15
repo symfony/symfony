@@ -12,11 +12,11 @@
 namespace Symfony\Component\Translation\Bridge\Phrase\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\HttpClientTrait;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
@@ -40,10 +40,10 @@ class PhraseProviderTest extends TestCase
     }
 
     private MockHttpClient $httpClient;
-    private MockObject&LoggerInterface $logger;
-    private MockObject&LoaderInterface $loader;
-    private MockObject&XliffFileDumper $xliffFileDumper;
-    private MockObject&CacheItemPoolInterface $cache;
+    private LoggerInterface $logger;
+    private LoaderInterface $loader;
+    private XliffFileDumper $xliffFileDumper;
+    private CacheItemPoolInterface $cache;
     private string $defaultLocale;
     private string $endpoint;
     private array $readConfig;
@@ -74,8 +74,9 @@ class PhraseProviderTest extends TestCase
                 return true;
             }));
 
+        $this->cache = $this->createMock(CacheItemPoolInterface::class);
         $this->getCache()
-            ->expects(self::once())
+            ->expects($this->once())
             ->method('getItem')
             ->with(self::callback(function ($v) use ($locale, $domain) {
                 $this->assertStringStartsWith($locale.'.'.$domain.'.', $v);
@@ -90,7 +91,6 @@ class PhraseProviderTest extends TestCase
         ];
 
         $this->getLoader()
-            ->expects($this->once())
             ->method('load')
             ->willReturn($expectedTranslatorBag->getCatalogue($locale));
 
@@ -127,6 +127,7 @@ class PhraseProviderTest extends TestCase
                 return true;
             }));
 
+        $this->cache = $this->createMock(CacheItemPoolInterface::class);
         $this->getCache()
             ->expects(self::once())
             ->method('getItem')
@@ -156,7 +157,6 @@ class PhraseProviderTest extends TestCase
         ];
 
         $this->getLoader()
-            ->expects($this->once())
             ->method('load')
             ->willReturn($expectedTranslatorBag->getCatalogue($locale));
 
@@ -205,6 +205,7 @@ class PhraseProviderTest extends TestCase
         $item->expects(self::once())->method('isHit')->willReturn(false);
         $item->expects(self::never())->method('set');
 
+        $this->cache = $this->createMock(CacheItemPoolInterface::class);
         $this->getCache()
             ->expects(self::once())
             ->method('getItem')
@@ -216,6 +217,7 @@ class PhraseProviderTest extends TestCase
             ->willReturn($item);
 
         $this->getCache()->expects(self::never())->method('save');
+        $this->loader = $this->createMock(LoaderInterface::class);
         $this->getLoader()->expects($this->once())->method('load')->willReturn($bag->getCatalogue($locale));
 
         $responses = [
@@ -258,6 +260,7 @@ class PhraseProviderTest extends TestCase
     #[DataProvider('cacheKeyProvider')]
     public function testCacheKeyOptionsSort(array $options, string $expectedKey)
     {
+        $this->cache = $this->createMock(CacheItemPoolInterface::class);
         $this->getCache()->expects(self::once())->method('getItem')->with($expectedKey);
         $this->getLoader()->method('load')->willReturn(new MessageCatalogue('en'));
 
@@ -292,7 +295,6 @@ class PhraseProviderTest extends TestCase
         $item->method('get')->willReturn($cachedValue);
 
         $this->getCache()
-            ->expects(self::once())
             ->method('getItem')
             ->willReturn($item);
 
@@ -370,6 +372,7 @@ class PhraseProviderTest extends TestCase
     #[DataProvider('readProviderExceptionsProvider')]
     public function testReadProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
+        $this->logger = $this->createMock(LoggerInterface::class);
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -404,6 +407,7 @@ class PhraseProviderTest extends TestCase
     #[DataProvider('initLocalesExceptionsProvider')]
     public function testInitLocalesExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
+        $this->logger = $this->createMock(LoggerInterface::class);
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -526,6 +530,7 @@ class PhraseProviderTest extends TestCase
     #[DataProvider('createLocalesExceptionsProvider')]
     public function testCreateLocaleExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
+        $this->logger = $this->createMock(LoggerInterface::class);
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -612,6 +617,7 @@ class PhraseProviderTest extends TestCase
     #[DataProvider('deleteExceptionsProvider')]
     public function testDeleteProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
+        $this->logger = $this->createMock(LoggerInterface::class);
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -726,6 +732,7 @@ class PhraseProviderTest extends TestCase
     #[DataProvider('writeExceptionsProvider')]
     public function testWriteProviderExceptions(int $statusCode, string $expectedExceptionMessage, string $expectedLoggerMessage)
     {
+        $this->logger = $this->createMock(LoggerInterface::class);
         $this->getLogger()
             ->expects(self::once())
             ->method('error')
@@ -1103,24 +1110,24 @@ class PhraseProviderTest extends TestCase
         return $this->httpClient ??= new MockHttpClient();
     }
 
-    private function getLogger(): MockObject&LoggerInterface
+    private function getLogger(): LoggerInterface
     {
-        return $this->logger ??= $this->createMock(LoggerInterface::class);
+        return $this->logger ??= new NullLogger();
     }
 
-    private function getLoader(): MockObject&LoaderInterface
+    private function getLoader(): LoaderInterface
     {
-        return $this->loader ??= $this->createMock(LoaderInterface::class);
+        return $this->loader ??= $this->createStub(LoaderInterface::class);
     }
 
-    private function getXliffFileDumper(): XliffFileDumper&MockObject
+    private function getXliffFileDumper(): XliffFileDumper
     {
-        return $this->xliffFileDumper ??= $this->createMock(XliffFileDumper::class);
+        return $this->xliffFileDumper ??= $this->createStub(XliffFileDumper::class);
     }
 
-    private function getCache(): MockObject&CacheItemPoolInterface
+    private function getCache(): CacheItemPoolInterface
     {
-        return $this->cache ??= $this->createMock(CacheItemPoolInterface::class);
+        return $this->cache ??= $this->createStub(CacheItemPoolInterface::class);
     }
 
     private function getDefaultLocale(): string

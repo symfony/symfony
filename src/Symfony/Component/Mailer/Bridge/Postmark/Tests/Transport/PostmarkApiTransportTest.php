@@ -146,7 +146,7 @@ class PostmarkApiTransportTest extends TestCase
 
         $expectedEvent = (new PostmarkDeliveryEvent('Inactive recipient', 406, $mail->getHeaders()));
 
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher = $this->createStub(EventDispatcherInterface::class);
         $dispatcher
             ->method('dispatch')
             ->willReturnCallback(function ($event) use ($expectedEvent) {

@@ -26,11 +26,33 @@ class AmpHttpClientTest extends HttpClientTestCase
 
     protected function getHttpClient(string $testCase): HttpClientInterface
     {
-        return new AmpHttpClient(['verify_peer' => false, 'verify_host' => false, 'timeout' => 5]);
+        return new AmpHttpClient(['verify_peer' => false, 'verify_host' => false, 'timeout' => 30]);
     }
 
     public function testProxy()
     {
         $this->markTestSkipped('A real proxy server would be needed.');
+    }
+
+    public function testMaxConnectDurationPreservesAsync()
+    {
+        $client = $this->getHttpClient(__FUNCTION__);
+
+        $responses = [];
+        for ($i = 0; $i < 3; ++$i) {
+            $responses[] = $client->request('GET', 'http://localhost:8057/', [
+                'max_connect_duration' => 5.0,
+            ]);
+        }
+
+        $start = microtime(true);
+        foreach ($client->stream($responses) as $chunk) {
+            if ($chunk->isFirst()) {
+                // noop - connection completed
+            }
+        }
+        $duration = microtime(true) - $start;
+
+        $this->assertLessThan(2, $duration, 'Requests should be processed concurrently');
     }
 }

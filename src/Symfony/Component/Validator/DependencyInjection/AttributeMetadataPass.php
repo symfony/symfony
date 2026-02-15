@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\MappingException;
 
 /**
@@ -32,9 +31,6 @@ final class AttributeMetadataPass implements CompilerPassInterface
         foreach ($container->getDefinitions() as $id => $definition) {
             if (!$definition->hasTag('validator.attribute_metadata')) {
                 continue;
-            }
-            if (!$definition->hasTag('container.excluded')) {
-                throw new InvalidArgumentException(\sprintf('The resource "%s" tagged "validator.attribute_metadata" is missing the "container.excluded" tag.', $id));
             }
             $class = $resolve($definition->getClass());
             foreach ($definition->getTag('validator.attribute_metadata') as $attributes) {

@@ -44,6 +44,24 @@ class SemaphoreStoreTest extends AbstractStoreTestCase
         $this->assertEquals($initialCount, $this->getOpenedSemaphores(), 'All semaphores should be removed');
     }
 
+    public function testProjectIdSeparatesLocks()
+    {
+        $keyName = __METHOD__;
+        $storeA = new SemaphoreStore('project-a');
+        $storeB = new SemaphoreStore('project-b');
+
+        $keyA = new Key($keyName);
+        $keyB = new Key($keyName);
+
+        $storeA->save($keyA);
+        $storeB->save($keyB);
+
+        $storeA->delete($keyA);
+        $storeB->delete($keyB);
+
+        $this->addToAssertionCount(1);
+    }
+
     private function getOpenedSemaphores()
     {
         if ('Darwin' === \PHP_OS) {

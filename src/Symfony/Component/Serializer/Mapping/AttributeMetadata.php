@@ -16,7 +16,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  *
- * @final since Symfony 7.4
+ * @final
  */
 class AttributeMetadata implements AttributeMetadataInterface
 {
@@ -173,13 +173,17 @@ class AttributeMetadata implements AttributeMetadataInterface
         }
     }
 
-    /**
-     * @internal since Symfony 7.4, will be replaced by `__serialize()` in 8.0
-     *
-     * @final since Symfony 7.4, will be replaced by `__serialize()` in 8.0
-     */
-    public function __sleep(): array
+    public function __serialize(): array
     {
-        return ['name', 'groups', 'maxDepth', 'serializedName', 'serializedPath', 'ignore', 'normalizationContexts', 'denormalizationContexts'];
+        return [
+            'name' => $this->name,
+            'groups' => $this->groups,
+            'maxDepth' => $this->maxDepth,
+            'serializedName' => $this->serializedName,
+            'serializedPath' => $this->serializedPath,
+            'ignore' => $this->ignore,
+            'normalizationContexts' => $this->normalizationContexts,
+            'denormalizationContexts' => $this->denormalizationContexts,
+        ];
     }
 }

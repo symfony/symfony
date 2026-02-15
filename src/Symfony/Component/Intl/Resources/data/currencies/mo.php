@@ -894,6 +894,10 @@ return [
             'XCD',
             'dolar est-caraib',
         ],
+        'XCG' => [
+            'Cg.',
+            'gulden caraib',
+        ],
         'XEU' => [
             'XEU',
             'unitate de monedă europeană',
@@ -957,6 +961,10 @@ return [
         'ZWD' => [
             'ZWD',
             'dolar Zimbabwe (1980–2008)',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'Zimbabwe Gold',
         ],
         'ZWL' => [
             'ZWL',

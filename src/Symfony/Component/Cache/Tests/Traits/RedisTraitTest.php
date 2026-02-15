@@ -21,6 +21,15 @@ use Symfony\Component\Cache\Traits\RedisTrait;
 #[RequiresPhpExtension('redis')]
 class RedisTraitTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        try {
+            (new \Redis())->connect(...explode(':', getenv('REDIS_HOST')));
+        } catch (\Exception $e) {
+            self::markTestSkipped(getenv('REDIS_HOST').': '.$e->getMessage());
+        }
+    }
+
     #[DataProvider('provideCreateConnection')]
     public function testCreateConnection(string $dsn, string $expectedClass)
     {
@@ -56,7 +65,7 @@ class RedisTraitTest extends TestCase
 
     public static function provideCreateConnection(): array
     {
-        $hosts = array_map(fn ($host) => \sprintf('host[%s]', $host), explode(' ', getenv('REDIS_CLUSTER_HOSTS') ?: ''));
+        $hosts = array_map(static fn ($host) => \sprintf('host[%s]', $host), explode(' ', getenv('REDIS_CLUSTER_HOSTS') ?: ''));
 
         return [
             [
@@ -87,12 +96,6 @@ class RedisTraitTest extends TestCase
     #[Group('integration')]
     public function testPconnectSelectsCorrectDatabase()
     {
-        if (!class_exists(\Redis::class)) {
-            self::markTestSkipped('The "Redis" class is required.');
-        }
-        if (!getenv('REDIS_HOST')) {
-            self::markTestSkipped('REDIS_HOST env var is not defined.');
-        }
         if (!\ini_get('redis.pconnect.pooling_enabled')) {
             self::markTestSkipped('The bug only occurs when pooling is enabled.');
         }
@@ -201,4 +204,139 @@ class RedisTraitTest extends TestCase
             ],
         ];
     }
+
+    #[DataProvider('providePredisMasterAuthResolution')]
+    public function testPredisMasterAuthResolution(string $dsn, array $options, string|array|null $expectedMasterAuth)
+    {
+        $predisClass = $this->createPredisCaptureClass();
+
+        $mock = new class {
+            use RedisTrait;
+        };
+
+        $mock::createConnection($dsn, ['class' => $predisClass] + $options);
+
+        $this->assertAuthMatchesExpected($expectedMasterAuth, $predisClass::$captured['options']['parameters'] ?? []);
+    }
+
+    public static function providePredisMasterAuthResolution(): \Generator
+    {
+        yield 'userinfo user+pass' => [
+            'redis://user:pass@localhost',
+            [],
+            ['user', 'pass'],
+        ];
+
+        yield 'userinfo with @ + query auth array' => [
+            'redis://user@pass@localhost?auth[]=otheruser&auth[]=otherpass',
+            [],
+            ['otheruser', 'otherpass'],
+        ];
+
+        yield 'query auth array' => [
+            'redis://localhost?auth[]=user&auth[]=pass',
+            [],
+            ['user', 'pass'],
+        ];
+
+        yield 'options auth array' => [
+            'redis://localhost',
+            ['auth' => ['user', 'pass']],
+            ['user', 'pass'],
+        ];
+
+        yield 'query auth beats options auth' => [
+            'redis://localhost?auth[]=query-user&auth[]=query-pass',
+            ['auth' => ['opt-user', 'opt-pass']],
+            ['query-user', 'query-pass'],
+        ];
+    }
+
+    #[DataProvider('providePredisSentinelAuthResolution')]
+    public function testPredisSentinelAuthResolution(string $dsn, array $options, string|array|null $expectedMasterAuth, string|array|null $expectedSentinelAuth)
+    {
+        $predisClass = $this->createPredisCaptureClass();
+
+        $mock = new class {
+            use RedisTrait;
+        };
+
+        $mock::createConnection($dsn, ['class' => $predisClass] + $options);
+
+        $this->assertAuthMatchesExpected($expectedMasterAuth, $predisClass::$captured['options']['parameters'] ?? []);
+        $this->assertAuthMatchesExpected($expectedSentinelAuth, $predisClass::$captured['parameters'][0] ?? []);
+    }
+
+    public static function providePredisSentinelAuthResolution(): \Generator
+    {
+        yield 'sentinel query auth, master userinfo' => [
+            'redis://master-user:master-pass@localhost?redis_sentinel=mymaster&auth[]=sentinel-user&auth[]=sentinel-pass',
+            [],
+            ['master-user', 'master-pass'],
+            ['sentinel-user', 'sentinel-pass'],
+        ];
+
+        yield 'sentinel options auth when query missing' => [
+            'redis://master-pass@localhost?redis_sentinel=mymaster',
+            ['auth' => ['sentinel-user', 'sentinel-pass']],
+            'master-pass',
+            ['sentinel-user', 'sentinel-pass'],
+        ];
+
+        yield 'sentinel query auth beats options auth' => [
+            'redis://master-pass@localhost?redis_sentinel=mymaster&auth[]=query-user&auth[]=query-pass',
+            ['auth' => ['opt-user', 'opt-pass']],
+            'master-pass',
+            ['query-user', 'query-pass'],
+        ];
+    }
+
+    private function assertAuthMatchesExpected(string|array|null $expectedAuth, array $parameters): void
+    {
+        if (null === $expectedAuth) {
+            self::assertArrayNotHasKey('username', $parameters);
+            self::assertArrayNotHasKey('password', $parameters);
+
+            return;
+        }
+
+        if (\is_array($expectedAuth)) {
+            self::assertSame($expectedAuth[0], $parameters['username'] ?? null);
+            self::assertSame($expectedAuth[1], $parameters['password'] ?? null);
+
+            return;
+        }
+
+        self::assertArrayNotHasKey('username', $parameters);
+        self::assertSame($expectedAuth, $parameters['password'] ?? null);
+    }
+
+    private function createPredisCaptureClass(): string
+    {
+        $predisClass = new class extends \Predis\Client {
+            public static array $captured = [];
+            private object $connection;
+
+            public function __construct($parameters = null, $options = null)
+            {
+                self::$captured = [
+                    'parameters' => $parameters,
+                    'options' => $options,
+                ];
+                $this->connection = new class {
+                    public function setSentinelTimeout(float $timeout): void
+                    {
+                    }
+                };
+            }
+
+            public function getConnection()
+            {
+                return $this->connection;
+            }
+        };
+
+        return $predisClass::class;
+    }
+
 }

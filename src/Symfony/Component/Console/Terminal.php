@@ -21,6 +21,8 @@ class Terminal
     private static ?int $width = null;
     private static ?int $height = null;
     private static ?bool $stty = null;
+    private static ?bool $kittyGraphics = null;
+    private static ?bool $iterm2Images = null;
 
     /**
      * About Ansi color types: https://en.wikipedia.org/wiki/ANSI_escape_code#Colors
@@ -80,9 +82,6 @@ class Terminal
         self::$colorMode = $colorMode;
     }
 
-    /**
-     * Gets the terminal width.
-     */
     public function getWidth(): int
     {
         $width = getenv('COLUMNS');
@@ -97,9 +96,6 @@ class Terminal
         return self::$width ?: 80;
     }
 
-    /**
-     * Gets the terminal height.
-     */
     public function getHeight(): int
     {
         $height = getenv('LINES');
@@ -131,6 +127,56 @@ class Terminal
         return self::$stty = (bool) shell_exec('stty 2> '.('\\' === \DIRECTORY_SEPARATOR ? 'NUL' : '/dev/null'));
     }
 
+    public static function supportsKittyGraphics(): bool
+    {
+        if (null !== self::$kittyGraphics) {
+            return self::$kittyGraphics;
+        }
+
+        $termProgram = getenv('TERM_PROGRAM') ?: '';
+        if (\in_array($termProgram, ['kitty', 'WezTerm', 'ghostty'], true)) {
+            return self::$kittyGraphics = true;
+        }
+
+        if (str_contains(getenv('TERM') ?: '', 'kitty')) {
+            return self::$kittyGraphics = true;
+        }
+
+        if (false !== getenv('GHOSTTY_RESOURCES_DIR')) {
+            return self::$kittyGraphics = true;
+        }
+
+        if (false !== getenv('KONSOLE_VERSION')) {
+            return self::$kittyGraphics = true;
+        }
+
+        return self::$kittyGraphics = false;
+    }
+
+    public static function supportsITerm2Images(): bool
+    {
+        if (null !== self::$iterm2Images) {
+            return self::$iterm2Images;
+        }
+
+        return self::$iterm2Images = 'iTerm.app' === getenv('TERM_PROGRAM');
+    }
+
+    public static function supportsImageProtocol(): bool
+    {
+        return self::supportsKittyGraphics() || self::supportsITerm2Images();
+    }
+
+    public static function setKittyGraphicsSupport(?bool $supported): void
+    {
+        self::$kittyGraphics = $supported;
+    }
+
+    public static function setITerm2ImagesSupport(?bool $supported): void
+    {
+        self::$iterm2Images = $supported;
+    }
+
     private static function initDimensions(): void
     {
         if ('\\' === \DIRECTORY_SEPARATOR) {
@@ -154,9 +200,6 @@ class Terminal
         }
     }
 
-    /**
-     * Initializes dimensions using the output of an stty columns line.
-     */
     private static function initDimensionsUsingStty(): void
     {
         if ($sttyString = self::getSttyColumns()) {
@@ -188,9 +231,6 @@ class Terminal
         return [(int) $matches[2], (int) $matches[1]];
     }
 
-    /**
-     * Runs and parses stty -a if it's available, suppressing any error output.
-     */
     private static function getSttyColumns(): ?string
     {
         return self::readFromProcess(['stty', '-a']);

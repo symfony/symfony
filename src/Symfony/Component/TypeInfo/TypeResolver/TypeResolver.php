@@ -24,13 +24,13 @@ use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  */
-final readonly class TypeResolver implements TypeResolverInterface
+final class TypeResolver implements TypeResolverInterface
 {
     /**
      * @param ContainerInterface $resolvers Locator of type resolvers, keyed by supported subject type
      */
     public function __construct(
-        private ContainerInterface $resolvers,
+        private readonly ContainerInterface $resolvers,
     ) {
     }
 

@@ -43,7 +43,7 @@ class TagAwareAdapterTest extends AdapterTestCase
         $cache = new TagAwareAdapter($this->getPruneableMock());
         $this->assertTrue($cache->prune());
 
-        $cache = new TagAwareAdapter($this->getNonPruneableMock());
+        $cache = new TagAwareAdapter($this->createStub(AdapterInterface::class));
         $this->assertFalse($cache->prune());
 
         $cache = new TagAwareAdapter($this->getFailingPruneableMock());
@@ -121,11 +121,6 @@ class TagAwareAdapterTest extends AdapterTestCase
             ->willReturn(false);
 
         return $pruneable;
-    }
-
-    private function getNonPruneableMock(): AdapterInterface&MockObject
-    {
-        return $this->createMock(AdapterInterface::class);
     }
 
     #[DoesNotPerformAssertions]

@@ -118,19 +118,17 @@ final class MailPaceApiTransportTest extends TestCase
 
     public function testSendThrowsForErrorsResponse()
     {
-        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
-            return new JsonMockResponse([
-                'errors' => [
-                    'to' => [
-                        'contains a blocked address',
-                        'number of email addresses exceeds maximum volume',
-                    ],
-                    'attachments.name' => ['Extension file type blocked, see Docs for full list of allowed file types'],
+        $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse([
+            'errors' => [
+                'to' => [
+                    'contains a blocked address',
+                    'number of email addresses exceeds maximum volume',
                 ],
-            ], [
-                'http_code' => 400,
-            ]);
-        });
+                'attachments.name' => ['Extension file type blocked, see Docs for full list of allowed file types'],
+            ],
+        ], [
+            'http_code' => 400,
+        ]));
         $transport = new MailPaceApiTransport('KEY', $client);
         $transport->setPort(8984);
 
@@ -147,9 +145,7 @@ final class MailPaceApiTransportTest extends TestCase
 
     public function testSendThrowsForInternalServerErrorResponse()
     {
-        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
-            return new MockResponse('', ['http_code' => 500]);
-        });
+        $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new MockResponse('', ['http_code' => 500]));
         $transport = new MailPaceApiTransport('KEY', $client);
         $transport->setPort(8984);
 

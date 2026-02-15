@@ -150,7 +150,6 @@ return [
         'zh' => 'Sinuwaa',
     ],
     'LocalizedNames' => [
-        'ar_001' => 'Araab',
         'de_AT' => 'Almaa bu Ótiriis',
         'de_CH' => 'Almaa bu Kawe bu Swis',
         'en_AU' => 'Àngale bu Óstraali',

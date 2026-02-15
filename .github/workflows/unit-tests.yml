@@ -26,17 +26,13 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: '8.2'
           - php: '8.4'
             mode: high-deps
-          - php: '8.2'
+          - php: '8.4'
             mode: low-deps
-          - php: '8.3'
           - php: '8.4'
           - php: '8.5'
-            # to be removed when ext-zstd is ready for PHP 8.5
-            extensions: amqp,apcu,brotli,igbinary,intl,mbstring,memcached,redis,relay
-            #mode: experimental
+          - php: '8.6'
       fail-fast: false
 
     runs-on: ubuntu-24.04
@@ -148,22 +144,12 @@ jobs:
           ./phpunit install
           echo "::endgroup::"
 
-      - name: Patch return types
-        if: "matrix.php == '8.2' && ! matrix.mode"
+      - name: Check return types
+        if: "matrix.php == '8.4' && ! matrix.mode"
         run: |
-          patch -sp1 < .github/expected-missing-return-types.diff
-          git add .
           sed -i 's/ *"\*\*\/Tests\/",//' composer.json
           composer install -q --optimize-autoloader || composer install --optimize-autoloader
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.2' php .github/patch-types.php
-          git checkout composer.json src/Symfony/Contracts/Service/ResetInterface.php
-          SYMFONY_PATCH_TYPE_DECLARATIONS='force=2&php=8.2' php .github/patch-types.php # ensure the script is idempotent
-          git checkout src/Symfony/Contracts/Service/ResetInterface.php
-          git diff --exit-code
-
-      - name: Check return types
-        if: "matrix.php == '8.2' && ! matrix.mode"
-        run: |
+          git checkout composer.json
           php .github/patch-types.php lint
 
       - name: Run tests
@@ -193,7 +179,7 @@ jobs:
               echo -e "\n\\e[32mOK\\e[0m $title\\n\\n::endgroup::"
             fi
 
-            [[ "${{ matrix.mode }}" = experimental ]] || (exit $ok)
+            exit $ok
           }
           export -f _run_tests
 
@@ -204,7 +190,7 @@ jobs:
           fi
 
           if [[ "${{ matrix.mode }}" = low-deps ]]; then
-            echo "$COMPONENTS" | xargs -n1 | parallel -j +3 "_run_tests {} '$COMPOSER_UP --prefer-lowest --prefer-stable && $PHPUNIT --do-not-fail-on-deprecation'"
+            echo "$COMPONENTS" | xargs -n1 | parallel -j +3 "_run_tests {} '$COMPOSER_UP --prefer-lowest --prefer-stable && $PHPUNIT --do-not-fail-on-deprecation --do-not-fail-on-phpunit-notice'"
 
             exit 0
           fi
@@ -216,7 +202,7 @@ jobs:
           PATCHED_COMPONENTS=$(git diff --name-only src/ | grep composer.json || true)
 
           # for 7.4 LTS, checkout and test previous major with the patched components (only for patched components)
-          if [[ $PATCHED_COMPONENTS && $SYMFONY_VERSION = 7.4 ]]; then
+          if [[ $PATCHED_COMPONENTS && $SYMFONY_VERSION = 7.4 && $FLIP = '' ]]; then
               export FLIP='^'
               SYMFONY_VERSION=$(echo $SYMFONY_VERSION | awk '{print $1 - 1}')
               echo -e "\\n\\e[33;1mChecking out Symfony $SYMFONY_VERSION and running tests with patched components as deps\\e[0m"
@@ -247,17 +233,17 @@ jobs:
           ./phpunit src/Symfony/Component/AssetMapper
 
       - name: Run tests with SIGCHLD enabled PHP
-        if: "matrix.php == '8.2' && ! matrix.mode"
+        if: "matrix.php == '8.4' && ! matrix.mode"
         run: |
           mkdir build
           cd build
-          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.2.0-pcntl-sigchild.tar.bz2
-          tar -xjf php-8.2.0-pcntl-sigchild.tar.bz2
+          wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.0-pcntl-sigchild.tar.bz2
+          tar -xjf php-8.4.0-pcntl-sigchild.tar.bz2
           cd ..
 
           mkdir -p /opt/php/lib
           echo memory_limit=-1 > /opt/php/lib/php.ini
-          ./phpunit install
+          SYMFONY_PHPUNIT_VERSION=12 ./phpunit install
           ./build/php/bin/php ./phpunit src/Symfony/Component/Process
 
       - name: Run PhpUnitBridge tests with PHPUnit 9.6

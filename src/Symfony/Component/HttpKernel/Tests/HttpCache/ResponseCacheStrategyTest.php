@@ -347,7 +347,7 @@ class ResponseCacheStrategyTest extends TestCase
     public function testCacheControlMerging(array $expects, array $main, array $surrogates)
     {
         $cacheStrategy = new ResponseCacheStrategy();
-        $buildResponse = function ($config) {
+        $buildResponse = static function ($config) {
             $response = new Response();
 
             foreach ($config as $key => $value) {

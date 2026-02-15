@@ -93,4 +93,9 @@ class KernelForTest extends Kernel
     public function registerContainerConfiguration(LoaderInterface $loader): void
     {
     }
+
+    public function getProjectDir(): string
+    {
+        return __DIR__.'/../Fixtures';
+    }
 }

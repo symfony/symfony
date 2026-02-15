@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ServerEvent;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -112,7 +113,15 @@ class WebDebugToolbarListener implements EventSubscriberInterface
                 $session->getFlashBag()->setAll($session->getFlashBag()->peekAll());
             }
 
-            $response->setContent($this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location'), 'host' => $request->getSchemeAndHttpHost()]));
+            $content = $this->twig->render('@WebProfiler/Profiler/toolbar_redirect.html.twig', ['location' => $response->headers->get('Location'), 'host' => $request->getSchemeAndHttpHost()]);
+
+            if ($response instanceof StreamedResponse) {
+                $response->setCallback(static function () use ($content): void {
+                    echo $content;
+                });
+            } else {
+                $response->setContent($content);
+            }
             $response->setStatusCode(200);
             $response->headers->remove('Location');
         }
@@ -156,24 +165,46 @@ class WebDebugToolbarListener implements EventSubscriberInterface
      */
     protected function injectToolbar(Response $response, Request $request, array $nonces): void
     {
-        $content = $response->getContent();
-        $pos = strripos($content, '</body>');
+        $responseRef = \WeakReference::create($response);
+        $injectToolbar = function (string $buffer) use ($request, $responseRef, $nonces): string {
+            if (false !== $pos = strripos($buffer, '</body>')) {
+                $toolbar = "\n".str_replace("\n", '', $this->getToolbarHTML($request, $responseRef->get()->headers->get('X-Debug-Token'), $nonces))."\n";
+                $buffer = substr($buffer, 0, $pos).$toolbar.substr($buffer, $pos);
+            }
 
-        if (false !== $pos) {
-            $toolbar = "\n".str_replace("\n", '', $this->twig->render(
-                '@WebProfiler/Profiler/toolbar_js.html.twig',
-                [
-                    'full_stack' => class_exists(FullStack::class),
-                    'excluded_ajax_paths' => $this->excludedAjaxPaths,
-                    'token' => $response->headers->get('X-Debug-Token'),
-                    'request' => $request,
-                    'csp_script_nonce' => $nonces['csp_script_nonce'] ?? null,
-                    'csp_style_nonce' => $nonces['csp_style_nonce'] ?? null,
-                ]
-            ))."\n";
-            $content = substr($content, 0, $pos).$toolbar.substr($content, $pos);
-            $response->setContent($content);
+            return $buffer;
+        };
+
+        if (!$response instanceof StreamedResponse) {
+            $response->setContent($injectToolbar($response->getContent()));
+
+            return;
         }
+
+        $callback = $response->getCallback();
+        $response->setCallback(static function () use ($callback, $injectToolbar): void {
+            ob_start($injectToolbar, 8); // length of '</body>'
+            try {
+                $callback(...\func_get_args());
+            } finally {
+                ob_end_flush();
+            }
+        });
+    }
+
+    private function getToolbarHTML(Request $request, ?string $debugToken, array $nonces): string
+    {
+        return $this->twig->render(
+            '@WebProfiler/Profiler/toolbar_js.html.twig',
+            [
+                'full_stack' => class_exists(FullStack::class),
+                'excluded_ajax_paths' => $this->excludedAjaxPaths,
+                'token' => $debugToken,
+                'request' => $request,
+                'csp_script_nonce' => $nonces['csp_script_nonce'] ?? null,
+                'csp_style_nonce' => $nonces['csp_style_nonce'] ?? null,
+            ]
+        );
     }
 
     public static function getSubscribedEvents(): array

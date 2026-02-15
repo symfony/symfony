@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Exception\LogicException;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-#[\Attribute(\Attribute::TARGET_PARAMETER)]
+#[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 final class Target
 {
     /**

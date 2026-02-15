@@ -12,8 +12,6 @@
 namespace Symfony\Component\Yaml\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -1044,11 +1042,9 @@ class ParserTest extends TestCase
         return $tests;
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testNullAsDuplicatedData()
     {
-        $this->expectUserDeprecationMessage('Since symfony/yaml 7.2: Duplicate key "child" detected on line 4 whilst parsing YAML. Silent handling of duplicate mapping keys in YAML is deprecated and will throw a ParseException in 8.0.');
+        $this->expectException(ParseException::class);
 
         $yaml = <<<EOD
             parent:
@@ -1067,6 +1063,17 @@ class ParserTest extends TestCase
             EOF;
 
         $this->assertSame(['hash' => null], Yaml::parse($input));
+    }
+
+    public function testLeadingCommentBlockIsIgnored()
+    {
+        $yaml = <<<'EOF'
+            # comment 1
+            # comment 2
+            foo: bar
+            EOF;
+
+        $this->assertSame(['foo' => 'bar'], Yaml::parse($yaml));
     }
 
     public function testCommentAtTheRootIndent()
@@ -1758,6 +1765,151 @@ class ParserTest extends TestCase
             EOT;
 
         $this->assertSame(['foo' => 'bar baz foobar foo', 'bar' => 'baz'], $this->parser->parse($yaml));
+    }
+
+    #[DataProvider('getUnquotedMultilineScalarHandlesCommentsAndBlanksData')]
+    public function testUnquotedMultilineScalarHandlesCommentsAndBlanks(string $yaml, array $expected)
+    {
+        $this->assertSame($expected, $this->parser->parse($yaml));
+    }
+
+    public static function getUnquotedMultilineScalarHandlesCommentsAndBlanksData()
+    {
+        yield 'comments interspersed stops scalar' => [
+            <<<YAML
+                key: unquoted
+                  # this comment terminates
+                another_key: works
+                YAML,
+            [
+                'key' => 'unquoted',
+                'another_key' => 'works',
+            ],
+        ];
+
+        yield 'only comments' => [
+            <<<YAML
+                key: unquoted
+                  # this comment should be ignored
+                  # another comment
+                another_key: works
+                YAML,
+            [
+                'key' => 'unquoted',
+                'another_key' => 'works',
+            ],
+        ];
+
+        yield 'blank lines are preserved and comment stops scalar' => [
+            <<<YAML
+                key: unquoted
+                  next line
+
+                  # this comment terminates the scalar
+                another_key: works
+                YAML,
+            [
+                'key' => 'unquoted next line',
+                'another_key' => 'works',
+            ],
+        ];
+
+        yield 'comment at end' => [
+            <<<YAML
+                key: unquoted
+                  next line
+                  # comment at end
+                another_key: works
+                YAML,
+            [
+                'key' => 'unquoted next line',
+                'another_key' => 'works',
+            ],
+        ];
+    }
+
+    public function testUnquotedMultilineScalarThrowsOnOrphanedLineAfterComment()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage('Unable to parse at line 3 (near "  next line")');
+
+        $yaml = <<<YAML
+            key: unquoted
+              # this comment terminates
+              next line
+            another_key: works
+            YAML;
+
+        $this->parser->parse($yaml);
+    }
+
+    public function testUnquotedMultilineScalarWithBlankLines()
+    {
+        $yaml = <<<YAML
+            foo:
+              line 1
+
+              line 2
+            YAML;
+        $this->assertSame(['foo' => "line 1\nline 2"], $this->parser->parse($yaml));
+    }
+
+    #[DataProvider('provideInvalidYamlFiles')]
+    public function testLineNumberInException(int $expectedLine, string $yaml, string $message)
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessage($message);
+        $this->expectExceptionMessage(\sprintf('at line %d', $expectedLine));
+
+        $this->parser->parse($yaml);
+    }
+
+    public static function provideInvalidYamlFiles(): iterable
+    {
+        yield 'invalid_nested_under_scalar' => [
+            4,
+            <<<YAML
+                en:
+                  NONAMESPACE: Include Entity without Namespace
+                  Invalid: Foo
+                    About: 'About us'
+                    - Invalid
+                YAML,
+            'Unable to parse',
+        ];
+
+        yield 'invalid_nested_under_scalar_with_trailing_newlines' => [
+            4,
+            <<<YAML
+                en:
+                  NONAMESPACE: Include Entity without Namespace
+                  Invalid: Foo
+                    About: 'About us'
+                    - Invalid
+
+
+                YAML,
+            'Unable to parse',
+        ];
+
+        yield 'colon_in_unquoted_value' => [
+            2,
+            <<<YAML
+                foo: bar
+                  baz: qux
+                YAML,
+            'A colon cannot be used in an unquoted mapping value',
+        ];
+
+        yield 'colon_in_unquoted_value_multiline' => [
+            2,
+            <<<YAML
+                foo:
+                  bar
+                  baz: qux
+                YAML,
+            'Mapping values are not allowed in multi-line blocks',
+        ];
     }
 
     #[DataProvider('unquotedStringWithTrailingComment')]

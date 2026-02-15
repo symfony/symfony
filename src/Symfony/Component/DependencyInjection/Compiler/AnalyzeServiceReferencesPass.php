@@ -39,6 +39,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
     private bool $lazy;
     private bool $byConstructor;
     private bool $byFactory;
+    private bool $byMultiUseArgument;
     private array $definitions;
     private array $aliases;
 
@@ -63,6 +64,7 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
         $this->lazy = false;
         $this->byConstructor = false;
         $this->byFactory = false;
+        $this->byMultiUseArgument = false;
         $this->definitions = $container->getDefinitions();
         $this->aliases = $container->getAliases();
 
@@ -85,7 +87,12 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
 
         if ($value instanceof ArgumentInterface) {
             $this->lazy = !$this->byFactory || !$value instanceof IteratorArgument;
+            $byMultiUseArgument = $this->byMultiUseArgument;
+            if ($value instanceof IteratorArgument) {
+                $this->byMultiUseArgument = true;
+            }
             parent::processValue($value->getValues());
+            $this->byMultiUseArgument = $byMultiUseArgument;
             $this->lazy = $lazy;
 
             return $value;
@@ -102,7 +109,8 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
                 $value,
                 $this->lazy || ($this->hasProxyDumper && $targetDefinition?->isLazy()),
                 ContainerInterface::IGNORE_ON_UNINITIALIZED_REFERENCE === $value->getInvalidBehavior(),
-                $this->byConstructor
+                $this->byConstructor,
+                $this->byMultiUseArgument
             );
 
             if ($inExpression) {
@@ -113,7 +121,9 @@ class AnalyzeServiceReferencesPass extends AbstractRecursivePass
                     $targetDefinition,
                     $value,
                     $this->lazy || $targetDefinition?->isLazy(),
-                    true
+                    true,
+                    $this->byConstructor,
+                    $this->byMultiUseArgument
                 );
             }
 

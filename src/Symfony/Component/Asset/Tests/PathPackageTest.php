@@ -76,8 +76,8 @@ class PathPackageTest extends TestCase
 
     public function testVersionStrategyGivesAbsoluteURL()
     {
-        $versionStrategy = $this->createMock(VersionStrategyInterface::class);
-        $versionStrategy->expects($this->any())
+        $versionStrategy = $this->createStub(VersionStrategyInterface::class);
+        $versionStrategy
             ->method('applyVersion')
             ->willReturn('https://cdn.com/bar/main.css');
         $package = new PathPackage('/subdirectory', $versionStrategy, $this->getContext('/bar'));
@@ -87,8 +87,8 @@ class PathPackageTest extends TestCase
 
     private function getContext($basePath)
     {
-        $context = $this->createMock(ContextInterface::class);
-        $context->expects($this->any())->method('getBasePath')->willReturn($basePath);
+        $context = $this->createStub(ContextInterface::class);
+        $context->method('getBasePath')->willReturn($basePath);
 
         return $context;
     }

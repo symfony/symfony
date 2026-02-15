@@ -12,7 +12,6 @@
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\ImgStub;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -37,7 +36,7 @@ class HtmlDumperTest extends TestCase
         $dumper->setDumpBoundaries('<bar>', '</bar>');
         $cloner = new VarCloner();
         $cloner->addCasters([
-            ':stream' => function ($res, $a) {
+            ':stream' => static function ($res, $a) {
                 unset($a['uri'], $a['wrapper_data']);
 
                 return $a;
@@ -119,7 +118,6 @@ class HtmlDumperTest extends TestCase
         );
     }
 
-    #[RequiresPhp('>=8.4')]
     public function testVirtualProperties()
     {
         $dumper = new HtmlDumper('php://output');

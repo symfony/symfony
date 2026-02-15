@@ -472,7 +472,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
 
     public function testCsrf()
     {
-        $this->csrfTokenManager->expects($this->any())
+        $this->csrfTokenManager
             ->method('getToken')
             ->willReturn(new CsrfToken('token_id', 'foo&bar'));
 
@@ -743,7 +743,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'],
-            'choice_label' => function ($choice, $label, $value) {
+            'choice_label' => static function ($choice, $label, $value) {
                 if ('&b' === $choice) {
                     return false;
                 }
@@ -774,7 +774,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
-            'choice_label' => fn () => false,
+            'choice_label' => static fn () => false,
             'multiple' => false,
             'expanded' => true,
         ]);
@@ -818,7 +818,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'],
-            'choice_label' => function ($choice, $label, $value) {
+            'choice_label' => static function ($choice, $label, $value) {
                 if ('&b' === $choice) {
                     return false;
                 }
@@ -849,7 +849,7 @@ abstract class AbstractDivLayoutTestCase extends AbstractLayoutTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
-            'choice_label' => fn () => false,
+            'choice_label' => static fn () => false,
             'multiple' => true,
             'expanded' => true,
         ]);

@@ -24,39 +24,61 @@ use Symfony\Contracts\HttpClient\Test\HttpClientTestCase;
 interface HttpClientInterface
 {
     public const OPTIONS_DEFAULTS = [
-        'auth_basic' => null,   // array|string - an array containing the username as first value, and optionally the
-                                //   password as the second one; or string like username:password - enabling HTTP Basic
-                                //   authentication (RFC 7617)
-        'auth_bearer' => null,  // string - a token enabling HTTP Bearer authorization (RFC 6750)
-        'query' => [],          // string[] - associative array of query string values to merge with the request's URL
-        'headers' => [],        // iterable|string[]|string[][] - headers names provided as keys or as part of values
-        'body' => '',           // array|string|resource|\Traversable|\Closure - the callback SHOULD yield a string
-                                //   smaller than the amount requested as argument; the empty string signals EOF; if
-                                //   an array is passed, it is meant as a form payload of field names and values
-        'json' => null,         // mixed - if set, implementations MUST set the "body" option to the JSON-encoded
-                                //   value and set the "content-type" header to a JSON-compatible value if it is not
-                                //   explicitly defined in the headers option - typically "application/json"
-        'user_data' => null,    // mixed - any extra data to attach to the request (scalar, callable, object...) that
-                                //   MUST be available via $response->getInfo('user_data') - not used internally
-        'max_redirects' => 20,  // int - the maximum number of redirects to follow; a value lower than or equal to 0
-                                //   means redirects should not be followed; "Authorization" and "Cookie" headers MUST
-                                //   NOT follow except for the initial host name
-        'http_version' => null, // string - defaults to the best supported version, typically 1.1 or 2.0
-        'base_uri' => null,     // string - the URI to resolve relative URLs, following rules in RFC 3986, section 2
-        'buffer' => true,       // bool|resource|\Closure - whether the content of the response should be buffered or not,
-                                //   or a stream resource where the response body should be written,
-                                //   or a closure telling if/where the response should be buffered based on its headers
-        'on_progress' => null,  // callable(int $dlNow, int $dlSize, array $info) - throwing any exceptions MUST abort the
-                                //   request; it MUST be called on connection, on headers and on completion; it SHOULD be
-                                //   called on upload/download of data and at least 1/s
-        'resolve' => [],        // string[] - a map of host to IP address that SHOULD replace DNS resolution
-        'proxy' => null,        // string - by default, the proxy-related env vars handled by curl SHOULD be honored
-        'no_proxy' => null,     // string - a comma separated list of hosts that do not require a proxy to be reached
-        'timeout' => null,      // float - the idle timeout (in seconds) - defaults to ini_get('default_socket_timeout')
-        'max_duration' => 0,    // float - the maximum execution time (in seconds) for the request+response as a whole;
-                                //   a value lower than or equal to 0 means it is unlimited
-        'bindto' => '0',        // string - the interface or the local socket to bind to
-        'verify_peer' => true,  // see https://php.net/context.ssl for the following options
+        // array|string - an array containing the username as first value, and optionally the
+        //   password as the second one; or string like username:password - enabling HTTP Basic
+        //   authentication (RFC 7617)
+        'auth_basic' => null,
+        // string - a token enabling HTTP Bearer authorization (RFC 6750)
+        'auth_bearer' => null,
+        // string[] - associative array of query string values to merge with the request's URL
+        'query' => [],
+        // iterable|string[]|string[][] - headers names provided as keys or as part of values
+        'headers' => [],
+        // array|string|resource|\Traversable|\Closure - the callback SHOULD yield a string
+        // smaller than the amount requested as argument; the empty string signals EOF; if
+        // an array is passed, it is meant as a form payload of field names and values
+        'body' => '',
+        // mixed - if set, implementations MUST set the "body" option to the JSON-encoded
+        //   value and set the "content-type" header to a JSON-compatible value if it is not
+        //   explicitly defined in the headers option - typically "application/json"
+        'json' => null,
+        // mixed - any extra data to attach to the request (scalar, callable, object...) that
+        //   MUST be available via $response->getInfo('user_data') - not used internally
+        'user_data' => null,
+        // int - the maximum number of redirects to follow; a value lower than or equal to 0
+        //   means redirects should not be followed; "Authorization" and "Cookie" headers MUST
+        //   NOT follow except for the initial host name
+        'max_redirects' => 20,
+        // string - defaults to the best supported version, typically 1.1 or 2.0
+        'http_version' => null,
+        // string - the URI to resolve relative URLs, following rules in RFC 3986, section 2
+        'base_uri' => null,
+        // bool|resource|\Closure - whether the content of the response should be buffered or not,
+        //   or a stream resource where the response body should be written,
+        //   or a closure telling if/where the response should be buffered based on its headers
+        'buffer' => true,
+        // callable(int $dlNow, int $dlSize, array $info) - throwing any exceptions MUST abort the
+        //   request; it MUST be called on connection, on headers and on completion; it SHOULD be
+        //   called on upload/download of data and at least 1/s
+        'on_progress' => null,
+        // string[] - a map of host to IP address that SHOULD replace DNS resolution
+        'resolve' => [],
+        // string - by default, the proxy-related env vars handled by curl SHOULD be honored
+        'proxy' => null,
+        // string - a comma separated list of hosts that do not require a proxy to be reached
+        'no_proxy' => null,
+        // float - the idle timeout (in seconds) - defaults to ini_get('default_socket_timeout')
+        'timeout' => null,
+        // float - the maximum execution time (in seconds) for the request+response as a whole;
+        //   a value lower than or equal to 0 means it is unlimited
+        'max_duration' => 0,
+        // float - the maximum duration (in seconds) allowed for DNS + TCP + TLS connection;
+        //   a value lower than or equal to 0 means unlimited, as long as option timeout is respected
+        'max_connect_duration' => 0,
+        // string - the interface or the local socket to bind to
+        'bindto' => '0',
+        // see https://php.net/context.ssl for the following options
+        'verify_peer' => true,
         'verify_host' => true,
         'cafile' => null,
         'capath' => null,
@@ -66,8 +88,13 @@ interface HttpClientInterface
         'ciphers' => null,
         'peer_fingerprint' => null,
         'capture_peer_cert_chain' => false,
-        'crypto_method' => \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT, // STREAM_CRYPTO_METHOD_TLSv*_CLIENT - minimum TLS version
-        'extra' => [],          // array - additional options that can be ignored if unsupported, unlike regular options
+        // STREAM_CRYPTO_METHOD_TLSv*_CLIENT - minimum TLS version
+        'crypto_method' => \STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT,
+        // array - additional options that can be ignored if unsupported, unlike regular options
+        'extra' => [
+            // bool - whether to use persistent connections where supported
+            'use_persistent_connections' => false,
+        ],
     ];
 
     /**

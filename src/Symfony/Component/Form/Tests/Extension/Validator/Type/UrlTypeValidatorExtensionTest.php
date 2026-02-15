@@ -12,15 +12,12 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
-use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
 class UrlTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
-    use ValidatorExtensionTrait;
-
     protected function createForm(array $options = [])
     {
-        return $this->factory->create(UrlType::class, null, $options + ['default_protocol' => 'http']);
+        return $this->factory->create(UrlType::class, null, $options);
     }
 
     public function testInvalidMessage()

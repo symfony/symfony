@@ -69,7 +69,7 @@ class SerializerDataCollector extends DataCollector implements LateDataCollector
         $totalTime = 0;
 
         foreach ($this->data as $handled) {
-            $totalTime += array_sum(array_map(fn (array $el): float => $el['time'], $handled));
+            $totalTime += array_sum(array_map(static fn (array $el): float => $el['time'], $handled));
         }
 
         return $totalTime;

@@ -41,10 +41,6 @@ trait FromCallableTrait
 
         $this->definition->setFactory(['Closure', 'fromCallable']);
 
-        if ($callable instanceof \Closure) {
-            $callable = static::processClosure($callable);
-        }
-
         if (\is_string($callable) && 1 === substr_count($callable, ':')) {
             $parts = explode(':', $callable);
 

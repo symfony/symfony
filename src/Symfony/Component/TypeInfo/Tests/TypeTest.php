@@ -39,10 +39,10 @@ class TypeTest extends TestCase
 
     public function testIsSatisfiedBy()
     {
-        $this->assertTrue(Type::union(Type::int(), Type::string())->isSatisfiedBy(fn (Type $t): bool => 'int' === (string) $t));
-        $this->assertTrue(Type::union(Type::int(), Type::string())->isSatisfiedBy(fn (Type $t): bool => $t instanceof UnionType));
-        $this->assertTrue(Type::list(Type::int())->isSatisfiedBy(fn (Type $t): bool => $t instanceof CollectionType && 'int' === (string) $t->getCollectionValueType()));
-        $this->assertFalse(Type::list(Type::int())->isSatisfiedBy(fn (Type $t): bool => 'int' === (string) $t));
+        $this->assertTrue(Type::union(Type::int(), Type::string())->isSatisfiedBy(static fn (Type $t): bool => 'int' === (string) $t));
+        $this->assertTrue(Type::union(Type::int(), Type::string())->isSatisfiedBy(static fn (Type $t): bool => $t instanceof UnionType));
+        $this->assertTrue(Type::list(Type::int())->isSatisfiedBy(static fn (Type $t): bool => $t instanceof CollectionType && 'int' === (string) $t->getCollectionValueType()));
+        $this->assertFalse(Type::list(Type::int())->isSatisfiedBy(static fn (Type $t): bool => 'int' === (string) $t));
     }
 
     public function testTraverse()

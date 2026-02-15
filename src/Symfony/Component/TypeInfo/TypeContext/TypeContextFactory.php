@@ -43,14 +43,19 @@ final class TypeContextFactory
     private static array $reflectionClassCache = [];
 
     /**
-     * @var array<string,array<string,TypeContext>
+     * @var array<string, array<string, TypeContext>>
      */
-    private array $intermediateTypeContextCache = [];
+    private array $baseTypeContextCache = [];
 
     /**
-     * @var array<string,array<string,TypeContext>
+     * @var array<string, array<string, TypeContext>>
      */
     private array $typeContextCache = [];
+
+    /**
+     * @var array<string, array<string, string>>
+     */
+    private array $usesCache = [];
 
     private ?Lexer $phpstanLexer = null;
     private ?PhpDocParser $phpstanParser = null;
@@ -73,7 +78,7 @@ final class TypeContextFactory
 
     public function createFromReflection(\Reflector $reflection): ?TypeContext
     {
-        $declaringClassReflection = match (true) {
+        $classReflection = match (true) {
             $reflection instanceof \ReflectionClass => $reflection,
             $reflection instanceof \ReflectionMethod => $reflection->getDeclaringClass(),
             $reflection instanceof \ReflectionProperty => $reflection->getDeclaringClass(),
@@ -82,53 +87,69 @@ final class TypeContextFactory
             default => null,
         };
 
-        if (null === $declaringClassReflection) {
+        if (null === $classReflection) {
             return null;
         }
 
-        $typeContext = $this->createIntermediateTypeContext($declaringClassReflection->getShortName(), $declaringClassReflection);
+        $typeContext = $this->createBaseTypeContext($classReflection->getName(), $classReflection);
 
         $templates = match (true) {
-            $reflection instanceof \ReflectionFunctionAbstract => $this->collectTemplates($reflection, $typeContext) + $this->collectTemplates($declaringClassReflection, $typeContext),
-            $reflection instanceof \ReflectionParameter => $this->collectTemplates($reflection->getDeclaringFunction(), $typeContext) + $this->collectTemplates($declaringClassReflection, $typeContext),
-            default => $this->collectTemplates($declaringClassReflection, $typeContext),
+            $reflection instanceof \ReflectionFunctionAbstract => $this->collectTemplates($reflection, $typeContext) + $this->collectTemplates($classReflection, $typeContext),
+            $reflection instanceof \ReflectionParameter => $this->collectTemplates($reflection->getDeclaringFunction(), $typeContext) + $this->collectTemplates($classReflection, $typeContext),
+            default => $this->collectTemplates($classReflection, $typeContext),
         };
 
-        return new TypeContext(
+        $typeContext = new TypeContext(
             $typeContext->calledClassName,
             $typeContext->declaringClassName,
             $typeContext->namespace,
             $typeContext->uses,
             $templates,
-            $this->collectTypeAliases($declaringClassReflection, $typeContext),
         );
-    }
-
-    private function createNewInstanceFromClassName(string $calledClassName, string $declaringClassName): TypeContext
-    {
-        $calledClassPath = explode('\\', $calledClassName);
-
-        $declaringClassReflection = self::$reflectionClassCache[$declaringClassName] ??= new \ReflectionClass($declaringClassName);
-
-        $typeContext = $this->createIntermediateTypeContext(end($calledClassPath), $declaringClassReflection);
 
         return new TypeContext(
             $typeContext->calledClassName,
             $typeContext->declaringClassName,
             $typeContext->namespace,
             $typeContext->uses,
-            $this->collectTemplates($declaringClassReflection, $typeContext),
+            $typeContext->templates,
+            $this->collectTypeAliases($classReflection, $typeContext),
+        );
+    }
+
+    private function createNewInstanceFromClassName(string $calledClassName, string $declaringClassName): TypeContext
+    {
+        $calledClassNameReflection = self::$reflectionClassCache[$calledClassName] ??= new \ReflectionClass($calledClassName);
+        $declaringClassReflection = self::$reflectionClassCache[$declaringClassName] ??= new \ReflectionClass($declaringClassName);
+
+        $calledClassTypeContext = $this->createBaseTypeContext($calledClassNameReflection->getName(), $calledClassNameReflection);
+        $typeContext = $this->createBaseTypeContext($calledClassNameReflection->getName(), $declaringClassReflection);
+
+        $typeContext = new TypeContext(
+            $typeContext->calledClassName,
+            $typeContext->declaringClassName,
+            $typeContext->namespace,
+            $typeContext->uses,
+            $this->collectTemplates($calledClassNameReflection, $calledClassTypeContext) + $this->collectTemplates($declaringClassReflection, $typeContext),
+        );
+
+        return new TypeContext(
+            $typeContext->calledClassName,
+            $typeContext->declaringClassName,
+            $typeContext->namespace,
+            $typeContext->uses,
+            $typeContext->templates,
             $this->collectTypeAliases($declaringClassReflection, $typeContext),
         );
     }
 
-    private function createIntermediateTypeContext(string $calledClassShortName, \ReflectionClass $declaringClassReflection): TypeContext
+    private function createBaseTypeContext(string $calledClassName, \ReflectionClass $declaringClassReflection): TypeContext
     {
         $declaringClassName = $declaringClassReflection->getName();
 
-        return $this->intermediateTypeContextCache[$declaringClassName][$calledClassShortName] ??= new TypeContext(
-            $calledClassShortName,
-            $declaringClassReflection->getShortName(),
+        return $this->baseTypeContextCache[$declaringClassName][$calledClassName] ??= new TypeContext(
+            $calledClassName,
+            $declaringClassReflection->getName(),
             trim($declaringClassReflection->getNamespaceName(), '\\'),
             $this->collectUses($declaringClassReflection),
         );
@@ -139,12 +160,16 @@ final class TypeContextFactory
      */
     private function collectUses(\ReflectionClass $reflection): array
     {
+        if (isset($this->usesCache[$reflection->getName()])) {
+            return $this->usesCache[$reflection->getName()];
+        }
+
         $fileName = $reflection->getFileName();
         if (!\is_string($fileName) || !is_file($fileName)) {
             return [];
         }
 
-        if (false === $lines = @file($fileName, \FILE_IGNORE_NEW_LINES)) {
+        if (false === $lines = @file($fileName, \FILE_IGNORE_NEW_LINES | \FILE_SKIP_EMPTY_LINES)) {
             throw new RuntimeException(\sprintf('Unable to read file "%s".', $fileName));
         }
 
@@ -168,7 +193,7 @@ final class TypeContextFactory
             $traitUses[] = $this->collectUses($traitReflection);
         }
 
-        return array_merge($uses, ...$traitUses);
+        return $this->usesCache[$reflection->getName()] = array_merge($uses, ...$traitUses);
     }
 
     /**

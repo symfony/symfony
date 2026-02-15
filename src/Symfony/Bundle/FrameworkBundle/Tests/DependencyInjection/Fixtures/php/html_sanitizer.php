@@ -1,13 +1,10 @@
 <?php
 
 $container->loadFromExtension('framework', [
-    'annotations' => false,
-    'http_method_override' => false,
-    'handle_all_throwables' => true,
-    'php_errors' => ['log' => true],
     'html_sanitizer' => [
         'sanitizers' => [
             'custom' => [
+                'default_action' => 'allow',
                 'allow_safe_elements' => true,
                 'allow_static_elements' => true,
                 'allow_elements' => [

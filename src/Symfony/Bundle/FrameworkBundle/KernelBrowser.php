@@ -84,7 +84,7 @@ class KernelBrowser extends HttpKernelBrowser
         $session->start();
 
         if (!$cookie instanceof Cookie) {
-            $domains = array_unique(array_map(fn (Cookie $cookie) => $cookie->getName() === $session->getName() ? $cookie->getDomain() : '', $cookieJar->all())) ?: [''];
+            $domains = array_unique(array_map(static fn (Cookie $cookie) => $cookie->getName() === $session->getName() ? $cookie->getDomain() : '', $cookieJar->all())) ?: [''];
             foreach ($domains as $domain) {
                 $cookieJar->set(new Cookie($session->getName(), $session->getId(), domain: $domain));
             }

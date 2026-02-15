@@ -242,7 +242,7 @@ final class ConnectionTest extends TestCase
 
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
-        $client->expects($this->once())->method('delete')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id));
+        $client->expects($this->once())->method('delete')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id));
 
         $connection = new Connection(['tube_name' => $tube], $client);
 
@@ -259,7 +259,7 @@ final class ConnectionTest extends TestCase
 
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
-        $client->expects($this->once())->method('delete')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
+        $client->expects($this->once())->method('delete')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
 
         $connection = new Connection(['tube_name' => $tube], $client);
 
@@ -278,7 +278,7 @@ final class ConnectionTest extends TestCase
 
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
-        $client->expects($this->once())->method('delete')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id));
+        $client->expects($this->once())->method('delete')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id));
 
         $connection = new Connection(['tube_name' => $tube, 'bury_on_reject' => $buryOnReject], $client);
 
@@ -293,7 +293,7 @@ final class ConnectionTest extends TestCase
 
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
-        $client->expects($this->once())->method('bury')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id), 1024);
+        $client->expects($this->once())->method('bury')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id), 1024);
 
         $connection = new Connection(['tube_name' => $tube, 'bury_on_reject' => true], $client);
 
@@ -309,7 +309,7 @@ final class ConnectionTest extends TestCase
 
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
-        $client->expects($this->once())->method('bury')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id), $priority);
+        $client->expects($this->once())->method('bury')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id), $priority);
 
         $connection = new Connection(['tube_name' => $tube, 'bury_on_reject' => true], $client);
 
@@ -326,7 +326,7 @@ final class ConnectionTest extends TestCase
 
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
-        $client->expects($this->once())->method('delete')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
+        $client->expects($this->once())->method('delete')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
 
         $connection = new Connection(['tube_name' => $tube], $client);
 
@@ -376,7 +376,7 @@ final class ConnectionTest extends TestCase
         $response = new JobStats(new JobId($id), new TubeName($tube), JobState::READY, $priority, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
         $client = $this->createMock(PheanstalkInterface::class);
-        $client->expects($this->once())->method('statsJob')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id))->willReturn($response);
+        $client->expects($this->once())->method('statsJob')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willReturn($response);
 
         $connection = new Connection(['tube_name' => $tube], $client);
 
@@ -392,7 +392,7 @@ final class ConnectionTest extends TestCase
         $exception = new ClientException('foobar error');
 
         $client = $this->createMock(PheanstalkInterface::class);
-        $client->expects($this->once())->method('statsJob')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
+        $client->expects($this->once())->method('statsJob')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
 
         $connection = new Connection(['tube_name' => $tube], $client);
 
@@ -415,7 +415,7 @@ final class ConnectionTest extends TestCase
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
         $client->expects($this->exactly(2))->method('put')->with(
-            $this->callback(function (string $data) use ($body, $headers): bool {
+            $this->callback(static function (string $data) use ($body, $headers): bool {
                 $expectedMessage = json_encode([
                     'body' => $body,
                     'headers' => $headers,
@@ -456,7 +456,7 @@ final class ConnectionTest extends TestCase
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->exactly(2))->method('useTube')->with(new TubeName($tube));
         $client->expects($this->exactly(2))->method('put')->with(
-            $this->callback(function (string $data) use ($body, $headers): bool {
+            $this->callback(static function (string $data) use ($body, $headers): bool {
                 $expectedMessage = json_encode([
                     'body' => $body,
                     'headers' => $headers,
@@ -494,7 +494,7 @@ final class ConnectionTest extends TestCase
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
         $client->expects($this->once())->method('put')->with(
-            $this->callback(function (string $data) use ($body, $headers): bool {
+            $this->callback(static function (string $data) use ($body, $headers): bool {
                 $expectedMessage = json_encode([
                     'body' => $body,
                     'headers' => $headers,
@@ -528,7 +528,7 @@ final class ConnectionTest extends TestCase
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
         $client->expects($this->once())->method('put')->with(
-            $this->callback(function (string $data) use ($body, $headers): bool {
+            $this->callback(static function (string $data) use ($body, $headers): bool {
                 $expectedMessage = json_encode([
                     'body' => $body,
                     'headers' => $headers,
@@ -556,7 +556,7 @@ final class ConnectionTest extends TestCase
 
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
-        $client->expects($this->once())->method('touch')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id));
+        $client->expects($this->once())->method('touch')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id));
 
         $connection = new Connection(['tube_name' => $tube], $client);
 
@@ -573,7 +573,7 @@ final class ConnectionTest extends TestCase
 
         $client = $this->createMock(PheanstalkInterface::class);
         $client->expects($this->once())->method('useTube')->with(new TubeName($tube));
-        $client->expects($this->once())->method('touch')->with($this->callback(fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
+        $client->expects($this->once())->method('touch')->with($this->callback(static fn (JobId $jobId): bool => $jobId->getId() === $id))->willThrowException($exception);
 
         $connection = new Connection(['tube_name' => $tube], $client);
 

@@ -118,8 +118,8 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         $setSession ??= \Closure::bind(static function ($subRequest, $request) { $subRequest->session = $request->session; }, null, Request::class);
         $setSession($subRequest, $request);
 
-        if ($request->get('_format')) {
-            $subRequest->attributes->set('_format', $request->get('_format'));
+        if ($request->attributes->has('_format')) {
+            $subRequest->attributes->set('_format', $request->attributes->get('_format'));
         }
         if ($request->getDefaultLocale() !== $request->getLocale()) {
             $subRequest->setLocale($request->getLocale());

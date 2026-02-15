@@ -12,6 +12,7 @@
 namespace Symfony\Component\Scheduler\DependencyInjection;
 
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Messenger\RunCommandMessage;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -63,9 +64,14 @@ class AddScheduleMessengerPass implements CompilerPassInterface
                 if ($serviceDefinition->hasTag('console.command')) {
                     /** @var AsCommand|null $attribute */
                     $attribute = ($container->getReflectionClass($serviceDefinition->getClass())->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
-                    $commandName = $attribute?->name ?? $serviceDefinition->getClass()::getDefaultName();
+                    $commandName = $attribute?->name;
 
-                    $message = new Definition(RunCommandMessage::class, [$commandName.(($tagAttributes['arguments'] ?? null) ? " {$tagAttributes['arguments']}" : '')]);
+                    if (\is_array($arguments = $tagAttributes['arguments'] ?? '')) {
+                        $input = (string) new ArrayInput(['command' => $commandName, ...$arguments]);
+                    } else {
+                        $input = $commandName.('' !== $arguments ? " $arguments" : '');
+                    }
+                    $message = new Definition(RunCommandMessage::class, [$input]);
                 } else {
                     $message = new Definition(ServiceCallMessage::class, [$serviceId, $tagAttributes['method'] ?? '__invoke', (array) ($tagAttributes['arguments'] ?? [])]);
                 }
@@ -86,7 +92,7 @@ class AddScheduleMessengerPass implements CompilerPassInterface
                         '$expression' => $tagAttributes['expression'] ?? throw new InvalidArgumentException(\sprintf('Tag "scheduler.task" is missing attribute "expression" on service "%s".', $serviceId)),
                         '$timezone' => $tagAttributes['timezone'] ?? null,
                     ],
-                }, fn ($value) => null !== $value);
+                }, static fn ($value) => null !== $value);
 
                 $tasksPerSchedule[$scheduleName][] = $taskDefinition = (new Definition(RecurringMessage::class))
                     ->setFactory([RecurringMessage::class, $tagAttributes['trigger']])

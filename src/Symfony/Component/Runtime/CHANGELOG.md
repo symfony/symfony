@@ -9,6 +9,8 @@ CHANGELOG
  * Add automatic detection of FrankenPHP worker mode in `SymfonyRuntime`
  * Expose the runtime class in `$_SERVER['APP_RUNTIME']`
  * Expose the runtime options in `$_SERVER['APP_RUNTIME_OPTIONS']`
+ * Make `project_dir` configurable in `composer.json`
+ * Expose `project_dir` as `APP_PROJECT_DIR` env var
 
 6.4
 ---

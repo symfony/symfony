@@ -57,7 +57,7 @@ class SecretsGenerateKeysCommandTest extends TestCase
 
     public function testItFailsGracefullyWhenLocalVaultIsDisabled()
     {
-        $vault = $this->createMock(AbstractVault::class);
+        $vault = $this->createStub(AbstractVault::class);
         $tester = new CommandTester(new SecretsGenerateKeysCommand($vault));
 
         $this->assertSame(1, $tester->execute(['--local' => true]));

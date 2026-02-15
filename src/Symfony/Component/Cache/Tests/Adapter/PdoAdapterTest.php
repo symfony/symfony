@@ -56,7 +56,7 @@ class PdoAdapterTest extends AdapterTestCase
     {
         $pdo = new \PDO('sqlite:'.self::$dbFile);
 
-        $getCacheItemCount = fn () => (int) $pdo->query('SELECT COUNT(*) FROM cache_items')->fetch(\PDO::FETCH_COLUMN);
+        $getCacheItemCount = static fn () => (int) $pdo->query('SELECT COUNT(*) FROM cache_items')->fetch(\PDO::FETCH_COLUMN);
 
         $this->assertSame(0, $getCacheItemCount());
 

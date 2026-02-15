@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Extension\Core\Type\CurrencyType;
 use Symfony\Component\Intl\Util\IntlTestHelper;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 class CurrencyTypeTest extends BaseTypeTestCase
 {
@@ -34,7 +35,6 @@ class CurrencyTypeTest extends BaseTypeTestCase
 
         $this->assertContainsEquals(new ChoiceView('EUR', 'EUR', 'Euro'), $choices);
         $this->assertContainsEquals(new ChoiceView('USD', 'USD', 'US Dollar'), $choices);
-        $this->assertContainsEquals(new ChoiceView('SIT', 'SIT', 'Slovenian Tolar'), $choices);
     }
 
     #[RequiresPhpExtension('intl')]
@@ -49,7 +49,6 @@ class CurrencyTypeTest extends BaseTypeTestCase
         // Don't check objects for identity
         $this->assertContainsEquals(new ChoiceView('EUR', 'EUR', 'євро'), $choices);
         $this->assertContainsEquals(new ChoiceView('USD', 'USD', 'долар США'), $choices);
-        $this->assertContainsEquals(new ChoiceView('SIT', 'SIT', 'словенський толар'), $choices);
     }
 
     public function testSubmitNull($expected = null, $norm = null, $view = null)
@@ -60,5 +59,64 @@ class CurrencyTypeTest extends BaseTypeTestCase
     public function testSubmitNullUsesDefaultEmptyData($emptyData = 'EUR', $expectedData = 'EUR')
     {
         parent::testSubmitNullUsesDefaultEmptyData($emptyData, $expectedData);
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testAnActiveAndLegalTenderCurrencyIn2006()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'choice_translation_locale' => 'fr',
+                'active_at' => new \DateTimeImmutable('2006-01-01', new \DateTimeZone('Etc/UTC')),
+                'legal_tender' => true,
+            ])
+            ->createView()->vars['choices'];
+
+        $this->assertContainsEquals(new ChoiceView('SIT', 'SIT', 'tolar slovène'), $choices);
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testAnExpiredCurrencyIn2007()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'choice_translation_locale' => 'fr',
+                'legal_tender' => true,
+                // The SIT currency expired on 2007-01-14.
+                'active_at' => new \DateTimeImmutable('2007-01-15', new \DateTimeZone('Etc/UTC')),
+            ])
+            ->createView()->vars['choices'];
+
+        $this->assertNotContainsEquals(new ChoiceView('SIT', 'SIT', 'tolar slovène'), $choices);
+    }
+
+    #[RequiresPhpExtension('intl')]
+    public function testRetrieveExpiredCurrenciesIn2007()
+    {
+        $choices = $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'choice_translation_locale' => 'fr',
+                'legal_tender' => true,
+                'active_at' => null,
+                // The SIT currency expired on 2007-01-14.
+                'not_active_at' => new \DateTimeImmutable('2007-01-15', new \DateTimeZone('Etc/UTC')),
+            ])
+            ->createView()->vars['choices'];
+
+        $this->assertContainsEquals(new ChoiceView('SIT', 'SIT', 'tolar slovène'), $choices);
+    }
+
+    public function testAnExceptionShouldBeThrownWhenTheActiveAtAndNotActiveAtOptionsAreBothSet()
+    {
+        $this->expectException(InvalidOptionsException::class);
+
+        $this->expectExceptionMessage('The "active_at" and "not_active_at" options cannot be used together.');
+
+        $this->factory
+            ->create(static::TESTED_TYPE, null, [
+                'active_at' => new \DateTimeImmutable(),
+                'not_active_at' => new \DateTimeImmutable(),
+            ])
+            ->createView();
     }
 }

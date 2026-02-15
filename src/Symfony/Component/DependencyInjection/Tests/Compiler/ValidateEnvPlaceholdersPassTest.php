@@ -334,7 +334,7 @@ class EnvConfiguration implements ConfigurationInterface
                 ->scalarNode('scalar_node_not_empty_validated')
                     ->cannotBeEmpty()
                     ->validate()
-                        ->always(fn ($value) => $value)
+                        ->always(static fn ($value) => $value)
                     ->end()
                 ->end()
                 ->integerNode('int_node')->end()
@@ -342,12 +342,12 @@ class EnvConfiguration implements ConfigurationInterface
                 ->booleanNode('bool_node')->end()
                 ->arrayNode('array_node')
                     ->beforeNormalization()
-                        ->ifTrue(fn ($value) => !\is_array($value))
-                        ->then(fn ($value) => ['child_node' => $value])
+                        ->ifTrue(static fn ($value) => !\is_array($value))
+                        ->then(static fn ($value) => ['child_node' => $value])
                     ->end()
                     ->beforeNormalization()
                         ->ifArray()
-                        ->then(function (array $v) {
+                        ->then(static function (array $v) {
                             if (isset($v['bool_force_cast'])) {
                                 $v['bool_force_cast'] = (bool) $v['bool_force_cast'];
                             }
@@ -360,7 +360,7 @@ class EnvConfiguration implements ConfigurationInterface
                         ->booleanNode('bool_force_cast')->end()
                         ->integerNode('int_unset_at_zero')
                             ->validate()
-                                ->ifTrue(fn ($value) => 0 === $value)
+                                ->ifTrue(static fn ($value) => 0 === $value)
                                 ->thenUnset()
                             ->end()
                         ->end()
@@ -371,7 +371,7 @@ class EnvConfiguration implements ConfigurationInterface
                 ->variableNode('variable_node')->end()
                 ->scalarNode('string_node')
                     ->validate()
-                        ->ifTrue(fn ($value) => !\is_string($value) || 'fail' === $value)
+                        ->ifTrue(static fn ($value) => !\is_string($value) || 'fail' === $value)
                         ->thenInvalid('%s is not a valid string')
                     ->end()
                 ->end()

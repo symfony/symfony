@@ -40,6 +40,7 @@ class Connection
         'poll_timeout' => 0.1,
         'visibility_timeout' => null,
         'delete_on_rejection' => true,
+        'retry_delay' => 0,
         'auto_setup' => true,
         'access_key' => null,
         'secret_key' => null,
@@ -103,6 +104,7 @@ class Connection
      * * poll_timeout: amount of seconds the transport should wait for new message
      * * visibility_timeout: amount of seconds the message won't be visible
      * * delete_on_rejection: Whether to delete message on rejection or allow SQS to handle retries. (Default: true).
+     * * retry_delay: amount of seconds the message won't be visible before retry. (Default: 0).
      * * sslmode: Can be "disable" to use http for a custom endpoint
      * * auto_setup: Whether the queue should be created automatically during send / get (Default: true)
      * * debug: Log all HTTP requests and responses as LoggerInterface::DEBUG (Default: false)
@@ -137,6 +139,7 @@ class Connection
             'poll_timeout' => $options['poll_timeout'],
             'visibility_timeout' => null !== $options['visibility_timeout'] ? (int) $options['visibility_timeout'] : null,
             'delete_on_rejection' => filter_var($options['delete_on_rejection'], \FILTER_VALIDATE_BOOL),
+            'retry_delay' => (int) $options['retry_delay'],
             'auto_setup' => filter_var($options['auto_setup'], \FILTER_VALIDATE_BOOL),
             'queue_name' => (string) $options['queue_name'],
             'queue_attributes' => $options['queue_attributes'],
@@ -323,7 +326,7 @@ class Connection
             $this->client->changeMessageVisibility([
                 'QueueUrl' => $this->getQueueUrl(),
                 'ReceiptHandle' => $id,
-                'VisibilityTimeout' => $this->configuration['visibility_timeout'] ?? 30,
+                'VisibilityTimeout' => $this->configuration['retry_delay'],
             ]);
         }
     }

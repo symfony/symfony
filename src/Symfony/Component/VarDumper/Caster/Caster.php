@@ -47,7 +47,7 @@ class Caster
      *
      * @param bool $hasDebugInfo Whether the __debugInfo method exists on $obj or not
      *
-     * @internal since Symfony 7.3
+     * @internal
      */
     public static function castObject(object $obj, string $class, bool $hasDebugInfo = false, ?string $debugClass = null): array
     {
@@ -165,7 +165,7 @@ class Caster
     }
 
     /**
-     * @internal since Symfony 7.3
+     * @internal
      */
     public static function castPhpIncompleteClass(\__PHP_Incomplete_Class $c, array $a, Stub $stub, bool $isNested): array
     {
@@ -195,7 +195,7 @@ class Caster
                 $p->isPublic() => $p->name,
                 $p->isProtected() => self::PREFIX_PROTECTED.$p->name,
                 default => "\0".$className."\0".$p->name,
-            }] = \PHP_VERSION_ID >= 80400 && $p->isVirtual() ? new VirtualStub($p) : new UninitializedStub($p);
+            }] = $p->isVirtual() ? new VirtualStub($p) : new UninitializedStub($p);
         }
 
         return $classProperties;

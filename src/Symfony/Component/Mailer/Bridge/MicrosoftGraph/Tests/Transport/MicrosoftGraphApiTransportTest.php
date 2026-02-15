@@ -160,7 +160,9 @@ class MicrosoftGraphApiTransportTest extends TestCase
             $message = json_decode($options['body'], true)['message'];
 
             $attachment = $message['attachments'][0];
-            $this->assertSame('Embedded content', $attachment['contentId']);
+            $this->assertSame('Embedded content', $attachment['name']);
+            $this->assertSame('Y29udGVudA==', $attachment['contentBytes']);
+            $this->assertMatchesRegularExpression('/^[0-9a-f]{32}@symfony$/', $attachment['contentId']);
             $this->assertTrue($attachment['isInline']);
 
             return new MockResponse('', ['http_code' => 202]);
@@ -229,6 +231,47 @@ class MicrosoftGraphApiTransportTest extends TestCase
         $transport->send($mail);
     }
 
+    #[DataProvider('headersToByPassProvider')]
+    public function testHeadersToBypass(string $header, string $value)
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $message = json_decode($options['body'], true)['message'];
+
+            $headers = $message['internetMessageHeaders'] ?? null;
+
+            $this->assertNull($headers);
+
+            return new MockResponse('', ['http_code' => 202]);
+        });
+        $transport = new MicrosoftGraphApiTransport('graph', new TokenManagerMock(), true, $client);
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('bob@symfony.com', 'Bob'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+        $mail->getHeaders()->addHeader($header, $value);
+        $transport->send($mail);
+    }
+
+    public static function headersToByPassProvider()
+    {
+        return [
+            ['x-ms-client-request-id', 'id'],
+            ['operation-id', 'operation-id'],
+            ['authorization', 'auth'],
+            ['x-ms-content-sha256', 'hash'],
+            ['received', 'from localhost'],
+            ['dkim-signature', 'signature'],
+            ['content-transfer-encoding', 'quoted-printable'],
+            ['sender', 'hugo@example.com'],
+            ['cc', 'alice@example.com'],
+            ['bcc', 'bob@example.com'],
+            ['content-type', 'text/plain'],
+            ['reply-to', 'fabpot@symfony.com'],
+            ['Return-Path', 'fabpot@symfony.com'],
+        ];
+    }
+
     #[DataProvider('importanceProvider')]
     public function testImportance(string $expected, int $priority)
     {
@@ -266,7 +309,7 @@ class MicrosoftGraphApiTransportTest extends TestCase
 
     public function testNonSuccessCodeThrown()
     {
-        $client = new MockHttpClient(fn (): ResponseInterface => new MockResponse('', ['http_code' => 503]));
+        $client = new MockHttpClient(static fn (): ResponseInterface => new MockResponse('', ['http_code' => 503]));
 
         $transport = new MicrosoftGraphApiTransport('graph', new TokenManagerMock(), true, $client);
 

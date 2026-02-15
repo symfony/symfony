@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * Validates that a value is valid as an ExpressionLanguage expression.
@@ -37,18 +37,17 @@ class ExpressionSyntax extends Constraint
      * @param string[]|null         $allowedVariables Restrict the available variables in the expression to these values (defaults to null that allows any variable)
      * @param string[]|null         $groups
      */
-    #[HasNamedArguments]
     public function __construct(?array $options = null, ?string $message = null, ?string $service = null, ?array $allowedVariables = null, ?array $groups = null, mixed $payload = null)
     {
-        if (\is_array($options)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        if (null !== $options) {
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
         }
 
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->message = $message ?? $this->message;
-        $this->service = $service ?? $this->service;
-        $this->allowedVariables = $allowedVariables ?? $this->allowedVariables;
+        $this->service = $service;
+        $this->allowedVariables = $allowedVariables;
     }
 
     public function validatedBy(): string

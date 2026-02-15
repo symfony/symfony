@@ -44,7 +44,7 @@ class UlidTest extends TestCase
     public function testWithInvalidUlid()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid ULID: "this is not a ulid".');
+        $this->expectExceptionMessage('Invalid ULID.');
 
         new Ulid('this is not a ulid');
     }
@@ -107,6 +107,50 @@ class UlidTest extends TestCase
     {
         $this->assertFalse(Ulid::isValid('not a ulid'));
         $this->assertTrue(Ulid::isValid('00000000000000000000000000'));
+        $this->assertTrue(Ulid::isValid('1BVXue8CnY8ogucrHX3TeF', Ulid::FORMAT_BASE_58));
+        $this->assertFalse(Ulid::isValid('1BVXue8CnY8ogucrHX3TeF', Ulid::FORMAT_BASE_32));
+        $this->assertTrue(Ulid::isValid('0177058f-4dac-d0b2-a990-a49af02bc008', Ulid::FORMAT_RFC_4122));
+        $this->assertFalse(Ulid::isValid('0177058f-4dac-d0b2-a990-a49af02bc008', Ulid::FORMAT_BASE_32));
+        $this->assertTrue(Ulid::isValid("\x01\x77\x05\x8F\x4D\xAC\xD0\xB2\xA9\x90\xA4\x9A\xF0\x2B\xC0\x08", Ulid::FORMAT_BINARY));
+        $this->assertTrue(Ulid::isValid(new Ulid()->toString()));
+        $this->assertTrue(Ulid::isValid(new Ulid()->toRfc4122(), Ulid::FORMAT_RFC_4122));
+    }
+
+    public function testIsValidWithVariousFormat()
+    {
+        $ulid = new Ulid();
+
+        $this->assertTrue(Ulid::isValid($ulid->toBase32(), Ulid::FORMAT_BASE_32));
+        $this->assertFalse(Ulid::isValid($ulid->toBase58(), Ulid::FORMAT_BASE_32));
+        $this->assertFalse(Ulid::isValid($ulid->toBinary(), Ulid::FORMAT_BASE_32));
+        $this->assertFalse(Ulid::isValid($ulid->toRfc4122(), Ulid::FORMAT_BASE_32));
+
+        $this->assertFalse(Ulid::isValid($ulid->toBase32(), Ulid::FORMAT_BASE_58));
+        $this->assertTrue(Ulid::isValid($ulid->toBase58(), Ulid::FORMAT_BASE_58));
+        $this->assertFalse(Ulid::isValid($ulid->toBinary(), Ulid::FORMAT_BASE_58));
+        $this->assertFalse(Ulid::isValid($ulid->toRfc4122(), Ulid::FORMAT_BASE_58));
+
+        $this->assertFalse(Ulid::isValid($ulid->toBase32(), Ulid::FORMAT_BINARY));
+        $this->assertFalse(Ulid::isValid($ulid->toBase58(), Ulid::FORMAT_BINARY));
+        $this->assertTrue(Ulid::isValid($ulid->toBinary(), Ulid::FORMAT_BINARY));
+        $this->assertFalse(Ulid::isValid($ulid->toRfc4122(), Ulid::FORMAT_BINARY));
+
+        $this->assertFalse(Ulid::isValid($ulid->toBase32(), Ulid::FORMAT_RFC_4122));
+        $this->assertFalse(Ulid::isValid($ulid->toBase58(), Ulid::FORMAT_RFC_4122));
+        $this->assertFalse(Ulid::isValid($ulid->toBinary(), Ulid::FORMAT_RFC_4122));
+        $this->assertTrue(Ulid::isValid($ulid->toRfc4122(), Ulid::FORMAT_RFC_4122));
+
+        $this->assertFalse(Ulid::isValid($ulid->toBase32(), Ulid::FORMAT_RFC_9562));
+        $this->assertFalse(Ulid::isValid($ulid->toBase58(), Ulid::FORMAT_RFC_9562));
+        $this->assertFalse(Ulid::isValid($ulid->toBinary(), Ulid::FORMAT_RFC_9562));
+        $this->assertTrue(Ulid::isValid($ulid->toRfc4122(), Ulid::FORMAT_RFC_9562));
+
+        $this->assertTrue(Ulid::isValid($ulid->toBase32(), Ulid::FORMAT_ALL));
+        $this->assertTrue(Ulid::isValid($ulid->toBase58(), Ulid::FORMAT_ALL));
+        $this->assertTrue(Ulid::isValid($ulid->toBinary(), Ulid::FORMAT_ALL));
+        $this->assertTrue(Ulid::isValid($ulid->toRfc4122(), Ulid::FORMAT_ALL));
+
+        $this->assertFalse(Ulid::isValid('30J7CNpDMfXPZrCsn4Cgey', Ulid::FORMAT_BASE_58), 'Fake base-58 string with the "O" forbidden char is not valid');
     }
 
     public function testEquals()

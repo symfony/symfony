@@ -12,7 +12,10 @@
 namespace Symfony\Component\HttpKernel\Tests\Bundle;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\HttpKernel\Kernel;
+use Symfony\Component\HttpKernel\Tests\Fixtures\BundleCompilerPass\BundleAsCompilerPassBundle;
 use Symfony\Component\HttpKernel\Tests\Fixtures\ExtensionPresentBundle\ExtensionPresentBundle;
 
 class BundleTest extends TestCase
@@ -42,6 +45,29 @@ class BundleTest extends TestCase
         $this->assertSame('ExplicitlyNamedBundle', $bundle->getName());
         $this->assertSame('Symfony\Component\HttpKernel\Tests\Bundle', $bundle->getNamespace());
         $this->assertSame('ExplicitlyNamedBundle', $bundle->getName());
+    }
+
+    public function testBundleAsCompilerPass()
+    {
+        $kernel = new class('test', true) extends Kernel {
+            public function registerBundles(): iterable
+            {
+                yield new BundleAsCompilerPassBundle();
+            }
+
+            public function registerContainerConfiguration(LoaderInterface $loader): void
+            {
+            }
+
+            public function getProjectDir(): string
+            {
+                return sys_get_temp_dir().'/bundle_as_compiler_pass';
+            }
+        };
+
+        $kernel->boot();
+
+        $this->assertTrue($kernel->getContainer()->has('foo'));
     }
 }
 

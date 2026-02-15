@@ -468,91 +468,91 @@
             </trans-unit>
             <trans-unit id="121">
                 <source>This value is not a valid Twig template.</source>
-                <target state="needs-review-translation">Questo valore non è un template Twig valido.</target>
+                <target>Questo valore non è un template Twig valido.</target>
             </trans-unit>
             <trans-unit id="122">
                 <source>This file is not a valid video.</source>
-                <target state="needs-review-translation">Questo file non è un video valido.</target>
+                <target>Questo file non è un video valido.</target>
             </trans-unit>
             <trans-unit id="123">
                 <source>The size of the video could not be detected.</source>
-                <target state="needs-review-translation">Non è stato possibile rilevare la dimensione del video.</target>
+                <target>Non è stato possibile rilevare la dimensione del video.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target state="needs-review-translation">La larghezza del video è troppo grande ({{ width }}px). La larghezza massima consentita è {{ max_width }}px.</target>
+                <target>La larghezza del video è troppo grande ({{ width }}px). La larghezza massima consentita è {{ max_width }}px.</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target state="needs-review-translation">La larghezza del video è troppo piccola ({{ width }}px). La larghezza minima prevista è {{ min_width }}px.</target>
+                <target>La larghezza del video è troppo piccola ({{ width }}px). La larghezza minima prevista è {{ min_width }}px.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target state="needs-review-translation">L'altezza del video è troppo grande ({{ height }}px). L'altezza massima consentita è {{ max_height }}px.</target>
+                <target>L'altezza del video è troppo grande ({{ height }}px). L'altezza massima consentita è {{ max_height }}px.</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target state="needs-review-translation">L'altezza del video è troppo piccola ({{ height }}px). L'altezza minima prevista è {{ min_height }}px.</target>
+                <target>L'altezza del video è troppo piccola ({{ height }}px). L'altezza minima prevista è {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">Il video ha troppo pochi pixel ({{ pixels }}). La quantità minima prevista è {{ min_pixels }}.</target>
+                <target>Il video ha troppo pochi pixel ({{ pixels }}). La quantità minima prevista è {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">Il video ha troppi pixel ({{ pixels }}). La quantità massima prevista è {{ max_pixels }}.</target>
+                <target>Il video ha troppi pixel ({{ pixels }}). La quantità massima prevista è {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target state="needs-review-translation">Il rapporto del video è troppo alto ({{ ratio }}). Il rapporto massimo consentito è {{ max_ratio }}.</target>
+                <target>Il rapporto del video è troppo alto ({{ ratio }}). Il rapporto massimo consentito è {{ max_ratio }}.</target>
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target state="needs-review-translation">Il rapporto del video è troppo piccolo ({{ ratio }}). Il rapporto minimo previsto è {{ min_ratio }}.</target>
+                <target>Il rapporto del video è troppo piccolo ({{ ratio }}). Il rapporto minimo previsto è {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
-                <target state="needs-review-translation">Il video è quadrato ({{ width }}x{{ height }}px). I video quadrati non sono consentiti.</target>
+                <target>Il video è quadrato ({{ width }}x{{ height }}px). I video quadrati non sono consentiti.</target>
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target state="needs-review-translation">Il video è in orientamento orizzontale ({{ width }}x{{ height }} px). I video orizzontali non sono consentiti.</target>
+                <target>Il video è in orientamento orizzontale ({{ width }}x{{ height }}px). I video orizzontali non sono consentiti.</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target state="needs-review-translation">Il video è in orientamento verticale ({{ width }}x{{ height }}px). I video in orientamento verticale non sono consentiti.</target>
+                <target>Il video è in orientamento verticale ({{ width }}x{{ height }}px). I video in orientamento verticale non sono consentiti.</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
-                <target state="needs-review-translation">Il file video è danneggiato.</target>
+                <target>Il file video è danneggiato.</target>
             </trans-unit>
             <trans-unit id="136">
                 <source>The video contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">Il video contiene più flussi. È consentito un solo flusso.</target>
+                <target>Il video contiene più flussi. È consentito un solo flusso.</target>
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target state="needs-review-translation">Codec video non supportato «{{ codec }}».</target>
+                <target>Codec video non supportato «{{ codec }}».</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target state="needs-review-translation">Container video non supportato "{{ container }}".</target>
+                <target>Container video non supportato "{{ container }}".</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
-                <target state="needs-review-translation">Il file immagine è danneggiato.</target>
+                <target>Il file immagine è danneggiato.</target>
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">L’immagine ha troppo pochi pixel ({{ pixels }}). La quantità minima prevista è {{ min_pixels }}.</target>
+                <target>L’immagine ha troppo pochi pixel ({{ pixels }}). La quantità minima prevista è {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">L’immagine ha troppi pixel ({{ pixels }}). La quantità massima prevista è {{ max_pixels }}.</target>
+                <target>L’immagine ha troppi pixel ({{ pixels }}). La quantità massima prevista è {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
-                <target state="needs-review-translation">Questo nome file non corrisponde al set di caratteri previsto.</target>
+                <target>Questo nome file non corrisponde al set di caratteri previsto.</target>
             </trans-unit>
         </body>
     </file>

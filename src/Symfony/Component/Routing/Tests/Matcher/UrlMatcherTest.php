@@ -22,6 +22,17 @@ use Symfony\Component\Routing\RouteCollection;
 
 class UrlMatcherTest extends TestCase
 {
+    public function testZero()
+    {
+        $coll = new RouteCollection();
+        $coll->add('index', new Route('/'));
+
+        $matcher = $this->getUrlMatcher($coll);
+
+        $this->expectException(ResourceNotFoundException::class);
+        $matcher->match('0');
+    }
+
     public function testNoMethodSoAllowed()
     {
         $coll = new RouteCollection();
@@ -1035,10 +1046,7 @@ class UrlMatcherTest extends TestCase
             '_route' => 'a',
             'slug' => 'vienna-2024',
             '_route_mapping' => [
-                'slug' => [
-                    'conference',
-                    'slug',
-                ],
+                'slug' => 'conference',
             ],
         ];
         $this->assertEquals($expected, $matcher->match('/conference/vienna-2024'));

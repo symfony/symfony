@@ -60,6 +60,20 @@ where:
  - `GROUP_ID` is your Sendgrid suppression group ID
  - `GROUPS_TO_DISPLAY_ID` is an array of the Sendgrid suppression group IDs presented to the user
 
+Scheduling
+----------
+
+When using the **API transport** (with a `sendgrid+api` DSN), you can schedule
+your emails by providing a `\DateTimeInterface` object in a
+`Symfony\Component\Mime\Header\DateHeader` named `Send-At`.
+
+```php
+$email = new \Symfony\Component\Mime\Email();
+$email->getHeaders()->addDateHeader('Send-At', new \DateTimeImmutable('+3 hours'));
+```
+It will be mapped to the `send_at` parameter of the `[POST] /mail/send`
+[API endpoint](https://www.twilio.com/docs/sendgrid/api-reference/mail-send/mail-send#request-body)
+
 Resources
 ---------
 

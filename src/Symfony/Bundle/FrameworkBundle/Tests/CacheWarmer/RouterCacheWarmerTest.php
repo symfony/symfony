@@ -23,14 +23,13 @@ class RouterCacheWarmerTest extends TestCase
     {
         $container = new Container();
 
-        $routerMock = $this->getMockBuilder(testRouterInterfaceWithWarmableInterface::class)->onlyMethods(['match', 'generate', 'getContext', 'setContext', 'getRouteCollection', 'warmUp'])->getMock();
-        $routerMock->method('warmUp')->willReturn([]);
+        $routerMock = $this->createMock(testRouterInterfaceWithWarmableInterface::class);
+        $routerMock->expects($this->once())->method('warmUp')->with('/tmp/cache', '/tmp/build')->willReturn([]);
 
         $container->set('router', $routerMock);
         $routerCacheWarmer = new RouterCacheWarmer($container);
 
         $routerCacheWarmer->warmUp('/tmp/cache', '/tmp/build');
-        $routerMock->expects($this->any())->method('warmUp')->with('/tmp/cache', '/tmp/build')->willReturn([]);
         $this->addToAssertionCount(1);
     }
 
@@ -38,7 +37,7 @@ class RouterCacheWarmerTest extends TestCase
     {
         $container = new Container();
 
-        $routerMock = $this->getMockBuilder(testRouterInterfaceWithoutWarmableInterface::class)->onlyMethods(['match', 'generate', 'getContext', 'setContext', 'getRouteCollection'])->getMock();
+        $routerMock = $this->createStub(testRouterInterfaceWithoutWarmableInterface::class);
         $container->set('router', $routerMock);
         $routerCacheWarmer = new RouterCacheWarmer($container);
         $this->expectException(\LogicException::class);
@@ -64,7 +63,7 @@ class RouterCacheWarmerTest extends TestCase
     {
         $container = new Container();
 
-        $routerMock = $this->getMockBuilder(testRouterInterfaceWithoutWarmableInterface::class)->onlyMethods(['match', 'generate', 'getContext', 'setContext', 'getRouteCollection'])->getMock();
+        $routerMock = $this->createStub(testRouterInterfaceWithoutWarmableInterface::class);
         $container->set('router', $routerMock);
         $routerCacheWarmer = new RouterCacheWarmer($container);
         $preload = $routerCacheWarmer->warmUp('/tmp');

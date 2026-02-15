@@ -25,6 +25,23 @@
         #search-results .sf-search svg {
             stroke-width: 3;
         }
+        #search-results .status-with-indicator {
+            position: relative;
+            display: inline-block;
+            padding-right: 20px;
+        }
+        #search-results .error-indicator {
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            padding: 3px 4px;
+        }
+        #search-results .error-indicator svg {
+            width: 18px;
+            height: 18px;
+        }
     </style>
 {% endblock %}
 
@@ -98,13 +115,20 @@
                 {% for result in tokens %}
                     {% if 'command' == profile_type %}
                         {% set css_class = result.status_code == 113 ? 'status-warning' : result.status_code > 0 ? 'status-error' : 'status-success' %}
+                        {% set has_errors = result.has_errors|default(false) and result.status_code == 0 %}
                     {% else %}
                         {% set css_class = result.status_code|default(0) > 399 ? 'status-error' : result.status_code|default(0) > 299 ? 'status-warning' : 'status-success' %}
+                        {% set has_errors = result.has_errors|default(false) and result.status_code < 400 %}
                     {% endif %}
 
                     <tr>
                         <td class="text-center">
-                            <span class="label {{ css_class }}">{{ result.status_code|default('n/a') }}</span>
+                            <span class="status-with-indicator">
+                                <span class="label {{ css_class }}">{{ result.status_code|default('n/a') }}</span>
+                                {%- if has_errors -%}
+                                    <span class="label status-error error-indicator">{{ source('@WebProfiler/Icon/logger.svg') }}</span>
+                                {%- endif -%}
+                            </span>
                         </td>
                         <td>
                             <span class="nowrap">{{ result.ip }} {{ _self.profile_search_filter(request, result, 'ip') }}</span>

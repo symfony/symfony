@@ -33,8 +33,9 @@ class SemaphoreStore implements BlockingStoreInterface
         return \extension_loaded('sysvsem');
     }
 
-    public function __construct()
-    {
+    public function __construct(
+        private readonly string $projectId = '',
+    ) {
         if (!static::isSupported()) {
             throw new InvalidArgumentException('Semaphore extension (sysvsem) is required.');
         }
@@ -56,7 +57,7 @@ class SemaphoreStore implements BlockingStoreInterface
             return;
         }
 
-        $keyId = unpack('i', hash('xxh128', $key, true))[1];
+        $keyId = unpack('i', hash('xxh64', $this->projectId.$key, true))[1];
         $resource = @sem_get($keyId);
         $acquired = $resource && @sem_acquire($resource, !$blocking);
 

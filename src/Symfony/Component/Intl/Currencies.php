@@ -72,7 +72,7 @@ final class Currencies extends ResourceBundle
             $names = iterator_to_array($names);
         }
 
-        array_walk($names, function (&$value) {
+        array_walk($names, static function (&$value) {
             $value = $value[self::INDEX_NAME];
         });
 
@@ -149,7 +149,7 @@ final class Currencies extends ResourceBundle
      *
      * @throws MissingResourceException if the given $country does not exist
      */
-    public static function forCountry(string $country, ?bool $legalTender = true, ?bool $active = true, \DateTimeInterface $date = new \DateTimeImmutable('today', new \DateTimeZone('Etc/UTC'))): array
+    public static function forCountry(string $country, ?bool $legalTender = true, ?bool $active = true, \DateTimeInterface $date = new \DateTimeImmutable('today', new \DateTimeZone('Etc/UTC')), bool $includeUndated = true): array
     {
         $currencies = [];
 
@@ -164,7 +164,7 @@ final class Currencies extends ResourceBundle
                 continue;
             }
 
-            if (self::isDateActive($country, $currency, $currencyMetadata, $date) !== $active) {
+            if (self::isDateActive($currencyMetadata, $date, $includeUndated) !== $active) {
                 continue;
             }
 
@@ -181,7 +181,7 @@ final class Currencies extends ResourceBundle
      * @param ?bool              $active      Indicates whether the currency should always be active for the given $date; null to not filter anything
      * @param \DateTimeInterface $date        The date that will be checked when $active is set to true
      */
-    public static function isValidInCountry(string $country, string $currency, ?bool $legalTender = true, ?bool $active = true, \DateTimeInterface $date = new \DateTimeImmutable('today', new \DateTimeZone('Etc/UTC'))): bool
+    public static function isValidInCountry(string $country, string $currency, ?bool $legalTender = true, ?bool $active = true, \DateTimeInterface $date = new \DateTimeImmutable('today', new \DateTimeZone('Etc/UTC')), bool $includeUndated = true): bool
     {
         if (!self::exists($currency)) {
             throw new \InvalidArgumentException("The currency $currency does not exist.");
@@ -201,7 +201,7 @@ final class Currencies extends ResourceBundle
             return true;
         }
 
-        return self::isDateActive($country, $currency, $currencyMetadata, $date) === $active;
+        return self::isDateActive($currencyMetadata, $date, $includeUndated) === $active;
     }
 
     /**
@@ -213,22 +213,21 @@ final class Currencies extends ResourceBundle
     }
 
     /**
-     * @param string                            $country          e.g. 'FR'
-     * @param string                            $currency         e.g. 'USD'
      * @param array{from?: string, to?: string} $currencyMetadata
      * @param \DateTimeInterface                $date             The date on which the check will be performed
+     * @param bool                              $includeUndated   Whether the currency should be included or not when there are no validity dates
      */
-    private static function isDateActive(string $country, string $currency, array $currencyMetadata, \DateTimeInterface $date): bool
+    private static function isDateActive(array $currencyMetadata, \DateTimeInterface $date, bool $includeUndated): bool
     {
         if (!\array_key_exists('from', $currencyMetadata)) {
             // Note: currencies that are not legal tender don't have often validity dates.
-            throw new \RuntimeException("Cannot check whether the currency $currency is active or not in $country because they are no validity dates available.");
+            return $includeUndated;
         }
 
-        $from = \DateTimeImmutable::createFromFormat('Y-m-d', $currencyMetadata['from']);
+        $from = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $currencyMetadata['from'], new \DateTimeZone('Etc/UTC'));
 
         if (\array_key_exists('to', $currencyMetadata)) {
-            $to = \DateTimeImmutable::createFromFormat('Y-m-d', $currencyMetadata['to']);
+            $to = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s', $currencyMetadata['to'], new \DateTimeZone('Etc/UTC'));
         } else {
             $to = null;
         }
@@ -242,7 +241,7 @@ final class Currencies extends ResourceBundle
      * @param ?bool              $active      Indicates whether the currency should always be active for the given $date; null to not filter anything
      * @param \DateTimeInterface $date        the date on which the check will be performed if $active is set to true
      */
-    public static function isValidInAnyCountry(string $currency, ?bool $legalTender = true, ?bool $active = true, \DateTimeInterface $date = new \DateTimeImmutable('today', new \DateTimeZone('Etc/UTC'))): bool
+    public static function isValidInAnyCountry(string $currency, ?bool $legalTender = true, ?bool $active = true, \DateTimeInterface $date = new \DateTimeImmutable('today', new \DateTimeZone('Etc/UTC')), bool $includeUndated = true): bool
     {
         if (!self::exists($currency)) {
             throw new \InvalidArgumentException("The currency $currency does not exist.");
@@ -262,7 +261,7 @@ final class Currencies extends ResourceBundle
                     return true;
                 }
 
-                if (self::isDateActive($countryCode, $currencyCode, $currencyMetadata, $date) !== $active) {
+                if (self::isDateActive($currencyMetadata, $date, $includeUndated) !== $active) {
                     continue;
                 }
 

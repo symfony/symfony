@@ -99,14 +99,14 @@ final class StringTypeResolver implements TypeResolverInterface
 
     private function getTypeFromNode(TypeNode $node, ?TypeContext $typeContext): Type
     {
-        $typeIsCollectionObject = fn (Type $type): bool => $type->isIdentifiedBy(\Traversable::class) || $type->isIdentifiedBy(\ArrayAccess::class);
+        $typeIsCollectionObject = static fn (Type $type): bool => $type->isIdentifiedBy(\Traversable::class) || $type->isIdentifiedBy(\ArrayAccess::class);
 
         if ($node instanceof CallableTypeNode) {
             return Type::callable();
         }
 
         if ($node instanceof ArrayTypeNode) {
-            return Type::list($this->getTypeFromNode($node->type, $typeContext));
+            return Type::array($this->getTypeFromNode($node->type, $typeContext));
         }
 
         if ($node instanceof ArrayShapeNode) {
@@ -127,7 +127,15 @@ final class StringTypeResolver implements TypeResolverInterface
         }
 
         if ($node instanceof ObjectShapeNode) {
-            return Type::object();
+            $shape = [];
+            foreach ($node->items as $item) {
+                $shape[(string) $item->keyName] = [
+                    'type' => $this->getTypeFromNode($item->valueType, $typeContext),
+                    'optional' => $item->optional,
+                ];
+            }
+
+            return $shape ? Type::objectShape($shape) : Type::object();
         }
 
         if ($node instanceof ThisTypeNode) {
@@ -269,6 +277,10 @@ final class StringTypeResolver implements TypeResolverInterface
                 if (1 === \count($variableTypes)) {
                     return new CollectionType(Type::generic($type, $keyType, $variableTypes[0]), $asList);
                 } elseif (2 === \count($variableTypes)) {
+                    if ($asList) {
+                        throw new \DomainException(\sprintf('"%s" type cannot have a key type defined.', $node->type));
+                    }
+
                     return Type::collection($type, $variableTypes[1], $variableTypes[0], $asList);
                 }
             }

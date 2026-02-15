@@ -11,11 +11,9 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Url;
-use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
@@ -29,24 +27,6 @@ class UrlTest extends TestCase
         $url = new Url(normalizer: 'trim', requireTld: true);
 
         $this->assertEquals('trim', $url->normalizer);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInvalidNormalizerThrowsException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
-        new Url(['normalizer' => 'Unknown Callable', 'requireTld' => true]);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInvalidNormalizerObjectThrowsException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
-        new Url(['normalizer' => new \stdClass(), 'requireTld' => true]);
     }
 
     public function testAttributes()
@@ -80,13 +60,13 @@ class UrlTest extends TestCase
         self::assertTrue($dConstraint->requireTld);
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testRequireTldDefaultsToFalse()
+    #[TestWith(['*'])]
+    #[TestWith(['http'])]
+    public function testProtocolsAsString(string $protocol)
     {
-        $constraint = new Url();
+        $constraint = new Url(protocols: $protocol, requireTld: true);
 
-        $this->assertFalse($constraint->requireTld);
+        $this->assertSame([$protocol], $constraint->protocols);
     }
 }
 

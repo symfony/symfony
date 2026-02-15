@@ -978,6 +978,26 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals($expected, $encoder->encode($data, 'xml'));
     }
 
+    public function testEncodeNan()
+    {
+        $value = \NAN;
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response>NAN</response>'."\n";
+
+        $this->assertEquals($expected, $this->encoder->encode($value, 'xml'));
+    }
+
+    public function testEncodeInfinite()
+    {
+        $value = \INF;
+
+        $expected = '<?xml version="1.0"?>'."\n".
+            '<response>INF</response>'."\n";
+
+        $this->assertEquals($expected, $this->encoder->encode($value, 'xml'));
+    }
+
     private function createXmlEncoderWithEnvelopeNormalizer(): XmlEncoder
     {
         $normalizers = [
@@ -1088,12 +1108,24 @@ class XmlEncoderTest extends TestCase
             </response>
             XML;
         $expected = ['person' => [
-            ['@key' => 0, 'firstname' => 'Benjamin', 'lastname' => 'Alexandre', ],
-            ['@key' => 1, 'firstname' => 'Damien', 'lastname' => 'Clay', ],
+            ['@key' => 0, 'firstname' => 'Benjamin', 'lastname' => 'Alexandre'],
+            ['@key' => 1, 'firstname' => 'Damien', 'lastname' => 'Clay'],
         ]];
 
         $this->assertSame($expected, $this->encoder->decode($source, 'xml', [
             XmlEncoder::PRESERVE_NUMERIC_KEYS => true,
         ]));
+    }
+
+    public function testEncodeEmptyArrayWithoutPreservingKeys()
+    {
+        $source = ['person' => []];
+        $expected = <<<'XML'
+            <?xml version="1.0"?>
+            <response><person/></response>
+
+            XML;
+
+        $this->assertSame($expected, $this->encoder->encode($source, 'xml'));
     }
 }

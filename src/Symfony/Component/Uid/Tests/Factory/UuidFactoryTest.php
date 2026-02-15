@@ -21,6 +21,7 @@ use Symfony\Component\Uid\UuidV3;
 use Symfony\Component\Uid\UuidV4;
 use Symfony\Component\Uid\UuidV5;
 use Symfony\Component\Uid\UuidV6;
+use Symfony\Component\Uid\UuidV7;
 
 final class UuidFactoryTest extends TestCase
 {
@@ -51,7 +52,7 @@ final class UuidFactoryTest extends TestCase
 
     public function testCreateTimedDefaultVersion()
     {
-        $this->assertInstanceOf(UuidV6::class, (new UuidFactory())->timeBased()->create());
+        $this->assertInstanceOf(UuidV7::class, (new UuidFactory())->timeBased()->create());
         $this->assertInstanceOf(UuidV1::class, (new UuidFactory(6, 1))->timeBased()->create());
     }
 
@@ -83,7 +84,7 @@ final class UuidFactoryTest extends TestCase
     public function testInvalidCreateTimed()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The given UUID date cannot be earlier than 1582-10-15.');
+        $this->expectExceptionMessage('The timestamp must be positive.');
 
         (new UuidFactory())->timeBased()->create(new \DateTimeImmutable('@-12219292800.001000'));
     }

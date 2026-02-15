@@ -50,7 +50,7 @@ class MongoDbStoreTest extends AbstractStoreTestCase
 
     private static function getMongoManager(): Manager
     {
-        return new Manager('mongodb://'.getenv('MONGODB_HOST'));
+        return new Manager(getenv('MONGODB_URI'));
     }
 
     protected function getClockDelay(): int

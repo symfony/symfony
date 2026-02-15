@@ -319,8 +319,7 @@ class Response
         if (headers_sent()) {
             if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true)) {
                 $statusCode ??= $this->statusCode;
-                trigger_deprecation('symfony/http-foundation', '7.4', 'Trying to use "%s::sendHeaders()" after headers have already been sent is deprecated and will throw a PHP warning in 8.0. Use a "StreamedResponse" instead.', static::class);
-                // header(\sprintf('HTTP/%s %s %s', $this->version, $statusCode, $this->statusText), true, $statusCode);
+                header(\sprintf('HTTP/%s %s %s', $this->version, $statusCode, $this->statusText), true, $statusCode);
             }
 
             return $this;

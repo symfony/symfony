@@ -634,6 +634,10 @@ return [
             'EC$',
             'Dọ́là Ilà Oòrùn Karíbíà',
         ],
+        'XCG' => [
+            'Cg.',
+            'Owó ìlú Kùrásọ̀ àti Saint Mátìnì',
+        ],
         'XOF' => [
             'F CFA',
             'Faransì ìwọ̀-oorùn Afíríkà',
@@ -661,6 +665,10 @@ return [
         'ZWD' => [
             'ZWD',
             'Dọla ti Orílẹ́ède Siibabuwe',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'Owó ìlú Sìnbábúwè',
         ],
     ],
 ];

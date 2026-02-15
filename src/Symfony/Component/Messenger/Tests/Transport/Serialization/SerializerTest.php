@@ -16,11 +16,14 @@ use PHPUnit\Framework\Constraint\Constraint;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
+use Symfony\Component\Messenger\Stamp\DeduplicateStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 use Symfony\Component\Messenger\Stamp\SerializedMessageStamp;
 use Symfony\Component\Messenger\Stamp\SerializerStamp;
 use Symfony\Component\Messenger\Stamp\ValidationStamp;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithInterfaceWithSerializedTypeName;
+use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageWithSerializedTypeName;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface as SerializerComponentInterface;
@@ -44,6 +47,7 @@ class SerializerTest extends TestCase
         $envelope = (new Envelope(new DummyMessage('Hello')))
             ->with(new SerializerStamp([ObjectNormalizer::GROUPS => ['foo']]))
             ->with(new ValidationStamp(['foo', 'bar']))
+            ->with(new DeduplicateStamp('someKey', 42, true))
             ->with(new SerializedMessageStamp('{"message":"Hello"}'))
         ;
 
@@ -262,6 +266,106 @@ class SerializerTest extends TestCase
                 'X-Message-Stamp-'.SerializerStamp::class => '[{}]',
             ],
         ]);
+    }
+
+    public function testEncodeUsesTypeToClassMapForType()
+    {
+        $serializer = new Serializer(typeToClassMap: ['custom.type' => DummyMessage::class]);
+
+        $encoded = $serializer->encode(new Envelope(new DummyMessage('Hello')));
+
+        $this->assertSame('custom.type', $encoded['headers']['type']);
+    }
+
+    public function testDecodeUsesTypeToClassMapForDeserialization()
+    {
+        $serializer = new Serializer(typeToClassMap: ['custom.type' => DummyMessage::class]);
+
+        $decodedEnvelope = $serializer->decode([
+            'body' => '{"message":"Hello"}',
+            'headers' => ['type' => 'custom.type'],
+        ]);
+
+        $this->assertInstanceOf(DummyMessage::class, $decodedEnvelope->getMessage());
+        $this->assertSame('Hello', $decodedEnvelope->getMessage()->getMessage());
+    }
+
+    public function testEncodeDecodeWithTypeToClassMap()
+    {
+        $serializer = new Serializer(typeToClassMap: ['custom.type' => DummyMessage::class]);
+
+        $envelope = new Envelope(new DummyMessage('Hello'));
+        $encoded = $serializer->encode($envelope);
+
+        $this->assertSame('custom.type', $encoded['headers']['type']);
+
+        $decodedEnvelope = $serializer->decode($encoded);
+
+        $this->assertEquals(new DummyMessage('Hello'), $decodedEnvelope->getMessage());
+    }
+
+    public function testEncodeFallsBackToFqcnWhenNotInMap()
+    {
+        $serializer = new Serializer(typeToClassMap: ['other.type' => 'SomeOtherClass']);
+
+        $encoded = $serializer->encode(new Envelope(new DummyMessage('Hello')));
+
+        $this->assertSame(DummyMessage::class, $encoded['headers']['type']);
+    }
+
+    public function testDecodeFallsBackToHeaderTypeWhenNotInMap()
+    {
+        $serializer = new Serializer(typeToClassMap: ['other.type' => 'SomeOtherClass']);
+
+        $decodedEnvelope = $serializer->decode([
+            'body' => '{"message":"Hello"}',
+            'headers' => ['type' => DummyMessage::class],
+        ]);
+
+        $this->assertInstanceOf(DummyMessage::class, $decodedEnvelope->getMessage());
+    }
+
+    public function testEncodeUsesSerializedTypeNameFromAttribute()
+    {
+        $serializer = new Serializer();
+
+        $encoded = $serializer->encode(new Envelope(new DummyMessageWithSerializedTypeName('Hello')));
+
+        $this->assertSame('dummy.message', $encoded['headers']['type']);
+    }
+
+    public function testEncodeUsesSerializedTypeNameFromInterfaceAttribute()
+    {
+        $serializer = new Serializer();
+
+        $encoded = $serializer->encode(new Envelope(new DummyMessageWithInterfaceWithSerializedTypeName('Hello')));
+
+        $this->assertSame('dummy.interface.message', $encoded['headers']['type']);
+    }
+
+    public function testTypeToClassMapTakesPrecedenceOverAttribute()
+    {
+        $serializer = new Serializer(typeToClassMap: ['map.type' => DummyMessageWithSerializedTypeName::class]);
+
+        $encoded = $serializer->encode(new Envelope(new DummyMessageWithSerializedTypeName('Hello')));
+
+        $this->assertSame('map.type', $encoded['headers']['type']);
+    }
+
+    public function testEncodedWithAttributeIsDecodableWithMap()
+    {
+        // Encode with attribute detection (no map)
+        $encoderSerializer = new Serializer();
+        $encoded = $encoderSerializer->encode(new Envelope(new DummyMessageWithSerializedTypeName('Hello')));
+
+        $this->assertSame('dummy.message', $encoded['headers']['type']);
+
+        // Decode with map
+        $decoderSerializer = new Serializer(typeToClassMap: ['dummy.message' => DummyMessageWithSerializedTypeName::class]);
+        $decodedEnvelope = $decoderSerializer->decode($encoded);
+
+        $this->assertInstanceOf(DummyMessageWithSerializedTypeName::class, $decodedEnvelope->getMessage());
+        $this->assertSame('Hello', $decodedEnvelope->getMessage()->getMessage());
     }
 }
 class DummySymfonySerializerNonSendableStamp implements NonSendableStampInterface

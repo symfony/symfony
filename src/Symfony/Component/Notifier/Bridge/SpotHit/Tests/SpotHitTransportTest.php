@@ -96,7 +96,7 @@ final class SpotHitTransportTest extends TransportTestCase
     public function testShouldForwardArgumentToRequest($setupTransport, $assertions)
     {
         $expectedRequest = [
-            function ($method, $url, $options) use ($assertions) {
+            static function ($method, $url, $options) use ($assertions) {
                 $bodyFields = [];
                 parse_str($options['body'], $bodyFields);
                 $assertions($bodyFields);

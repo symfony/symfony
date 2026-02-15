@@ -40,8 +40,7 @@ class CollectionType extends Type implements WrappingTypeInterface
 
         if ($this->isList()) {
             if (!$type->isIdentifiedBy(TypeIdentifier::ARRAY)) {
-                trigger_deprecation('symfony/type-info', '7.3', 'Creating a "%s" that is a list and not an array is deprecated and will throw a "%s" in 8.0.', self::class, InvalidArgumentException::class);
-                // throw new InvalidArgumentException(\sprintf('Cannot create a "%s" as list when type is not "array".', self::class));
+                throw new InvalidArgumentException(\sprintf('Cannot create a "%s" as list when type is not "array".', self::class));
             }
 
             $keyType = $this->getCollectionKeyType();
@@ -49,7 +48,36 @@ class CollectionType extends Type implements WrappingTypeInterface
             if (!$keyType instanceof BuiltinType || TypeIdentifier::INT !== $keyType->getTypeIdentifier()) {
                 throw new InvalidArgumentException(\sprintf('"%s" is not a valid list key type.', (string) $keyType));
             }
+        } elseif ($type instanceof GenericType && $type->getWrappedType() instanceof BuiltinType && TypeIdentifier::ARRAY === $type->getWrappedType()->getTypeIdentifier()) {
+            $keyType = $this->getCollectionKeyType();
+
+            $this->assertValidArrayKeyType($keyType);
         }
+    }
+
+    private function assertValidArrayKeyType(Type $keyType, ?Type $rootType = null): void
+    {
+        $rootType ??= $keyType;
+
+        if ($keyType instanceof UnionType) {
+            foreach ($keyType->getTypes() as $type) {
+                $this->assertValidArrayKeyType($type, $rootType);
+            }
+
+            return;
+        }
+
+        if ($keyType instanceof TemplateType) {
+            $this->assertValidArrayKeyType($keyType->getBound(), $rootType);
+
+            return;
+        }
+
+        if ($keyType instanceof BuiltinType && \in_array($keyType->getTypeIdentifier(), [TypeIdentifier::INT, TypeIdentifier::STRING], true)) {
+            return;
+        }
+
+        throw new InvalidArgumentException(\sprintf('"%s" is not a valid array key type.', (string) $rootType));
     }
 
     /**

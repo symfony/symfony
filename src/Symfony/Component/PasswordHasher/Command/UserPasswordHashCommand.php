@@ -172,7 +172,7 @@ class UserPasswordHashCommand extends Command
     {
         $passwordQuestion = new Question('Type in your password to be hashed');
 
-        return $passwordQuestion->setValidator(function ($value) {
+        return $passwordQuestion->setValidator(static function ($value) {
             if ('' === trim($value)) {
                 throw new InvalidArgumentException('The password must not be empty.');
             }

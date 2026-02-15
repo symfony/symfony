@@ -97,7 +97,7 @@ class AssetMapperRepository
      *
      * Key is the logical path, value is the absolute path.
      *
-     * @return string[]
+     * @return array<string, string>
      */
     public function all(): array
     {

@@ -47,39 +47,28 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
         $builder
             ->scalarNode('realm')->defaultNull()->end()
             ->arrayNode('token_extractors', 'token_extractor')
-                ->beforeNormalization()
-                    ->ifString()
-                    ->then(fn ($v) => [$v])
-                ->end()
+                ->acceptAndWrap(['string'])
                 ->cannotBeEmpty()
-                ->defaultValue([
-                    'security.access_token_extractor.header',
-                ])
+                ->defaultValue(['security.access_token_extractor.header'])
                 ->scalarPrototype()->end()
             ->end()
         ;
 
         $tokenHandlerNodeBuilder = $builder
             ->arrayNode('token_handler')
-                ->example([
-                    'id' => 'App\Security\CustomTokenHandler',
-                ])
+                ->example(['id' => 'App\Security\CustomTokenHandler'])
+                ->acceptAndWrap(['string'], 'id')
 
-                ->beforeNormalization()
-                    ->ifString()
-                    ->then(fn ($v) => ['id' => $v])
-                ->end()
-
-                ->beforeNormalization()
-                    ->ifTrue(fn ($v) => \is_array($v) && 1 < \count($v))
-                    ->then(fn () => throw new InvalidConfigurationException('You cannot configure multiple token handlers.'))
+                ->validate()
+                    ->ifTrue(static fn ($v) => \is_array($v) && 1 < \count($v))
+                    ->then(static fn () => throw new InvalidConfigurationException('You cannot configure multiple token handlers.'))
                 ->end()
 
                 // "isRequired" must be set otherwise the following custom validation is not called
                 ->isRequired()
-                ->beforeNormalization()
-                    ->ifTrue(fn ($v) => \is_array($v) && !$v)
-                    ->then(fn () => throw new InvalidConfigurationException('You must set a token handler.'))
+                ->validate()
+                    ->ifTrue(static fn ($v) => \is_array($v) && !$v)
+                    ->then(static fn () => throw new InvalidConfigurationException('You must set a token handler.'))
                 ->end()
 
                 ->children()
@@ -133,7 +122,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
             'request_body' => 'security.access_token_extractor.request_body',
             'header' => 'security.access_token_extractor.header',
         ];
-        $extractors = array_map(fn ($extractor) => $aliases[$extractor] ?? $extractor, $extractors);
+        $extractors = array_map(static fn ($extractor) => $aliases[$extractor] ?? $extractor, $extractors);
 
         if (1 === \count($extractors)) {
             return current($extractors);
@@ -141,7 +130,7 @@ final class AccessTokenFactory extends AbstractFactory implements StatelessAuthe
         $extractorId = \sprintf('security.authenticator.access_token.chain_extractor.%s', $firewallName);
         $container
             ->setDefinition($extractorId, new ChildDefinition('security.authenticator.access_token.chain_extractor'))
-            ->replaceArgument(0, array_map(fn (string $extractorId): Reference => new Reference($extractorId), $extractors))
+            ->replaceArgument(0, array_map(static fn (string $extractorId): Reference => new Reference($extractorId), $extractors))
         ;
 
         return $extractorId;

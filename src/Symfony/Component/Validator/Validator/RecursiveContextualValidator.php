@@ -60,6 +60,7 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         private ConstraintValidatorFactoryInterface $validatorFactory,
         private array $objectInitializers = [],
         private ?ContainerInterface $groupProviderLocator = null,
+        private bool $propertyMetadataExistenceCheck = false,
     ) {
         $this->defaultPropertyPath = $context->getPropertyPath();
         $this->defaultGroups = [$context->getGroup() ?: Constraint::DEFAULT_GROUP];
@@ -166,6 +167,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         }
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
+
+        if ($this->propertyMetadataExistenceCheck && !$propertyMetadatas) {
+            throw new ValidatorException(\sprintf('The property "%s" does not exist in class "%s".', $propertyName, $classMetadata->getClassName()));
+        }
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
         $cacheKey = $this->generateCacheKey($object);
         $propertyPath = PropertyPath::append($this->defaultPropertyPath, $propertyName);
@@ -207,6 +212,10 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
         }
 
         $propertyMetadatas = $classMetadata->getPropertyMetadata($propertyName);
+
+        if ($this->propertyMetadataExistenceCheck && !$propertyMetadatas) {
+            throw new ValidatorException(\sprintf('The property "%s" does not exist in class "%s".', $propertyName, $classMetadata->getClassName()));
+        }
         $groups = $groups ? $this->normalizeGroups($groups) : $this->defaultGroups;
 
         if (\is_object($objectOrClass)) {

@@ -147,7 +147,7 @@ abstract class AbstractRedisSessionHandlerTestCase extends TestCase
 
         $options = [
             'prefix' => self::PREFIX,
-            'ttl' => fn () => $ttl,
+            'ttl' => static fn () => $ttl,
         ];
 
         $handler = new RedisSessionHandler($this->redisClient, $options);

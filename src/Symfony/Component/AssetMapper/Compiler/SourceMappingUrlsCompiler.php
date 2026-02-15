@@ -18,11 +18,11 @@ use Symfony\Component\Filesystem\Path;
 /**
  * Rewrites already-existing source map URLs to their final digested path.
  *
- * Originally sourced from https://github.com/rails/propshaft/blob/main/lib/propshaft/compilers/source_mapping_urls.rb
+ * Originally sourced from https://github.com/rails/propshaft/blob/main/lib/propshaft/compiler/source_mapping_urls.rb
  */
 final class SourceMappingUrlsCompiler implements AssetCompilerInterface
 {
-    private const SOURCE_MAPPING_PATTERN = '/^(\/\/|\/\*)# sourceMappingURL=(.+\.map)/m';
+    private const SOURCE_MAPPING_PATTERN = '{^(//|/\*)# sourceMappingURL=(.+\.map)}m';
 
     public function supports(MappedAsset $asset): bool
     {
@@ -31,7 +31,7 @@ final class SourceMappingUrlsCompiler implements AssetCompilerInterface
 
     public function compile(string $content, MappedAsset $asset, AssetMapperInterface $assetMapper): string
     {
-        return preg_replace_callback(self::SOURCE_MAPPING_PATTERN, function ($matches) use ($asset, $assetMapper) {
+        return preg_replace_callback(self::SOURCE_MAPPING_PATTERN, static function ($matches) use ($asset, $assetMapper) {
             $resolvedPath = Path::join(\dirname($asset->sourcePath), $matches[2]);
 
             $dependentAsset = $assetMapper->getAssetFromSourcePath($resolvedPath);

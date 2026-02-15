@@ -60,8 +60,7 @@ class DoctrineIntegrationTest extends TestCase
             ->where('m.body = :body')
             ->setParameter('body', '{"message": "Hi i am delayed"}');
 
-        // DBAL 2 compatibility
-        $result = method_exists($qb, 'executeQuery') ? $qb->executeQuery() : $qb->execute();
+        $result = $qb->executeQuery();
 
         $availableAt = new \DateTimeImmutable($result->fetchOne(), new \DateTimeZone('UTC'));
 
@@ -79,8 +78,7 @@ class DoctrineIntegrationTest extends TestCase
             ->where('m.body = :body')
             ->setParameter('body', '{"message": "Hi, I am not actually delayed"}');
 
-        // DBAL 2 compatibility
-        $result = method_exists($qb, 'executeQuery') ? $qb->executeQuery() : $qb->execute();
+        $result = $qb->executeQuery();
 
         $availableAt = new \DateTimeImmutable($result->fetchOne(), new \DateTimeZone('UTC'));
 

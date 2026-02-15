@@ -1,6 +1,38 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Improve `NotNormalizableValueException` exception messages in `BackedEnumNormalizer` to contain more useful information
+ * Trigger a deprecation when a date could not be parsed using the default format
+
+8.0
+---
+
+ * Remove `CsvEncoder::ESCAPE_CHAR_KEY` constant and escape character functionality
+ * Remove `CsvEncoderContextBuilder::withEscapeChar()` method
+ * Remove `AbstractNormalizerContextBuilder::withDefaultContructorArguments()`, use `withDefaultConstructorArguments()` instead
+ * Change signature of `NameConverterInterface::normalize()` and `NameConverterInterface::denormalize()` methods:
+
+   Before:
+
+   ```php
+   public function normalize(string $propertyName): string;
+   public function denormalize(string $propertyName): string;
+   ```
+
+   After:
+
+   ```php
+   public function normalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string;
+   public function denormalize(string $propertyName, ?string $class = null, ?string $format = null, array $context = []): string;
+   ```
+ * Remove `AdvancedNameConverterInterface`, use `NameConverterInterface` instead
+ * Remove `ClassMetadataFactoryCompiler`, `CompiledClassMetadataFactory` and `CompiledClassMetadataCacheWarmer`
+ * Remove class aliases in the `Annotation` namespace, use attributes instead
+ * Remove getters in attribute classes in favor of public properties
+
 7.4
 ---
 
@@ -13,6 +45,7 @@ CHANGELOG
  * Deprecate class aliases in the `Annotation` namespace, use attributes instead
  * Deprecate getters in attribute classes in favor of public properties
  * Deprecate `ClassMetadataFactoryCompiler`
+ * Add `FORCE_TIMEZONE_KEY` to `DateTimeNormalizer` to force the timezone during denormalization
 
 7.3
 ---

@@ -177,7 +177,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $container->register('baz', TestDefinition2::class)->addTag('test_tag');
 
         $container->register('foo', ServiceLocator::class)
-            ->setArguments([new TaggedIteratorArgument('test_tag', null, null, true)])
+            ->setArguments([new TaggedIteratorArgument('test_tag', null, true)])
             ->addTag('container.service_locator')
         ;
 
@@ -198,7 +198,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $container->register('baz', TestDefinition2::class)->addTag('test_tag', ['index' => 1]);
 
         $container->register('foo', ServiceLocator::class)
-            ->setArguments([new TaggedIteratorArgument('test_tag', 'index', null, true)])
+            ->setArguments([new TaggedIteratorArgument('test_tag', 'index', true)])
             ->addTag('container.service_locator')
         ;
 
@@ -217,7 +217,7 @@ class ServiceLocatorTagPassTest extends TestCase
 
         $locator = new Definition(Locator::class);
         $locator->setPublic(true);
-        $locator->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('test_tag', null, null, true)));
+        $locator->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('test_tag', null, true)));
 
         $container->setDefinition(Locator::class, $locator);
 

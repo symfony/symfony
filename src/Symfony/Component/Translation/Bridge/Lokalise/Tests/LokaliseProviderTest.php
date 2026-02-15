@@ -12,6 +12,7 @@
 namespace Symfony\Component\Translation\Bridge\Lokalise\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -651,8 +652,8 @@ class LokaliseProviderTest extends ProviderTestCase
         $consecutiveLoadArguments = [];
         $consecutiveLoadReturns = [];
         $response = new JsonMockResponse([
-            'files' => array_reduce($locales, function ($carry, $locale) use ($domains, $responseContents, &$consecutiveLoadArguments, &$consecutiveLoadReturns) {
-                $carry[$locale] = array_reduce($domains, function ($carry, $domain) use ($locale, $responseContents, &$consecutiveLoadArguments, &$consecutiveLoadReturns) {
+            'files' => array_reduce($locales, static function ($carry, $locale) use ($domains, $responseContents, &$consecutiveLoadArguments, &$consecutiveLoadReturns) {
+                $carry[$locale] = array_reduce($domains, static function ($carry, $domain) use ($locale, $responseContents, &$consecutiveLoadArguments, &$consecutiveLoadReturns) {
                     $carry[$domain.'.xliff'] = [
                         'content' => $responseContents[$locale][$domain],
                     ];
@@ -667,7 +668,7 @@ class LokaliseProviderTest extends ProviderTestCase
             }, []),
         ]);
 
-        $loader = $this->getLoader();
+        $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->exactly(\count($consecutiveLoadArguments)))
             ->method('load')
             ->willReturnCallback(function (...$args) use (&$consecutiveLoadArguments, &$consecutiveLoadReturns) {
@@ -692,6 +693,84 @@ class LokaliseProviderTest extends ProviderTestCase
                 $this->assertEquals($expectedTranslatorBag->getCatalogue($locale)->all($domain), $translatorBag->getCatalogue($locale)->all($domain));
             }
         }
+    }
+
+    #[RequiresPhpExtension('zip')]
+    public function testReadWithExportAsync()
+    {
+        $zipLocation = __DIR__.\DIRECTORY_SEPARATOR.'Fixtures'.\DIRECTORY_SEPARATOR.'Symfony-locale.zip';
+        $firstResponse = static fn (): ResponseInterface => new JsonMockResponse(
+            ['error' => ['code' => 413, 'message' => 'test']],
+            ['http_code' => 406],
+        );
+        $secondResponse = static fn (): ResponseInterface => new JsonMockResponse(
+            ['process_id' => 123],
+        );
+        $thirdResponse = static fn (): ResponseInterface => new JsonMockResponse(
+            ['process' => ['status' => 'finished', 'details' => ['download_url' => 'https://api.lokalise.com/Symfony-locale.zip']]],
+        );
+        $fourResponse = function (string $method, string $url, array $options = []) use ($zipLocation): ResponseInterface {
+            $this->assertSame('GET', $method);
+            $this->assertSame('https://api.lokalise.com/Symfony-locale.zip', $url);
+            $this->assertFalse($options['buffer']);
+
+            return new MockResponse(file_get_contents($zipLocation));
+        };
+
+        $provider = self::createProvider((new MockHttpClient([$firstResponse, $secondResponse, $thirdResponse, $fourResponse]))->withOptions([
+            'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
+            'headers' => ['X-Api-Token' => 'API_KEY'],
+        ]), new XliffFileLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+        $translatorBag = $provider->read(['foo'], ['baz']);
+
+        // We don't want to assert equality of metadata here, due to the ArrayLoader usage.
+        /** @var MessageCatalogue $catalogue */
+        foreach ($translatorBag->getCatalogues() as $catalogue) {
+            $catalogue->deleteMetadata('', '');
+        }
+
+        $arrayLoader = new ArrayLoader();
+        $expectedTranslatorBag = new TranslatorBag();
+        $expectedTranslatorBag->addCatalogue($arrayLoader->load(
+            [
+                'how are you' => 'How are you?',
+                'welcome_header' => 'Hello world!',
+            ],
+            'en',
+            'no_filename'
+        ));
+        $expectedTranslatorBag->addCatalogue($arrayLoader->load(
+            [
+                'how are you' => 'Como estas?',
+                'welcome_header' => 'Hola mundo!',
+            ],
+            'es',
+            'no_filename'
+        ));
+        $this->assertEquals($expectedTranslatorBag->getCatalogues(), $translatorBag->getCatalogues());
+    }
+
+    #[RequiresPhpExtension('zip')]
+    public function testReadWithExportAsyncFailedProcess()
+    {
+        $firstResponse = static fn (): ResponseInterface => new JsonMockResponse(
+            ['error' => ['code' => 413, 'message' => 'test']],
+            ['http_code' => 406],
+        );
+        $secondResponse = static fn (): ResponseInterface => new JsonMockResponse(
+            ['process_id' => 123],
+        );
+        $thirdResponse = static fn (): ResponseInterface => new JsonMockResponse(
+            ['process' => ['status' => 'failed']],
+        );
+
+        $provider = self::createProvider((new MockHttpClient([$firstResponse, $secondResponse, $thirdResponse]))->withOptions([
+            'base_uri' => 'https://api.lokalise.com/api2/projects/PROJECT_ID/',
+            'headers' => ['X-Api-Token' => 'API_KEY'],
+        ]), new XliffFileLoader(), $this->getLogger(), $this->getDefaultLocale(), 'api.lokalise.com');
+
+        $this->expectException(ProviderException::class);
+        $provider->read(['foo'], ['baz']);
     }
 
     public function testDeleteProcess()

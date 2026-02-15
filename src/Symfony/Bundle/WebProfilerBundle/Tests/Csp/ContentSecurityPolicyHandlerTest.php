@@ -208,9 +208,9 @@ class ContentSecurityPolicyHandlerTest extends TestCase
 
     private function mockNonceGenerator($value)
     {
-        $generator = $this->createMock(NonceGenerator::class);
+        $generator = $this->createStub(NonceGenerator::class);
 
-        $generator->expects($this->any())
+        $generator
             ->method('generate')
             ->willReturn($value);
 

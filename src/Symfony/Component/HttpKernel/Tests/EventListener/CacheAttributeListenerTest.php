@@ -13,7 +13,7 @@ namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\TestWith;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -221,6 +221,8 @@ class CacheAttributeListenerTest extends TestCase
 
     #[TestWith(['test.getDate()'])]
     #[TestWith(['date'])]
+    #[TestWith(['args["test"].getDate()'])]
+    #[TestWith(['request.attributes.get("date")'])]
     public function testLastModifiedNotModifiedResponse(string $expression)
     {
         $entity = new TestEntity();
@@ -230,7 +232,7 @@ class CacheAttributeListenerTest extends TestCase
         $request->headers->add(['If-Modified-Since' => 'Fri, 23 Aug 2013 00:00:00 GMT']);
 
         $listener = new CacheAttributeListener();
-        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), fn (TestEntity $test) => new Response(), [$entity], $request, null);
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), static fn (TestEntity $test) => new Response(), [$entity], $request, null);
 
         $listener->onKernelControllerArguments($controllerArgumentsEvent);
         $response = $controllerArgumentsEvent->getController()($entity);
@@ -240,6 +242,8 @@ class CacheAttributeListenerTest extends TestCase
 
     #[TestWith(['test.getDate()'])]
     #[TestWith(['date'])]
+    #[TestWith(['args["test"].getDate()'])]
+    #[TestWith(['request.attributes.get("date")'])]
     public function testLastModifiedHeader(string $expression)
     {
         $entity = new TestEntity();
@@ -248,7 +252,7 @@ class CacheAttributeListenerTest extends TestCase
         $request->attributes->set('date', new \DateTimeImmutable('Fri, 23 Aug 2013 00:00:00 GMT'));
 
         $listener = new CacheAttributeListener();
-        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), fn (TestEntity $test) => new Response(), [$entity], $request, null);
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), static fn (TestEntity $test) => new Response(), [$entity], $request, null);
         $listener->onKernelControllerArguments($controllerArgumentsEvent);
 
         $controllerResponse = $controllerArgumentsEvent->getController()($entity);
@@ -264,6 +268,8 @@ class CacheAttributeListenerTest extends TestCase
 
     #[TestWith(['test.getId()'])]
     #[TestWith(['id'])]
+    #[TestWith(['args["test"].getId()'])]
+    #[TestWith(['request.attributes.get("id")'])]
     public function testEtagNotModifiedResponse(string $expression)
     {
         $entity = new TestEntity();
@@ -273,7 +279,7 @@ class CacheAttributeListenerTest extends TestCase
         $request->headers->add(['If-None-Match' => \sprintf('"%s"', hash('sha256', $entity->getId()))]);
 
         $listener = new CacheAttributeListener();
-        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), fn (TestEntity $test) => new Response(), [$entity], $request, null);
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), static fn (TestEntity $test) => new Response(), [$entity], $request, null);
 
         $listener->onKernelControllerArguments($controllerArgumentsEvent);
         $response = $controllerArgumentsEvent->getController()($entity);
@@ -283,6 +289,8 @@ class CacheAttributeListenerTest extends TestCase
 
     #[TestWith(['test.getId()'])]
     #[TestWith(['id'])]
+    #[TestWith(['args["test"].getId()'])]
+    #[TestWith(['request.attributes.get("id")'])]
     public function testEtagHeader(string $expression)
     {
         $entity = new TestEntity();
@@ -291,7 +299,7 @@ class CacheAttributeListenerTest extends TestCase
         $request->attributes->set('id', '12345');
 
         $listener = new CacheAttributeListener();
-        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), fn (TestEntity $test) => new Response(), [$entity], $request, null);
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), static fn (TestEntity $test) => new Response(), [$entity], $request, null);
         $listener->onKernelControllerArguments($controllerArgumentsEvent);
 
         $controllerResponse = $controllerArgumentsEvent->getController()($entity);
@@ -303,6 +311,45 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertTrue($response->headers->has('Etag'));
         $this->assertStringContainsString(hash('sha256', $entity->getId()), $response->headers->get('Etag'));
+    }
+
+    #[DataProvider('provideLastModifiedHeaderAndEtagClosureCases')]
+    public function testLastModifiedHeaderAndEtagHeadersClosures(\Closure $lastModifiedClosure, \Closure $etagClosure)
+    {
+        $entity = new TestEntity();
+
+        $request = $this->createRequest(new Cache(lastModified: $lastModifiedClosure, etag: $etagClosure));
+        $request->attributes->set('date', new \DateTimeImmutable('Fri, 23 Aug 2013 00:00:00 GMT'));
+        $request->attributes->set('id', '12345');
+
+        $listener = new CacheAttributeListener();
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), static fn (TestEntity $test) => new Response(), [$entity], $request, null);
+        $listener->onKernelControllerArguments($controllerArgumentsEvent);
+
+        $controllerResponse = $controllerArgumentsEvent->getController()($entity);
+        $responseEvent = new ResponseEvent($this->getKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $controllerResponse);
+        $listener->onKernelResponse($responseEvent);
+
+        $response = $responseEvent->getResponse();
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertTrue($response->headers->has('Last-Modified'));
+        $this->assertSame('Fri, 23 Aug 2013 00:00:00 GMT', $response->headers->get('Last-Modified'));
+        $this->assertTrue($response->headers->has('Etag'));
+        $this->assertStringContainsString(hash('sha256', $entity->getId()), $response->headers->get('Etag'));
+    }
+
+    public static function provideLastModifiedHeaderAndEtagClosureCases(): iterable
+    {
+        yield 'using arguments' => [
+            static fn (array $arguments, Request $request) => $arguments['test']->getDate(),
+            static fn (array $arguments, Request $request) => $arguments['test']->getId(),
+        ];
+
+        yield 'using request attributes' => [
+            static fn (array $arguments, Request $request) => $request->attributes->get('date'),
+            static fn (array $arguments, Request $request) => $request->attributes->get('id'),
+        ];
     }
 
     public function testConfigurationDoesNotOverrideAlreadySetResponseHeaders()
@@ -375,6 +422,30 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame($expectedVary, $response->getVary());
     }
 
+    public function testAttributeRespectsExplicitPrivateFromController()
+    {
+        $request = $this->createRequest(new Cache(public: true));
+        $response = new Response();
+        $response->setPrivate();
+
+        $this->listener->onKernelResponse($this->createEventMock($request, $response));
+
+        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
+    }
+
+    public function testAttributeRespectsExplicitPublicFromController()
+    {
+        $request = $this->createRequest(new Cache(public: false));
+        $response = new Response();
+        $response->setPublic();
+
+        $this->listener->onKernelResponse($this->createEventMock($request, $response));
+
+        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+    }
+
     public static function provideVaryHeaderScenarios(): \Traversable
     {
         yield 'no vary headers at all' => [
@@ -421,9 +492,93 @@ class CacheAttributeListenerTest extends TestCase
         ];
     }
 
-    private function createRequest(Cache $cache): Request
+    #[DataProvider('provideCacheIfCases')]
+    public function testCacheAppliedOnlyWhenIfEvaluatesToTrue(string|\Closure $if1, string|\Closure $if2, bool $sMaxAge, bool $public, bool $maxAge, bool $private)
     {
-        return new Request([], [], ['_cache' => [$cache]]);
+        $entity = new TestEntity();
+
+        $request = $this->createRequest(
+            new Cache(smaxage: '1 days', public: true, if: $if1),
+            new Cache(maxage: '10 days', public: false, if: $if2),
+        );
+
+        $listener = new CacheAttributeListener();
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), [new TestController(true), '__invoke'], [$entity], $request, null);
+        $listener->onKernelControllerArguments($controllerArgumentsEvent);
+
+        $controllerResponse = $controllerArgumentsEvent->getController()($entity);
+        $responseEvent = new ResponseEvent($this->getKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $controllerResponse);
+        $listener->onKernelResponse($responseEvent);
+
+        $response = $responseEvent->getResponse();
+
+        $this->assertSame(200, $response->getStatusCode());
+
+        $this->assertSame($sMaxAge, $response->headers->hasCacheControlDirective('s-maxage'));
+        $this->assertSame($public, $response->headers->hasCacheControlDirective('public'));
+        $this->assertSame($maxAge, $response->headers->hasCacheControlDirective('max-age'));
+        $this->assertSame($private, $response->headers->hasCacheControlDirective('private'));
+    }
+
+    public static function provideCacheIfCases(): iterable
+    {
+        yield 'expression' => [
+            'args["test"].getId() <= 0',
+            'args["test"].getId() > 0',
+            false,
+            false,
+            true,
+            true,
+        ];
+
+        yield 'expression accessing controller' => [
+            'this.cache',
+            'not this.cache',
+            true,
+            true,
+            false,
+            false,
+        ];
+
+        yield 'closure' => [
+            static fn (array $arguments, Request $request, ?object $controller) => $arguments['test']->getDate() <= new \DateTimeImmutable(),
+            static fn (array $arguments, Request $request, ?object $controller) => $arguments['test']->getDate() > new \DateTimeImmutable(),
+            true,
+            true,
+            false,
+            false,
+        ];
+
+        yield 'closure accessing controller' => [
+            static fn (array $arguments, Request $request, ?object $controller) => $controller->cache,
+            static fn (array $arguments, Request $request, ?object $controller) => !$controller->cache,
+            true,
+            true,
+            false,
+            false,
+        ];
+    }
+
+    public function testErrorIsThrownWhenIfEvaluatesToNonBool()
+    {
+        $entity = new TestEntity();
+
+        $request = $this->createRequest(
+            new Cache(smaxage: '1 days', public: true, if: static fn (array $arguments, Request $request) => 'foo'),
+        );
+
+        $listener = new CacheAttributeListener();
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), static fn (TestEntity $test) => new Response(), [$entity], $request, null);
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage(\sprintf('The value of the "$if" option of the "%s" attribute must evaluate to a boolean, "string" given.', Cache::class));
+
+        $listener->onKernelControllerArguments($controllerArgumentsEvent);
+    }
+
+    private function createRequest(Cache ...$cache): Request
+    {
+        return new Request([], [], ['_cache' => $cache]);
     }
 
     private function createEventMock(Request $request, Response $response): ResponseEvent
@@ -431,9 +586,9 @@ class CacheAttributeListenerTest extends TestCase
         return new ResponseEvent($this->getKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $response);
     }
 
-    private function getKernel(): MockObject&HttpKernelInterface
+    private function getKernel(): Stub&HttpKernelInterface
     {
-        return $this->createMock(HttpKernelInterface::class);
+        return $this->createStub(HttpKernelInterface::class);
     }
 }
 
@@ -447,5 +602,17 @@ class TestEntity
     public function getId()
     {
         return '12345';
+    }
+}
+
+class TestController
+{
+    public function __construct(public bool $cache)
+    {
+    }
+
+    public function __invoke(TestEntity $test)
+    {
+        return new Response();
     }
 }

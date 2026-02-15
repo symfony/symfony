@@ -315,6 +315,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('cache.security_is_granted_attribute_expression_language')
             ->parent('cache.system')
+            ->private()
             ->tag('cache.pool')
 
         ->set('security.is_csrf_token_valid_attribute_expression_language', BaseExpressionLanguage::class)
@@ -322,6 +323,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('cache.security_is_csrf_token_valid_attribute_expression_language')
             ->parent('cache.system')
+            ->private()
             ->tag('cache.pool')
     ;
 };

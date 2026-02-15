@@ -51,7 +51,7 @@ class SessionHandlerFactoryTest extends TestCase
     #[RequiresPhpExtension('redis')]
     public function testCreateRedisHandlerFromConnectionObject()
     {
-        $handler = SessionHandlerFactory::createHandler($this->createMock(\Redis::class));
+        $handler = SessionHandlerFactory::createHandler($this->createStub(\Redis::class));
         $this->assertInstanceOf(RedisSessionHandler::class, $handler);
     }
 
@@ -69,7 +69,7 @@ class SessionHandlerFactoryTest extends TestCase
         $ttlProperty = $reflection->getProperty('ttl');
         $this->assertSame(3600, $ttlProperty->getValue($handler));
 
-        $handler = SessionHandlerFactory::createHandler('redis://localhost?prefix=foo&ttl=3600&ignored=bar', ['ttl' => fn () => 123]);
+        $handler = SessionHandlerFactory::createHandler('redis://localhost?prefix=foo&ttl=3600&ignored=bar', ['ttl' => static fn () => 123]);
 
         $this->assertInstanceOf(\Closure::class, $reflection->getProperty('ttl')->getValue($handler));
     }

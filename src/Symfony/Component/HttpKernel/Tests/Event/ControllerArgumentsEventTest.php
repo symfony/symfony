@@ -12,6 +12,8 @@
 namespace Symfony\Component\HttpKernel\Tests\Event;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\ExpressionLanguage\Expression;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
@@ -25,13 +27,13 @@ class ControllerArgumentsEventTest extends TestCase
 {
     public function testControllerArgumentsEvent()
     {
-        $event = new ControllerArgumentsEvent(new TestHttpKernel(), function () {}, ['test'], new Request(), HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent(new TestHttpKernel(), static function () {}, ['test'], new Request(), HttpKernelInterface::MAIN_REQUEST);
         $this->assertSame(['test'], $event->getArguments());
     }
 
     public function testSetAttributes()
     {
-        $controller = function () {};
+        $controller = static function () {};
         $event = new ControllerArgumentsEvent(new TestHttpKernel(), $controller, ['test'], new Request(), HttpKernelInterface::MAIN_REQUEST);
         $event->setController($controller, []);
 
@@ -59,10 +61,26 @@ class ControllerArgumentsEventTest extends TestCase
 
         $this->assertEquals($expected, $event->getAttributes());
 
-        $expected[Bar::class][] = new Bar('foo');
-        $event->setController($controller, $expected);
+        $attributes = [
+            new Bar('class'),
+            new Bar('method'),
+            new Bar('foo'),
+            new Baz(),
+        ];
+        $event->setController($controller, $attributes);
 
-        $this->assertEquals($expected, $event->getAttributes());
+        $grouped = [
+            Bar::class => [
+                new Bar('class'),
+                new Bar('method'),
+                new Bar('foo'),
+            ],
+            Baz::class => [
+                new Baz(),
+            ],
+        ];
+        $this->assertEquals($grouped, $event->getAttributes());
+        $this->assertEquals($attributes, $event->getAttributes('*'));
         $this->assertSame($controllerEvent->getAttributes(), $event->getAttributes());
     }
 
@@ -82,10 +100,58 @@ class ControllerArgumentsEventTest extends TestCase
 
         $this->assertEquals($expected, $event->getAttributes(Bar::class));
 
-        $expected[] = new Bar('foo');
-        $event->setController($controller, [Bar::class => $expected]);
+        // When setting attributes, provide as flat list
+        $flatAttributes = [
+            new Bar('class'),
+            new Bar('method'),
+            new Bar('foo'),
+        ];
+        $event->setController($controller, $flatAttributes);
 
-        $this->assertEquals($expected, $event->getAttributes(Bar::class));
+        $expectedAfterSet = [
+            new Bar('class'),
+            new Bar('method'),
+            new Bar('foo'),
+        ];
+        $this->assertEquals($expectedAfterSet, $event->getAttributes(Bar::class));
         $this->assertSame($controllerEvent->getAttributes(Bar::class), $event->getAttributes(Bar::class));
+    }
+
+    public function testEvaluateWithClosureUsesNamedArguments()
+    {
+        $request = new Request();
+        $controller = [new AttributeController(), 'action'];
+        $controllerEvent = new ControllerEvent(new TestHttpKernel(), $controller, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent(new TestHttpKernel(), $controllerEvent, ['value'], $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $closure = function (array $args, Request $requestArg, ?object $controllerArg) use ($request): string {
+            $this->assertSame(['baz' => 'value'], $args);
+            $this->assertSame($request, $requestArg);
+            $this->assertInstanceOf(AttributeController::class, $controllerArg);
+
+            return 'ok';
+        };
+
+        $this->assertSame('ok', $event->evaluate($closure, null));
+    }
+
+    public function testEvaluateWithExpressionDelegatesToExpressionLanguage()
+    {
+        $request = new Request();
+        $controller = [new AttributeController(), 'action'];
+        $controllerEvent = new ControllerEvent(new TestHttpKernel(), $controller, $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new ControllerArgumentsEvent(new TestHttpKernel(), $controllerEvent, ['value'], $request, HttpKernelInterface::MAIN_REQUEST);
+
+        $expressionLanguage = $this->createMock(ExpressionLanguage::class);
+        $expressionLanguage->expects($this->once())
+            ->method('evaluate')
+            ->with(new Expression('args["baz"]'), [
+                'request' => $request,
+                'args' => ['baz' => 'value'],
+                'this' => $controller[0],
+            ])
+            ->willReturn('value');
+
+        $this->assertSame('value', $event->evaluate(new Expression('args["baz"]'), $expressionLanguage));
     }
 }

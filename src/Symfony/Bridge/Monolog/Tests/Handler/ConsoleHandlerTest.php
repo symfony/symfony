@@ -22,6 +22,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleTerminateEvent;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\Output;
@@ -131,14 +132,6 @@ class ConsoleHandlerTest extends TestCase
 
     public static function provideHandleOrBubbleSilentTests(): array
     {
-        // The VERBOSITY_SILENT const is not defined for Console below 7.2, but in that case, the code behaves as before
-        if (!\defined('\Symfony\Component\Console\Output\OutputInterface::VERBOSITY_SILENT')) {
-            return [
-                [OutputInterface::VERBOSITY_NORMAL, Level::Warning, true, true],
-                [OutputInterface::VERBOSITY_NORMAL, Level::Info, false, false],
-            ];
-        }
-
         return [
             [OutputInterface::VERBOSITY_SILENT, Level::Warning, false, false],
             [OutputInterface::VERBOSITY_NORMAL, Level::Warning, true, true],
@@ -209,30 +202,56 @@ class ConsoleHandlerTest extends TestCase
         $logger->pushHandler($handler);
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(ConsoleEvents::COMMAND, function () use ($logger) {
+        $dispatcher->addListener(ConsoleEvents::COMMAND, static function () use ($logger) {
             $logger->info('Before command message.');
         });
-        $dispatcher->addListener(ConsoleEvents::TERMINATE, function () use ($logger) {
+        $dispatcher->addListener(ConsoleEvents::TERMINATE, static function () use ($logger) {
             $logger->info('Before terminate message.');
         });
 
         $dispatcher->addSubscriber($handler);
 
-        $dispatcher->addListener(ConsoleEvents::COMMAND, function () use ($logger) {
+        $dispatcher->addListener(ConsoleEvents::COMMAND, static function () use ($logger) {
             $logger->info('After command message.');
         });
-        $dispatcher->addListener(ConsoleEvents::TERMINATE, function () use ($logger) {
+        $dispatcher->addListener(ConsoleEvents::TERMINATE, static function () use ($logger) {
             $logger->info('After terminate message.');
         });
 
-        $event = new ConsoleCommandEvent(new Command('foo'), $this->createMock(InputInterface::class), $output);
+        $event = new ConsoleCommandEvent(new Command('foo'), new ArrayInput([]), $output);
         $dispatcher->dispatch($event, ConsoleEvents::COMMAND);
         $this->assertStringContainsString('Before command message.', $out = $output->fetch());
         $this->assertStringContainsString('After command message.', $out);
 
-        $event = new ConsoleTerminateEvent(new Command('foo'), $this->createMock(InputInterface::class), $output, 0);
+        $event = new ConsoleTerminateEvent(new Command('foo'), new ArrayInput([]), $output, 0);
         $dispatcher->dispatch($event, ConsoleEvents::TERMINATE);
         $this->assertStringContainsString('Before terminate message.', $out = $output->fetch());
         $this->assertStringContainsString('After terminate message.', $out);
+    }
+
+    public function testInteractiveOnly()
+    {
+        $output = $this->createStub(OutputInterface::class);
+
+        $message = RecordFactory::create(Level::Info, 'My info message');
+        $interactiveInput = $this->createStub(InputInterface::class);
+        $interactiveInput
+            ->method('isInteractive')
+            ->willReturn(true);
+        $handler = new ConsoleHandler(interactiveOnly: true);
+        $handler->setInput($interactiveInput);
+        $handler->setOutput($output);
+        self::assertTrue($handler->isHandling($message), '->isHandling returns true when input is interactive');
+        self::assertFalse($handler->getBubble(), '->getBubble returns false when input is interactive and interactiveOnly is true');
+
+        $nonInteractiveInput = $this->createStub(InputInterface::class);
+        $nonInteractiveInput
+            ->method('isInteractive')
+            ->willReturn(false);
+        $handler = new ConsoleHandler(interactiveOnly: true);
+        $handler->setInput($nonInteractiveInput);
+        $handler->setOutput($output);
+        self::assertFalse($handler->isHandling($message), '->isHandling returns false when input is not interactive');
+        self::assertTrue($handler->getBubble(), '->getBubble returns true when input is not interactive and interactiveOnly is true');
     }
 }

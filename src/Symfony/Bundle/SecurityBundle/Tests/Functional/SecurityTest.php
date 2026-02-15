@@ -145,7 +145,7 @@ class SecurityTest extends AbstractWebTestCase
         // put a csrf token in the storage
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = static::getContainer()->get(EventDispatcherInterface::class);
-        $setCsrfToken = function (RequestEvent $event) {
+        $setCsrfToken = static function (RequestEvent $event) {
             static::getContainer()->get('security.csrf.token_storage')->setToken('logout', 'bar');
             $event->setResponse(new Response(''));
         };

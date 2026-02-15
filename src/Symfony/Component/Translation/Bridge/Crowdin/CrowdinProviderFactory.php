@@ -28,11 +28,11 @@ final class CrowdinProviderFactory extends AbstractProviderFactory
     private const HOST = 'api.crowdin.com';
 
     public function __construct(
-        private HttpClientInterface $client,
-        private LoggerInterface $logger,
-        private string $defaultLocale,
-        private LoaderInterface $loader,
-        private XliffFileDumper $xliffFileDumper,
+        private readonly HttpClientInterface $client,
+        private readonly LoggerInterface $logger,
+        private readonly string $defaultLocale,
+        private readonly LoaderInterface $loader,
+        private readonly XliffFileDumper $xliffFileDumper,
     ) {
     }
 

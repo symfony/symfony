@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\ClickSend\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\ClickSend\ClickSendOptions;
 use Symfony\Component\Notifier\Bridge\ClickSend\ClickSendTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
@@ -57,10 +58,7 @@ final class ClickSendTransportTest extends TransportTestCase
     public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from)
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects(self::exactly(2))->method('getStatusCode')->willReturn(200);
-        $response->expects(self::once())->method('getContent')->willReturn('');
-        $client = new MockHttpClient(function (string $method, string $url, array $options) use ($response): ResponseInterface {
+        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
             self::assertSame('POST', $method);
             self::assertSame('https://rest.clicksend.com/v3/sms/send', $url);
 
@@ -72,7 +70,7 @@ final class ClickSendTransportTest extends TransportTestCase
             self::assertArrayHasKey('list_id', $message);
             self::assertArrayNotHasKey('to', $message);
 
-            return $response;
+            return new MockResponse('');
         });
         $transport = $this->createTransport($client, $from);
         $transport->send($message);
@@ -81,10 +79,7 @@ final class ClickSendTransportTest extends TransportTestCase
     public function testNoInvalidArgumentExceptionIsThrownIfFromIsValidWithoutOptionalParameters()
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects(self::exactly(2))->method('getStatusCode')->willReturn(200);
-        $response->expects(self::once())->method('getContent')->willReturn('');
-        $client = new MockHttpClient(function (string $method, string $url, array $options) use ($response): ResponseInterface {
+        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
             self::assertSame('POST', $method);
             self::assertSame('https://rest.clicksend.com/v3/sms/send', $url);
 
@@ -95,7 +90,7 @@ final class ClickSendTransportTest extends TransportTestCase
             self::assertArrayNotHasKey('list_id', $message);
             self::assertArrayHasKey('to', $message);
 
-            return $response;
+            return new MockResponse('');
         });
         $transport = $this->createTransport($client, null, null, null, null);
         $transport->send($message);

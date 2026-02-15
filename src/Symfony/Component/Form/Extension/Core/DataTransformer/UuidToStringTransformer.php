@@ -24,13 +24,6 @@ use Symfony\Component\Uid\Uuid;
  */
 class UuidToStringTransformer implements DataTransformerInterface
 {
-    /**
-     * Transforms a Uuid object into a string.
-     *
-     * @param Uuid $value A Uuid object
-     *
-     * @throws TransformationFailedException If the given value is not a Uuid object
-     */
     public function transform(mixed $value): ?string
     {
         if (null === $value) {
@@ -44,14 +37,6 @@ class UuidToStringTransformer implements DataTransformerInterface
         return (string) $value;
     }
 
-    /**
-     * Transforms a UUID string into a Uuid object.
-     *
-     * @param string $value A UUID string
-     *
-     * @throws TransformationFailedException If the given value is not a string,
-     *                                       or could not be transformed
-     */
     public function reverseTransform(mixed $value): ?Uuid
     {
         if (null === $value || '' === $value) {

@@ -5,6 +5,8 @@ return [
         'fa' => 'دری',
         'fa_AF' => 'دری (افغانستان)',
         'fa_IR' => 'دری (Eron)',
+        'kk_Arab' => 'qozoqcha (عربی)',
+        'kk_Arab_CN' => 'qozoqcha (عربی, Xitoy)',
         'ks_Arab' => 'kashmircha (عربی)',
         'ks_Arab_IN' => 'kashmircha (عربی, Hindiston)',
         'pa_Arab' => 'panjobcha (عربی)',

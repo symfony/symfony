@@ -524,7 +524,7 @@ class ConfigurationTest extends TestCase
     public function testBaselineFileWriteError()
     {
         $filename = $this->createFile();
-        chmod($filename, 0444);
+        chmod($filename, 0o444);
         $configuration = Configuration::fromUrlEncodedString('generateBaseline=true&baselineFile='.urlencode($filename));
 
         $this->expectException(\ErrorException::class);

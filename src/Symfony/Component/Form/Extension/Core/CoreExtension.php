@@ -17,6 +17,7 @@ use Symfony\Component\Form\ChoiceList\Factory\ChoiceListFactoryInterface;
 use Symfony\Component\Form\ChoiceList\Factory\DefaultChoiceListFactory;
 use Symfony\Component\Form\ChoiceList\Factory\PropertyAccessDecorator;
 use Symfony\Component\Form\Extension\Core\Type\TransformationFailureExtension;
+use Symfony\Component\Form\Flow;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -78,6 +79,12 @@ class CoreExtension extends AbstractExtension
             new Type\TelType(),
             new Type\ColorType($this->translator),
             new Type\WeekType(),
+            new Flow\Type\ButtonFlowType(),
+            new Flow\Type\FinishFlowType(),
+            new Flow\Type\NavigatorFlowType(),
+            new Flow\Type\NextFlowType(),
+            new Flow\Type\PreviousFlowType(),
+            new Flow\Type\FormFlowType($this->propertyAccessor),
         ];
     }
 

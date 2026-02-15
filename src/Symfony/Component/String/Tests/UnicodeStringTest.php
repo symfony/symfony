@@ -11,11 +11,58 @@
 
 namespace Symfony\Component\String\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\String\AbstractString;
 use Symfony\Component\String\UnicodeString;
 
 class UnicodeStringTest extends AbstractUnicodeTestCase
 {
+    #[DataProvider('provideTrimNormalization')]
+    public function testTrimPrefixNormalization(string $expected, string $string, $prefix)
+    {
+        $str = new UnicodeString($string);
+        $this->assertSame($expected, $str->trimPrefix($prefix)->toString());
+    }
+
+    #[DataProvider('provideTrimNormalization')]
+    public function testTrimSuffixNormalization(string $expected, string $string, $suffix)
+    {
+        $suffixStr = match (true) {
+            $suffix instanceof AbstractString => $suffix->toString(),
+            \is_array($suffix) => implode('', $suffix),
+            $suffix instanceof \Traversable => implode('', iterator_to_array($suffix)),
+            default => (string) $suffix,
+        };
+
+        $str = new UnicodeString($expected.$suffixStr);
+        $this->assertSame($expected, $str->trimSuffix($suffix)->toString());
+    }
+
+    public static function provideTrimNormalization(): iterable
+    {
+        // "é" in NFC (\xC3\xA9) vs NFD (\x65\xCC\x81)
+        $nfc = "\xC3\xA9";
+        $nfd = "\x65\xCC\x81";
+
+        yield 'nfc_string_nfd_prefix' => ['abc', $nfc.'abc', $nfd];
+        yield 'nfd_string_nfc_prefix' => ['abc', $nfd.'abc', $nfc];
+
+        yield 'abstract_string' => ['abc', $nfc.'abc', new UnicodeString($nfd)];
+
+        yield 'array' => ['abc', $nfc.'abc', [$nfd]];
+
+        yield 'stringable' => ['abc', $nfc.'abc', new class($nfd) implements \Stringable {
+            public function __construct(private string $s)
+            {
+            }
+
+            public function __toString(): string
+            {
+                return $this->s;
+            }
+        }];
+    }
+
     protected static function createFromString(string $string): AbstractString
     {
         return new UnicodeString($string);
@@ -249,6 +296,9 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
             [
                 [false, "cle\u{0301} prive\u{0301}e", 'cle', UnicodeString::NFD],
                 [true, "cle\u{0301} prive\u{0301}e", 'clé', UnicodeString::NFD],
+                [true, '06', '0'],
+                [true, '0', '0'],
+                [true, '012', '01'],
             ]
         );
     }
@@ -260,6 +310,10 @@ class UnicodeStringTest extends AbstractUnicodeTestCase
             [
                 [false, "cle\u{0301} prive\u{0301}e", 'ee', UnicodeString::NFD],
                 [true, "cle\u{0301} prive\u{0301}e", 'ée', UnicodeString::NFD],
+                [false, '06', '0'],
+                [true, '06', '6'],
+                [true, '0', '0'],
+                [true, '10', '0'],
             ]
         );
     }

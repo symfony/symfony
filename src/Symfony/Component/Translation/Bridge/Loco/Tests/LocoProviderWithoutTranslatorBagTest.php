@@ -60,6 +60,7 @@ class LocoProviderWithoutTranslatorBagTest extends LocoProviderTest
             }
         }
 
+        $this->loader = $this->createMock(LoaderInterface::class);
         $loader = $this->getLoader();
         $consecutiveLoadArguments = array_merge($consecutiveLoadArguments, $consecutiveLoadArguments);
         $consecutiveLoadReturns = array_merge($consecutiveLoadReturns, $consecutiveLoadReturns);

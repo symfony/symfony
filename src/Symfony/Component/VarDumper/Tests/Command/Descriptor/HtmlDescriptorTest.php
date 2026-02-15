@@ -36,7 +36,7 @@ class HtmlDescriptorTest extends TestCase
     public function testItOutputsStylesAndScriptsOnFirstDescribeCall()
     {
         $output = new BufferedOutput();
-        $dumper = $this->createMock(HtmlDumper::class);
+        $dumper = $this->createStub(HtmlDumper::class);
         $dumper->method('dump')->willReturn('[DUMPED]');
         $descriptor = new HtmlDescriptor($dumper);
 
@@ -53,7 +53,7 @@ class HtmlDescriptorTest extends TestCase
     public function testDescribe(array $context, string $expectedOutput)
     {
         $output = new BufferedOutput();
-        $dumper = $this->createMock(HtmlDumper::class);
+        $dumper = $this->createStub(HtmlDumper::class);
         $dumper->method('dump')->willReturn('[DUMPED]');
         $descriptor = new HtmlDescriptor($dumper);
 

@@ -11,10 +11,10 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\Forms;
-use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 use Symfony\Component\Form\Tests\Extension\Core\Type\CollectionTypeTest;
 use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
 use Symfony\Component\Form\Tests\Extension\Core\Type\TextTypeTest;
@@ -25,16 +25,14 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Valid;
-use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Validation;
 
 class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
-    use ValidatorExtensionTrait;
-
     public function testSubmitValidatesData()
     {
         $builder = $this->factory->createBuilder(
@@ -44,16 +42,17 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
                 'validation_groups' => 'group',
             ]
         );
-        $builder->add('firstName', FormTypeTest::TESTED_TYPE);
+        $builder->add('firstName', TextType::class, [
+            'constraints' => new NotNull(groups: ['group']),
+        ]);
         $form = $builder->getForm();
-
-        $this->validator->expects($this->once())
-            ->method('validate')
-            ->with($this->equalTo($form))
-            ->willReturn(new ConstraintViolationList());
 
         // specific data is irrelevant
         $form->submit([]);
+
+        $this->assertTrue($form->isSubmitted());
+        $this->assertFalse($form->isValid());
+        $this->assertFalse($form->get('firstName')->isValid());
     }
 
     public function testValidConstraint()
@@ -79,7 +78,7 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
     public function testGroupSequenceWithConstraintsOption()
     {
         $form = Forms::createFormFactoryBuilder()
-            ->addExtension(new ValidatorExtension(Validation::createValidator(), false))
+            ->addExtension(new ValidatorExtension(Validation::createValidator()))
             ->getFormFactory()
             ->create(FormTypeTest::TESTED_TYPE, null, ['validation_groups' => new GroupSequence(['First', 'Second'])])
             ->add('field', TextTypeTest::TESTED_TYPE, [
@@ -104,8 +103,8 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
         $authorMetadata = (new ClassMetadata(Author::class))
             ->addPropertyConstraint('firstName', new NotBlank(groups: ['Second']))
         ;
-        $metadataFactory = $this->createMock(MetadataFactoryInterface::class);
-        $metadataFactory->expects($this->any())
+        $metadataFactory = $this->createStub(MetadataFactoryInterface::class);
+        $metadataFactory
             ->method('getMetadataFor')
             ->willReturnCallback(static function ($classOrObject) use ($formMetadata, $authorMetadata) {
                 if (Author::class === $classOrObject || $classOrObject instanceof Author) {
@@ -169,8 +168,8 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
             ->addPropertyConstraint('firstName', new NotBlank());
         $organizationMetadata = (new ClassMetadata(Organization::class))
             ->addPropertyConstraint('authors', new Valid());
-        $metadataFactory = $this->createMock(MetadataFactoryInterface::class);
-        $metadataFactory->expects($this->any())
+        $metadataFactory = $this->createStub(MetadataFactoryInterface::class);
+        $metadataFactory
             ->method('getMetadataFor')
             ->willReturnCallback(static function ($classOrObject) use ($formMetadata, $authorMetadata, $organizationMetadata) {
                 if (Author::class === $classOrObject || $classOrObject instanceof Author) {
@@ -260,8 +259,8 @@ class FormTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
             ->addPropertyConstraint('firstName', new Length(1));
         $organizationMetadata = (new ClassMetadata(Organization::class))
             ->addPropertyConstraint('authors', new Valid());
-        $metadataFactory = $this->createMock(MetadataFactoryInterface::class);
-        $metadataFactory->expects($this->any())
+        $metadataFactory = $this->createStub(MetadataFactoryInterface::class);
+        $metadataFactory
             ->method('getMetadataFor')
             ->willReturnCallback(static function ($classOrObject) use ($formMetadata, $authorMetadata, $organizationMetadata) {
                 if (Author::class === $classOrObject || $classOrObject instanceof Author) {

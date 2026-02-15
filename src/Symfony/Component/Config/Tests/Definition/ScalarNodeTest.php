@@ -17,6 +17,7 @@ use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\ScalarNode;
+use Symfony\Component\Config\Exception\LogicException;
 
 class ScalarNodeTest extends TestCase
 {
@@ -52,12 +53,13 @@ class ScalarNodeTest extends TestCase
         $this->assertSame('"foo" is deprecated', $deprecation['message']);
         $this->assertSame('vendor/package', $deprecation['package']);
         $this->assertSame('1.1', $deprecation['version']);
+        $this->assertSame('Since vendor/package 1.1: "foo" is deprecated', $childNode->getDeprecationMessage());
 
         $node = new ArrayNode('root');
         $node->addChild($childNode);
 
         $deprecationTriggered = 0;
-        $deprecationHandler = function ($level, $message, $file, $line) use (&$prevErrorHandler, &$deprecationTriggered) {
+        $deprecationHandler = static function ($level, $message, $file, $line) use (&$prevErrorHandler, &$deprecationTriggered) {
             if (\E_USER_DEPRECATED === $level) {
                 return ++$deprecationTriggered;
             }
@@ -80,6 +82,16 @@ class ScalarNodeTest extends TestCase
             restore_error_handler();
         }
         $this->assertSame(1, $deprecationTriggered, '->finalize() should trigger if the deprecated node is set');
+    }
+
+    public function testNotDeprecatedException()
+    {
+        $childNode = new ScalarNode('foo');
+
+        $this->assertFalse($childNode->isDeprecated());
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('The node "foo" is not deprecated.');
+        $childNode->getDeprecation('node', 'path');
     }
 
     #[DataProvider('getInvalidValues')]

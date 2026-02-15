@@ -137,7 +137,7 @@ class SerializerCacheWarmerTest extends TestCase
 
         $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], $file);
 
-        spl_autoload_register($classLoader = function ($class) use ($mappedClass) {
+        spl_autoload_register($classLoader = static function ($class) use ($mappedClass) {
             if ($class === $mappedClass) {
                 throw new \DomainException('This exception should be caught by the warmer.');
             }

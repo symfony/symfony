@@ -18,10 +18,11 @@ use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyWriteInfo;
-use Symfony\Component\Serializer\Annotation\Ignore;
+use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\Mapping\Loader\AccessorCollisionResolverTrait;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 /**
@@ -31,6 +32,8 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
  */
 final class ObjectNormalizer extends AbstractObjectNormalizer
 {
+    use AccessorCollisionResolverTrait;
+
     private static $reflectionCache = [];
     private static $isReadableCache = [];
     private static $isWritableCache = [];
@@ -75,35 +78,11 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
         $reflClass = new \ReflectionClass($class);
 
         foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
-            if (
-                0 !== $reflMethod->getNumberOfRequiredParameters()
-                || $reflMethod->isStatic()
-                || $reflMethod->isConstructor()
-                || $reflMethod->isDestructor()
-            ) {
-                continue;
-            }
-
             $name = $reflMethod->name;
-            $attributeName = null;
+            $attributeName = $this->getAttributeNameFromAccessor($reflClass, $reflMethod, false);
 
-            // ctype_lower check to find out if method looks like accessor but actually is not, e.g. hash, cancel
-            if (match ($name[0]) {
-                'g' => str_starts_with($name, 'get') && isset($name[$i = 3]),
-                'h' => str_starts_with($name, 'has') && isset($name[$i = 3]),
-                'c' => str_starts_with($name, 'can') && isset($name[$i = 3]),
-                'i' => str_starts_with($name, 'is') && isset($name[$i = 2]),
-                default => false,
-            } && !ctype_lower($name[$i])) {
-                if ($reflClass->hasProperty($name)) {
-                    $attributeName = $name;
-                } else {
-                    $attributeName = substr($name, $i);
-
-                    if (!$reflClass->hasProperty($attributeName)) {
-                        $attributeName = lcfirst($attributeName);
-                    }
-                }
+            if ($this->hasPropertyForAccessor($reflMethod->getDeclaringClass(), $name) && (null === $attributeName || $this->hasAttributeNameCollision($reflClass, $attributeName, $name))) {
+                $attributeName = $name;
             }
 
             if (null !== $attributeName && $this->isAllowedAttribute($object, $attributeName, $format, $context)) {
@@ -153,6 +132,10 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
 
         $class = \is_object($classOrObject) ? $classOrObject::class : $classOrObject;
 
+        if ($this->classDiscriminatorResolver?->getMappingForMappedObject($classOrObject)?->getTypeProperty() === $attribute) {
+            return true;
+        }
+
         if ($context['_read_attributes'] ?? true) {
             if (!isset(self::$isReadableCache[$class.$attribute])) {
                 self::$isReadableCache[$class.$attribute] = $this->propertyInfoExtractor->isReadable($class, $attribute) || $this->hasAttributeAccessorMethod($class, $attribute) || (\is_object($classOrObject) && $this->propertyAccessor->isReadable($classOrObject, $attribute));
@@ -168,11 +151,7 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
 
     private function hasAttributeAccessorMethod(string $class, string $attribute): bool
     {
-        if (!isset(self::$reflectionCache[$class])) {
-            self::$reflectionCache[$class] = new \ReflectionClass($class);
-        }
-
-        $reflection = self::$reflectionCache[$class];
+        $reflection = self::$reflectionCache[$class] ??= new \ReflectionClass($class);
 
         if (!$reflection->hasMethod($attribute)) {
             return false;
@@ -182,6 +161,7 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
 
         return !$method->isStatic()
             && !$method->getAttributes(Ignore::class)
-            && !$method->getNumberOfRequiredParameters();
+            && !$method->getNumberOfRequiredParameters()
+            && !\in_array((string) $method->getReturnType(), ['void', 'never'], true);
     }
 }

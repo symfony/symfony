@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Tests\Transport;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
+use Symfony\Component\Mailer\Tests\DummyTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mailer\Transport\Transports;
 use Symfony\Component\Mime\Header\Headers;
@@ -53,8 +54,8 @@ class TransportsTest extends TestCase
     public function testTransportDoesNotExist()
     {
         $transport = new Transports([
-            'foo' => $this->createMock(TransportInterface::class),
-            'bar' => $this->createMock(TransportInterface::class),
+            'foo' => new DummyTransport('localhost'),
+            'bar' => new DummyTransport('localhost'),
         ]);
 
         $headers = (new Headers())->addTextHeader('X-Transport', 'foobar');
@@ -69,7 +70,7 @@ class TransportsTest extends TestCase
     {
         $exception = new \Exception();
 
-        $fooTransport = $this->createMock(TransportInterface::class);
+        $fooTransport = $this->createStub(TransportInterface::class);
         $fooTransport->method('send')
             ->willThrowException($exception);
 

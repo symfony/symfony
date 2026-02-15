@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Console\Helper\Dumper;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\VarDumper\Dumper\CliDumper;
 
 class DumperNativeFallbackTest extends TestCase
@@ -36,7 +36,7 @@ class DumperNativeFallbackTest extends TestCase
     #[DataProvider('provideVariables')]
     public function testInvoke($variable, $primitiveString)
     {
-        $dumper = new Dumper($this->createMock(OutputInterface::class));
+        $dumper = new Dumper(new NullOutput());
 
         $this->assertSame($primitiveString, $dumper($variable));
     }

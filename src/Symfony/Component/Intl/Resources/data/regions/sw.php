@@ -44,7 +44,7 @@ return [
         'BZ' => 'Belize',
         'CA' => 'Kanada',
         'CC' => 'Visiwa vya Cocos (Keeling)',
-        'CD' => 'Jamhuri ya Kidemokrasia ya Kongo',
+        'CD' => 'Kongo - Kinshasa',
         'CF' => 'Jamhuri ya Afrika ya Kati',
         'CG' => 'Kongo - Brazzaville',
         'CH' => 'Uswisi',

@@ -15,9 +15,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
-use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\RememberMeBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
@@ -25,6 +24,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 use Symfony\Component\Security\Http\Event\LoginSuccessEvent;
 use Symfony\Component\Security\Http\EventListener\RememberMeListener;
 use Symfony\Component\Security\Http\RememberMe\RememberMeHandlerInterface;
+use Symfony\Component\Security\Http\Tests\Fixtures\DummyAuthenticator;
 
 class RememberMeListenerTest extends TestCase
 {
@@ -69,7 +69,7 @@ class RememberMeListenerTest extends TestCase
     {
         $passport ??= $this->createPassport();
 
-        return new LoginSuccessEvent($this->createMock(AuthenticatorInterface::class), $passport, $this->createMock(TokenInterface::class), $this->request, $this->response, 'main_firewall');
+        return new LoginSuccessEvent(new DummyAuthenticator(), $passport, new NullToken(), $this->request, $this->response, 'main_firewall');
     }
 
     private function createPassport(?array $badges = null)
@@ -80,6 +80,6 @@ class RememberMeListenerTest extends TestCase
             $badges = [$badge];
         }
 
-        return new SelfValidatingPassport(new UserBadge('test', fn ($username) => new InMemoryUser($username, null)), $badges);
+        return new SelfValidatingPassport(new UserBadge('test', static fn ($username) => new InMemoryUser($username, null)), $badges);
     }
 }

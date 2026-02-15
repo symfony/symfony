@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Symfony\Bridge\Twig\Test\FormLayoutTestCase;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -27,7 +27,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class AbstractLayoutTestCase extends FormLayoutTestCase
 {
-    protected MockObject&CsrfTokenManagerInterface $csrfTokenManager;
+    protected Stub&CsrfTokenManagerInterface $csrfTokenManager;
     protected array $testableFeatures = [];
 
     private string $defaultLocale;
@@ -41,7 +41,7 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('en');
 
-        $this->csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $this->csrfTokenManager = $this->createStub(CsrfTokenManagerInterface::class);
 
         parent::setUp();
     }

@@ -71,7 +71,7 @@ final class SecretsListCommand extends Command
         $rows = [];
 
         $dump = new Dumper($output);
-        $dump = fn ($v) => null === $v ? '******' : $dump($v);
+        $dump = static fn ($v) => null === $v ? '******' : $dump($v);
 
         foreach ($secrets as $name => $value) {
             $rows[$name] = [$name, $dump($value)];

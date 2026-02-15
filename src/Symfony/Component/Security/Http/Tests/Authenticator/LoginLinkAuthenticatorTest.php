@@ -12,10 +12,9 @@
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\LoginLinkAuthenticator;
@@ -29,16 +28,16 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandlerInterface;
 
 class LoginLinkAuthenticatorTest extends TestCase
 {
-    private MockObject&LoginLinkHandlerInterface $loginLinkHandler;
-    private MockObject&AuthenticationSuccessHandlerInterface $successHandler;
-    private MockObject&AuthenticationFailureHandlerInterface $failureHandler;
+    private LoginLinkHandlerInterface $loginLinkHandler;
+    private AuthenticationSuccessHandlerInterface $successHandler;
+    private AuthenticationFailureHandlerInterface $failureHandler;
     private LoginLinkAuthenticator $authenticator;
 
     protected function setUp(): void
     {
-        $this->loginLinkHandler = $this->createMock(LoginLinkHandlerInterface::class);
-        $this->successHandler = $this->createMock(AuthenticationSuccessHandlerInterface::class);
-        $this->failureHandler = $this->createMock(AuthenticationFailureHandlerInterface::class);
+        $this->loginLinkHandler = $this->createStub(LoginLinkHandlerInterface::class);
+        $this->successHandler = $this->createStub(AuthenticationSuccessHandlerInterface::class);
+        $this->failureHandler = $this->createStub(AuthenticationFailureHandlerInterface::class);
     }
 
     #[DataProvider('provideSupportData')]
@@ -59,16 +58,15 @@ class LoginLinkAuthenticatorTest extends TestCase
 
     public function testSuccessfulAuthenticate()
     {
-        $this->setUpAuthenticator();
-
         $request = Request::create('/login/link/check?stuff=1&user=weaverryan');
-        $user = $this->createMock(UserInterface::class);
-        $this->loginLinkHandler->expects($this->once())
+        $user = new InMemoryUser('John', 'password');
+        $loginLinkHandler = $this->createMock(LoginLinkHandlerInterface::class);
+        $loginLinkHandler->expects($this->once())
             ->method('consumeLoginLink')
             ->with($request)
             ->willReturn($user);
 
-        $passport = $this->authenticator->authenticate($request);
+        $passport = (new LoginLinkAuthenticator($loginLinkHandler, new HttpUtils(), $this->successHandler, $this->failureHandler, []))->authenticate($request);
         $this->assertInstanceOf(SelfValidatingPassport::class, $passport);
         /** @var UserBadge $userBadge */
         $userBadge = $passport->getBadge(UserBadge::class);
@@ -81,12 +79,13 @@ class LoginLinkAuthenticatorTest extends TestCase
         $this->setUpAuthenticator();
 
         $request = Request::create('/login/link/check?stuff=1&user=weaverryan');
-        $this->loginLinkHandler->expects($this->once())
+        $loginLinkHandler = $this->createMock(LoginLinkHandlerInterface::class);
+        $loginLinkHandler->expects($this->once())
             ->method('consumeLoginLink')
             ->with($request)
             ->willThrowException(new ExpiredLoginLinkException());
 
-        $passport = $this->authenticator->authenticate($request);
+        $passport = (new LoginLinkAuthenticator($loginLinkHandler, new HttpUtils(), $this->successHandler, $this->failureHandler, []))->authenticate($request);
 
         $this->expectException(InvalidLoginLinkAuthenticationException::class);
 
@@ -99,13 +98,13 @@ class LoginLinkAuthenticatorTest extends TestCase
         $this->setUpAuthenticator();
 
         $request = Request::create('/login/link/check?stuff=1');
-        $this->createMock(UserInterface::class);
-        $this->loginLinkHandler->expects($this->never())
+        $loginLinkHandler = $this->createMock(LoginLinkHandlerInterface::class);
+        $loginLinkHandler->expects($this->never())
             ->method('consumeLoginLink');
 
         $this->expectException(InvalidLoginLinkAuthenticationException::class);
 
-        $this->authenticator->authenticate($request);
+        (new LoginLinkAuthenticator($loginLinkHandler, new HttpUtils(), $this->successHandler, $this->failureHandler, []))->authenticate($request);
     }
 
     public function testPassportBadges()

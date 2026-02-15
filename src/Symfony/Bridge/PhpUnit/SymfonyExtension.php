@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\PhpUnit;
 
+use Doctrine\Deprecations\Deprecation;
 use PHPUnit\Event\Code\Test;
 use PHPUnit\Event\Code\TestMethod;
 use PHPUnit\Event\Test\BeforeTestMethodErrored;
@@ -40,6 +41,10 @@ class SymfonyExtension implements Extension
     {
         if (class_exists(DebugClassLoader::class)) {
             DebugClassLoader::enable();
+        }
+
+        if (class_exists(Deprecation::class)) {
+            Deprecation::withoutDeduplication();
         }
 
         $reader = new AttributeReader();

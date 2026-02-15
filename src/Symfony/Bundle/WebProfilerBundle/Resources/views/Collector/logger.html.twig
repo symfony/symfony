@@ -7,10 +7,16 @@
         :root {
             --log-filter-active-num-color: #2563EB;
             --log-timestamp-color: #555;
+            --log-silenced-bg: #EDE9FE;
+            --log-silenced-color: #6D28D9;
+            --log-silenced-border: #a78bfa;
         }
         .theme-dark {
             --log-filter-active-num-color: #2563EB;
             --log-timestamp-color: #ccc;
+            --log-silenced-bg: #5B21B6;
+            --log-silenced-color: #EDE9FE;
+            --log-silenced-border: #a78bfa;
         }
 
         .log-filters {
@@ -181,12 +187,8 @@
             color: var(--badge-danger-color);
         }
         .log-type-badge.badge-silenced {
-            background: #EDE9FE;
-            color: #6D28D9;
-        }
-        .theme-dark .log-type-badge.badge-silenced {
-            background: #5B21B6;
-            color: #EDE9FE;
+            background: var(--log-silenced-bg);
+            color: var(--log-silenced-color);
         }
 
         tr.log-status-warning > td:first-child,
@@ -213,7 +215,11 @@
             background: var(--red-400);
         }
         tr.log-status-silenced > td:first-child:before {
-            background: #a78bfa;
+            background: var(--log-silenced-border);
+        }
+
+        .sf-profiler-log-col-time {
+            width: 140px;
         }
 
         .container-compilation-logs {
@@ -439,56 +445,58 @@
             </details>
         </div>
 
-        <table class="logs">
-            <colgroup>
-                <col style="width: 140px">
-                <col>
-            </colgroup>
+        <div aria-live="polite">
+            <table class="logs">
+                <colgroup>
+                    <col class="sf-profiler-log-col-time">
+                    <col>
+                </colgroup>
 
-            <thead>
-                <tr>
-                    <th>Time</th>
-                    <th>Message</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for log in collector.processedLogs %}
-                    {% set css_class = 'error' == log.type ? 'error'
-                        : (log.priorityName == 'WARNING' or 'deprecation' == log.type) ? 'warning'
-                        : 'silenced' == log.type ? 'silenced'
-                    %}
-                    <tr class="log-status-{{ css_class }}" data-type="{{ log.type }}" data-priority="{{ log.priority }}" data-channel="{{ log.channel }}" style="{{ 'event' == log.channel or 'DEBUG' == log.priorityName ? 'display: none' }}">
-                        <td class="log-timestamp">
-                            <time class="newline" title="{{ log.timestamp|date('r') }}" datetime="{{ log.timestamp|date(constant('DateTimeInterface::RFC3339_EXTENDED')) }}" data-convert-to-user-timezone data-render-as-time data-render-with-millisecond-precision>
-                                {{ log.timestamp|date('H:i:s.v') }}
-                            </time>
-
-                            {% if log.type in ['error', 'deprecation', 'silenced'] or 'WARNING' == log.priorityName %}
-                                <span class="log-type-badge badge badge-{{ css_class }}">
-                                    {% if 'error' == log.type or 'WARNING' == log.priorityName %}
-                                        {{ log.priorityName|lower }}
-                                    {% else %}
-                                        {{ log.type|lower }}
-                                    {% endif %}
-                                </span>
-                            {% else %}
-                                <span class="log-type-badge badge badge-{{ css_class }}">
-                                    {{ log.priorityName|lower }}
-                                </span>
-                            {% endif %}
-                        </td>
-
-                        <td class="font-normal">
-                            {{ _self.render_log_message('debug', loop.index, log) }}
-                        </td>
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Message</th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
 
-        <div class="no-logs-message empty">
-            <p>There are no log messages.</p>
+                <tbody>
+                    {% for log in collector.processedLogs %}
+                        {% set css_class = 'error' == log.type ? 'error'
+                            : (log.priorityName == 'WARNING' or 'deprecation' == log.type) ? 'warning'
+                            : 'silenced' == log.type ? 'silenced'
+                        %}
+                        <tr class="log-status-{{ css_class }}" data-type="{{ log.type }}" data-priority="{{ log.priority }}" data-channel="{{ log.channel }}" style="{{ 'event' == log.channel or 'DEBUG' == log.priorityName ? 'display: none' }}">
+                            <td class="log-timestamp">
+                                <time class="newline" title="{{ log.timestamp|date('r') }}" datetime="{{ log.timestamp|date(constant('DateTimeInterface::RFC3339_EXTENDED')) }}" data-convert-to-user-timezone data-render-as-time data-render-with-millisecond-precision>
+                                    {{ log.timestamp|date('H:i:s.v') }}
+                                </time>
+
+                                {% if log.type in ['error', 'deprecation', 'silenced'] or 'WARNING' == log.priorityName %}
+                                    <span class="log-type-badge badge badge-{{ css_class }}">
+                                        {% if 'error' == log.type or 'WARNING' == log.priorityName %}
+                                            {{ log.priorityName|lower }}
+                                        {% else %}
+                                            {{ log.type|lower }}
+                                        {% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="log-type-badge badge badge-{{ css_class }}">
+                                        {{ log.priorityName|lower }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td class="font-normal">
+                                {{ _self.render_log_message('debug', loop.index, log) }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="no-logs-message empty">
+                <p>There are no log messages.</p>
+            </div>
         </div>
     {% endif %}
 

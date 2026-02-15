@@ -292,6 +292,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'kcg',
         'kde',
         'kea',
+        'kek',
         'ken',
         'kfo',
         'kg',
@@ -407,6 +408,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'mwl',
         'mwr',
         'mwv',
+        'mww',
         'my',
         'mye',
         'myv',
@@ -559,6 +561,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'suk',
         'sus',
         'sux',
+        'suz',
         'sv',
         'sw',
         'swb',
@@ -939,6 +942,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'kcg',
         'kde',
         'kea',
+        'kek',
         'ken',
         'kfo',
         'kgp',
@@ -1050,6 +1054,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'mwl',
         'mwr',
         'mwv',
+        'mww',
         'mya',
         'mye',
         'myv',
@@ -1202,6 +1207,7 @@ class LanguagesTest extends ResourceBundleTestCase
         'sun',
         'sus',
         'sux',
+        'suz',
         'swa',
         'swb',
         'swc',
@@ -1782,7 +1788,7 @@ class LanguagesTest extends ResourceBundleTestCase
     public static function provideLanguagesWithAlpha3Equivalent()
     {
         return array_map(
-            fn ($value) => [$value],
+            static fn ($value) => [$value],
             array_keys(self::ALPHA2_TO_ALPHA3)
         );
     }
@@ -1796,7 +1802,7 @@ class LanguagesTest extends ResourceBundleTestCase
     public static function provideLanguagesWithoutAlpha3Equivalent()
     {
         return array_map(
-            fn ($value) => [$value],
+            static fn ($value) => [$value],
             array_diff(self::LANGUAGES, array_keys(self::ALPHA2_TO_ALPHA3))
         );
     }
@@ -1828,7 +1834,7 @@ class LanguagesTest extends ResourceBundleTestCase
     public static function provideLanguagesWithAlpha2Equivalent()
     {
         return array_map(
-            fn ($value) => [$value],
+            static fn ($value) => [$value],
             array_keys(self::ALPHA3_TO_ALPHA2)
         );
     }
@@ -1842,7 +1848,7 @@ class LanguagesTest extends ResourceBundleTestCase
     public static function provideLanguagesWithoutAlpha2Equivalent()
     {
         return array_map(
-            fn ($value) => [$value],
+            static fn ($value) => [$value],
             array_diff(self::ALPHA3_CODES, array_keys(self::ALPHA3_TO_ALPHA2))
         );
     }

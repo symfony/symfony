@@ -113,7 +113,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
 
     private function generateSymbolNamePairs(ArrayAccessibleResourceBundle $rootBundle): array
     {
-        $symbolNamePairs = array_map(fn ($pair) => \array_slice(iterator_to_array($pair), 0, 2), iterator_to_array($rootBundle['Currencies']));
+        $symbolNamePairs = array_map(static fn ($pair) => \array_slice(iterator_to_array($pair), 0, 2), iterator_to_array($rootBundle['Currencies']));
 
         // Remove unwanted currencies
         return array_diff_key($symbolNamePairs, self::DENYLIST);
@@ -165,11 +165,11 @@ class CurrencyDataGenerator extends AbstractDataGenerator
                 }
 
                 if (\array_key_exists('from', $metadata)) {
-                    $metadata['from'] = self::icuPairToDate($metadata['from']);
+                    $metadata['from'] = self::icuPairToDatetimeString($metadata['from']);
                 }
 
                 if (\array_key_exists('to', $metadata)) {
-                    $metadata['to'] = self::icuPairToDate($metadata['to']);
+                    $metadata['to'] = self::icuPairToDatetimeString($metadata['to']);
                 }
 
                 if (\array_key_exists('tender', $metadata)) {
@@ -225,7 +225,7 @@ class CurrencyDataGenerator extends AbstractDataGenerator
      *
      * @param array{0: int, 1: int} $pair
      */
-    private static function icuPairToDate(array $pair): string
+    private static function icuPairToDatetimeString(array $pair): string
     {
         [$highBits32, $lowBits32] = $pair;
 
@@ -241,12 +241,13 @@ class CurrencyDataGenerator extends AbstractDataGenerator
             --$seconds;
         }
 
-        $datetime = \DateTimeImmutable::createFromFormat('U', $seconds, new \DateTimeZone('Etc/UTC'));
+        // Note: Unlike the XML files, the date pair is already in UTC.
+        $datetime = \DateTimeImmutable::createFromFormat('U', (string) $seconds, new \DateTimeZone('Etc/UTC'));
 
         if (false === $datetime) {
             throw new \RuntimeException('Unable to parse ICU milliseconds pair.');
         }
 
-        return $datetime->format('Y-m-d');
+        return $datetime->format('Y-m-d\TH:i:s');
     }
 }

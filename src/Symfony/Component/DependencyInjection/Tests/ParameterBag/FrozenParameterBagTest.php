@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\ParameterBag;
 
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
@@ -67,7 +66,6 @@ class FrozenParameterBagTest extends TestCase
      * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testGetDeprecated()
     {
         $bag = new FrozenParameterBag(

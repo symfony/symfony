@@ -153,9 +153,7 @@ final class ScalewayApiTransport extends AbstractApiTransport
 
     protected function formatAddresses(array $addresses): array
     {
-        return array_map(function (Address $address) {
-            return $this->formatAddress($address);
-        }, $addresses);
+        return array_map(fn (Address $address) => $this->formatAddress($address), $addresses);
     }
 
     private function getEndpoint(): ?string

@@ -126,7 +126,7 @@ class Collection implements CollectionInterface
             'count' => null,
             'dn' => null,
         ]);
-        array_walk($attributes, function (&$value) {
+        array_walk($attributes, static function (&$value) {
             unset($value['count']);
         });
 

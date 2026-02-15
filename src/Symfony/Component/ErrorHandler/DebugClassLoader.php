@@ -869,7 +869,7 @@ class DebugClassLoader
 
                 $constant = new \ReflectionClassConstant($definingClass, $constantName);
 
-                if (\PHP_VERSION_ID >= 80300 && $constantType = $constant->getType()) {
+                if ($constantType = $constant->getType()) {
                     if ($constantType instanceof \ReflectionNamedType) {
                         $n = $constantType->getName();
                     } else {
@@ -1245,7 +1245,7 @@ class DebugClassLoader
             $static = 'static' === $parts[0];
 
             for ($i = $static ? 2 : 0; null !== $p = $parts[$i] ?? null; $i += 2) {
-                if (\in_array($p, ['', '|', '&', 'callable'], true) || \in_array(substr($returnType, -1), ['|', '&'], true)) {
+                if (\in_array($p, ['', 'callable'], true) || \in_array(substr($returnType, -1), ['|', '&'], true) || \in_array($p[0], ['|', '&'], true)) {
                     $returnType .= trim($parts[$i - 1] ?? '').$p;
                     continue;
                 }

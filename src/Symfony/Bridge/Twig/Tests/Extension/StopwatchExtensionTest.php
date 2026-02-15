@@ -77,18 +77,18 @@ class StopwatchExtensionTest extends TestCase
                 $expectedName->evaluate($name);
                 $this->assertSame($expectedCategory, $category);
 
-                return $this->createMock(StopwatchEvent::class);
+                return new StopwatchEvent('1.0');
             })
         ;
 
         $stopwatch
             ->expects($this->exactly($expectedCalls))
             ->method('stop')
-            ->willReturnCallback(function (string $name) use (&$expectedStopCalls) {
+            ->willReturnCallback(static function (string $name) use (&$expectedStopCalls) {
                 [$expectedName] = array_shift($expectedStopCalls);
                 $expectedName->evaluate($name);
 
-                return $this->createMock(StopwatchEvent::class);
+                return new StopwatchEvent('1.0');
             })
         ;
 

@@ -11,7 +11,7 @@ return [
         'Africa/Dakar' => 'Greenwich Mean Time (Dakar)',
         'Africa/Freetown' => 'Greenwich Mean Time (Freetown)',
         'Africa/Johannesburg' => 'Afrika Borwa Nako (Johannesburg)',
-        'Africa/Lome' => 'Greenwich Mean Time (Lome)',
+        'Africa/Lome' => 'Greenwich Mean Time (Lomé)',
         'Africa/Maseru' => 'Lesotho Nako (Maseru)',
         'Africa/Monrovia' => 'Greenwich Mean Time (Monrovia)',
         'Africa/Nouakchott' => 'Greenwich Mean Time (Nouakchott)',

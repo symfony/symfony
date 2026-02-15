@@ -112,6 +112,8 @@ class ImportMapManager
                     $entry->packageModuleSpecifier,
                     null,
                     $importName,
+                    null,
+                    $entry->isEntrypoint,
                 );
 
                 // remove it: then it will be re-added

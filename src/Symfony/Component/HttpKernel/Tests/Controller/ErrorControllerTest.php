@@ -26,7 +26,7 @@ class ErrorControllerTest extends TestCase
     #[DataProvider('getInvokeControllerDataProvider')]
     public function testInvokeController(Request $request, \Exception $exception, int $statusCode, string $content)
     {
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = $this->createStub(HttpKernelInterface::class);
         $errorRenderer = new HtmlErrorRenderer();
         $controller = new ErrorController($kernel, null, $errorRenderer);
         $response = $controller($exception);

@@ -1,0 +1,8 @@
+services:
+    my_service:
+        class: \Redis
+
+framework:
+    lock:
+      foo: "%env(REDIS_DSN)%"
+      bar: my_service

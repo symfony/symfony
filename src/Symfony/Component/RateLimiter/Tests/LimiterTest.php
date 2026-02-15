@@ -61,6 +61,6 @@ class LimiterTest extends TestCase
 
     private function createFactory(array $options)
     {
-        return new RateLimiterFactory($options, $this->createMock(StorageInterface::class), $this->createMock(LockFactory::class));
+        return new RateLimiterFactory($options, $this->createStub(StorageInterface::class), $this->createStub(LockFactory::class));
     }
 }

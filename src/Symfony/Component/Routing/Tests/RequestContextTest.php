@@ -47,7 +47,7 @@ class RequestContextTest extends TestCase
 
     public function testConstructParametersBcLayer()
     {
-        $requestContext = new class() extends RequestContext {
+        $requestContext = new class extends RequestContext {
             public function __construct()
             {
                 $this->setParameters(['foo' => 'bar']);

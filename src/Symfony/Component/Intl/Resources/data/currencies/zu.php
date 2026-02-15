@@ -634,6 +634,10 @@ return [
             'EC$',
             'i-East Caribbean Dollar',
         ],
+        'XCG' => [
+            'Cg.',
+            'Caribbean guilder',
+        ],
         'XOF' => [
             'F CFA',
             'i-West African CFA Franc',
@@ -657,6 +661,10 @@ return [
         'ZMW' => [
             'ZMW',
             'i-Zambian Kwacha',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'Zimbabwean Gold',
         ],
     ],
 ];

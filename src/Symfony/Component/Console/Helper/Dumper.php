@@ -36,7 +36,7 @@ final class Dumper
                 return rtrim($dumper->dump(($this->cloner ??= new VarCloner())->cloneVar($var)->withRefHandles(false), true));
             };
         } else {
-            $this->handler = fn ($var): string => match (true) {
+            $this->handler = static fn ($var): string => match (true) {
                 null === $var => 'null',
                 true === $var => 'true',
                 false === $var => 'false',

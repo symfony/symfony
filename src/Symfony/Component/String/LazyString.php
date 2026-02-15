@@ -103,38 +103,9 @@ class LazyString implements \Stringable, \JsonSerializable
 
     public function __serialize(): array
     {
-        if (self::class === (new \ReflectionMethod($this, '__sleep'))->class || self::class !== (new \ReflectionMethod($this, '__serialize'))->class) {
-            $this->__toString();
-
-            return ['value' => $this->value];
-        }
-
-        trigger_deprecation('symfony/string', '7.4', 'Implementing "%s::__sleep()" is deprecated, use "__serialize()" instead.', get_debug_type($this));
-
-        $data = [];
-        foreach ($this->__sleep() as $key) {
-            try {
-                if (($r = new \ReflectionProperty($this, $key))->isInitialized($this)) {
-                    $data[$key] = $r->getValue($this);
-                }
-            } catch (\ReflectionException) {
-                $data[$key] = $this->$key;
-            }
-        }
-
-        return $data;
-    }
-
-    /**
-     * @deprecated since Symfony 7.4, will be replaced by `__serialize()` in 8.0
-     */
-    public function __sleep(): array
-    {
-        trigger_deprecation('symfony/string', '7.4', 'Calling "%s::__sleep()" is deprecated, use "__serialize()" instead.', get_debug_type($this));
-
         $this->__toString();
 
-        return ['value'];
+        return ['value' => $this->value];
     }
 
     public function jsonSerialize(): string

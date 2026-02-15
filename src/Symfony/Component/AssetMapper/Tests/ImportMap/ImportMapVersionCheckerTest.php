@@ -36,7 +36,7 @@ class ImportMapVersionCheckerTest extends TestCase
         $remoteDownloader = $this->createMock(RemotePackageDownloader::class);
         $remoteDownloader->expects($this->exactly(\count($importMapEntries)))
             ->method('getDependencies')
-            ->with($this->callback(function ($importName) use ($importMapEntries) {
+            ->with($this->callback(static function ($importName) use ($importMapEntries) {
                 foreach ($importMapEntries as $entry) {
                     if ($entry->importName === $importName) {
                         return true;
@@ -45,7 +45,7 @@ class ImportMapVersionCheckerTest extends TestCase
 
                 return false;
             }))
-            ->willReturnCallback(function ($importName) use ($dependencies) {
+            ->willReturnCallback(static function ($importName) use ($dependencies) {
                 if (!isset($dependencies[$importName])) {
                     throw new \InvalidArgumentException(\sprintf('Missing dependencies in test for "%s"', $importName));
                 }

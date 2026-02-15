@@ -24,7 +24,7 @@ class ZookeeperStoreFactoryTest extends TestCase
 {
     public function testCreateZooKeeperStore()
     {
-        $store = StoreFactory::createStore($this->createMock(\Zookeeper::class));
+        $store = StoreFactory::createStore($this->createStub(\Zookeeper::class));
 
         $this->assertInstanceOf(ZookeeperStore::class, $store);
     }

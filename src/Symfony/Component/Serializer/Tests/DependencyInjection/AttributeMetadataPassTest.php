@@ -13,7 +13,6 @@ namespace Symfony\Component\Serializer\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\DependencyInjection\AttributeMetadataPass;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
@@ -52,18 +51,14 @@ class AttributeMetadataPassTest extends TestCase
             ->setArguments([false, []]);
 
         $container->register('service1', '%user_entity.class%')
-            ->addTag('serializer.attribute_metadata')
-            ->addTag('container.excluded');
+            ->addTag('serializer.attribute_metadata');
         $container->register('service2', 'App\Entity\Product')
-            ->addTag('serializer.attribute_metadata')
-            ->addTag('container.excluded');
+            ->addTag('serializer.attribute_metadata');
         $container->register('service3', 'App\Entity\Order')
-            ->addTag('serializer.attribute_metadata')
-            ->addTag('container.excluded');
+            ->addTag('serializer.attribute_metadata');
         // Classes should be deduplicated
         $container->register('service4', 'App\Entity\Order')
-            ->addTag('serializer.attribute_metadata')
-            ->addTag('container.excluded');
+            ->addTag('serializer.attribute_metadata');
 
         (new AttributeMetadataPass())->process($container);
 
@@ -78,18 +73,6 @@ class AttributeMetadataPassTest extends TestCase
         $this->assertSame([false, $expectedClasses], $arguments);
     }
 
-    public function testThrowsWhenMissingExcludedTag()
-    {
-        $container = new ContainerBuilder();
-        $container->register('serializer.mapping.attribute_loader');
-
-        $container->register('service_without_excluded', 'App\\Entity\\User')
-            ->addTag('serializer.attribute_metadata');
-
-        $this->expectException(InvalidArgumentException::class);
-        (new AttributeMetadataPass())->process($container);
-    }
-
     public function testProcessWithForOptionAndMatchingMembers()
     {
         $sourceClass = _AttrMeta_Source::class;
@@ -100,8 +83,7 @@ class AttributeMetadataPassTest extends TestCase
             ->setArguments([false, []]);
 
         $container->register('service.source', $sourceClass)
-            ->addTag('serializer.attribute_metadata', ['for' => $targetClass])
-            ->addTag('container.excluded');
+            ->addTag('serializer.attribute_metadata', ['for' => $targetClass]);
 
         (new AttributeMetadataPass())->process($container);
 
@@ -119,8 +101,7 @@ class AttributeMetadataPassTest extends TestCase
             ->setArguments([false, []]);
 
         $container->register('service.source', $sourceClass)
-            ->addTag('serializer.attribute_metadata', ['for' => $targetClass])
-            ->addTag('container.excluded');
+            ->addTag('serializer.attribute_metadata', ['for' => $targetClass]);
 
         $this->expectException(MappingException::class);
         (new AttributeMetadataPass())->process($container);

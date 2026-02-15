@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Clickatell\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Clickatell\ClickatellTransport;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Exception\TransportException;
@@ -21,7 +22,6 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class ClickatellTransportTest extends TransportTestCase
 {
@@ -53,26 +53,18 @@ final class ClickatellTransportTest extends TransportTestCase
 
         $this->expectException(LogicException::class);
 
-        $transport->send($this->createMock(MessageInterface::class));
+        $transport->send($this->createStub(MessageInterface::class));
     }
 
     public function testExceptionIsThrownWhenHttpSendFailed()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(500);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode([
-                'error' => [
-                    'code' => 105,
-                    'description' => 'Invalid Account Reference EX0000000',
-                    'documentation' => 'https://documentation-page',
-                ],
-            ]));
-
-        $client = new MockHttpClient($response);
+        $client = new MockHttpClient(new MockResponse(json_encode([
+            'error' => [
+                'code' => 105,
+                'description' => 'Invalid Account Reference EX0000000',
+                'documentation' => 'https://documentation-page',
+            ],
+        ]), ['http_code' => 500]));
 
         $transport = self::createTransport($client);
 

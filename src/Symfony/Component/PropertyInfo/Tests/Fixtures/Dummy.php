@@ -188,6 +188,9 @@ class Dummy extends ParentDummy
     /** @var Dummy[]|null  */
     public $nullableTypedCollection = null;
 
+    /** @var string|mixed  */
+    public $unionWithMixed;
+
     public static function getStatic()
     {
     }

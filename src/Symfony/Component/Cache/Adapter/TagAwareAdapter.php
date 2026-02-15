@@ -211,9 +211,9 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             }
 
             return $this->pool->clear($prefix);
-        } else {
-            $this->deferred = [];
         }
+
+        $this->deferred = [];
 
         return $this->pool->clear();
     }

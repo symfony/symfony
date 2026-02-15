@@ -136,13 +136,13 @@ final class TurboSmsTransportTest extends TransportTestCase
         $this->expectException(LengthException::class);
         $this->expectExceptionMessage('The sender length of a TurboSMS message must not exceed 20 characters.');
 
-        new TurboSmsTransport('authToken', 'abcdefghijklmnopqrstu', $this->createMock(HttpClientInterface::class));
+        new TurboSmsTransport('authToken', 'abcdefghijklmnopqrstu', new MockHttpClient());
     }
 
     public function testInvalidSubjectWithLatinSymbols()
     {
         $message = new SmsMessage('380931234567', str_repeat('z', 1522));
-        $transport = new TurboSmsTransport('authToken', 'sender', $this->createMock(HttpClientInterface::class));
+        $transport = new TurboSmsTransport('authToken', 'sender', new MockHttpClient());
 
         $this->expectException(LengthException::class);
         $this->expectExceptionMessage('The subject length for "latin" symbols of a TurboSMS message must not exceed 1521 characters.');
@@ -153,7 +153,7 @@ final class TurboSmsTransportTest extends TransportTestCase
     public function testInvalidSubjectWithCyrillicSymbols()
     {
         $message = new SmsMessage('380931234567', str_repeat('z', 661).'Й');
-        $transport = new TurboSmsTransport('authToken', 'sender', $this->createMock(HttpClientInterface::class));
+        $transport = new TurboSmsTransport('authToken', 'sender', new MockHttpClient());
 
         $this->expectException(LengthException::class);
         $this->expectExceptionMessage('The subject length for "cyrillic" symbols of a TurboSMS message must not exceed 661 characters.');

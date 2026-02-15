@@ -182,7 +182,7 @@ return [
         'PF' => 'Polynesia Ffrengig',
         'PG' => 'Papua Guinea Newydd',
         'PH' => 'Y Philipinau',
-        'PK' => 'Pakistan',
+        'PK' => 'Pacistan',
         'PL' => 'Gwlad Pwyl',
         'PM' => 'Saint-Pierre-et-Miquelon',
         'PN' => 'Ynysoedd Pitcairn',

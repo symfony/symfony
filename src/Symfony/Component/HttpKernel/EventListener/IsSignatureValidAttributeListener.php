@@ -12,9 +12,11 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Attribute\IsSignatureValid;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
+use Symfony\Component\HttpKernel\Event\ControllerAttributeEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -29,25 +31,49 @@ class IsSignatureValidAttributeListener implements EventSubscriberInterface
     ) {
     }
 
-    public function onKernelControllerArguments(ControllerArgumentsEvent $event): void
+    public function onKernelControllerAttribute(ControllerAttributeEvent $event): void
     {
-        if (!$attributes = $event->getAttributes(IsSignatureValid::class)) {
+        $kernelEvent = $event->kernelEvent;
+
+        if (!$kernelEvent instanceof ControllerArgumentsEvent) {
             return;
         }
 
-        $request = $event->getRequest();
-        foreach ($attributes as $attribute) {
-            $methods = array_map('strtoupper', $attribute->methods);
-            if ($methods && !\in_array($request->getMethod(), $methods, true)) {
-                continue;
-            }
+        $this->processAttribute($event->attribute, $kernelEvent->getRequest());
+    }
 
-            $this->uriSigner->verify($request);
+    /**
+     * @internal since Symfony 8.1, use onKernelControllerAttribute() instead
+     */
+    public function onKernelControllerArguments(ControllerArgumentsEvent $event): void
+    {
+        $request = $event->getRequest();
+
+        foreach ($event->getAttributes(IsSignatureValid::class) as $attribute) {
+            $this->processAttribute($attribute, $request);
         }
+    }
+
+    private function processAttribute(IsSignatureValid $attribute, Request $request): void
+    {
+        $methods = array_map('strtoupper', $attribute->methods);
+        if ($methods && !\in_array($request->getMethod(), $methods, true)) {
+            return;
+        }
+
+        $this->uriSigner->verify($request);
     }
 
     public static function getSubscribedEvents(): array
     {
-        return [KernelEvents::CONTROLLER_ARGUMENTS => ['onKernelControllerArguments', 30]];
+        if (!class_exists(ControllerAttributesListener::class, false)) {
+            return [
+                KernelEvents::CONTROLLER_ARGUMENTS => ['onKernelControllerArguments', 30],
+            ];
+        }
+
+        return [
+            KernelEvents::CONTROLLER_ARGUMENTS.'.'.IsSignatureValid::class => 'onKernelControllerAttribute',
+        ];
     }
 }

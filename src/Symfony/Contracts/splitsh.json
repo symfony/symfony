@@ -1,0 +1,13 @@
+{
+    "subtrees": {
+        "cache-contracts": "Cache",
+        "deprecation-contracts": "Deprecation",
+        "event-dispatcher-contracts": "EventDispatcher",
+        "http-client-contracts": "HttpClient",
+        "service-contracts": "Service",
+        "translation-contracts": "Translation"
+    },
+    "defaults": {
+        "git_constraint": "<1.8.2"
+    }
+}

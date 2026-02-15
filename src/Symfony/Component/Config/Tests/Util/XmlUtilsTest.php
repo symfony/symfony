@@ -203,7 +203,7 @@ class XmlUtilsTest extends TestCase
     {
         $errorReporting = error_reporting(-1);
 
-        set_error_handler(function ($errno, $errstr) {
+        set_error_handler(static function ($errno, $errstr) {
             throw new \Exception($errstr, $errno);
         });
 

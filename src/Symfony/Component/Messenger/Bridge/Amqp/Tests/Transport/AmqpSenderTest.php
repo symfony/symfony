@@ -31,7 +31,7 @@ class AmqpSenderTest extends TestCase
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
         $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->method('encode')->with($envelope)->willReturn($encoded);
+        $serializer->expects($this->once())->method('encode')->with($envelope)->willReturn($encoded);
 
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers']);
@@ -46,7 +46,7 @@ class AmqpSenderTest extends TestCase
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
         $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->method('encode')->with($envelope)->willReturn($encoded);
+        $serializer->expects($this->once())->method('encode')->with($envelope)->willReturn($encoded);
 
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers'], 0, $stamp);
@@ -61,7 +61,7 @@ class AmqpSenderTest extends TestCase
         $encoded = ['body' => '...'];
 
         $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->method('encode')->with($envelope)->willReturn($encoded);
+        $serializer->expects($this->once())->method('encode')->with($envelope)->willReturn($encoded);
 
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('publish')->with($encoded['body'], []);
@@ -76,7 +76,7 @@ class AmqpSenderTest extends TestCase
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class, 'Content-Type' => 'application/json']];
 
         $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->method('encode')->with($envelope)->willReturn($encoded);
+        $serializer->expects($this->once())->method('encode')->with($envelope)->willReturn($encoded);
 
         $connection = $this->createMock(Connection::class);
         unset($encoded['headers']['Content-Type']);
@@ -93,7 +93,7 @@ class AmqpSenderTest extends TestCase
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class, 'Content-Type' => 'application/json']];
 
         $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->method('encode')->with($envelope)->willReturn($encoded);
+        $serializer->expects($this->once())->method('encode')->with($envelope)->willReturn($encoded);
 
         $connection = $this->createMock(Connection::class);
         unset($encoded['headers']['Content-Type']);
@@ -110,10 +110,10 @@ class AmqpSenderTest extends TestCase
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
         $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->method('encode')->with($envelope)->willReturn($encoded);
+        $serializer->expects($this->once())->method('encode')->with($envelope)->willReturn($encoded);
 
         $connection = $this->createMock(Connection::class);
-        $connection->method('publish')->with($encoded['body'], $encoded['headers'])->willThrowException(new \AMQPException());
+        $connection->expects($this->once())->method('publish')->with($encoded['body'], $encoded['headers'])->willThrowException(new \AMQPException());
 
         $sender = new AmqpSender($connection, $serializer);
         $sender->send($envelope);
@@ -128,7 +128,7 @@ class AmqpSenderTest extends TestCase
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
         $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->method('encode')->with($envelope)->willReturn($encoded);
+        $serializer->expects($this->once())->method('encode')->with($envelope)->willReturn($encoded);
 
         $connection = $this->createMock(Connection::class);
 
@@ -149,7 +149,7 @@ class AmqpSenderTest extends TestCase
         $encoded = ['body' => '...', 'headers' => ['type' => DummyMessage::class]];
 
         $serializer = $this->createMock(SerializerInterface::class);
-        $serializer->method('encode')->with($envelope)->willReturn($encoded);
+        $serializer->expects($this->once())->method('encode')->with($envelope)->willReturn($encoded);
 
         $connection = $this->createMock(Connection::class);
 

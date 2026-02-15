@@ -29,6 +29,7 @@ class GetAttrNodeTest extends AbstractNodeTestCase
 
             ['baz', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), self::getArrayNode(), GetAttrNode::METHOD_CALL), ['foo' => new Obj()]],
             ['a', new GetAttrNode(new NameNode('foo'), new NameNode('index'), self::getArrayNode(), GetAttrNode::ARRAY_CALL), ['foo' => ['b' => 'a', 'b'], 'index' => 'b']],
+            [null, new GetAttrNode(new NameNode('foo'), new ConstantNode(0), new ArgumentsNode(), GetAttrNode::ARRAY_CALL, true), ['foo' => null]],
         ];
     }
 
@@ -57,6 +58,7 @@ class GetAttrNodeTest extends AbstractNodeTestCase
             ['foo[index]', new GetAttrNode(new NameNode('foo'), new NameNode('index'), self::getArrayNode(), GetAttrNode::ARRAY_CALL)],
 
             ['foo?.foo()', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo', true, true), new ArgumentsNode(), GetAttrNode::METHOD_CALL)],
+            ['foo?.[0]', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), new ArgumentsNode(), GetAttrNode::ARRAY_CALL, true)],
         ];
     }
 

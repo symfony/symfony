@@ -22,7 +22,7 @@ class ZstandardCompressorTest extends TestCase
 {
     private const WRITABLE_ROOT = __DIR__.'/../Fixtures/zstandard_compressor_filesystem';
 
-    private Filesystem $filesystem;
+    private ?Filesystem $filesystem = null;
 
     protected function setUp(): void
     {
@@ -38,7 +38,7 @@ class ZstandardCompressorTest extends TestCase
 
     protected function tearDown(): void
     {
-        $this->filesystem->remove(self::WRITABLE_ROOT);
+        $this->filesystem?->remove(self::WRITABLE_ROOT);
     }
 
     public function testCompress()

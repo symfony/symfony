@@ -112,7 +112,7 @@ class EventSourceHttpClientTest extends TestCase
     {
         $chunk = new DataChunk(0, '');
         $response = new MockResponse('', ['canceled' => false, 'http_method' => 'POST', 'url' => 'http://localhost:8080/events', 'response_headers' => ['content-type: text/event-stream']]);
-        $responseStream = new ResponseStream((function () use ($response, $chunk) {
+        $responseStream = new ResponseStream((static function () use ($response, $chunk) {
             yield $response => new FirstChunk();
             yield $response => $chunk;
             yield $response => new ErrorChunk(0, 'timeout');
@@ -140,7 +140,7 @@ class EventSourceHttpClientTest extends TestCase
     {
         $chunk = new DataChunk(0, '');
         $response = new MockResponse('', ['canceled' => false, 'http_method' => 'GET', 'url' => 'http://localhost:8080/events', 'response_headers' => ['content-type: '.$contentType]]);
-        $responseStream = new ResponseStream((function () use ($response, $chunk) {
+        $responseStream = new ResponseStream((static function () use ($response, $chunk) {
             yield $response => new FirstChunk();
             yield $response => $chunk;
             yield $response => new ErrorChunk(0, 'timeout');

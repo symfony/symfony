@@ -109,15 +109,15 @@ class StreamedJsonResponseTest extends TestCase
         $content = $this->createSendResponse(
             [
                 '_embedded' => [
-                    'list' => (function (): \Generator {
+                    'list' => (static function (): \Generator {
                         yield 0 => 'test';
                         yield 'key' => 'value';
                     })(),
-                    'map' => (function (): \Generator {
+                    'map' => (static function (): \Generator {
                         yield 'key' => 'value';
                         yield 0 => 'test';
                     })(),
-                    'integer' => (function (): \Generator {
+                    'integer' => (static function (): \Generator {
                         yield 1 => 'one';
                         yield 3 => 'three';
                     })(),
@@ -222,7 +222,7 @@ class StreamedJsonResponseTest extends TestCase
         $response = new StreamedJsonResponse([
             '_embedded' => [
                 'count' => '2', // options are applied to the initial json encode
-                'values' => (function (): \Generator {
+                'values' => (static function (): \Generator {
                     yield 'with/unescaped/slash' => 'With/a/slash'; // options are applied to key and values
                     yield '3' => '3'; // numeric check for value, but not for the key
                 })(),

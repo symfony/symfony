@@ -11,12 +11,10 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 class ConstraintWithoutValueWithNamedArguments extends Constraint
 {
-    #[HasNamedArguments]
     public function __construct(?array $groups = null)
     {
         parent::__construct(null, $groups);

@@ -412,7 +412,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
                     }
                 } elseif (\is_array($data) && !is_numeric($key)) {
                     // Is this array fully numeric keys?
-                    if (!$preserveNumericKeys && null === array_find_key($data, static fn ($v, $k) => is_string($k))) {
+                    if (!$preserveNumericKeys && $data && null === array_find_key($data, static fn ($v, $k) => \is_string($k))) {
                         /*
                          * Create nodes to append to $parentNode based on the $key of this array
                          * Produces <xml><item>0</item><item>1</item></xml>
@@ -514,7 +514,7 @@ class XmlEncoder implements EncoderInterface, DecoderInterface, NormalizationAwa
 
             return $this->selectNodeType($node, $this->serializer->normalize($val, $format, $context), $format, $context);
         } elseif (is_numeric($val)) {
-            return $this->appendText($node, (string) $val);
+            return $this->appendText($node, is_nan($val) ? 'NAN' : (string) $val);
         } elseif (\is_string($val) && $this->needsCdataWrapping($node->nodeName, $val, $context)) {
             return $this->appendCData($node, $val);
         } elseif (\is_string($val)) {

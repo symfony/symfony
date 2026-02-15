@@ -14,7 +14,6 @@ namespace Symfony\Component\Messenger\Bridge\Doctrine\Tests\Transport;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
 use PHPUnit\Framework\Attributes\Group;
@@ -64,11 +63,9 @@ class DoctrinePostgreSqlPgbouncerIntegrationTest extends TestCase
         }
 
         $url = "pdo-pgsql://postgres:password@$host";
-        $params = class_exists(DsnParser::class) ? (new DsnParser())->parse($url) : ['url' => $url];
+        $params = (new DsnParser())->parse($url);
         $config = new Configuration();
-        if (class_exists(DefaultSchemaManagerFactory::class)) {
-            $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
-        }
+        $config->setSchemaManagerFactory(new DefaultSchemaManagerFactory());
 
         $this->driverConnection = DriverManager::getConnection($params, $config);
         $this->connection = new PostgreSqlConnection(['table_name' => 'queue_table'], $this->driverConnection);
@@ -79,14 +76,7 @@ class DoctrinePostgreSqlPgbouncerIntegrationTest extends TestCase
         if (!isset($this->driverConnection)) {
             return;
         }
-        $this->createSchemaManager()->dropTable('queue_table');
+        $this->driverConnection->createSchemaManager()->dropTable('queue_table');
         $this->driverConnection->close();
-    }
-
-    private function createSchemaManager(): AbstractSchemaManager
-    {
-        return method_exists($this->driverConnection, 'createSchemaManager')
-            ? $this->driverConnection->createSchemaManager()
-            : $this->driverConnection->getSchemaManager();
     }
 }

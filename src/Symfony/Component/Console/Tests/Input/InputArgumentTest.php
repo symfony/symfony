@@ -84,6 +84,17 @@ class InputArgumentTest extends TestCase
         $this->assertSame([1, 2], $argument->getDefault(), '->setDefault() changes the default value');
     }
 
+    public function testSetDefaultWithObject()
+    {
+        $default = new \DateTimeImmutable('2024-01-01');
+        $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', $default);
+        $this->assertSame($default, $argument->getDefault(), '->getDefault() returns the object default value');
+
+        $newDefault = new \DateTimeImmutable('2024-06-01');
+        $argument->setDefault($newDefault);
+        $this->assertSame($newDefault, $argument->getDefault(), '->setDefault() changes the default value to an object');
+    }
+
     public function testSetDefaultWithRequiredArgument()
     {
         $argument = new InputArgument('foo', InputArgument::REQUIRED);
@@ -121,22 +132,22 @@ class InputArgumentTest extends TestCase
         $this->assertTrue($argument->hasCompletion());
         $suggestions = new CompletionSuggestions();
         $argument->complete(new CompletionInput(), $suggestions);
-        $this->assertSame($values, array_map(fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
+        $this->assertSame($values, array_map(static fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
     }
 
     public function testCompleteClosure()
     {
         $values = ['foo', 'bar'];
-        $argument = new InputArgument('foo', null, '', null, fn (CompletionInput $input): array => $values);
+        $argument = new InputArgument('foo', null, '', null, static fn (CompletionInput $input): array => $values);
         $this->assertTrue($argument->hasCompletion());
         $suggestions = new CompletionSuggestions();
         $argument->complete(new CompletionInput(), $suggestions);
-        $this->assertSame($values, array_map(fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
+        $this->assertSame($values, array_map(static fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
     }
 
     public function testCompleteClosureReturnIncorrectType()
     {
-        $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', null, fn (CompletionInput $input) => 'invalid');
+        $argument = new InputArgument('foo', InputArgument::OPTIONAL, '', null, static fn (CompletionInput $input) => 'invalid');
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Closure for argument "foo" must return an array. Got "string".');

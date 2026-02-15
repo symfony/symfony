@@ -41,18 +41,18 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
     ];
 
     private array $defaultOptions = self::OPTIONS_DEFAULTS + [
-        'auth_ntlm' => null, // array|string - an array containing the username as first value, and optionally the
-                             //   password as the second one; or string like username:password - enabling NTLM auth
+        // array|string - an array containing the username as first value, and optionally the
+        //  password as the second one; or string like username:password - enabling NTLM auth
+        'auth_ntlm' => null,
         'extra' => [
-            'curl' => [],    // A list of extra curl options indexed by their corresponding CURLOPT_*
+            'use_persistent_connections' => false,
+            // A list of extra curl options indexed by their corresponding CURLOPT_*
+            'curl' => [],
         ],
     ];
     private static array $emptyDefaults = self::OPTIONS_DEFAULTS + ['auth_ntlm' => null];
 
     private ?LoggerInterface $logger = null;
-
-    private int $maxHostConnections;
-    private int $maxPendingPushes;
 
     /**
      * An internal object to share state between the client and its responses.
@@ -72,22 +72,18 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             throw new \LogicException('You cannot use the "Symfony\Component\HttpClient\CurlHttpClient" as the "curl" extension is not installed.');
         }
 
-        $this->maxHostConnections = $maxHostConnections;
-        $this->maxPendingPushes = $maxPendingPushes;
-
         $this->defaultOptions['buffer'] ??= self::shouldBuffer(...);
 
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, $this->defaultOptions);
         }
+
+        $this->multi = new CurlClientState($maxHostConnections, $maxPendingPushes);
     }
 
     public function setLogger(LoggerInterface $logger): void
     {
-        $this->logger = $logger;
-        if (isset($this->multi)) {
-            $this->multi->logger = $logger;
-        }
+        $this->logger = $this->multi->logger = $logger;
     }
 
     /**
@@ -95,8 +91,6 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
      */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
-        $multi = $this->ensureState();
-
         [$url, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
         $scheme = $url['scheme'];
         $authority = $url['authority'];
@@ -143,7 +137,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_1_1;
         } elseif (\defined('CURL_VERSION_HTTP2') && (\CURL_VERSION_HTTP2 & CurlClientState::$curlVersion['features']) && ('https:' === $scheme || 2.0 === (float) $options['http_version'])) {
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_2_0;
-        } elseif (\defined('CURL_VERSION_HTTP3') && (\CURL_VERSION_HTTP3 & CurlClientState::$curlVersion['features']) && 3.0 === (float) $options['http_version']) {
+        } elseif (\defined('CURL_VERSION_HTTP3') && (\CURL_VERSION_HTTP3 & CurlClientState::$curlVersion['features']) && 3.0 === (float) $options['http_version'] && !self::willUseProxy($proxy, $curlopts[\CURLOPT_NOPROXY], $host)) {
             $curlopts[\CURLOPT_HTTP_VERSION] = \CURL_HTTP_VERSION_3;
         }
 
@@ -176,24 +170,24 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         }
 
         // curl's resolve feature varies by host:port but ours varies by host only, let's handle this with our own DNS map
-        if (isset($multi->dnsCache->hostnames[$host])) {
-            $options['resolve'] += [$host => $multi->dnsCache->hostnames[$host]];
+        if (isset($this->multi->dnsCache->hostnames[$host])) {
+            $options['resolve'] += [$host => $this->multi->dnsCache->hostnames[$host]];
         }
 
-        if ($options['resolve'] || $multi->dnsCache->evictions) {
+        if ($options['resolve'] || $this->multi->dnsCache->evictions) {
             // First reset any old DNS cache entries then add the new ones
-            $resolve = $multi->dnsCache->evictions;
-            $multi->dnsCache->evictions = [];
+            $resolve = $this->multi->dnsCache->evictions;
+            $this->multi->dnsCache->evictions = [];
 
             if ($resolve && 0x072A00 > CurlClientState::$curlVersion['version_number']) {
                 // DNS cache removals require curl 7.42 or higher
-                $multi->reset();
+                $this->multi->reset();
             }
 
             foreach ($options['resolve'] as $resolveHost => $ip) {
                 $resolve[] = null === $ip ? "-$resolveHost:$port" : "$resolveHost:$port:$ip";
-                $multi->dnsCache->hostnames[$resolveHost] = $ip;
-                $multi->dnsCache->removals["-$resolveHost:$port"] = "-$resolveHost:$port";
+                $this->multi->dnsCache->hostnames[$resolveHost] = $ip;
+                $this->multi->dnsCache->removals["-$resolveHost:$port"] = "-$resolveHost:$port";
             }
 
             $curlopts[\CURLOPT_RESOLVE] = $resolve;
@@ -294,13 +288,17 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $curlopts[\CURLOPT_TIMEOUT_MS] = 1000 * $options['max_duration'];
         }
 
+        if (0 < $options['max_connect_duration']) {
+            $curlopts[\CURLOPT_CONNECTTIMEOUT_MS] = ceil(1000 * $options['max_connect_duration']);
+        }
+
         if (!empty($options['extra']['curl']) && \is_array($options['extra']['curl'])) {
             $this->validateExtraCurlOptions($options['extra']['curl']);
             $curlopts += $options['extra']['curl'];
         }
 
-        if ($pushedResponse = $multi->pushedResponses[$url] ?? null) {
-            unset($multi->pushedResponses[$url]);
+        if ($pushedResponse = $this->multi->pushedResponses[$url] ?? null) {
+            unset($this->multi->pushedResponses[$url]);
 
             if (self::acceptPushForRequest($method, $options, $pushedResponse)) {
                 $this->logger?->debug(\sprintf('Accepting pushed response: "%s %s"', $method, $url));
@@ -308,7 +306,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
                 // Reinitialize the pushed response with request's options
                 $ch = $pushedResponse->handle;
                 $pushedResponse = $pushedResponse->response;
-                $pushedResponse->__construct($multi, $url, $options, $this->logger);
+                $pushedResponse->__construct($this->multi, $url, $options, $this->logger);
             } else {
                 $this->logger?->debug(\sprintf('Rejecting pushed response: "%s"', $url));
                 $pushedResponse = null;
@@ -318,7 +316,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
         if (!$pushedResponse) {
             $ch = curl_init();
             $this->logger?->info(\sprintf('Request: "%s %s"', $method, $url));
-            $curlopts += [\CURLOPT_SHARE => $multi->share];
+            $curlopts += [\CURLOPT_SHARE => ($options['extra']['use_persistent_connections'] ?? false) ? $this->multi->share : $this->multi->persistentShare];
         }
 
         foreach ($curlopts as $opt => $value) {
@@ -331,7 +329,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        return $pushedResponse ?? new CurlResponse($multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $authority), CurlClientState::$curlVersion['version_number'], $url);
+        return $pushedResponse ?? new CurlResponse($this->multi, $ch, $options, $this->logger, $method, self::createRedirectResolver($options, $authority), CurlClientState::$curlVersion['version_number'], $url);
     }
 
     public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
@@ -340,11 +338,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             $responses = [$responses];
         }
 
-        $multi = $this->ensureState();
-
-        if ($multi->handle instanceof \CurlMultiHandle) {
+        if ($this->multi->handle instanceof \CurlMultiHandle) {
             $active = 0;
-            while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($multi->handle, $active)) {
+            while (\CURLM_CALL_MULTI_PERFORM === curl_multi_exec($this->multi->handle, $active)) {
             }
         }
 
@@ -353,9 +349,7 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
     public function reset(): void
     {
-        if (isset($this->multi)) {
-            $this->multi->reset();
-        }
+        $this->multi->reset();
     }
 
     /**
@@ -384,7 +378,9 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             }
         }
 
-        return true;
+        $statusCode = $pushedResponse->response->getInfo('http_code') ?: 200;
+
+        return $statusCode < 300 || 400 <= $statusCode;
     }
 
     /**
@@ -446,20 +442,15 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
                 curl_setopt($ch, \CURLOPT_HTTPHEADER, $redirectHeaders['with_auth']);
             }
 
-            curl_setopt($ch, \CURLOPT_PROXY, self::getProxyUrl($options['proxy'], $url));
+            $proxy = self::getProxyUrl($options['proxy'], $url);
+            curl_setopt($ch, \CURLOPT_PROXY, $proxy);
+
+            if (\defined('CURL_HTTP_VERSION_3') && \CURL_HTTP_VERSION_3 === curl_getinfo($ch, \CURLINFO_HTTP_VERSION) && self::willUseProxy($proxy, $options['no_proxy'] ?? $_SERVER['no_proxy'] ?? $_SERVER['NO_PROXY'] ?? '', parse_url($url['authority'], \PHP_URL_HOST))) {
+                curl_setopt($ch, \CURLOPT_HTTP_VERSION, \defined('CURL_HTTP_VERSION_2_0') ? \CURL_HTTP_VERSION_2_0 : \CURL_HTTP_VERSION_1_1);
+            }
 
             return implode('', $url);
         };
-    }
-
-    private function ensureState(): CurlClientState
-    {
-        if (!isset($this->multi)) {
-            $this->multi = new CurlClientState($this->maxHostConnections, $this->maxPendingPushes);
-            $this->multi->logger = $this->logger;
-        }
-
-        return $this->multi;
     }
 
     private function findConstantName(int $opt): ?string
@@ -489,6 +480,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_INTERFACE => 'bindto',
             \CURLOPT_TIMEOUT_MS => 'max_duration',
             \CURLOPT_TIMEOUT => 'max_duration',
+            \CURLOPT_CONNECTTIMEOUT_MS => 'max_connect_duration',
+            \CURLOPT_CONNECTTIMEOUT => 'max_connect_duration',
             \CURLOPT_MAXREDIRS => 'max_redirects',
             \CURLOPT_POSTREDIR => 'max_redirects',
             \CURLOPT_PROXY => 'proxy',
@@ -527,8 +520,6 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
             \CURLOPT_URL,
             \CURLOPT_FOLLOWLOCATION,
             \CURLOPT_HEADER,
-            \CURLOPT_CONNECTTIMEOUT,
-            \CURLOPT_CONNECTTIMEOUT_MS,
             \CURLOPT_HTTP_VERSION,
             \CURLOPT_PORT,
             \CURLOPT_DNS_USE_GLOBAL_CACHE,
@@ -561,5 +552,26 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
                 throw new InvalidArgumentException(\sprintf('Cannot set "%s" with "extra.curl".', $constName));
             }
         }
+    }
+
+    private static function willUseProxy(?string $proxy, string $noProxy, string $host): bool
+    {
+        if (null === $proxy) {
+            return false;
+        }
+
+        if ('' === $noProxy) {
+            return true;
+        }
+
+        foreach (preg_split('/[\s,]+/', $noProxy) as $rule) {
+            $dotRule = '.'.ltrim($rule, '.');
+
+            if ('*' === $rule || $host === $rule || str_ends_with($host, $dotRule)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

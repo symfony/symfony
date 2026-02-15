@@ -11,7 +11,7 @@ return [
         'Atlantic/Stanley' => 'hora de Islas Malvinas (Stanley)',
         'Indian/Christmas' => 'hora de la isla de Navidad',
         'Pacific/Easter' => 'hora de Isla de Pascua',
-        'Pacific/Honolulu' => 'hora de Hawái-Aleutianas (Honolulu)',
+        'Pacific/Honolulu' => 'hora estándar de Hawái-Aleutianas (Honolulu)',
         'Pacific/Tarawa' => 'hora de las Islas Gilbert (Tarawa)',
         'Pacific/Wake' => 'hora de la Isla Wake',
     ],

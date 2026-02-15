@@ -30,7 +30,7 @@ class NormalizationTest extends TestCase
                     ->node('encoders', 'array')
                         ->useAttributeAsKey('class')
                         ->prototype('array')
-                            ->beforeNormalization()->ifString()->then(fn ($v) => ['algorithm' => $v])->end()
+                            ->beforeNormalization()->ifString()->then(static fn ($v) => ['algorithm' => $v])->end()
                             ->children()
                                 ->node('algorithm', 'scalar')->end()
                             ->end()
@@ -87,7 +87,7 @@ class NormalizationTest extends TestCase
             ],
         ];
 
-        return array_map(fn ($v) => [$v], $configs);
+        return array_map(static fn ($v) => [$v], $configs);
     }
 
     #[DataProvider('getAnonymousKeysTests')]
@@ -131,7 +131,7 @@ class NormalizationTest extends TestCase
             ],
         ];
 
-        return array_map(fn ($v) => [$v], $configs);
+        return array_map(static fn ($v) => [$v], $configs);
     }
 
     #[DataProvider('getNumericKeysTests')]
@@ -160,7 +160,7 @@ class NormalizationTest extends TestCase
             ],
         ];
 
-        return array_map(fn ($v) => [$v], $configs);
+        return array_map(static fn ($v) => [$v], $configs);
     }
 
     public function testNonAssociativeArrayThrowsExceptionIfAttributeNotSet()

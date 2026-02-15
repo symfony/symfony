@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Bandwidth\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthOptions;
 use Symfony\Component\Notifier\Bridge\Bandwidth\BandwidthTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
@@ -57,14 +58,11 @@ final class BandwidthTransportTest extends TransportTestCase
     public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from)
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects(self::exactly(2))->method('getStatusCode')->willReturn(202);
-        $response->expects(self::once())->method('getContent')->willReturn(json_encode(['id' => 'foo']));
-        $client = new MockHttpClient(function (string $method, string $url) use ($response): ResponseInterface {
+        $client = new MockHttpClient(static function (string $method, string $url): ResponseInterface {
             self::assertSame('POST', $method);
             self::assertSame('https://messaging.bandwidth.com/api/v2/users/account_id/messages', $url);
 
-            return $response;
+            return new MockResponse(json_encode(['id' => 'foo']), ['http_code' => 202]);
         });
         $transport = $this->createTransport($client, $from);
         $sentMessage = $transport->send($message);

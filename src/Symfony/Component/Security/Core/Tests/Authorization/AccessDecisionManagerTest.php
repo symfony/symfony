@@ -13,7 +13,9 @@ namespace Symfony\Component\Security\Core\Tests\Authorization;
 
 use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManager;
 use Symfony\Component\Security\Core\Authorization\Strategy\AccessDecisionStrategyInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\CacheableVoterInterface;
@@ -31,8 +33,6 @@ class AccessDecisionManagerTest extends TestCase
 
     public function testVoterCalls()
     {
-        $token = $this->createMock(TokenInterface::class);
-
         $voters = [
             $this->getExpectedVoter(VoterInterface::ACCESS_DENIED),
             $this->getExpectedVoter(VoterInterface::ACCESS_GRANTED),
@@ -40,7 +40,7 @@ class AccessDecisionManagerTest extends TestCase
         ];
 
         $strategy = new class implements AccessDecisionStrategyInterface {
-            public function decide(\Traversable $results): bool
+            public function decide(\Traversable $results, ?AccessDecision $accessDecision = null): bool
             {
                 $i = 0;
                 foreach ($results as $result) {
@@ -62,12 +62,12 @@ class AccessDecisionManagerTest extends TestCase
 
         $manager = new AccessDecisionManager($voters, $strategy);
 
-        $this->assertTrue($manager->decide($token, ['ROLE_FOO']));
+        $this->assertTrue($manager->decide(new NullToken(), ['ROLE_FOO']));
     }
 
     public function testCacheableVoters()
     {
-        $token = $this->createMock(TokenInterface::class);
+        $token = new NullToken();
         $voter = $this->createMock(CacheableVoterInterface::class);
 
         $voter
@@ -92,7 +92,7 @@ class AccessDecisionManagerTest extends TestCase
 
     public function testCacheableVotersIgnoresNonStringAttributes()
     {
-        $token = $this->createMock(TokenInterface::class);
+        $token = new NullToken();
         $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->never())
@@ -114,7 +114,7 @@ class AccessDecisionManagerTest extends TestCase
 
     public function testCacheableVotersWithMultipleAttributes()
     {
-        $token = $this->createMock(TokenInterface::class);
+        $token = new NullToken();
         $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->exactly(2))
@@ -147,7 +147,7 @@ class AccessDecisionManagerTest extends TestCase
 
     public function testCacheableVotersWithEmptyAttributes()
     {
-        $token = $this->createMock(TokenInterface::class);
+        $token = new NullToken();
         $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->never())
@@ -169,7 +169,7 @@ class AccessDecisionManagerTest extends TestCase
 
     public function testCacheableVotersSupportsMethodsCalledOnce()
     {
-        $token = $this->createMock(TokenInterface::class);
+        $token = new NullToken();
         $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->once())
@@ -194,7 +194,7 @@ class AccessDecisionManagerTest extends TestCase
 
     public function testCacheableVotersNotCalled()
     {
-        $token = $this->createMock(TokenInterface::class);
+        $token = new NullToken();
         $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->once())
@@ -214,7 +214,7 @@ class AccessDecisionManagerTest extends TestCase
 
     public function testCacheableVotersWithMultipleAttributesAndNonString()
     {
-        $token = $this->createMock(TokenInterface::class);
+        $token = new NullToken();
         $voter = $this->createMock(CacheableVoterInterface::class);
         $voter
             ->expects($this->once())

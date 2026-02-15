@@ -16,7 +16,6 @@ require_once __DIR__.'/Fixtures/includes/classes.php';
 require_once __DIR__.'/Fixtures/includes/ProjectExtension.php';
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
@@ -38,7 +37,6 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\BadMethodCallException;
 use Symfony\Component\DependencyInjection\Exception\EnvNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\ParameterCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
@@ -115,7 +113,6 @@ class ContainerBuilderTest extends TestCase
      * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testDeprecateParameter()
     {
         $builder = new ContainerBuilder();
@@ -132,7 +129,6 @@ class ContainerBuilderTest extends TestCase
      * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testParameterDeprecationIsTrgiggeredWhenCompiled()
     {
         $builder = new ContainerBuilder();
@@ -472,8 +468,8 @@ class ContainerBuilderTest extends TestCase
         $builder = new ContainerBuilder();
         $builder->setResourceTracking(false);
         $defaultPasses = $builder->getCompiler()->getPassConfig()->getPasses();
-        $builder->addCompilerPass($pass1 = $this->createMock(CompilerPassInterface::class), PassConfig::TYPE_BEFORE_OPTIMIZATION, -5);
-        $builder->addCompilerPass($pass2 = $this->createMock(CompilerPassInterface::class), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
+        $builder->addCompilerPass($pass1 = $this->createStub(CompilerPassInterface::class), PassConfig::TYPE_BEFORE_OPTIMIZATION, -5);
+        $builder->addCompilerPass($pass2 = $this->createStub(CompilerPassInterface::class), PassConfig::TYPE_BEFORE_OPTIMIZATION, 10);
 
         $passes = $builder->getCompiler()->getPassConfig()->getPasses();
         $this->assertCount(\count($passes) - 2, $defaultPasses);
@@ -850,28 +846,10 @@ class ContainerBuilderTest extends TestCase
         $container = new ContainerBuilder();
         $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, $c1 = static function (Definition $definition) {});
         $config = new ContainerBuilder();
-        $config->registerAttributeForAutoconfiguration(AsTaggedItem::class, $c2 = function (Definition $definition) {});
+        $config->registerAttributeForAutoconfiguration(AsTaggedItem::class, $c2 = static function (Definition $definition) {});
 
         $container->merge($config);
         $this->assertSame([AsTaggedItem::class => [$c1, $c2]], $container->getAttributeAutoconfigurators());
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testGetAutoconfiguredAttributes()
-    {
-        $container = new ContainerBuilder();
-        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, $c = static function () {});
-
-        $this->expectUserDeprecationMessage('Since symfony/dependency-injection 7.3: The "Symfony\Component\DependencyInjection\ContainerBuilder::getAutoconfiguredAttributes()" method is deprecated, use "getAttributeAutoconfigurators()" instead.');
-        $configurators = $container->getAutoconfiguredAttributes();
-        $this->assertSame($c, $configurators[AsTaggedItem::class]);
-
-        // Method call fails with more than one configurator for a given attribute
-        $container->registerAttributeForAutoconfiguration(AsTaggedItem::class, $c = static function () {});
-
-        $this->expectException(LogicException::class);
-        $container->getAutoconfiguredAttributes();
     }
 
     public function testResolveEnvValues()
@@ -1271,7 +1249,7 @@ class ContainerBuilderTest extends TestCase
 
         $matchingResources = array_filter(
             $container->getResources(),
-            fn (ResourceInterface $resource) => 'reflection.BarClass' === (string) $resource
+            static fn (ResourceInterface $resource) => 'reflection.BarClass' === (string) $resource
         );
 
         $this->assertNotEmpty($matchingResources);
@@ -1452,7 +1430,7 @@ class ContainerBuilderTest extends TestCase
     public function testLazyLoadedService()
     {
         $loader = new ClosureLoader($container = new ContainerBuilder());
-        $loader->load(function (ContainerBuilder $container) {
+        $loader->load(static function (ContainerBuilder $container) {
             $container->set('a', new \BazClass());
             $definition = new Definition('BazClass');
             $definition->setLazy(true);
@@ -1968,11 +1946,7 @@ class ContainerBuilderTest extends TestCase
         $container->compile();
 
         $wither = $container->get('wither');
-        if (\PHP_VERSION_ID >= 80400) {
-            $this->assertTrue((new \ReflectionClass($wither))->isUninitializedLazyObject($wither));
-        } else {
-            $this->assertTrue($wither->resetLazyObject());
-        }
+        $this->assertTrue((new \ReflectionClass($wither))->isUninitializedLazyObject($wither));
         $this->assertInstanceOf(Foo::class, $wither->foo);
         $this->assertInstanceOf(Wither::class, $wither->withFoo1($wither->foo));
     }
@@ -2015,7 +1989,6 @@ class ContainerBuilderTest extends TestCase
      * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     public function testDirectlyAccessingDeprecatedPublicService()
     {
         $this->expectUserDeprecationMessage('Since foo/bar 3.8: Accessing the "Symfony\Component\DependencyInjection\Tests\A" service directly from the container is deprecated, use dependency injection instead.');

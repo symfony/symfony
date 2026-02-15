@@ -12,12 +12,12 @@
 namespace Symfony\Bridge\Doctrine\Tests\Form\Type;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmExtension;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -30,17 +30,23 @@ use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleIntIdNoToStringEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringCastableIdEntity;
 use Symfony\Bridge\Doctrine\Tests\Fixtures\SingleStringIdEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\UlidIdEntity;
+use Symfony\Bridge\Doctrine\Tests\Fixtures\UuidIdEntity;
+use Symfony\Bridge\Doctrine\Types\UlidType;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Form\ChoiceList\LazyChoiceList;
-use Symfony\Component\Form\ChoiceList\Loader\LazyChoiceLoader;
 use Symfony\Component\Form\ChoiceList\View\ChoiceGroupView;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Tests\Extension\Core\Type\BaseTypeTestCase;
 use Symfony\Component\Form\Tests\Extension\Core\Type\FormTypeTest;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Component\Uid\Ulid;
+use Symfony\Component\Uid\Uuid;
 
 class EntityTypeTest extends BaseTypeTestCase
 {
@@ -56,12 +62,21 @@ class EntityTypeTest extends BaseTypeTestCase
     private const COMPOSITE_STRING_IDENT_CLASS = CompositeStringIdEntity::class;
 
     private EntityManager $em;
-    private MockObject&ManagerRegistry $emRegistry;
+    private ManagerRegistry $emRegistry;
 
     protected function setUp(): void
     {
+        if (Type::hasType('uuid')) {
+            Type::overrideType('uuid', UuidType::class);
+        } else {
+            Type::addType('uuid', UuidType::class);
+        }
+        if (!Type::hasType('ulid')) {
+            Type::addType('ulid', UlidType::class);
+        }
+
         $this->em = DoctrineTestHelper::createTestEntityManager();
-        $this->emRegistry = $this->createRegistryMock('default', $this->em);
+        $this->emRegistry = $this->createRegistryMock($this->em);
 
         parent::setUp();
 
@@ -75,6 +90,8 @@ class EntityTypeTest extends BaseTypeTestCase
             $this->em->getClassMetadata(self::SINGLE_STRING_CASTABLE_IDENT_CLASS),
             $this->em->getClassMetadata(self::COMPOSITE_IDENT_CLASS),
             $this->em->getClassMetadata(self::COMPOSITE_STRING_IDENT_CLASS),
+            $this->em->getClassMetadata(UuidIdEntity::class),
+            $this->em->getClassMetadata(UlidIdEntity::class),
         ];
 
         try {
@@ -88,9 +105,9 @@ class EntityTypeTest extends BaseTypeTestCase
         }
     }
 
-    protected function getExtensions(): array
+    protected function getExtensions(?ViolationMapperInterface $violationMapper = null): array
     {
-        return array_merge(parent::getExtensions(), [
+        return array_merge(parent::getExtensions($violationMapper), [
             new DoctrineOrmExtension($this->emRegistry),
         ]);
     }
@@ -221,7 +238,7 @@ class EntityTypeTest extends BaseTypeTestCase
         $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => fn () => new \stdClass(),
+            'query_builder' => static fn () => new \stdClass(),
         ]);
     }
 
@@ -235,8 +252,7 @@ class EntityTypeTest extends BaseTypeTestCase
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => function () {
-                return;
+            'query_builder' => static function () {
             },
         ]);
 
@@ -766,7 +782,7 @@ class EntityTypeTest extends BaseTypeTestCase
             'em' => 'default',
             'class' => self::ITEM_GROUP_CLASS,
             'choice_label' => 'name',
-            'choice_value' => function (?GroupableEntity $entity = null) {
+            'choice_value' => static function (?GroupableEntity $entity = null) {
                 if (null === $entity) {
                     return '';
                 }
@@ -1059,7 +1075,7 @@ class EntityTypeTest extends BaseTypeTestCase
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => fn (EntityRepository $repository) => $repository->createQueryBuilder('e')
+            'query_builder' => static fn (EntityRepository $repository) => $repository->createQueryBuilder('e')
                 ->where('e.id IN (1, 2)'),
             'choice_label' => 'name',
         ]);
@@ -1081,7 +1097,7 @@ class EntityTypeTest extends BaseTypeTestCase
         $field = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => 'default',
             'class' => self::COMPOSITE_IDENT_CLASS,
-            'query_builder' => fn (EntityRepository $repository) => $repository->createQueryBuilder('e')
+            'query_builder' => static fn (EntityRepository $repository) => $repository->createQueryBuilder('e')
                 ->where('e.id1 IN (10, 50)'),
             'choice_label' => 'name',
         ]);
@@ -1137,6 +1153,7 @@ class EntityTypeTest extends BaseTypeTestCase
 
     public function testGetManagerForClassIfNoEm()
     {
+        $this->emRegistry = $this->createMock(ManagerRegistry::class);
         $this->emRegistry->expects($this->never())
             ->method('getManager');
 
@@ -1145,7 +1162,10 @@ class EntityTypeTest extends BaseTypeTestCase
             ->with(self::SINGLE_IDENT_CLASS)
             ->willReturn($this->em);
 
-        $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+        $factory = Forms::createFormFactoryBuilder()
+            ->addExtensions($this->getExtensions())
+            ->getFormFactory();
+        $factory->createNamed('name', static::TESTED_TYPE, null, [
             'class' => self::SINGLE_IDENT_CLASS,
             'required' => false,
             'choice_label' => 'name',
@@ -1154,13 +1174,17 @@ class EntityTypeTest extends BaseTypeTestCase
 
     public function testExplicitEm()
     {
+        $this->emRegistry = $this->createMock(ManagerRegistry::class);
         $this->emRegistry->expects($this->never())
             ->method('getManager');
 
         $this->emRegistry->expects($this->never())
             ->method('getManagerForClass');
 
-        $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+        $factory = Forms::createFormFactoryBuilder()
+            ->addExtensions($this->getExtensions())
+            ->getFormFactory();
+        $factory->createNamed('name', static::TESTED_TYPE, null, [
             'em' => $this->em,
             'class' => self::SINGLE_IDENT_CLASS,
             'choice_label' => 'name',
@@ -1197,13 +1221,13 @@ class EntityTypeTest extends BaseTypeTestCase
         $formBuilder->add('property2', static::TESTED_TYPE, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => fn (EntityRepository $repo) => $repo->createQueryBuilder('e')->where('e.id IN (1, 2)'),
+            'query_builder' => static fn (EntityRepository $repo) => $repo->createQueryBuilder('e')->where('e.id IN (1, 2)'),
         ]);
 
         $formBuilder->add('property3', static::TESTED_TYPE, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => fn (EntityRepository $repo) => $repo->createQueryBuilder('e')->where('e.id IN (1, 2)'),
+            'query_builder' => static fn (EntityRepository $repo) => $repo->createQueryBuilder('e')->where('e.id IN (1, 2)'),
         ]);
 
         $form = $formBuilder->getForm();
@@ -1253,13 +1277,13 @@ class EntityTypeTest extends BaseTypeTestCase
         $formBuilder->add('property2', static::TESTED_TYPE, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => fn (EntityRepository $repo) => $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1),
+            'query_builder' => static fn (EntityRepository $repo) => $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1),
         ]);
 
         $formBuilder->add('property3', static::TESTED_TYPE, [
             'em' => 'default',
             'class' => self::SINGLE_IDENT_CLASS,
-            'query_builder' => fn (EntityRepository $repo) => $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1),
+            'query_builder' => static fn (EntityRepository $repo) => $repo->createQueryBuilder('e')->where('e.id = :id')->setParameter('id', 1),
         ]);
 
         $form = $formBuilder->getForm();
@@ -1279,12 +1303,11 @@ class EntityTypeTest extends BaseTypeTestCase
         $this->assertSame($choiceList1, $choiceList3);
     }
 
-    protected function createRegistryMock($name, $em): MockObject&ManagerRegistry
+    private function createRegistryMock($em): ManagerRegistry
     {
-        $registry = $this->createMock(ManagerRegistry::class);
-        $registry->expects($this->any())
+        $registry = $this->createStub(ManagerRegistry::class);
+        $registry
             ->method('getManager')
-            ->with($this->equalTo($name))
             ->willReturn($em);
 
         return $registry;
@@ -1747,7 +1770,7 @@ class EntityTypeTest extends BaseTypeTestCase
             ->add('entity_two', self::TESTED_TYPE, [
                 'em' => 'default',
                 'class' => self::SINGLE_IDENT_CLASS,
-                'choice_value' => fn ($choice) => $choice ? $choice->name : '',
+                'choice_value' => static fn ($choice) => $choice ? $choice->name : '',
             ])
             ->createView()
         ;
@@ -1761,10 +1784,6 @@ class EntityTypeTest extends BaseTypeTestCase
 
     public function testEmptyChoicesWhenLazy()
     {
-        if (!class_exists(LazyChoiceLoader::class)) {
-            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
-        }
-
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
         $this->persist([$entity1, $entity2]);
@@ -1783,10 +1802,6 @@ class EntityTypeTest extends BaseTypeTestCase
 
     public function testLoadedChoicesWhenLazyAndBoundData()
     {
-        if (!class_exists(LazyChoiceLoader::class)) {
-            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
-        }
-
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
         $this->persist([$entity1, $entity2]);
@@ -1806,10 +1821,6 @@ class EntityTypeTest extends BaseTypeTestCase
 
     public function testLoadedChoicesWhenLazyAndSubmittedData()
     {
-        if (!class_exists(LazyChoiceLoader::class)) {
-            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
-        }
-
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
         $this->persist([$entity1, $entity2]);
@@ -1830,10 +1841,6 @@ class EntityTypeTest extends BaseTypeTestCase
 
     public function testEmptyChoicesWhenLazyAndEmptyDataIsSubmitted()
     {
-        if (!class_exists(LazyChoiceLoader::class)) {
-            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
-        }
-
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
         $this->persist([$entity1, $entity2]);
@@ -1853,10 +1860,6 @@ class EntityTypeTest extends BaseTypeTestCase
 
     public function testErrorOnSubmitInvalidValuesWhenLazyAndCustomQueryBuilder()
     {
-        if (!class_exists(LazyChoiceLoader::class)) {
-            $this->markTestSkipped('This test requires symfony/form 7.2 or superior.');
-        }
-
         $entity1 = new SingleIntIdEntity(1, 'Foo');
         $entity2 = new SingleIntIdEntity(2, 'Bar');
         $this->persist([$entity1, $entity2]);
@@ -1881,5 +1884,109 @@ class EntityTypeTest extends BaseTypeTestCase
         $this->assertCount(0, $view['entity_one']->vars['choices']);
         $this->assertCount(1, $errors = $form->getErrors(true));
         $this->assertSame('The selected choice is invalid.', $errors->current()->getMessage());
+    }
+
+    public function testUidFormatBase58WithUuid()
+    {
+        $uuid = Uuid::fromString('71c5fd46-3f16-4abb-bad7-90ac1e654a2d');
+        $entity1 = new UuidIdEntity($uuid);
+        $this->persist([$entity1]);
+
+        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => UuidIdEntity::class,
+            'choice_label' => static fn () => 'label',
+            'uid_format' => 'base58',
+        ])->createView();
+
+        $this->assertCount(1, $view->vars['choices']);
+        $this->assertSame($uuid->toBase58(), $view->vars['choices'][0]->value);
+    }
+
+    public function testUidFormatBase32WithUuid()
+    {
+        $uuid = Uuid::fromString('71c5fd46-3f16-4abb-bad7-90ac1e654a2d');
+        $entity1 = new UuidIdEntity($uuid);
+        $this->persist([$entity1]);
+
+        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => UuidIdEntity::class,
+            'choice_label' => static fn () => 'label',
+            'uid_format' => 'base32',
+        ])->createView();
+
+        $this->assertCount(1, $view->vars['choices']);
+        $this->assertSame($uuid->toBase32(), $view->vars['choices'][0]->value);
+    }
+
+    public function testUidFormatBase58WithUlid()
+    {
+        $ulid = Ulid::fromString('01ARZ3NDEKTSV4RRFFQ69G5FAV');
+        $entity1 = new UlidIdEntity($ulid);
+        $this->persist([$entity1]);
+
+        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => UlidIdEntity::class,
+            'choice_label' => static fn () => 'label',
+            'uid_format' => 'base58',
+        ])->createView();
+
+        $this->assertCount(1, $view->vars['choices']);
+        $this->assertSame($ulid->toBase58(), $view->vars['choices'][0]->value);
+    }
+
+    public function testUidFormatRfc4122WithUlid()
+    {
+        $ulid = Ulid::fromString('01ARZ3NDEKTSV4RRFFQ69G5FAV');
+        $entity1 = new UlidIdEntity($ulid);
+        $this->persist([$entity1]);
+
+        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => UlidIdEntity::class,
+            'choice_label' => static fn () => 'label',
+            'uid_format' => 'rfc4122',
+        ])->createView();
+
+        $this->assertCount(1, $view->vars['choices']);
+        $this->assertSame($ulid->toRfc4122(), $view->vars['choices'][0]->value);
+    }
+
+    public function testSubmitWithUidFormat()
+    {
+        $uuid = Uuid::fromString('71c5fd46-3f16-4abb-bad7-90ac1e654a2d');
+        $entity1 = new UuidIdEntity($uuid);
+        $this->persist([$entity1]);
+
+        $form = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => UuidIdEntity::class,
+            'choice_label' => static fn () => 'label',
+            'uid_format' => 'base58',
+        ]);
+
+        $form->submit($uuid->toBase58());
+
+        $this->assertTrue($form->isSynchronized());
+        $this->assertSame($entity1, $form->getData());
+    }
+
+    public function testUidFormatDefaultBehavior()
+    {
+        $uuid = Uuid::fromString('71c5fd46-3f16-4abb-bad7-90ac1e654a2d');
+        $entity1 = new UuidIdEntity($uuid);
+        $this->persist([$entity1]);
+
+        $view = $this->factory->createNamed('name', static::TESTED_TYPE, null, [
+            'em' => 'default',
+            'class' => UuidIdEntity::class,
+            'choice_label' => static fn () => 'label',
+        ])->createView();
+
+        $this->assertCount(1, $view->vars['choices']);
+        // Default behavior: UUID uses __toString() which is RFC4122 format
+        $this->assertSame($uuid->toRfc4122(), $view->vars['choices'][0]->value);
     }
 }

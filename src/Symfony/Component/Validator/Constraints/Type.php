@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
 
@@ -36,53 +35,15 @@ class Type extends Constraint
      * @param string|list<string>|null $type   The type(s) to enforce on the value
      * @param string[]|null            $groups
      */
-    #[HasNamedArguments]
-    public function __construct(string|array|null $type, ?string $message = null, ?array $groups = null, mixed $payload = null, ?array $options = null)
+    public function __construct(string|array|null $type, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
-        if (null === $type && !isset($options['type'])) {
+        if (null === $type) {
             throw new MissingOptionsException(\sprintf('The options "type" must be set for constraint "%s".', self::class), ['type']);
         }
 
-        if (\is_array($type) && \is_string(key($type))) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-
-            $options = array_merge($type, $options ?? []);
-            $type = $options['type'] ?? null;
-        } elseif (null !== $type) {
-            if (\is_array($options)) {
-                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-            }
-        } elseif (\is_array($options)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-        }
-
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->message = $message ?? $this->message;
-        $this->type = $type ?? $this->type;
-    }
-
-    /**
-     * @deprecated since Symfony 7.4
-     */
-    public function getDefaultOption(): ?string
-    {
-        if (0 === \func_num_args() || func_get_arg(0)) {
-            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
-        }
-
-        return 'type';
-    }
-
-    /**
-     * @deprecated since Symfony 7.4
-     */
-    public function getRequiredOptions(): array
-    {
-        if (0 === \func_num_args() || func_get_arg(0)) {
-            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
-        }
-
-        return ['type'];
+        $this->type = $type;
     }
 }

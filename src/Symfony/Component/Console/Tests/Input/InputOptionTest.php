@@ -174,6 +174,17 @@ class InputOptionTest extends TestCase
         $this->assertSame([1, 2], $option->getDefault(), '->setDefault() changes the default value');
     }
 
+    public function testSetDefaultWithObject()
+    {
+        $default = new \DateTimeImmutable('2024-01-01');
+        $option = new InputOption('foo', null, InputOption::VALUE_REQUIRED, '', $default);
+        $this->assertSame($default, $option->getDefault(), '->getDefault() returns the object default value');
+
+        $newDefault = new \DateTimeImmutable('2024-06-01');
+        $option->setDefault($newDefault);
+        $this->assertSame($newDefault, $option->getDefault(), '->setDefault() changes the default value to an object');
+    }
+
     public function testDefaultValueWithValueNoneMode()
     {
         $option = new InputOption('foo', 'f', InputOption::VALUE_NONE);
@@ -232,22 +243,22 @@ class InputOptionTest extends TestCase
         $this->assertTrue($option->hasCompletion());
         $suggestions = new CompletionSuggestions();
         $option->complete(new CompletionInput(), $suggestions);
-        $this->assertSame($values, array_map(fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
+        $this->assertSame($values, array_map(static fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
     }
 
     public function testCompleteClosure()
     {
         $values = ['foo', 'bar'];
-        $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL, '', null, fn (CompletionInput $input): array => $values);
+        $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL, '', null, static fn (CompletionInput $input): array => $values);
         $this->assertTrue($option->hasCompletion());
         $suggestions = new CompletionSuggestions();
         $option->complete(new CompletionInput(), $suggestions);
-        $this->assertSame($values, array_map(fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
+        $this->assertSame($values, array_map(static fn (Suggestion $suggestion) => $suggestion->getValue(), $suggestions->getValueSuggestions()));
     }
 
     public function testCompleteClosureReturnIncorrectType()
     {
-        $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL, '', null, fn (CompletionInput $input) => 'invalid');
+        $option = new InputOption('foo', null, InputOption::VALUE_OPTIONAL, '', null, static fn (CompletionInput $input) => 'invalid');
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Closure for option "foo" must return an array. Got "string".');

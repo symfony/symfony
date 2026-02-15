@@ -38,6 +38,10 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         foreach ($container->getDefinitions() as $id => $definition) {
+            if ($definition->hasErrors()) {
+                continue;
+            }
+
             // synthetic service is public
             if ($definition->isSynthetic() && !$definition->isPublic()) {
                 throw new RuntimeException(\sprintf('A synthetic service ("%s") must be public.', $id));

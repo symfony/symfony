@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\SimpleTextin\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\SimpleTextin\SimpleTextinTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -56,15 +57,11 @@ final class SimpleTextinTransportTest extends TransportTestCase
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects(self::exactly(2))->method('getStatusCode')->willReturn(201);
-        $response->expects(self::once())->method('getContent')->willReturn(json_encode(['id' => 'foo']));
-
-        $client = new MockHttpClient(function (string $method, string $url) use ($response): ResponseInterface {
+        $client = new MockHttpClient(static function (string $method, string $url): ResponseInterface {
             self::assertSame('POST', $method);
             self::assertSame('https://api-app2.simpletexting.com/v2/api/messages', $url);
 
-            return $response;
+            return new MockResponse(json_encode(['id' => 'foo']), ['http_code' => 201]);
         });
 
         $transport = $this->createTransport($client, $from);

@@ -28,7 +28,7 @@ class XliffFileLoaderTest extends TestCase
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertEquals([new FileResource($resource)], $catalogue->getResources());
         $this->assertSame([], libxml_get_errors());
-        $this->assertContainsOnly('string', $catalogue->all('domain1'));
+        $this->assertContainsOnlyString($catalogue->all('domain1'));
     }
 
     public function testLoadRawXliff()
@@ -72,7 +72,7 @@ class XliffFileLoaderTest extends TestCase
 
         $this->assertEquals('en', $catalogue->getLocale());
         $this->assertSame([], libxml_get_errors());
-        $this->assertContainsOnly('string', $catalogue->all('domain1'));
+        $this->assertContainsOnlyString($catalogue->all('domain1'));
         $this->assertSame(['foo', 'extra', 'key', 'test'], array_keys($catalogue->all('domain1')));
     }
 
@@ -252,7 +252,7 @@ class XliffFileLoaderTest extends TestCase
 
         $domains = $catalogue->all();
         $this->assertCount(3, $domains['domain1']);
-        $this->assertContainsOnly('string', $catalogue->all('domain1'));
+        $this->assertContainsOnlyString($catalogue->all('domain1'));
 
         // target attributes
         $this->assertEquals(['target-attributes' => ['order' => 1]], $catalogue->getMetadata('bar', 'domain1'));

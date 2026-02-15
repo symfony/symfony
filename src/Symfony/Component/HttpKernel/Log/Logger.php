@@ -59,19 +59,13 @@ class Logger extends AbstractLogger implements DebugLoggerInterface
      */
     public function __construct(?string $minLevel = null, $output = null, ?callable $formatter = null, private readonly ?RequestStack $requestStack = null, bool $debug = false)
     {
-        if (null === $minLevel) {
-            $minLevel = null === $output || 'php://stdout' === $output || 'php://stderr' === $output ? LogLevel::ERROR : LogLevel::WARNING;
-
-            if (isset($_ENV['SHELL_VERBOSITY']) || isset($_SERVER['SHELL_VERBOSITY'])) {
-                $minLevel = match ((int) ($_ENV['SHELL_VERBOSITY'] ?? $_SERVER['SHELL_VERBOSITY'])) {
-                    -1 => LogLevel::ERROR,
-                    1 => LogLevel::NOTICE,
-                    2 => LogLevel::INFO,
-                    3 => LogLevel::DEBUG,
-                    default => $minLevel,
-                };
-            }
-        }
+        $minLevel ??= match ((int) ($_ENV['SHELL_VERBOSITY'] ?? $_SERVER['SHELL_VERBOSITY'] ?? 0)) {
+            -1 => LogLevel::ERROR,
+            1 => LogLevel::NOTICE,
+            2 => LogLevel::INFO,
+            3 => LogLevel::DEBUG,
+            default => null === $output || 'php://stdout' === $output || 'php://stderr' === $output ? LogLevel::ERROR : LogLevel::WARNING,
+        };
 
         if (!isset(self::LEVELS[$minLevel])) {
             throw new InvalidArgumentException(\sprintf('The log level "%s" does not exist.', $minLevel));

@@ -13,7 +13,6 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use BcMath\Number;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
@@ -52,7 +51,6 @@ class NumberNormalizerTest extends TestCase
         yield 'null' => [null, false];
     }
 
-    #[RequiresPhp('>=8.4')]
     #[RequiresPhpExtension('bcmath')]
     #[DataProvider('normalizeGoodBcMathNumberValueProvider')]
     public function testNormalizeBcMathNumber(Number $data, string $expected)
@@ -100,7 +98,6 @@ class NumberNormalizerTest extends TestCase
         yield 'null' => [null];
     }
 
-    #[RequiresPhp('>=8.4')]
     #[RequiresPhpExtension('bcmath')]
     public function testSupportsBcMathNumberDenormalization()
     {
@@ -118,7 +115,6 @@ class NumberNormalizerTest extends TestCase
         $this->assertFalse($this->normalizer->supportsDenormalization(null, \stdClass::class));
     }
 
-    #[RequiresPhp('>=8.4')]
     #[RequiresPhpExtension('bcmath')]
     #[DataProvider('denormalizeGoodBcMathNumberValueProvider')]
     public function testDenormalizeBcMathNumber(string|int $data, string $type, Number $expected)
@@ -150,7 +146,6 @@ class NumberNormalizerTest extends TestCase
         }
     }
 
-    #[RequiresPhp('>=8.4')]
     #[RequiresPhpExtension('bcmath')]
     #[DataProvider('denormalizeBadBcMathNumberValueProvider')]
     public function testDenormalizeBadBcMathNumberValueThrows(mixed $data, string $type, string $expectedException, string $expectedExceptionMessage)

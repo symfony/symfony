@@ -436,8 +436,8 @@ class AccessTokenTest extends AbstractWebTestCase
         ];
 
         return [
-            [fn () => self::createJws($claims)],
-            [fn () => self::createJwe(self::createJws($claims))],
+            [static fn () => self::createJws($claims)],
+            [static fn () => self::createJwe(self::createJws($claims))],
         ];
     }
 
@@ -458,14 +458,14 @@ class AccessTokenTest extends AbstractWebTestCase
         ];
 
         return [
-            [fn () => self::createJws([...$claims, 'aud' => 'Invalid Audience'])],
-            [fn () => self::createJws([...$claims, 'iss' => 'Invalid Issuer'])],
-            [fn () => self::createJws([...$claims, 'exp' => $time - 3600])],
-            [fn () => self::createJws([...$claims, 'nbf' => $time + 3600])],
-            [fn () => self::createJws([...$claims, 'iat' => $time + 3600])],
-            [fn () => self::createJws([...$claims, 'username' => 'Invalid Username'])],
-            [fn () => self::createJwe(self::createJws($claims), ['exp' => $time - 3600])],
-            [fn () => self::createJwe(self::createJws($claims), ['cty' => 'x-specific'])],
+            [static fn () => self::createJws([...$claims, 'aud' => 'Invalid Audience'])],
+            [static fn () => self::createJws([...$claims, 'iss' => 'Invalid Issuer'])],
+            [static fn () => self::createJws([...$claims, 'exp' => $time - 3600])],
+            [static fn () => self::createJws([...$claims, 'nbf' => $time + 3600])],
+            [static fn () => self::createJws([...$claims, 'iat' => $time + 3600])],
+            [static fn () => self::createJws([...$claims, 'username' => 'Invalid Username'])],
+            [static fn () => self::createJwe(self::createJws($claims), ['exp' => $time - 3600])],
+            [static fn () => self::createJwe(self::createJws($claims), ['cty' => 'x-specific'])],
         ];
     }
 

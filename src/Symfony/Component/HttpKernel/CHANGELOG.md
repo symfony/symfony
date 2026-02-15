@@ -1,6 +1,41 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `hasErrors()` method to `Profile` to track profiles with errors (exceptions or error-level logs)
+ * Validate typed route parameters before calling controllers and return an HTTP error when an invalid value is provided
+ * Add `ControllerAttributeEvent` et al. to dispatch events named after controller attributes
+ * Add support for `UploadedFile` when using `MapRequestPayload`
+ * Add support for bundles as compiler pass
+ * Add support for `SOURCE_DATE_EPOCH` environment variable
+ * Add property `$controllerMetadata` to several kernel events to give listeners access to controller metadata
+ * Add `Request` attribute `_controller_attributes` to decouple controller attributes from their source code
+ * Return attributes as a flat list when using `Controller[Arguments]Event::getAttributes('*')`
+ * Pass `request` and `args` variables to `Cache` attribute expressions containing the `Request` object and controller arguments
+ * Allow using closures with the `Cache` attribute
+ * Allow setting a condition when the `Cache` attribute should be applied
+ * Add `ControllerEvent::evaluate()` et al. to help with evaluating expressions or closures in controller attributes
+ * Deprecate passing a non-flat list of attributes to `Controller::setController()`
+ * Deprecate the `Symfony\Component\HttpKernel\DependencyInjection\Extension` class, use the parent `Symfony\Component\DependencyInjection\Extension\Extension` class instead
+ * Allow using Expression or \Closure for `validationGroups` in `#[MapRequestPayload]` and `#[MapQueryString]`
+ * Deprecate passing a `ControllerArgumentsEvent` to the `ViewEvent` constructor; pass a `ControllerArgumentsMetadata` instead
+ * Support variadic argument with `#[MapRequestPayload]`
+ * Add `#[Serialize]` to serialize values returned by controllers
+
+8.0
+---
+
+ * Remove `AddAnnotatedClassesToCachePass`
+ * Remove `Extension::getAnnotatedClassesToCompile()` and `Extension::addAnnotatedClassesToCompile()`
+ * Remove `Kernel::getAnnotatedClassesToCompile()` and `Kernel::setAnnotatedClassCache()`
+ * Make `ServicesResetter` class `final`
+ * Add argument `$logChannel` to `ErrorListener::logException()`
+ * Add argument `$event` to `DumpListener::configure()`
+ * Replace `__sleep/wakeup()` by `__(un)serialize()` on kernels and data collectors
+ * Add method `getShareDir()` to `KernelInterface`
+
 7.4
 ---
 
@@ -9,6 +44,8 @@ CHANGELOG
  * Deprecate implementing `__sleep/wakeup()` on data collectors; use `__(un)serialize()` instead
  * Add `#[IsSignatureValid]` attribute to validate URI signatures
  * Make `Profile` final and `Profiler::__sleep()` internal
+ * Collect the application runner class
+ * Allow configuring `DumpListener` to use a different dumper when CLI profiling is enabled
 
 7.3
 ---

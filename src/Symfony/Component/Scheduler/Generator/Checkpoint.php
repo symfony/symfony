@@ -38,7 +38,7 @@ final class Checkpoint implements CheckpointInterface
         }
 
         if ($this->cache) {
-            [$this->time, $this->index, $this->from] = $this->cache->get($this->name, fn () => [$now, -1, $now]) + [2 => $now];
+            [$this->time, $this->index, $this->from] = $this->cache->get($this->name, static fn () => [$now, -1, $now]) + [2 => $now];
             $this->save($this->time, $this->index);
         } elseif ($this->reset) {
             $this->reset = false;

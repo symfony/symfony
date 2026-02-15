@@ -40,7 +40,7 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
         $this->setUpAuthenticator();
         $request = new Request([], [], [], [], [], ['CONTENT_TYPE' => 'application/x-www-form-urlencoded']);
         $request->request->set('access_token', 'INVALID_ACCESS_TOKEN');
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
 
         $this->assertNull($this->authenticator->supports($request));
     }
@@ -50,7 +50,7 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
         $this->setUpAuthenticator('protection-token');
         $request = new Request([], [], [], [], [], ['CONTENT_TYPE' => 'application/x-www-form-urlencoded']);
         $request->request->set('protection-token', 'INVALID_ACCESS_TOKEN');
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
 
         $this->assertNull($this->authenticator->supports($request));
     }
@@ -61,7 +61,7 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
         $this->setUpAuthenticator();
         $request = new Request([], [], [], [], [], ['CONTENT_TYPE' => 'application/x-www-form-urlencoded'], 'access_token=VALID_ACCESS_TOKEN');
         $request->request->set('access_token', 'VALID_ACCESS_TOKEN');
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
 
         $passport = $this->authenticator->authenticate($request);
         $this->assertInstanceOf(SelfValidatingPassport::class, $passport);
@@ -73,7 +73,7 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
         $this->setUpAuthenticator('protection-token');
         $request = new Request([], [], [], [], [], ['CONTENT_TYPE' => 'application/x-www-form-urlencoded']);
         $request->request->set('protection-token', 'VALID_ACCESS_TOKEN');
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
 
         $passport = $this->authenticator->authenticate($request);
         $this->assertInstanceOf(SelfValidatingPassport::class, $passport);
@@ -93,24 +93,24 @@ class FormEncodedBodyAccessTokenAuthenticatorTest extends TestCase
     public static function provideInvalidAuthenticateData(): iterable
     {
         $request = new Request();
-        $request->setMethod(Request::METHOD_GET);
+        $request->setMethod('GET');
         yield [$request, 'Invalid credentials.', BadCredentialsException::class];
 
         $request = new Request();
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         yield [$request, 'Invalid credentials.', BadCredentialsException::class];
 
         $request = new Request([], [], [], [], [], ['HTTP_AUTHORIZATION' => 'Bearer VALID_ACCESS_TOKEN']);
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         yield [$request, 'Invalid credentials.', BadCredentialsException::class];
 
         $request = new Request();
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->request->set('foo', 'VALID_ACCESS_TOKEN');
         yield [$request, 'Invalid credentials.', BadCredentialsException::class];
 
         $request = new Request([], [], [], [], [], ['CONTENT_TYPE' => 'application/x-www-form-urlencoded']);
-        $request->setMethod(Request::METHOD_POST);
+        $request->setMethod('POST');
         $request->request->set('access_token', 'INVALID_ACCESS_TOKEN');
         yield [$request, 'Invalid access token or invalid user.', BadCredentialsException::class];
     }

@@ -31,7 +31,7 @@ class PasswordHasherFactoryTest extends TestCase
             'arguments' => ['sha512', true, 5],
         ]]);
 
-        $hasher = $factory->getPasswordHasher($this->createMock(PasswordAuthenticatedUserInterface::class));
+        $hasher = $factory->getPasswordHasher($this->createStub(PasswordAuthenticatedUserInterface::class));
         $expectedHasher = new MessageDigestPasswordHasher('sha512', true, 5);
 
         $this->assertEquals($expectedHasher->hash('foo', 'moo'), $hasher->hash('foo', 'moo'));
@@ -43,7 +43,7 @@ class PasswordHasherFactoryTest extends TestCase
             PasswordAuthenticatedUserInterface::class => new MessageDigestPasswordHasher('sha1'),
         ]);
 
-        $hasher = $factory->getPasswordHasher($this->createMock(PasswordAuthenticatedUserInterface::class));
+        $hasher = $factory->getPasswordHasher($this->createStub(PasswordAuthenticatedUserInterface::class));
         $expectedHasher = new MessageDigestPasswordHasher('sha1');
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }
@@ -54,7 +54,7 @@ class PasswordHasherFactoryTest extends TestCase
             PasswordAuthenticatedUserInterface::class => ['instance' => new MessageDigestPasswordHasher('sha1')],
         ]);
 
-        $hasher = $factory->getPasswordHasher($this->createMock(PasswordAuthenticatedUserInterface::class));
+        $hasher = $factory->getPasswordHasher($this->createStub(PasswordAuthenticatedUserInterface::class));
         $expectedHasher = new MessageDigestPasswordHasher('sha1');
         $this->assertEquals($expectedHasher->hash('foo', ''), $hasher->hash('foo', ''));
     }

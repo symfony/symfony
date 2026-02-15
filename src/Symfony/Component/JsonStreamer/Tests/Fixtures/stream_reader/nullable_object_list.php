@@ -24,7 +24,7 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
         if (null === $data) {
             return null;
         }
-        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>|null".', \get_debug_type($data)));
+        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>|null'));
     };
     return $providers['list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>|null'](\Symfony\Component\JsonStreamer\Read\Decoder::decodeString((string) $string));
 };

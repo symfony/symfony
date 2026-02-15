@@ -12,12 +12,9 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\DateIntervalType;
-use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
 class DateIntervalTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
-    use ValidatorExtensionTrait;
-
     protected function createForm(array $options = [])
     {
         return $this->factory->create(DateIntervalType::class, null, $options);

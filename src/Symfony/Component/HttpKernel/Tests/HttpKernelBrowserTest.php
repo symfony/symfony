@@ -80,9 +80,22 @@ class HttpKernelBrowserTest extends TestCase
         $r = new \ReflectionObject($client);
         $m = $r->getMethod('filterResponse');
 
-        $response = new StreamedResponse(function () {
+        $response = new StreamedResponse(static function () {
             echo 'foo';
         });
+
+        $domResponse = $m->invoke($client, $response);
+        $this->assertEquals('foo', $domResponse->getContent());
+    }
+
+    public function testFilterResponseSupportsStreamedResponsesWithChunks()
+    {
+        $client = new HttpKernelBrowser(new TestHttpKernel());
+
+        $r = new \ReflectionObject($client);
+        $m = $r->getMethod('filterResponse');
+
+        $response = new StreamedResponse(new \ArrayIterator(['foo']));
 
         $domResponse = $m->invoke($client, $response);
         $this->assertEquals('foo', $domResponse->getContent());
@@ -157,7 +170,7 @@ class HttpKernelBrowserTest extends TestCase
             ->getMock()
         ;
         /* should be modified when the getClientSize will be removed */
-        $file->expects($this->any())
+        $file->expects($this->atLeastOnce())
             ->method('getSize')
             ->willReturn(\PHP_INT_MAX)
         ;

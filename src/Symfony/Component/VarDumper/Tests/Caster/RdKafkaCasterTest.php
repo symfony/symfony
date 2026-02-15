@@ -43,14 +43,14 @@ class RdKafkaCasterTest extends TestCase
     public function testDumpConf()
     {
         $conf = new Conf();
-        $conf->setErrorCb(function ($kafka, $err, $reason) {});
-        $conf->setDrMsgCb(function () {});
-        $conf->setRebalanceCb(function () {});
+        $conf->setErrorCb(static function ($kafka, $err, $reason) {});
+        $conf->setDrMsgCb(static function () {});
+        $conf->setRebalanceCb(static function () {});
 
         // BC with earlier version of extension rdkafka
         foreach (['setLogCb', 'setOffsetCommitCb', 'setStatsCb', 'setConsumeCb'] as $method) {
             if (method_exists($conf, $method)) {
-                $conf->{$method}(function () {});
+                $conf->{$method}(static function () {});
             }
         }
 

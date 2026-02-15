@@ -42,6 +42,9 @@ class ChatterTest extends TestCase
             ->method('send')
             ->with($message)
             ->willReturn($sentMessage);
+        $this->bus
+            ->expects($this->never())
+            ->method('dispatch');
 
         $chatter = new Chatter($this->transport);
         $this->assertSame($sentMessage, $chatter->send($message));

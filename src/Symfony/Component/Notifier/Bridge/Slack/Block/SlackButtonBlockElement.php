@@ -16,7 +16,7 @@ namespace Symfony\Component\Notifier\Bridge\Slack\Block;
  */
 final class SlackButtonBlockElement extends AbstractSlackBlockElement
 {
-    public function __construct(string $text, ?string $url = null, ?string $style = null, ?string $value = null)
+    public function __construct(string $text, ?string $url = null, ?string $style = null, ?string $value = null, ?array $confirm = null)
     {
         $this->options = [
             'type' => 'button',
@@ -37,6 +37,10 @@ final class SlackButtonBlockElement extends AbstractSlackBlockElement
 
         if ($value) {
             $this->options['value'] = $value;
+        }
+
+        if ($confirm) {
+            $this->options['confirm'] = $confirm;
         }
     }
 }

@@ -118,4 +118,33 @@ class Psr18ClientTest extends TestCase
         $resultResponse = $client->sendRequest($request);
         $this->assertSame('Very Early Hints', $resultResponse->getReasonPhrase());
     }
+
+    public function testAutoUpgradeHttpVersion()
+    {
+        $clientWithoutOption = new Psr18Client(new MockHttpClient(static fn (string $method, string $url, array $options) => new MockResponse(json_encode([
+            'SERVER_PROTOCOL' => 'HTTP/'.$options['http_version'] ?? '',
+        ]), [
+            'response_headers' => [
+                'Content-Type' => 'application/json',
+            ],
+        ])));
+        $clientWithOptionFalse = $clientWithoutOption->withOptions(['auto_upgrade_http_version' => false]);
+
+        foreach (['1.0', '1.1', '2.0', '3.0'] as $httpVersion) {
+            $request = $clientWithoutOption->createRequest('GET', 'http://localhost:8057')
+                ->withProtocolVersion($httpVersion);
+
+            $responseWithoutOption = $clientWithoutOption->sendRequest($request);
+            $bodyWithoutOption = json_decode((string) $responseWithoutOption->getBody(), true);
+            if ('1.0' === $httpVersion) {
+                $this->assertSame('HTTP/1.0', $bodyWithoutOption['SERVER_PROTOCOL']);
+            } else {
+                $this->assertSame('HTTP/', $bodyWithoutOption['SERVER_PROTOCOL']);
+            }
+
+            $responseWithOptionFalse = $clientWithOptionFalse->sendRequest($request);
+            $bodyWithOptionFalse = json_decode((string) $responseWithOptionFalse->getBody(), true);
+            $this->assertSame('HTTP/'.$httpVersion, $bodyWithOptionFalse['SERVER_PROTOCOL']);
+        }
+    }
 }

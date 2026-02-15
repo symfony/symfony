@@ -99,7 +99,7 @@ class RouteTest extends TestCase
         $this->assertEquals('bar2', $route->getDefault('foo2'), '->getDefault() return the default value');
         $this->assertNull($route->getDefault('not_defined'), '->getDefault() return null if default value is not set');
 
-        $route->setDefault('_controller', $closure = fn () => 'Hello');
+        $route->setDefault('_controller', $closure = static fn () => 'Hello');
         $this->assertEquals($closure, $route->getDefault('_controller'), '->setDefault() sets a default value');
 
         $route->setDefaults(['foo' => 'foo']);

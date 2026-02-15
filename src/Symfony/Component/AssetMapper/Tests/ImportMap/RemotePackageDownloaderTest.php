@@ -53,7 +53,7 @@ class RemotePackageDownloaderTest extends TestCase
             ->method('getEntries')
             ->willReturn($importMapEntries);
 
-        $progressCallback = fn () => null;
+        $progressCallback = static fn () => null;
         $packageResolver->expects($this->once())
             ->method('downloadPackages')
             ->with(
@@ -168,8 +168,8 @@ class RemotePackageDownloaderTest extends TestCase
         $remotePackageStorage = new RemotePackageStorage('/foo/assets/vendor');
         $downloader = new RemotePackageDownloader(
             $remotePackageStorage,
-            $this->createMock(ImportMapConfigReader::class),
-            $this->createMock(PackageResolverInterface::class),
+            $this->createStub(ImportMapConfigReader::class),
+            $this->createStub(PackageResolverInterface::class),
         );
         $this->assertSame('/foo/assets/vendor', $downloader->getVendorDir());
     }

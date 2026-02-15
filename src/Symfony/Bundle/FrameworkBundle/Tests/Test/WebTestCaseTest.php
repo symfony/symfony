@@ -382,8 +382,8 @@ class WebTestCaseTest extends TestCase
 
     private function getResponseTester(Response $response): WebTestCase
     {
-        $client = $this->createMock(KernelBrowser::class);
-        $client->expects($this->any())->method('getResponse')->willReturn($response);
+        $client = $this->createStub(KernelBrowser::class);
+        $client->method('getResponse')->willReturn($response);
 
         $request = new Request([], [], [], [], [], [
             'HTTPS' => 'on',
@@ -391,36 +391,36 @@ class WebTestCaseTest extends TestCase
             'SERVER_NAME' => 'example.com',
         ]);
         $request->setFormat('custom', ['application/vnd.myformat']);
-        $client->expects($this->any())->method('getRequest')->willReturn($request);
+        $client->method('getRequest')->willReturn($request);
 
         return $this->getTester($client);
     }
 
     private function getCrawlerTester(Crawler $crawler): WebTestCase
     {
-        $client = $this->createMock(KernelBrowser::class);
-        $client->expects($this->any())->method('getCrawler')->willReturn($crawler);
+        $client = $this->createStub(KernelBrowser::class);
+        $client->method('getCrawler')->willReturn($crawler);
 
         return $this->getTester($client);
     }
 
     private function getClientTester(): WebTestCase
     {
-        $client = $this->createMock(KernelBrowser::class);
+        $client = $this->createStub(KernelBrowser::class);
         $jar = new CookieJar();
         $jar->set(new Cookie('foo', 'bar', null, '/path', 'example.com'));
-        $client->expects($this->any())->method('getCookieJar')->willReturn($jar);
+        $client->method('getCookieJar')->willReturn($jar);
 
         return $this->getTester($client);
     }
 
     private function getRequestTester(): WebTestCase
     {
-        $client = $this->createMock(KernelBrowser::class);
+        $client = $this->createStub(KernelBrowser::class);
         $request = new Request();
         $request->attributes->set('foo', 'bar');
         $request->attributes->set('_route', 'homepage');
-        $client->expects($this->any())->method('getRequest')->willReturn($request);
+        $client->method('getRequest')->willReturn($request);
 
         return $this->getTester($client);
     }
@@ -428,9 +428,9 @@ class WebTestCaseTest extends TestCase
     private function createHistoryTester(string $method, bool $returnValue): WebTestCase
     {
         /** @var KernelBrowser&MockObject $client */
-        $client = $this->createMock(KernelBrowser::class);
+        $client = $this->createStub(KernelBrowser::class);
         /** @var History&MockObject $history */
-        $history = $this->createMock(History::class);
+        $history = $this->createStub(History::class);
 
         $history->method($method)->willReturn($returnValue);
         $client->method('getHistory')->willReturn($history);

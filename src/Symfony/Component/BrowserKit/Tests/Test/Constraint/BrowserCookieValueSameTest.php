@@ -38,10 +38,10 @@ class BrowserCookieValueSameTest extends TestCase
 
     private function getBrowser(): AbstractBrowser
     {
-        $browser = $this->createMock(AbstractBrowser::class);
+        $browser = $this->createStub(AbstractBrowser::class);
         $jar = new CookieJar();
         $jar->set(new Cookie('foo', 'bar', null, '/path', 'example.com'));
-        $browser->expects($this->any())->method('getCookieJar')->willReturn($jar);
+        $browser->method('getCookieJar')->willReturn($jar);
 
         return $browser;
     }

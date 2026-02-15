@@ -26,12 +26,12 @@ class ExpressionLanguageProviderTest extends TestCase
     protected function setUp(): void
     {
         $functionProvider = new ServiceLocator([
-            'env' => fn () => fn (string $arg) => [
+            'env' => static fn () => static fn (string $arg) => [
                 'APP_ENV' => 'test',
                 'PHP_VERSION' => '7.2',
             ][$arg] ?? null,
-            'sum' => fn () => fn ($a, $b) => $a + $b,
-            'foo' => fn () => fn () => 'bar',
+            'sum' => static fn () => static fn ($a, $b) => $a + $b,
+            'foo' => static fn () => static fn () => 'bar',
         ]);
 
         $this->context = new RequestContext();

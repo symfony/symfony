@@ -22,7 +22,7 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
         if (\is_string($data)) {
             return $data;
         }
-        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null|string".', \get_debug_type($data)));
+        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null|string'));
     };
     return $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties'](\Symfony\Component\JsonStreamer\Read\Decoder::decodeString((string) $string));
 };

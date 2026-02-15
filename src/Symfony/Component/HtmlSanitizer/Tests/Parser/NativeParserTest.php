@@ -11,11 +11,9 @@
 
 namespace Symfony\Component\HtmlSanitizer\Tests\Parser;
 
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HtmlSanitizer\Parser\NativeParser;
 
-#[RequiresPhp('>=8.4')]
 class NativeParserTest extends TestCase
 {
     public function testParseValid()

@@ -888,11 +888,11 @@ return [
         ],
         'SLE' => [
             'SLE',
-            'Sijeraleonski leone',
+            'sijeraleonski leone',
         ],
         'SLL' => [
             'SLL',
-            'Sijeraleonski leone (1964—2022)',
+            'sijeraleonski leone (1964—2022)',
         ],
         'SOS' => [
             'SOS',
@@ -1066,6 +1066,10 @@ return [
             'XCD',
             'Istočnokaripski dolar',
         ],
+        'XCG' => [
+            'Cg.',
+            'karipski gulden',
+        ],
         'XEU' => [
             'XEU',
             'Evropska valutna jedinica',
@@ -1141,6 +1145,10 @@ return [
         'ZWD' => [
             'ZWD',
             'Zimbabvejski dolar (1980–2008)',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'zimbabveansko zlato',
         ],
         'ZWL' => [
             'ZWL',

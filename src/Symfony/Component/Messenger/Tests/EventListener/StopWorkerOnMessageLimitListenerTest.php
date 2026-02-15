@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
+use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Worker;
 
 class StopWorkerOnMessageLimitListenerTest extends TestCase
@@ -51,8 +52,7 @@ class StopWorkerOnMessageLimitListenerTest extends TestCase
                 $this->equalTo(['count' => 1])
             );
 
-        $worker = $this->createMock(Worker::class);
-        $event = new WorkerRunningEvent($worker, false);
+        $event = new WorkerRunningEvent(new Worker([], new MessageBus()), false);
 
         $maximumCountListener = new StopWorkerOnMessageLimitListener(1, $logger);
         $maximumCountListener->onWorkerRunning($event);

@@ -47,4 +47,14 @@ class ResponseFormatSameTest extends TestCase
 
         $constraint->evaluate(new Response('', 200, ['Content-Type' => 'application/ld+json']));
     }
+
+    public function testOverriddenFormat()
+    {
+        $request = new Request();
+        $request->setFormat('jsonapi', ['application/vnd.api+json']);
+        $request->setFormat('apijson', ['application/vnd.api+json']);
+
+        $constraint = new ResponseFormatSame($request, 'apijson');
+        $this->assertTrue($constraint->evaluate(new Response('', 200, ['Content-Type' => 'application/vnd.api+json']), '', true));
+    }
 }

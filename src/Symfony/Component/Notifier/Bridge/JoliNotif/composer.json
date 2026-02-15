@@ -21,10 +21,10 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "jolicode/jolinotif": "^2.7.2|^3.0",
-        "symfony/http-client": "^7.2|^8.0",
-        "symfony/notifier": "^7.3|^8.0"
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/notifier": "^7.4|^8.0"
     },
     "autoload": {
         "psr-4": {

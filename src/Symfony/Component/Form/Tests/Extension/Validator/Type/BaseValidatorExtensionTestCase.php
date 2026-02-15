@@ -11,15 +11,26 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
 use Symfony\Component\Form\Test\FormInterface;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Validator\Constraints\GroupSequence;
+use Symfony\Component\Validator\ValidatorBuilder;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
  */
 abstract class BaseValidatorExtensionTestCase extends TypeTestCase
 {
+    protected function setUp(): void
+    {
+        $this->dispatcher = new EventDispatcher();
+
+        parent::setUp();
+    }
+
     public function testValidationGroupNullByDefault()
     {
         $form = $this->createForm();
@@ -66,7 +77,7 @@ abstract class BaseValidatorExtensionTestCase extends TypeTestCase
     public function testValidationGroupsCanBeSetToClosure()
     {
         $form = $this->createForm([
-            'validation_groups' => function (FormInterface $form) { },
+            'validation_groups' => static function (FormInterface $form) { },
         ]);
 
         $this->assertIsCallable($form->getConfig()->getOption('validation_groups'));
@@ -82,4 +93,11 @@ abstract class BaseValidatorExtensionTestCase extends TypeTestCase
     }
 
     abstract protected function createForm(array $options = []);
+
+    protected function getExtensions(?ViolationMapperInterface $violationMapper = null): array
+    {
+        return [
+            new ValidatorExtension((new ValidatorBuilder())->getValidator(), $violationMapper),
+        ];
+    }
 }

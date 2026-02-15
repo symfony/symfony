@@ -60,8 +60,8 @@ class ResendApiTransportTest extends TestCase
         $email->getHeaders()
             ->add(new MetadataHeader('custom', $json))
             ->add(new TagHeader('TagInHeaders'))
-            ->addTextHeader('templateId', 1)
-            ->addParameterizedHeader('params', 'params', $params)
+            ->addTextHeader('x-custom-id', '1')
+            ->addParameterizedHeader('x-custom-params', 'custom', $params)
             ->addTextHeader('foo', 'bar');
         $envelope = new Envelope(new Address('alice@system.com', 'Alice'), [new Address('bob@system.com', 'Bob')]);
 
@@ -73,10 +73,10 @@ class ResendApiTransportTest extends TestCase
         $this->assertEquals($json, $payload['headers']['X-Metadata-custom']);
         $this->assertArrayHasKey('tags', $payload);
         $this->assertEquals(['X-Tag' => 'TagInHeaders'], current($payload['tags']));
-        $this->assertArrayHasKey('templateId', $payload['headers']);
-        $this->assertEquals('1', $payload['headers']['templateId']);
-        $this->assertArrayHasKey('params', $payload['headers']);
-        $this->assertEquals('params; param1=foo; param2=bar', $payload['headers']['params']);
+        $this->assertArrayHasKey('x-custom-id', $payload['headers']);
+        $this->assertEquals('1', $payload['headers']['x-custom-id']);
+        $this->assertArrayHasKey('x-custom-params', $payload['headers']);
+        $this->assertEquals('custom; param1=foo; param2=bar', $payload['headers']['x-custom-params']);
         $this->assertArrayHasKey('foo', $payload['headers']);
         $this->assertEquals('bar', $payload['headers']['foo']);
     }

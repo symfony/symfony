@@ -176,7 +176,7 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $envelope = new Envelope(new \stdClass());
         $exception = new HandlerFailedException(
             $envelope,
-            array_map(fn (int $retry) => new RecoverableMessageHandlingException('retry', retryDelay: $retry), $retries)
+            array_map(static fn (int $retry) => new RecoverableMessageHandlingException('retry', retryDelay: $retry), $retries)
         );
         $event = new WorkerMessageFailedEvent($envelope, 'my_receiver', $exception);
 
@@ -332,9 +332,7 @@ class SendFailedMessageForRetryListenerTest extends TestCase
         $envelope = new Envelope(new \stdClass());
 
         $sender = $this->createMock(SenderInterface::class);
-        $sender->expects($this->once())->method('send')->willReturnCallback(static function (Envelope $envelope) {
-            return $envelope->with(new TransportMessageIdStamp(123));
-        });
+        $sender->expects($this->once())->method('send')->willReturnCallback(static fn (Envelope $envelope) => $envelope->with(new TransportMessageIdStamp(123)));
 
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
         $eventDispatcher->expects($this->once())->method('dispatch')->willReturnCallback(

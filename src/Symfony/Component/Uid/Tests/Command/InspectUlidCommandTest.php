@@ -22,7 +22,7 @@ final class InspectUlidCommandTest extends TestCase
         $commandTester = new CommandTester(new InspectUlidCommand());
 
         $this->assertSame(1, $commandTester->execute(['ulid' => 'foobar']));
-        $this->assertStringContainsString('Invalid ULID: "foobar"', $commandTester->getDisplay());
+        $this->assertStringContainsString('Invalid ULID.', $commandTester->getDisplay());
 
         foreach ([
             '01E439TP9XJZ9RPFH3T1PYBCR8',

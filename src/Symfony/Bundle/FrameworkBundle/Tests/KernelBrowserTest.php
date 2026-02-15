@@ -64,7 +64,7 @@ class KernelBrowserTest extends AbstractWebTestCase
 
     public function testGetProfileWithoutRequest()
     {
-        $browser = new KernelBrowser($this->createMock(KernelInterface::class));
+        $browser = new KernelBrowser($this->createStub(KernelInterface::class));
 
         $this->assertFalse($browser->getProfile());
     }

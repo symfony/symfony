@@ -145,7 +145,7 @@ class NoPrivateNetworkHttpClientTest extends TestCase
         $content = 'foo';
 
         $executionCount = 0;
-        $customCallback = function (int $dlNow, int $dlSize, array $info) use (&$executionCount): void {
+        $customCallback = static function (int $dlNow, int $dlSize, array $info) use (&$executionCount): void {
             ++$executionCount;
         };
 

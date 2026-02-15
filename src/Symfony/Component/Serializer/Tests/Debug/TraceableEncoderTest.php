@@ -26,14 +26,14 @@ class TraceableEncoderTest extends TestCase
         $encoder
             ->expects($this->once())
             ->method('encode')
-            ->with('data', 'format', $this->isType('array'))
+            ->with('data', 'format', $this->isArray())
             ->willReturn('encoded');
 
         $decoder = $this->createMock(DecoderInterface::class);
         $decoder
             ->expects($this->once())
             ->method('decode')
-            ->with('data', 'format', $this->isType('array'))
+            ->with('data', 'format', $this->isArray())
             ->willReturn('decoded');
 
         $this->assertSame('encoded', (new TraceableEncoder($encoder, new SerializerDataCollector(), 'default'))->encode('data', 'format'));
@@ -44,18 +44,18 @@ class TraceableEncoderTest extends TestCase
     {
         $serializerName = uniqid('name', true);
 
-        $encoder = $this->createMock(EncoderInterface::class);
-        $decoder = $this->createMock(DecoderInterface::class);
+        $encoder = $this->createStub(EncoderInterface::class);
+        $decoder = $this->createStub(DecoderInterface::class);
 
         $dataCollector = $this->createMock(SerializerDataCollector::class);
         $dataCollector
             ->expects($this->once())
             ->method('collectEncoding')
-            ->with($this->isType('string'), $encoder::class, $this->isType('float'), $serializerName);
+            ->with($this->isString(), $encoder::class, $this->isFloat(), $serializerName);
         $dataCollector
             ->expects($this->once())
             ->method('collectDecoding')
-            ->with($this->isType('string'), $decoder::class, $this->isType('float'), $serializerName);
+            ->with($this->isString(), $decoder::class, $this->isFloat(), $serializerName);
 
         (new TraceableEncoder($encoder, $dataCollector, $serializerName))->encode('data', 'format', [TraceableSerializer::DEBUG_TRACE_ID => 'debug']);
         (new TraceableEncoder($decoder, $dataCollector, $serializerName))->decode('data', 'format', [TraceableSerializer::DEBUG_TRACE_ID => 'debug']);
@@ -63,8 +63,8 @@ class TraceableEncoderTest extends TestCase
 
     public function testNotCollectEncodingDataIfNoDebugTraceId()
     {
-        $encoder = $this->createMock(EncoderInterface::class);
-        $decoder = $this->createMock(DecoderInterface::class);
+        $encoder = $this->createStub(EncoderInterface::class);
+        $decoder = $this->createStub(DecoderInterface::class);
 
         $dataCollector = $this->createMock(SerializerDataCollector::class);
         $dataCollector->expects($this->never())->method('collectEncoding');
@@ -78,22 +78,22 @@ class TraceableEncoderTest extends TestCase
     {
         $this->expectException(\BadMethodCallException::class);
 
-        (new TraceableEncoder($this->createMock(DecoderInterface::class), new SerializerDataCollector(), 'default'))->encode('data', 'format');
+        (new TraceableEncoder($this->createStub(DecoderInterface::class), new SerializerDataCollector(), 'default'))->encode('data', 'format');
     }
 
     public function testCannotDecodeIfNotDecoder()
     {
         $this->expectException(\BadMethodCallException::class);
 
-        (new TraceableEncoder($this->createMock(EncoderInterface::class), new SerializerDataCollector(), 'default'))->decode('data', 'format');
+        (new TraceableEncoder($this->createStub(EncoderInterface::class), new SerializerDataCollector(), 'default'))->decode('data', 'format');
     }
 
     public function testSupports()
     {
-        $encoder = $this->createMock(EncoderInterface::class);
+        $encoder = $this->createStub(EncoderInterface::class);
         $encoder->method('supportsEncoding')->willReturn(true);
 
-        $decoder = $this->createMock(DecoderInterface::class);
+        $decoder = $this->createStub(DecoderInterface::class);
         $decoder->method('supportsDecoding')->willReturn(true);
 
         $traceableEncoder = new TraceableEncoder($encoder, new SerializerDataCollector(), 'default');

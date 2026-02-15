@@ -59,7 +59,7 @@ class AttributeLoader implements LoaderInterface
         return $success;
     }
 
-    public function doLoadClassMetadata(\ReflectionClass $reflClass, ClassMetadata $metadata): bool
+    private function doLoadClassMetadata(\ReflectionClass $reflClass, ClassMetadata $metadata): bool
     {
         $className = $reflClass->name;
         $success = false;
@@ -78,7 +78,7 @@ class AttributeLoader implements LoaderInterface
         }
 
         foreach ($reflClass->getProperties() as $property) {
-            if ($property->getDeclaringClass()->name === $className) {
+            if ($property->class === $className) {
                 foreach ($this->getAttributes($property) as $constraint) {
                     if ($constraint instanceof Constraint) {
                         $metadata->addPropertyConstraint($property->name, $constraint);
@@ -90,7 +90,7 @@ class AttributeLoader implements LoaderInterface
         }
 
         foreach ($reflClass->getMethods() as $method) {
-            if ($method->getDeclaringClass()->name === $className) {
+            if ($method->class === $className) {
                 foreach ($this->getAttributes($method) as $constraint) {
                     if ($constraint instanceof Callback) {
                         $constraint->callback = $method->getName();

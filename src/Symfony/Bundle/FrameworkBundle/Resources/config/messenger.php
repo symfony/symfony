@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
@@ -44,13 +45,13 @@ use Symfony\Component\Messenger\Transport\Serialization\Normalizer\FlattenExcept
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
+use Symfony\Component\Messenger\Transport\Serialization\SigningSerializer;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory;
 use Symfony\Component\Messenger\Transport\TransportFactory;
+use Symfony\Component\String\LazyString;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
-        ->alias(SerializerInterface::class, 'messenger.default_serializer')
-
         // Asynchronous
         ->set('messenger.senders_locator', SendersLocator::class)
             ->args([
@@ -72,13 +73,33 @@ return static function (ContainerConfigurator $container) {
                 service('serializer'),
                 abstract_arg('format'),
                 abstract_arg('context'),
+                abstract_arg('message type to serialized type map'),
             ])
 
         ->set('serializer.normalizer.flatten_exception', FlattenExceptionNormalizer::class)
             ->tag('serializer.normalizer', ['built_in' => true, 'priority' => -880])
 
+        ->set('.messenger.transport.native_php_serializer', PhpSerializer::class)
         ->set('messenger.transport.native_php_serializer', PhpSerializer::class)
+            ->factory('current')
+            ->args([[service('.messenger.transport.native_php_serializer')]])
         ->alias('messenger.default_serializer', 'messenger.transport.native_php_serializer')
+        ->alias(SerializerInterface::class, 'messenger.default_serializer')
+
+        ->set('messenger.signing_serializer', SigningSerializer::class)
+            ->abstract()
+            ->args([
+                service('.inner'),
+                inline_service('string') // wrap the signing key in a lazy string to prevent a hard dependency on the kernel.secret parameter
+                    ->factory(class_exists(LazyString::class) ? [LazyString::class, 'fromCallable'] : 'current')
+                    ->args([
+                        class_exists(LazyString::class, false) ? service_closure('.messenger.signing_serializer.signing_key') : [new Parameter('kernel.secret')],
+                    ]),
+                abstract_arg('message types to serializers'), // read and replaced by MessengerPass
+            ])
+        ->set('.messenger.signing_serializer.signing_key', 'string')
+            ->factory('current')
+            ->args([[new Parameter('kernel.secret')]])
 
         // Middleware
         ->set('messenger.middleware.handle_message', HandleMessageMiddleware::class)

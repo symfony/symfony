@@ -23,17 +23,15 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\MarshallingSessionH
 class MarshallingSessionHandlerTest extends TestCase
 {
     protected MockObject&\SessionHandlerInterface $handler;
-    protected MockObject&MarshallerInterface $marshaller;
 
     protected function setUp(): void
     {
-        $this->marshaller = $this->createMock(MarshallerInterface::class);
         $this->handler = $this->createMock(AbstractSessionHandler::class);
     }
 
     public function testOpen()
     {
-        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
+        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class));
 
         $this->handler->expects($this->once())->method('open')
             ->with('path', 'name')->willReturn(true);
@@ -43,7 +41,7 @@ class MarshallingSessionHandlerTest extends TestCase
 
     public function testClose()
     {
-        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
+        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class));
 
         $this->handler->expects($this->once())->method('close')->willReturn(true);
 
@@ -52,7 +50,7 @@ class MarshallingSessionHandlerTest extends TestCase
 
     public function testDestroy()
     {
-        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
+        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class));
 
         $this->handler->expects($this->once())->method('destroy')
             ->with('session_id')->willReturn(true);
@@ -62,7 +60,7 @@ class MarshallingSessionHandlerTest extends TestCase
 
     public function testGc()
     {
-        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
+        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class));
 
         $this->handler->expects($this->once())->method('gc')
             ->with(4711)->willReturn(1);
@@ -72,11 +70,12 @@ class MarshallingSessionHandlerTest extends TestCase
 
     public function testRead()
     {
-        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
+        $marshaller = $this->createMock(MarshallerInterface::class);
+        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $marshaller);
 
         $this->handler->expects($this->once())->method('read')->with('session_id')
             ->willReturn('data');
-        $this->marshaller->expects($this->once())->method('unmarshall')->with('data')
+        $marshaller->expects($this->once())->method('unmarshall')->with('data')
             ->willReturn('unmarshalled_data')
         ;
 
@@ -86,9 +85,10 @@ class MarshallingSessionHandlerTest extends TestCase
 
     public function testWrite()
     {
-        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
+        $marshaller = $this->createMock(MarshallerInterface::class);
+        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $marshaller);
 
-        $this->marshaller->expects($this->once())->method('marshall')
+        $marshaller->expects($this->once())->method('marshall')
             ->with(['data' => 'data'], [])
             ->willReturn(['data' => 'marshalled_data']);
 
@@ -101,7 +101,7 @@ class MarshallingSessionHandlerTest extends TestCase
 
     public function testValidateId()
     {
-        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
+        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class));
 
         $this->handler->expects($this->once())->method('validateId')
             ->with('session_id')->willReturn(true);
@@ -111,7 +111,7 @@ class MarshallingSessionHandlerTest extends TestCase
 
     public function testUpdateTimestamp()
     {
-        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->marshaller);
+        $marshallingSessionHandler = new MarshallingSessionHandler($this->handler, $this->createStub(MarshallerInterface::class));
 
         $this->handler->expects($this->once())->method('updateTimestamp')
             ->with('session_id', 'data')->willReturn(true);

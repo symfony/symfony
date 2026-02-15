@@ -68,6 +68,25 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
+    #[DataProvider('getDeprecationOnLinesData')]
+    public function testDeprecationTriggersParseException(int $yamlLine, string $yamlValue)
+    {
+        $lines = explode("\n", $yamlValue);
+        $errorLine = end($lines);
+        $expectedError = 'This is a simulated deprecation at line '.$yamlLine.' (near "'.$errorLine.'")';
+
+        $constraint = new Yaml(
+            message: 'myMessageTest',
+            flags: YamlParser::PARSE_OBJECT,
+        );
+        $this->validator->validate($yamlValue, $constraint);
+        $this->buildViolation('myMessageTest')
+            ->setParameter('{{ error }}', $expectedError)
+            ->setParameter('{{ line }}', $yamlLine)
+            ->setCode(Yaml::INVALID_YAML_ERROR)
+            ->assertRaised();
+    }
+
     public static function getValidValues()
     {
         return [
@@ -90,5 +109,35 @@ class YamlValidatorTest extends ConstraintValidatorTestCase
             ['{:INVALID]', 'Malformed unquoted YAML string at line 1 (near "{:INVALID]").', 1],
             ["key:\nvalue", 'Unable to parse at line 2 (near "value").', 2],
         ];
+    }
+
+    /**
+     * @return array<string, array{0: int, 1: string}>
+     */
+    public static function getDeprecationOnLinesData(): array
+    {
+        $serialized = serialize(new DeprecatedObjectFixture());
+
+        return [
+            'deprecation at line 1' => [1, "object: !php/object '".$serialized."'"],
+            'deprecation at line 2' => [2, "valid: yaml\nobject: !php/object '".$serialized."'"],
+            'deprecation at line 5' => [5, "line1: value\nline2: value\nline3: value\nline4: value\nobject: !php/object '".$serialized."'"],
+        ];
+    }
+}
+
+/**
+ * Fixture class for triggering deprecation during unserialize.
+ */
+class DeprecatedObjectFixture
+{
+    public function __serialize(): array
+    {
+        return [];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        @trigger_error('This is a simulated deprecation', \E_USER_DEPRECATED);
     }
 }

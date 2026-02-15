@@ -77,8 +77,8 @@ if ($argc >= 2) {
     echo "Git clone to {$repoDir} complete.\n";
 }
 
-$gitTag = $git->getLastTag(fn ($tag) => preg_match('#^release-[0-9]{1,}-[0-9]{1}$#', $tag));
-$shortIcuVersion = strip_minor_versions(preg_replace('#release-([0-9]{1,})-([0-9]{1,})#', '$1.$2', $gitTag));
+$gitTag = $git->getLastTag(static fn ($tag) => preg_match('#^release-[0-9]{1,}[.-][0-9]{1}$#', $tag));
+$shortIcuVersion = strip_minor_versions(preg_replace('#release-([0-9]{1,})[.-]([0-9]{1,})#', '$1.$2', $gitTag));
 
 echo "Checking out `{$gitTag}` for version `{$shortIcuVersion}`...\n";
 $git->checkout('tags/'.$gitTag);

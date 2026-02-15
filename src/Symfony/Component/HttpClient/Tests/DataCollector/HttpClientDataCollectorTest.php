@@ -12,8 +12,12 @@
 namespace Symfony\Component\HttpClient\Tests\DataCollector;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\CurlHttpClient;
 use Symfony\Component\HttpClient\DataCollector\HttpClientDataCollector;
+use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
@@ -48,9 +52,9 @@ class HttpClientDataCollectorTest extends TestCase
         $sut->registerClient('http_client1', $httpClient1);
         $sut->registerClient('http_client2', $httpClient2);
         $sut->registerClient('http_client3', $httpClient3);
-        $this->assertEquals(0, $sut->getRequestCount());
+        $this->assertSame(0, $sut->getRequestCount());
         $sut->lateCollect();
-        $this->assertEquals(3, $sut->getRequestCount());
+        $this->assertSame(3, $sut->getRequestCount());
     }
 
     public function testItCollectsErrorCount()
@@ -77,9 +81,9 @@ class HttpClientDataCollectorTest extends TestCase
         $sut->registerClient('http_client1', $httpClient1);
         $sut->registerClient('http_client2', $httpClient2);
         $sut->registerClient('http_client3', $httpClient3);
-        $this->assertEquals(0, $sut->getErrorCount());
+        $this->assertSame(0, $sut->getErrorCount());
         $sut->lateCollect();
-        $this->assertEquals(1, $sut->getErrorCount());
+        $this->assertSame(1, $sut->getErrorCount());
     }
 
     public function testItCollectsErrorCountByClient()
@@ -106,12 +110,12 @@ class HttpClientDataCollectorTest extends TestCase
         $sut->registerClient('http_client1', $httpClient1);
         $sut->registerClient('http_client2', $httpClient2);
         $sut->registerClient('http_client3', $httpClient3);
-        $this->assertEquals([], $sut->getClients());
+        $this->assertSame([], $sut->getClients());
         $sut->lateCollect();
         $collectedData = $sut->getClients();
-        $this->assertEquals(0, $collectedData['http_client1']['error_count']);
-        $this->assertEquals(1, $collectedData['http_client2']['error_count']);
-        $this->assertEquals(0, $collectedData['http_client3']['error_count']);
+        $this->assertSame(0, $collectedData['http_client1']['error_count']);
+        $this->assertSame(1, $collectedData['http_client2']['error_count']);
+        $this->assertSame(0, $collectedData['http_client3']['error_count']);
     }
 
     public function testItCollectsTracesByClient()
@@ -138,7 +142,7 @@ class HttpClientDataCollectorTest extends TestCase
         $sut->registerClient('http_client1', $httpClient1);
         $sut->registerClient('http_client2', $httpClient2);
         $sut->registerClient('http_client3', $httpClient3);
-        $this->assertEquals([], $sut->getClients());
+        $this->assertSame([], $sut->getClients());
         $sut->lateCollect();
         $collectedData = $sut->getClients();
         $this->assertCount(2, $collectedData['http_client1']['traces']);
@@ -160,9 +164,9 @@ class HttpClientDataCollectorTest extends TestCase
         $collectedData = $sut->getClients();
         $this->assertCount(1, $collectedData['http_client1']['traces']);
         $sut->reset();
-        $this->assertEquals([], $sut->getClients());
-        $this->assertEquals(0, $sut->getErrorCount());
-        $this->assertEquals(0, $sut->getRequestCount());
+        $this->assertSame([], $sut->getClients());
+        $this->assertSame(0, $sut->getErrorCount());
+        $this->assertSame(0, $sut->getRequestCount());
     }
 
     #[DataProvider('provideCurlRequests')]
@@ -175,8 +179,7 @@ class HttpClientDataCollectorTest extends TestCase
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
 
-        $isWindows = '\\' === \DIRECTORY_SEPARATOR;
-        self::assertEquals(\sprintf($expectedCurlCommand, $isWindows ? '"' : "'", $isWindows ? '' : "'"), $curlCommand);
+        self::assertSame(str_replace(['"', "'"], '', $expectedCurlCommand), str_replace(['"', "'"], '', $curlCommand));
     }
 
     public static function provideCurlRequests(): iterable
@@ -189,10 +192,10 @@ class HttpClientDataCollectorTest extends TestCase
             'curl \\
   --compressed \\
   --request GET \\
-  --url %1$shttp://localhost:8057/json%1$s \\
-  --header %1$sAccept: */*%1$s \\
-  --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s',
+  --url http://localhost:8057/json \\
+  --header Accept: */* \\
+  --header Accept-Encoding: gzip \\
+  --header User-Agent: Symfony HttpClient (Native)',
         ];
         yield 'GET with base uri' => [
             [
@@ -205,10 +208,10 @@ class HttpClientDataCollectorTest extends TestCase
             'curl \\
   --compressed \\
   --request GET \\
-  --url %1$shttp://localhost:8057/json/1%1$s \\
-  --header %1$sAccept: */*%1$s \\
-  --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s',
+  --url http://localhost:8057/json/1 \\
+  --header Accept: */* \\
+  --header Accept-Encoding: gzip \\
+  --header User-Agent: Symfony HttpClient (Native)',
         ];
         yield 'GET with resolve' => [
             [
@@ -223,12 +226,12 @@ class HttpClientDataCollectorTest extends TestCase
             ],
             'curl \\
   --compressed \\
-  --resolve %1$slocalhost:8057:127.0.0.1%1$s \\
+  --resolve localhost:8057:127.0.0.1 \\
   --request GET \\
-  --url %1$shttp://localhost:8057/json%1$s \\
-  --header %1$sAccept: */*%1$s \\
-  --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s',
+  --url http://localhost:8057/json \\
+  --header Accept: */* \\
+  --header Accept-Encoding: gzip \\
+  --header User-Agent: Symfony HttpClient (Native)',
         ];
         yield 'POST with string body' => [
             [
@@ -241,13 +244,13 @@ class HttpClientDataCollectorTest extends TestCase
             'curl \\
   --compressed \\
   --request POST \\
-  --url %1$shttp://localhost:8057/json%1$s \\
-  --header %1$sAccept: */*%1$s \\
-  --header %1$sContent-Length: 11%1$s \\
-  --header %1$sContent-Type: application/x-www-form-urlencoded%1$s \\
-  --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s \\
-  --data-raw %1$sfoo bar baz%1$s',
+  --url http://localhost:8057/json \\
+  --header Accept: */* \\
+  --header Content-Length: 11 \\
+  --header Content-Type: application/x-www-form-urlencoded \\
+  --header Accept-Encoding: gzip \\
+  --header User-Agent: Symfony HttpClient (Native) \\
+  --data-raw foo bar baz',
         ];
         yield 'POST with array body' => [
             [
@@ -279,13 +282,13 @@ class HttpClientDataCollectorTest extends TestCase
             'curl \\
   --compressed \\
   --request POST \\
-  --url %1$shttp://localhost:8057/json%1$s \\
-  --header %1$sAccept: */*%1$s \\
-  --header %1$sContent-Type: application/x-www-form-urlencoded%1$s \\
-  --header %1$sContent-Length: 211%1$s \\
-  --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s \\
-  --data-raw %2$sfoo=fooval%2$s --data-raw %2$sbar=barval%2$s --data-raw %2$sbaz=bazval%2$s --data-raw %2$sfoobar[baz]=bazval%2$s --data-raw %2$sfoobar[qux]=quxval%2$s --data-raw %2$sbazqux[0]=bazquxval1%2$s --data-raw %2$sbazqux[1]=bazquxval2%2$s --data-raw %2$sobject[fooprop]=foopropval%2$s --data-raw %2$sobject[barprop]=barpropval%2$s --data-raw %2$stostring=tostringval%2$s',
+  --url http://localhost:8057/json \\
+  --header Accept: */* \\
+  --header Content-Type: application/x-www-form-urlencoded \\
+  --header Content-Length: 211 \\
+  --header Accept-Encoding: gzip \\
+  --header User-Agent: Symfony HttpClient (Native) \\
+  --data-raw foo=fooval --data-raw bar=barval --data-raw baz=bazval --data-raw foobar[baz]=bazval --data-raw foobar[qux]=quxval --data-raw bazqux[0]=bazquxval1 --data-raw bazqux[1]=bazquxval2 --data-raw object[fooprop]=foopropval --data-raw object[barprop]=barpropval --data-raw tostring=tostringval',
         ];
 
         // escapeshellarg on Windows replaces double quotes & percent signs with spaces
@@ -308,10 +311,10 @@ class HttpClientDataCollectorTest extends TestCase
                 'curl \\
   --compressed \\
   --request GET \\
-  --url %1$shttp://localhost:8057/?foo=fooval&bar=newbarval&foobar[baz]=bazval&foobar[qux]=quxval&bazqux[0]=bazquxval1&bazqux[1]=bazquxval2%1$s \\
-  --header %1$sAccept: */*%1$s \\
-  --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s',
+  --url http://localhost:8057/?foo=fooval&bar=newbarval&foobar[baz]=bazval&foobar[qux]=quxval&bazqux[0]=bazquxval1&bazqux[1]=bazquxval2 \\
+  --header Accept: */* \\
+  --header Accept-Encoding: gzip \\
+  --header User-Agent: Symfony HttpClient (Native)',
             ];
             yield 'POST with json' => [
                 [
@@ -330,13 +333,13 @@ class HttpClientDataCollectorTest extends TestCase
                 'curl \\
   --compressed \\
   --request POST \\
-  --url %1$shttp://localhost:8057/json%1$s \\
-  --header %1$sContent-Type: application/json%1$s \\
-  --header %1$sAccept: */*%1$s \\
-  --header %1$sContent-Length: 120%1$s \\
-  --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s \\
-  --data-raw %1$s{"foo":{"bar":"baz","qux":[1.1,1.0],"fred":["\u003Cfoo\u003E","\u0027bar\u0027","\u0022baz\u0022","\u0026blong\u0026"]}}%1$s',
+  --url http://localhost:8057/json \\
+  --header Content-Type: application/json \\
+  --header Accept: */* \\
+  --header Content-Length: 120 \\
+  --header Accept-Encoding: gzip \\
+  --header User-Agent: Symfony HttpClient (Native) \\
+  --data-raw {"foo":{"bar":"baz","qux":[1.1,1.0],"fred":["\u003Cfoo\u003E","\u0027bar\u0027","\u0022baz\u0022","\u0026blong\u0026"]}}',
             ];
         }
     }
@@ -357,14 +360,14 @@ class HttpClientDataCollectorTest extends TestCase
         $collectedData = $sut->getClients();
         self::assertCount(1, $collectedData['http_client']['traces']);
         $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
-        self::assertEquals(\sprintf('curl \\
+        self::assertSame('curl \\
   --compressed \\
   --request GET \\
-  --url %1$shttp://localhost:8057/301%1$s \\
-  --header %1$sAccept: */*%1$s \\
-  --header %1$sAuthorization: Basic Zm9vOmJhcg==%1$s \\
-  --header %1$sAccept-Encoding: gzip%1$s \\
-  --header %1$sUser-Agent: Symfony HttpClient (Native)%1$s', '\\' === \DIRECTORY_SEPARATOR ? '"' : "'"), $curlCommand
+  --url http://localhost:8057/301 \\
+  --header Accept: */* \\
+  --header Authorization: Basic Zm9vOmJhcg== \\
+  --header Accept-Encoding: gzip \\
+  --header User-Agent: Symfony HttpClient (Native)', str_replace(['"', "'"], '', $curlCommand)
         );
     }
 
@@ -425,6 +428,25 @@ class HttpClientDataCollectorTest extends TestCase
         self::assertNull($curlCommand);
     }
 
+    #[RequiresPhpExtension('curl')]
+    public function testGeneratingCurlCommandForArraysWithResourcesAndUnreachableHost()
+    {
+        $httpClient = new TraceableHttpClient(new CurlHttpClient());
+        try {
+            $httpClient->request('POST', 'http://localhast:8057/', [
+                'body' => ['file' => fopen('data://text/plain,', 'r')],
+            ]);
+        } catch (TransportException) {
+        }
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $httpClient);
+        $sut->lateCollect();
+        $collectedData = $sut->getClients();
+        self::assertCount(1, $collectedData['http_client']['traces']);
+        $curlCommand = $collectedData['http_client']['traces'][0]['curlCommand'];
+        self::assertNull($curlCommand);
+    }
+
     private function httpClientThatHasTracedRequests($tracedRequests): TraceableHttpClient
     {
         $httpClient = new TraceableHttpClient(new NativeHttpClient());
@@ -435,5 +457,43 @@ class HttpClientDataCollectorTest extends TestCase
         }
 
         return $httpClient;
+    }
+
+    #[DataProvider('provideClientIsResetWhenExpectedCases')]
+    public function testClientIsResetWhenExpected(\Closure $request, bool $wasReset)
+    {
+        $mockHttpClient = new class extends MockHttpClient {
+            public bool $wasReset = false;
+
+            public function reset(): void
+            {
+                parent::reset();
+
+                $this->wasReset = true;
+            }
+        };
+
+        $sut = new HttpClientDataCollector();
+        $sut->registerClient('http_client', $traceableHttpClient = new TraceableHttpClient($mockHttpClient));
+        $request($traceableHttpClient);
+        $sut->lateCollect();
+
+        $this->assertSame($wasReset, $mockHttpClient->wasReset);
+    }
+
+    public static function provideClientIsResetWhenExpectedCases(): iterable
+    {
+        yield [
+            static function (TraceableHttpClient $traceableHttpClient) {
+                $response = $traceableHttpClient->request('GET', 'http://localhost/');
+                $response->getContent();
+            },
+            true,
+        ];
+
+        yield [
+            static fn () => null,
+            false,
+        ];
     }
 }

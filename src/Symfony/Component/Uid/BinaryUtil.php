@@ -187,3 +187,5 @@ class BinaryUtil
         return bin2hex($time);
     }
 }
+
+// @php-cs-fixer-ignore long_to_shorthand_operator To prevent false positive causing "Cannot use assign-op operators with string offsets" error

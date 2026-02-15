@@ -17,8 +17,8 @@ use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
 use Symfony\Bundle\SecurityBundle\Tests\Fixtures\DummyAuthenticator;
 use Symfony\Component\Console\Tester\CommandTester;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 
 class DebugFirewallCommandTest extends TestCase
@@ -26,10 +26,8 @@ class DebugFirewallCommandTest extends TestCase
     public function testFirewallListOutputMatchesFixture()
     {
         $firewallNames = ['main', 'api'];
-        $contexts = $this->createMock(ContainerInterface::class);
-        $eventDispatchers = $this->createMock(ContainerInterface::class);
 
-        $command = new DebugFirewallCommand($firewallNames, $contexts, $eventDispatchers, []);
+        $command = new DebugFirewallCommand($firewallNames, new Container(), new Container(), []);
         $tester = new CommandTester($command);
 
         $this->assertSame(0, $tester->execute([]));
@@ -44,16 +42,12 @@ class DebugFirewallCommandTest extends TestCase
     {
         $firewallNames = ['main', 'api'];
 
-        $contexts = $this->createMock(ContainerInterface::class);
-        $contexts->method('has')->willReturn(false);
-
-        $eventDispatchers = $this->createMock(ContainerInterface::class);
         $authenticators = [];
 
         $command = new DebugFirewallCommand(
             $firewallNames,
-            $contexts,
-            $eventDispatchers,
+            new Container(),
+            new Container(),
             $authenticators
         );
 
@@ -85,11 +79,10 @@ class DebugFirewallCommandTest extends TestCase
 
         $context = new FirewallContext([], config: $config);
 
-        $contexts = $this->createMock(ContainerInterface::class);
-        $contexts->method('has')->willReturn(true);
-        $contexts->method('get')->willReturn($context);
+        $contexts = new Container();
+        $contexts->set('security.firewall.map.context.main', $context);
 
-        $eventDispatchers = $this->createMock(ContainerInterface::class);
+        $eventDispatchers = new Container();
         $authenticator = new DummyAuthenticator();
         $authenticators = ['main' => [$authenticator]];
 
@@ -117,21 +110,17 @@ class DebugFirewallCommandTest extends TestCase
 
         $context = new FirewallContext([], config: $config);
 
-        $contexts = $this->createMock(ContainerInterface::class);
-        $contexts->method('has')->willReturn(true);
-        $contexts->method('get')->willReturn($context);
+        $contexts = new Container();
+        $contexts->set('security.firewall.map.context.main', $context);
 
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
-        $listener = fn () => null;
-        $listenerTwo = fn (int $number) => $number * 2;
-        $dispatcher->method('getListeners')->willReturn([
-            'security.event' => [$listener, $listenerTwo],
-        ]);
-        $dispatcher->method('getListenerPriority')->willReturn(42);
+        $dispatcher = new EventDispatcher();
+        $listener = static fn () => null;
+        $listenerTwo = static fn (int $number) => $number * 2;
+        $dispatcher->addListener('security.event', $listener, 42);
+        $dispatcher->addListener('security.event', $listenerTwo, 42);
 
-        $eventDispatchers = $this->createMock(ContainerInterface::class);
-        $eventDispatchers->method('has')->willReturn(true);
-        $eventDispatchers->method('get')->willReturn($dispatcher);
+        $eventDispatchers = new Container();
+        $eventDispatchers->set('security.event_dispatcher.main', $dispatcher);
 
         $authenticator = new DummyAuthenticator();
         $authenticatorTwo = new DummyAuthenticator();
@@ -169,13 +158,12 @@ class DebugFirewallCommandTest extends TestCase
 
         $context = new FirewallContext([], config: $config);
 
-        $contexts = $this->createMock(ContainerInterface::class);
-        $contexts->method('has')->willReturn(true);
-        $contexts->method('get')->willReturn($context);
+        $contexts = new Container();
+        $contexts->set('security.firewall.map.context.main', $context);
 
-        $eventDispatchers = $this->createMock(ContainerInterface::class);
+        $eventDispatchers = new Container();
         $authenticator = new DummyAuthenticator();
-        $authenticatorTwo = $this->createMock(AuthenticatorInterface::class);
+        $authenticatorTwo = $this->createStub(AuthenticatorInterface::class);
         $authenticators = ['main' => [$authenticator], 'api' => [$authenticatorTwo]];
 
         $command = new DebugFirewallCommand(

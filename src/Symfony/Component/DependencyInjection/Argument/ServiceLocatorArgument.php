@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Argument;
 
-use Symfony\Component\DependencyInjection\Loader\Configurator\Traits\ArgumentTrait;
-
 /**
  * Represents a closure acting as a service locator.
  *

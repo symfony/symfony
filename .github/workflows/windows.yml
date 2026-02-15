@@ -42,7 +42,7 @@ jobs:
         run: |
           $env:Path = 'c:\php;' + $env:Path
           mkdir c:\php && cd c:\php
-          iwr -outf php.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.2.0-Win32-vs16-x86.zip
+          iwr -outf php.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.0-Win32-vs17-x86.zip
           7z x php.zip -y >nul
           Copy php.ini-development php.ini
           "memory_limit=-1" >> php.ini
@@ -55,6 +55,7 @@ jobs:
           "extension=php_xsl.dll" >> php.ini
           "extension=php_mbstring.dll" >> php.ini
           "extension=php_openssl.dll" >> php.ini
+          "extension=php_curl.dll" >> php.ini
           cd ${{ github.workspace }}
           iwr -outf composer.phar https://getcomposer.org/download/latest-stable/composer.phar
 
@@ -76,16 +77,37 @@ jobs:
 
           php phpunit install
 
+          # curl makes composer fast, but we want to disable it for this job
+          (Get-Content -Raw c:\php\php.ini) -replace 'extension=php_curl\.dll', ';extension=php_curl.dll' | Set-Content c:\php\php.ini
+
       - name: Run tests
         run: |
           $env:Path = 'c:\php;' + $env:Path
           $x = 0
+          $workingDir = $PWD.Path
 
           Remove-Item -Path src\Symfony\Bridge\PhpUnit -Recurse
           mv src\Symfony\Component\HttpClient\phpunit.xml.dist src\Symfony\Component\HttpClient\phpunit.xml
-          php phpunit src\Symfony --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group network --exclude-group transient-on-windows || ($x = 1)
-          # HttpClient tests need to run separately, they block when run with other components' tests concurrently
-          php phpunit src\Symfony\Component\HttpClient || ($x = 1)
+          # HttpClient tests need to run separately, they timeout otherwise
+          $hcJob = Start-Job -ScriptBlock {
+            Set-Location $using:workingDir
+            & php phpunit src\Symfony\Component\HttpClient 2>&1 | Out-File -FilePath "hc.log" -Encoding utf8
+            return $LASTEXITCODE
+          }
+          sleep 10
+
+          & php phpunit src\Symfony --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group network --exclude-group transient-on-windows
+          if ($LASTEXITCODE -ne 0) { $x = 1 }
+
+          Wait-Job $hcJob | Out-Null
+          $hcExit = Receive-Job $hcJob
+          Get-Content "hc.log"
+          if ($hcExit -ne 0) {
+            $x = 1
+            Write-Host "`e[41mKO`e[0m src\Symfony/Component/HttpClient`n"
+          } else {
+            Write-Host "`e[32mOK`e[0m src\Symfony/Component/HttpClient`n"
+          }
 
           exit $x
 
@@ -119,14 +141,14 @@ jobs:
         run: |
           $env:Path = 'c:\php;' + $env:Path
           mkdir c:\php && cd c:\php
-          iwr -outf php.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.2.0-Win32-vs16-x86.zip
+          iwr -outf php.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.0-Win32-vs17-x86.zip
           7z x php.zip -y >nul
           cd ext
-          iwr -outf php_apcu.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.22-8.2-ts-vs16-x86.zip
+          iwr -outf php_apcu.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.24-8.4-ts-vs17-x86.zip
           7z x php_apcu.zip -y >nul
-          iwr -outf php_igbinary.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_igbinary-3.2.16-8.2-ts-vs16-x86.zip
+          iwr -outf php_igbinary.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_igbinary-3.2.16-8.4-ts-vs17-x86.zip
           7z x php_igbinary.zip -y >nul
-          iwr -outf php_redis.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-6.2.0-8.2-ts-vs16-x86.zip
+          iwr -outf php_redis.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_redis-6.2.0-8.4-ts-vs17-x86.zip
           7z x php_redis.zip -y >nul
           cd ..
           Copy php.ini-development php.ini
@@ -179,10 +201,5 @@ jobs:
       - name: Run tests
         run: |
           $env:Path = 'c:\php;' + $env:Path
-          $x = 0
 
-          php phpunit src\Symfony --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group network --exclude-group transient-on-windows --requires-php-extension apcu --requires-php-extension curl --requires-php-extension fileinfo --requires-php-extension igbinary --requires-php-extension intl --requires-php-extension openssl --requires-php-extension pdo_sqlite --requires-php-extension redis --requires-php-extension sodium || ($x = 1)
-          # HttpClient tests need to run separately, they block when run with other components' tests concurrently
-          php phpunit src\Symfony\Component\HttpClient --requires-php-extension curl --requires-php-extension openssl || ($x = 1)
-
-          exit $x
+          php phpunit src\Symfony --exclude-group tty --exclude-group benchmark --exclude-group intl-data --exclude-group transient-on-windows --requires-php-extension apcu --requires-php-extension curl --requires-php-extension fileinfo --requires-php-extension igbinary --requires-php-extension intl --requires-php-extension openssl --requires-php-extension pdo_sqlite --requires-php-extension redis --requires-php-extension sodium

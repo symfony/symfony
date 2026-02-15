@@ -31,6 +31,11 @@ final class EarlyExpirationMessage
 
         $pool = $reverseContainer->getId($pool);
 
+        if ($callback instanceof \Closure && !($r = new \ReflectionFunction($callback))->isAnonymous()) {
+            $callback = [$r->getClosureThis() ?? $r->getClosureCalledClass()?->name, $r->name];
+            $callback[0] ?: $callback = $r->name;
+        }
+
         if (\is_object($callback)) {
             if (null === $id = $reverseContainer->getId($callback)) {
                 return null;

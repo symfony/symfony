@@ -155,6 +155,10 @@
             width: 18px;
             margin-right: 3px;
         }
+        .sf-profiler-mailer-scrollable {
+            max-height: 600px;
+            overflow-y: auto;
+        }
     </style>
 {% endblock %}
 
@@ -331,7 +335,7 @@
                 Download as EML file
             </a>
 
-            <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.toString() }}</pre>
+            <pre class="prewrap sf-profiler-mailer-scrollable" style="margin-left: 5px">{{ message.toString() }}</pre>
         {% else %}
             <div class="sf-tabs">
                 <div class="tab">
@@ -412,7 +416,7 @@
                                     <h3 class="tab-title">Text content</h3>
                                     <div class="tab-content">
                                         {% if textBody %}
-                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                            <pre class="mailer-email-body prewrap sf-profiler-mailer-scrollable">
                                                 {%- if message.textCharset() %}
                                                     {{- textBody|convert_encoding('UTF-8', message.textCharset()) }}
                                                 {%- else %}
@@ -431,7 +435,7 @@
                                     <div class="tab">
                                         <h3 class="tab-title">HTML preview</h3>
                                         <div class="tab-content">
-                                            <pre class="prewrap" style="max-height: 600px"><iframe src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}" style="height: 80vh;width: 100%;"></iframe>
+                                            <pre class="prewrap sf-profiler-mailer-scrollable"><iframe src="data:text/html;charset=utf-8;base64,{{ collector.base64Encode(htmlBody) }}" style="height: 80vh;width: 100%;"></iframe>
                                             </pre>
                                         </div>
                                     </div>
@@ -441,7 +445,7 @@
                                     <h3 class="tab-title">HTML content</h3>
                                     <div class="tab-content">
                                         {% if htmlBody %}
-                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                            <pre class="mailer-email-body prewrap sf-profiler-mailer-scrollable">
                                                 {%- if message.htmlCharset() %}
                                                     {{- htmlBody|convert_encoding('UTF-8', message.htmlCharset()) }}
                                                 {%- else %}
@@ -461,7 +465,7 @@
                                     <h3 class="tab-title">Content</h3>
                                     <div class="tab-content">
                                         {% if body %}
-                                            <pre class="mailer-email-body prewrap" style="max-height: 600px">
+                                            <pre class="mailer-email-body prewrap sf-profiler-mailer-scrollable">
                                                 {{- body }}
                                             </pre>
                                         {% else %}
@@ -480,7 +484,7 @@
                 <div class="tab">
                     <h3 class="tab-title">MIME parts</h3>
                     <div class="tab-content">
-                        <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.body().asDebugString() }}</pre>
+                        <pre class="prewrap sf-profiler-mailer-scrollable" style="margin-left: 5px">{{ message.body().asDebugString() }}</pre>
                     </div>
                 </div>
 
@@ -492,7 +496,7 @@
                             Download as EML file
                         </a>
 
-                        <pre class="prewrap" style="max-height: 600px; margin-left: 5px">{{ message.toString() }}</pre>
+                        <pre class="prewrap sf-profiler-mailer-scrollable" style="margin-left: 5px">{{ message.toString() }}</pre>
                     </div>
                 </div>
             </div>

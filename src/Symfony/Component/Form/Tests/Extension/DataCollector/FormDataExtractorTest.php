@@ -371,8 +371,8 @@ class FormDataExtractorTest extends TestCase
     {
         $form = $this->createBuilder('name')
             ->addModelTransformer(new CallbackTransformer(
-                function () {},
-                function () {
+                static function () {},
+                static function () {
                     throw new TransformationFailedException('Fail!');
                 }
             ))

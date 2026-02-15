@@ -31,7 +31,7 @@ class ValidateRequestListenerTest extends TestCase
     {
         $this->expectException(ConflictingHeadersException::class);
         $dispatcher = new EventDispatcher();
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = $this->createStub(HttpKernelInterface::class);
 
         $request = new Request();
         $request->setTrustedProxies(['1.1.1.1'], Request::HEADER_X_FORWARDED_FOR | Request::HEADER_FORWARDED);

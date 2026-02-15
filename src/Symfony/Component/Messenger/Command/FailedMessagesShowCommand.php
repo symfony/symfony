@@ -16,7 +16,6 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Messenger\Stamp\ErrorDetailsStamp;
@@ -54,14 +53,15 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
+        $io = new SymfonyStyle($input, $output);
+        $errorIo = $io->getErrorStyle();
 
         $failureTransportName = $input->getOption('transport');
         if (self::DEFAULT_TRANSPORT_OPTION === $failureTransportName) {
-            $this->printWarningAvailableFailureTransports($io, $this->getGlobalFailureReceiverName());
+            $this->printWarningAvailableFailureTransports($errorIo, $this->getGlobalFailureReceiverName());
         }
         if ('' === $failureTransportName || null === $failureTransportName) {
-            $failureTransportName = $this->interactiveChooseFailureTransport($io);
+            $failureTransportName = $this->interactiveChooseFailureTransport($errorIo);
         }
         $failureTransportName = self::DEFAULT_TRANSPORT_OPTION === $failureTransportName ? $this->getGlobalFailureReceiverName() : $failureTransportName;
 
@@ -74,26 +74,24 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
         }
 
         if ($input->getOption('stats')) {
-            $this->listMessagesPerClass($failureTransportName, $io, $input->getOption('max'));
+            $this->listMessagesPerClass($receiver, $io, $input->getOption('max'));
         } elseif (null === $id = $input->getArgument('id')) {
-            $this->listMessages($failureTransportName, $io, $input->getOption('max'), $input->getOption('class-filter'));
+            $this->listMessages($receiver, $failureTransportName, $io, $errorIo, $input->getOption('max'), $input->getOption('class-filter'));
         } else {
-            $this->showMessage($failureTransportName, $id, $io);
+            $this->showMessage($receiver, $failureTransportName, $id, $io, $errorIo);
         }
 
         return 0;
     }
 
-    private function listMessages(?string $failedTransportName, SymfonyStyle $io, int $max, ?string $classFilter = null): void
+    private function listMessages(ListableReceiverInterface $receiver, string $failedTransportName, SymfonyStyle $io, SymfonyStyle $errorIo, int $max, ?string $classFilter = null): void
     {
-        /** @var ListableReceiverInterface $receiver */
-        $receiver = $this->getReceiver($failedTransportName);
         $envelopes = $receiver->all($max);
 
         $rows = [];
 
         if ($classFilter) {
-            $io->comment(\sprintf('Displaying only \'%s\' messages', $classFilter));
+            $errorIo->comment(\sprintf('Displaying only \'%s\' messages', $classFilter));
         }
 
         $this->phpSerializer?->acceptPhpIncompleteClass();
@@ -105,9 +103,7 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
                     continue;
                 }
 
-                /** @var RedeliveryStamp|null $lastRedeliveryStamp */
                 $lastRedeliveryStamp = $envelope->last(RedeliveryStamp::class);
-                /** @var ErrorDetailsStamp|null $lastErrorDetailsStamp */
                 $lastErrorDetailsStamp = $envelope->last(ErrorDetailsStamp::class);
 
                 $rows[] = [
@@ -132,18 +128,16 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
         $io->table(['Id', 'Class', 'Failed at', 'Error'], $rows);
 
         if ($rowsCount === $max) {
-            $io->comment(\sprintf('Showing first %d messages.', $max));
+            $errorIo->comment(\sprintf('Showing first %d messages.', $max));
         } elseif ($classFilter) {
-            $io->comment(\sprintf('Showing %d message(s).', $rowsCount));
+            $errorIo->comment(\sprintf('Showing %d message(s).', $rowsCount));
         }
 
-        $io->comment(\sprintf('Run <comment>messenger:failed:show {id} --transport=%s -vv</comment> to see message details.', $failedTransportName));
+        $errorIo->comment(\sprintf('Run <comment>messenger:failed:show {id} --transport=%s -vv</comment> to see message details.', $failedTransportName));
     }
 
-    private function listMessagesPerClass(?string $failedTransportName, SymfonyStyle $io, int $max): void
+    private function listMessagesPerClass(ListableReceiverInterface $receiver, SymfonyStyle $io, int $max): void
     {
-        /** @var ListableReceiverInterface $receiver */
-        $receiver = $this->getReceiver($failedTransportName);
         $envelopes = $receiver->all($max);
 
         $countPerClass = [];
@@ -172,10 +166,8 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
         $io->table(['Class', 'Count'], $countPerClass);
     }
 
-    private function showMessage(?string $failedTransportName, string $id, SymfonyStyle $io): void
+    private function showMessage(ListableReceiverInterface $receiver, string $failedTransportName, string $id, SymfonyStyle $io, SymfonyStyle $errorIo): void
     {
-        /** @var ListableReceiverInterface $receiver */
-        $receiver = $this->getReceiver($failedTransportName);
         $this->phpSerializer?->acceptPhpIncompleteClass();
         try {
             $envelope = $receiver->find($id);
@@ -186,7 +178,7 @@ class FailedMessagesShowCommand extends AbstractFailedMessagesCommand
             throw new RuntimeException(\sprintf('The message "%s" was not found.', $id));
         }
 
-        $this->displaySingleMessage($envelope, $io);
+        $this->displaySingleMessage($envelope, $io, $errorIo);
 
         $io->writeln([
             '',

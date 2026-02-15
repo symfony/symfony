@@ -12,7 +12,6 @@
 namespace Symfony\Component\Ldap\Tests\Security;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,19 +37,13 @@ use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class CheckLdapCredentialsListenerTest extends TestCase
 {
-    private MockObject&LdapInterface $ldap;
-
-    protected function setUp(): void
-    {
-        $this->ldap = $this->createMock(LdapInterface::class);
-    }
-
     #[DataProvider('provideShouldNotCheckPassport')]
     public function testShouldNotCheckPassport($authenticator, $passport)
     {
-        $this->ldap->expects($this->never())->method('bind');
+        $ldap = $this->createMock(LdapInterface::class);
+        $ldap->expects($this->never())->method('bind');
 
-        $listener = $this->createListener();
+        $listener = $this->createListener($ldap);
         $listener->onCheckPassport(new CheckPassportEvent($authenticator, $passport));
     }
 
@@ -117,10 +110,11 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The presented password is invalid.');
 
-        $this->ldap->method('escape')->willReturnArgument(0);
-        $this->ldap->expects($this->any())->method('bind')->willThrowException(new InvalidCredentialsException());
+        $ldap = $this->createStub(LdapInterface::class);
+        $ldap->method('escape')->willReturnArgument(0);
+        $ldap->method('bind')->willThrowException(new InvalidCredentialsException());
 
-        $listener = $this->createListener();
+        $listener = $this->createListener($ldap);
         $listener->onCheckPassport($this->createEvent());
     }
 
@@ -136,7 +130,8 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $query = $this->createMock(QueryInterface::class);
         $query->expects($this->once())->method('execute')->willReturn($collection);
 
-        $this->ldap
+        $ldap = $this->createMock(LdapInterface::class);
+        $ldap
             ->method('bind')
             ->willReturnCallback(function (...$args) {
                 static $series = [
@@ -147,10 +142,10 @@ class CheckLdapCredentialsListenerTest extends TestCase
                 $this->assertSame(array_shift($series), $args);
             })
         ;
-        $this->ldap->expects($this->any())->method('escape')->with('Wouter', '', LdapInterface::ESCAPE_FILTER)->willReturn('wouter');
-        $this->ldap->expects($this->once())->method('query')->with('{user_identifier}', 'wouter_test')->willReturn($query);
+        $ldap->expects($this->any())->method('escape')->with('Wouter', '', LdapInterface::ESCAPE_FILTER)->willReturn('wouter');
+        $ldap->expects($this->once())->method('query')->with('{user_identifier}', 'wouter_test')->willReturn($query);
 
-        $listener = $this->createListener();
+        $listener = $this->createListener($ldap);
         $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', '{user_identifier}', 'elsa', 'test1234A$', '{user_identifier}_test')));
     }
 
@@ -159,12 +154,13 @@ class CheckLdapCredentialsListenerTest extends TestCase
         $this->expectException(BadCredentialsException::class);
         $this->expectExceptionMessage('The presented user identifier is invalid.');
 
-        $collection = $this->createMock(CollectionInterface::class);
+        $collection = $this->createStub(CollectionInterface::class);
 
         $query = $this->createMock(QueryInterface::class);
         $query->expects($this->once())->method('execute')->willReturn($collection);
 
-        $this->ldap
+        $ldap = $this->createMock(LdapInterface::class);
+        $ldap
             ->method('bind')
             ->willReturnCallback(function (...$args) {
                 static $series = [
@@ -175,10 +171,10 @@ class CheckLdapCredentialsListenerTest extends TestCase
                 $this->assertSame(array_shift($series), $args);
             })
         ;
-        $this->ldap->method('escape')->willReturnArgument(0);
-        $this->ldap->expects($this->once())->method('query')->willReturn($query);
+        $ldap->method('escape')->willReturnArgument(0);
+        $ldap->expects($this->once())->method('query')->willReturn($query);
 
-        $listener = $this->createListener();
+        $listener = $this->createListener($ldap);
         $listener->onCheckPassport($this->createEvent('s3cr3t', new LdapBadge('app.ldap', '{user_identifier}', 'elsa', 'test1234A$', '{user_identifier}_test')));
     }
 
@@ -186,13 +182,13 @@ class CheckLdapCredentialsListenerTest extends TestCase
     {
         return new CheckPassportEvent(
             new TestAuthenticator(),
-            new Passport(new UserBadge('Wouter', fn () => new InMemoryUser('Wouter', null, ['ROLE_USER'])), new PasswordCredentials($password), [$ldapBadge ?? new LdapBadge('app.ldap')])
+            new Passport(new UserBadge('Wouter', static fn () => new InMemoryUser('Wouter', null, ['ROLE_USER'])), new PasswordCredentials($password), [$ldapBadge ?? new LdapBadge('app.ldap')])
         );
     }
 
-    private function createListener()
+    private function createListener(?LdapInterface $ldap = null)
     {
-        $ldapLocator = new class(['app.ldap' => fn () => $this->ldap]) implements ContainerInterface {
+        $ldapLocator = new class(['app.ldap' => fn () => $ldap ?? $this->createStub(LdapInterface::class)]) implements ContainerInterface {
             use ServiceLocatorTrait;
         };
 

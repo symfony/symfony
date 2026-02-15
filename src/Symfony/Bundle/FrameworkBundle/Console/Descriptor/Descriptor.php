@@ -15,6 +15,7 @@ use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphEdge;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -243,7 +244,7 @@ abstract class Descriptor implements DescriptorInterface
                 }
             }
         }
-        uasort($maxPriority, fn ($a, $b) => $b <=> $a);
+        uasort($maxPriority, static fn ($a, $b) => $b <=> $a);
 
         return array_keys($maxPriority);
     }
@@ -258,9 +259,33 @@ abstract class Descriptor implements DescriptorInterface
         return $sortedTags;
     }
 
+    protected function resolvePriorityServiceTags(ContainerBuilder $container, Definition $definition, ?string $tagName = null): array
+    {
+        $tags = null !== $tagName ? $definition->getTag($tagName) : $definition->getTags();
+
+        $priority = ($container->getReflectionClass($definition->getClass())?->getAttributes(AsTaggedItem::class)[0] ?? null)?->newInstance()->priority;
+        if (!$priority) {
+            return $tags;
+        }
+
+        if (null !== $tagName) {
+            foreach ($tags as &$tag) {
+                $tag['priority'] ??= $priority;
+            }
+        } else {
+            foreach ($tags as &$tagConfigs) {
+                foreach ($tagConfigs as &$tag) {
+                    $tag['priority'] ??= $priority;
+                }
+            }
+        }
+
+        return $tags;
+    }
+
     protected function sortByPriority(array $tag): array
     {
-        usort($tag, fn ($a, $b) => ($b['priority'] ?? 0) <=> ($a['priority'] ?? 0));
+        usort($tag, static fn ($a, $b) => ($b['priority'] ?? 0) <=> ($a['priority'] ?? 0));
 
         return $tag;
     }
@@ -353,12 +378,42 @@ abstract class Descriptor implements DescriptorInterface
     {
         try {
             return array_values(array_unique(array_map(
-                fn (ServiceReferenceGraphEdge $edge) => $edge->getSourceNode()->getId(),
+                static fn (ServiceReferenceGraphEdge $edge) => $edge->getSourceNode()->getId(),
                 $container->getCompiler()->getServiceReferenceGraph()->getNode($serviceId)->getInEdges()
             )));
         } catch (InvalidArgumentException $exception) {
             return [];
         }
+    }
+
+    /**
+     * @return array<array{id: string, class: ?string, priority: int}>
+     */
+    protected function getDecorationStack(ContainerBuilder $container, string $id): array
+    {
+        $stack = [];
+
+        while ($container->hasDefinition($id) || $container->hasAlias($id)) {
+            // resolve Alias and continue
+            if ($container->hasAlias($id)) {
+                $id = (string) $container->getAlias($id);
+                continue;
+            }
+
+            $definition = $container->getDefinition($id);
+            $class = $definition->getClass();
+            $priority = $definition->decorationPriority ?? 0;
+
+            $stack[] = ['id' => $id, 'class' => $class, 'priority' => $priority];
+
+            if (!$nextId = $definition->innerServiceId) {
+                break;
+            }
+
+            $id = $nextId;
+        }
+
+        return $stack;
     }
 
     private function filterRoutesByHttpMethod(RouteCollection $routes, string $method): RouteCollection

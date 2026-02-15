@@ -31,7 +31,7 @@ class DelayedMessageHandlingException extends RuntimeException implements Wrappe
         $this->envelope = $envelope;
 
         $exceptionMessages = implode(", \n", array_map(
-            fn (\Throwable $e) => $e::class.': '.$e->getMessage(),
+            static fn (\Throwable $e) => $e::class.': '.$e->getMessage(),
             $exceptions
         ));
 

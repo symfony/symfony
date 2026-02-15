@@ -30,6 +30,7 @@ return [
         'ay' => 'aymara',
         'az' => 'ozarbayjon',
         'ba' => 'boshqird',
+        'bal' => 'baluj',
         'ban' => 'bali',
         'bas' => 'basa',
         'be' => 'belarus',
@@ -452,7 +453,6 @@ return [
         'pt_PT' => 'portugal (Yevropa)',
         'ro_MD' => 'moldovan',
         'sw_CD' => 'suaxili (Kongo)',
-        'zh_Hans' => 'xitoy (soddalashgan)',
         'zh_Hant' => 'xitoy (an’anaviy)',
     ],
 ];

@@ -79,3 +79,6 @@ class ©
         $this->metadata = $metadata;
     }
 }
+
+// @php-cs-fixer-ignore long_to_shorthand_operator To prevent false positive causing "Cannot use assign-op operators with string offsets" error
+// @php-cs-fixer-ignore psr_autoloading This class is explicitly having short, special name

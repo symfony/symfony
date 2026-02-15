@@ -23,7 +23,6 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -67,7 +66,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
         $this
             ->setDefinition([
-                new InputArgument('receivers', InputArgument::IS_ARRAY, 'Names of the receivers/transports to consume in order of priority', $defaultReceiverName ? [$defaultReceiverName] : []),
+                new InputArgument('receivers', InputArgument::IS_ARRAY, 'Names or regular expression patterns of the receivers/transports to consume in order of priority', $defaultReceiverName ? [$defaultReceiverName] : []),
                 new InputOption('limit', 'l', InputOption::VALUE_REQUIRED, 'Limit the number of received messages'),
                 new InputOption('failure-limit', 'f', InputOption::VALUE_REQUIRED, 'The number of failed messages the worker can consume'),
                 new InputOption('memory-limit', 'm', InputOption::VALUE_REQUIRED, 'The memory limit the worker can consume'),
@@ -85,9 +84,15 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
                     <info>php %command.full_name% <receiver-name></info>
 
-                To receive from multiple transports, pass each name:
+                You can specify a single receiver name or use a regular expression to match
+                multiple receivers. When a regular expression matches multiple transport names,
+                the order of the receivers will match their order in the configuration:
 
-                    <info>php %command.full_name% receiver1 receiver2</info>
+                    <info>php %command.full_name% "receiver1|receiver2"</info>
+
+                To get a different order, pass each name or regular expression as a separate argument:
+
+                    <info>php %command.full_name% receiver2 receiver1</info>
 
                 Use the <info>--limit</info> option to limit the number of messages received:
 
@@ -145,7 +150,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
     protected function interact(InputInterface $input, OutputInterface $output): void
     {
-        $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
+        $io = new SymfonyStyle($input, $output);
 
         if ($input->getOption('all')) {
             return;
@@ -184,7 +189,16 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
         $receivers = [];
         $rateLimiters = [];
-        $receiverNames = $input->getOption('all') ? $this->receiverNames : $input->getArgument('receivers');
+        if ($input->getOption('all')) {
+            $receiverNames = $this->receiverNames;
+        } else {
+            $receiverNames = [];
+            foreach ($input->getArgument('receivers') as $receiver) {
+                $receiverNames = array_merge($receiverNames, preg_grep(\sprintf('{^%s$}', $receiver), $this->receiverNames));
+            }
+            $receiverNames = $receiverNames ?: $input->getArgument('receivers');
+            $receiverNames = array_unique($receiverNames);
+        }
 
         if ($input->getOption('all') && $excludedTransports = $input->getOption('exclude-receivers')) {
             $receiverNames = array_diff($receiverNames, $excludedTransports);
@@ -253,19 +267,20 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
         $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
 
-        $io = new SymfonyStyle($input, $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output);
+        $io = new SymfonyStyle($input, $output);
+        $errorIo = $io->getErrorStyle();
         $io->success(\sprintf('Consuming messages from transport%s "%s".', \count($receivers) > 1 ? 's' : '', implode(', ', $receiverNames)));
 
         if ($stopsWhen) {
             $last = array_pop($stopsWhen);
             $stopsWhen = ($stopsWhen ? implode(', ', $stopsWhen).' or ' : '').$last;
-            $io->comment("The worker will automatically exit once it has {$stopsWhen}.");
+            $errorIo->comment("The worker will automatically exit once it has {$stopsWhen}.");
         }
 
-        $io->comment('Quit the worker with CONTROL-C.');
+        $errorIo->comment('Quit the worker with CONTROL-C.');
 
         if (OutputInterface::VERBOSITY_VERBOSE > $output->getVerbosity()) {
-            $io->comment('Re-run the command with a -vv option to see logs about consumed messages.');
+            $errorIo->comment('Re-run the command with a -vv option to see logs about consumed messages.');
         }
 
         $bus = $input->getOption('bus') ? $this->routableBus->getMessageBus($input->getOption('bus')) : $this->routableBus;

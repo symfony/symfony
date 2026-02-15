@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @param list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithArray> $data
+ * @param list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithList> $data
  */
 return static function (mixed $data, \Psr\Container\ContainerInterface $valueTransformers, array $options): \Traversable {
     try {

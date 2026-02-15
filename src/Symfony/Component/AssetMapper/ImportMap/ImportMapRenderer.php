@@ -81,7 +81,7 @@ class ImportMapRenderer
             } elseif ('css' !== $data['type']) {
                 $importMap[$importName] = $path;
                 if ($preload) {
-                    $modulePreloads[] = $path;
+                    $modulePreloads[$path] = $path;
                 }
             } elseif ($preload) {
                 $webLinks[$path] = 'style';

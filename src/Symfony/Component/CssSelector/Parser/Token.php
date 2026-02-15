@@ -31,6 +31,9 @@ class Token
     public const TYPE_NUMBER = 'number';
     public const TYPE_STRING = 'string';
 
+    /**
+     * @param self::TYPE_*|null $type
+     */
     public function __construct(
         private ?string $type,
         private ?string $value,
@@ -38,7 +41,10 @@ class Token
     ) {
     }
 
-    public function getType(): ?int
+    /**
+     * @return self::TYPE_*|null
+     */
+    public function getType(): ?string
     {
         return $this->type;
     }

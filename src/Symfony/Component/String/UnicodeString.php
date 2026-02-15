@@ -106,7 +106,9 @@ class UnicodeString extends AbstractUnicodeString
             return false;
         }
 
-        $grapheme = grapheme_extract($this->string, \strlen($suffix), \GRAPHEME_EXTR_MAXBYTES, \strlen($this->string) - \strlen($suffix)) ?: '';
+        if (false === $grapheme = grapheme_extract($this->string, \strlen($suffix), \GRAPHEME_EXTR_MAXBYTES, \strlen($this->string) - \strlen($suffix))) {
+            $grapheme = '';
+        }
 
         if ($this->ignoreCase) {
             return 0 === mb_stripos($grapheme, $suffix, 0, 'UTF-8');
@@ -357,7 +359,9 @@ class UnicodeString extends AbstractUnicodeString
             return false;
         }
 
-        $grapheme = grapheme_extract($this->string, \strlen($prefix), \GRAPHEME_EXTR_MAXBYTES) ?: '';
+        if (false === $grapheme = grapheme_extract($this->string, \strlen($prefix), \GRAPHEME_EXTR_MAXBYTES)) {
+            $grapheme = '';
+        }
 
         if ($this->ignoreCase) {
             return 0 === mb_stripos($grapheme, $prefix, 0, 'UTF-8');
@@ -366,51 +370,47 @@ class UnicodeString extends AbstractUnicodeString
         return $prefix === $grapheme;
     }
 
-    public function __unserialize(array $data): void
+    public function trimPrefix($prefix): static
     {
-        if ($wakeup = self::class !== (new \ReflectionMethod($this, '__wakeup'))->class && self::class === (new \ReflectionMethod($this, '__unserialize'))->class) {
-            trigger_deprecation('symfony/string', '7.4', 'Implementing "%s::__wakeup()" is deprecated, use "__unserialize()" instead.', get_debug_type($this));
+        if (\is_array($prefix) || $prefix instanceof \Traversable) {
+            return parent::trimPrefix($prefix);
         }
 
-        try {
-            if (\in_array(array_keys($data), [['string'], ["\0*\0string"]], true)) {
-                $this->string = $data['string'] ?? $data["\0*\0string"];
-
-                if ($wakeup) {
-                    $this->__wakeup();
-                }
-
-                return;
-            }
-
-            trigger_deprecation('symfony/string', '7.4', 'Passing more than just key "string" to "%s::__unserialize()" is deprecated, populate properties in "%s::__unserialize()" instead.', self::class, get_debug_type($this));
-
-            \Closure::bind(function ($data) use ($wakeup) {
-                foreach ($data as $key => $value) {
-                    $this->{("\0" === $key[0] ?? '') ? substr($key, 1 + strrpos($key, "\0")) : $key} = $value;
-                }
-
-                if ($wakeup) {
-                    $this->__wakeup();
-                }
-            }, $this, static::class)($data);
-        } finally {
-            if (!$wakeup) {
-                if (!\is_string($this->string)) {
-                    throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
-                }
-
-                normalizer_is_normalized($this->string) ?: $this->string = normalizer_normalize($this->string);
-            }
+        if ($prefix instanceof AbstractString) {
+            $prefix = $prefix->string;
+        } else {
+            $prefix = (string) $prefix;
         }
+
+        if (!normalizer_is_normalized($prefix, \Normalizer::NFC)) {
+            $prefix = normalizer_normalize($prefix, \Normalizer::NFC);
+        }
+
+        return parent::trimPrefix($prefix);
     }
 
-    /**
-     * @deprecated since Symfony 7.4, will be replaced by `__unserialize()` in 8.0
-     */
-    public function __wakeup(): void
+    public function trimSuffix($suffix): static
     {
-        trigger_deprecation('symfony/string', '7.4', 'Calling "%s::__wakeup()" is deprecated, use "__unserialize()" instead.', get_debug_type($this));
+        if (\is_array($suffix) || $suffix instanceof \Traversable) {
+            return parent::trimSuffix($suffix);
+        }
+
+        if ($suffix instanceof AbstractString) {
+            $suffix = $suffix->string;
+        } else {
+            $suffix = (string) $suffix;
+        }
+
+        if (!normalizer_is_normalized($suffix, \Normalizer::NFC)) {
+            $suffix = normalizer_normalize($suffix, \Normalizer::NFC);
+        }
+
+        return parent::trimSuffix($suffix);
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->string = $data['string'] ?? $data["\0*\0string"];
 
         if (!\is_string($this->string)) {
             throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);

@@ -24,12 +24,6 @@ trait FactoryTrait
      */
     final public function factory(string|array|\Closure|ReferenceConfigurator|Expression $factory): static
     {
-        if ($factory instanceof \Closure) {
-            $this->definition->setFactory(static::processClosure($factory));
-
-            return $this;
-        }
-
         if (\is_string($factory) && 1 === substr_count($factory, ':')) {
             $factoryParts = explode(':', $factory);
 

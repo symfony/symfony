@@ -14,6 +14,7 @@ namespace Symfony\Component\EventDispatcher\Tests\Debug;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\Debug\WrappedListener;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
@@ -23,7 +24,7 @@ class WrappedListenerTest extends TestCase
     #[DataProvider('provideListenersToDescribe')]
     public function testListenerDescription($listener, $expected)
     {
-        $wrappedListener = new WrappedListener($listener, null, $this->createMock(Stopwatch::class), $this->createMock(EventDispatcherInterface::class));
+        $wrappedListener = new WrappedListener($listener, null, new Stopwatch(), new EventDispatcher());
 
         $this->assertStringMatchesFormat($expected, $wrappedListener->getPretty());
     }
@@ -36,10 +37,10 @@ class WrappedListenerTest extends TestCase
             [['Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'],
             [['Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'invalidMethod'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::invalidMethod'],
             ['var_dump', 'var_dump'],
-            [function () {}, 'closure'],
+            [static function () {}, 'closure'],
             [\Closure::fromCallable([new FooListener(), 'listen']), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'],
             [\Closure::fromCallable(['Symfony\Component\EventDispatcher\Tests\Debug\FooListener', 'listenStatic']), 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listenStatic'],
-            [\Closure::fromCallable(function () {}), 'closure'],
+            [\Closure::fromCallable(static function () {}), 'closure'],
             [[#[\Closure(name: FooListener::class)] static fn () => new FooListener(), 'listen'], 'Symfony\Component\EventDispatcher\Tests\Debug\FooListener::listen'],
         ];
     }

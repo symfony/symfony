@@ -19,6 +19,7 @@ use Symfony\Component\TypeInfo\Type\EnumType;
 use Symfony\Component\TypeInfo\Type\GenericType;
 use Symfony\Component\TypeInfo\Type\IntersectionType;
 use Symfony\Component\TypeInfo\Type\NullableType;
+use Symfony\Component\TypeInfo\Type\ObjectShapeType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
 use Symfony\Component\TypeInfo\Type\TemplateType;
 use Symfony\Component\TypeInfo\Type\UnionType;
@@ -170,13 +171,9 @@ trait TypeFactoryTrait
     /**
      * @return CollectionType<BuiltinType<TypeIdentifier::ITERABLE>>
      */
-    public static function iterable(?Type $value = null, ?Type $key = null, bool $asList = false): CollectionType
+    public static function iterable(?Type $value = null, ?Type $key = null): CollectionType
     {
-        if ($asList) {
-            trigger_deprecation('symfony/type-info', '7.3', 'The third argument of "%s()" is deprecated. Use the "%s::list()" method to create a list instead.', __METHOD__, self::class);
-        }
-
-        return self::collection(self::builtin(TypeIdentifier::ITERABLE), $value, $key, $asList);
+        return self::collection(self::builtin(TypeIdentifier::ITERABLE), $value, $key);
     }
 
     /**
@@ -200,11 +197,9 @@ trait TypeFactoryTrait
      */
     public static function arrayShape(array $shape, bool $sealed = true, ?Type $extraKeyType = null, ?Type $extraValueType = null): ArrayShapeType
     {
-        $shape = array_map(static function (array|Type $item): array {
-            return $item instanceof Type
+        $shape = array_map(static fn (array|Type $item): array => $item instanceof Type
                 ? ['type' => $item, 'optional' => false]
-                : ['type' => $item['type'], 'optional' => $item['optional'] ?? false];
-        }, $shape);
+                : ['type' => $item['type'], 'optional' => $item['optional'] ?? false], $shape);
 
         if ($extraKeyType || $extraValueType) {
             $sealed = false;
@@ -231,6 +226,21 @@ trait TypeFactoryTrait
     public static function object(?string $className = null): BuiltinType|ObjectType
     {
         return null !== $className ? new ObjectType($className) : new BuiltinType(TypeIdentifier::OBJECT);
+    }
+
+    /**
+     * @param array<string, array{type: Type, optional?: bool}|Type> $shape
+     */
+    public static function objectShape(array $shape): ObjectShapeType
+    {
+        $shape = array_map(
+            static fn (array|Type $item): array => $item instanceof Type
+                ? ['type' => $item, 'optional' => false]
+                : ['type' => $item['type'], 'optional' => $item['optional'] ?? false],
+            $shape
+        );
+
+        return new ObjectShapeType($shape);
     }
 
     /**
@@ -294,7 +304,7 @@ trait TypeFactoryTrait
         $unionTypes = [];
 
         $nullableUnion = false;
-        $isNullable = fn (Type $type): bool => $type instanceof BuiltinType && TypeIdentifier::NULL === $type->getTypeIdentifier();
+        $isNullable = static fn (Type $type): bool => $type instanceof BuiltinType && TypeIdentifier::NULL === $type->getTypeIdentifier();
 
         foreach ($types as $type) {
             if ($type instanceof NullableType) {
@@ -304,7 +314,7 @@ trait TypeFactoryTrait
 
             if ($type instanceof UnionType) {
                 foreach ($type->getTypes() as $unionType) {
-                    if ($isNullable($type)) {
+                    if ($isNullable($unionType)) {
                         $nullableUnion = true;
 
                         continue;

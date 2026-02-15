@@ -19,7 +19,7 @@ use Symfony\Component\Config\Definition\NodeInterface;
 /**
  * This class provides a fluent interface for defining a node.
  *
- * @template TParent of NodeParentInterface|null
+ * @template TParent of NodeParentInterface|null = null
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
@@ -178,6 +178,10 @@ abstract class NodeDefinition implements NodeParentInterface
      */
     public function defaultValue(mixed $value): static
     {
+        if ($this->required) {
+            throw new InvalidDefinitionException(\sprintf('The node "%s" cannot be required and have a default value.', $this->name));
+        }
+
         $this->default = true;
         $this->defaultValue = $value;
 
@@ -191,6 +195,10 @@ abstract class NodeDefinition implements NodeParentInterface
      */
     public function isRequired(): static
     {
+        if ($this->default) {
+            throw new InvalidDefinitionException(\sprintf('The node "%s" cannot be required and have a default value.', $this->name));
+        }
+
         $this->required = true;
 
         return $this;

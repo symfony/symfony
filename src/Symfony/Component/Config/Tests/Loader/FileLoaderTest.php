@@ -23,10 +23,8 @@ class FileLoaderTest extends TestCase
 {
     public function testImportWithFileLocatorDelegation()
     {
-        $locatorMock = $this->createMock(FileLocatorInterface::class);
-
-        $locatorMockForAdditionalLoader = $this->createMock(FileLocatorInterface::class);
-        $locatorMockForAdditionalLoader->expects($this->any())
+        $locatorMockForAdditionalLoader = $this->createStub(FileLocatorInterface::class);
+        $locatorMockForAdditionalLoader
             ->method('locate')
             ->willReturn(
                 ['path/to/file1'],
@@ -36,7 +34,7 @@ class FileLoaderTest extends TestCase
                 ['path/to/file1', 'path/to/file2']
             );
 
-        $fileLoader = new TestFileLoader($locatorMock);
+        $fileLoader = new TestFileLoader(new FileLocator());
         $fileLoader->setSupports(false);
         $fileLoader->setCurrentDir('.');
 
@@ -93,16 +91,14 @@ class FileLoaderTest extends TestCase
 
     public function testImportWithGlobLikeResourceWhichContainsMultipleLines()
     {
-        $locatorMock = $this->createMock(FileLocatorInterface::class);
-        $loader = new TestFileLoader($locatorMock);
+        $loader = new TestFileLoader(new FileLocator());
 
         $this->assertSame("foo\nfoobar[foo]", $loader->import("foo\nfoobar[foo]"));
     }
 
     public function testImportWithGlobLikeResourceWhichContainsSlashesAndMultipleLines()
     {
-        $locatorMock = $this->createMock(FileLocatorInterface::class);
-        $loader = new TestFileLoader($locatorMock);
+        $loader = new TestFileLoader(new FileLocator());
 
         $this->assertSame("foo\nfoo/bar[foo]", $loader->import("foo\nfoo/bar[foo]"));
     }

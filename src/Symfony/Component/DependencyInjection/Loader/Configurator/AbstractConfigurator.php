@@ -101,6 +101,9 @@ abstract class AbstractConfigurator
             case $value instanceof \UnitEnum:
                 return $value;
 
+            case $value instanceof \Closure:
+                return self::processClosure($value);
+
             case $value instanceof ArgumentInterface:
             case $value instanceof Definition:
             case $value instanceof Expression:
@@ -120,7 +123,7 @@ abstract class AbstractConfigurator
      *
      * @throws InvalidArgumentException if the closure is anonymous or references a non-static method
      */
-    final public static function processClosure(\Closure $closure): callable
+    private static function processClosure(\Closure $closure): callable
     {
         $function = new \ReflectionFunction($closure);
         if ($function->isAnonymous()) {

@@ -114,4 +114,14 @@ class MockClockTest extends TestCase
         $this->assertNotSame($clock, $utcClock);
         $this->assertSame('UTC', $utcClock->now()->getTimezone()->getName());
     }
+
+    public function testSleepWithNegativeValueDoesNothing()
+    {
+        $initialTime = new \DateTimeImmutable('2000-01-01 12:00:00 UTC');
+
+        $clock = new MockClock($initialTime);
+        $clock->sleep(-10.5);
+
+        $this->assertEquals($initialTime, $clock->now());
+    }
 }

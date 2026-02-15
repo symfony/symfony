@@ -41,13 +41,13 @@ class Uuid extends AbstractUid
         $type = preg_match('{^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$}Di', $uuid) ? (int) $uuid[14] : false;
 
         if (false === $type || (static::TYPE ?: $type) !== $type) {
-            throw new InvalidArgumentException(\sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
+            throw new InvalidArgumentException(\sprintf('Invalid UUID%s.', static::TYPE ? 'v'.static::TYPE : ''));
         }
 
         $this->uid = strtolower($uuid);
 
         if ($checkVariant && !\in_array($this->uid[19], ['8', '9', 'a', 'b'], true)) {
-            throw new InvalidArgumentException(\sprintf('Invalid UUID%s: "%s".', static::TYPE ? 'v'.static::TYPE : '', $uuid));
+            throw new InvalidArgumentException(\sprintf('Invalid UUID%s.', static::TYPE ? 'v'.static::TYPE : ''));
         }
     }
 
@@ -127,10 +127,8 @@ class Uuid extends AbstractUid
     /**
      * @param int-mask-of<Uuid::FORMAT_*> $format
      */
-    public static function isValid(string $uuid /* , int $format = self::FORMAT_RFC_9562 */): bool
+    public static function isValid(string $uuid, int $format = self::FORMAT_RFC_9562): bool
     {
-        $format = 1 < \func_num_args() ? func_get_arg(1) : self::FORMAT_RFC_9562;
-
         if (36 === \strlen($uuid) && !($format & self::FORMAT_RFC_9562)) {
             return false;
         }

@@ -109,6 +109,19 @@ class SlidingWindowLimiterTest extends TestCase
         );
     }
 
+    public function testNegativeConsume()
+    {
+        $limiter = $this->createLimiter();
+
+        $limiter->consume(10);
+
+        for ($i = 1; $i <= 3; ++$i) {
+            $rateLimit = $limiter->consume(-1);
+            $this->assertEquals($i, $rateLimit->getRemainingTokens());
+            $this->assertTrue($rateLimit->isAccepted());
+        }
+    }
+
     private function createLimiter(): SlidingWindowLimiter
     {
         return new SlidingWindowLimiter('test', 10, new \DateInterval('PT12S'), $this->storage);

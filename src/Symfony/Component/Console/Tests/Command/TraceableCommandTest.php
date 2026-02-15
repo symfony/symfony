@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\TraceableCommand;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
 use Symfony\Component\Console\Tests\Fixtures\LoopExampleCommand;
 use Symfony\Component\Stopwatch\Stopwatch;
 
@@ -26,6 +27,7 @@ class TraceableCommandTest extends TestCase
     {
         $this->application = new Application();
         $this->application->addCommand(new LoopExampleCommand());
+        $this->application->addCommand(new InvokableTestCommand());
     }
 
     public function testRunIsOverriddenWithoutProfile()
@@ -55,6 +57,16 @@ class TraceableCommandTest extends TestCase
 
         $output = $commandTester->getDisplay();
         $this->assertLoopOutputCorrectness($output);
+    }
+
+    public function testRunOnInvokableCommand()
+    {
+        $command = $this->application->find('invokable:test');
+        $traceableCommand = new TraceableCommand($command, new Stopwatch());
+
+        $commandTester = new CommandTester($traceableCommand);
+        $commandTester->execute([]);
+        $commandTester->assertCommandIsSuccessful();
     }
 
     public function assertLoopOutputCorrectness(string $output)

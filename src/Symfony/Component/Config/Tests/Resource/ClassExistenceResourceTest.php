@@ -59,7 +59,7 @@ class ClassExistenceResourceTest extends TestCase
 
     public function testExistsKo()
     {
-        spl_autoload_register($autoloader = function ($class) use (&$loadedClass) { $loadedClass = $class; });
+        spl_autoload_register($autoloader = static function ($class) use (&$loadedClass) { $loadedClass = $class; });
 
         try {
             $res = new ClassExistenceResource('MissingFooClass');

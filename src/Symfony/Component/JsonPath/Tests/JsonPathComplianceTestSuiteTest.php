@@ -18,9 +18,15 @@ use Symfony\Component\JsonPath\JsonCrawler;
 
 final class JsonPathComplianceTestSuiteTest extends TestCase
 {
+    private const COMPLIANCE_TEST_SUITE_FILE = 'vendor/jsonpath-standard/jsonpath-compliance-test-suite/cts.json';
+
     #[DataProvider('complianceCaseProvider')]
-    public function testComplianceTestCase(string $selector, mixed $document, array $expectedResults, bool $invalidSelector)
+    public function testComplianceTestCase(?string $selector, mixed $document, array $expectedResults, bool $invalidSelector)
     {
+        if (null === $selector) {
+            $this->markTestSkipped('The JsonPath compliance test suite is not available. Did you run "composer update"?');
+        }
+
         $jsonCrawler = new JsonCrawler(json_encode($document));
 
         if ($invalidSelector) {
@@ -35,8 +41,12 @@ final class JsonPathComplianceTestSuiteTest extends TestCase
     }
 
     #[DataProvider('resourceComplianceCaseProvider')]
-    public function testComplianceTestCaseWithResource(string $selector, mixed $document, array $expectedResults, bool $invalidSelector)
+    public function testComplianceTestCaseWithResource(?string $selector, mixed $document, array $expectedResults, bool $invalidSelector)
     {
+        if (null === $selector) {
+            $this->markTestSkipped('The JsonPath compliance test suite is not available. Did you run "composer update"?');
+        }
+
         $json = json_encode($document);
         $resource = fopen('php://memory', 'r+');
         fwrite($resource, $json);
@@ -59,7 +69,14 @@ final class JsonPathComplianceTestSuiteTest extends TestCase
 
     public static function complianceCaseProvider(): iterable
     {
-        $data = json_decode(file_get_contents(__DIR__.'/Fixtures/cts.json'), false, flags: \JSON_THROW_ON_ERROR);
+        $testSuiteFile = self::getComplianceTestSuiteFile();
+        if (null === $testSuiteFile) {
+            yield 'missing test suite dataset' => [null, null, [], false];
+
+            return;
+        }
+
+        $data = json_decode(file_get_contents($testSuiteFile), false, flags: \JSON_THROW_ON_ERROR);
 
         foreach ($data->tests as $test) {
             yield $test->name => [
@@ -73,7 +90,14 @@ final class JsonPathComplianceTestSuiteTest extends TestCase
 
     public static function resourceComplianceCaseProvider(): iterable
     {
-        $data = json_decode(file_get_contents(__DIR__.'/Fixtures/cts.json'), false, flags: \JSON_THROW_ON_ERROR);
+        $testSuiteFile = self::getComplianceTestSuiteFile();
+        if (null === $testSuiteFile) {
+            yield 'missing test suite dataset' => [null, null, [], false];
+
+            return;
+        }
+
+        $data = json_decode(file_get_contents($testSuiteFile), false, flags: \JSON_THROW_ON_ERROR);
 
         foreach ($data->tests as $test) {
             // if there's no document, no resource can be created
@@ -93,9 +117,7 @@ final class JsonPathComplianceTestSuiteTest extends TestCase
     private static function convertToArray(mixed $value): mixed
     {
         if ($value instanceof \stdClass) {
-            return array_map(function ($val) {
-                return self::convertToArray($val);
-            }, get_object_vars($value));
+            return array_map(static fn ($val) => self::convertToArray($val), get_object_vars($value));
         }
 
         if (\is_array($value)) {
@@ -103,5 +125,17 @@ final class JsonPathComplianceTestSuiteTest extends TestCase
         }
 
         return $value;
+    }
+
+    private static function getComplianceTestSuiteFile(): ?string
+    {
+        $monorepoPath = \dirname(__DIR__, 5).'/'.self::COMPLIANCE_TEST_SUITE_FILE;
+        if (file_exists($monorepoPath)) {
+            return $monorepoPath;
+        }
+
+        $standalonePath = \dirname(__DIR__).'/'.self::COMPLIANCE_TEST_SUITE_FILE;
+
+        return file_exists($standalonePath) ? $standalonePath : null;
     }
 }

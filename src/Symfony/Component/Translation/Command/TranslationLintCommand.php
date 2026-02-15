@@ -37,6 +37,7 @@ class TranslationLintCommand extends Command
         private TranslatorInterface&TranslatorBagInterface $translator,
         private array $enabledLocales = [],
     ) {
+        $this->enabledLocales = array_filter($enabledLocales);
         parent::__construct();
     }
 
@@ -70,7 +71,7 @@ class TranslationLintCommand extends Command
     {
         $locales = $input->getOption('locale');
 
-        /** @var array<string, array<string, array<string, \Throwable>> $errors */
+        /** @var array<string, array<string, array<string, \Throwable>>> $errors */
         $errors = [];
         $domainsByLocales = [];
 

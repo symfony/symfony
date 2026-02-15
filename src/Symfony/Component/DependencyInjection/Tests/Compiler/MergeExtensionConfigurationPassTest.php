@@ -33,21 +33,15 @@ class MergeExtensionConfigurationPassTest extends TestCase
 
         $extension = $this->createMock(ExtensionInterface::class);
         $extension->expects($this->any())
-            ->method('getXsdValidationBasePath')
-            ->willReturn(false);
-        $extension->expects($this->any())
-            ->method('getNamespace')
-            ->willReturn('http://example.org/schema/dic/foo');
-        $extension->expects($this->any())
             ->method('getAlias')
             ->willReturn('foo');
         $extension->expects($this->once())
             ->method('load')
-            ->willReturnCallback(function (array $config, ContainerBuilder $container) use (&$tmpProviders) {
+            ->willReturnCallback(static function (array $config, ContainerBuilder $container) use (&$tmpProviders) {
                 $tmpProviders = $container->getExpressionLanguageProviders();
             });
 
-        $provider = $this->createMock(ExpressionFunctionProviderInterface::class);
+        $provider = $this->createStub(ExpressionFunctionProviderInterface::class);
         $container = new ContainerBuilder(new ParameterBag());
         $container->registerExtension($extension);
         $container->prependExtensionConfig('foo', ['bar' => true]);
@@ -64,7 +58,7 @@ class MergeExtensionConfigurationPassTest extends TestCase
         $extension = $this->getMockBuilder(FooExtension::class)->onlyMethods(['load'])->getMock();
         $extension->expects($this->once())
             ->method('load')
-            ->with($this->isType('array'), $this->isInstanceOf(MergeExtensionConfigurationContainerBuilder::class))
+            ->with($this->isArray(), $this->isInstanceOf(MergeExtensionConfigurationContainerBuilder::class))
         ;
 
         $container = new ContainerBuilder(new ParameterBag());

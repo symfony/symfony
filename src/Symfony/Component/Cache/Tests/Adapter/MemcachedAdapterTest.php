@@ -121,7 +121,7 @@ class MemcachedAdapterTest extends AdapterTestCase
             'port' => $port,
         ];
 
-        $f = fn ($s) => ['host' => $s['host'], 'port' => $s['port']];
+        $f = static fn ($s) => ['host' => $s['host'], 'port' => $s['port']];
         $this->assertSame([$expect], array_map($f, $client1->getServerList()));
         $this->assertSame([$expect], array_map($f, $client2->getServerList()));
         $this->assertSame([$expect], array_map($f, $client3->getServerList()));

@@ -81,10 +81,11 @@ class EnumNodeDefinitionTest extends TestCase
         $node = $def->getNode();
 
         $this->assertTrue($node->isDeprecated());
-        $deprecation = $def->getNode()->getDeprecation($node->getName(), $node->getPath());
+        $deprecation = $node->getDeprecation($node->getName(), $node->getPath());
         $this->assertSame('The "foo" node is deprecated.', $deprecation['message']);
         $this->assertSame('vendor/package', $deprecation['package']);
         $this->assertSame('1.1', $deprecation['version']);
+        $this->assertSame('Since vendor/package 1.1: The "foo" node is deprecated.', $node->getDeprecationMessage());
     }
 
     public function testSameStringCoercedValuesAreDifferent()

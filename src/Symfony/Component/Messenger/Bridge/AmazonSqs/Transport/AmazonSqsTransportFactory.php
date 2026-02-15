@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\TransportFactoryInterface;
 use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
@@ -25,6 +26,7 @@ class AmazonSqsTransportFactory implements TransportFactoryInterface
 {
     public function __construct(
         private ?LoggerInterface $logger = null,
+        private ?HttpClientInterface $httpClient = null,
     ) {
     }
 
@@ -32,7 +34,7 @@ class AmazonSqsTransportFactory implements TransportFactoryInterface
     {
         unset($options['transport_name']);
 
-        return new AmazonSqsTransport(Connection::fromDsn($dsn, $options, null, $this->logger), $serializer, null, null, !($options['delete_on_rejection'] ?? false));
+        return new AmazonSqsTransport(Connection::fromDsn($dsn, $options, $this->httpClient, $this->logger), $serializer, null, null, !($options['delete_on_rejection'] ?? false));
     }
 
     public function supports(#[\SensitiveParameter] string $dsn, array $options): bool

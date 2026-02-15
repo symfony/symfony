@@ -14,6 +14,7 @@ namespace Symfony\Component\Cache\Adapter;
 use Predis\Connection\Aggregate\ClusterInterface;
 use Predis\Connection\Aggregate\PredisCluster;
 use Predis\Connection\Aggregate\ReplicationInterface;
+use Predis\Connection\Replication\ReplicationInterface as Predis2ReplicationInterface;
 use Predis\Response\ErrorInterface;
 use Predis\Response\Status;
 use Relay\Relay;
@@ -267,7 +268,7 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
                     $evalArgs = [$lua, $evalArgs, 1];
                 }
 
-                $results = $this->pipeline(function () use ($evalArgs) {
+                $results = $this->pipeline(static function () use ($evalArgs) {
                     yield 'eval' => $evalArgs;
                 });
 
@@ -288,9 +289,16 @@ class RedisTagAwareAdapter extends AbstractTagAwareAdapter
 
         $hosts = $this->getHosts();
         $host = reset($hosts);
-        if ($host instanceof \Predis\Client && $host->getConnection() instanceof ReplicationInterface) {
+        if ($host instanceof \Predis\Client) {
+            $connection = $host->getConnection();
+
             // Predis supports info command only on the master in replication environments
-            $hosts = [$host->getClientFor('master')];
+            if ($connection instanceof ReplicationInterface) {
+                $hosts = [$host->getClientFor('master')];
+            } elseif ($connection instanceof Predis2ReplicationInterface) {
+                $connection->switchToMaster();
+                $hosts = [$host];
+            }
         }
 
         foreach ($hosts as $host) {

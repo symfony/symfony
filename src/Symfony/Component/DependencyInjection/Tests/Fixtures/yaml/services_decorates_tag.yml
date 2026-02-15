@@ -1,0 +1,14 @@
+services:
+    foo:
+        class: stdClass
+        tags:
+            - { name: my_tag }
+
+    bar:
+        class: stdClass
+        tags:
+            - { name: my_tag }
+
+    tag_decorator:
+        class: stdClass
+        decorates_tag: my_tag

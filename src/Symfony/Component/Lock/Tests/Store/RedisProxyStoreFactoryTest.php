@@ -26,7 +26,7 @@ class RedisProxyStoreFactoryTest extends TestCase
             $this->markTestSkipped();
         }
 
-        $store = StoreFactory::createStore($this->createMock(RedisProxy::class));
+        $store = StoreFactory::createStore($this->createStub(RedisProxy::class));
 
         $this->assertInstanceOf(RedisStore::class, $store);
     }

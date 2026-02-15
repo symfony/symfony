@@ -281,11 +281,7 @@
 
 {# Rows #}
 
-{% block form_row -%}
-    {%- set widget_attr = {} -%}
-    {%- if help -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~ '_help'}} -%}
-    {%- endif -%}
+{% block form_row_render -%}
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' row')|trim})} %}{{ block('attributes') }}{% endwith %}>
         <div class="large-12 columns{% if (not compound or force_error|default(false)) and not valid %} error{% endif %}">
             {{- form_label(form) -}}
@@ -294,7 +290,7 @@
             {{- form_errors(form) -}}
         </div>
     </div>
-{%- endblock form_row %}
+{%- endblock form_row_render %}
 
 {% block choice_row -%}
     {% set force_error = true %}
@@ -342,8 +338,7 @@
     {% if errors|length > 0 -%}
         {% if form is not rootform %}<small class="error">{% else %}<div data-alert class="alert-box alert">{% endif %}
         {%- for error in errors -%}
-            {{ error.message }}
-            {% if not loop.last %}, {% endif %}
+            <span id="{{ id ~ '_error' ~ loop.index }}">{{ error.message }}</span>{% if not loop.last %}, {% endif %}
         {%- endfor -%}
         {% if form is not rootform %}</small>{% else %}</div>{% endif %}
     {%- endif %}

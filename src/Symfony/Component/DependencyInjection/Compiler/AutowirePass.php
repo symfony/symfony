@@ -335,13 +335,6 @@ class AutowirePass extends AbstractRecursivePass
                         $value = $this->doProcessValue($value);
                     } elseif ($lazy = $attribute->lazy) {
                         $value ??= $getValue();
-                        if ($this->container->has($value->getType())) {
-                            $type = $this->container->findDefinition($value->getType())->getClass();
-                        }
-                        $definition = (new Definition($type))
-                            ->setFactory('current')
-                            ->setArguments([[$value]])
-                            ->setLazy(true);
 
                         if (!\is_array($lazy)) {
                             if (str_contains($type, '|')) {
@@ -350,8 +343,14 @@ class AutowirePass extends AbstractRecursivePass
                             $lazy = str_contains($type, '&') ? explode('&', $type) : [];
                         }
 
+                        $proxyType = $lazy ? $type : $this->resolveProxyType($type, $value);
+                        $definition = (new Definition($proxyType))
+                            ->setFactory('current')
+                            ->setArguments([[$value]])
+                            ->setLazy(true);
+
                         if ($lazy) {
-                            if (!class_exists($type) && !interface_exists($type, false)) {
+                            if (!$this->container->getReflectionClass($proxyType, false)) {
                                 $definition->setClass('object');
                             }
                             foreach ($lazy as $v) {
@@ -742,5 +741,27 @@ class AutowirePass extends AbstractRecursivePass
         }
 
         return $alias;
+    }
+
+    /**
+     * Resolves the class name that should be proxied for a lazy service.
+     *
+     * @param string $originalType The original parameter type-hint (e.g., the interface)
+     * @param string $serviceId    The service ID the type-hint resolved to (e.g., the alias)
+     */
+    private function resolveProxyType(string $originalType, string $serviceId): string
+    {
+        if (!$this->container->has($serviceId)) {
+            return $originalType;
+        }
+
+        $resolvedType = $this->container->findDefinition($serviceId)->getClass();
+        $resolvedType = $this->container->getParameterBag()->resolveValue($resolvedType);
+
+        if (!$resolvedType || !$this->container->getReflectionClass($resolvedType, false)) {
+            return $originalType;
+        }
+
+        return $resolvedType;
     }
 }

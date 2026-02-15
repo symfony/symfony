@@ -23,17 +23,17 @@ use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
 {
     private MockObject&Connection $connection;
-    private MockObject&EntityManagerInterface $entityManager;
+    private EntityManagerInterface $entityManager;
     private DoctrineTransactionMiddleware $middleware;
 
     protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
 
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
 
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
         $managerRegistry->method('getManager')->willReturn($this->entityManager);
 
         $this->middleware = new DoctrineTransactionMiddleware($managerRegistry);
@@ -47,11 +47,18 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
         $this->connection->expects($this->once())
             ->method('commit')
         ;
-        $this->entityManager->expects($this->once())
+
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->method('getConnection')->willReturn($this->connection);
+        $entityManager->expects($this->once())
             ->method('flush')
         ;
 
-        $this->middleware->handle(new Envelope(new \stdClass()), $this->getStackMock());
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getManager')->willReturn($entityManager);
+
+        $middleware = new DoctrineTransactionMiddleware($managerRegistry);
+        $middleware->handle(new Envelope(new \stdClass()), $this->getStackMock());
     }
 
     public function testTransactionIsRolledBackOnException()
@@ -89,8 +96,10 @@ class DoctrineTransactionMiddlewareTest extends MiddlewareTestCase
 
     public function testInvalidEntityManagerThrowsException()
     {
+        $this->connection->expects($this->never())->method('getDatabasePlatform');
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $managerRegistry
+            ->expects($this->once())
             ->method('getManager')
             ->with('unknown_manager')
             ->willThrowException(new \InvalidArgumentException());

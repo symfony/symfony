@@ -371,6 +371,7 @@ class TimezonesTest extends ResourceBundleTestCase
         'America/Coral_Harbour',
         'America/Cordoba',
         'America/Costa_Rica',
+        'America/Coyhaique',
         'America/Creston',
         'America/Cuiaba',
         'America/Curacao',
@@ -909,7 +910,7 @@ class TimezonesTest extends ResourceBundleTestCase
 
     public static function provideTimezones(): iterable
     {
-        return array_map(fn ($timezone) => [$timezone], self::ZONES);
+        return array_map(static fn ($timezone) => [$timezone], self::ZONES);
     }
 
     #[DataProvider('provideCountries')]

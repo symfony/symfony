@@ -16,7 +16,7 @@ use Symfony\Component\Config\Definition\IntegerNode;
 /**
  * This class provides a fluent interface for defining an integer node.
  *
- * @template TParent of NodeParentInterface|null
+ * @template TParent of NodeParentInterface|null = null
  *
  * @extends NumericNodeDefinition<TParent>
  *

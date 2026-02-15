@@ -12,11 +12,8 @@
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
 use Doctrine\DBAL\Connection as DBALConnection;
-use Doctrine\DBAL\Driver\Exception as DriverException;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
-use Doctrine\DBAL\LockMode;
-use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Query\ForUpdate\ConflictResolutionMode;
@@ -59,7 +56,6 @@ class Connection implements ResetInterface
     protected ?float $queueEmptiedAt = null;
 
     private bool $autoSetup;
-    private bool $doMysqlCleanup = false;
 
     /**
      * Constructor.
@@ -83,7 +79,6 @@ class Connection implements ResetInterface
     public function reset(): void
     {
         $this->queueEmptiedAt = null;
-        $this->doMysqlCleanup = false;
     }
 
     public function getConfiguration(): array
@@ -161,19 +156,6 @@ class Connection implements ResetInterface
 
     public function get(): ?array
     {
-        if ($this->doMysqlCleanup && $this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
-            try {
-                $this->driverConnection->delete($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59']);
-                $this->doMysqlCleanup = false;
-            } catch (DriverException $e) {
-                // Ignore the exception
-            } catch (TableNotFoundException $e) {
-                if ($this->autoSetup) {
-                    $this->setup();
-                }
-            }
-        }
-
         get:
         $this->driverConnection->beginTransaction();
         try {
@@ -197,21 +179,7 @@ class Connection implements ResetInterface
                 $sql = $query->getSQL();
             }
 
-            if (method_exists(QueryBuilder::class, 'forUpdate')) {
-                $sql = $this->addLockMode($query, $sql);
-            } else {
-                if (preg_match('/FROM (.+) WHERE/', $sql, $matches)) {
-                    $fromClause = $matches[1];
-                    $sql = str_replace(
-                        \sprintf('FROM %s WHERE', $fromClause),
-                        \sprintf('FROM %s WHERE', $this->driverConnection->getDatabasePlatform()->appendLockHint($fromClause, LockMode::PESSIMISTIC_WRITE)),
-                        $sql
-                    );
-                }
-
-                // use SELECT ... FOR UPDATE to lock table
-                $sql .= ' '.$this->driverConnection->getDatabasePlatform()->getWriteLockSQL();
-            }
+            $sql = $this->addLockMode($query, $sql);
 
             $doctrineEnvelope = $this->executeQuery(
                 $sql,
@@ -261,14 +229,6 @@ class Connection implements ResetInterface
     public function ack(string $id): bool
     {
         try {
-            if ($this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
-                if ($updated = $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0) {
-                    $this->doMysqlCleanup = true;
-                }
-
-                return $updated;
-            }
-
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
@@ -278,14 +238,6 @@ class Connection implements ResetInterface
     public function reject(string $id): bool
     {
         try {
-            if ($this->driverConnection->getDatabasePlatform() instanceof AbstractMySQLPlatform) {
-                if ($updated = $this->driverConnection->update($this->configuration['table_name'], ['delivered_at' => '9999-12-31 23:59:59'], ['id' => $id]) > 0) {
-                    $this->doMysqlCleanup = true;
-                }
-
-                return $updated;
-            }
-
             return $this->driverConnection->delete($this->configuration['table_name'], ['id' => $id]) > 0;
         } catch (DBALException $exception) {
             throw new TransportException($exception->getMessage(), 0, $exception);
@@ -395,14 +347,6 @@ class Connection implements ResetInterface
         $this->addTableToSchema($schema);
     }
 
-    /**
-     * @internal
-     */
-    public function getExtraSetupSqlForTable(Table $createdTable): array
-    {
-        return [];
-    }
-
     private function createAvailableMessagesQueryBuilder(): QueryBuilder
     {
         $now = new \DateTimeImmutable('UTC');
@@ -489,23 +433,17 @@ class Connection implements ResetInterface
 
         try {
             if ($this->driverConnection->getDatabasePlatform() instanceof PostgreSQLPlatform) {
-                $first = $this->driverConnection->fetchFirstColumn($sql, $parameters, $types);
-
-                $id = $first[0] ?? null;
-
-                if (!$id) {
+                if (!$id = $this->driverConnection->fetchFirstColumn($sql, $parameters, $types)[0] ?? null) {
                     throw new TransportException('no id was returned by PostgreSQL from RETURNING clause.');
                 }
+
+                $this->driverConnection->executeStatement('SELECT pg_notify(?, ?)', [$this->configuration['table_name'], $this->configuration['queue_name']]);
             } elseif ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
                 $sequenceName = $this->configuration['table_name'].self::ORACLE_SEQUENCES_SUFFIX;
 
                 $this->driverConnection->executeStatement($sql, $parameters, $types);
 
-                $result = $this->driverConnection->fetchOne('SELECT '.$sequenceName.'.CURRVAL FROM DUAL');
-
-                $id = (int) $result;
-
-                if (!$id) {
+                if (!$id = (int) $this->driverConnection->fetchOne('SELECT '.$sequenceName.'.CURRVAL FROM DUAL')) {
                     throw new TransportException('no id was returned by Oracle from sequence: '.$sequenceName);
                 }
             } else {
@@ -561,14 +499,8 @@ class Connection implements ResetInterface
             ->setNotnull(true);
         $table->addColumn('delivered_at', Types::DATETIME_IMMUTABLE)
             ->setNotnull(false);
-        if (class_exists(PrimaryKeyConstraint::class)) {
-            $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('id'))], true));
-        } else {
-            $table->setPrimaryKey(['id']);
-        }
-        $table->addIndex(['queue_name']);
-        $table->addIndex(['available_at']);
-        $table->addIndex(['delivered_at']);
+        $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted('id'))], true));
+        $table->addIndex(['queue_name', 'available_at', 'delivered_at', 'id']);
 
         // We need to create a sequence for Oracle and set the id column to get the correct nextval
         if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {

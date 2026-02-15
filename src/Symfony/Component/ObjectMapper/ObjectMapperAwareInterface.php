@@ -17,7 +17,7 @@ namespace Symfony\Component\ObjectMapper;
 interface ObjectMapperAwareInterface
 {
     /**
-     * Sets the owning ObjectMapper object.
+     * Returns a clone of the original instance, configured with the given object mapper.
      */
     public function withObjectMapper(ObjectMapperInterface $objectMapper): static;
 }

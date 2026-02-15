@@ -39,7 +39,7 @@ class LoginLinkNotification extends Notification implements EmailNotificationInt
     public function asEmailMessage(EmailRecipientInterface $recipient, ?string $transport = null): ?EmailMessage
     {
         if (!class_exists(NotificationEmail::class)) {
-            throw new \LogicException(\sprintf('The "%s" method requires "symfony/twig-bridge:>4.4".', __METHOD__));
+            throw new \LogicException(\sprintf('The "%s()" method requires symfony/twig-bridge. Try running "composer require symfony/twig-bridge".', __METHOD__));
         }
 
         $email = NotificationEmail::asPublicEmail()

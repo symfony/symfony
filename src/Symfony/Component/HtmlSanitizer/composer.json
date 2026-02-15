@@ -16,11 +16,9 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "ext-dom": "*",
-        "league/uri": "^6.5|^7.0",
-        "masterminds/html5": "^2.7.2",
-        "symfony/deprecation-contracts": "^2.5|^3"
+        "league/uri": "^6.5|^7.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\HtmlSanitizer\\": "" },

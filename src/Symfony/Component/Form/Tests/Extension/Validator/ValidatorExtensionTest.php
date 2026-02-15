@@ -35,7 +35,7 @@ class ValidatorExtensionTest extends TestCase
             ->setMetadataFactory($metadataFactory)
             ->getValidator();
 
-        $extension = new ValidatorExtension($validator, false);
+        $extension = new ValidatorExtension($validator);
 
         $this->assertInstanceOf(ValidatorTypeGuesser::class, $extension->loadTypeGuesser());
 

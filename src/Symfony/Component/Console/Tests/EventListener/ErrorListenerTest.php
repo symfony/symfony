@@ -22,7 +22,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\Input;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\StringInput;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\NullOutput;
 
 class ErrorListenerTest extends TestCase
 {
@@ -38,7 +38,7 @@ class ErrorListenerTest extends TestCase
         ;
 
         $listener = new ErrorListener($logger);
-        $listener->onConsoleError(new ConsoleErrorEvent(new ArgvInput(['console.php', 'test:run', '--foo=baz', 'buzz']), $this->createMock(OutputInterface::class), $error, new Command('test:run')));
+        $listener->onConsoleError(new ConsoleErrorEvent(new ArgvInput(['console.php', 'test:run', '--foo=baz', 'buzz']), new NullOutput(), $error, new Command('test:run')));
     }
 
     public function testOnConsoleErrorWithNoCommandAndNoInputString()
@@ -53,7 +53,7 @@ class ErrorListenerTest extends TestCase
         ;
 
         $listener = new ErrorListener($logger);
-        $listener->onConsoleError(new ConsoleErrorEvent(new NonStringInput(), $this->createMock(OutputInterface::class), $error));
+        $listener->onConsoleError(new ConsoleErrorEvent(new NonStringInput(), new NullOutput(), $error));
     }
 
     public function testOnConsoleTerminateForNonZeroExitCodeWritesToLog()
@@ -109,7 +109,7 @@ class ErrorListenerTest extends TestCase
 
     private function getConsoleTerminateEvent(InputInterface $input, $exitCode)
     {
-        return new ConsoleTerminateEvent(new Command('test:run'), $input, $this->createMock(OutputInterface::class), $exitCode);
+        return new ConsoleTerminateEvent(new Command('test:run'), $input, new NullOutput(), $exitCode);
     }
 }
 

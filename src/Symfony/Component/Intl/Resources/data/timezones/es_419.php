@@ -41,7 +41,6 @@ return [
         'Etc/UTC' => 'hora universal coordinada',
         'Europe/Athens' => 'hora de Europa del Este (Atenas)',
         'Europe/Bucharest' => 'hora de Europa del Este (Bucarest)',
-        'Europe/Busingen' => 'hora de Europa central (Büsingen)',
         'Europe/Chisinau' => 'hora de Europa del Este (Chisináu)',
         'Europe/Guernsey' => 'hora del meridiano de Greenwich (Guernsey)',
         'Europe/Helsinki' => 'hora de Europa del Este (Helsinki)',

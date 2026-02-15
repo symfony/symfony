@@ -1014,6 +1014,10 @@ return [
             'EC$',
             'istočnokaripski dolar',
         ],
+        'XCG' => [
+            'Cg.',
+            'karipski gulden',
+        ],
         'XEU' => [
             'XEU',
             'Evropska valutna jedinica',
@@ -1085,6 +1089,10 @@ return [
         'ZWD' => [
             'ZWD',
             'Zimbabveanski dolar (1980–2008)',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'zimbabveansko zlato',
         ],
         'ZWL' => [
             'ZWL',

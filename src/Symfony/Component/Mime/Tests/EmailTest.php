@@ -491,8 +491,8 @@ class EmailTest extends TestCase
         $e = new Email();
         $e->addPart(new DataPart(new File($name)));
         $e->addPart((new DataPart(new File($name)))->asInline());
-        $this->assertEquals([$att->bodyToString(), $inline->bodyToString()], array_map(fn (DataPart $a) => $a->bodyToString(), $e->getAttachments()));
-        $this->assertEquals([$att->getPreparedHeaders(), $inline->getPreparedHeaders()], array_map(fn (DataPart $a) => $a->getPreparedHeaders(), $e->getAttachments()));
+        $this->assertEquals([$att->bodyToString(), $inline->bodyToString()], array_map(static fn (DataPart $a) => $a->bodyToString(), $e->getAttachments()));
+        $this->assertEquals([$att->getPreparedHeaders(), $inline->getPreparedHeaders()], array_map(static fn (DataPart $a) => $a->getPreparedHeaders(), $e->getAttachments()));
     }
 
     public function testSerialize()

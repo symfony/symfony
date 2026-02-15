@@ -23,14 +23,10 @@
 
 {# Rows #}
 
-{% block form_row -%}
+{% block form_row_render -%}
     {%- if expanded is defined and expanded -%}
         {{ block('fieldset_form_row') }}
     {%- else -%}
-        {%- set widget_attr = {} -%}
-        {%- if help -%}
-            {%- set widget_attr = {attr: {'aria-describedby': id ~ '_help'}} -%}
-        {%- endif -%}
         {%- set row_class = row_class|default(row_attr.class|default('mb-3')) -%}
         {%- set is_form_floating = is_form_floating|default('form-floating' in row_class) -%}
         {%- set is_input_group = is_input_group|default('input-group' in row_class) -%}
@@ -68,7 +64,7 @@
             {%- endif -%}
         {##}</div>
     {%- endif -%}
-{%- endblock form_row %}
+{%- endblock form_row_render %}
 
 {% block fieldset_form_row -%}
     {%- set widget_attr = {} -%}

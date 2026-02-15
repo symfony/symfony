@@ -14,6 +14,7 @@ namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
+use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
 use Symfony\Component\Validator\Tests\Fixtures\FilesLoader;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 
@@ -21,7 +22,7 @@ class FilesLoaderTest extends TestCase
 {
     public function testCallsGetFileLoaderInstanceForeachPath()
     {
-        $loader = $this->getFilesLoader($this->createMock(LoaderInterface::class));
+        $loader = $this->getFilesLoader(new StaticMethodLoader());
         $this->assertEquals(4, $loader->getTimesCalled());
     }
 

@@ -36,14 +36,6 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
         $this->divisor = $divisor ?? 1;
     }
 
-    /**
-     * Transforms a normalized format into a localized money string.
-     *
-     * @param int|float|string|null $value Normalized number
-     *
-     * @throws TransformationFailedException if the given value is not numeric or
-     *                                       if the value cannot be transformed
-     */
     public function transform(mixed $value): string
     {
         if (null !== $value && '' !== $value && 1 !== $this->divisor) {
@@ -56,14 +48,6 @@ class MoneyToLocalizedStringTransformer extends NumberToLocalizedStringTransform
         return parent::transform($value);
     }
 
-    /**
-     * Transforms a localized money string into a normalized format.
-     *
-     * @param string $value Localized money string
-     *
-     * @throws TransformationFailedException if the given value is not a string
-     *                                       or if the value cannot be transformed
-     */
     public function reverseTransform(mixed $value): int|float|null
     {
         $value = parent::reverseTransform($value);

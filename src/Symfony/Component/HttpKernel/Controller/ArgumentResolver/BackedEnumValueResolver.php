@@ -35,16 +35,16 @@ final class BackedEnumValueResolver implements ValueResolverInterface
             return [];
         }
 
+        $name = $argument->getName();
+
         // do not support if no value can be resolved at all
         // letting the \Symfony\Component\HttpKernel\Controller\ArgumentResolver\DefaultValueResolver be used
         // or \Symfony\Component\HttpKernel\Controller\ArgumentResolver fail with a meaningful error.
-        if (!$request->attributes->has($argument->getName())) {
+        if (!$request->attributes->has($name)) {
             return [];
         }
 
-        $value = $request->attributes->get($argument->getName());
-
-        if (null === $value) {
+        if (null === $value = $request->attributes->get($name)) {
             return [null];
         }
 
@@ -52,17 +52,17 @@ final class BackedEnumValueResolver implements ValueResolverInterface
             return [$value];
         }
 
+        /** @var class-string<\BackedEnum> $type */
+        $type = $argument->getType();
+
         if (!\is_int($value) && !\is_string($value)) {
-            throw new \LogicException(\sprintf('Could not resolve the "%s $%s" controller argument: expecting an int or string, got "%s".', $argument->getType(), $argument->getName(), get_debug_type($value)));
+            throw new NotFoundHttpException(\sprintf('Could not resolve the "%s $%s" controller argument: expecting an int or string, got "%s".', $type, $name, get_debug_type($value)));
         }
 
-        /** @var class-string<\BackedEnum> $enumType */
-        $enumType = $argument->getType();
-
         try {
-            return [$enumType::from($value)];
+            return [$type::from($value)];
         } catch (\ValueError|\TypeError $e) {
-            throw new NotFoundHttpException(\sprintf('Could not resolve the "%s $%s" controller argument: ', $argument->getType(), $argument->getName()).$e->getMessage(), $e);
+            throw new NotFoundHttpException(\sprintf('Could not resolve the "%s $%s" controller argument: ', $type, $name).$e->getMessage(), $e);
         }
     }
 }

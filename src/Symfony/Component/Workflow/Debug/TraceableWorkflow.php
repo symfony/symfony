@@ -89,6 +89,11 @@ class TraceableWorkflow implements WorkflowInterface
         return $this->calls;
     }
 
+    public function getInner(): WorkflowInterface
+    {
+        return $this->workflow;
+    }
+
     private function callInner(string $method, array $args): mixed
     {
         if ($this->disabled?->__invoke()) {

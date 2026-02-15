@@ -14,7 +14,6 @@ namespace Symfony\Component\Security\Http\Tests\LoginLink;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Constraint\Constraint;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -34,7 +33,7 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkHandler;
 
 class LoginLinkHandlerTest extends TestCase
 {
-    private MockObject&UrlGeneratorInterface $router;
+    private UrlGeneratorInterface $router;
     private TestLoginLinkHandlerUserProvider $userProvider;
     private PropertyAccessorInterface $propertyAccessor;
     private ExpiredSignatureStorage $expiredLinkStorage;
@@ -42,7 +41,6 @@ class LoginLinkHandlerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->router = $this->createMock(UrlGeneratorInterface::class);
         $this->userProvider = new TestLoginLinkHandlerUserProvider();
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
         $this->expiredLinkCache = new ArrayAdapter();
@@ -53,6 +51,7 @@ class LoginLinkHandlerTest extends TestCase
     #[Group('time-sensitive')]
     public function testCreateLoginLink($user, array $extraProperties, ?Request $request = null)
     {
+        $this->router = $this->createMock(UrlGeneratorInterface::class);
         $this->router->expects($this->once())
             ->method('generate')
             ->with(
@@ -124,6 +123,7 @@ class LoginLinkHandlerTest extends TestCase
     {
         $extraProperties = ['emailProperty' => 'ryan@symfonycasts.com', 'passwordProperty' => 'pwhash'];
 
+        $this->router = $this->createMock(UrlGeneratorInterface::class);
         $this->router->expects($this->once())
             ->method('generate')
             ->with(
@@ -278,7 +278,7 @@ class LoginLinkHandlerTest extends TestCase
             'route_name' => 'app_check_login_link_route',
         ], $options);
 
-        return new LoginLinkHandler($this->router, $this->userProvider, new SignatureHasher($this->propertyAccessor, $extraProperties, 's3cret', $this->expiredLinkStorage, $options['max_uses'] ?? null), $options);
+        return new LoginLinkHandler($this->router ?? $this->createStub(UrlGeneratorInterface::class), $this->userProvider, new SignatureHasher($this->propertyAccessor, $extraProperties, 's3cret', $this->expiredLinkStorage, $options['max_uses'] ?? null), $options);
     }
 }
 

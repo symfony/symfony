@@ -138,12 +138,6 @@ class CodeExtensionTest extends TestCase
             TWIG;
         $html = $this->render($template, $data);
 
-        // highlight_file function output changed sing PHP 8.3
-        // see https://github.com/php/php-src/blob/e2667f17bc24e3cd200bb3eda457f566f1f77f8f/UPGRADING#L239-L242
-        if (\PHP_VERSION_ID < 80300) {
-            $html = str_replace('&nbsp;', ' ', $html);
-        }
-
         $html = html_entity_decode($html);
 
         $this->assertEquals($expected, $html);

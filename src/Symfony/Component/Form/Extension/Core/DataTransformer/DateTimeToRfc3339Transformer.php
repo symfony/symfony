@@ -20,14 +20,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
  */
 class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
 {
-    /**
-     * Transforms a normalized date into a localized date.
-     *
-     * @param \DateTimeInterface $dateTime A DateTimeInterface object
-     *
-     * @throws TransformationFailedException If the given value is not a \DateTimeInterface
-     */
-    public function transform(mixed $dateTime): string
+    public function transform(mixed $dateTime): ?string
     {
         if (null === $dateTime) {
             return '';
@@ -45,14 +38,6 @@ class DateTimeToRfc3339Transformer extends BaseDateTimeTransformer
         return preg_replace('/\+00:00$/', 'Z', $dateTime->format('c'));
     }
 
-    /**
-     * Transforms a formatted string following RFC 3339 into a normalized date.
-     *
-     * @param string $rfc3339 Formatted string
-     *
-     * @throws TransformationFailedException If the given value is not a string,
-     *                                       if the value could not be transformed
-     */
     public function reverseTransform(mixed $rfc3339): ?\DateTime
     {
         if (!\is_string($rfc3339)) {

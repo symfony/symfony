@@ -15,7 +15,7 @@ $_SERVER['APP_RUNTIME_OPTIONS'] = [
 ];
 require __DIR__.'/autoload.php';
 
-return function (array $context): void {
+return static function (array $context): void {
     if (isset($context['APP_ENV']) || isset($context['APP_DEBUG'])) {
         echo 'An error occurred on the variable name options.';
     } else {

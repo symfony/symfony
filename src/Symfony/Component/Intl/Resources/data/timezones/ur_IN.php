@@ -24,6 +24,7 @@ return [
         'America/Campo_Grande' => 'ایمیزون ٹائم (کیمپو گرینڈ)',
         'America/Caracas' => 'وینزوئیلا ٹائم (کراکاس)',
         'America/Cayenne' => 'فرینچ گیانا ٹائم (کائین)',
+        'America/Coyhaique' => 'چلی ٹائم (کویائیکے)',
         'America/Cuiaba' => 'ایمیزون ٹائم (کوئیابا)',
         'America/Danmarkshavn' => 'گرین وچ مین ٹائم (ڈنمارک شاون)',
         'America/Glace_Bay' => 'اٹلانٹک ٹائم (گلیس بے)',

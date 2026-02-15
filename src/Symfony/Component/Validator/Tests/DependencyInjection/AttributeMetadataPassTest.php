@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\DependencyInjection\AttributeMetadataPass;
 use Symfony\Component\Validator\Exception\MappingException;
 
@@ -49,18 +48,14 @@ class AttributeMetadataPassTest extends TestCase
             ->addMethodCall('addAttributeMappings', [[]]);
 
         $container->register('service1', '%user_entity.class%')
-            ->addTag('validator.attribute_metadata')
-            ->addTag('container.excluded');
+            ->addTag('validator.attribute_metadata');
         $container->register('service2', 'App\Entity\Product')
-            ->addTag('validator.attribute_metadata')
-            ->addTag('container.excluded');
+            ->addTag('validator.attribute_metadata');
         $container->register('service3', 'App\Entity\Order')
-            ->addTag('validator.attribute_metadata')
-            ->addTag('container.excluded');
+            ->addTag('validator.attribute_metadata');
         // Classes should be deduplicated
         $container->register('service4', 'App\Entity\Order')
-            ->addTag('validator.attribute_metadata')
-            ->addTag('container.excluded');
+            ->addTag('validator.attribute_metadata');
 
         (new AttributeMetadataPass())->process($container);
 
@@ -77,18 +72,6 @@ class AttributeMetadataPassTest extends TestCase
         $this->assertEquals([$expectedClasses], $methodCalls[1][1]);
     }
 
-    public function testThrowsWhenMissingExcludedTag()
-    {
-        $container = new ContainerBuilder();
-        $container->register('validator.builder');
-
-        $container->register('service_without_excluded', 'App\\Entity\\User')
-            ->addTag('validator.attribute_metadata');
-
-        $this->expectException(InvalidArgumentException::class);
-        (new AttributeMetadataPass())->process($container);
-    }
-
     public function testProcessWithForOptionAndMatchingMembers()
     {
         $sourceClass = _AttrMeta_Source::class;
@@ -98,8 +81,7 @@ class AttributeMetadataPassTest extends TestCase
         $container->register('validator.builder');
 
         $container->register('service.source', $sourceClass)
-            ->addTag('validator.attribute_metadata', ['for' => $targetClass])
-            ->addTag('container.excluded');
+            ->addTag('validator.attribute_metadata', ['for' => $targetClass]);
 
         (new AttributeMetadataPass())->process($container);
 
@@ -118,8 +100,7 @@ class AttributeMetadataPassTest extends TestCase
         $container->register('validator.builder');
 
         $container->register('service.source', $sourceClass)
-            ->addTag('validator.attribute_metadata', ['for' => $targetClass])
-            ->addTag('container.excluded');
+            ->addTag('validator.attribute_metadata', ['for' => $targetClass]);
 
         $this->expectException(MappingException::class);
         (new AttributeMetadataPass())->process($container);

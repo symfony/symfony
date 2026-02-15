@@ -468,91 +468,91 @@
             </trans-unit>
             <trans-unit id="121">
                 <source>This value is not a valid Twig template.</source>
-                <target state="needs-review-translation">Nilai ini bukan templat Twig yang valid.</target>
+                <target>Nilai ini bukan templat Twig yang valid.</target>
             </trans-unit>
             <trans-unit id="122">
                 <source>This file is not a valid video.</source>
-                <target state="needs-review-translation">Berkas ini bukan video yang valid.</target>
+                <target>Berkas ini bukan video yang valid.</target>
             </trans-unit>
             <trans-unit id="123">
                 <source>The size of the video could not be detected.</source>
-                <target state="needs-review-translation">Ukuran video tidak dapat dideteksi.</target>
+                <target>Ukuran video tidak dapat dideteksi.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target state="needs-review-translation">Lebar video terlalu besar ({{ width }}px). Lebar maksimum yang diizinkan adalah {{ max_width }}px.</target>
+                <target>Lebar video terlalu besar ({{ width }}px). Lebar maksimum yang diizinkan adalah {{ max_width }}px.</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target state="needs-review-translation">Lebar video terlalu kecil ({{ width }}px). Lebar minimum yang diharapkan adalah {{ min_width }}px.</target>
+                <target>Lebar video terlalu kecil ({{ width }}px). Lebar minimum yang diharapkan adalah {{ min_width }}px.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target state="needs-review-translation">Tinggi video terlalu besar ({{ height }}px). Tinggi maksimum yang diizinkan adalah {{ max_height }}px.</target>
+                <target>Tinggi video terlalu besar ({{ height }}px). Tinggi maksimum yang diizinkan adalah {{ max_height }}px.</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target state="needs-review-translation">Tinggi video terlalu kecil ({{ height }}px). Tinggi minimum yang diharapkan adalah {{ min_height }}px.</target>
+                <target>Tinggi video terlalu kecil ({{ height }}px). Tinggi minimum yang diharapkan adalah {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">Video memiliki terlalu sedikit piksel ({{ pixels }}). Jumlah minimum yang diharapkan adalah {{ min_pixels }}.</target>
+                <target>Video memiliki terlalu sedikit piksel ({{ pixels }}). Jumlah minimum yang diharapkan adalah {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">Video memiliki terlalu banyak piksel ({{ pixels }}). Jumlah maksimum yang diharapkan adalah {{ max_pixels }}.</target>
+                <target>Video memiliki terlalu banyak piksel ({{ pixels }}). Jumlah maksimum yang diharapkan adalah {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target state="needs-review-translation">Rasio video terlalu besar ({{ ratio }}). Rasio maksimum yang diizinkan adalah {{ max_ratio }}.</target>
+                <target>Rasio video terlalu besar ({{ ratio }}). Rasio maksimum yang diizinkan adalah {{ max_ratio }}.</target>
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target state="needs-review-translation">Rasio video terlalu kecil ({{ ratio }}). Rasio minimum yang diharapkan adalah {{ min_ratio }}.</target>
+                <target>Rasio video terlalu kecil ({{ ratio }}). Rasio minimum yang diharapkan adalah {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
-                <target state="needs-review-translation">Video berbentuk persegi ({{ width }}x{{ height }}px). Video persegi tidak diizinkan.</target>
+                <target>Video berbentuk persegi ({{ width }}x{{ height }}px). Video persegi tidak diizinkan.</target>
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target state="needs-review-translation">Video berorientasi lanskap ({{ width }}x{{ height }} px). Video berorientasi lanskap tidak diizinkan.</target>
+                <target>Video berorientasi lanskap ({{ width }}x{{ height }}px). Video berorientasi lanskap tidak diizinkan.</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target state="needs-review-translation">Video berorientasi potret ({{ width }}x{{ height }}px). Video berorientasi potret tidak diizinkan.</target>
+                <target>Video berorientasi potret ({{ width }}x{{ height }}px). Video berorientasi potret tidak diizinkan.</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
-                <target state="needs-review-translation">Berkas video rusak.</target>
+                <target>Berkas video rusak.</target>
             </trans-unit>
             <trans-unit id="136">
                 <source>The video contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">Video berisi beberapa aliran. Hanya satu aliran yang diizinkan.</target>
+                <target>Video berisi beberapa aliran. Hanya satu aliran yang diizinkan.</target>
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target state="needs-review-translation">Kodek video tidak didukung "{{ codec }}".</target>
+                <target>Kodek video tidak didukung "{{ codec }}".</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target state="needs-review-translation">Kontainer video tidak didukung "{{ container }}".</target>
+                <target>Kontainer video tidak didukung "{{ container }}".</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
-                <target state="needs-review-translation">File gambar rusak.</target>
+                <target>Berkas gambar rusak.</target>
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">Gambar memiliki terlalu sedikit piksel ({{ pixels }}). Jumlah minimum yang diharapkan adalah {{ min_pixels }}.</target>
+                <target>Gambar memiliki terlalu sedikit piksel ({{ pixels }}). Jumlah minimum yang diharapkan adalah {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">Gambar memiliki terlalu banyak piksel ({{ pixels }}). Jumlah maksimum yang diharapkan adalah {{ max_pixels }}.</target>
+                <target>Gambar memiliki terlalu banyak piksel ({{ pixels }}). Jumlah maksimum yang diharapkan adalah {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
-                <target state="needs-review-translation">Nama berkas ini tidak sesuai dengan set karakter yang diharapkan.</target>
+                <target>Nama berkas ini tidak sesuai dengan set karakter yang diharapkan.</target>
             </trans-unit>
         </body>
     </file>

@@ -427,4 +427,50 @@ class MailjetApiTransportTest extends TestCase
             $method->invoke($transport, $email, $envelope)
         );
     }
+
+    public function testTemplateErrorReportingHeaderSupportsSmtpRelayFormat()
+    {
+        $email = (new Email())
+            ->subject('Sending email to mailjet API')
+            ->replyTo(new Address('qux@example.com', 'Qux'));
+        $email->getHeaders()
+            ->addTextHeader('X-MJ-TemplateErrorReporting', 'errors@mailjet.com');
+        $envelope = new Envelope(new Address('foo@example.com', 'Foo'), [
+            new Address('bar@example.com', 'Bar'),
+        ]);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
+        $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
+        self::assertSame(
+            [
+                'Messages' => [
+                    [
+                        'From' => [
+                            'Email' => 'foo@example.com',
+                            'Name' => 'Foo',
+                        ],
+                        'To' => [
+                            [
+                                'Email' => 'bar@example.com',
+                                'Name' => '',
+                            ],
+                        ],
+                        'Subject' => 'Sending email to mailjet API',
+                        'Attachments' => [],
+                        'InlinedAttachments' => [],
+                        'ReplyTo' => [
+                            'Email' => 'qux@example.com',
+                            'Name' => 'Qux',
+                        ],
+                        'TemplateErrorReporting' => [
+                            'Email' => 'errors@mailjet.com',
+                            'Name' => '',
+                        ],
+                    ],
+                ],
+                'SandBoxMode' => false,
+            ],
+            $method->invoke($transport, $email, $envelope)
+        );
+    }
 }

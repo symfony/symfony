@@ -149,8 +149,7 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
                 $queryParameters = $parameters['_query'];
                 unset($parameters['_query']);
             } else {
-                trigger_deprecation('symfony/routing', '7.4', 'Parameter "_query" is reserved for passing an array of query parameters. Passing a scalar value is deprecated and will throw an exception in Symfony 8.0.');
-                // throw new InvalidParameterException('Parameter "_query" must be an array of query parameters.');
+                throw new InvalidParameterException('Parameter "_query" must be an array of query parameters.');
             }
         }
 
@@ -271,8 +270,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
         }
 
         // add a query string if needed
-        $extra = array_udiff_assoc(array_diff_key($parameters, $variables), $defaults, fn ($a, $b) => $a == $b ? 0 : 1);
-        $extra = array_merge($extra, $queryParameters);
+        $extra = array_udiff_assoc(array_diff_key($parameters, $variables), $defaults, static fn ($a, $b) => $a == $b ? 0 : 1);
+        $extra = array_replace($extra, $queryParameters);
 
         array_walk_recursive($extra, $caster = static function (&$v) use (&$caster) {
             if (\is_object($v)) {

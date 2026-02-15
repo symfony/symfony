@@ -56,7 +56,7 @@ class TreeNodeTest extends TestCase
     {
         $root = new TreeNode('Root');
 
-        $root->addChild(function () {
+        $root->addChild(static function () {
             yield new TreeNode('Generated Child 1');
             yield new TreeNode('Generated Child 2');
         });

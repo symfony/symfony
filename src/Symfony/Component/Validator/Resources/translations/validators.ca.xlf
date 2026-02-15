@@ -468,91 +468,91 @@
             </trans-unit>
             <trans-unit id="121">
                 <source>This value is not a valid Twig template.</source>
-                <target state="needs-review-translation">Aquest valor no és una plantilla Twig vàlida.</target>
+                <target>Aquest valor no és una plantilla Twig vàlida.</target>
             </trans-unit>
             <trans-unit id="122">
                 <source>This file is not a valid video.</source>
-                <target state="needs-review-translation">Aquest fitxer no és un vídeo vàlid.</target>
+                <target>Aquest fitxer no és un vídeo vàlid.</target>
             </trans-unit>
             <trans-unit id="123">
                 <source>The size of the video could not be detected.</source>
-                <target state="needs-review-translation">No s'ha pogut detectar la mida del vídeo.</target>
+                <target>No s'ha pogut detectar la mida del vídeo.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target state="needs-review-translation">L'amplada del vídeo és massa gran ({{ width }}px). L'amplada màxima permesa és {{ max_width }}px.</target>
+                <target>L'amplada del vídeo és massa gran ({{ width }}px). L'amplada màxima permesa és {{ max_width }}px.</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target state="needs-review-translation">L’amplada del vídeo és massa petita ({{ width }}px). L’amplada mínima esperada és {{ min_width }}px.</target>
+                <target>L'amplada del vídeo és massa petita ({{ width }}px). L'amplada mínima esperada és {{ min_width }}px.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target state="needs-review-translation">L'alçada del vídeo és massa gran ({{ height }}px). L'alçada màxima permesa és {{ max_height }}px.</target>
+                <target>L'altura del vídeo és massa gran ({{ height }}px). L'altura màxima permesa és {{ max_height }}px.</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target state="needs-review-translation">L'alçada del vídeo és massa petita ({{ height }}px). L'alçada mínima esperada és {{ min_height }}px.</target>
+                <target>L'altura del vídeo és massa petita ({{ height }}px). L'altura mínima esperada és {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">El vídeo té massa pocs píxels ({{ pixels }}). La quantitat mínima esperada és {{ min_pixels }}.</target>
+                <target>El vídeo no té suficients píxels ({{ pixels }}). La quantitat mínima esperada és {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">El vídeo té massa píxels ({{ pixels }}). La quantitat màxima prevista és {{ max_pixels }}.</target>
+                <target>El vídeo té massa píxels ({{ pixels }}). La quantitat màxima prevista és {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target state="needs-review-translation">La relació del vídeo és massa gran ({{ ratio }}). La relació màxima permesa és {{ max_ratio }}.</target>
+                <target>La relació del vídeo és massa gran ({{ ratio }}). La relació màxima permesa és {{ max_ratio }}.</target>
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target state="needs-review-translation">La relació del vídeo és massa petita ({{ ratio }}). La relació mínima esperada és {{ min_ratio }}.</target>
+                <target>La relació del vídeo és massa petita ({{ ratio }}). La relació mínima esperada és {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
-                <target state="needs-review-translation">El vídeo és quadrat ({{ width }}x{{ height }}px). No es permeten vídeos quadrats.</target>
+                <target>El vídeo és quadrat ({{ width }}x{{ height }}px). No es permeten vídeos quadrats.</target>
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target state="needs-review-translation">El vídeo té orientació horitzontal ({{ width }}x{{ height }} px). No es permeten vídeos horitzontals.</target>
+                <target>El vídeo té orientació horitzontal ({{ width }}x{{ height }} px). No es permeten vídeos horitzontals.</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target state="needs-review-translation">El vídeo és en orientació vertical ({{ width }}x{{ height }} px). No es permeten vídeos en orientació vertical.</target>
+                <target>El vídeo és en orientació vertical ({{ width }}x{{ height }} px). No es permeten vídeos en orientació vertical.</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
-                <target state="needs-review-translation">El fitxer de vídeo està corrupte.</target>
+                <target>El fitxer de vídeo està espatllat.</target>
             </trans-unit>
             <trans-unit id="136">
                 <source>The video contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">El vídeo conté diversos fluxos. Només es permet un sol flux.</target>
+                <target>El vídeo conté diversos fluxos. Només es permet un sol flux.</target>
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target state="needs-review-translation">Còdec de vídeo no compatible «{{ codec }}».</target>
+                <target>Còdec de vídeo incompatible «{{ codec }}».</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target state="needs-review-translation">Contenidor de vídeo no compatible "{{ container }}".</target>
+                <target>Contenidor de vídeo incompatible "{{ container }}".</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
-                <target state="needs-review-translation">El fitxer d'imatge està malmès.</target>
+                <target>El fitxer d'imatge està espatllat.</target>
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">La imatge té massa pocs píxels ({{ pixels }}). La quantitat mínima esperada és {{ min_pixels }}.</target>
+                <target>La imatge no té suficients píxels ({{ pixels }}). La quantitat mínima esperada és {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">La imatge té massa píxels ({{ pixels }}). El nombre màxim esperat és {{ max_pixels }}.</target>
+                <target>La imatge té massa píxels ({{ pixels }}). El nombre màxim esperat és {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
-                <target state="needs-review-translation">Aquest nom de fitxer no coincideix amb el joc de caràcters esperat.</target>
+                <target>Aquest nom de fitxer no coincideix amb el charset esperat.</target>
             </trans-unit>
         </body>
     </file>

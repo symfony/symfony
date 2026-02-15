@@ -35,6 +35,44 @@ class CachePruneCommandTest extends TestCase
         $tester->execute([]);
     }
 
+    public function testCommandFailsOnPruneError()
+    {
+        $failedPool = $this->createMock(PruneableInterface::class);
+        $failedPool->expects($this->once())->method('prune')->willReturn(false);
+
+        $generator = new RewindableGenerator(static function () use ($failedPool) {
+            yield 'failed_pool' => $failedPool;
+        }, 1);
+
+        $tester = $this->getCommandTester($this->getKernel(), $generator);
+        $tester->execute([]);
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $this->assertStringContainsString('[ERROR] Cache pool "failed_pool" could not be pruned.', $tester->getDisplay());
+    }
+
+    public function testCommandContinuesOnFailure()
+    {
+        $failedPool = $this->createMock(PruneableInterface::class);
+        $failedPool->expects($this->once())->method('prune')->willReturn(false);
+
+        $successPool = $this->createMock(PruneableInterface::class);
+        $successPool->expects($this->once())->method('prune')->willReturn(true);
+
+        $generator = new RewindableGenerator(static function () use ($failedPool, $successPool) {
+            yield 'failed_pool' => $failedPool;
+            yield 'success_pool' => $successPool;
+        }, 2);
+
+        $tester = $this->getCommandTester($this->getKernel(), $generator);
+        $tester->execute([]);
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $display = $tester->getDisplay();
+        $this->assertStringContainsString('[ERROR] Cache pool "failed_pool" could not be pruned.', $display);
+        $this->assertStringContainsString('Pruning cache pool: success_pool', $display);
+    }
+
     private function getRewindableGenerator(): RewindableGenerator
     {
         return new RewindableGenerator(function () {
@@ -45,7 +83,7 @@ class CachePruneCommandTest extends TestCase
 
     private function getEmptyRewindableGenerator(): RewindableGenerator
     {
-        return new RewindableGenerator(fn () => new \ArrayIterator([]), 0);
+        return new RewindableGenerator(static fn () => new \ArrayIterator([]), 0);
     }
 
     private function getKernel(): MockObject&KernelInterface

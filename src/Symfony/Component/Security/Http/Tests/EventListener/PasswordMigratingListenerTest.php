@@ -12,9 +12,9 @@
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Security\Core\Authentication\Token\NullToken;
@@ -33,37 +33,38 @@ use Symfony\Component\Security\Http\Tests\Fixtures\DummyAuthenticator;
 
 class PasswordMigratingListenerTest extends TestCase
 {
-    private MockObject&PasswordHasherFactoryInterface $hasherFactory;
+    private PasswordHasherFactoryInterface $hasherFactory;
     private PasswordMigratingListener $listener;
-    private UserInterface&PasswordAuthenticatedUserInterface $user;
+    private PasswordAuthenticatedUserInterface $user;
 
     protected function setUp(): void
     {
-        $this->user = $this->createMock(TestPasswordAuthenticatedUser::class);
-        $this->user->expects($this->any())->method('getPassword')->willReturn('old-hash');
-        $encoder = $this->createMock(PasswordHasherInterface::class);
-        $encoder->expects($this->any())->method('needsRehash')->willReturn(true);
-        $encoder->expects($this->any())->method('hash')->with('pa$$word', null)->willReturn('new-hash');
-        $this->hasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
-        $this->hasherFactory->expects($this->any())->method('getPasswordHasher')->with($this->user)->willReturn($encoder);
+        $this->user = new InMemoryUser('John', 'old-hash');
+        $encoder = $this->createStub(PasswordHasherInterface::class);
+        $encoder->method('needsRehash')->willReturn(true);
+        $encoder->method('hash')->willReturn('new-hash');
+        $this->hasherFactory = new PasswordHasherFactory([
+            InMemoryUser::class => $encoder,
+        ]);
         $this->listener = new PasswordMigratingListener($this->hasherFactory);
     }
 
     #[DataProvider('provideUnsupportedEvents')]
     public function testUnsupportedEvents($event)
     {
-        $this->hasherFactory->expects($this->never())->method('getPasswordHasher');
+        $hasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
+        $hasherFactory->expects($this->never())->method('getPasswordHasher');
 
-        $this->listener->onLoginSuccess($event);
+        (new PasswordMigratingListener($hasherFactory))->onLoginSuccess($event);
     }
 
     public static function provideUnsupportedEvents()
     {
         // no password upgrade badge
-        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => new DummyTestPasswordAuthenticatedUser())))];
+        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', static fn () => new DummyTestPasswordAuthenticatedUser())))];
 
         // blank password
-        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => new DummyTestPasswordAuthenticatedUser()), [new PasswordUpgradeBadge('', self::createPasswordUpgrader())]))];
+        yield [self::createEvent(new SelfValidatingPassport(new UserBadge('test', static fn () => new DummyTestPasswordAuthenticatedUser()), [new PasswordUpgradeBadge('', self::createPasswordUpgrader())]))];
     }
 
     public function testUpgradeWithUpgrader()
@@ -99,10 +100,11 @@ class PasswordMigratingListenerTest extends TestCase
     {
         $this->user = new InMemoryUser('test', null);
 
-        $this->hasherFactory->expects($this->never())->method('getPasswordHasher');
+        $hasherFactory = $this->createMock(PasswordHasherFactoryInterface::class);
+        $hasherFactory->expects($this->never())->method('getPasswordHasher');
 
         $event = $this->createEvent(new SelfValidatingPassport(new UserBadge('test', fn () => $this->user), [new PasswordUpgradeBadge('pa$$word')]));
-        $this->listener->onLoginSuccess($event);
+        (new PasswordMigratingListener($hasherFactory))->onLoginSuccess($event);
     }
 
     private static function createPasswordUpgrader()

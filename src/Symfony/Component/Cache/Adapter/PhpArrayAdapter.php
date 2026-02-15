@@ -324,7 +324,7 @@ class PhpArrayAdapter implements AdapterInterface, CacheInterface, PruneableInte
 
         file_put_contents($tmpFile, $dump);
         @chmod($tmpFile, 0o666 & ~umask());
-        unset($serialized, $value, $dump);
+        unset($value, $dump);
 
         @rename($tmpFile, $this->file);
         unset(self::$valuesCache[$this->file]);

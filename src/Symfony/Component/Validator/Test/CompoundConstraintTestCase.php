@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Test;
 
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Compound;
 use Symfony\Component\Validator\Constraints\CompoundValidator;
@@ -21,7 +22,6 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Symfony\Component\Validator\Validation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * A test case to ease testing Compound Constraints.
@@ -58,10 +58,7 @@ abstract class CompoundConstraintTestCase extends TestCase
 
     protected function createContext(?ValidatorInterface $validator = null): ExecutionContextInterface
     {
-        $translator = $this->createMock(TranslatorInterface::class);
-        $translator->expects($this->any())->method('trans')->willReturnArgument(0);
-
-        return new ExecutionContext($validator ?? $this->createValidator(), $this->root, $translator);
+        return new ExecutionContext($validator ?? $this->createValidator(), $this->root, new IdentityTranslator());
     }
 
     public function assertViolationsRaisedByCompound(Constraint|array $constraints): void
@@ -89,7 +86,7 @@ abstract class CompoundConstraintTestCase extends TestCase
         $expectedViolations = iterator_to_array($context->getViolations());
 
         if (!$expectedViolations) {
-            throw new ExpectationFailedException(\sprintf('Expected at least one violation for constraint(s) "%s", got none raised.', implode(', ', array_map(fn ($constraint) => $constraint::class, $constraints))));
+            throw new ExpectationFailedException(\sprintf('Expected at least one violation for constraint(s) "%s", got none raised.', implode(', ', array_map(static fn ($constraint) => $constraint::class, $constraints))));
         }
 
         $failedToAssertViolations = [];
@@ -106,7 +103,7 @@ abstract class CompoundConstraintTestCase extends TestCase
             [],
             $failedToAssertViolations,
             \sprintf('Expected violation(s) for constraint(s) %s to be raised by compound.',
-                implode(', ', array_map(fn ($violation) => ($violation->getConstraint())::class, $failedToAssertViolations))
+                implode(', ', array_map(static fn ($violation) => ($violation->getConstraint())::class, $failedToAssertViolations))
             )
         );
     }

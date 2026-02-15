@@ -23,7 +23,7 @@ class DriverTest extends TestCase
     public function testConnect()
     {
         $driverMock = $this->createMock(DriverInterface::class);
-        $connectionMock = $this->createMock(ConnectionInterface::class);
+        $connectionMock = $this->createStub(ConnectionInterface::class);
 
         $driverMock->expects($this->once())
             ->method('connect')

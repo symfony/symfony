@@ -94,13 +94,13 @@ final class TwitterTransport extends AbstractTransport
             implode('&', array_map('rawurlencode', [
                 $method,
                 $url,
-                implode('&', array_map(fn ($k) => rawurlencode($k).'='.rawurlencode($sign[$k]), array_keys($sign))),
+                implode('&', array_map(static fn ($k) => rawurlencode($k).'='.rawurlencode($sign[$k]), array_keys($sign))),
             ])),
             rawurlencode($this->apiSecret).'&'.rawurlencode($this->accessSecret),
             true
         ));
 
-        $options['headers'][] = 'Authorization: OAuth '.implode(', ', array_map(fn ($k) => $k.'="'.rawurlencode($oauth[$k]).'"', array_keys($oauth)));
+        $options['headers'][] = 'Authorization: OAuth '.implode(', ', array_map(static fn ($k) => $k.'="'.rawurlencode($oauth[$k]).'"', array_keys($oauth)));
 
         return $this->client->request($method, $url, $options);
     }

@@ -12,8 +12,6 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
@@ -255,42 +253,5 @@ class MainConfigurationTest extends TestCase
         yield [['expose_security_errors' => 'none'], ExposeSecurityLevel::None];
         yield [['expose_security_errors' => 'account_status'], ExposeSecurityLevel::AccountStatus];
         yield [['expose_security_errors' => 'all'], ExposeSecurityLevel::All];
-    }
-
-    #[DataProvider('provideHideUserNotFoundLegacyData')]
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testExposeSecurityErrorsWithLegacyConfig(array $config, ExposeSecurityLevel $expectedExposeSecurityErrors, ?bool $expectedHideUserNotFound)
-    {
-        $this->expectUserDeprecationMessage('Since symfony/security-bundle 7.3: The "hide_user_not_found" option is deprecated and will be removed in 8.0. Use the "expose_security_errors" option instead.');
-
-        $config = array_merge(static::$minimalConfig, $config);
-
-        $processor = new Processor();
-        $configuration = new MainConfiguration([], []);
-        $processedConfig = $processor->processConfiguration($configuration, [$config]);
-
-        $this->assertEquals($expectedExposeSecurityErrors, $processedConfig['expose_security_errors']);
-        $this->assertEquals($expectedHideUserNotFound, $processedConfig['hide_user_not_found']);
-    }
-
-    public static function provideHideUserNotFoundLegacyData(): iterable
-    {
-        yield [['hide_user_not_found' => true], ExposeSecurityLevel::None, true];
-        yield [['hide_user_not_found' => false], ExposeSecurityLevel::All, false];
-    }
-
-    public function testCannotUseHideUserNotFoundAndExposeSecurityErrorsAtTheSameTime()
-    {
-        $processor = new Processor();
-        $configuration = new MainConfiguration([], []);
-
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('You cannot use both "hide_user_not_found" and "expose_security_errors" at the same time.');
-
-        $processor->processConfiguration($configuration, [static::$minimalConfig + [
-            'hide_user_not_found' => true,
-            'expose_security_errors' => ExposeSecurityLevel::None,
-        ]]);
     }
 }

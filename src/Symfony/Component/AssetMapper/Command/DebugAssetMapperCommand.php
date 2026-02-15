@@ -102,9 +102,7 @@ final class DebugAssetMapperCommand extends Command
                 }
                 $pathRows[] = [$path, $namespace];
             }
-            uasort($pathRows, static function (array $a, array $b): int {
-                return [(bool) $a[1], ...$a] <=> [(bool) $b[1], ...$b];
-            });
+            uasort($pathRows, static fn (array $a, array $b): int => [(bool) $a[1], ...$a] <=> [(bool) $b[1], ...$b]);
             if ($pathRows) {
                 $io->table(['Path', 'Namespace prefix'], $pathRows);
             } else {
@@ -121,9 +119,7 @@ final class DebugAssetMapperCommand extends Command
                     $this->shortenPath($row[1]),
                 ], $rows);
             }
-            uasort($rows, static function (array $a, array $b): int {
-                return [$a] <=> [$b];
-            });
+            uasort($rows, static fn (array $a, array $b): int => [$a] <=> [$b]);
             $io->table(['Logical Path', 'Filesystem Path'], $rows);
             if ($this->didShortenPaths) {
                 $io->note('To see the full paths, re-run with the --full option.');

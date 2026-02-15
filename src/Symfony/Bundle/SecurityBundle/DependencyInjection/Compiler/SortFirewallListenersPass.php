@@ -45,7 +45,7 @@ class SortFirewallListenersPass implements CompilerPassInterface
         $prioritiesByServiceId = $this->getListenerPriorities($listenerIteratorArgument, $container);
 
         $listeners = $listenerIteratorArgument->getValues();
-        usort($listeners, fn (Reference $a, Reference $b) => $prioritiesByServiceId[(string) $b] <=> $prioritiesByServiceId[(string) $a]);
+        usort($listeners, static fn (Reference $a, Reference $b) => $prioritiesByServiceId[(string) $b] <=> $prioritiesByServiceId[(string) $a]);
 
         $listenerIteratorArgument->setValues(array_values($listeners));
     }

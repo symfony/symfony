@@ -27,6 +27,9 @@ class ExprBuilder
     public const TYPE_STRING = 'string';
     public const TYPE_NULL = 'null';
     public const TYPE_ARRAY = 'array';
+    public const TYPE_BOOL = 'bool';
+    public const TYPE_INT = 'int';
+    public const TYPE_BACKED_ENUM = 'backed-enum';
 
     public string $allowedTypes;
     public ?\Closure $ifPart = null;
@@ -67,7 +70,7 @@ class ExprBuilder
     public function ifTrue(?\Closure $closure = null): static
     {
         $this->ifPart = $closure ?? static fn ($v) => true === $v;
-        $this->allowedTypes = self::TYPE_ANY;
+        $this->allowedTypes = $closure ? self::TYPE_ANY : self::TYPE_BOOL;
 
         return $this;
     }
@@ -82,7 +85,7 @@ class ExprBuilder
     public function ifFalse(?\Closure $closure = null): static
     {
         $this->ifPart = $closure ? static fn ($v) => !$closure($v) : static fn ($v) => false === $v;
-        $this->allowedTypes = self::TYPE_ANY;
+        $this->allowedTypes = $closure ? self::TYPE_ANY : self::TYPE_BOOL;
 
         return $this;
     }

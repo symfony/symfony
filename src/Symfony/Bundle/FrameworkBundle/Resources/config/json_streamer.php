@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-use Symfony\Component\JsonStreamer\CacheWarmer\LazyGhostCacheWarmer;
 use Symfony\Component\JsonStreamer\CacheWarmer\StreamerCacheWarmer;
 use Symfony\Component\JsonStreamer\JsonStreamReader;
 use Symfony\Component\JsonStreamer\JsonStreamWriter;
@@ -32,13 +31,16 @@ return static function (ContainerConfigurator $container) {
                 tagged_locator('json_streamer.value_transformer'),
                 service('json_streamer.write.property_metadata_loader'),
                 param('.json_streamer.stream_writers_dir'),
+                service('config_cache_factory')->ignoreOnInvalid(),
+                param('.json_streamer.default_options'),
             ])
         ->set('json_streamer.stream_reader', JsonStreamReader::class)
             ->args([
                 tagged_locator('json_streamer.value_transformer'),
                 service('json_streamer.read.property_metadata_loader'),
                 param('.json_streamer.stream_readers_dir'),
-                param('.json_streamer.lazy_ghosts_dir'),
+                service('config_cache_factory')->ignoreOnInvalid(),
+                param('.json_streamer.default_options'),
             ])
         ->alias(JsonStreamWriter::class, 'json_streamer.stream_writer')
         ->alias(JsonStreamReader::class, 'json_streamer.stream_reader')
@@ -106,13 +108,7 @@ return static function (ContainerConfigurator $container) {
                 param('.json_streamer.stream_writers_dir'),
                 param('.json_streamer.stream_readers_dir'),
                 service('logger')->ignoreOnInvalid(),
-            ])
-            ->tag('kernel.cache_warmer')
-
-        ->set('.json_streamer.cache_warmer.lazy_ghost', LazyGhostCacheWarmer::class)
-            ->args([
-                abstract_arg('streamable class names'),
-                param('.json_streamer.lazy_ghosts_dir'),
+                service('config_cache_factory')->ignoreOnInvalid(),
             ])
             ->tag('kernel.cache_warmer')
     ;

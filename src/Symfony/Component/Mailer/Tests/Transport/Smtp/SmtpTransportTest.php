@@ -143,7 +143,8 @@ class SmtpTransportTest extends TestCase
     {
         $calls = 0;
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $eventDispatcher->expects($this->any())
+        $eventDispatcher
+            ->expects($this->exactly(2))
             ->method('dispatch')
             ->with($this->callback(static function ($event) use (&$calls): bool {
                 ++$calls;

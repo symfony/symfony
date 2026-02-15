@@ -138,7 +138,7 @@ class EnumNodeTest extends TestCase
         $node = new EnumNode('foo', null, enumFqcn: StringBackedTestEnum::class);
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The value "qux" is not allowed for path "foo". Permissible values: foo, bar (cases of the "Symfony\Component\Config\Tests\Fixtures\StringBackedTestEnum" enum)');
+        $this->expectExceptionMessage('The value "qux" is not allowed for path "foo". Permissible values: "foo", "bar baz" (cases of the "Symfony\Component\Config\Tests\Fixtures\StringBackedTestEnum" enum)');
 
         $node->finalize('qux');
     }
@@ -148,7 +148,7 @@ class EnumNodeTest extends TestCase
         $node = new EnumNode('foo', null, enumFqcn: StringBackedTestEnum::class);
 
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('The value 1 is not allowed for path "foo". Permissible values: foo, bar (cases of the "Symfony\Component\Config\Tests\Fixtures\StringBackedTestEnum" enum).');
+        $this->expectExceptionMessage('The value 1 is not allowed for path "foo". Permissible values: "foo", "bar baz" (cases of the "Symfony\Component\Config\Tests\Fixtures\StringBackedTestEnum" enum).');
 
         $node->finalize(1);
     }
@@ -221,5 +221,13 @@ class EnumNodeTest extends TestCase
         $this->expectExceptionMessage('"Symfony\Component\Config\Definition\EnumNode" only supports one type of enum, "Symfony\Component\Config\Tests\Fixtures\TestEnum" and "Symfony\Component\Config\Tests\Fixtures\TestEnum2" passed.');
 
         new EnumNode('ccc', null, [...TestEnum::cases(), TestEnum2::Ccc]);
+    }
+
+    public function testFinalizeNullableBackedEnum()
+    {
+        $node = new EnumNode('status', null, enumFqcn: StringBackedTestEnum::class);
+        $node->setAllowEmptyValue(true); // Equivalent to ->defaultNull() in the builder
+
+        $this->assertNull($node->finalize(null));
     }
 }

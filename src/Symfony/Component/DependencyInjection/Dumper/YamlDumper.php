@@ -70,7 +70,7 @@ class YamlDumper extends Dumper
 
         $tagsCode = '';
         $tags = $definition->getTags();
-        $tags['container.error'] = array_map(fn ($e) => ['message' => $e], $definition->getErrors());
+        $tags['container.error'] = array_map(static fn ($e) => ['message' => $e], $definition->getErrors());
         foreach ($tags as $name => $tags) {
             foreach ($tags as $attributes) {
                 $att = [];
@@ -265,11 +265,11 @@ class YamlDumper extends Dumper
                         'index_by' => $tag->getIndexAttribute(),
                     ];
 
-                    if (null !== $tag->getDefaultIndexMethod()) {
-                        $content['default_index_method'] = $tag->getDefaultIndexMethod();
+                    if (null !== $tag->getDefaultIndexMethod(false)) {
+                        $content['default_index_method'] = $tag->getDefaultIndexMethod(false);
                     }
-                    if (null !== $tag->getDefaultPriorityMethod()) {
-                        $content['default_priority_method'] = $tag->getDefaultPriorityMethod();
+                    if (null !== $tag->getDefaultPriorityMethod(false)) {
+                        $content['default_priority_method'] = $tag->getDefaultPriorityMethod(false);
                     }
                 }
                 if ($excludes = $tag->getExclude()) {

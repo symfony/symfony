@@ -16,5 +16,10 @@ class PseudoTypeDummy
     /**
      * @var scalar
      */
+    public $scalarPseudoType;
+
+    /**
+     * @var unknownpseudo
+     */
     public $unknownPseudoType;
 }

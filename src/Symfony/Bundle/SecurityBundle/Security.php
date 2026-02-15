@@ -187,7 +187,7 @@ class Security implements AuthorizationCheckerInterface, UserAuthorizationChecke
         $firewallAuthenticatorLocator = $this->authenticators[$firewallName];
 
         if (!$authenticatorName) {
-            $authenticatorIds = array_filter(array_keys($firewallAuthenticatorLocator->getProvidedServices()), fn (string $authenticatorId) => $authenticatorId !== \sprintf('security.authenticator.remember_me.%s', $firewallName));
+            $authenticatorIds = array_filter(array_keys($firewallAuthenticatorLocator->getProvidedServices()), static fn (string $authenticatorId) => $authenticatorId !== \sprintf('security.authenticator.remember_me.%s', $firewallName));
             if (!$authenticatorIds) {
                 throw new LogicException(\sprintf('No authenticator was found for the firewall "%s".', $firewallName));
             }

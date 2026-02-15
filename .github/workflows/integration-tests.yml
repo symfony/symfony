@@ -23,7 +23,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['8.2']
+        php: ['8.4']
       fail-fast: false
 
     services:

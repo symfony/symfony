@@ -103,7 +103,7 @@ final class TokenBucketLimiter implements LimiterInterface
                 $reservation = new Reservation($now + $waitDuration, new RateLimit(0, \DateTimeImmutable::createFromFormat('U', floor($now + $waitDuration)), false, $this->maxBurst));
             }
 
-            if (0 < $tokens) {
+            if (0 !== $tokens) {
                 $this->storage->save($bucket);
             }
         } finally {

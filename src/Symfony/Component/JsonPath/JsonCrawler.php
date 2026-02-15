@@ -30,8 +30,6 @@ use Symfony\Component\JsonStreamer\Read\Splitter;
  */
 final class JsonCrawler implements JsonCrawlerInterface
 {
-    private static \stdClass $nothing;
-
     private const RFC9535_FUNCTIONS = [
         'length' => true,
         'count' => true,
@@ -39,6 +37,8 @@ final class JsonCrawler implements JsonCrawlerInterface
         'search' => true,
         'value' => true,
     ];
+
+    private const SINGULAR_ARGUMENT_FUNCTIONS = ['length', 'match', 'search'];
 
     /**
      * Comparison operators and their corresponding lengths.
@@ -778,6 +778,10 @@ final class JsonCrawler implements JsonCrawlerInterface
         $value = $argList[0] ?? null;
         $nodelistSize = $nodelistSizes[0] ?? 0;
 
+        if ($nodelistSize > 1 && \in_array($name, self::SINGULAR_ARGUMENT_FUNCTIONS, true)) {
+            throw new JsonCrawlerException($args, \sprintf('non-singular query is not allowed as argument to "%s" function', $name));
+        }
+
         return match ($name) {
             'length' => match (true) {
                 \is_string($value) => mb_strlen($value),
@@ -831,8 +835,8 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     private function compareEquality(mixed $left, mixed $right): bool
     {
-        $leftIsNothing = $left === Nothing::Nothing;
-        $rightIsNothing = $right === Nothing::Nothing;
+        $leftIsNothing = Nothing::Nothing === $left;
+        $rightIsNothing = Nothing::Nothing === $right;
 
         if (
             $leftIsNothing && $rightIsNothing
@@ -1031,8 +1035,28 @@ final class JsonCrawler implements JsonCrawlerInterface
                     throw new JsonCrawlerException($left, 'non-singular query is not comparable');
                 }
 
+                $this->validateFunctionArguments($left);
+                $this->validateFunctionArguments($right);
+
                 return;
             }
+        }
+    }
+
+    private function validateFunctionArguments(string $expr): void
+    {
+        // is there a function call?
+        if (!preg_match('/^(\w+)\((.*)\)$/', trim($expr), $matches)) {
+            return;
+        }
+
+        if (!\in_array($functionName = $matches[1], self::SINGULAR_ARGUMENT_FUNCTIONS, true)) {
+            return;
+        }
+
+        $arg = trim($matches[2]);
+        if (str_starts_with($arg, '@') && $this->isNonSingularRelativeQuery($arg)) {
+            throw new JsonCrawlerException($arg, \sprintf('non-singular query is not allowed as argument to "%s" function', $functionName));
         }
     }
 
@@ -1072,9 +1096,7 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     private function normalizeStorage(\stdClass|array $data): array
     {
-        return array_map(function ($value) {
-            return $value instanceof \stdClass || $value && \is_array($value) ? self::normalizeStorage($value) : $value;
-        }, (array) $data);
+        return array_map(fn ($value) => $value instanceof \stdClass || $value && \is_array($value) ? $this->normalizeStorage($value) : $value, (array) $data);
     }
 
     private function isValidMixedBracketExpression(string $expr): bool

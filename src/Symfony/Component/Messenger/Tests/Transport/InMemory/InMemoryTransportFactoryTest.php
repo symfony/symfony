@@ -41,7 +41,7 @@ class InMemoryTransportFactoryTest extends TestCase
     public function testCreateTransport()
     {
         /** @var SerializerInterface $serializer */
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = $this->createStub(SerializerInterface::class);
 
         $this->assertInstanceOf(InMemoryTransport::class, $this->factory->createTransport('in-memory://', [], $serializer));
     }
@@ -77,7 +77,7 @@ class InMemoryTransportFactoryTest extends TestCase
 
     public function testResetCreatedTransports()
     {
-        $transport = $this->factory->createTransport('in-memory://', [], $this->createMock(SerializerInterface::class));
+        $transport = $this->factory->createTransport('in-memory://', [], $this->createStub(SerializerInterface::class));
         $transport->send(Envelope::wrap(new DummyMessage('Hello.')));
 
         $this->assertCount(1, $transport->get());

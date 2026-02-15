@@ -23,7 +23,7 @@ class TranslationDataCollectorTest extends TestCase
 {
     public function testCollectEmptyMessages()
     {
-        $dataCollector = new TranslationDataCollector(new DataCollectorTranslator($this->createMock(Translator::class)));
+        $dataCollector = new TranslationDataCollector(new DataCollectorTranslator(new Translator('en')));
         $dataCollector->lateCollect();
 
         $this->assertEquals(0, $dataCollector->getCountMissings());
@@ -101,7 +101,7 @@ class TranslationDataCollectorTest extends TestCase
         $translator->setFallbackLocales(['en']);
         $translator->addGlobalParameter('welcome', 'Welcome {name}!');
         $dataCollector = new TranslationDataCollector(new DataCollectorTranslator($translator));
-        $dataCollector->collect($this->createMock(Request::class), $this->createMock(Response::class));
+        $dataCollector->collect(new Request(), new Response());
 
         $this->assertSame('fr', $dataCollector->getLocale());
         $this->assertSame(['en'], $dataCollector->getFallbackLocales());

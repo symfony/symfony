@@ -21,6 +21,8 @@ return [
         'hy' => 'armenagiella',
         'hy_AM' => 'armenagiella (Armenia)',
         'kk' => 'kazakhgiella',
+        'kk_Arab' => 'kazakhgiella (arábalaš)',
+        'kk_Arab_CN' => 'kazakhgiella (arábalaš, Kiinná)',
         'kk_Cyrl' => 'kazakhgiella (kyrillalaš)',
         'kk_Cyrl_KZ' => 'kazakhgiella (kyrillalaš, Kasakstan)',
         'kk_KZ' => 'kazakhgiella (Kasakstan)',

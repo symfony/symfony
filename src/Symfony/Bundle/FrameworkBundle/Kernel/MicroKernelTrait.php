@@ -108,8 +108,8 @@ trait MicroKernelTrait
 
     public function getCacheDir(): string
     {
-        if (isset($_SERVER['APP_CACHE_DIR'])) {
-            return $_SERVER['APP_CACHE_DIR'].'/'.$this->environment;
+        if (null !== $dir = $_SERVER['APP_CACHE_DIR'] ?? null) {
+            return $this->getEnvDir($dir);
         }
 
         return parent::getCacheDir();
@@ -117,11 +117,25 @@ trait MicroKernelTrait
 
     public function getBuildDir(): string
     {
-        if (isset($_SERVER['APP_BUILD_DIR'])) {
-            return $_SERVER['APP_BUILD_DIR'].'/'.$this->environment;
+        if (null !== $dir = $_SERVER['APP_BUILD_DIR'] ?? null) {
+            return $this->getEnvDir($dir);
         }
 
         return parent::getBuildDir();
+    }
+
+    public function getShareDir(): ?string
+    {
+        if (null !== $dir = $_SERVER['APP_SHARE_DIR'] ?? null) {
+            if (false === $dir = filter_var($dir, \FILTER_VALIDATE_BOOL, \FILTER_NULL_ON_FAILURE) ?? $dir) {
+                return null;
+            }
+            if (\is_string($dir)) {
+                return $this->getEnvDir($dir);
+            }
+        }
+
+        return parent::getShareDir();
     }
 
     public function getLogDir(): string
@@ -229,5 +243,40 @@ trait MicroKernelTrait
         }
 
         return $collection;
+    }
+
+    /**
+     * Returns the kernel parameters.
+     *
+     * @return array<string, array|bool|string|int|float|\UnitEnum|null>
+     */
+    protected function getKernelParameters(): array
+    {
+        $parameters = parent::getKernelParameters();
+        $bundlesPath = $this->getBundlesPath();
+        $bundlesDefinition = !is_file($bundlesPath) ? [FrameworkBundle::class => ['all' => true]] : require $bundlesPath;
+        $knownEnvs = [$this->environment => true];
+
+        foreach ($bundlesDefinition as $envs) {
+            $knownEnvs += $envs;
+        }
+        unset($knownEnvs['all']);
+        $parameters['.container.known_envs'] = array_keys($knownEnvs);
+        $parameters['.kernel.config_dir'] = $this->getConfigDir();
+        $parameters['.kernel.bundles_definition'] = $bundlesDefinition;
+
+        return $parameters;
+    }
+
+    private function getEnvDir(string $dir): string
+    {
+        if ('' !== $dir && \in_array($dir[0], ['/', '\\'], true)) {
+            return $dir.'/'.$this->environment;
+        }
+        if ('\\' === \DIRECTORY_SEPARATOR && ':' === ($dir[1] ?? '') && 65 <= \ord($dir[0]) && \ord($dir[0]) <= 122 && !\in_array($dir[0], ['[', ']', '^', '_', '`'], true)) {
+            return $dir.'/'.$this->environment;
+        }
+
+        return $this->getProjectDir().'/'.$dir.'/'.$this->environment;
     }
 }

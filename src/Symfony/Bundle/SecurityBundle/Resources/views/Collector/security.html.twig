@@ -534,10 +534,14 @@
                                     <tr class="voter_result">
                                         <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
                                         <td class="font-normal">
-                                            {{ decision.result
-                                                ? '<span class="label status-success same-width">GRANTED</span>'
-                                                : '<span class="label status-error same-width">DENIED</span>'
-                                            }}
+                                            {% set result = decision.result|default(null) %}
+                                            {% if result is same as(true) %}
+                                                <span class="label status-success same-width">GRANTED</span>
+                                            {% elseif result is same as(false) %}
+                                                <span class="label status-error same-width">DENIED</span>
+                                            {% else %}
+                                                <span class="label status-warning same-width">ERROR</span>
+                                            {% endif %}
                                         </td>
                                         <td>
                                             {% if decision.attributes|length == 1 %}

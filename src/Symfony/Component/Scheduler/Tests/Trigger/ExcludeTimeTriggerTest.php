@@ -19,7 +19,7 @@ class ExcludeTimeTriggerTest extends TestCase
 {
     public function testGetNextRun()
     {
-        $inner = $this->createMock(TriggerInterface::class);
+        $inner = $this->createStub(TriggerInterface::class);
         $inner
             ->method('getNextRunDate')
             ->willReturnCallback(static fn (\DateTimeImmutable $d) => $d->modify('+1 sec'));

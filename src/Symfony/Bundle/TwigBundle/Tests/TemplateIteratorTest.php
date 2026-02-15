@@ -25,6 +25,7 @@ class TemplateIteratorTest extends TestCase
         sort($sorted);
         $this->assertEquals(
             [
+                '@!Bar/index.html.twig',
                 '@Bar/index.html.twig',
                 '@Bar/layout.html.twig',
                 '@Foo/index.html.twig',
@@ -43,6 +44,7 @@ class TemplateIteratorTest extends TestCase
         sort($sorted);
         $this->assertEquals(
             [
+                '@!Bar/index.html.twig',
                 '@Bar/index.html.twig',
                 '@Bar/layout.html.twig',
                 '@Foo/index.html.twig',
@@ -54,12 +56,12 @@ class TemplateIteratorTest extends TestCase
 
     private function createKernelMock(): Kernel
     {
-        $bundle = $this->createMock(BundleInterface::class);
-        $bundle->expects($this->any())->method('getName')->willReturn('BarBundle');
-        $bundle->expects($this->any())->method('getPath')->willReturn(__DIR__.'/Fixtures/templates/BarBundle');
+        $bundle = $this->createStub(BundleInterface::class);
+        $bundle->method('getName')->willReturn('BarBundle');
+        $bundle->method('getPath')->willReturn(__DIR__.'/Fixtures/templates/BarBundle');
 
-        $kernel = $this->createMock(Kernel::class);
-        $kernel->expects($this->any())->method('getBundles')->willReturn([
+        $kernel = $this->createStub(Kernel::class);
+        $kernel->method('getBundles')->willReturn([
             $bundle,
         ]);
 

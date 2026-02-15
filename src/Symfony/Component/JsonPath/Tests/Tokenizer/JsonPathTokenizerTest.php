@@ -349,4 +349,18 @@ class JsonPathTokenizerTest extends TestCase
             'dash sign' => ['-test'],
         ];
     }
+
+    public function testQuotedTrueFalseNullShouldNotThrow()
+    {
+        foreach (['True', 'False', 'Null'] as $value) {
+            JsonPathTokenizer::tokenize(
+                new JsonPath(\sprintf('$[?@.a=="%s"]', $value))
+            );
+            JsonPathTokenizer::tokenize(
+                new JsonPath(\sprintf('$[?@.a==\'%s\']', $value))
+            );
+        }
+
+        $this->expectNotToPerformAssertions();
+    }
 }

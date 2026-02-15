@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\ContactEveryone\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneOptions;
 use Symfony\Component\Notifier\Bridge\ContactEveryone\ContactEveryoneTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
@@ -49,9 +50,7 @@ final class ContactEveryoneTransportTest extends TransportTestCase
     public function testSendSuccessfully()
     {
         $messageId = bin2hex(random_bytes(7));
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')->willReturn(200);
-        $response->method('getContent')->willReturn($messageId);
+        $response = new MockResponse($messageId);
         $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 
         $transport = $this->createTransport($client);

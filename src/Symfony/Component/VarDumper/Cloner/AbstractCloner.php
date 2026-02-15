@@ -167,8 +167,6 @@ abstract class AbstractCloner implements ClonerInterface
         'CurlHandle' => ['Symfony\Component\VarDumper\Caster\CurlCaster', 'castCurl'],
 
         'Dba\Connection' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],
-        ':dba' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],
-        ':dba persistent' => ['Symfony\Component\VarDumper\Caster\ResourceCaster', 'castDba'],
 
         'GdImage' => ['Symfony\Component\VarDumper\Caster\GdCaster', 'castGd'],
 

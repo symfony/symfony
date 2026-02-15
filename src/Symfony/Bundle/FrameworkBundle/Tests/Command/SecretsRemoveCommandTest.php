@@ -22,10 +22,10 @@ class SecretsRemoveCommandTest extends TestCase
     #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(bool $withLocalVault, array $input, array $expectedSuggestions)
     {
-        $vault = $this->createMock(AbstractVault::class);
+        $vault = $this->createStub(AbstractVault::class);
         $vault->method('list')->willReturn(['SECRET' => null, 'OTHER_SECRET' => null]);
         if ($withLocalVault) {
-            $localVault = $this->createMock(AbstractVault::class);
+            $localVault = $this->createStub(AbstractVault::class);
             $localVault->method('list')->willReturn(['SECRET' => null]);
         } else {
             $localVault = null;

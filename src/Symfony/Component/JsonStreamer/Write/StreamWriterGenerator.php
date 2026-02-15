@@ -11,17 +11,18 @@
 
 namespace Symfony\Component\JsonStreamer\Write;
 
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\JsonStreamer\DataModel\Write\BackedEnumNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\CollectionNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\CompositeNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\DataModelNodeInterface;
+use Symfony\Component\JsonStreamer\DataModel\Write\DateTimeNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\ObjectNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\ScalarNode;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
+use Symfony\Component\JsonStreamer\StreamerDumper;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BackedEnumType;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
@@ -40,13 +41,15 @@ use Symfony\Component\TypeInfo\Type\UnionType;
  */
 final class StreamWriterGenerator
 {
+    private StreamerDumper $dumper;
     private ?PhpGenerator $phpGenerator = null;
-    private ?Filesystem $fs = null;
 
     public function __construct(
         private PropertyMetadataLoaderInterface $propertyMetadataLoader,
         private string $streamWritersDir,
+        ?ConfigCacheFactoryInterface $cacheFactory = null,
     ) {
+        $this->dumper = new StreamerDumper($propertyMetadataLoader, $streamWritersDir, $cacheFactory);
     }
 
     /**
@@ -56,37 +59,16 @@ final class StreamWriterGenerator
      */
     public function generate(Type $type, array $options = []): string
     {
-        $path = $this->getPath($type);
-        if (is_file($path)) {
-            return $path;
-        }
+        $path = \sprintf('%s%s%s.json.php', $this->streamWritersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) $type));
+        $generateContent = function () use ($type, $options): string {
+            $this->phpGenerator ??= new PhpGenerator();
 
-        $this->phpGenerator ??= new PhpGenerator();
-        $this->fs ??= new Filesystem();
+            return $this->phpGenerator->generate($this->createDataModel($type, '$data', $options), $options);
+        };
 
-        $dataModel = $this->createDataModel($type, '$data', $options, ['depth' => 0]);
-        $php = $this->phpGenerator->generate($dataModel, $options);
-
-        if (!$this->fs->exists($this->streamWritersDir)) {
-            $this->fs->mkdir($this->streamWritersDir);
-        }
-
-        $tmpFile = $this->fs->tempnam(\dirname($path), basename($path));
-
-        try {
-            $this->fs->dumpFile($tmpFile, $php);
-            $this->fs->rename($tmpFile, $path);
-            $this->fs->chmod($path, 0o666 & ~umask());
-        } catch (IOException $e) {
-            throw new RuntimeException(\sprintf('Failed to write "%s" stream writer file.', $path), previous: $e);
-        }
+        $this->dumper->dump($type, $path, $generateContent);
 
         return $path;
-    }
-
-    private function getPath(Type $type): string
-    {
-        return \sprintf('%s%s%s.json.php', $this->streamWritersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) $type));
     }
 
     /**
@@ -96,6 +78,7 @@ final class StreamWriterGenerator
     private function createDataModel(Type $type, string $accessor, array $options = [], array $context = []): DataModelNodeInterface
     {
         $context['original_type'] ??= $type;
+        $context['depth'] ??= 0;
 
         if ($type instanceof UnionType) {
             return new CompositeNode($accessor, array_map(fn (Type $t): DataModelNodeInterface => $this->createDataModel($t, $accessor, $options, $context), $type->getTypes()));
@@ -111,6 +94,10 @@ final class StreamWriterGenerator
 
         if ($type instanceof GenericType) {
             $type = $type->getWrappedType();
+        }
+
+        if ($type instanceof ObjectType && is_a($type->getClassName(), \DateTimeInterface::class, true)) {
+            return new DateTimeNode($accessor, $type);
         }
 
         if ($type instanceof ObjectType && !$type instanceof EnumType) {
@@ -133,9 +120,9 @@ final class StreamWriterGenerator
             $propertiesNodes = [];
 
             foreach ($propertiesMetadata as $streamedName => $propertyMetadata) {
-                $propertyAccessor = $accessor.'->'.$propertyMetadata->getName();
+                $propertyAccessor = $propertyMetadata->getName() ? $accessor.'->'.$propertyMetadata->getName() : 'null';
 
-                foreach ($propertyMetadata->getNativeToStreamValueTransformer() as $valueTransformer) {
+                foreach ($propertyMetadata->getValueTransformers() as $valueTransformer) {
                     if (\is_string($valueTransformer)) {
                         $valueTransformerServiceAccessor = "\$valueTransformers->get('$valueTransformer')";
                         $propertyAccessor = "{$valueTransformerServiceAccessor}->transform($propertyAccessor, ['_current_object' => $accessor] + \$options)";

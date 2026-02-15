@@ -29,14 +29,4 @@ class MaxDepth
             throw new InvalidArgumentException(\sprintf('Parameter given to "%s" must be a positive integer.', static::class));
         }
     }
-
-    #[\Deprecated('Use the "maxdepth" property instead', 'symfony/serializer:7.4')]
-    public function getMaxDepth(): int
-    {
-        return $this->maxDepth;
-    }
-}
-
-if (!class_exists(\Symfony\Component\Serializer\Annotation\MaxDepth::class, false)) {
-    class_alias(MaxDepth::class, \Symfony\Component\Serializer\Annotation\MaxDepth::class);
 }

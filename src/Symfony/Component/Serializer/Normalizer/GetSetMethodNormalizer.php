@@ -87,8 +87,9 @@ final class GetSetMethodNormalizer extends AbstractObjectNormalizer
         return !$method->isStatic()
             && !($method->getAttributes(Ignore::class) || $method->getAttributes(LegacyIgnore::class))
             && !$method->getNumberOfRequiredParameters()
+            && !\in_array((string) $method->getReturnType(), ['void', 'never'], true)
             && ((2 < ($methodLength = \strlen($method->name)) && str_starts_with($method->name, 'is') && !ctype_lower($method->name[2]))
-                || (3 < $methodLength && (str_starts_with($method->name, 'has') || str_starts_with($method->name, 'get')) && !ctype_lower($method->name[3]))
+                || (3 < $methodLength && (str_starts_with($method->name, 'has') || str_starts_with($method->name, 'get') || str_starts_with($method->name, 'can')) && !ctype_lower($method->name[3]))
             );
     }
 
@@ -168,6 +169,10 @@ final class GetSetMethodNormalizer extends AbstractObjectNormalizer
         }
 
         $class = \is_object($classOrObject) ? $classOrObject::class : $classOrObject;
+
+        if ($this->classDiscriminatorResolver?->getMappingForMappedObject($classOrObject)?->getTypeProperty() === $attribute) {
+            return true;
+        }
 
         if (!isset(self::$reflectionCache[$class])) {
             self::$reflectionCache[$class] = new \ReflectionClass($class);

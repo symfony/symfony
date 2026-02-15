@@ -23,15 +23,17 @@ class CompoundRateLimiterFactoryTest extends TestCase
     {
         $factory1 = $this->createMock(RateLimiterFactoryInterface::class);
         $factory1
+            ->expects($this->once())
             ->method('create')
             ->with('foo')
-            ->willReturn($this->createMock(LimiterInterface::class))
+            ->willReturn($this->createStub(LimiterInterface::class))
         ;
         $factory2 = $this->createMock(RateLimiterFactoryInterface::class);
         $factory2
+            ->expects($this->once())
             ->method('create')
             ->with('foo')
-            ->willReturn($this->createMock(LimiterInterface::class))
+            ->willReturn($this->createStub(LimiterInterface::class))
         ;
 
         $compoundFactory = new CompoundRateLimiterFactory([$factory1, $factory2]);

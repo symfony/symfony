@@ -23,11 +23,8 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Loader\FileLoader;
-use Symfony\Component\DependencyInjection\Loader\IniFileLoader;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\AbstractClass;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\MissingParent;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\Foo;
@@ -48,6 +45,8 @@ use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAs
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasInterface;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasMultiple;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasProdEnv;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasTargetOne;
+use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithAsAliasTargetTwo;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\WithCustomAsAlias;
 use Symfony\Component\DependencyInjection\Tests\Fixtures\Utils\NotAService;
 
@@ -66,41 +65,17 @@ class FileLoaderTest extends TestCase
         $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath));
 
         $resolver = new LoaderResolver([
-            new IniFileLoader($container, new FileLocator(self::$fixturesPath.'/ini')),
-            new XmlFileLoader($container, new FileLocator(self::$fixturesPath.'/xml')),
             new PhpFileLoader($container, new FileLocator(self::$fixturesPath.'/php')),
             new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml')),
         ]);
 
         $loader->setResolver($resolver);
-        $loader->import('{F}ixtures/{xml,yaml}/services2.{yml,xml}');
+        $loader->import('{F}ixtures/{php,yaml}/services2.{php,yml}');
 
         $actual = $container->getParameterBag()->all();
-        $expected = [
-            'a_string' => 'a string',
-            'foo' => 'bar',
-            'values' => [
-                0,
-                'integer' => 4,
-                100 => null,
-                'true',
-                true,
-                false,
-                'on',
-                'off',
-                'float' => 1.3,
-                1000.3,
-                'a string',
-                ['foo', 'bar'],
-            ],
-            'mixedcase' => ['MixedCaseKey' => 'value'],
-            'constant' => \PHP_EOL,
-            'bar' => '%foo%',
-            'escape' => '@escapeme',
-            'foo_bar' => new Reference('foo_bar'),
-        ];
+        $expectedKeys = ['a_string', 'foo', 'values', 'mixedcase', 'constant', 'bar', 'escape', 'foo_bar'];
 
-        $this->assertEquals(array_keys($expected), array_keys($actual), '->load() imports and merges imported files');
+        $this->assertEquals($expectedKeys, array_keys($actual), '->load() imports and merges imported files');
     }
 
     public function testRegisterClasses()
@@ -251,6 +226,25 @@ class FileLoaderTest extends TestCase
             '{Class "?Symfony\\\\Component\\\\DependencyInjection\\\\Tests\\\\Fixtures\\\\Prototype\\\\BadClasses\\\\MissingClass"? not found}',
             $container->getDefinition(MissingParent::class)->getErrors()[0]
         );
+    }
+
+    public function testClassIsSetEvenWhenDefinitionHasErrors()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('bad_classes_dir', 'BadClasses');
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'), 'test');
+
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\BadClasses\\',
+            'Prototype/%bad_classes_dir%/*'
+        );
+
+        $definition = $container->getDefinition(MissingParent::class);
+
+        // The class should be set even when the definition has errors
+        $this->assertSame(MissingParent::class, $definition->getClass());
+        $this->assertNotEmpty($definition->getErrors());
     }
 
     public function testRegisterClassesWithBadPrefix()
@@ -435,6 +429,22 @@ class FileLoaderTest extends TestCase
             'Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\\',
             'PrototypeAsAlias/{WithAsAliasMultipleInterface,AliasBarInterface,AliasFooInterface}.php'
         );
+    }
+
+    public function testRegisterClassesWithAsAliasTarget()
+    {
+        $container = new ContainerBuilder();
+        $loader = new TestFileLoader($container, new FileLocator(self::$fixturesPath.'/Fixtures'));
+        $loader->registerClasses(
+            (new Definition())->setAutoconfigured(true),
+            'Symfony\Component\DependencyInjection\Tests\Fixtures\PrototypeAsAlias\\',
+            'PrototypeAsAlias/{WithAsAliasTargetOne,WithAsAliasTargetTwo,AliasFooInterface}.php'
+        );
+        // Verify target-specific aliases are created
+        $this->assertTrue($container->hasAlias(AliasFooInterface::class.' $one'));
+        $this->assertTrue($container->hasAlias(AliasFooInterface::class.' $two'));
+        $this->assertSame(WithAsAliasTargetOne::class, (string) $container->getAlias(AliasFooInterface::class.' $one'));
+        $this->assertSame(WithAsAliasTargetTwo::class, (string) $container->getAlias(AliasFooInterface::class.' $two'));
     }
 
     public function testRegisterClassesWithStaticConstructor()

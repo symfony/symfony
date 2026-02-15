@@ -54,6 +54,7 @@ class StoreFactoryTest extends TestCase
         }
         if (\extension_loaded('sysvsem')) {
             yield ['semaphore', SemaphoreStore::class];
+            yield ['semaphore://project-id', SemaphoreStore::class];
         }
         if (class_exists(AbstractAdapter::class) && MemcachedAdapter::isSupported()) {
             yield ['memcached://server.com', MemcachedStore::class];

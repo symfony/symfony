@@ -30,7 +30,7 @@ class ImportMapUpdateCheckerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->importMapConfigReader = $this->createMock(ImportMapConfigReader::class);
+        $this->importMapConfigReader = $this->createStub(ImportMapConfigReader::class);
         $httpClient = new MockHttpClient();
         $httpClient->setResponseFactory(self::responseFactory(...));
         $this->updateChecker = new ImportMapUpdateChecker($this->importMapConfigReader, $httpClient);
@@ -120,9 +120,9 @@ class ImportMapUpdateCheckerTest extends TestCase
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries($entries));
         if (null !== $expectedException) {
             $this->expectException($expectedException::class);
-            $this->updateChecker->getAvailableUpdates(array_map(fn ($entry) => $entry->importName, $entries));
+            $this->updateChecker->getAvailableUpdates(array_map(static fn ($entry) => $entry->importName, $entries));
         } else {
-            $update = $this->updateChecker->getAvailableUpdates(array_map(fn ($entry) => $entry->importName, $entries));
+            $update = $this->updateChecker->getAvailableUpdates(array_map(static fn ($entry) => $entry->importName, $entries));
             $this->assertEquals($expectedUpdateInfo, $update);
         }
     }

@@ -46,7 +46,7 @@ class TokenManagerTest extends TestCase
     public function testTokenCached()
     {
         $counter = 0;
-        $client = new MockHttpClient(function () use (&$counter): ResponseInterface {
+        $client = new MockHttpClient(static function () use (&$counter): ResponseInterface {
             ++$counter;
 
             return new JsonMockResponse(['access_token' => 't'.$counter, 'expires_in' => 3599]);
@@ -62,7 +62,7 @@ class TokenManagerTest extends TestCase
     public function testTokenExpired()
     {
         $counter = 0;
-        $client = new MockHttpClient(function () use (&$counter): ResponseInterface {
+        $client = new MockHttpClient(static function () use (&$counter): ResponseInterface {
             ++$counter;
 
             return new JsonMockResponse(['access_token' => 't'.$counter, 'expires_in' => 3599]);
@@ -81,7 +81,7 @@ class TokenManagerTest extends TestCase
 
     public function testNonSuccessCodeThrown()
     {
-        $client = new MockHttpClient(fn (): ResponseInterface => new MockResponse('', ['http_code' => 503]));
+        $client = new MockHttpClient(static fn (): ResponseInterface => new MockResponse('', ['http_code' => 503]));
 
         $manager = new TokenManager('graph', 'auth', 'tenant', 'client', 'key', $client);
 

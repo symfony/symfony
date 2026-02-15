@@ -31,7 +31,7 @@ class EnvelopeListenerTest extends TestCase
 
         $listener->onMessage($event);
 
-        $recipients = array_map(fn (Address $a): string => $a->getAddress(), $event->getEnvelope()->getRecipients());
+        $recipients = array_map(static fn (Address $a): string => $a->getAddress(), $event->getEnvelope()->getRecipients());
         $this->assertSame($expected, $recipients);
     }
 

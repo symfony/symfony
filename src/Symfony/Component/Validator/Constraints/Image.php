@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * Validates that a file (or a path to a file) is a valid image.
@@ -119,7 +119,6 @@ class Image extends File
      *
      * @see https://www.iana.org/assignments/media-types/media-types.xhtml Existing media types
      */
-    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         int|string|null $maxSize = null,
@@ -173,6 +172,10 @@ class Image extends File
         ?string $filenameCountUnit = null,
         ?string $filenameCharsetMessage = null,
     ) {
+        if (null !== $options) {
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
+        }
+
         parent::__construct(
             $options,
             $maxSize,
@@ -202,14 +205,14 @@ class Image extends File
             $filenameCharsetMessage,
         );
 
-        $this->minWidth = $minWidth ?? $this->minWidth;
-        $this->maxWidth = $maxWidth ?? $this->maxWidth;
-        $this->maxHeight = $maxHeight ?? $this->maxHeight;
-        $this->minHeight = $minHeight ?? $this->minHeight;
-        $this->maxRatio = $maxRatio ?? $this->maxRatio;
-        $this->minRatio = $minRatio ?? $this->minRatio;
-        $this->minPixels = $minPixels ?? $this->minPixels;
-        $this->maxPixels = $maxPixels ?? $this->maxPixels;
+        $this->minWidth = $minWidth;
+        $this->maxWidth = $maxWidth;
+        $this->maxHeight = $maxHeight;
+        $this->minHeight = $minHeight;
+        $this->maxRatio = $maxRatio;
+        $this->minRatio = $minRatio;
+        $this->minPixels = $minPixels;
+        $this->maxPixels = $maxPixels;
         $this->allowSquare = $allowSquare ?? $this->allowSquare;
         $this->allowLandscape = $allowLandscape ?? $this->allowLandscape;
         $this->allowPortrait = $allowPortrait ?? $this->allowPortrait;
@@ -232,7 +235,7 @@ class Image extends File
             $this->mimeTypes = 'image/*';
         }
 
-        if (!\in_array('image/*', (array) $this->mimeTypes, true) && !\array_key_exists('mimeTypesMessage', $options ?? []) && null === $mimeTypesMessage) {
+        if (!\in_array('image/*', (array) $this->mimeTypes, true) && null === $mimeTypesMessage) {
             $this->mimeTypesMessage = 'The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.';
         }
     }

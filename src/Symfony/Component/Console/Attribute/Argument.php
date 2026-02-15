@@ -14,24 +14,24 @@ namespace Symfony\Component\Console\Attribute;
 use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\Suggestion;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\String\UnicodeString;
 
 #[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 class Argument
 {
-    private const ALLOWED_TYPES = ['string', 'bool', 'int', 'float', 'array'];
+    public mixed $default = null;
+    public array|\Closure $suggestedValues;
 
-    private string|bool|int|float|array|null $default = null;
-    private array|\Closure $suggestedValues;
-    private ?int $mode = null;
     /**
+     * @internal
+     *
      * @var string|class-string<\BackedEnum>
      */
-    private string $typeName = '';
+    public string $typeName = '';
+    private ?int $mode = null;
+    private ?InteractiveAttributeInterface $interactiveAttribute = null;
 
     /**
      * Represents a console command <argument> definition.
@@ -67,11 +67,6 @@ class Argument
         }
 
         $self->typeName = $type->getName();
-        $isBackedEnum = is_subclass_of($self->typeName, \BackedEnum::class);
-
-        if (!\in_array($self->typeName, self::ALLOWED_TYPES, true) && !$isBackedEnum) {
-            throw new LogicException(\sprintf('The type "%s" on %s "$%s" of "%s" is not supported as a command argument. Only "%s" types and backed enums are allowed.', $self->typeName, $reflection->getMemberName(), $name, $reflection->getSourceName(), implode('", "', self::ALLOWED_TYPES)));
-        }
 
         if (!$self->name) {
             $self->name = (new UnicodeString($name))->kebab();
@@ -79,17 +74,26 @@ class Argument
 
         $self->default = $reflection->hasDefaultValue() ? $reflection->getDefaultValue() : null;
 
-        $self->mode = ($reflection->hasDefaultValue() || $reflection->isNullable()) ? InputArgument::OPTIONAL : InputArgument::REQUIRED;
-        if ('array' === $self->typeName) {
+        $isOptional = $reflection->hasDefaultValue() || $reflection->isNullable() || $reflection->isVariadic();
+        $self->mode = $isOptional ? InputArgument::OPTIONAL : InputArgument::REQUIRED;
+        if ('array' === $self->typeName || $reflection->isVariadic()) {
             $self->mode |= InputArgument::IS_ARRAY;
         }
 
         if (\is_array($self->suggestedValues) && !\is_callable($self->suggestedValues) && 2 === \count($self->suggestedValues) && ($instance = $reflection->getSourceThis()) && $instance::class === $self->suggestedValues[0] && \is_callable([$instance, $self->suggestedValues[1]])) {
+            // In case that the callback is declared as a static method `[Foo::class, 'methodName']` - yet it is not callable,
+            // while non-static method `[Foo $instance, 'methodName']` would be callable, we transform the callback on the fly into a non-static version.
             $self->suggestedValues = [$instance, $self->suggestedValues[1]];
         }
 
-        if ($isBackedEnum && !$self->suggestedValues) {
+        if (is_subclass_of($self->typeName, \BackedEnum::class) && !$self->suggestedValues) {
             $self->suggestedValues = array_column($self->typeName::cases(), 'value');
+        }
+
+        $self->interactiveAttribute = Ask::tryFrom($member, $self->name) ?? AskChoice::tryFrom($member, $self->name);
+
+        if ($self->interactiveAttribute && $isOptional) {
+            throw new LogicException(\sprintf('The %s "$%s" argument of "%s" cannot be both interactive and optional.', $reflection->getMemberName(), $self->name, $reflection->getSourceName()));
         }
 
         return $self;
@@ -108,14 +112,16 @@ class Argument
     /**
      * @internal
      */
-    public function resolveValue(InputInterface $input): mixed
+    public function getInteractiveAttribute(): ?InteractiveAttributeInterface
     {
-        $value = $input->getArgument($this->name);
+        return $this->interactiveAttribute;
+    }
 
-        if (is_subclass_of($this->typeName, \BackedEnum::class) && (\is_string($value) || \is_int($value))) {
-            return $this->typeName::tryFrom($value) ?? throw InvalidArgumentException::fromEnumValue($this->name, $value, $this->suggestedValues);
-        }
-
-        return $value;
+    /**
+     * @internal
+     */
+    public function isRequired(): bool
+    {
+        return InputArgument::REQUIRED === (InputArgument::REQUIRED & $this->mode);
     }
 }

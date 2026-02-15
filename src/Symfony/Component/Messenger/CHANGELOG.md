@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add regex support for transport name patterns in the `messenger:consume` command
+ * Add an idle timeout option to the `BatchHandlerTrait`
+
+8.0
+---
+
+ * Remove `text` format when using the `messenger:stats` command; use `txt` instead
+ * Add method `getRetryDelay()` to `RecoverableExceptionInterface`
+
 7.4
 ---
 
@@ -8,6 +20,8 @@ CHANGELOG
  * Allow any `ServiceResetterInterface` implementation in `ResetServicesListener`
  * Add `Symfony\Component\Messenger\Middleware\AddDefaultStampsMiddleware` and `Symfony\Component\Messenger\Message\DefaultStampsProviderInterface`
  * Add the possibility to configure exchange to exchange bindings in AMQP transport
+ * Add `MessageSentToTransportsEvent` that is dispatched only after the message was sent to at least one transport
+ * Support signing messages per handler
 
 7.3
 ---

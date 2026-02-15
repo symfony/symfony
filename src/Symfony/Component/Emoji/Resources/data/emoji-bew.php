@@ -151,7 +151,7 @@ return [
     '🇲🇫' => 'bendèra: Sint-Martèn (Prasman)',
     '🇲🇬' => 'bendèra: Madagaskar',
     '🇲🇭' => 'bendèra: Pulo Marsal',
-    '🇲🇰' => 'bendèra: Makèdoni Lor',
+    '🇲🇰' => 'bendèra: Makédoni Lor',
     '🇲🇱' => 'bendèra: Mali',
     '🇲🇲' => 'bendèra: Mianmar (Birma)',
     '🇲🇳' => 'bendèra: Monggoli',

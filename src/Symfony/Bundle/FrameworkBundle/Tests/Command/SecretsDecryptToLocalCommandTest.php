@@ -67,7 +67,7 @@ class SecretsDecryptToLocalCommandTest extends TestCase
         $tester = new CommandTester(new SecretsDecryptToLocalCommand($mainVault, $localVault));
 
         $this->assertSame(0, $tester->execute([]));
-        $this->assertStringContainsString('1 secret is already overridden in the local vault and will be skipped.', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/1 secret is already overridden in the local vault and will be\s+skipped\./', $tester->getDisplay());
         $this->assertSame('old_value', $localVault->reveal('FOO_SECRET'));
     }
 

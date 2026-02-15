@@ -193,7 +193,7 @@ class TextDescriptor extends Descriptor
             }
 
             // calculate max. width based on available commands per namespace
-            $width = $this->getColumnWidth(array_merge(...array_values(array_map(fn ($namespace) => array_intersect($namespace['commands'], array_keys($commands)), array_values($namespaces)))));
+            $width = $this->getColumnWidth(array_merge(...array_values(array_map(static fn ($namespace) => array_intersect($namespace['commands'], array_keys($commands)), array_values($namespaces)))));
 
             if ($describedNamespace) {
                 $this->writeText(\sprintf('<comment>Available commands for the "%s" namespace:</comment>', $describedNamespace), $options);
@@ -202,7 +202,7 @@ class TextDescriptor extends Descriptor
             }
 
             foreach ($namespaces as $namespace) {
-                $namespace['commands'] = array_filter($namespace['commands'], fn ($name) => isset($commands[$name]));
+                $namespace['commands'] = array_filter($namespace['commands'], static fn ($name) => isset($commands[$name]));
 
                 if (!$namespace['commands']) {
                     continue;

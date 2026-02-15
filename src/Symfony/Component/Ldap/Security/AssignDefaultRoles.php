@@ -13,13 +13,13 @@ namespace Symfony\Component\Ldap\Security;
 
 use Symfony\Component\Ldap\Entry;
 
-final readonly class AssignDefaultRoles implements RoleFetcherInterface
+final class AssignDefaultRoles implements RoleFetcherInterface
 {
     /**
      * @param string[] $roles
      */
     public function __construct(
-        private array $roles,
+        private readonly array $roles,
     ) {
     }
 

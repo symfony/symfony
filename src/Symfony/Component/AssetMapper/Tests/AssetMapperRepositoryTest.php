@@ -138,7 +138,7 @@ class AssetMapperRepositoryTest extends TestCase
             '*/*3.css',
             '*/*.digested.*',
         ];
-        $excludedGlobs = array_map(function ($pattern) {
+        $excludedGlobs = array_map(static function ($pattern) {
             // globbed equally in FrameworkExtension
             return Glob::toRegex($pattern, true, false);
         }, $excludedPatterns);

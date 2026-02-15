@@ -117,7 +117,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
 
     public function testSendThrowsForErrorResponse()
     {
-        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
             $json = json_encode([
                 'message' => 'i\'m a teapot',
                 'type' => 'sender',

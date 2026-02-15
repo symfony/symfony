@@ -34,7 +34,7 @@ class ImportMapAuditorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->importMapConfigReader = $this->createMock(ImportMapConfigReader::class);
+        $this->importMapConfigReader = $this->createStub(ImportMapConfigReader::class);
         $this->httpClient = new MockHttpClient();
         $this->importMapAuditor = new ImportMapAuditor($this->importMapConfigReader, $this->httpClient);
     }

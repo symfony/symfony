@@ -11,11 +11,9 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\SchemaListener;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Event\SchemaCreateTableEventArgs;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Schema\Table;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +26,8 @@ class MessengerTransportDoctrineSchemaListenerTest extends TestCase
     public function testPostGenerateSchema()
     {
         $schema = new Schema();
-        $dbalConnection = $this->createMock(Connection::class);
+        $dbalConnection = $this->createStub(Connection::class);
+        $dbalConnection->method('getConfiguration')->willReturn(new Configuration());
         $entityManager = $this->createMock(EntityManagerInterface::class);
         $entityManager->expects($this->once())
             ->method('getConnection')
@@ -38,7 +37,7 @@ class MessengerTransportDoctrineSchemaListenerTest extends TestCase
         $doctrineTransport = $this->createMock(DoctrineTransport::class);
         $doctrineTransport->expects($this->once())
             ->method('configureSchema')
-            ->with($schema, $dbalConnection, $this->callback(fn () => true));
+            ->with($schema, $dbalConnection, $this->callback(static fn () => true));
         $otherTransport = $this->createMock(TransportInterface::class);
         $otherTransport->expects($this->never())
             ->method($this->anything());
@@ -47,63 +46,92 @@ class MessengerTransportDoctrineSchemaListenerTest extends TestCase
         $subscriber->postGenerateSchema($event);
     }
 
-    public function testOnSchemaCreateTable()
+    public function testPostGenerateSchemaRespectsSchemaFilter()
     {
-        if (!class_exists(SchemaCreateTableEventArgs::class)) {
-            self::markTestSkipped('This test requires DBAL < 4.');
-        }
+        $schema = new Schema();
 
-        $platform = $this->createMock(AbstractPlatform::class);
-        $table = new Table('queue_table');
-        $event = new SchemaCreateTableEventArgs($table, [], [], $platform);
+        $configuration = new Configuration();
+        $configuration->setSchemaAssetsFilter(static fn (string $tableName) => 'messenger_messages' !== $tableName);
 
-        $otherTransport = $this->createMock(TransportInterface::class);
-        $otherTransport->expects($this->never())
-            ->method($this->anything());
+        $dbalConnection = $this->createStub(Connection::class);
+        $dbalConnection->method('getConfiguration')->willReturn($configuration);
 
-        $doctrineTransport = $this->createMock(DoctrineTransport::class);
-        $doctrineTransport->expects($this->once())
-            ->method('getExtraSetupSqlForTable')
-            ->with($table)
-            ->willReturn(['ALTER TABLE pizza ADD COLUMN extra_cheese boolean']);
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $entityManager->method('getConnection')->willReturn($dbalConnection);
+        $event = new GenerateSchemaEventArgs($entityManager, $schema);
 
-        // we use the platform to generate the full create table sql
-        $platform->expects($this->once())
-            ->method('getCreateTableSQL')
-            ->with($table)
-            ->willReturn('CREATE TABLE pizza (id integer NOT NULL)');
+        $doctrineTransport = $this->createStub(DoctrineTransport::class);
+        $doctrineTransport->method('configureSchema')
+            ->willReturnCallback(static function (Schema $schema) {
+                $table = $schema->createTable('messenger_messages');
+                $table->addColumn('id', 'integer', ['autoincrement' => true]);
+            });
 
-        $subscriber = new MessengerTransportDoctrineSchemaListener([$otherTransport, $doctrineTransport]);
+        $listener = new MessengerTransportDoctrineSchemaListener([$doctrineTransport]);
+        $listener->postGenerateSchema($event);
 
-        $subscriber->onSchemaCreateTable($event);
-        $this->assertTrue($event->isDefaultPrevented());
-        $this->assertSame([
-            'CREATE TABLE pizza (id integer NOT NULL)',
-            'ALTER TABLE pizza ADD COLUMN extra_cheese boolean',
-        ], $event->getSql());
+        $this->assertFalse($schema->hasTable('messenger_messages'));
     }
 
-    public function testOnSchemaCreateTableNoExtraSql()
+    public function testPostGenerateSchemaRespectsSchemaFilterIncludingSequences()
     {
-        if (!class_exists(SchemaCreateTableEventArgs::class)) {
-            self::markTestSkipped('This test requires DBAL < 4.');
-        }
+        $schema = new Schema();
 
-        $platform = $this->createMock(AbstractPlatform::class);
-        $table = new Table('queue_table');
-        $event = new SchemaCreateTableEventArgs($table, [], [], $platform);
+        $configuration = new Configuration();
+        $excluded = ['messenger_messages', 'messenger_messages_seq'];
+        $configuration->setSchemaAssetsFilter(static fn (string $assetName) => !\in_array($assetName, $excluded, true));
 
-        $doctrineTransport = $this->createMock(DoctrineTransport::class);
-        $doctrineTransport->expects($this->once())
-            ->method('getExtraSetupSqlForTable')
-            ->willReturn([]);
+        $dbalConnection = $this->createStub(Connection::class);
+        $dbalConnection->method('getConfiguration')->willReturn($configuration);
 
-        $platform->expects($this->never())
-            ->method('getCreateTableSQL');
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $entityManager->method('getConnection')->willReturn($dbalConnection);
+        $event = new GenerateSchemaEventArgs($entityManager, $schema);
 
-        $subscriber = new MessengerTransportDoctrineSchemaListener([$doctrineTransport]);
+        $doctrineTransport = $this->createStub(DoctrineTransport::class);
+        $doctrineTransport->method('configureSchema')
+            ->willReturnCallback(static function (Schema $schema) {
+                $table = $schema->createTable('messenger_messages');
+                $table->addColumn('id', 'integer', ['autoincrement' => true]);
+                $schema->createSequence('messenger_messages_seq');
+            });
 
-        $subscriber->onSchemaCreateTable($event);
-        $this->assertFalse($event->isDefaultPrevented());
+        $listener = new MessengerTransportDoctrineSchemaListener([$doctrineTransport]);
+        $listener->postGenerateSchema($event);
+
+        $this->assertFalse($schema->hasTable('messenger_messages'));
+        $this->assertFalse($schema->hasSequence('messenger_messages_seq'));
+    }
+
+    public function testPostGenerateSchemaFilterDoesNotAffectPreExistingSequences()
+    {
+        $schema = new Schema();
+        $schema->createSequence('existing_seq');
+
+        $configuration = new Configuration();
+        $excluded = ['messenger_messages', 'messenger_messages_seq', 'existing_seq'];
+        $configuration->setSchemaAssetsFilter(static fn (string $assetName) => !\in_array($assetName, $excluded, true));
+
+        $dbalConnection = $this->createStub(Connection::class);
+        $dbalConnection->method('getConfiguration')->willReturn($configuration);
+
+        $entityManager = $this->createStub(EntityManagerInterface::class);
+        $entityManager->method('getConnection')->willReturn($dbalConnection);
+        $event = new GenerateSchemaEventArgs($entityManager, $schema);
+
+        $doctrineTransport = $this->createStub(DoctrineTransport::class);
+        $doctrineTransport->method('configureSchema')
+            ->willReturnCallback(static function (Schema $schema) {
+                $table = $schema->createTable('messenger_messages');
+                $table->addColumn('id', 'integer', ['autoincrement' => true]);
+                $schema->createSequence('messenger_messages_seq');
+            });
+
+        $listener = new MessengerTransportDoctrineSchemaListener([$doctrineTransport]);
+        $listener->postGenerateSchema($event);
+
+        $this->assertFalse($schema->hasTable('messenger_messages'));
+        $this->assertFalse($schema->hasSequence('messenger_messages_seq'));
+        $this->assertTrue($schema->hasSequence('existing_seq'));
     }
 }

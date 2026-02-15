@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add support of `ipPoolId` option
+
 7.2
 ---
 

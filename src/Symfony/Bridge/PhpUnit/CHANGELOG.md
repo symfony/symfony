@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add support for `phpunit.dist.xml` suffix
+
 7.4
 ---
 

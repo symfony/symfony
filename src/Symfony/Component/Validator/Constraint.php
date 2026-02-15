@@ -11,10 +11,8 @@
 
 namespace Symfony\Component\Validator;
 
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Exception\InvalidOptionsException;
-use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
  * Contains the properties of a constraint definition.
@@ -78,116 +76,20 @@ abstract class Constraint
     }
 
     /**
-     * Initializes the constraint with options.
+     * Initializes the constraint with the groups and payload options.
      *
-     * You should pass an associative array. The keys should be the names of
-     * existing properties in this class. The values should be the value for these
-     * properties.
-     *
-     * Alternatively you can override the method getDefaultOption() to return the
-     * name of an existing property. If no associative array is passed, this
-     * property is set instead.
-     *
-     * You can force that certain options are set by overriding
-     * getRequiredOptions() to return the names of these options. If any
-     * option is not set here, an exception is thrown.
-     *
-     * @param mixed    $options The options (as associative array)
-     *                          or the value for the default
-     *                          option (any other type)
      * @param string[] $groups  An array of validation groups
      * @param mixed    $payload Domain-specific data attached to a constraint
-     *
-     * @throws InvalidOptionsException       When you pass the names of non-existing
-     *                                       options
-     * @throws MissingOptionsException       When you don't pass any of the options
-     *                                       returned by getRequiredOptions()
-     * @throws ConstraintDefinitionException When you don't pass an associative
-     *                                       array, but getDefaultOption() returns
-     *                                       null
      */
     public function __construct(mixed $options = null, ?array $groups = null, mixed $payload = null)
     {
         unset($this->groups); // enable lazy initialization
 
-        if (null === $options && (\func_num_args() > 0 || self::class === (new \ReflectionMethod($this, 'getRequiredOptions'))->getDeclaringClass()->getName())) {
-            if (null !== $groups) {
-                $this->groups = $groups;
-            }
-            $this->payload = $payload;
-
-            return;
-        }
-
-        trigger_deprecation('symfony/validator', '7.4', 'Support for evaluating options in the base Constraint class is deprecated. Initialize properties in the constructor of %s instead.', static::class);
-
-        $options = $this->normalizeOptions($options);
         if (null !== $groups) {
-            $options['groups'] = $groups;
-        }
-        $options['payload'] = $payload ?? $options['payload'] ?? null;
-
-        foreach ($options as $name => $value) {
-            $this->$name = $value;
-        }
-    }
-
-    /**
-     * @deprecated since Symfony 7.4
-     *
-     * @return array<string, mixed>
-     */
-    protected function normalizeOptions(mixed $options): array
-    {
-        $normalizedOptions = [];
-        $defaultOption = $this->getDefaultOption(false);
-        $invalidOptions = [];
-        $missingOptions = array_flip($this->getRequiredOptions(false));
-        $knownOptions = get_class_vars(static::class);
-
-        if (\is_array($options) && isset($options['value']) && !property_exists($this, 'value')) {
-            if (null === $defaultOption) {
-                throw new ConstraintDefinitionException(\sprintf('No default option is configured for constraint "%s".', static::class));
-            }
-
-            $options[$defaultOption] = $options['value'];
-            unset($options['value']);
+            $this->groups = $groups;
         }
 
-        if (\is_array($options)) {
-            reset($options);
-        }
-        if ($options && \is_array($options) && \is_string(key($options))) {
-            foreach ($options as $option => $value) {
-                if (\array_key_exists($option, $knownOptions)) {
-                    $normalizedOptions[$option] = $value;
-                    unset($missingOptions[$option]);
-                } else {
-                    $invalidOptions[] = $option;
-                }
-            }
-        } elseif (null !== $options && !(\is_array($options) && 0 === \count($options))) {
-            if (null === $defaultOption) {
-                throw new ConstraintDefinitionException(\sprintf('No default option is configured for constraint "%s".', static::class));
-            }
-
-            if (\array_key_exists($defaultOption, $knownOptions)) {
-                $normalizedOptions[$defaultOption] = $options;
-                unset($missingOptions[$defaultOption]);
-            } else {
-                $invalidOptions[] = $defaultOption;
-            }
-        }
-
-        if (\count($invalidOptions) > 0) {
-            throw new InvalidOptionsException(\sprintf('The options "%s" do not exist in constraint "%s".', implode('", "', $invalidOptions), static::class), $invalidOptions);
-        }
-
-        if (\count($missingOptions) > 0) {
-            throw new MissingOptionsException(\sprintf('The options "%s" must be set for constraint "%s".', implode('", "', array_keys($missingOptions)), static::class), array_keys($missingOptions));
-        }
-
-        return $normalizedOptions;
+        $this->payload = $payload;
     }
 
     /**
@@ -247,42 +149,6 @@ abstract class Constraint
         if (\in_array(self::DEFAULT_GROUP, $this->groups) && !\in_array($group, $this->groups, true)) {
             $this->groups[] = $group;
         }
-    }
-
-    /**
-     * Returns the name of the default option.
-     *
-     * Override this method to define a default option.
-     *
-     * @deprecated since Symfony 7.4
-     * @see __construct()
-     */
-    public function getDefaultOption(): ?string
-    {
-        if (0 === \func_num_args() || func_get_arg(0)) {
-            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
-        }
-
-        return null;
-    }
-
-    /**
-     * Returns the name of the required options.
-     *
-     * Override this method if you want to define required options.
-     *
-     * @return string[]
-     *
-     * @deprecated since Symfony 7.4
-     * @see __construct()
-     */
-    public function getRequiredOptions(): array
-    {
-        if (0 === \func_num_args() || func_get_arg(0)) {
-            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
-        }
-
-        return [];
     }
 
     /**

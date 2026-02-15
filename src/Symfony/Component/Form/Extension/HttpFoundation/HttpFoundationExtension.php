@@ -24,6 +24,7 @@ class HttpFoundationExtension extends AbstractExtension
     {
         return [
             new Type\FormTypeHttpFoundationExtension(),
+            new Type\FormFlowTypeSessionDataStorageExtension(),
         ];
     }
 }

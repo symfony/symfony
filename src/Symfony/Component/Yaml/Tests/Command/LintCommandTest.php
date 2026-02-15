@@ -179,12 +179,7 @@ bar';
     protected function createCommand(): Command
     {
         $application = new Application();
-        $command = new LintCommand();
-        if (method_exists($application, 'addCommand')) {
-            $application->addCommand($command);
-        } else {
-            $application->add($command);
-        }
+        $application->addCommand(new LintCommand());
 
         return $application->find('lint:yaml');
     }

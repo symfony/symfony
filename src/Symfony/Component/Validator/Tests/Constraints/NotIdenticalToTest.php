@@ -18,6 +18,15 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class NotIdenticalToTest extends TestCase
 {
+    public function testArrayValueDoesNotTriggerDeprecation()
+    {
+        $constraint = new NotIdenticalTo(value: []);
+        self::assertSame([], $constraint->value);
+
+        $constraint = new NotIdenticalTo(value: [1, 2, 3]);
+        self::assertSame([1, 2, 3], $constraint->value);
+    }
+
     public function testAttributes()
     {
         $metadata = new ClassMetadata(NotIdenticalToDummy::class);

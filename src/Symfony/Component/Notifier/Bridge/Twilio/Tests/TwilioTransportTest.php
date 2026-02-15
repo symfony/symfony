@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Twilio\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -83,23 +84,15 @@ final class TwilioTransportTest extends TransportTestCase
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(201);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode([
-                'sid' => '123',
-                'message' => 'foo',
-                'more_info' => 'bar',
-            ]));
-
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
             $this->assertSame('POST', $method);
             $this->assertSame('https://api.twilio.com/2010-04-01/Accounts/accountSid/Messages.json', $url);
 
-            return $response;
+            return new MockResponse(json_encode([
+                'sid' => '123',
+                'message' => 'foo',
+                'more_info' => 'bar',
+            ]), ['http_code' => 201]);
         });
 
         $transport = self::createTransport($client, $from);

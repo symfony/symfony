@@ -48,11 +48,17 @@ class JsonManifestVersionStrategyTest extends TestCase
         $strategy->getVersion($path);
     }
 
-    #[DataProvider('provideMissingStrategies')]
+    #[DataProvider('provideMissingStrictStrategies')]
     public function testMissingManifestFileThrowsException(JsonManifestVersionStrategy $strategy)
     {
         $this->expectException(RuntimeException::class);
         $strategy->getVersion('main.js');
+    }
+
+    #[DataProvider('provideMissingStrategies')]
+    public function testMissingManifestFileReturnsOriginalPathInNonStrictMode(JsonManifestVersionStrategy $strategy)
+    {
+        $this->assertSame('main.js', $strategy->applyVersion('main.js'));
     }
 
     #[DataProvider('provideInvalidStrategies')]
@@ -86,9 +92,14 @@ class JsonManifestVersionStrategyTest extends TestCase
         yield from static::provideStrategies('non-existent-file.json');
     }
 
-    public static function provideStrategies(string $manifestPath): \Generator
+    public static function provideMissingStrictStrategies(): \Generator
     {
-        $httpClient = new MockHttpClient(function ($method, $url, $options) {
+        yield from static::provideStrategies('non-existent-file.json', true);
+    }
+
+    public static function provideStrategies(string $manifestPath, bool $strictMode = false): \Generator
+    {
+        $httpClient = new MockHttpClient(static function ($method, $url, $options) {
             $filename = __DIR__.'/../Fixtures/'.basename($url);
 
             if (file_exists($filename)) {
@@ -98,9 +109,9 @@ class JsonManifestVersionStrategyTest extends TestCase
             return new MockResponse('{}', ['http_code' => 404]);
         });
 
-        yield [new JsonManifestVersionStrategy('https://cdn.example.com/'.$manifestPath, $httpClient)];
+        yield [new JsonManifestVersionStrategy('https://cdn.example.com/'.$manifestPath, $httpClient, $strictMode)];
 
-        yield [new JsonManifestVersionStrategy(__DIR__.'/../Fixtures/'.$manifestPath)];
+        yield [new JsonManifestVersionStrategy(__DIR__.'/../Fixtures/'.$manifestPath, null, $strictMode)];
     }
 
     public static function provideStrictStrategies(): \Generator

@@ -49,10 +49,6 @@ class TimeTypeTest extends BaseTypeTestCase
 
     public function testSubmitDatePoint()
     {
-        if (!class_exists(DatePoint::class)) {
-            self::markTestSkipped('The DatePoint class is not available.');
-        }
-
         $form = $this->factory->create(static::TESTED_TYPE, null, [
             'model_timezone' => 'UTC',
             'view_timezone' => 'UTC',

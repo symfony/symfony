@@ -13,7 +13,6 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Exception\LogicException;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
@@ -52,8 +51,9 @@ class NoSuspiciousCharactersValidator extends ConstraintValidator
     /**
      * @param string[] $defaultLocales
      */
-    public function __construct(private readonly array $defaultLocales = [])
+    public function __construct(private array $defaultLocales = [])
     {
+        $this->defaultLocales = array_filter($defaultLocales);
     }
 
     public function validate(mixed $value, Constraint $constraint): void
@@ -75,41 +75,16 @@ class NoSuspiciousCharactersValidator extends ConstraintValidator
         }
 
         $checker = new \Spoofchecker();
-        $checks = $constraint->checks;
-
-        if (method_exists($checker, 'setRestrictionLevel')) {
-            $checks |= self::CHECK_RESTRICTION_LEVEL;
-            $checker->setRestrictionLevel($constraint->restrictionLevel ?? NoSuspiciousCharacters::RESTRICTION_LEVEL_MODERATE);
-        } elseif (NoSuspiciousCharacters::RESTRICTION_LEVEL_MINIMAL === $constraint->restrictionLevel) {
-            $checks |= self::CHECK_CHAR_LIMIT;
-        } elseif (NoSuspiciousCharacters::RESTRICTION_LEVEL_SINGLE_SCRIPT === $constraint->restrictionLevel) {
-            $checks |= self::CHECK_SINGLE_SCRIPT | self::CHECK_CHAR_LIMIT;
-        } elseif ($constraint->restrictionLevel) {
-            throw new LogicException('You can only use one of RESTRICTION_LEVEL_NONE, RESTRICTION_LEVEL_MINIMAL or RESTRICTION_LEVEL_SINGLE_SCRIPT with intl compiled against ICU < 58.');
-        } else {
-            $checks |= self::CHECK_SINGLE_SCRIPT;
-        }
-
+        $checker->setRestrictionLevel($constraint->restrictionLevel ?? NoSuspiciousCharacters::RESTRICTION_LEVEL_MODERATE);
         $checker->setAllowedLocales(implode(',', $constraint->locales ?? $this->defaultLocales));
-
-        $checker->setChecks($checks);
+        $checker->setChecks($constraint->checks | self::CHECK_RESTRICTION_LEVEL);
 
         if (!$checker->isSuspicious($value, $errorCode)) {
             return;
         }
 
         foreach (self::CHECK_ERROR as $check => $error) {
-            if (\PHP_VERSION_ID < 80204) {
-                if (!($checks & $check)) {
-                    continue;
-                }
-
-                $checker->setChecks($check);
-
-                if (!$checker->isSuspicious($value)) {
-                    continue;
-                }
-            } elseif (!($errorCode & $check)) {
+            if (!($errorCode & $check)) {
                 continue;
             }
 

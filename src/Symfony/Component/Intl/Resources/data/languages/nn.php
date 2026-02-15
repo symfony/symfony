@@ -66,7 +66,6 @@ return [
         'tce' => 'sørleg tutchone',
         'tiv' => 'tivi',
         'tkl' => 'tokelau',
-        'tn' => 'tswana',
         'tog' => 'tonga (Nyasa)',
         'ttm' => 'nordleg tutchone',
         'tvl' => 'tuvalu',

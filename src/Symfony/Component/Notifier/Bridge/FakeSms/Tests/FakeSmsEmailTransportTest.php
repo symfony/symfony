@@ -14,10 +14,10 @@ namespace Symfony\Component\Notifier\Bridge\FakeSms\Tests;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsEmailTransport;
+use Symfony\Component\Notifier\Bridge\FakeSms\Mailer\DummyMailer;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
-use Symfony\Component\Notifier\Tests\Mailer\DummyMailer;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -66,7 +66,7 @@ final class FakeSmsEmailTransportTest extends TransportTestCase
         $transport->send($message);
 
         /** @var Email $sentEmail */
-        $sentEmail = $mailer->getSentEmail();
+        $sentEmail = $mailer->sentEmail;
         $this->assertInstanceOf(Email::class, $sentEmail);
         $this->assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
         $this->assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
@@ -89,7 +89,7 @@ final class FakeSmsEmailTransportTest extends TransportTestCase
         $transport->send($message);
 
         /** @var Email $sentEmail */
-        $sentEmail = $mailer->getSentEmail();
+        $sentEmail = $mailer->sentEmail;
         $this->assertInstanceOf(Email::class, $sentEmail);
         $this->assertSame($to, $sentEmail->getTo()[0]->getEncodedAddress());
         $this->assertSame($from, $sentEmail->getFrom()[0]->getEncodedAddress());
@@ -97,5 +97,18 @@ final class FakeSmsEmailTransportTest extends TransportTestCase
         $this->assertSame($subject, $sentEmail->getTextBody());
         $this->assertTrue($sentEmail->getHeaders()->has('X-Transport'));
         $this->assertSame($transportName, $sentEmail->getHeaders()->get('X-Transport')->getBody());
+    }
+
+    public function testSendWithFromInSmsMessage()
+    {
+        $mailer = new DummyMailer();
+        $transport = new FakeSmsEmailTransport($mailer, 'recipient@example.com', 'sender@example.com');
+        $transport->send(new SmsMessage('0611223344', 'Hello!', '+33611223344'));
+
+        $sentEmail = $mailer->sentEmail;
+        $this->assertInstanceOf(Email::class, $sentEmail);
+        $this->assertSame('recipient@example.com', $sentEmail->getTo()[0]->getEncodedAddress());
+        $this->assertSame('sender@example.com', $sentEmail->getFrom()[0]->getEncodedAddress());
+        $this->assertSame('New SMS on phone number: 0611223344', $sentEmail->getSubject());
     }
 }

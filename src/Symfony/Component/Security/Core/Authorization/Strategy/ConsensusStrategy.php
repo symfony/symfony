@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Authorization\Strategy;
 
+use Symfony\Component\Security\Core\Authorization\AccessDecision;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 /**
@@ -38,7 +39,7 @@ final class ConsensusStrategy implements AccessDecisionStrategyInterface, \Strin
     ) {
     }
 
-    public function decide(\Traversable $results): bool
+    public function decide(\Traversable $results, ?AccessDecision $accessDecision = null): bool
     {
         $grant = 0;
         $deny = 0;

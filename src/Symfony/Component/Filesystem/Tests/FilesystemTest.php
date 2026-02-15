@@ -662,7 +662,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->symlink($file, $link);
 
-        $this->filesystem->chown($link, 'user'.time().mt_rand(1000, 9999));
+        $this->filesystem->chown($link, 'user'.time().random_int(1000, 9999));
     }
 
     public function testChownLinkFails()
@@ -677,7 +677,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->hardlink($file, $link);
 
-        $this->filesystem->chown($link, 'user'.time().mt_rand(1000, 9999));
+        $this->filesystem->chown($link, 'user'.time().random_int(1000, 9999));
     }
 
     public function testChownFail()
@@ -688,7 +688,7 @@ class FilesystemTest extends FilesystemTestCase
         $dir = $this->workspace.\DIRECTORY_SEPARATOR.'dir';
         mkdir($dir);
 
-        $this->filesystem->chown($dir, 'user'.time().mt_rand(1000, 9999));
+        $this->filesystem->chown($dir, 'user'.time().random_int(1000, 9999));
     }
 
     public function testChgrpByName()
@@ -795,7 +795,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->symlink($file, $link);
 
-        $this->filesystem->chgrp($link, 'user'.time().mt_rand(1000, 9999));
+        $this->filesystem->chgrp($link, 'user'.time().random_int(1000, 9999));
     }
 
     public function testChgrpLinkFails()
@@ -810,7 +810,7 @@ class FilesystemTest extends FilesystemTestCase
 
         $this->filesystem->hardlink($file, $link);
 
-        $this->filesystem->chgrp($link, 'user'.time().mt_rand(1000, 9999));
+        $this->filesystem->chgrp($link, 'user'.time().random_int(1000, 9999));
     }
 
     public function testChgrpFail()
@@ -821,7 +821,7 @@ class FilesystemTest extends FilesystemTestCase
         $dir = $this->workspace.\DIRECTORY_SEPARATOR.'dir';
         mkdir($dir);
 
-        $this->filesystem->chgrp($dir, 'user'.time().mt_rand(1000, 9999));
+        $this->filesystem->chgrp($dir, 'user'.time().random_int(1000, 9999));
     }
 
     public function testRename()
@@ -1286,6 +1286,25 @@ class FilesystemTest extends FilesystemTestCase
         $this->assertDirectoryExists($targetPath);
         $this->assertFileEquals($sourcePath.'file1', $targetPath.'link1');
         $this->assertTrue(is_link($targetPath.\DIRECTORY_SEPARATOR.'link1'));
+    }
+
+    public function testMirrorCopiesLinksByFollowingSymlinks()
+    {
+        $this->markAsSkippedIfSymlinkIsMissing();
+
+        $sourcePath = $this->workspace.\DIRECTORY_SEPARATOR.'source'.\DIRECTORY_SEPARATOR;
+
+        mkdir($sourcePath);
+        file_put_contents($sourcePath.'file1', 'FILE1');
+        symlink($sourcePath.'file1', $sourcePath.'link1');
+
+        $targetPath = $this->workspace.\DIRECTORY_SEPARATOR.'target'.\DIRECTORY_SEPARATOR;
+
+        $this->filesystem->mirror($sourcePath, $targetPath, null, ['follow_symlinks' => true]);
+
+        $this->assertDirectoryExists($targetPath);
+        $this->assertFileEquals($sourcePath.'file1', $targetPath.'link1');
+        $this->assertFalse(is_link($targetPath.\DIRECTORY_SEPARATOR.'link1'));
     }
 
     public function testMirrorCopiesLinkedDirectoryContents()

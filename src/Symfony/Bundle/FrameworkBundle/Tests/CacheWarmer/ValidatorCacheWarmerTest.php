@@ -156,7 +156,7 @@ class ValidatorCacheWarmerTest extends TestCase
         $validatorBuilder->addYamlMapping(__DIR__.'/../Fixtures/Validation/Resources/does_not_exist.yaml');
         $warmer = new ValidatorCacheWarmer($validatorBuilder, $file);
 
-        spl_autoload_register($classloader = function ($class) use ($mappedClass) {
+        spl_autoload_register($classloader = static function ($class) use ($mappedClass) {
             if ($class === $mappedClass) {
                 throw new \DomainException('This exception should be caught by the warmer.');
             }

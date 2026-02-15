@@ -70,6 +70,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('container.preload', ['class' => ExtensionSet::class])
             ->tag('container.preload', ['class' => Template::class])
             ->tag('container.preload', ['class' => TemplateWrapper::class])
+            ->tag('kernel.reset', ['method' => '?resetGlobals'])
         ->alias(Environment::class, 'twig')
 
         ->set('twig.app_variable', AppVariable::class)

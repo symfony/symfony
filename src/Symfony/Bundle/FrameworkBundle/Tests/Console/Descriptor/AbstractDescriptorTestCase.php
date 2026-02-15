@@ -12,7 +12,6 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FooUnitEnum;
@@ -189,7 +188,6 @@ abstract class AbstractDescriptorTestCase extends TestCase
      * The #[IgnoreDeprecation] attribute must be kept as deprecations will always be raised.
      */
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     #[DataProvider('getDescribeContainerParameterTestData')]
     public function testDescribeContainerParameter($parameter, $expectedDescription, array $options, $file)
     {
@@ -236,7 +234,6 @@ abstract class AbstractDescriptorTestCase extends TestCase
     }
 
     #[IgnoreDeprecations]
-    #[Group('legacy')]
     #[DataProvider('getDescribeDeprecatedCallableTestData')]
     public function testDescribeDeprecatedCallable($callable, $expectedDescription, $file)
     {

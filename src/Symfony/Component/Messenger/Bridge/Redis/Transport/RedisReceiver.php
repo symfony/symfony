@@ -17,6 +17,7 @@ use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\KeepaliveReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
 use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -25,7 +26,7 @@ use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
  * @author Alexander Schranz <alexander@sulu.io>
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
-class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInterface
+class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInterface, ListableReceiverInterface
 {
     private SerializerInterface $serializer;
 
@@ -38,9 +39,7 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
 
     public function get(): iterable
     {
-        $message = $this->connection->get();
-
-        if (null === $message) {
+        if (null === $message = $this->connection->get()) {
             return [];
         }
 
@@ -56,9 +55,7 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
             return $this->get();
         }
 
-        $redisEnvelope = json_decode($message['data']['message'] ?? '', true);
-
-        if (null === $redisEnvelope) {
+        if (null === $redisEnvelope = json_decode($message['data']['message'] ?? '', true)) {
             return [];
         }
 
@@ -87,17 +84,17 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
 
     public function ack(Envelope $envelope): void
     {
-        $this->connection->ack($this->findRedisReceivedStamp($envelope)->getId());
+        $this->connection->ack($this->findRedisReceivedStampId($envelope));
     }
 
     public function reject(Envelope $envelope): void
     {
-        $this->connection->reject($this->findRedisReceivedStamp($envelope)->getId());
+        $this->connection->reject($this->findRedisReceivedStampId($envelope));
     }
 
     public function keepalive(Envelope $envelope, ?int $seconds = null): void
     {
-        $this->connection->keepalive($this->findRedisReceivedStamp($envelope)->getId(), $seconds);
+        $this->connection->keepalive($this->findRedisReceivedStampId($envelope), $seconds);
     }
 
     public function getMessageCount(): int
@@ -105,15 +102,59 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
         return $this->connection->getMessageCount();
     }
 
-    private function findRedisReceivedStamp(Envelope $envelope): RedisReceivedStamp
+    public function all(?int $limit = null): iterable
     {
-        /** @var RedisReceivedStamp|null $redisReceivedStamp */
-        $redisReceivedStamp = $envelope->last(RedisReceivedStamp::class);
+        $messages = $this->connection->findAll($limit);
 
-        if (null === $redisReceivedStamp) {
-            throw new LogicException('No RedisReceivedStamp found on the Envelope.');
+        foreach ($messages as $message) {
+            if (null !== $envelope = $this->createEnvelopeFromData($message['id'], $message['data']['message'] ?? null)) {
+                yield $envelope;
+            }
+        }
+    }
+
+    public function find(mixed $id): ?Envelope
+    {
+        if (null === $message = $this->connection->find($id)) {
+            return null;
         }
 
-        return $redisReceivedStamp;
+        return $this->createEnvelopeFromData($message['id'], $message['data']['message'] ?? null);
+    }
+
+    private function createEnvelopeFromData(string $id, ?string $json): ?Envelope
+    {
+        if (null === $json) {
+            return null;
+        }
+
+        if (null === $redisEnvelope = json_decode($json, true)) {
+            return null;
+        }
+
+        try {
+            if (\array_key_exists('body', $redisEnvelope) && \array_key_exists('headers', $redisEnvelope)) {
+                $envelope = $this->serializer->decode([
+                    'body' => $redisEnvelope['body'],
+                    'headers' => $redisEnvelope['headers'],
+                ]);
+            } else {
+                $envelope = $this->serializer->decode($redisEnvelope);
+            }
+        } catch (MessageDecodingFailedException) {
+            return null;
+        }
+
+        return $envelope
+            ->withoutAll(TransportMessageIdStamp::class)
+            ->with(
+                new RedisReceivedStamp($id),
+                new TransportMessageIdStamp($id)
+            );
+    }
+
+    private function findRedisReceivedStampId(Envelope $envelope): string
+    {
+        return $envelope->last(RedisReceivedStamp::class)?->getId() ?? throw new LogicException('No RedisReceivedStamp found on the Envelope.');
     }
 }

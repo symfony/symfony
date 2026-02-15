@@ -1,6 +1,14 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add reverse class-map based on Map attribute
+ * Merge nested properties when targeting the same class
+ * Add a `targetClass` option to `MapCollection`
+ * Add a `TransformObjectMapperAwareInterface` to inject the current object mapper instance to transformers
+
 7.4
 ---
 

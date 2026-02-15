@@ -37,7 +37,7 @@ class DateTimeNormalizerContextBuilderTest extends TestCase
     {
         $context = $this->contextBuilder
             ->withFormat($values[DateTimeNormalizer::FORMAT_KEY])
-            ->withTimezone($values[DateTimeNormalizer::TIMEZONE_KEY])
+            ->withTimezone($values[DateTimeNormalizer::TIMEZONE_KEY], $values[DateTimeNormalizer::FORCE_TIMEZONE_KEY])
             ->withCast($values[DateTimeNormalizer::CAST_KEY])
             ->toArray();
 
@@ -53,18 +53,23 @@ class DateTimeNormalizerContextBuilderTest extends TestCase
             DateTimeNormalizer::FORMAT_KEY => 'format',
             DateTimeNormalizer::TIMEZONE_KEY => new \DateTimeZone('GMT'),
             DateTimeNormalizer::CAST_KEY => 'int',
+            DateTimeNormalizer::FORCE_TIMEZONE_KEY => true,
         ]];
 
         yield 'With null values' => [[
             DateTimeNormalizer::FORMAT_KEY => null,
             DateTimeNormalizer::TIMEZONE_KEY => null,
             DateTimeNormalizer::CAST_KEY => null,
+            DateTimeNormalizer::FORCE_TIMEZONE_KEY => null,
         ]];
     }
 
     public function testCastTimezoneStringToTimezone()
     {
-        $this->assertEquals([DateTimeNormalizer::TIMEZONE_KEY => new \DateTimeZone('GMT')], $this->contextBuilder->withTimezone('GMT')->toArray());
+        $this->assertEquals(
+            [DateTimeNormalizer::TIMEZONE_KEY => new \DateTimeZone('GMT'), DateTimeNormalizer::FORCE_TIMEZONE_KEY => null],
+            $this->contextBuilder->withTimezone('GMT')->toArray()
+        );
     }
 
     public function testCannotSetInvalidTimezone()

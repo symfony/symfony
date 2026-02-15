@@ -93,11 +93,9 @@ final class PersistentRememberMeHandler extends AbstractRememberMeHandler
         }
 
         return parent::consumeRememberMeCookie(new RememberMeDetails(
-            method_exists($token, 'getClass') ? $token->getClass(false) : '',
             $token->getUserIdentifier(),
             $expires,
             $token->getLastUsed()->getTimestamp().':'.$series.':'.$tokenValue.':'.(method_exists($token, 'getClass') ? $token->getClass(false) : ''),
-            false
         ));
     }
 

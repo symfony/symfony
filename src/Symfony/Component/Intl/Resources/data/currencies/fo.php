@@ -626,6 +626,10 @@ return [
             'EC$',
             'Eystur Karibia dollari',
         ],
+        'XCG' => [
+            'Cg.',
+            'Karibia gyllin',
+        ],
         'XOF' => [
             'F CFA',
             'Vesturafrika CFA frankur',
@@ -645,6 +649,10 @@ return [
         'ZMW' => [
             'ZMW',
             'Sambia kwacha',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'Simbabvi gull',
         ],
     ],
 ];

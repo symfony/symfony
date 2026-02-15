@@ -78,3 +78,5 @@ final class PseudoLocalizationTranslatorTest extends TestCase
         ], $options);
     }
 }
+
+// @php-cs-fixer-ignore random_api_migration As logic is coupled with mt_rand() in src

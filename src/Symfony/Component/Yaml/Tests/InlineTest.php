@@ -203,6 +203,14 @@ class InlineTest extends TestCase
         Inline::parse('{ foo: bar } bar');
     }
 
+    public function testParseEmbeddedMappingWithDuplicateKeysShouldThrowException()
+    {
+        $this->expectException(ParseException::class);
+        $this->expectExceptionMessageMatches('/Duplicate key "bar" detected/');
+
+        Inline::parse('[ foo: { bar: 1, bar: 2 } ]');
+    }
+
     public function testParseInvalidTaggedSequenceShouldThrowException()
     {
         $this->expectException(ParseException::class);
@@ -391,6 +399,10 @@ class InlineTest extends TestCase
             ['[foo, bar: { foo: bar }]', ['foo', '1' => ['bar' => ['foo' => 'bar']]]],
             ['[foo, \'@foo.baz\', { \'%foo%\': \'foo is %foo%\', bar: \'%foo%\' }, true, \'@service_container\']', ['foo', '@foo.baz', ['%foo%' => 'foo is %foo%', 'bar' => '%foo%'], true, '@service_container']],
 
+            ['[ foo: { bar: [ \'foobar\', 12 ] } ]', [['foo' => ['bar' => ['foobar', 12]]]]],
+            ['[ foo: { bar: \'foobar\', baz: false } ]', [['foo' => ['bar' => 'foobar', 'baz' => false]]]],
+            ['[ foo: { bar: [ \'foobar\', 12 ], baz: true } ]', [['foo' => ['bar' => ['foobar', 12], 'baz' => true]]]],
+
             // Binary string not utf8-compliant but starting with and utf8-equivalent "&" character
             ['{ uid: !!binary Ju0Yh+uqSXOagJZFTlUt8g== }', ['uid' => hex2bin('26ed1887ebaa49739a8096454e552df2')]],
         ];
@@ -474,6 +486,10 @@ class InlineTest extends TestCase
             ['[foo, [[], {}]]', ['foo', [[], new \stdClass()]]],
             ['[foo, [[{}, {}], {}]]', ['foo', [[new \stdClass(), new \stdClass()], new \stdClass()]]],
             ['[foo, {bar: {}}]', ['foo', '1' => (object) ['bar' => new \stdClass()]]],
+
+            ['[ foo: { bar: [ \'foobar\', 12 ] } ]', [(object) ['foo' => (object) ['bar' => ['foobar', 12]]]]],
+            ['[ foo: { bar: \'foobar\', baz: false } ]', [(object) ['foo' => (object) ['bar' => 'foobar', 'baz' => false]]]],
+            ['[ foo: { bar: [ \'foobar\', 12 ], baz: true } ]', [(object) ['foo' => (object) ['bar' => ['foobar', 12], 'baz' => true]]]],
         ];
     }
 

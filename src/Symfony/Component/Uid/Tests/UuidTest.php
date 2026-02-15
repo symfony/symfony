@@ -39,7 +39,7 @@ class UuidTest extends TestCase
     public function testConstructorWithInvalidUuid(string $uuid)
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid UUID: "'.$uuid.'".');
+        $this->expectExceptionMessage('Invalid UUID.');
 
         Uuid::fromString($uuid);
     }
@@ -60,7 +60,7 @@ class UuidTest extends TestCase
         $class = Uuid::class.'V'.$uuid[14];
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid UUIDv'.$uuid[14].': "'.$uuid.'".');
+        $this->expectExceptionMessage('Invalid UUIDv'.$uuid[14].'.');
 
         new $class($uuid);
     }

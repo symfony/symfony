@@ -49,4 +49,9 @@ class HttpOptionsTest extends TestCase
         $options->setHeader('Accept', 'application/html');
         $this->assertSame(['Accept' => 'application/html', 'Accept-Language' => 'en-US,en;q=0.5'], $options->toArray()['headers']);
     }
+
+    public function testSetMaxConnectDuration()
+    {
+        $this->assertSame(5.0, (new HttpOptions())->setMaxConnectDuration(5.0)->toArray()['max_connect_duration']);
+    }
 }

@@ -33,7 +33,7 @@ class AmqpTransportFactoryTest extends TestCase
     public function testItCreatesTheTransport()
     {
         $factory = new AmqpTransportFactory();
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = $this->createStub(SerializerInterface::class);
 
         $expectedTransport = new AmqpTransport(Connection::fromDsn('amqp://localhost', ['host' => 'localhost']), $serializer);
 

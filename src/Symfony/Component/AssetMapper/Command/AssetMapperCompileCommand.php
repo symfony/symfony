@@ -84,7 +84,7 @@ final class AssetMapperCompileCommand extends Command
         foreach ($entrypointFiles as $entrypointName => $path) {
             $this->compiledConfigReader->saveConfig($path, $this->importMapGenerator->findEagerEntrypointImports($entrypointName));
         }
-        $styledEntrypointNames = array_map(fn (string $entrypointName) => \sprintf('<info>%s</>', $entrypointName), array_keys($entrypointFiles));
+        $styledEntrypointNames = array_map(static fn (string $entrypointName) => \sprintf('<info>%s</>', $entrypointName), array_keys($entrypointFiles));
         $io->comment(\sprintf('Entrypoint metadata written for <comment>%d</> entrypoints (%s).', \count($entrypointFiles), implode(', ', $styledEntrypointNames)));
 
         if ($this->isDebug) {

@@ -15,7 +15,6 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Validator\Command\DebugCommand;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
-use Symfony\Component\Validator\Mapping\Factory\MetadataFactoryInterface;
 use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Validator\Tests\Dummy\DummyClassOne;
 
@@ -180,9 +179,7 @@ class DebugCommandTest extends TestCase
 
     public function testOutputWithInvalidClassArgument()
     {
-        $validator = $this->createMock(MetadataFactoryInterface::class);
-
-        $command = new DebugCommand($validator);
+        $command = new DebugCommand(new LazyLoadingMetadataFactory());
 
         $tester = new CommandTester($command);
         $tester->execute(['class' => 'App\\NotFoundResource'], ['decorated' => false]);

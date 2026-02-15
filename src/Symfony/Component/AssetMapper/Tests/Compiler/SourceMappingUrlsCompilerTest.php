@@ -22,10 +22,10 @@ class SourceMappingUrlsCompilerTest extends TestCase
     #[DataProvider('provideCompileTests')]
     public function testCompile(string $sourceLogicalName, string $input, string $expectedOutput, $expectedDependencies)
     {
-        $assetMapper = $this->createMock(AssetMapperInterface::class);
-        $assetMapper->expects($this->any())
+        $assetMapper = $this->createStub(AssetMapperInterface::class);
+        $assetMapper
             ->method('getAssetFromSourcePath')
-            ->willReturnCallback(function ($path) {
+            ->willReturnCallback(static function ($path) {
                 return match ($path) {
                     '/project/assets/foo.js.map' => new MappedAsset('foo.js.map',
                         publicPathWithoutDigest: '/assets/foo.js.map',
@@ -49,7 +49,7 @@ class SourceMappingUrlsCompilerTest extends TestCase
             publicPathWithoutDigest: '/assets/'.$sourceLogicalName,
         );
         $this->assertSame($expectedOutput, $compiler->compile($input, $asset, $assetMapper));
-        $assetDependencyLogicalPaths = array_map(fn (MappedAsset $dependency) => $dependency->logicalPath, $asset->getDependencies());
+        $assetDependencyLogicalPaths = array_map(static fn (MappedAsset $dependency) => $dependency->logicalPath, $asset->getDependencies());
         $this->assertSame($expectedDependencies, $assetDependencyLogicalPaths);
     }
 

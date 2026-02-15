@@ -4,19 +4,19 @@
         <body>
             <trans-unit id="1">
                 <source>This value should be false.</source>
-                <target>falseである必要があります。</target>
+                <target>この値はfalseでなければなりません。</target>
             </trans-unit>
             <trans-unit id="2">
                 <source>This value should be true.</source>
-                <target>trueである必要があります。</target>
+                <target>この値はtrueでなければなりません。</target>
             </trans-unit>
             <trans-unit id="3">
                 <source>This value should be of type {{ type }}.</source>
-                <target>{{ type }}型でなければなりません。</target>
+                <target>この値は{{ type }}型でなければなりません。</target>
             </trans-unit>
             <trans-unit id="4">
                 <source>This value should be blank.</source>
-                <target>空でなければなりません。</target>
+                <target>この値は空でなければなりません。</target>
             </trans-unit>
             <trans-unit id="5">
                 <source>The value you selected is not a valid choice.</source>
@@ -28,7 +28,7 @@
             </trans-unit>
             <trans-unit id="7">
                 <source>You must select at most {{ limit }} choice.|You must select at most {{ limit }} choices.</source>
-                <target>{{ limit }}個以内で選択してください。</target>
+                <target>{{ limit }}個以下で選択してください。</target>
             </trans-unit>
             <trans-unit id="8">
                 <source>One or more of the given values is invalid.</source>
@@ -44,15 +44,15 @@
             </trans-unit>
             <trans-unit id="11">
                 <source>This value is not a valid date.</source>
-                <target>無効な日付です。</target>
+                <target>有効な日付ではありません。</target>
             </trans-unit>
             <trans-unit id="12">
                 <source>This value is not a valid datetime.</source>
-                <target>無効な日時です。</target>
+                <target>有効な日時ではありません。</target>
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
-                <target>無効なメールアドレスです。</target>
+                <target>有効なメールアドレスではありません。</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
@@ -64,35 +64,35 @@
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>ファイルのサイズが大きすぎます({{ size }} {{ suffix }})。ファイルサイズは{{ limit }} {{ suffix }}以下にしてください。</target>
+                <target>ファイルのサイズが大きすぎます（{{ size }} {{ suffix }}）。{{ limit }} {{ suffix }}以下にしてください。</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>ファイルのMIMEタイプが無効です({{ type }})。有効なMIMEタイプは{{ types }}です。</target>
+                <target>ファイルのMIMEタイプが無効です（{{ type }}）。有効なMIMEタイプは{{ types }}です。</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
-                <target>{{ limit }}以下でなければなりません。</target>
+                <target>この値は{{ limit }}以下でなければなりません。</target>
             </trans-unit>
             <trans-unit id="19">
                 <source>This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.</source>
-                <target>この値は、{{ limit }}文字以内で入力してください。</target>
+                <target>長すぎます。この値は{{ limit }}文字以下で入力してください。</target>
             </trans-unit>
             <trans-unit id="20">
                 <source>This value should be {{ limit }} or more.</source>
-                <target>{{ limit }}以上でなければなりません。</target>
+                <target>この値は{{ limit }}以上でなければなりません。</target>
             </trans-unit>
             <trans-unit id="21">
                 <source>This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.</source>
-                <target>この値は、{{ limit }}文字以上で入力してください。</target>
+                <target>短すぎます。この値は{{ limit }}文字以上で入力してください。</target>
             </trans-unit>
             <trans-unit id="22">
                 <source>This value should not be blank.</source>
-                <target>入力してください。</target>
+                <target>この値は空にできません。</target>
             </trans-unit>
             <trans-unit id="23">
                 <source>This value should not be null.</source>
-                <target>入力してください。</target>
+                <target>値を入力してください。</target>
             </trans-unit>
             <trans-unit id="24">
                 <source>This value should be null.</source>
@@ -100,23 +100,23 @@
             </trans-unit>
             <trans-unit id="25">
                 <source>This value is not valid.</source>
-                <target>無効な値です。</target>
+                <target>有効な値ではありません。</target>
             </trans-unit>
             <trans-unit id="26">
                 <source>This value is not a valid time.</source>
-                <target>無効な時刻です。</target>
+                <target>有効な時刻ではありません。</target>
             </trans-unit>
             <trans-unit id="27">
                 <source>This value is not a valid URL.</source>
-                <target>無効なURLです。</target>
+                <target>有効なURLではありません。</target>
             </trans-unit>
             <trans-unit id="31">
                 <source>The two values should be equal.</source>
-                <target>2つの値が同じでなければなりません。</target>
+                <target>2つの値は同じでなければなりません。</target>
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>ファイルのサイズが大きすぎます。有効な最大サイズは{{ limit }} {{ suffix }}です。</target>
+                <target>ファイルのサイズが大きすぎます。許可されている最大サイズは{{ limit }} {{ suffix }}です。</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>
@@ -128,19 +128,19 @@
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
-                <target>有効な数値ではありません。</target>
+                <target>この値は有効な数値でなければなりません。</target>
             </trans-unit>
             <trans-unit id="36">
                 <source>This file is not a valid image.</source>
-                <target>ファイルが画像ではありません。</target>
+                <target>選択されたファイルは有効な画像ではありません。</target>
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
-                <target>無効なIPアドレスです。</target>
+                <target>有効なIPアドレスではありません。</target>
             </trans-unit>
             <trans-unit id="38">
                 <source>This value is not a valid language.</source>
-                <target>無効な言語名です。</target>
+                <target>有効な言語名ではありません。</target>
             </trans-unit>
             <trans-unit id="39">
                 <source>This value is not a valid locale.</source>
@@ -160,19 +160,19 @@
             </trans-unit>
             <trans-unit id="43">
                 <source>The image width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target>画像の幅が大きすぎます({{ width }}ピクセル)。{{ max_width }}ピクセル以下にしてください。</target>
+                <target>画像の幅が大きすぎます（{{ width }}px）。{{ max_width }}px以下にしてください。</target>
             </trans-unit>
             <trans-unit id="44">
                 <source>The image width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target>画像の幅が小さすぎます({{ width }}ピクセル)。{{ min_width }}ピクセル以上にしてください。</target>
+                <target>画像の幅が小さすぎます（{{ width }}px）。{{ min_width }}px以上にしてください。</target>
             </trans-unit>
             <trans-unit id="45">
                 <source>The image height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target>画像の高さが大きすぎます({{ height }}ピクセル)。{{ max_height }}ピクセル以下にしてください。</target>
+                <target>画像の高さが大きすぎます（{{ height }}px）。{{ max_height }}px以下にしてください。</target>
             </trans-unit>
             <trans-unit id="46">
                 <source>The image height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target>画像の高さが小さすぎます({{ height }}ピクセル)。{{ min_height }}ピクセル以上にしてください。</target>
+                <target>画像の高さが小さすぎます（{{ height }}px）。{{ min_height }}px以上にしてください。</target>
             </trans-unit>
             <trans-unit id="47">
                 <source>This value should be the user's current password.</source>
@@ -180,11 +180,11 @@
             </trans-unit>
             <trans-unit id="48">
                 <source>This value should have exactly {{ limit }} character.|This value should have exactly {{ limit }} characters.</source>
-                <target>{{ limit }}文字ちょうどで入力してください。</target>
+                <target>この値は{{ limit }}文字ちょうどで入力してください。</target>
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
-                <target>ファイルのアップロードに失敗しました。</target>
+                <target>ファイルのアップロードが完了しませんでした。</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
@@ -204,11 +204,11 @@
             </trans-unit>
             <trans-unit id="54">
                 <source>This collection should contain {{ limit }} element or more.|This collection should contain {{ limit }} elements or more.</source>
-                <target>少なくとも{{ limit }}個の要素を含む必要があります。</target>
+                <target>要素は{{ limit }}個以上でなければなりません。</target>
             </trans-unit>
             <trans-unit id="55">
                 <source>This collection should contain {{ limit }} element or less.|This collection should contain {{ limit }} elements or less.</source>
-                <target>{{ limit }}個以下の要素を含む必要があります。</target>
+                <target>要素は{{ limit }}個以下でなければなりません。</target>
             </trans-unit>
             <trans-unit id="56">
                 <source>This collection should contain exactly {{ limit }} element.|This collection should contain exactly {{ limit }} elements.</source>
@@ -220,7 +220,7 @@
             </trans-unit>
             <trans-unit id="58">
                 <source>Unsupported card type or invalid card number.</source>
-                <target>未対応のカード種類または無効なカード番号です。</target>
+                <target>対応していないカードまたは無効なカード番号です。</target>
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
@@ -248,59 +248,59 @@
             </trans-unit>
             <trans-unit id="65">
                 <source>This value should be equal to {{ compared_value }}.</source>
-                <target>{{ compared_value }}と同じ値でなければなりません。</target>
+                <target>この値は{{ compared_value }}と同じ値でなければなりません。</target>
             </trans-unit>
             <trans-unit id="66">
                 <source>This value should be greater than {{ compared_value }}.</source>
-                <target>{{ compared_value }}より大きくなければなりません。</target>
+                <target>この値は{{ compared_value }}より大きくなければなりません。</target>
             </trans-unit>
             <trans-unit id="67">
                 <source>This value should be greater than or equal to {{ compared_value }}.</source>
-                <target>{{ compared_value }}以上でなければなりません。</target>
+                <target>この値は{{ compared_value }}以上でなければなりません。</target>
             </trans-unit>
             <trans-unit id="68">
                 <source>This value should be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>この値は{{ compared_value_type }} {{ compared_value }}と同じでなければなりません。</target>
+                <target>この値は{{ compared_value_type }}型の{{ compared_value }}と同じでなければなりません。</target>
             </trans-unit>
             <trans-unit id="69">
                 <source>This value should be less than {{ compared_value }}.</source>
-                <target>{{ compared_value }}未満でなければなりません。</target>
+                <target>この値は{{ compared_value }}未満でなければなりません。</target>
             </trans-unit>
             <trans-unit id="70">
                 <source>This value should be less than or equal to {{ compared_value }}.</source>
-                <target>{{ compared_value }}以下でなければなりません。</target>
+                <target>この値は{{ compared_value }}以下でなければなりません。</target>
             </trans-unit>
             <trans-unit id="71">
                 <source>This value should not be equal to {{ compared_value }}.</source>
-                <target>{{ compared_value }}と等しくてはいけません。</target>
+                <target>この値は{{ compared_value }}と等しくてはいけません。</target>
             </trans-unit>
             <trans-unit id="72">
                 <source>This value should not be identical to {{ compared_value_type }} {{ compared_value }}.</source>
-                <target>この値は{{ compared_value_type }}の{{ compared_value }}と異なる値にしてください。</target>
+                <target>この値は{{ compared_value_type }}型の{{ compared_value }}と異なる値にしてください。</target>
             </trans-unit>
             <trans-unit id="73">
                 <source>The image ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target>画像のアスペクト比が大きすぎます({{ ratio }})。{{ max_ratio }}までにしてください。</target>
+                <target>画像のアスペクト比が大きすぎます（{{ ratio }}）。{{ max_ratio }}までにしてください。</target>
             </trans-unit>
             <trans-unit id="74">
                 <source>The image ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target>画像のアスペクト比が小さすぎます({{ ratio }})。{{ min_ratio }}以上にしてください。</target>
+                <target>画像のアスペクト比が小さすぎます（{{ ratio }}）。{{ min_ratio }}以上にしてください。</target>
             </trans-unit>
             <trans-unit id="75">
                 <source>The image is square ({{ width }}x{{ height }}px). Square images are not allowed.</source>
-                <target>画像が正方形になっています({{ width }}x{{ height }}ピクセル)。正方形の画像は許可されていません。</target>
+                <target>画像が正方形になっています（{{ width }}x{{ height }}px）。正方形の画像は許可されていません。</target>
             </trans-unit>
             <trans-unit id="76">
                 <source>The image is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented images are not allowed.</source>
-                <target>画像が横向きになっています({{ width }}x{{ height }}ピクセル)。横向きの画像は許可されていません。</target>
+                <target>画像が横向きになっています（{{ width }}x{{ height }}px）。横向きの画像は許可されていません。</target>
             </trans-unit>
             <trans-unit id="77">
                 <source>The image is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented images are not allowed.</source>
-                <target>画像が縦向きになっています({{ width }}x{{ height }}ピクセル)。縦向きの画像は許可されていません。</target>
+                <target>画像が縦向きになっています（{{ width }}x{{ height }}px）。縦向きの画像は許可されていません。</target>
             </trans-unit>
             <trans-unit id="78">
                 <source>An empty file is not allowed.</source>
-                <target>空のファイルは無効です。</target>
+                <target>空のファイルは許可されていません。</target>
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
@@ -308,11 +308,11 @@
             </trans-unit>
             <trans-unit id="80">
                 <source>This value does not match the expected {{ charset }} charset.</source>
-                <target>文字コードが{{ charset }}と一致しません。</target>
+                <target>この値の文字コードが期待される{{ charset }}と一致しません。</target>
             </trans-unit>
             <trans-unit id="81" resname="This is not a valid Business Identifier Code (BIC).">
                 <source>This value is not a valid Business Identifier Code (BIC).</source>
-                <target>有効なSWIFTコードではありません。</target>
+                <target>有効な事業者識別コード（BIC）ではありません。</target>
             </trans-unit>
             <trans-unit id="82">
                 <source>Error</source>
@@ -324,7 +324,7 @@
             </trans-unit>
             <trans-unit id="84">
                 <source>This value should be a multiple of {{ compared_value }}.</source>
-                <target>{{ compared_value }}の倍数でなければなりません。</target>
+                <target>この値は{{ compared_value }}の倍数でなければなりません。</target>
             </trans-unit>
             <trans-unit id="85">
                 <source>This Business Identifier Code (BIC) is not associated with IBAN {{ iban }}.</source>
@@ -332,7 +332,7 @@
             </trans-unit>
             <trans-unit id="86">
                 <source>This value should be valid JSON.</source>
-                <target>有効なJSONでなければなりません。</target>
+                <target>この値は有効なJSONでなければなりません。</target>
             </trans-unit>
             <trans-unit id="87">
                 <source>This collection should contain only unique elements.</source>
@@ -340,19 +340,19 @@
             </trans-unit>
             <trans-unit id="88">
                 <source>This value should be positive.</source>
-                <target>正の数でなければなりません。</target>
+                <target>この値は正の数でなければなりません。</target>
             </trans-unit>
             <trans-unit id="89">
                 <source>This value should be either positive or zero.</source>
-                <target>正の数、または0でなければなりません。</target>
+                <target>この値は正の数、または0でなければなりません。</target>
             </trans-unit>
             <trans-unit id="90">
                 <source>This value should be negative.</source>
-                <target>負の数でなければなりません。</target>
+                <target>この値は負の数でなければなりません。</target>
             </trans-unit>
             <trans-unit id="91">
                 <source>This value should be either negative or zero.</source>
-                <target>負の数、または0でなければなりません。</target>
+                <target>この値は負の数、または0でなければなりません。</target>
             </trans-unit>
             <trans-unit id="92">
                 <source>This value is not a valid timezone.</source>
@@ -364,7 +364,7 @@
             </trans-unit>
             <trans-unit id="94">
                 <source>This value should be between {{ min }} and {{ max }}.</source>
-                <target>{{ min }}以上{{ max }}以下でなければなりません。</target>
+                <target>この値は{{ min }}以上{{ max }}以下でなければなりません。</target>
             </trans-unit>
             <trans-unit id="95">
                 <source>This value is not a valid hostname.</source>
@@ -376,11 +376,11 @@
             </trans-unit>
             <trans-unit id="97">
                 <source>This value should satisfy at least one of the following constraints:</source>
-                <target>以下の制約のうち少なくとも1つを満たす必要があります:</target>
+                <target>以下の制約のうち少なくとも1つを満たさなければなりません。</target>
             </trans-unit>
             <trans-unit id="98">
                 <source>Each element of this collection should satisfy its own set of constraints.</source>
-                <target>コレクションの各要素は、それぞれの制約を満たす必要があります。</target>
+                <target>コレクションの各要素は、それぞれの制約を満たさなければなりません。</target>
             </trans-unit>
             <trans-unit id="99">
                 <source>This value is not a valid International Securities Identification Number (ISIN).</source>
@@ -388,7 +388,7 @@
             </trans-unit>
             <trans-unit id="100">
                 <source>This value should be a valid expression.</source>
-                <target>有効な式でなければなりません。</target>
+                <target>この値は有効な式形式でなければなりません。</target>
             </trans-unit>
             <trans-unit id="101">
                 <source>This value is not a valid CSS color.</source>
@@ -400,7 +400,7 @@
             </trans-unit>
             <trans-unit id="103">
                 <source>The value of the netmask should be between {{ min }} and {{ max }}.</source>
-                <target>ネットマスクは{{ min }}から{{ max }}の範囲で入力してください。</target>
+                <target>サブネットマスクは{{ min }}から{{ max }}の範囲で入力してください。</target>
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
@@ -428,11 +428,11 @@
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target>ファイルの拡張子が無効です({{ extension }})。有効な拡張子は{{ extensions }}です。</target>
+                <target>ファイルの拡張子が無効です（{{ extension }}）。有効な拡張子は{{ extensions }}です。</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
-                <target>検出された文字コードは無効です({{ detected }})。有効な文字コードは{{ encodings }}です。</target>
+                <target>検出された文字コードは無効です（{{ detected }}）。有効な文字コードは{{ encodings }}です。</target>
             </trans-unit>
             <trans-unit id="112">
                 <source>This value is not a valid MAC address.</source>
@@ -444,11 +444,11 @@
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
-                <target>短すぎます。{{ min }}単語以上にする必要があります。</target>
+                <target>短すぎます。この値は{{ min }}単語以上にする必要があります。</target>
             </trans-unit>
             <trans-unit id="115">
                 <source>This value is too long. It should contain one word.|This value is too long. It should contain {{ max }} words or less.</source>
-                <target>長すぎます。{{ max }}単語以下にする必要があります。</target>
+                <target>長すぎます。この値は{{ max }}単語以下にする必要があります。</target>
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
@@ -456,7 +456,7 @@
             </trans-unit>
             <trans-unit id="117">
                 <source>This value is not a valid week.</source>
-                <target>無効な週形式です。</target>
+                <target>有効な週形式ではありません。</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
@@ -472,87 +472,87 @@
             </trans-unit>
             <trans-unit id="122">
                 <source>This file is not a valid video.</source>
-                <target state="needs-review-translation">このファイルは有効な動画ではありません。</target>
+                <target>選択されたファイルは有効な動画ではありません。</target>
             </trans-unit>
             <trans-unit id="123">
                 <source>The size of the video could not be detected.</source>
-                <target state="needs-review-translation">動画のサイズを検出できませんでした。</target>
+                <target>動画のファイルサイズを検出できませんでした。</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target state="needs-review-translation">動画の幅が大きすぎます（{{ width }}px）。許可されている最大幅は {{ max_width }}px です。</target>
+                <target>動画の幅が大きすぎます（{{ width }}px）。許可されている最大の幅は {{ max_width }}px です。</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target state="needs-review-translation">動画の幅が小さすぎます（{{ width }}px）。想定される最小幅は {{ min_width }}px です。</target>
+                <target>動画の幅が小さすぎます（{{ width }}px）。許可されている最小の幅は {{ min_width }}px です。</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target state="needs-review-translation">動画の高さが大きすぎます ({{ height }}px)。許可されている最大の高さは {{ max_height }}px です。</target>
+                <target>動画の高さが大きすぎます （{{ height }}px）。許可されている最大の高さは {{ max_height }}px です。</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target state="needs-review-translation">ビデオの高さが小さすぎます ({{ height }}px)。想定される最小高さは {{ min_height }}px です。</target>
+                <target>動画の高さが小さすぎます （{{ height }}px）。許可されている最小の高さは {{ min_height }}px です。</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">この動画のピクセル数が少なすぎます ({{ pixels }}). 期待される最小量は {{ min_pixels }} です。</target>
+                <target>この動画のピクセル数が少なすぎます （{{ pixels }}）。許可されている最小ピクセル数は {{ min_pixels }} です。</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">この動画のピクセル数が多すぎます ({{ pixels }})。想定される最大値は {{ max_pixels }} です。</target>
+                <target>この動画のピクセル数が多すぎます （{{ pixels }}）。許可されている最大ピクセル数は {{ max_pixels }} です。</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target state="needs-review-translation">動画の比率が大きすぎます ({{ ratio }})。許可されている最大比率は {{ max_ratio }} です。</target>
+                <target>動画のアスペクト比が大きすぎます （{{ ratio }}）。許可されている最大比率は {{ max_ratio }} です。</target>
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target state="needs-review-translation">ビデオのアスペクト比が小さすぎます ({{ ratio }})。想定される最小比率は {{ min_ratio }} です。</target>
+                <target>動画のアスペクト比が小さすぎます （{{ ratio }}）。許可されている最小比率は {{ min_ratio }} です。</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
-                <target state="needs-review-translation">動画は正方形です ({{ width }}x{{ height }}px)。正方形の動画は許可されていません。</target>
+                <target>動画は正方形です （{{ width }}x{{ height }}px）。正方形の動画は許可されていません。</target>
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target state="needs-review-translation">動画は横向きです（{{ width }}x{{ height }}px）。横向きの動画は許可されていません。</target>
+                <target>動画は横向きです（{{ width }}x{{ height }}px）。横向きの動画は許可されていません。</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target state="needs-review-translation">動画は縦向きです（{{ width }}x{{ height }}px）。縦向きの動画は許可されていません。</target>
+                <target>動画は縦向きです（{{ width }}x{{ height }}px）。縦向きの動画は許可されていません。</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
-                <target state="needs-review-translation">ビデオファイルが破損しています。</target>
+                <target>動画ファイルが破損しています。</target>
             </trans-unit>
             <trans-unit id="136">
                 <source>The video contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">この動画には複数のストリームが含まれています。許可されるのは1つのストリームのみです。</target>
+                <target>この動画には複数のストリームが含まれています。許可されるのは1つのストリームのみです。</target>
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target state="needs-review-translation">サポートされていないビデオコーデック「{{ codec }}」。</target>
+                <target>サポートされていないビデオコーデック「{{ codec }}」です。</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target state="needs-review-translation">サポートされていない動画コンテナ "{{ container }}".</target>
+                <target>サポートされていない動画コンテナ「{{ container }}」です。</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
-                <target state="needs-review-translation">画像ファイルが破損しています。</target>
+                <target>画像ファイルが破損しています。</target>
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">画像のピクセル数が少なすぎます（{{ pixels }}）。想定される最小数は {{ min_pixels }} です。</target>
+                <target>画像のピクセル数が少なすぎます（{{ pixels }}）。許可されている最小ピクセル数は {{ min_pixels }} です。</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">画像のピクセル数が多すぎます ({{ pixels }}). 想定される最大値は {{ max_pixels }} です.</target>
+                <target>画像のピクセル数が多すぎます（{{ pixels }}）。許可されている最大ピクセル数は {{ max_pixels }} です。</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
-                <target state="needs-review-translation">このファイル名は期待される文字セットと一致しません。</target>
+                <target>このファイル名は期待される文字セットと一致しません。</target>
             </trans-unit>
         </body>
     </file>

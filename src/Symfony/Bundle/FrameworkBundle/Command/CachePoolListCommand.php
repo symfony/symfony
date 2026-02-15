@@ -48,7 +48,7 @@ final class CachePoolListCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $io->table(['Pool name'], array_map(fn ($pool) => [$pool], $this->poolNames));
+        $io->table(['Pool name'], array_map(static fn ($pool) => [$pool], $this->poolNames));
 
         return 0;
     }

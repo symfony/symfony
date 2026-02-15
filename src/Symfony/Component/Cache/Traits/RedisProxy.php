@@ -24,6 +24,8 @@ class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
  */
 class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
 {
+    use Redis62ProxyTrait;
+    use Redis63ProxyTrait;
     use RedisProxyTrait {
         resetLazyObject as reset;
     }
@@ -273,16 +275,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
         return $this->initializeLazyObject()->expireAt(...\func_get_args());
     }
 
-    public function expiremember($key, $field, $ttl, $unit = null): \Redis|false|int
-    {
-        return $this->initializeLazyObject()->expiremember(...\func_get_args());
-    }
-
-    public function expirememberat($key, $field, $timestamp): \Redis|false|int
-    {
-        return $this->initializeLazyObject()->expirememberat(...\func_get_args());
-    }
-
     public function expiretime($key): \Redis|false|int
     {
         return $this->initializeLazyObject()->expiretime(...\func_get_args());
@@ -446,11 +438,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function getTransferredBytes(): array
     {
         return $this->initializeLazyObject()->getTransferredBytes(...\func_get_args());
-    }
-
-    public function getWithMeta($key): \Redis|array|false
-    {
-        return $this->initializeLazyObject()->getWithMeta(...\func_get_args());
     }
 
     public function getset($key, $value): \Redis|false|string
@@ -911,16 +898,6 @@ class RedisProxy extends \Redis implements ResetInterface, LazyObjectInterface
     public function select($db): \Redis|bool
     {
         return $this->initializeLazyObject()->select(...\func_get_args());
-    }
-
-    public function serverName(): false|string
-    {
-        return $this->initializeLazyObject()->serverName(...\func_get_args());
-    }
-
-    public function serverVersion(): false|string
-    {
-        return $this->initializeLazyObject()->serverVersion(...\func_get_args());
     }
 
     public function set($key, $value, $options = null): \Redis|bool|string

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -41,36 +40,11 @@ class DateTime extends Constraint
      * @param non-empty-string|null $format The datetime format to match (defaults to 'Y-m-d H:i:s')
      * @param string[]|null         $groups
      */
-    #[HasNamedArguments]
-    public function __construct(string|array|null $format = null, ?string $message = null, ?array $groups = null, mixed $payload = null, ?array $options = null)
+    public function __construct(?string $format = null, ?string $message = null, ?array $groups = null, mixed $payload = null)
     {
-        if (\is_array($format)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-
-            $options = array_merge($format, $options ?? []);
-        } elseif (null !== $format) {
-            if (\is_array($options)) {
-                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-
-                $options['value'] = $format;
-            }
-        }
-
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->format = $format ?? $this->format;
         $this->message = $message ?? $this->message;
-    }
-
-    /**
-     * @deprecated since Symfony 7.4
-     */
-    public function getDefaultOption(): ?string
-    {
-        if (0 === \func_num_args() || func_get_arg(0)) {
-            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
-        }
-
-        return 'format';
     }
 }

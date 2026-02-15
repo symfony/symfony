@@ -13,11 +13,12 @@ namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
 use PHPUnit\Framework\Attributes\RequiresMethod;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authentication\Token\NullToken;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\ClosureVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Http\Attribute\IsGrantedContext;
 
 #[RequiresMethod(IsGrantedContext::class, 'isGranted')]
@@ -28,14 +29,14 @@ class ClosureVoterTest extends TestCase
     protected function setUp(): void
     {
         $this->voter = new ClosureVoter(
-            $this->createMock(AuthorizationCheckerInterface::class),
+            $this->createStub(AuthorizationCheckerInterface::class),
         );
     }
 
     public function testEmptyAttributeAbstains()
     {
         $this->assertSame(VoterInterface::ACCESS_ABSTAIN, $this->voter->vote(
-            $this->createMock(TokenInterface::class),
+            new NullToken(),
             null,
             [])
         );
@@ -43,35 +44,29 @@ class ClosureVoterTest extends TestCase
 
     public function testClosureReturningFalseDeniesAccess()
     {
-        $token = $this->createMock(TokenInterface::class);
-        $token->method('getRoleNames')->willReturn([]);
-        $token->method('getUser')->willReturn($this->createMock(UserInterface::class));
+        $token = new UsernamePasswordToken(new InMemoryUser('john', 'password'), 'main', []);
 
         $this->assertSame(VoterInterface::ACCESS_DENIED, $this->voter->vote(
             $token,
             null,
-            [fn () => false]
+            [static fn () => false]
         ));
     }
 
     public function testClosureReturningTrueGrantsAccess()
     {
-        $token = $this->createMock(TokenInterface::class);
-        $token->method('getRoleNames')->willReturn([]);
-        $token->method('getUser')->willReturn($this->createMock(UserInterface::class));
+        $token = new UsernamePasswordToken(new InMemoryUser('john', 'password'), 'main', []);
 
         $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->voter->vote(
             $token,
             null,
-            [fn () => true]
+            [static fn () => true]
         ));
     }
 
     public function testArgumentsContent()
     {
-        $token = $this->createMock(TokenInterface::class);
-        $token->method('getRoleNames')->willReturn(['MY_ROLE', 'ANOTHER_ROLE']);
-        $token->method('getUser')->willReturn($this->createMock(UserInterface::class));
+        $token = new UsernamePasswordToken(new InMemoryUser('john', 'password'), 'main', ['MY_ROLE', 'ANOTHER_ROLE']);
 
         $outerSubject = new \stdClass();
 

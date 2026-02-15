@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 
 /**
@@ -28,44 +27,14 @@ class Callback extends Constraint
     public $callback;
 
     /**
-     * @param string|string[]|callable|null $callback The callback definition
-     * @param string[]|null                 $groups
+     * @param string|callable|null $callback The callback definition
+     * @param string[]|null        $groups
      */
-    #[HasNamedArguments]
-    public function __construct(array|string|callable|null $callback = null, ?array $groups = null, mixed $payload = null, ?array $options = null)
+    public function __construct(string|callable|null $callback = null, ?array $groups = null, mixed $payload = null)
     {
-        // Invocation through attributes with an array parameter only
-        if (\is_array($callback) && 1 === \count($callback) && isset($callback['value'])) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        parent::__construct(null, $groups, $payload);
 
-            $callback = $callback['value'];
-        }
-
-        if (!\is_array($callback) || (!isset($callback['callback']) && !isset($callback['groups']) && !isset($callback['payload']))) {
-            if (\is_array($options)) {
-                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-            }
-        } else {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-
-            $options = array_merge($callback, $options ?? []);
-        }
-
-        parent::__construct($options, $groups, $payload);
-
-        $this->callback = $callback ?? $this->callback;
-    }
-
-    /**
-     * @deprecated since Symfony 7.4
-     */
-    public function getDefaultOption(): ?string
-    {
-        if (0 === \func_num_args() || func_get_arg(0)) {
-            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
-        }
-
-        return 'callback';
+        $this->callback = $callback;
     }
 
     public function getTargets(): string|array

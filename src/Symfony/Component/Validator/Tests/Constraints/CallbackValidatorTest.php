@@ -15,7 +15,6 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\CallbackValidator;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
-use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 
 class CallbackValidatorTest_Class
@@ -98,7 +97,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
     public function testClosure()
     {
         $object = new CallbackValidatorTest_Object();
-        $constraint = new Callback(function ($object, ExecutionContextInterface $context) {
+        $constraint = new Callback(static function ($object, ExecutionContextInterface $context) {
             $context->addViolation('My message', ['{{ value }}' => 'foobar']);
 
             return false;
@@ -113,7 +112,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
 
     public function testClosureNullObject()
     {
-        $constraint = new Callback(function ($object, ExecutionContextInterface $context) {
+        $constraint = new Callback(static function ($object, ExecutionContextInterface $context) {
             $context->addViolation('My message', ['{{ value }}' => 'foobar']);
 
             return false;
@@ -129,7 +128,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
     public function testClosureExplicitName()
     {
         $object = new CallbackValidatorTest_Object();
-        $constraint = new Callback(callback: function ($object, ExecutionContextInterface $context) {
+        $constraint = new Callback(callback: static function ($object, ExecutionContextInterface $context) {
             $context->addViolation('My message', ['{{ value }}' => 'foobar']);
 
             return false;
@@ -177,25 +176,9 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    public function testExpectValidMethods()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        $object = new CallbackValidatorTest_Object();
-
-        $this->validator->validate($object, new Callback(callback: ['foobar']));
-    }
-
-    public function testExpectValidCallbacks()
-    {
-        $this->expectException(ConstraintDefinitionException::class);
-        $object = new CallbackValidatorTest_Object();
-
-        $this->validator->validate($object, new Callback(callback: ['foo', 'bar']));
-    }
-
     public function testConstraintGetTargets()
     {
-        $constraint = new Callback(callback: []);
+        $constraint = new Callback(callback: 'strtolower');
         $targets = [Constraint::CLASS_CONSTRAINT, Constraint::PROPERTY_CONSTRAINT];
 
         $this->assertEquals($targets, $constraint->getTargets());
@@ -227,7 +210,7 @@ class CallbackValidatorTest extends ConstraintValidatorTestCase
     {
         $object = new \stdClass();
         $payloadCopy = 'Replace me!';
-        $callback = function ($object, ExecutionContextInterface $constraint, $payload) use (&$payloadCopy) {
+        $callback = static function ($object, ExecutionContextInterface $constraint, $payload) use (&$payloadCopy) {
             $payloadCopy = $payload;
         };
 

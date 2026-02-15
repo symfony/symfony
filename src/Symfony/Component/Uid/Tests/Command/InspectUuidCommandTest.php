@@ -22,7 +22,7 @@ final class InspectUuidCommandTest extends TestCase
         $commandTester = new CommandTester(new InspectUuidCommand());
 
         $this->assertSame(1, $commandTester->execute(['uuid' => 'foobar']));
-        $this->assertStringContainsString('Invalid UUID: "foobar"', $commandTester->getDisplay());
+        $this->assertStringContainsString('Invalid UUID.', $commandTester->getDisplay());
     }
 
     public function testNil()

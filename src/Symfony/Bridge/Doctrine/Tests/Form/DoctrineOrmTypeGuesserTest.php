@@ -72,12 +72,8 @@ class DoctrineOrmTypeGuesserTest extends TestCase
     {
         $classMetadata = new ClassMetadata('Acme\Entity\Foo');
 
-        if (class_exists(ManyToOneAssociationMapping::class)) {
-            $associationMapping = new ManyToOneAssociationMapping('field', 'Acme\Entity\Foo', 'Acme\Entity\Bar');
-            $associationMapping->joinColumns[] = new JoinColumnMapping('field', 'field');
-        } else {
-            $associationMapping = ['joinColumns' => [[]]];
-        }
+        $associationMapping = new ManyToOneAssociationMapping('field', 'Acme\Entity\Foo', 'Acme\Entity\Bar');
+        $associationMapping->joinColumns[] = new JoinColumnMapping('field', 'field');
         $classMetadata->associationMappings['field'] = $associationMapping;
 
         $this->assertEquals(new ValueGuess(false, Guess::HIGH_CONFIDENCE), $this->getGuesser($classMetadata)->guessRequired('TestEntity', 'field'));
@@ -87,14 +83,10 @@ class DoctrineOrmTypeGuesserTest extends TestCase
     {
         $classMetadata = new ClassMetadata('Acme\Entity\Foo');
 
-        if (class_exists(ManyToOneAssociationMapping::class)) {
-            $associationMapping = new ManyToOneAssociationMapping('field', 'Acme\Entity\Foo', 'Acme\Entity\Bar');
-            $joinColumnMapping = new JoinColumnMapping('field', 'field');
-            $joinColumnMapping->nullable = true;
-            $associationMapping->joinColumns[] = $joinColumnMapping;
-        } else {
-            $associationMapping = ['joinColumns' => [['nullable' => true]]];
-        }
+        $associationMapping = new ManyToOneAssociationMapping('field', 'Acme\Entity\Foo', 'Acme\Entity\Bar');
+        $joinColumnMapping = new JoinColumnMapping('field', 'field');
+        $joinColumnMapping->nullable = true;
+        $associationMapping->joinColumns[] = $joinColumnMapping;
         $classMetadata->associationMappings['field'] = $associationMapping;
 
         $this->assertEquals(new ValueGuess(false, Guess::HIGH_CONFIDENCE), $this->getGuesser($classMetadata)->guessRequired('TestEntity', 'field'));
@@ -104,14 +96,10 @@ class DoctrineOrmTypeGuesserTest extends TestCase
     {
         $classMetadata = new ClassMetadata('Acme\Entity\Foo');
 
-        if (class_exists(ManyToOneAssociationMapping::class)) {
-            $associationMapping = new ManyToOneAssociationMapping('field', 'Acme\Entity\Foo', 'Acme\Entity\Bar');
-            $joinColumnMapping = new JoinColumnMapping('field', 'field');
-            $joinColumnMapping->nullable = false;
-            $associationMapping->joinColumns[] = $joinColumnMapping;
-        } else {
-            $associationMapping = ['joinColumns' => [['nullable' => false]]];
-        }
+        $associationMapping = new ManyToOneAssociationMapping('field', 'Acme\Entity\Foo', 'Acme\Entity\Bar');
+        $joinColumnMapping = new JoinColumnMapping('field', 'field');
+        $joinColumnMapping->nullable = false;
+        $associationMapping->joinColumns[] = $joinColumnMapping;
         $classMetadata->associationMappings['field'] = $associationMapping;
 
         $this->assertEquals(new ValueGuess(true, Guess::HIGH_CONFIDENCE), $this->getGuesser($classMetadata)->guessRequired('TestEntity', 'field'));

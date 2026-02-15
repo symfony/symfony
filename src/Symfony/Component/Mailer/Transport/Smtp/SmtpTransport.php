@@ -155,18 +155,7 @@ class SmtpTransport extends AbstractTransport
 
     protected function parseMessageId(string $mtaResult): string
     {
-        $regexps = [
-            '/250 Ok (?P<id>[0-9a-f-]+)\r?$/mis',
-            '/250 Ok:? queued as (?P<id>[A-Z0-9]+)\r?$/mis',
-        ];
-        $matches = [];
-        foreach ($regexps as $regexp) {
-            if (preg_match($regexp, $mtaResult, $matches)) {
-                return $matches['id'];
-            }
-        }
-
-        return '';
+        return preg_match('/^250 (?:\S+ )?Ok:?+ (?:queued as |id=)?+(?P<id>[A-Z0-9._-]++)/im', $mtaResult, $matches) ? $matches['id'] : '';
     }
 
     public function __toString(): string

@@ -4,7 +4,8 @@ CHANGELOG
 7.4
 ---
 
-* Allow SQS to handle it's own retry/DLQ
+* Allow SQS to handle its own retry/DLQ
+* Add `retry_delay` option to configure the delay between retries when using SQS retry/DLQ handling
 
 7.3
 ---

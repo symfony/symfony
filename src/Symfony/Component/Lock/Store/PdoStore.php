@@ -98,7 +98,7 @@ class PdoStore implements PersistingStoreInterface
             $stmt = $conn->prepare($sql);
         }
 
-        $stmt->bindValue(':id', $this->getHashedKey($key));
+        $stmt->bindValue(':id', $this->getKeyName($key));
         $stmt->bindValue(':token', $this->getUniqueToken($key));
 
         try {
@@ -134,7 +134,7 @@ class PdoStore implements PersistingStoreInterface
         $stmt = $this->getConnection()->prepare($sql);
 
         $uniqueToken = $this->getUniqueToken($key);
-        $stmt->bindValue(':id', $this->getHashedKey($key));
+        $stmt->bindValue(':id', $this->getKeyName($key));
         $stmt->bindValue(':token1', $uniqueToken);
         $stmt->bindValue(':token2', $uniqueToken);
         $result = $stmt->execute();
@@ -152,7 +152,7 @@ class PdoStore implements PersistingStoreInterface
         $sql = "DELETE FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token";
         $stmt = $this->getConnection()->prepare($sql);
 
-        $stmt->bindValue(':id', $this->getHashedKey($key));
+        $stmt->bindValue(':id', $this->getKeyName($key));
         $stmt->bindValue(':token', $this->getUniqueToken($key));
         $stmt->execute();
     }
@@ -162,7 +162,7 @@ class PdoStore implements PersistingStoreInterface
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token AND $this->expirationCol > {$this->getCurrentTimestampStatement()}";
         $stmt = $this->getConnection()->prepare($sql);
 
-        $stmt->bindValue(':id', $this->getHashedKey($key));
+        $stmt->bindValue(':id', $this->getKeyName($key));
         $stmt->bindValue(':token', $this->getUniqueToken($key));
         $result = $stmt->execute();
 
@@ -188,7 +188,7 @@ class PdoStore implements PersistingStoreInterface
     public function createTable(): void
     {
         $sql = match ($driver = $this->getDriver()) {
-            'mysql' => "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(44) NOT NULL, $this->expirationCol INTEGER UNSIGNED NOT NULL) COLLATE utf8mb4_bin, ENGINE = InnoDB",
+            'mysql' => "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(44) NOT NULL, $this->expirationCol INTEGER UNSIGNED NOT NULL) ENGINE = InnoDB",
             'sqlite' => "CREATE TABLE $this->table ($this->idCol TEXT NOT NULL PRIMARY KEY, $this->tokenCol TEXT NOT NULL, $this->expirationCol INTEGER)",
             'pgsql' => "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(64) NOT NULL, $this->expirationCol INTEGER)",
             'oci' => "CREATE TABLE $this->table ($this->idCol VARCHAR2(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR2(64) NOT NULL, $this->expirationCol INTEGER)",

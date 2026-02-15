@@ -49,7 +49,7 @@ final class MicrosoftTeamsTransportTest extends TransportTestCase
 
     public function testSendWithErrorResponseThrows()
     {
-        $client = new MockHttpClient(fn (string $method, string $url, array $options = []): ResponseInterface => new MockResponse('testErrorMessage', ['response_headers' => ['request-id' => ['testRequestId']], 'http_code' => 400]));
+        $client = new MockHttpClient(static fn (string $method, string $url, array $options = []): ResponseInterface => new MockResponse('testErrorMessage', ['response_headers' => ['request-id' => ['testRequestId']], 'http_code' => 400]));
 
         $transport = self::createTransport($client);
 

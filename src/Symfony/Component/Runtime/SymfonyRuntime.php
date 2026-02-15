@@ -73,6 +73,7 @@ class SymfonyRuntime extends GenericRuntime
     private readonly ConsoleOutput $output;
     private readonly Application $console;
     private readonly Command $command;
+    private readonly Request $request;
 
     /**
      * @param array{
@@ -88,6 +89,7 @@ class SymfonyRuntime extends GenericRuntime
      *   error_handler?: string|false,
      *   env_var_name?: string,
      *   debug_var_name?: string,
+     *   project_dir_var?: string|false,
      *   dotenv_overload?: ?bool,
      *   dotenv_extra_paths?: ?string[],
      *   worker_loop_max?: int, // Use 0 or a negative integer to never restart the worker. Default: 500
@@ -111,6 +113,14 @@ class SymfonyRuntime extends GenericRuntime
             $this->getInput();
         }
 
+        if (isset($options['project_dir']) && $projectDirVar = $options['project_dir_var'] ?? 'APP_PROJECT_DIR') {
+            $_SERVER[$projectDirVar] = $_ENV[$projectDirVar] = $options['project_dir'];
+
+            if ($options['use_putenv'] ?? false) {
+                putenv($projectDirVar.'='.$options['project_dir']);
+            }
+        }
+
         if (!($options['disable_dotenv'] ?? false) && isset($options['project_dir']) && !class_exists(MissingDotenv::class, false)) {
             $overrideExistingVars = $options['dotenv_overload'] ?? false;
             $dotenv = (new Dotenv($envKey, $debugKey))
@@ -120,7 +130,7 @@ class SymfonyRuntime extends GenericRuntime
             $dotenv->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']), $overrideExistingVars);
 
             if (\is_array($options['dotenv_extra_paths'] ?? null) && $options['dotenv_extra_paths']) {
-                $options['dotenv_extra_paths'] = array_map(fn (string $path) => $options['project_dir'].'/'.$path, $options['dotenv_extra_paths']);
+                $options['dotenv_extra_paths'] = array_map(static fn (string $path) => $options['project_dir'].'/'.$path, $options['dotenv_extra_paths']);
 
                 $overrideExistingVars
                     ? $dotenv->overload(...$options['dotenv_extra_paths'])
@@ -163,7 +173,7 @@ class SymfonyRuntime extends GenericRuntime
                 return new FrankenPhpWorkerRunner($application, $this->options['worker_loop_max']);
             }
 
-            return new HttpKernelRunner($application, Request::createFromGlobals(), $this->options['debug'] ?? false);
+            return new HttpKernelRunner($application, $this->request ??= Request::createFromGlobals(), $this->options['debug'] ?? false);
         }
 
         if ($application instanceof Response) {
@@ -177,7 +187,7 @@ class SymfonyRuntime extends GenericRuntime
             if (!$application->getName() || !$console->has($application->getName())) {
                 $application->setName($_SERVER['argv'][0]);
 
-                if (!method_exists($console, 'addCommand') || method_exists($console, 'add') && (new \ReflectionMethod($console, 'add'))->getDeclaringClass()->getName() !== (new \ReflectionMethod($console, 'addCommand'))->getDeclaringClass()->getName()) {
+                if (!method_exists($console, 'addCommand') || method_exists($console, 'add') && (new \ReflectionMethod($console, 'add'))->class !== (new \ReflectionMethod($console, 'addCommand'))->class) {
                     $console->add($application);
                 } else {
                     $console->addCommand($application);
@@ -208,7 +218,7 @@ class SymfonyRuntime extends GenericRuntime
     protected function getArgument(\ReflectionParameter $parameter, ?string $type): mixed
     {
         return match ($type) {
-            Request::class => Request::createFromGlobals(),
+            Request::class => $this->request ??= Request::createFromGlobals(),
             InputInterface::class => $this->getInput(),
             OutputInterface::class => $this->output ??= new ConsoleOutput(),
             Application::class => $this->console ??= new Application(),

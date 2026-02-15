@@ -38,7 +38,7 @@ class NullAdapterTest extends TestCase
         $adapter = $this->createCachePool();
 
         $fetched = [];
-        $adapter->get('myKey', function ($item) use (&$fetched) { $fetched[] = $item; });
+        $adapter->get('myKey', static function ($item) use (&$fetched) { $fetched[] = $item; });
         $this->assertCount(1, $fetched);
         $item = $fetched[0];
         $this->assertFalse($item->isHit());
@@ -136,6 +136,15 @@ class NullAdapterTest extends TestCase
 
         $this->assertTrue($adapter->saveDeferred($item));
         $this->assertTrue($this->createCachePool()->commit());
+    }
+
+    public function testTaggable()
+    {
+        $this->expectNotToPerformAssertions();
+        $adapter = $this->createCachePool();
+        $item = $adapter->getItem('any_item');
+        // No error triggered 'Cache item "%s" comes from a non tag-aware pool: you cannot tag it.'
+        $item->tag(['tag1']);
     }
 
     public function testInvalidateTags()

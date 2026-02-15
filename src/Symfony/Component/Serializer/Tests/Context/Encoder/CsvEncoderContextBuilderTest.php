@@ -12,8 +12,6 @@
 namespace Symfony\Component\Serializer\Tests\Context\Encoder;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Context\Encoder\CsvEncoderContextBuilder;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
@@ -119,25 +117,5 @@ class CsvEncoderContextBuilderTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->contextBuilder->withEnclosure('ọ');
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testCannotSetMultipleBytesAsEscapeChar()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/serializer 7.2: The "Symfony\Component\Serializer\Context\Encoder\CsvEncoderContextBuilder::withEscapeChar" method is deprecated. It will be removed in 8.0.');
-
-        $this->expectException(InvalidArgumentException::class);
-        $this->contextBuilder->withEscapeChar('ọ');
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testWithEscapeCharIsDeprecated()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/serializer 7.2: The "Symfony\Component\Serializer\Context\Encoder\CsvEncoderContextBuilder::withEscapeChar" method is deprecated. It will be removed in 8.0.');
-        $context = $this->contextBuilder->withEscapeChar('\\');
-
-        $this->assertSame(['csv_escape_char' => '\\'], $context->toArray());
     }
 }

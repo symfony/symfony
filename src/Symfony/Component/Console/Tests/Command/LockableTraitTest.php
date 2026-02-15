@@ -76,7 +76,7 @@ class LockableTraitTest extends TestCase
 
         $tester = new CommandTester($command);
 
-        $lock = $this->createMock(SharedLockInterface::class);
+        $lock = $this->createStub(SharedLockInterface::class);
         $lock->method('acquire')->willReturn(false);
 
         $lockFactory->expects(static::once())->method('createLock')->willReturn($lock);

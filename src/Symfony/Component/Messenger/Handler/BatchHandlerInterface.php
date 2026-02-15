@@ -32,3 +32,5 @@ interface BatchHandlerInterface
      */
     public function flush(bool $force): void;
 }
+
+// @php-cs-fixer-ignore no_superfluous_phpdoc_tags As long as `__invoke` method is commented out

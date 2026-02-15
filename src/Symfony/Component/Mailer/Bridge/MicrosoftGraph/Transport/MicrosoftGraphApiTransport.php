@@ -157,7 +157,7 @@ class MicrosoftGraphApiTransport extends AbstractApiTransport
             ];
 
             if ('inline' === $disposition) {
-                $attr['contentId'] = $filename;
+                $attr['contentId'] = $attachment->getContentId();
                 $attr['isInline'] = true;
             }
 
@@ -171,7 +171,7 @@ class MicrosoftGraphApiTransport extends AbstractApiTransport
     {
         $headers = [];
 
-        $headersToBypass = ['x-ms-client-request-id', 'operation-id', 'authorization', 'x-ms-content-sha256', 'received', 'dkim-signature', 'content-transfer-encoding', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to'];
+        $headersToBypass = ['x-ms-client-request-id', 'operation-id', 'authorization', 'x-ms-content-sha256', 'received', 'dkim-signature', 'content-transfer-encoding', 'sender', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to', 'return-path'];
 
         foreach ($email->getHeaders()->all() as $name => $header) {
             if (\in_array($name, $headersToBypass, true)) {

@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\ExpectationFailedException;
 use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 use Symfony\Component\Finder\Finder;
+use Symfony\Component\Finder\SplFileInfo;
 
 class FinderTest extends Iterator\RealIteratorTestCase
 {
@@ -931,7 +932,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testSort()
     {
         $finder = $this->buildFinder();
-        $this->assertSame($finder, $finder->sort(fn (\SplFileInfo $a, \SplFileInfo $b) => strcmp($a->getRealPath(), $b->getRealPath())));
+        $this->assertSame($finder, $finder->sort(static fn (\SplFileInfo $a, \SplFileInfo $b) => strcmp($a->getRealPath(), $b->getRealPath())));
         $this->assertOrderedIterator($this->toAbsolute([
             'Zephire.php',
             'foo',
@@ -987,7 +988,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testFilter()
     {
         $finder = $this->buildFinder();
-        $this->assertSame($finder, $finder->filter(fn (\SplFileInfo $f) => str_contains($f, 'test')));
+        $this->assertSame($finder, $finder->filter(static fn (\SplFileInfo $f) => str_contains($f, 'test')));
         $this->assertIterator($this->toAbsolute(['test.php', 'test.py']), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -1014,7 +1015,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $finder
             ->in($this->vfsScheme.'://x')
-            ->filter(fn (): bool => true, true) // does nothing
+            ->filter(static fn (): bool => true, true) // does nothing
             ->filter(function (\SplFileInfo $file): bool {
                 $path = $this->stripSchemeFromVfsPath($file->getPathname());
 
@@ -1024,7 +1025,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
                 return $res;
             }, true)
-            ->filter(fn (): bool => true, true); // does nothing
+            ->filter(static fn (): bool => true, true); // does nothing
 
         $this->assertSameVfsIterator([
             'x/a.php',
@@ -1084,6 +1085,20 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'qux_12_0.php',
             'qux_2_0.php',
         ]), $finder->in(self::$tmpDir)->getIterator());
+    }
+
+    public function testUseUnixPaths()
+    {
+        $fixturesDirectory = __DIR__.\DIRECTORY_SEPARATOR.'Fixtures';
+
+        // Fix __DIR__ on Windows giving us backslashes.
+        $fixturesDirectory = str_replace('\\', '/', $fixturesDirectory);
+
+        $finder = $this->buildFinder();
+        $this->assertSame($finder, $finder->useUnixPaths());
+        foreach ($finder->in($fixturesDirectory) as $file) {
+            $this->assertStringNotContainsString('\\', $file->getPathname(), 'Paths should be in UNIX style.');
+        }
     }
 
     public function testIn()
@@ -1296,9 +1311,217 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $this->assertIterator($this->toAbsolute(['foo', 'foo/bar.tmp', 'toto']), $finder->getIterator());
     }
 
+    public function testAppendStandardizesItemsToBeSymfonySplFileInfo()
+    {
+        $finder1 = $this->buildFinder();
+        $finder1->files()->in(self::$tmpDir.\DIRECTORY_SEPARATOR.'foo');
+
+        $finder2 = $this->buildFinder();
+        $finder2->directories()->in(self::$tmpDir);
+
+        $finder1->append($finder2);
+        $finder1->append($this->toAbsolute(['foo']));
+        $finder1->append(array_map(static fn ($item) => new \SplFileInfo($item), $this->toAbsolute(['toto'])));
+
+        foreach ($finder1 as $item) {
+            $this->assertInstanceOf(SplFileInfo::class, $item);
+        }
+    }
+
+    public function testRelativePathWithoutAppend()
+    {
+        $this->setupVfsProvider([
+            'a' => [
+                'a1' => '',
+                'a2' => '',
+                'b' => [
+                    'b1' => '',
+                    'b2' => '',
+                    'c' => [
+                        'c1' => '',
+                        'c2' => '',
+                    ],
+                ],
+            ],
+        ]);
+
+        $dir = $this->vfsScheme.'://';
+
+        $finder = Finder::create()->sortByName()->in($dir.'a/b');
+        $this->assertSame(
+            [
+                ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'b1', 'relativePathname' => 'b1'],
+                ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'b2', 'relativePathname' => 'b2'],
+                ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c', 'relativePathname' => 'c'],
+                ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c1', 'relativePathname' => 'c'.\DIRECTORY_SEPARATOR.'c1'],
+                ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'c'.\DIRECTORY_SEPARATOR.'c2'],
+            ],
+            self::formatForAssert($finder),
+        );
+    }
+
+    public function testRelativePathWithAppendedFinderForParentDirectory()
+    {
+        $this->setupVfsProvider([
+            'a' => [
+                'a1' => '',
+                'a2' => '',
+                'b' => [
+                    'b1' => '',
+                    'b2' => '',
+                    'c' => [
+                        'c1' => '',
+                        'c2' => '',
+                    ],
+                ],
+            ],
+        ]);
+
+        $dir = $this->vfsScheme.'://';
+
+        $finder = Finder::create()->sortByName(true)->in($dir.'a/b');
+        $finder->append(Finder::create()->in($dir.'a'));
+
+        $expected = [
+            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'a1', 'relativePathname' => 'a1'],
+            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'a2', 'relativePathname' => 'a2'],
+            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'b', 'relativePathname' => 'b'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'b1', 'relativePathname' => 'b1'],
+            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'b1', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'b1'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'b2', 'relativePathname' => 'b2'],
+            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'b2', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'b2'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c', 'relativePathname' => 'c'],
+            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'c', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'c'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c1', 'relativePathname' => 'c'.\DIRECTORY_SEPARATOR.'c1'],
+            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c1', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c1'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'c'.\DIRECTORY_SEPARATOR.'c2'],
+            ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2'],
+        ];
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            usort($expected, static fn ($a, $b) => $a['key'] <=> $b['key']);
+        }
+
+        $this->assertSame($expected, self::formatForAssert($finder));
+    }
+
+    public function testRelativePathWithAppendedFinderForChildDirectory()
+    {
+        $this->setupVfsProvider([
+            'a' => [
+                'a1' => '',
+                'a2' => '',
+                'b' => [
+                    'b1' => '',
+                    'b2' => '',
+                    'c' => [
+                        'c1' => '',
+                        'c2' => '',
+                    ],
+                ],
+            ],
+        ]);
+
+        $dir = $this->vfsScheme.'://';
+
+        $finder = Finder::create()->sortByName(true)->in($dir.'a/b');
+        $finder->append(Finder::create()->in($dir.'a/b/c'));
+
+        $expected = [
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'b1', 'relativePathname' => 'b1'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'b2', 'relativePathname' => 'b2'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c', 'relativePathname' => 'c'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c1', 'relativePathname' => 'c'.\DIRECTORY_SEPARATOR.'c1'],
+            ['key' => $dir.'a/b/c'.\DIRECTORY_SEPARATOR.'c1', 'relativePathname' => 'c1'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'c'.\DIRECTORY_SEPARATOR.'c2'],
+            ['key' => $dir.'a/b/c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'c2'],
+        ];
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            usort($expected, static fn ($a, $b) => $a['key'] <=> $b['key']);
+        }
+
+        $this->assertSame($expected, self::formatForAssert($finder));
+    }
+
+    public function testRelativePathWithAppendedPaths()
+    {
+        $this->setupVfsProvider([
+            'a' => [
+                'a1' => '',
+                'a2' => '',
+                'b' => [
+                    'b1' => '',
+                    'b2' => '',
+                    'c' => [
+                        'c1' => '',
+                        'c2' => '',
+                    ],
+                ],
+            ],
+        ]);
+
+        $dir = $this->vfsScheme.'://';
+
+        $finder = Finder::create()->sortByName(true)->in($dir.'a/b');
+        $finder->append([$dir.'a/a1', $dir.'a/b/c/c1']);
+
+        $expected = [
+            ['key' => $dir.'a/a1', 'relativePathname' => $dir.'a/a1'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'b1', 'relativePathname' => 'b1'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'b2', 'relativePathname' => 'b2'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c', 'relativePathname' => 'c'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c1', 'relativePathname' => 'c'.\DIRECTORY_SEPARATOR.'c1'],
+            ['key' => $dir.'a/b/c/c1', 'relativePathname' => $dir.'a/b/c/c1'],
+            ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'c'.\DIRECTORY_SEPARATOR.'c2'],
+        ];
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            usort($expected, static fn ($a, $b) => $a['key'] <=> $b['key']);
+        }
+
+        $this->assertSame($expected, self::formatForAssert($finder));
+    }
+
+    public function testRelativePathWithAppendedOnEmptyFinder()
+    {
+        $this->setupVfsProvider([
+            'a' => [
+                'a1' => '',
+                'a2' => '',
+                'b' => [
+                    'b1' => '',
+                    'b2' => '',
+                    'c' => [
+                        'c1' => '',
+                        'c2' => '',
+                    ],
+                ],
+            ],
+        ]);
+
+        $dir = $this->vfsScheme.'://';
+
+        $finder = Finder::create()->sortByName();
+        $finder->append([$dir.'a/a1']);
+        $this->assertSame(
+            [
+                ['key' => $dir.'a/a1', 'relativePathname' => $dir.'a/a1'],
+            ],
+            self::formatForAssert($finder),
+        );
+    }
+
     public function testAppendReturnsAFinder()
     {
         $this->assertInstanceOf(Finder::class, Finder::create()->append([]));
+    }
+
+    public function testAppendEmptyIterableAllowsIteration()
+    {
+        $finder = Finder::create()->files()->name('*.php')->append([]);
+
+        $this->assertSame([], iterator_to_array($finder->getIterator()));
     }
 
     public function testAppendDoesNotRequireIn()
@@ -1659,5 +1882,15 @@ class FinderTest extends Iterator\RealIteratorTestCase
     protected function buildFinder()
     {
         return Finder::create()->exclude('gitignore');
+    }
+
+    private static function formatForAssert(Finder $finder): array
+    {
+        $data = [];
+        foreach ($finder as $key => $value) {
+            $data[] = ['key' => $key, 'relativePathname' => $value->getRelativePathname()];
+        }
+
+        return $data;
     }
 }

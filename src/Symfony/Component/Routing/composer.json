@@ -16,21 +16,16 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "symfony/deprecation-contracts": "^2.5|^3"
     },
     "require-dev": {
-        "symfony/config": "^6.4|^7.0|^8.0",
-        "symfony/http-foundation": "^6.4|^7.0|^8.0",
-        "symfony/yaml": "^6.4|^7.0|^8.0",
-        "symfony/expression-language": "^6.4|^7.0|^8.0",
-        "symfony/dependency-injection": "^6.4|^7.0|^8.0",
-        "psr/log": "^1|^2|^3"
-    },
-    "conflict": {
-        "symfony/config": "<6.4",
-        "symfony/dependency-injection": "<6.4",
-        "symfony/yaml": "<6.4"
+        "psr/log": "^1|^2|^3",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/expression-language": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/http-foundation": "^7.4|^8.0",
+        "symfony/yaml": "^7.4|^8.0"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Routing\\": "" },

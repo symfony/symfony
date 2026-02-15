@@ -47,6 +47,7 @@ class DynamoDbStore implements PersistingStoreInterface
         'write_capacity_units' => 20,
         'sslmode' => null,
         'debug' => null,
+        'http_client' => null,
     ];
 
     private DynamoDbClient $client;
@@ -119,7 +120,7 @@ class DynamoDbStore implements PersistingStoreInterface
                 $options['table_name'] = $tableName;
             }
 
-            $this->client = new DynamoDbClient($clientConfiguration);
+            $this->client = new DynamoDbClient($clientConfiguration, null, $options['http_client']);
         }
 
         $this->tableName = $options['table_name'] ?? self::DEFAULT_OPTIONS['table_name'];

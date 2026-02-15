@@ -268,7 +268,7 @@ class BinaryFileResponse extends Response
                         if ($start < 0 || $start > $end) {
                             $this->setStatusCode(416);
                             $this->headers->set('Content-Range', \sprintf('bytes */%s', $fileSize));
-                        } elseif ($end - $start < $fileSize - 1) {
+                        } else {
                             $this->maxlen = $end < $fileSize ? $end - $start + 1 : -1;
                             $this->offset = $start;
 
@@ -392,5 +392,10 @@ class BinaryFileResponse extends Response
         $this->deleteFileAfterSend = $shouldDelete;
 
         return $this;
+    }
+
+    public function shouldDeleteFileAfterSend(): bool
+    {
+        return $this->deleteFileAfterSend;
     }
 }

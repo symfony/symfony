@@ -170,12 +170,16 @@ class AttributeClassLoaderTest extends TestCase
     public function testDefaultValuesForMethods()
     {
         $routes = $this->loader->load(DefaultValueController::class);
-        $this->assertCount(5, $routes);
+        $this->assertCount(7, $routes);
         $this->assertEquals('/{default}/path', $routes->get('action')->getPath());
         $this->assertEquals('value', $routes->get('action')->getDefault('default'));
         $this->assertEquals('Symfony', $routes->get('hello_with_default')->getDefault('name'));
         $this->assertEquals('World', $routes->get('hello_without_default')->getDefault('name'));
         $this->assertEquals('diamonds', $routes->get('string_enum_action')->getDefault('default'));
+        $this->assertArrayHasKey('libelle', $routes->get('defaultMappedParam_default')->getDefaults());
+        $this->assertNull($routes->get('defaultMappedParam_default')->getDefault('libelle'));
+        $this->assertArrayHasKey('barLibelle', $routes->get('defaultAdvancedMappedParam_default')->getDefaults());
+        $this->assertNull($routes->get('defaultAdvancedMappedParam_default')->getDefault('barLibelle'));
         $this->assertEquals(20, $routes->get('int_enum_action')->getDefault('default'));
     }
 

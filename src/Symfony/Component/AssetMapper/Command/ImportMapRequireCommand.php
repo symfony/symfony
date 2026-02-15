@@ -36,12 +36,8 @@ final class ImportMapRequireCommand extends Command
     public function __construct(
         private readonly ImportMapManager $importMapManager,
         private readonly ImportMapVersionChecker $importMapVersionChecker,
-        private readonly ?string $projectDir = null,
+        private readonly string $projectDir,
     ) {
-        if (null === $projectDir) {
-            trigger_deprecation('symfony/asset-mapper', '7.3', 'The "%s()" method will have a new `string $projectDir` argument in version 8.0, not defining it is deprecated.', __METHOD__);
-        }
-
         parent::__construct();
     }
 
@@ -135,7 +131,7 @@ final class ImportMapRequireCommand extends Command
 
         $this->renderVersionProblems($this->importMapVersionChecker, $output);
 
-        $newPackageNames = array_map(fn (ImportMapEntry $package): string => $package->importName, $newPackages);
+        $newPackageNames = array_map(static fn (ImportMapEntry $package): string => $package->importName, $newPackages);
 
         if (1 === \count($newPackages)) {
             $messages = [\sprintf('Package "%s" added to importmap.php.', $newPackageNames[0])];
@@ -149,9 +145,7 @@ final class ImportMapRequireCommand extends Command
                 array_map(fn (ImportMapEntry $package): array => [
                     $package->importName,
                     $package->version ?? '-',
-                    // BC layer for AssetMapper < 7.3
-                    // When `projectDir` is not null, we use the absolute path of the package
-                    null !== $this->projectDir ? Path::makeRelative($package->path, $this->projectDir) : $package->path,
+                    Path::makeRelative($package->path, $this->projectDir),
                 ], $newPackages),
             );
         }

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Validator\Tests\Validator;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -27,15 +27,15 @@ class TraceableValidatorTest extends TestCase
     {
         $originalValidator = $this->createMock(ValidatorInterface::class);
         $violations = new ConstraintViolationList([
-            $this->createMock(ConstraintViolation::class),
-            $this->createMock(ConstraintViolation::class),
+            $this->createStub(ConstraintViolation::class),
+            $this->createStub(ConstraintViolation::class),
         ]);
         $originalValidator->expects($this->exactly(2))->method('validate')->willReturn($violations);
 
         $validator = new TraceableValidator($originalValidator);
 
         $object = new \stdClass();
-        $constraints = [$this->createMock(Constraint::class)];
+        $constraints = [new NotNull()];
         $groups = ['Default', 'Create'];
 
         $validator->validate($object, $constraints, $groups);
@@ -74,16 +74,16 @@ class TraceableValidatorTest extends TestCase
 
         $expects = fn ($method) => $originalValidator->expects($this->once())->method($method);
 
-        $expects('getMetadataFor')->willReturn($expected = $this->createMock(MetadataInterface::class));
+        $expects('getMetadataFor')->willReturn($expected = $this->createStub(MetadataInterface::class));
         $this->assertSame($expected, $validator->getMetadataFor('value'), 'returns original validator getMetadataFor() result');
 
         $expects('hasMetadataFor')->willReturn($expected = false);
         $this->assertSame($expected, $validator->hasMetadataFor('value'), 'returns original validator hasMetadataFor() result');
 
-        $expects('inContext')->willReturn($expected = $this->createMock(ContextualValidatorInterface::class));
-        $this->assertSame($expected, $validator->inContext($this->createMock(ExecutionContextInterface::class)), 'returns original validator inContext() result');
+        $expects('inContext')->willReturn($expected = $this->createStub(ContextualValidatorInterface::class));
+        $this->assertSame($expected, $validator->inContext($this->createStub(ExecutionContextInterface::class)), 'returns original validator inContext() result');
 
-        $expects('startContext')->willReturn($expected = $this->createMock(ContextualValidatorInterface::class));
+        $expects('startContext')->willReturn($expected = $this->createStub(ContextualValidatorInterface::class));
         $this->assertSame($expected, $validator->startContext(), 'returns original validator startContext() result');
 
         $expects('validate')->willReturn($expected = new ConstraintViolationList());

@@ -62,9 +62,7 @@ final class MailomatApiTransport extends AbstractApiTransport
         }
 
         if (202 !== $statusCode) {
-            $violations = array_map(static function (array $violation) {
-                return ($violation['propertyPath'] ? '('.$violation['propertyPath'].') ' : '').$violation['message'];
-            }, $result['violations']);
+            $violations = array_map(static fn (array $violation) => ($violation['propertyPath'] ? '('.$violation['propertyPath'].') ' : '').$violation['message'], $result['violations']);
 
             throw new HttpTransportException(\sprintf('Unable to send an email: %s (code %d).', implode('; ', $violations), $statusCode), $response);
         }

@@ -66,6 +66,8 @@ abstract class ResourceBundleTestCase extends TestCase
         'az_Cyrl_AZ',
         'az_Latn',
         'az_Latn_AZ',
+        'ba',
+        'ba_RU',
         'be',
         'be_BY',
         'bg',
@@ -146,6 +148,7 @@ abstract class ResourceBundleTestCase extends TestCase
         'en_DG',
         'en_DK',
         'en_DM',
+        'en_EE',
         'en_ER',
         'en_ES',
         'en_FI',
@@ -155,6 +158,7 @@ abstract class ResourceBundleTestCase extends TestCase
         'en_FR',
         'en_GB',
         'en_GD',
+        'en_GE',
         'en_GG',
         'en_GH',
         'en_GI',
@@ -173,6 +177,7 @@ abstract class ResourceBundleTestCase extends TestCase
         'en_IT',
         'en_JE',
         'en_JM',
+        'en_JP',
         'en_KE',
         'en_KI',
         'en_KN',
@@ -180,6 +185,8 @@ abstract class ResourceBundleTestCase extends TestCase
         'en_LC',
         'en_LR',
         'en_LS',
+        'en_LT',
+        'en_LV',
         'en_MG',
         'en_MH',
         'en_MO',
@@ -228,6 +235,7 @@ abstract class ResourceBundleTestCase extends TestCase
         'en_TT',
         'en_TV',
         'en_TZ',
+        'en_UA',
         'en_UG',
         'en_UM',
         'en_US',
@@ -422,6 +430,8 @@ abstract class ResourceBundleTestCase extends TestCase
         'ki',
         'ki_KE',
         'kk',
+        'kk_Arab',
+        'kk_Arab_CN',
         'kk_Cyrl',
         'kk_Cyrl_KZ',
         'kk_KZ',
@@ -442,6 +452,11 @@ abstract class ResourceBundleTestCase extends TestCase
         'ks_Deva_IN',
         'ks_IN',
         'ku',
+        'ku_Latn',
+        'ku_Latn_IQ',
+        'ku_Latn_SY',
+        'ku_Latn_TR',
+        'ku_SY',
         'ku_TR',
         'kw',
         'kw_GB',
@@ -731,6 +746,7 @@ abstract class ResourceBundleTestCase extends TestCase
         'iw' => 'he',
         'iw_IL' => 'he_IL',
         'ks_IN' => 'ks_Arab_IN',
+        'ku_SY' => 'ku_Latn_SY',
         'mo' => 'ro',
         'no_NO' => 'no',
         'no_NO_NY' => 'nn_NO',
@@ -782,7 +798,7 @@ abstract class ResourceBundleTestCase extends TestCase
     public static function provideLocales()
     {
         return array_map(
-            fn ($locale) => [$locale],
+            static fn ($locale) => [$locale],
             static::getLocales()
         );
     }
@@ -790,7 +806,7 @@ abstract class ResourceBundleTestCase extends TestCase
     public static function provideLocaleAliases()
     {
         return array_map(
-            fn ($alias, $ofLocale) => [$alias, $ofLocale],
+            static fn ($alias, $ofLocale) => [$alias, $ofLocale],
             array_keys(static::getLocaleAliases()),
             static::getLocaleAliases()
         );
@@ -799,7 +815,7 @@ abstract class ResourceBundleTestCase extends TestCase
     public static function provideRootLocales()
     {
         return array_map(
-            fn ($locale) => [$locale],
+            static fn ($locale) => [$locale],
             static::getRootLocales()
         );
     }
@@ -818,7 +834,7 @@ abstract class ResourceBundleTestCase extends TestCase
     {
         if (null === self::$rootLocales) {
             // no locales for which fallback is possible (e.g "en_GB")
-            self::$rootLocales = array_filter(static::getLocales(), fn ($locale) => !str_contains($locale, '_'));
+            self::$rootLocales = array_filter(static::getLocales(), static fn ($locale) => !str_contains($locale, '_'));
         }
 
         return self::$rootLocales;

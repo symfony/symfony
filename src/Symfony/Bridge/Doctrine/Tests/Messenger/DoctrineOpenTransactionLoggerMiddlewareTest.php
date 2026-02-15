@@ -24,7 +24,7 @@ class DoctrineOpenTransactionLoggerMiddlewareTest extends MiddlewareTestCase
 {
     private AbstractLogger $logger;
     private MockObject&Connection $connection;
-    private MockObject&EntityManagerInterface $entityManager;
+    private EntityManagerInterface $entityManager;
     private DoctrineOpenTransactionLoggerMiddleware $middleware;
 
     protected function setUp(): void
@@ -40,10 +40,10 @@ class DoctrineOpenTransactionLoggerMiddlewareTest extends MiddlewareTestCase
 
         $this->connection = $this->createMock(Connection::class);
 
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
 
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
         $managerRegistry->method('getManager')->willReturn($this->entityManager);
 
         $this->middleware = new DoctrineOpenTransactionLoggerMiddleware($managerRegistry, null, $this->logger);

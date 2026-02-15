@@ -35,13 +35,13 @@ class VarClonerTest extends TestCase
         };
 
         AbstractCloner::addDefaultCasters([
-            $o1::class => function ($obj, $array) {
+            $o1::class => static function ($obj, $array) {
                 $array['p1'] = 123;
 
                 return $array;
             },
             // Test we can override the default casters
-            \DateTimeInterface::class => function (\DateTimeInterface $obj, $array, Stub $stub, bool $isNested, int $filter) {
+            \DateTimeInterface::class => static function (\DateTimeInterface $obj, $array, Stub $stub, bool $isNested, int $filter) {
                 $array = DateCaster::castDateTime($obj, $array, $stub, $isNested, $filter);
                 $array['foo'] = 'bar';
 
@@ -50,7 +50,7 @@ class VarClonerTest extends TestCase
         ]);
         $cloner = new VarCloner();
         $cloner->addCasters([
-            $o2::class => function ($obj, $array) {
+            $o2::class => static function ($obj, $array) {
                 $array['p2'] = 456;
 
                 return $array;
@@ -461,8 +461,8 @@ class VarClonerTest extends TestCase
     public function testCaster()
     {
         $cloner = new VarCloner([
-            '*' => fn ($obj, $array) => ['foo' => 123],
-            __CLASS__ => function ($obj, $array) {
+            '*' => static fn ($obj, $array) => ['foo' => 123],
+            __CLASS__ => static function ($obj, $array) {
                 ++$array['foo'];
 
                 return $array;

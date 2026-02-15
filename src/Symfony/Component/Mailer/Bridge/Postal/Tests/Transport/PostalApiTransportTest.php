@@ -63,7 +63,7 @@ class PostalApiTransportTest extends TestCase
             $this->assertSame(base64_encode('some attachment'), $body['attachments'][0]['data']);
             $this->assertSame('foo@bar.fr', $body['reply_to']);
 
-            return new JsonMockResponse(['message_id' => 'foobar'], [
+            return new JsonMockResponse(['data' => ['message_id' => 'foobar']], [
                 'http_code' => 200,
             ]);
         });
@@ -86,11 +86,9 @@ class PostalApiTransportTest extends TestCase
 
     public function testSendThrowsForErrorResponse()
     {
-        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
-            return new JsonMockResponse(['message' => 'i\'m a teapot'], [
-                'http_code' => 418,
-            ]);
-        });
+        $client = new MockHttpClient(static fn (string $method, string $url, array $options): ResponseInterface => new JsonMockResponse(['message' => 'i\'m a teapot'], [
+            'http_code' => 418,
+        ]));
         $transport = new PostalApiTransport('TOKEN', 'postal.localhost', $client);
 
         $mail = new Email();

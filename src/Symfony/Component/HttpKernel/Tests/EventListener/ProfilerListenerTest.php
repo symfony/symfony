@@ -40,10 +40,10 @@ class ProfilerListenerTest extends TestCase
             ->method('collect')
             ->willReturn($profile);
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = $this->createStub(HttpKernelInterface::class);
         $mainRequest = new Request();
         $subRequest = new Request();
-        $response = $this->createMock(Response::class);
+        $response = new Response();
 
         $requestStack = new RequestStack();
         $requestStack->push($mainRequest);
@@ -75,7 +75,7 @@ class ProfilerListenerTest extends TestCase
             ->expects(null === $enable ? $this->never() : $this->once())
             ->method($enable ? 'enable' : 'disable');
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = $this->createStub(HttpKernelInterface::class);
         $response = new Response();
 
         $requestStack = new RequestStack();

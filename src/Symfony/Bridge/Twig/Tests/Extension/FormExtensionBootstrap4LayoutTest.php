@@ -16,7 +16,7 @@ use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Component\Form\FormRenderer;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -65,7 +65,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTestCase
             'bootstrap_4_layout.html.twig',
             'custom_widgets.html.twig',
         ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->createMock(CsrfTokenManagerInterface::class));
+        $this->renderer = new FormRenderer($rendererEngine, new CsrfTokenManager());
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
 
         $view = $this->factory
@@ -76,7 +76,7 @@ class FormExtensionBootstrap4LayoutTest extends AbstractBootstrap4LayoutTestCase
         $this->assertSame(<<<'HTML'
             <div class="input-group "><div class="input-group-prepend">
                                 <span class="input-group-text">&euro; </span>
-                            </div><input type="text" id="name" name="name" required="required" class="form-control" /></div>
+                            </div><input type="text" id="name" name="name" required="required" inputmode="decimal" class="form-control" /></div>
             HTML,
             trim($this->renderWidget($view))
         );

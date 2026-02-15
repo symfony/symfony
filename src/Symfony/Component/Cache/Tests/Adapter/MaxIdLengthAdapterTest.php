@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Assert;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
@@ -19,25 +20,24 @@ class MaxIdLengthAdapterTest extends TestCase
 {
     public function testLongKey()
     {
-        $cache = $this->getMockBuilder(MaxIdLengthAdapter::class)
-            ->setConstructorArgs([str_repeat('-', 10)])
-            ->onlyMethods(['doHave', 'doFetch', 'doDelete', 'doSave', 'doClear'])
-            ->getMock();
+        $cache = new class extends MaxIdLengthAdapter {
+            private static $series = [
+                ['----------:z5XrNUPebf0nPxQwjc6C1A:'],
+                ['----------:---------------------------------------'],
+            ];
 
-        $cache->expects($this->exactly(2))
-            ->method('doHave')
-            ->willReturnCallback(function (...$args) {
-                static $series = [
-                    ['----------:z5XrNUPebf0nPxQwjc6C1A:'],
-                    ['----------:---------------------------------------'],
-                ];
+            public function __construct()
+            {
+                parent::__construct(str_repeat('-', 10));
+            }
 
-                $expectedArgs = array_shift($series);
-                $this->assertSame($expectedArgs, $args);
+            protected function doHave(string $id): bool
+            {
+                Assert::assertSame(array_shift(self::$series), $id);
 
                 return false;
-            })
-        ;
+            }
+        };
 
         $cache->hasItem(str_repeat('-', 40));
         $cache->hasItem(str_repeat('-', 39));
@@ -45,13 +45,17 @@ class MaxIdLengthAdapterTest extends TestCase
 
     public function testLongKeyVersioning()
     {
-        $cache = $this->getMockBuilder(MaxIdLengthAdapter::class)
-            ->setConstructorArgs([str_repeat('-', 26)])
-            ->getMock();
+        $cache = new class extends MaxIdLengthAdapter {
+            public function __construct()
+            {
+                parent::__construct(str_repeat('-', 26));
+            }
 
-        $cache
-            ->method('doFetch')
-            ->willReturn(['2:']);
+            protected function doFetch(array $ids): iterable
+            {
+                return ['2:'];
+            }
+        };
 
         $reflectionClass = new \ReflectionClass(AbstractAdapter::class);
 
@@ -90,5 +94,30 @@ abstract class MaxIdLengthAdapter extends AbstractAdapter
         $this->maxIdLength = 50;
 
         parent::__construct($ns);
+    }
+
+    protected function doFetch(array $ids): iterable
+    {
+        throw new \LogicException(\sprintf('"%s()" was not expected to be called.', __METHOD__));
+    }
+
+    protected function doHave(string $id): bool
+    {
+        throw new \LogicException(\sprintf('"%s()" was not expected to be called.', __METHOD__));
+    }
+
+    protected function doClear(string $namespace): bool
+    {
+        throw new \LogicException(\sprintf('"%s()" was not expected to be called.', __METHOD__));
+    }
+
+    protected function doDelete(array $ids): bool
+    {
+        throw new \LogicException(\sprintf('"%s()" was not expected to be called.', __METHOD__));
+    }
+
+    protected function doSave(array $values, int $lifetime): array|bool
+    {
+        throw new \LogicException(\sprintf('"%s()" was not expected to be called.', __METHOD__));
     }
 }

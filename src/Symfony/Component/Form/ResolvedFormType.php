@@ -13,6 +13,10 @@ namespace Symfony\Component\Form;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Flow\ButtonFlowBuilder;
+use Symfony\Component\Form\Flow\ButtonFlowTypeInterface;
+use Symfony\Component\Form\Flow\FormFlowBuilder;
+use Symfony\Component\Form\Flow\FormFlowTypeInterface;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -154,6 +158,14 @@ class ResolvedFormType implements ResolvedFormTypeInterface
 
         if ($this->innerType instanceof SubmitButtonTypeInterface) {
             return new SubmitButtonBuilder($name, $options);
+        }
+
+        if ($this->innerType instanceof ButtonFlowTypeInterface) {
+            return new ButtonFlowBuilder($name, $options);
+        }
+
+        if ($this->innerType instanceof FormFlowTypeInterface) {
+            return new FormFlowBuilder($name, $dataClass, new EventDispatcher(), $factory, $options);
         }
 
         return new FormBuilder($name, $dataClass, new EventDispatcher(), $factory, $options);

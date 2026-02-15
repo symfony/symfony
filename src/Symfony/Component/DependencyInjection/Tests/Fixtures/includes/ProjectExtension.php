@@ -23,16 +23,6 @@ class ProjectExtension implements ExtensionInterface
         $configuration->setParameter('project.parameter.foo', $config['foo'] ?? 'foobar');
     }
 
-    public function getXsdValidationBasePath(): string|false
-    {
-        return false;
-    }
-
-    public function getNamespace(): string
-    {
-        return 'http://www.example.com/schema/project';
-    }
-
     public function getAlias(): string
     {
         return 'project';

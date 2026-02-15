@@ -337,7 +337,7 @@ abstract class AbstractTableLayoutTestCase extends AbstractLayoutTestCase
 
     public function testCsrf()
     {
-        $this->csrfTokenManager->expects($this->any())
+        $this->csrfTokenManager
             ->method('getToken')
             ->willReturn(new CsrfToken('token_id', 'foo&bar'));
 

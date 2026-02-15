@@ -21,15 +21,23 @@ use Symfony\Component\JsonStreamer\Mapping\Write\AttributePropertyMetadataLoader
 use Symfony\Component\JsonStreamer\Mapping\Write\DateTimeTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyEnum;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithArray;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDollarNamedProperties;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedArray;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedDictDummies;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedList;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNestedListDummies;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithOtherDummies;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithSyntheticProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransformerAttributes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummy;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyDict;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\BooleanToStringValueTransformer;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\DoubleIntAndCastToStringValueTransformer;
 use Symfony\Component\JsonStreamer\Tests\ServiceContainer;
@@ -56,9 +64,9 @@ class StreamWriterGeneratorTest extends TestCase
     }
 
     #[DataProvider('generatedStreamWriterDataProvider')]
-    public function testGeneratedStreamWriter(string $fixture, Type $type)
+    public function testGeneratedStreamWriter(string $fixture, Type $type, ?PropertyMetadataLoaderInterface $propertyMetadataLoader = null)
     {
-        $propertyMetadataLoader = new GenericTypePropertyMetadataLoader(
+        $propertyMetadataLoader ??= new GenericTypePropertyMetadataLoader(
             new DateTimeTypePropertyMetadataLoader(new AttributePropertyMetadataLoader(
                 new PropertyMetadataLoader(TypeResolver::create()),
                 new ServiceContainer([
@@ -72,6 +80,14 @@ class StreamWriterGeneratorTest extends TestCase
 
         $generator = new StreamWriterGenerator($propertyMetadataLoader, $this->streamWritersDir);
 
+        if ($_ENV['TEST_GENERATE_FIXTURES'] ?? false) {
+            file_put_contents(
+                \sprintf('%s/Fixtures/stream_writer/%s.php', \dirname(__DIR__), $fixture),
+                file_get_contents($generator->generate($type)),
+            );
+            $this->markTestIncomplete('TEST_GENERATE_FIXTURES is set');
+        }
+
         $this->assertStringEqualsFile(
             \sprintf('%s/Fixtures/stream_writer/%s.php', \dirname(__DIR__), $fixture),
             file_get_contents($generator->generate($type)),
@@ -79,7 +95,7 @@ class StreamWriterGeneratorTest extends TestCase
     }
 
     /**
-     * @return iterable<array{0: string, 1: Type}>
+     * @return iterable<array{0: string, 1: Type, 2?: PropertyMetadataLoaderInterface}>
      */
     public static function generatedStreamWriterDataProvider(): iterable
     {
@@ -95,8 +111,13 @@ class StreamWriterGeneratorTest extends TestCase
         yield ['null_list', Type::list(Type::null())];
         yield ['object_list', Type::list(Type::object(DummyWithNameAttributes::class))];
         yield ['nullable_object_list', Type::nullable(Type::list(Type::object(DummyWithNameAttributes::class)))];
-        yield ['nested_list', Type::list(Type::object(DummyWithArray::class))];
-        yield ['double_nested_list', Type::list(Type::object(DummyWithNestedArray::class))];
+        yield ['nested_list', Type::list(Type::object(DummyWithList::class))];
+        yield ['double_nested_list', Type::list(Type::object(DummyWithNestedList::class))];
+        yield ['object_with_nested_list_self', Type::object(DummyWithNestedListDummies::class)];
+        yield ['object_with_nested_dict_self', Type::object(DummyWithNestedDictDummies::class)];
+
+        yield ['nested_array', Type::list(Type::object(DummyWithArray::class))];
+        yield ['double_nested_array', Type::list(Type::object(DummyWithNestedArray::class))];
 
         yield ['dict', Type::dict()];
         yield ['object_dict', Type::dict(Type::object(DummyWithNameAttributes::class))];
@@ -110,7 +131,10 @@ class StreamWriterGeneratorTest extends TestCase
         yield ['object_in_object', Type::object(DummyWithOtherDummies::class)];
         yield ['object_with_value_transformer', Type::object(DummyWithValueTransformerAttributes::class)];
         yield ['self_referencing_object', Type::object(SelfReferencingDummy::class)];
+        yield ['self_referencing_object_list', Type::object(SelfReferencingDummyList::class)];
+        yield ['self_referencing_object_dict', Type::object(SelfReferencingDummyDict::class)];
         yield ['object_with_dollar_named_properties', Type::object(DummyWithDollarNamedProperties::class)];
+        yield ['object_with_synthetic_properties', Type::object(DummyWithSyntheticProperties::class), new SyntheticPropertyMetadataLoader()];
 
         yield ['union', Type::union(Type::int(), Type::list(Type::enum(DummyBackedEnum::class)), Type::object(DummyWithNameAttributes::class))];
         yield ['object_with_union', Type::object(DummyWithUnionProperties::class)];

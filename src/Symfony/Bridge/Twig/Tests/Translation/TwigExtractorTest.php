@@ -15,11 +15,10 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Translation\TwigExtractor;
+use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Translation\MessageCatalogue;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
-use Twig\Loader\LoaderInterface;
 
 class TwigExtractorTest extends TestCase
 {
@@ -28,14 +27,13 @@ class TwigExtractorTest extends TestCase
     #[DataProvider('getExtractData')]
     public function testExtract($template, $messages)
     {
-        $loader = $this->createMock(LoaderInterface::class);
-        $twig = new Environment($loader, [
+        $twig = new Environment(new ArrayLoader(), [
             'strict_variables' => true,
             'debug' => true,
             'cache' => false,
             'autoescape' => false,
         ]);
-        $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
+        $twig->addExtension(new TranslationExtension(new IdentityTranslator()));
 
         $extractor = new TwigExtractor($twig);
         $extractor->setPrefix('prefix');
@@ -96,8 +94,8 @@ class TwigExtractorTest extends TestCase
     #[DataProvider('resourcesWithSyntaxErrorsProvider')]
     public function testExtractSyntaxError($resources, array $messages)
     {
-        $twig = new Environment($this->createMock(LoaderInterface::class));
-        $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
+        $twig = new Environment(new ArrayLoader());
+        $twig->addExtension(new TranslationExtension(new IdentityTranslator()));
 
         $extractor = new TwigExtractor($twig);
         $catalogue = new MessageCatalogue('en');
@@ -124,7 +122,7 @@ class TwigExtractorTest extends TestCase
             'cache' => false,
             'autoescape' => false,
         ]);
-        $twig->addExtension(new TranslationExtension($this->createMock(TranslatorInterface::class)));
+        $twig->addExtension(new TranslationExtension(new IdentityTranslator()));
 
         $extractor = new TwigExtractor($twig);
         $catalogue = new MessageCatalogue('en');

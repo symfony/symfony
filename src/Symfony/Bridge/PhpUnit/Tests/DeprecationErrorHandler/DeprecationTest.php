@@ -34,7 +34,7 @@ class DeprecationTest extends TestCase
             if ('C' === $class[0] && str_starts_with($class, 'ComposerAutoloaderInit')) {
                 $r = new \ReflectionClass($class);
                 $vendorDir = \dirname($r->getFileName(), 2);
-                if (file_exists($vendorDir.'/composer/installed.json') && @mkdir($vendorDir.'/myfakevendor/myfakepackage1', 0777, true)) {
+                if (file_exists($vendorDir.'/composer/installed.json') && @mkdir($vendorDir.'/myfakevendor/myfakepackage1', 0o777, true)) {
                     break;
                 }
             }

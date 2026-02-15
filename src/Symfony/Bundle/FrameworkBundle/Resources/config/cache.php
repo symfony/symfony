@@ -96,6 +96,7 @@ return static function (ContainerConfigurator $container) {
                 '', // namespace
                 0, // default lifetime
                 abstract_arg('version'),
+                service('cache.default_marshaller')->ignoreOnInvalid(),
             ])
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('cache.pool', ['clearer' => 'cache.default_clearer', 'reset' => 'reset'])

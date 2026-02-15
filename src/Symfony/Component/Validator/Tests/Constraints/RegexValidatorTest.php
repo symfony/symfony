@@ -12,8 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\RegexValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -55,17 +53,6 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    #[DataProvider('getValidValuesWithWhitespaces')]
-    public function testValidValuesWithWhitespaces($value)
-    {
-        $constraint = new Regex(['pattern' => '/^[0-9]+$/', 'normalizer' => 'trim']);
-        $this->validator->validate($value, $constraint);
-
-        $this->assertNoViolation();
-    }
-
     #[DataProvider('getValidValuesWithWhitespaces')]
     public function testValidValuesWithWhitespacesNamed($value)
     {
@@ -101,25 +88,6 @@ class RegexValidatorTest extends ConstraintValidatorTestCase
             ["\x00070707\x00"],
             ["\x0B\x0B70707\x0B\x0B"],
         ];
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    #[DataProvider('getInvalidValues')]
-    public function testInvalidValues($value)
-    {
-        $constraint = new Regex([
-            'pattern' => '/^[0-9]+$/',
-            'message' => 'myMessage',
-        ]);
-
-        $this->validator->validate($value, $constraint);
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', '"'.$value.'"')
-            ->setParameter('{{ pattern }}', '/^[0-9]+$/')
-            ->setCode(Regex::REGEX_FAILED_ERROR)
-            ->assertRaised();
     }
 
     #[DataProvider('getInvalidValues')]

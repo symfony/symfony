@@ -164,7 +164,7 @@ class TranslationExtractCommandTest extends TestCase
             }
         }
 
-        $command = $this->createMock(TranslationExtractCommand::class);
+        $command = $this->createStub(TranslationExtractCommand::class);
 
         $method = new \ReflectionMethod(TranslationExtractCommand::class, 'filterDuplicateTransPaths');
 
@@ -192,7 +192,7 @@ class TranslationExtractCommandTest extends TestCase
             ->method('set');
 
         // Calling private method
-        $translationUpdate = $this->createMock(TranslationExtractCommand::class);
+        $translationUpdate = $this->createStub(TranslationExtractCommand::class);
         $reflection = new \ReflectionObject($translationUpdate);
         $method = $reflection->getMethod('removeNoFillTranslations');
         $method->invokeArgs($translationUpdate, [$operation]);
@@ -231,44 +231,37 @@ class TranslationExtractCommandTest extends TestCase
 
     private function createCommandTester($extractedMessages = [], $loadedMessages = [], ?KernelInterface $kernel = null, array $transPaths = [], array $codePaths = [], ?array $writerMessages = null): CommandTester
     {
-        $translator = $this->createMock(Translator::class);
-        $translator
-            ->expects($this->any())
-            ->method('getFallbackLocales')
-            ->willReturn(['en']);
+        $translator = new Translator('fr');
+        $translator->setFallbackLocales(['en']);
 
-        $extractor = $this->createMock(ExtractorInterface::class);
+        $extractor = $this->createStub(ExtractorInterface::class);
         $extractor
-            ->expects($this->any())
             ->method('extract')
             ->willReturnCallback(
-                function ($path, $catalogue) use ($extractedMessages) {
+                static function ($path, $catalogue) use ($extractedMessages) {
                     foreach ($extractedMessages as $domain => $messages) {
                         $catalogue->add($messages, $domain);
                     }
                 }
             );
 
-        $loader = $this->createMock(TranslationReader::class);
+        $loader = $this->createStub(TranslationReader::class);
         $loader
-            ->expects($this->any())
             ->method('read')
             ->willReturnCallback(
-                function ($path, $catalogue) use ($loadedMessages) {
+                static function ($path, $catalogue) use ($loadedMessages) {
                     $catalogue->add($loadedMessages);
                 }
             );
 
-        $writer = $this->createMock(TranslationWriter::class);
+        $writer = $this->createStub(TranslationWriter::class);
         $writer
-            ->expects($this->any())
             ->method('getFormats')
             ->willReturn(
                 ['xlf', 'yml', 'yaml']
             );
         if (null !== $writerMessages) {
             $writer
-                ->expects($this->any())
                 ->method('write')
                 ->willReturnCallback(
                     function (MessageCatalogue $catalogue) use ($writerMessages) {
@@ -282,21 +275,18 @@ class TranslationExtractCommandTest extends TestCase
                 ['foo', $this->getBundle($this->translationDir)],
                 ['test', $this->getBundle('test')],
             ];
-            $kernel = $this->createMock(KernelInterface::class);
+            $kernel = $this->createStub(KernelInterface::class);
             $kernel
-                ->expects($this->any())
                 ->method('getBundle')
                 ->willReturnMap($returnValues);
         }
 
         $kernel
-            ->expects($this->any())
             ->method('getBundles')
             ->willReturn([]);
 
         $container = new Container();
         $kernel
-            ->expects($this->any())
             ->method('getContainer')
             ->willReturn($container);
 
@@ -310,9 +300,8 @@ class TranslationExtractCommandTest extends TestCase
 
     private function getBundle($path)
     {
-        $bundle = $this->createMock(BundleInterface::class);
+        $bundle = $this->createStub(BundleInterface::class);
         $bundle
-            ->expects($this->any())
             ->method('getPath')
             ->willReturn($path)
         ;

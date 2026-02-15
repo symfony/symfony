@@ -62,7 +62,7 @@ final class FakeSmsEmailTransport extends AbstractTransport
         }
 
         $email = (new Email())
-            ->from($message->getFrom() ?: $this->from)
+            ->from($this->from)
             ->to($this->to)
             ->subject(\sprintf('New SMS on phone number: %s', $message->getPhone()))
             ->html($message->getSubject())

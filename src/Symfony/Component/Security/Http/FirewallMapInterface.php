@@ -36,7 +36,7 @@ interface FirewallMapInterface
      * If there is no logout listener, the third element of the outer array
      * must be null.
      *
-     * @return array{iterable<mixed, callable|FirewallListenerInterface>, ExceptionListener, LogoutListener}
+     * @return array{iterable<mixed, FirewallListenerInterface>, ExceptionListener, LogoutListener}
      */
     public function getListeners(Request $request): array;
 }

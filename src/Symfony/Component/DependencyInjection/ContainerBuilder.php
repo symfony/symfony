@@ -200,10 +200,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function registerExtension(ExtensionInterface $extension): void
     {
         $this->extensions[$extension->getAlias()] = $extension;
-
-        if (false !== $extension->getNamespace()) {
-            $this->extensionsByNs[$extension->getNamespace() ?? ''] = $extension;
-        }
     }
 
     /**
@@ -1171,7 +1167,7 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         }
 
         if (!array_is_list($arguments)) {
-            $arguments = array_combine(array_map(fn ($k) => preg_replace('/^.*\\$/', '', $k), array_keys($arguments)), $arguments);
+            $arguments = array_combine(array_map(static fn ($k) => preg_replace('/^.*\\$/', '', $k), array_keys($arguments)), $arguments);
         }
 
         if (null !== $factory) {
@@ -1372,13 +1368,10 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      *          }
      *      }
      *
-     * @param bool $throwOnAbstract
-     *
      * @return array<string, array> An array of tags with the tagged service as key, holding a list of attribute arrays
      */
-    public function findTaggedResourceIds(string $tagName/* , bool $throwOnAbstract = true */): array
+    public function findTaggedResourceIds(string $tagName, bool $throwOnAbstract = true): array
     {
-        $throwOnAbstract = \func_num_args() > 1 ? func_get_arg(1) : true;
         $this->usedTags[] = $tagName;
         $tags = [];
         foreach ($this->getDefinitions() as $id => $definition) {
@@ -1476,13 +1469,11 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
      * using camel case: "foo.bar" or "foo_bar" creates an alias bound to
      * "$fooBar"-named arguments with $type as type-hint. Such arguments will
      * receive the service $id when autowiring is used.
-     *
-     * @param ?string $target
      */
-    public function registerAliasForArgument(string $id, string $type, ?string $name = null/* , ?string $target = null */): Alias
+    public function registerAliasForArgument(string $id, string $type, ?string $name = null, ?string $target = null): Alias
     {
         $parsedName = (new Target($name ??= $id))->getParsedName();
-        $target = (\func_num_args() > 3 ? func_get_arg(3) : null) ?? $name;
+        $target ??= $name;
 
         if (!preg_match('/^[a-zA-Z_\x7f-\xff]/', $parsedName)) {
             if ($id !== $name) {
@@ -1507,27 +1498,6 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
     public function getAutoconfiguredInstanceof(): array
     {
         return $this->autoconfiguredInstanceof;
-    }
-
-    /**
-     * @return array<class-string, callable>
-     *
-     * @deprecated Use {@see getAttributeAutoconfigurators()} instead
-     */
-    public function getAutoconfiguredAttributes(): array
-    {
-        trigger_deprecation('symfony/dependency-injection', '7.3', 'The "%s()" method is deprecated, use "getAttributeAutoconfigurators()" instead.', __METHOD__);
-
-        $autoconfiguredAttributes = [];
-        foreach ($this->autoconfiguredAttributes as $attribute => $configurators) {
-            if (\count($configurators) > 1) {
-                throw new LogicException(\sprintf('The "%s" attribute has %d configurators. Use "getAttributeAutoconfigurators()" to get all of them.', $attribute, \count($configurators)));
-            }
-
-            $autoconfiguredAttributes[$attribute] = $configurators[0];
-        }
-
-        return $autoconfiguredAttributes;
     }
 
     /**

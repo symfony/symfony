@@ -13,9 +13,8 @@ $ruleset = new TwigCsFixer\Ruleset\Ruleset();
 $ruleset->addStandard(new TwigCsFixer\Standard\TwigCsFixer());
 
 $finder = new TwigCsFixer\File\Finder();
-$finder->in('src/Symfony/Bridge/');
-$finder->in('src/Symfony/Bundle/');
-$finder->in('src/Symfony/Component/');
+$finder->in('src/');
+$finder->exclude('Symfony/Contracts/');
 $finder->exclude('Fixtures');
 
 $config = new TwigCsFixer\Config\Config();

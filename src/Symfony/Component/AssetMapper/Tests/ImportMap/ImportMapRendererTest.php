@@ -60,10 +60,10 @@ class ImportMapRendererTest extends TestCase
                 ],
             ]);
 
-        $assetPackages = $this->createMock(Packages::class);
-        $assetPackages->expects($this->any())
+        $assetPackages = $this->createStub(Packages::class);
+        $assetPackages
             ->method('getUrl')
-            ->willReturnCallback(function ($path) {
+            ->willReturnCallback(static function ($path) {
                 // try to imitate the behavior of the real service
                 if (str_starts_with($path, 'http') || str_starts_with($path, '/')) {
                     return $path;
@@ -116,7 +116,7 @@ class ImportMapRendererTest extends TestCase
 
         $renderer = new ImportMapRenderer(
             $importMapGenerator,
-            $this->createMock(Packages::class),
+            $this->createStub(Packages::class),
             polyfillImportName: 'es-module-shims',
         );
         $html = $renderer->render(['app']);

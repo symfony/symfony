@@ -254,7 +254,7 @@ class ArrayNodeDefinitionTest extends TestCase
             ->children()
                 ->scalarNode('value')
                     ->beforeNormalization()
-                        ->ifTrue(fn ($value) => !$value)
+                        ->ifTrue(static fn ($value) => !$value)
                         ->thenUnset()
                     ->end()
                 ->end()
@@ -346,6 +346,53 @@ class ArrayNodeDefinitionTest extends TestCase
             [['enabled' => true, 'foo' => 'baz'], [['foo' => 'baz']], 'any configuration enables an enableable node'],
             [['enabled' => false, 'foo' => 'baz'], [['foo' => 'baz', 'enabled' => false]], 'An enableable node can be disabled'],
             [['enabled' => false, 'foo' => 'bar'], [false], 'false disables an enableable node'],
+        ];
+    }
+
+    #[DataProvider('provideEnabledStateAfterMerging')]
+    public function testEnabledStateIsPreservedAcrossMergedConfigs(array $firstConfig, array $expected, callable $nodeFactory)
+    {
+        $processor = new Processor();
+        $node = $nodeFactory();
+
+        $this->assertSame(
+            $expected,
+            $processor->process($node->getNode(), [
+                $firstConfig,
+                ['foo' => 'baz'],
+            ])
+        );
+    }
+
+    public static function provideEnabledStateAfterMerging(): array
+    {
+        $factory = static function (callable $builder) {
+            $node = new ArrayNodeDefinition('root');
+            $builder($node)
+                ->children()
+                    ->scalarNode('foo')->defaultValue('bar')->end()
+                ->end()
+            ;
+
+            return $node;
+        };
+
+        return [
+            'canBeEnabled keeps explicit true' => [
+                ['enabled' => true],
+                ['enabled' => true, 'foo' => 'baz'],
+                static fn () => $factory(static fn ($node) => $node->canBeEnabled()),
+            ],
+            'canBeDisabled keeps explicit false' => [
+                ['enabled' => false],
+                ['enabled' => false, 'foo' => 'baz'],
+                static fn () => $factory(static fn ($node) => $node->canBeDisabled()),
+            ],
+            'canBeDisabled keeps explicit true' => [
+                ['enabled' => true],
+                ['enabled' => true, 'foo' => 'baz'],
+                static fn () => $factory(static fn ($node) => $node->canBeDisabled()),
+            ],
         ];
     }
 

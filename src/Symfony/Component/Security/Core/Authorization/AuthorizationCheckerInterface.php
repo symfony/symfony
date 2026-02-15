@@ -24,5 +24,5 @@ interface AuthorizationCheckerInterface
      * @param mixed               $attribute      A single attribute to vote on (can be of any type; strings, Expression and Closure instances are supported by the core)
      * @param AccessDecision|null $accessDecision Should be used to explain the decision
      */
-    public function isGranted(mixed $attribute, mixed $subject = null/* , ?AccessDecision $accessDecision = null */): bool;
+    public function isGranted(mixed $attribute, mixed $subject = null, ?AccessDecision $accessDecision = null): bool;
 }

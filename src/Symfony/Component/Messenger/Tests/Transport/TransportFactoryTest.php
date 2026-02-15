@@ -28,10 +28,10 @@ class TransportFactoryTest extends TestCase
             $this->expectException(InvalidArgumentException::class);
             $this->expectExceptionMessage($expectedMessage);
         }
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = $this->createStub(SerializerInterface::class);
         $factories = [];
         foreach ($transportSupport as $supported) {
-            $factory = $this->createMock(TransportFactoryInterface::class);
+            $factory = $this->createStub(TransportFactoryInterface::class);
             $factory->method('supports', $dsn, [])->willReturn($supported);
             $factories[] = $factory;
         }

@@ -16,13 +16,13 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Event\AuthenticationSuccessEvent;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
-use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\PreAuthenticatedUserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\EventListener\UserCheckerListener;
+use Symfony\Component\Security\Http\Tests\Fixtures\DummyAuthenticator;
 
 class UserCheckerListenerTest extends TestCase
 {
@@ -70,6 +70,6 @@ class UserCheckerListenerTest extends TestCase
     {
         $passport ??= new SelfValidatingPassport(new UserBadge('test', fn () => $this->user));
 
-        return new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport);
+        return new CheckPassportEvent(new DummyAuthenticator(), $passport);
     }
 }

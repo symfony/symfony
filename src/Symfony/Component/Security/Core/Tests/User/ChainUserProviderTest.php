@@ -20,7 +20,6 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Core\User\InMemoryUserProvider;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 class ChainUserProviderTest extends TestCase
@@ -40,7 +39,7 @@ class ChainUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($this->equalTo('foo'))
-            ->willReturn($account = $this->createMock(UserInterface::class))
+            ->willReturn($account = new InMemoryUser('John', 'password'))
         ;
 
         $provider = new ChainUserProvider([$provider1, $provider2]);
@@ -70,7 +69,7 @@ class ChainUserProviderTest extends TestCase
             ->expects($this->once())
             ->method('loadUserByIdentifier')
             ->with($this->equalTo('foo'), $this->equalTo(['attr' => 5]))
-            ->willReturn($account = $this->createMock(UserInterface::class))
+            ->willReturn($account = new InMemoryUser('John', 'password'))
         ;
 
         $provider = new ChainUserProvider([$provider0, $provider1, $provider2]);
@@ -134,11 +133,11 @@ class ChainUserProviderTest extends TestCase
         $provider3
             ->expects($this->once())
             ->method('refreshUser')
-            ->willReturn($account = $this->createMock(UserInterface::class))
+            ->willReturn($account = new InMemoryUser('John', 'password'))
         ;
 
         $provider = new ChainUserProvider([$provider1, $provider2, $provider3]);
-        $this->assertSame($account, $provider->refreshUser($this->createMock(UserInterface::class)));
+        $this->assertSame($account, $provider->refreshUser(new InMemoryUser('John', 'password')));
     }
 
     public function testRefreshUserAgain()
@@ -166,11 +165,11 @@ class ChainUserProviderTest extends TestCase
         $provider2
             ->expects($this->once())
             ->method('refreshUser')
-            ->willReturn($account = $this->createMock(UserInterface::class))
+            ->willReturn($account = new InMemoryUser('John', 'password'))
         ;
 
         $provider = new ChainUserProvider([$provider1, $provider2]);
-        $this->assertSame($account, $provider->refreshUser($this->createMock(UserInterface::class)));
+        $this->assertSame($account, $provider->refreshUser(new InMemoryUser('John', 'password')));
     }
 
     public function testRefreshUserThrowsUnsupportedUserException()
@@ -205,7 +204,7 @@ class ChainUserProviderTest extends TestCase
 
         $this->expectException(UnsupportedUserException::class);
 
-        $provider->refreshUser($this->createMock(UserInterface::class));
+        $provider->refreshUser(new InMemoryUser('John', 'password'));
     }
 
     public function testSupportsClass()
@@ -277,11 +276,11 @@ class ChainUserProviderTest extends TestCase
         $provider2
             ->expects($this->once())
             ->method('refreshUser')
-            ->willReturn($account = $this->createMock(UserInterface::class))
+            ->willReturn($account = new InMemoryUser('John', 'password'))
         ;
 
         $provider = new ChainUserProvider(new \ArrayObject([$provider1, $provider2]));
-        $this->assertSame($account, $provider->refreshUser($this->createMock(UserInterface::class)));
+        $this->assertSame($account, $provider->refreshUser(new InMemoryUser('John', 'password')));
     }
 
     public function testPasswordUpgrades()

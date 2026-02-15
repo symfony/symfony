@@ -81,7 +81,7 @@ class ImportMapAuditCommand extends Command
         $rows = [];
 
         $packagesWithoutVersion = [];
-        $vulnerabilitiesCount = array_map(fn () => 0, self::SEVERITY_COLORS);
+        $vulnerabilitiesCount = array_map(static fn () => 0, self::SEVERITY_COLORS);
         foreach ($audit as $packageAudit) {
             if (!$packageAudit->version) {
                 $packagesWithoutVersion[] = $packageAudit->package;
@@ -158,7 +158,7 @@ class ImportMapAuditCommand extends Command
 
     private function displayJson(array $audit): int
     {
-        $vulnerabilitiesCount = array_map(fn () => 0, self::SEVERITY_COLORS);
+        $vulnerabilitiesCount = array_map(static fn () => 0, self::SEVERITY_COLORS);
 
         $json = [
             'packages' => [],
@@ -169,7 +169,7 @@ class ImportMapAuditCommand extends Command
             $json['packages'][] = [
                 'package' => $packageAudit->package,
                 'version' => $packageAudit->version,
-                'vulnerabilities' => array_map(fn (ImportMapPackageAuditVulnerability $v) => [
+                'vulnerabilities' => array_map(static fn (ImportMapPackageAuditVulnerability $v) => [
                     'ghsa_id' => $v->ghsaId,
                     'cve_id' => $v->cveId,
                     'url' => $v->url,

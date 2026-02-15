@@ -24,7 +24,7 @@
     {%- if errors|length > 0 -%}
         <ul>
             {%- for error in errors -%}
-                <li class="{{ error_item_class|default('text-red-700') }}">{{ error.message }}</li>
+                <li class="{{ error_item_class|default('text-red-700') }}" id="{{ id ~ '_error' ~ loop.index }}">{{ error.message }}</li>
             {%- endfor -%}
         </ul>
     {%- endif -%}

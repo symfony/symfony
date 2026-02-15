@@ -30,8 +30,8 @@ class IntlCallbackChoiceLoaderTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        self::$loader = new IntlCallbackChoiceLoader(fn () => self::$choices);
-        self::$value = fn ($choice) => $choice->value ?? null;
+        self::$loader = new IntlCallbackChoiceLoader(static fn () => self::$choices);
+        self::$value = static fn ($choice) => $choice->value ?? null;
         self::$choices = [
             (object) ['value' => 'choice_one'],
             (object) ['value' => 'choice_two'],
@@ -47,7 +47,7 @@ class IntlCallbackChoiceLoaderTest extends TestCase
     public function testLoadChoicesOnlyOnce()
     {
         $calls = 0;
-        $loader = new IntlCallbackChoiceLoader(function () use (&$calls) {
+        $loader = new IntlCallbackChoiceLoader(static function () use (&$calls) {
             ++$calls;
 
             return self::$choices;

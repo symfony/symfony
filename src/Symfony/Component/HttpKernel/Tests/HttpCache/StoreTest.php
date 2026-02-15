@@ -350,7 +350,7 @@ class StoreTest extends TestCase
 
     /**
      * Basic case when the second header has a different value.
-     * Both responses should be cached
+     * Both responses should be cached.
      */
     public function testWriteWithMultipleVaryAndCachedAllResponse()
     {
@@ -376,7 +376,7 @@ class StoreTest extends TestCase
 
     /**
      * Basic case when the second header has the same value on both requests.
-     * The last response should be cached
+     * The last response should be cached.
      */
     public function testWriteWithMultipleVaryAndCachedLastResponse()
     {
@@ -402,7 +402,7 @@ class StoreTest extends TestCase
 
     /**
      * Case when a vary value has been removed.
-     * Both responses should be cached
+     * Both responses should be cached.
      */
     public function testWriteWithChangingVary()
     {
@@ -425,11 +425,11 @@ class StoreTest extends TestCase
 
     /**
      * Case when a vary value has been removed and headers of the new vary list are the same.
-     * The last response should be cached
+     * The last response should be cached.
      */
     public function testWriteWithRemoveVaryAndAllHeadersOnTheList()
     {
-        $req1 = Request::create('/foo', 'get', [], [], [], ['HTTP_FOO' => 'foo', 'HTTP_FOOBAR' => 'bar',]);
+        $req1 = Request::create('/foo', 'get', [], [], [], ['HTTP_FOO' => 'foo', 'HTTP_FOOBAR' => 'bar']);
         $content = str_repeat('a', 24).'b'.str_repeat('a', 24);
         $res1 = new Response($content, 200, ['vary' => ['Foo', 'bar', 'foobar'], 'X-Body-Eval' => 'SSI']);
         $this->store->write($req1, $res1);
@@ -448,7 +448,7 @@ class StoreTest extends TestCase
 
     /**
      * Case when a vary value has been added and headers of the new vary list are the same.
-     * The last response should be cached
+     * The last response should be cached.
      */
     public function testWriteWithAddingVaryAndAllHeadersOnTheList()
     {

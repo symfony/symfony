@@ -92,7 +92,7 @@ class DkimSignerTest extends TestCase
 
     public function testSignWithUnsupportedAlgorithm()
     {
-        $message = $this->createMock(Message::class);
+        $message = $this->createStub(Message::class);
 
         $signer = new DkimSigner(self::$pk, 'testdkim.symfony.net', 'sf', [
             'algorithm' => 'unsupported-value',

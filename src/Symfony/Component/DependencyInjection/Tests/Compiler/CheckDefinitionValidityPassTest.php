@@ -156,6 +156,18 @@ class CheckDefinitionValidityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testProcessSkipsDefinitionsWithErrors()
+    {
+        $container = new ContainerBuilder();
+        $definition = $container->register('a')->setSynthetic(true)->setPublic(false);
+        $definition->addError('Some error message');
+
+        // This should not throw an exception because the definition has errors
+        $this->process($container);
+
+        $this->addToAssertionCount(1);
+    }
+
     protected function process(ContainerBuilder $container)
     {
         $pass = new CheckDefinitionValidityPass();

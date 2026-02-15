@@ -95,7 +95,7 @@ trait LazyDecoratorTrait
             $notByRef = $access & Hydrator::PROPERTY_NOT_BY_REF || ($access >> 2) & \ReflectionProperty::IS_PRIVATE_SET;
         }
 
-        if ($notByRef || 2 !== ((Registry::$parentMethods[$class] ??= Registry::getParentMethods($class))['get'] ?: 2)) {
+        if ($notByRef || 2 !== ((Registry::$parentGet[$class] ??= Registry::getParentGet($class)) ?: 2)) {
             $value = $instance->$name;
 
             return $value;

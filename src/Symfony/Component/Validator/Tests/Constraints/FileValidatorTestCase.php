@@ -12,8 +12,6 @@
 namespace Symfony\Component\Validator\Tests\Constraints;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\FileValidator;
@@ -372,37 +370,6 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testInvalidMimeTypeDoctrineStyle()
-    {
-        $file = $this
-            ->getMockBuilder(\Symfony\Component\HttpFoundation\File\File::class)
-            ->setConstructorArgs([__DIR__.'/Fixtures/foo'])
-            ->getMock();
-        $file
-            ->expects($this->once())
-            ->method('getPathname')
-            ->willReturn($this->path);
-        $file
-            ->expects($this->once())
-            ->method('getMimeType')
-            ->willReturn('application/pdf');
-
-        $this->validator->validate($file, new File([
-            'mimeTypes' => ['image/png', 'image/jpg'],
-            'mimeTypesMessage' => 'myMessage',
-        ]));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ type }}', '"application/pdf"')
-            ->setParameter('{{ types }}', '"image/png", "image/jpg"')
-            ->setParameter('{{ file }}', '"'.$this->path.'"')
-            ->setParameter('{{ name }}', '"'.basename($this->path).'"')
-            ->setCode(File::INVALID_MIME_TYPE_ERROR)
-            ->assertRaised();
-    }
-
     public function testInvalidWildcardMimeType()
     {
         $file = $this
@@ -447,23 +414,6 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testDisallowEmptyDoctrineStyle()
-    {
-        ftruncate($this->file, 0);
-
-        $this->validator->validate($this->getFile($this->path), new File([
-            'disallowEmptyMessage' => 'myMessage',
-        ]));
-
-        $this->buildViolation('myMessage')
-            ->setParameter('{{ file }}', '"'.$this->path.'"')
-            ->setParameter('{{ name }}', '"'.basename($this->path).'"')
-            ->setCode(File::EMPTY_ERROR)
-            ->assertRaised();
-    }
-
     #[DataProvider('uploadedFileErrorProvider')]
     public function testUploadedFileError($error, $message, array $params = [], $maxSize = null)
     {
@@ -493,36 +443,34 @@ abstract class FileValidatorTestCase extends ConstraintValidatorTestCase
             [(string) \UPLOAD_ERR_EXTENSION, 'uploadExtensionErrorMessage'],
         ];
 
-        if (class_exists(UploadedFile::class)) {
-            // when no maxSize is specified on constraint, it should use the ini value
-            $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
-                '{{ limit }}' => UploadedFile::getMaxFilesize() / 1048576,
-                '{{ suffix }}' => 'MiB',
-            ]];
+        // when no maxSize is specified on constraint, it should use the ini value
+        $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
+            '{{ limit }}' => UploadedFile::getMaxFilesize() / 1048576,
+            '{{ suffix }}' => 'MiB',
+        ]];
 
-            // it should use the smaller limitation (maxSize option in this case)
-            $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
-                '{{ limit }}' => 1,
-                '{{ suffix }}' => 'bytes',
-            ], '1'];
+        // it should use the smaller limitation (maxSize option in this case)
+        $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
+            '{{ limit }}' => 1,
+            '{{ suffix }}' => 'bytes',
+        ], '1'];
 
-            // access FileValidator::factorizeSizes() private method to format max file size
-            $reflection = new \ReflectionClass(new FileValidator());
-            $method = $reflection->getMethod('factorizeSizes');
-            [, $limit, $suffix] = $method->invokeArgs(new FileValidator(), [0, UploadedFile::getMaxFilesize(), false]);
+        // access FileValidator::factorizeSizes() private method to format max file size
+        $reflection = new \ReflectionClass(new FileValidator());
+        $method = $reflection->getMethod('factorizeSizes');
+        [, $limit, $suffix] = $method->invokeArgs(new FileValidator(), [0, UploadedFile::getMaxFilesize(), false]);
 
-            // it correctly parses the maxSize option and not only uses simple string comparison
-            // 1000G should be bigger than the ini value
-            $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
-                '{{ limit }}' => $limit,
-                '{{ suffix }}' => $suffix,
-            ], '1000G'];
+        // it correctly parses the maxSize option and not only uses simple string comparison
+        // 1000G should be bigger than the ini value
+        $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
+            '{{ limit }}' => $limit,
+            '{{ suffix }}' => $suffix,
+        ], '1000G'];
 
-            $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
-                '{{ limit }}' => '100',
-                '{{ suffix }}' => 'kB',
-            ], '100K'];
-        }
+        $tests[] = [(string) \UPLOAD_ERR_INI_SIZE, 'uploadIniSizeErrorMessage', [
+            '{{ limit }}' => '100',
+            '{{ suffix }}' => 'kB',
+        ], '100K'];
 
         return $tests;
     }

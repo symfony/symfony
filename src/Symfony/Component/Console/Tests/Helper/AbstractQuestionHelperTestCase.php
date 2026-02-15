@@ -18,13 +18,13 @@ abstract class AbstractQuestionHelperTestCase extends TestCase
 {
     protected function createStreamableInputInterfaceMock($stream = null, $interactive = true)
     {
-        $mock = $this->createMock(StreamableInputInterface::class);
-        $mock->expects($this->any())
+        $mock = $this->createStub(StreamableInputInterface::class);
+        $mock
             ->method('isInteractive')
             ->willReturn($interactive);
 
         if ($stream) {
-            $mock->expects($this->any())
+            $mock
                 ->method('getStream')
                 ->willReturn($stream);
         }

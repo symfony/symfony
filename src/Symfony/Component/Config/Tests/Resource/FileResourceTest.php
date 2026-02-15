@@ -55,7 +55,7 @@ class FileResourceTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/The file ".*" does not exist./');
-        new FileResource('/____foo/foobar'.mt_rand(1, 999999));
+        new FileResource('/____foo/foobar'.random_int(1, 999999));
     }
 
     public function testIsFresh()

@@ -382,7 +382,7 @@ class LdapUserProviderTest extends TestCase
 
     public function testRefreshUserShouldReturnUserWithSameProperties()
     {
-        $ldap = $this->createMock(LdapInterface::class);
+        $ldap = $this->createStub(LdapInterface::class);
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={user_identifier})', 'userpassword', ['email']);
 
         $user = new LdapUser(new Entry('foo'), 'foo', 'bar', ['ROLE_DUMMY'], ['email' => 'foo@symfony.com']);
@@ -394,13 +394,14 @@ class LdapUserProviderTest extends TestCase
     {
         // Given
         $result = $this->createMock(CollectionInterface::class);
-        $query = $this->createMock(QueryInterface::class);
+        $query = $this->createStub(QueryInterface::class);
         $query
             ->method('execute')
             ->willReturn($result)
         ;
-        $ldap = $this->createMock(LdapInterface::class);
+        $ldap = $this->createStub(LdapInterface::class);
         $result
+            ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
             ->willReturn(new Entry('foo', ['sAMAccountName' => ['foo']]))
@@ -417,7 +418,7 @@ class LdapUserProviderTest extends TestCase
             ->method('query')
             ->willReturn($query)
         ;
-        $roleFetcher = $this->createMock(RoleFetcherInterface::class);
+        $roleFetcher = $this->createStub(RoleFetcherInterface::class);
         $roleFetcher
             ->method('fetchRoles')
             ->willReturn(['ROLE_FOO', 'ROLE_BAR'])

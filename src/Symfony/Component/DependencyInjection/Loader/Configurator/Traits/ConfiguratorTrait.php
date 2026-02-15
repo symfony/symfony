@@ -22,12 +22,6 @@ trait ConfiguratorTrait
      */
     final public function configurator(string|array|\Closure|ReferenceConfigurator $configurator): static
     {
-        if ($configurator instanceof \Closure) {
-            $this->definition->setConfigurator(static::processClosure($configurator));
-
-            return $this;
-        }
-
         $this->definition->setConfigurator(static::processValue($configurator, true));
 
         return $this;

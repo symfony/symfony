@@ -19,6 +19,8 @@ use Symfony\Component\Console\Command\LazyCommand;
 use Symfony\Component\Console\Command\SignalableCommandInterface;
 use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
+use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Console\Tests\Fixtures\MethodBasedTestCommand;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -233,6 +235,38 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertTrue($container->hasAlias($aliasPrefix.'my-command2'));
     }
 
+    public function testProcessMultiCommandSameClass()
+    {
+        $container = new ContainerBuilder();
+
+        $definition = new Definition(MethodBasedTestCommand::class);
+        $definition->addTag('console.command');
+        $definition->addTag('console.command', ['method' => 'cmd1']);
+        $definition->addTag('console.command', ['method' => 'cmd2']);
+
+        $container->setDefinition(MethodBasedTestCommand::class, $definition);
+
+        new AddConsoleCommandPass()->process($container);
+        $container->compile();
+
+        /** @var ContainerCommandLoader $loader */
+        $loader = $container->get('console.command_loader');
+
+        $this->assertSame(['app:cmd0', 'app:cmd1', 'app:cmd2'], $loader->getNames());
+
+        $commandTester = new CommandTester($loader->get('app:cmd0'));
+        $this->assertSame(Command::SUCCESS, $commandTester->execute([]));
+        $this->assertSame('cmd0', $commandTester->getDisplay());
+
+        $commandTester = new CommandTester($loader->get('app:cmd1'));
+        $this->assertSame(Command::SUCCESS, $commandTester->execute([]));
+        $this->assertSame('cmd1', $commandTester->getDisplay());
+
+        $commandTester = new CommandTester($loader->get('app:cmd2'));
+        $this->assertSame(Command::SUCCESS, $commandTester->execute([]));
+        $this->assertSame('cmd2', $commandTester->getDisplay());
+    }
+
     public function testProcessOnChildDefinitionWithClass()
     {
         $container = new ContainerBuilder();
@@ -329,6 +363,25 @@ class AddConsoleCommandPassTest extends TestCase
         $this->assertStringContainsString('usage1', $command->getUsages()[0]);
     }
 
+    public function testProcessCommandWithDescriptionWithpercentageSigns()
+    {
+        $container = new ContainerBuilder();
+        $container
+            ->register(
+                'description_with_percentage_signs_command',
+                DescriptionWithPercentageSignsCommand::class,
+            )
+            ->addTag('console.command')
+        ;
+        $pass = new AddConsoleCommandPass();
+        $pass->process($container);
+
+        $command = $container->get('console.command_loader')->get('description-percentage-signs');
+
+        self::assertTrue($container->has('description_with_percentage_signs_command.command'));
+        self::assertSame('Just testing %percentage-signs%', $command->getDescription());
+    }
+
     public function testProcessInvokableSignalableCommand()
     {
         $container = new ContainerBuilder();
@@ -380,6 +433,14 @@ class DescribedCommand extends Command
 
 #[AsCommand(name: 'invokable', description: 'Just testing', help: 'The %command.name% help content.')]
 class InvokableCommand
+{
+    public function __invoke(): void
+    {
+    }
+}
+
+#[AsCommand(name: 'description-percentage-signs', description: 'Just testing %percentage-signs%')]
+class DescriptionWithPercentageSignsCommand
 {
     public function __invoke(): void
     {

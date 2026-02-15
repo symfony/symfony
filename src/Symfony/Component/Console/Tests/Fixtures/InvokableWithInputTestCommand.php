@@ -13,7 +13,8 @@ namespace Symfony\Component\Console\Tests\Fixtures;
 
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Attribute\Input;
+use Symfony\Component\Console\Attribute\Interact;
+use Symfony\Component\Console\Attribute\MapInput;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -21,7 +22,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand('invokable:input:test')]
 class InvokableWithInputTestCommand
 {
-    public function __invoke(SymfonyStyle $io, #[Input] UserDto $user): int
+    #[Interact]
+    public function interact(SymfonyStyle $io, #[MapInput] UserDto $user): void
+    {
+        $user->email ??= 'user.interactive@command.com';
+    }
+
+    public function __invoke(SymfonyStyle $io, #[MapInput] UserDto $user): int
     {
         $io->writeln($user->name);
         $io->writeln($user->email);
@@ -47,7 +54,7 @@ final class UserDto
     #[Argument]
     public string $password;
 
-    #[Input]
+    #[MapInput]
     public UserGroupDto $group;
 
     #[Option]
@@ -58,6 +65,12 @@ final class UserDto
 
     #[Option]
     public UserStatus $status = UserStatus::Unverified;
+
+    #[Interact]
+    public function interact(SymfonyStyle $io): void
+    {
+        $this->password ??= 'user-dto-interactive-password';
+    }
 }
 
 final class UserGroupDto

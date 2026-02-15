@@ -46,16 +46,6 @@ class Event extends BaseEvent
         return $this->transition;
     }
 
-    /**
-     * @deprecated since Symfony 7.3, inject the workflow in the constructor where you need it
-     */
-    public function getWorkflow(): WorkflowInterface
-    {
-        trigger_deprecation('symfony/workflow', '7.3', 'The "%s()" method is deprecated, inject the workflow in the constructor where you need it.', __METHOD__);
-
-        return $this->workflow;
-    }
-
     public function getWorkflowName(): string
     {
         return $this->workflow->getName();

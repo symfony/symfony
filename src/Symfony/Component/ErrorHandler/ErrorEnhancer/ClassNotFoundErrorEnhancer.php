@@ -141,7 +141,7 @@ class ClassNotFoundErrorEnhancer implements ErrorEnhancerInterface
         ];
 
         if ($prefix) {
-            $candidates = array_filter($candidates, fn ($candidate) => str_starts_with($candidate, $prefix));
+            $candidates = array_filter($candidates, static fn ($candidate) => str_starts_with($candidate, $prefix));
         }
 
         // We cannot use the autoloader here as most of them use require; but if the class

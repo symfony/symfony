@@ -17,6 +17,10 @@ use Psr\Link\LinkInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
+use Symfony\Component\Form\Flow\FormFlowInterface;
+use Symfony\Component\Form\Flow\FormFlowTypeInterface;
+use Symfony\Component\Form\Flow\Type\FormFlowType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -155,6 +159,10 @@ abstract class AbstractController implements ServiceSubscriberInterface
             return new JsonResponse($json, $status, $headers, true);
         }
 
+        if (null === $data) {
+            return new JsonResponse('null', $status, $headers, true);
+        }
+
         return new JsonResponse($data, $status, $headers);
     }
 
@@ -226,13 +234,8 @@ abstract class AbstractController implements ServiceSubscriberInterface
      */
     protected function denyAccessUnlessGranted(mixed $attribute, mixed $subject = null, string $message = 'Access Denied.'): void
     {
-        if (class_exists(AccessDecision::class)) {
-            $accessDecision = $this->getAccessDecision($attribute, $subject);
-            $isGranted = $accessDecision->isGranted;
-        } else {
-            $accessDecision = null;
-            $isGranted = $this->isGranted($attribute, $subject);
-        }
+        $accessDecision = $this->getAccessDecision($attribute, $subject);
+        $isGranted = $accessDecision->isGranted;
 
         if (!$isGranted) {
             $e = $this->createAccessDeniedException(3 > \func_num_args() && $accessDecision ? $accessDecision->getMessage() : $message);
@@ -300,7 +303,7 @@ abstract class AbstractController implements ServiceSubscriberInterface
 
         $twig = $this->container->get('twig');
 
-        $callback = function () use ($twig, $view, $parameters) {
+        $callback = static function () use ($twig, $view, $parameters) {
             $twig->display($view, $parameters);
         };
 
@@ -345,6 +348,8 @@ abstract class AbstractController implements ServiceSubscriberInterface
 
     /**
      * Creates and returns a Form instance from the type of the form.
+     *
+     * @return ($type is class-string<FormFlowTypeInterface> ? FormFlowInterface : FormInterface)
      */
     protected function createForm(string $type, mixed $data = null, array $options = []): FormInterface
     {
@@ -357,6 +362,14 @@ abstract class AbstractController implements ServiceSubscriberInterface
     protected function createFormBuilder(mixed $data = null, array $options = []): FormBuilderInterface
     {
         return $this->container->get('form.factory')->createBuilder(FormType::class, $data, $options);
+    }
+
+    /**
+     * Creates and returns a form flow builder instance.
+     */
+    protected function createFormFlowBuilder(mixed $data = null, array $options = []): FormFlowBuilderInterface
+    {
+        return $this->container->get('form.factory')->createBuilder(FormFlowType::class, $data, $options);
     }
 
     /**

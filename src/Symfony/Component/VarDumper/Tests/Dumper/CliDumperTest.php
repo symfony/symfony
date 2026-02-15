@@ -12,9 +12,7 @@
 namespace Symfony\Component\VarDumper\Tests\Dumper;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Caster\CutStub;
 use Symfony\Component\VarDumper\Cloner\Data;
@@ -42,12 +40,12 @@ class CliDumperTest extends TestCase
         $dumper->setColors(false);
         $cloner = new VarCloner();
         $cloner->addCasters([
-            ':stream' => function ($res, $a) {
+            ':stream' => static function ($res, $a) {
                 unset($a['uri'], $a['wrapper_data']);
 
                 return $a;
             },
-            'Symfony\Component\VarDumper\Tests\Fixture\DumbFoo' => function ($foo, $a) {
+            'Symfony\Component\VarDumper\Tests\Fixture\DumbFoo' => static function ($foo, $a) {
                 $a['foo'] = new CutStub($a['foo']);
 
                 return $a;
@@ -301,7 +299,6 @@ class CliDumperTest extends TestCase
         putenv('DUMP_STRING_LENGTH=');
     }
 
-    #[RequiresPhp('>=8.4')]
     public function testVirtualProperties()
     {
         $this->assertDumpEquals(<<<EODUMP
@@ -327,7 +324,7 @@ class CliDumperTest extends TestCase
         $dumper->setColors(false);
         $cloner = new VarCloner();
         $cloner->addCasters([
-            ':stream' => function ($res, $a) {
+            ':stream' => static function ($res, $a) {
                 unset($a['wrapper_data']);
 
                 return $a;
@@ -453,7 +450,7 @@ class CliDumperTest extends TestCase
         }
 
         $out = '';
-        $dumper = new CliDumper(function ($line, $depth) use (&$out) {
+        $dumper = new CliDumper(static function ($line, $depth) use (&$out) {
             if ($depth >= 0) {
                 $out .= str_repeat('  ', $depth).$line."\n";
             }
@@ -508,10 +505,6 @@ class CliDumperTest extends TestCase
 
     public function testFileLinkFormat()
     {
-        if (!class_exists(FileLinkFormatter::class)) {
-            $this->markTestSkipped(\sprintf('Class "%s" is required to run this test.', FileLinkFormatter::class));
-        }
-
         $data = new Data([
             [
                 new ClassStub(self::class),

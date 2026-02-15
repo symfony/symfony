@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
-use Doctrine\DBAL\Schema\Table;
-
 /**
  * Uses PostgreSQL LISTEN/NOTIFY to push messages to workers.
  *
@@ -24,9 +22,12 @@ use Doctrine\DBAL\Schema\Table;
  */
 final class PostgreSqlConnection extends Connection
 {
+    private bool $listening = false;
+    private bool $notifyHandledExternally = false;
+
     /**
      * * check_delayed_interval: The interval to check for delayed messages, in milliseconds. Set to 0 to disable checks. Default: 60000 (1 minute)
-     * * get_notify_timeout: The length of time to wait for a response when calling PDO::pgsqlGetNotify, in milliseconds. Default: 0.
+     * * get_notify_timeout: The time to wait for a message, in milliseconds. Default: 0, which means until check_delayed_interval is reached.
      */
     protected const DEFAULT_OPTIONS = parent::DEFAULT_OPTIONS + [
         'check_delayed_interval' => 60000,
@@ -48,6 +49,11 @@ final class PostgreSqlConnection extends Connection
         $this->unlisten();
     }
 
+    public function isListening(): bool
+    {
+        return $this->listening;
+    }
+
     public function reset(): void
     {
         parent::reset();
@@ -56,91 +62,80 @@ final class PostgreSqlConnection extends Connection
 
     public function get(): ?array
     {
-        if (null === $this->queueEmptiedAt) {
+        if ($this->notifyHandledExternally || null === $this->queueEmptiedAt) {
             return parent::get();
         }
+
+        // Fallback: when no external listener handles LISTEN/NOTIFY,
+        // block here until a notification arrives or timeout expires
 
         // This is secure because the table name must be a valid identifier:
         // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
         $this->executeStatement(\sprintf('LISTEN "%s"', $this->configuration['table_name']));
 
+        $this->listening = true;
+
         /** @var \PDO $nativeConnection */
         $nativeConnection = $this->driverConnection->getNativeConnection();
+        $timeout = $this->configuration['check_delayed_interval'] - (microtime(true) * 1000 - $this->queueEmptiedAt);
+        $timeout = max(0, ceil(min($this->configuration['get_notify_timeout'] ?: $timeout, $timeout)));
 
-        $notification = $nativeConnection->pgsqlGetNotify(\PDO::FETCH_ASSOC, $this->configuration['get_notify_timeout']);
+        $notification = $nativeConnection->getNotify(\PDO::FETCH_ASSOC, $timeout);
         if (
             // no notifications, or for another table or queue
             (false === $notification || $notification['message'] !== $this->configuration['table_name'] || $notification['payload'] !== $this->configuration['queue_name'])
             // delayed messages
             && (microtime(true) * 1000 - $this->queueEmptiedAt < $this->configuration['check_delayed_interval'])
         ) {
-            usleep(1000);
-
             return null;
         }
 
         return parent::get();
     }
 
-    public function setup(): void
+    /**
+     * Registers a LISTEN on the PostgreSQL connection for the configured table.
+     *
+     * When called, also disables the internal LISTEN/NOTIFY blocking in get(),
+     * assuming an external listener (e.g. PostgreSqlNotifyOnIdleListener) handles it.
+     *
+     * Safe to call multiple times; PostgreSQL ignores duplicate LISTEN for the same channel.
+     */
+    public function listen(): void
     {
-        parent::setup();
-
-        $this->executeStatement(implode("\n", $this->getTriggerSql()));
+        // This is secure because the table name must be a valid identifier:
+        // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+        $this->executeStatement(\sprintf('LISTEN "%s"', $this->configuration['table_name']));
+        $this->listening = true;
+        $this->notifyHandledExternally = true;
     }
 
     /**
-     * @return string[]
+     * Blocks until a PostgreSQL NOTIFY is received or the timeout expires.
+     *
+     * Automatically registers a LISTEN before waiting to handle reconnections.
+     *
+     * @param int $timeoutMs The maximum time to wait in milliseconds
+     *
+     * @return bool True if a notification was received, false on timeout
      */
-    public function getExtraSetupSqlForTable(Table $createdTable): array
+    public function waitForNotify(int $timeoutMs): bool
     {
-        if (!$createdTable->hasOption(self::TABLE_OPTION_NAME)) {
-            return [];
-        }
+        $this->listen();
 
-        if ($createdTable->getOption(self::TABLE_OPTION_NAME) !== $this->configuration['table_name']) {
-            return [];
-        }
+        /** @var \PDO $nativeConnection */
+        $nativeConnection = $this->driverConnection->getNativeConnection();
 
-        return $this->getTriggerSql();
-    }
-
-    private function getTriggerSql(): array
-    {
-        $functionName = $this->createTriggerFunctionName();
-
-        return [
-            // create trigger function
-            \sprintf(<<<'SQL'
-                CREATE OR REPLACE FUNCTION %1$s() RETURNS TRIGGER AS $$
-                    BEGIN
-                        PERFORM pg_notify('%2$s', NEW.queue_name::text);
-                        RETURN NEW;
-                    END;
-                $$ LANGUAGE plpgsql;
-                SQL,
-                $functionName,
-                $this->configuration['table_name']
-            ),
-            // register trigger
-            \sprintf('DROP TRIGGER IF EXISTS notify_trigger ON %s;', $this->configuration['table_name']),
-            \sprintf('CREATE TRIGGER notify_trigger AFTER INSERT OR UPDATE ON %1$s FOR EACH ROW EXECUTE PROCEDURE %2$s();', $this->configuration['table_name'], $functionName),
-        ];
-    }
-
-    private function createTriggerFunctionName(): string
-    {
-        $tableConfig = explode('.', $this->configuration['table_name']);
-
-        if (1 === \count($tableConfig)) {
-            return \sprintf('notify_%1$s', $tableConfig[0]);
-        }
-
-        return \sprintf('%1$s.notify_%2$s', $tableConfig[0], $tableConfig[1]);
+        return false !== $nativeConnection->getNotify(\PDO::FETCH_ASSOC, $timeoutMs);
     }
 
     private function unlisten(): void
     {
+        if (!$this->listening) {
+            return;
+        }
+
         $this->executeStatement(\sprintf('UNLISTEN "%s"', $this->configuration['table_name']));
+        $this->listening = false;
     }
 }

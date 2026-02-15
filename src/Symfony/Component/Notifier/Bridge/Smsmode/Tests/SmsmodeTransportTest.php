@@ -13,6 +13,7 @@ namespace Symfony\Component\Notifier\Bridge\Smsmode\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Smsmode\SmsmodeOptions;
 use Symfony\Component\Notifier\Bridge\Smsmode\SmsmodeTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
@@ -57,17 +58,11 @@ final class SmsmodeTransportTest extends TransportTestCase
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
 
-        $response = $this->createMock(ResponseInterface::class);
-
-        $response->expects(self::exactly(2))->method('getStatusCode')->willReturn(201);
-
-        $response->expects(self::once())->method('getContent')->willReturn(json_encode(['messageId' => 'foo']));
-
-        $client = new MockHttpClient(function (string $method, string $url) use ($response): ResponseInterface {
+        $client = new MockHttpClient(static function (string $method, string $url): ResponseInterface {
             self::assertSame('POST', $method);
             self::assertSame('https://rest.smsmode.com/sms/v1/messages', $url);
 
-            return $response;
+            return new MockResponse(json_encode(['messageId' => 'foo']), ['http_code' => 201]);
         });
 
         $transport = $this->createTransport($client, $from);
@@ -81,16 +76,12 @@ final class SmsmodeTransportTest extends TransportTestCase
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects(self::exactly(2))->method('getStatusCode')->willReturn(201);
-        $response->expects(self::once())->method('getContent')->willReturn(json_encode(['messageId' => 'foo']));
-
-        $transport = $this->createTransport(new MockHttpClient(function (string $method, string $url, array $options) use ($response): ResponseInterface {
+        $transport = $this->createTransport(new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
             $this->assertSame('https://rest.smsmode.com/sms/v1/messages', $url);
             $this->assertSame('Accept: application/json', $options['normalized_headers']['accept'][0]);
 
-            return $response;
+            return new MockResponse(json_encode(['messageId' => 'foo']), ['http_code' => 201]);
         }), 'foo');
 
         $result = $transport->send($message);

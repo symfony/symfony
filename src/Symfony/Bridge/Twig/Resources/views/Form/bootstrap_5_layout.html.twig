@@ -320,13 +320,9 @@
 
 {# Rows #}
 
-{%- block form_row -%}
+{%- block form_row_render -%}
     {%- if compound is defined and compound -%}
         {%- set element = 'fieldset' -%}
-    {%- endif -%}
-    {%- set widget_attr = {} -%}
-    {%- if help -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~ '_help'}} -%}
     {%- endif -%}
     {%- set row_class = row_class|default(row_attr.class|default('mb-3')|trim) -%}
     <{{ element|default('div') }}{% with {attr: row_attr|merge({class: row_class})} %}{{ block('attributes') }}{% endwith %}>
@@ -340,7 +336,7 @@
         {{- form_help(form) -}}
         {{- form_errors(form) -}}
     </{{ element|default('div') }}>
-{%- endblock form_row %}
+{%- endblock form_row_render %}
 
 {%- block button_row -%}
     <div{% with {attr: row_attr|merge({class: row_attr.class|default('mb-3')|trim})} %}{{ block('attributes') }}{% endwith %}>
@@ -353,7 +349,7 @@
 {%- block form_errors -%}
     {%- if errors|length > 0 -%}
         {%- for error in errors -%}
-            <div class="{% if form is not rootform %}invalid-feedback{% else %}alert alert-danger{% endif %} d-block">{{ error.message }}</div>
+            <div class="{% if form is not rootform %}invalid-feedback{% else %}alert alert-danger{% endif %} d-block" id="{{ id ~ '_error' ~ loop.index }}">{{ error.message }}</div>
         {%- endfor -%}
     {%- endif %}
 {%- endblock form_errors %}

@@ -19,7 +19,7 @@ class ProviderExceptionTest extends TestCase
 {
     public function testExceptionWithDebugMessage()
     {
-        $mock = $this->createMock(ResponseInterface::class);
+        $mock = $this->createStub(ResponseInterface::class);
         $mock->method('getInfo')->willReturn('debug');
 
         $exception = new ProviderException('Exception message', $mock, 503);
@@ -28,7 +28,7 @@ class ProviderExceptionTest extends TestCase
 
     public function testExceptionWithNullAsDebugMessage()
     {
-        $mock = $this->createMock(ResponseInterface::class);
+        $mock = $this->createStub(ResponseInterface::class);
         $mock->method('getInfo')->willReturn(null);
 
         $exception = new ProviderException('Exception message', $mock, 503);

@@ -145,6 +145,12 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
      */
     public function setFallbackLocales(array $locales): void
     {
+        if ($this->getFallbackLocales() === $locales) {
+            // No change in fallback locales:
+            // Do not clear catalogues as regeneration of catalogues is computational expensive.
+            return;
+        }
+
         // needed as the fallback locales are linked to the already loaded catalogues
         $this->catalogues = [];
 
@@ -429,7 +435,7 @@ class Translator implements TranslatorInterface, TranslatorBagInterface, LocaleA
         }
 
         foreach ($this->fallbackLocales as $fallback) {
-            if ($fallback === $originLocale) {
+            if (!$fallback || $fallback === $originLocale) {
                 continue;
             }
 

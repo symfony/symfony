@@ -20,7 +20,7 @@ class LazyClosureTest extends TestCase
 {
     public function testMagicGetThrows()
     {
-        $closure = new LazyClosure(fn () => null);
+        $closure = new LazyClosure(static fn () => null);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot read property "foo" from a lazy closure.');

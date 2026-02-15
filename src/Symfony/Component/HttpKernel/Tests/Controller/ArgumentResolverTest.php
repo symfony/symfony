@@ -36,7 +36,7 @@ class ArgumentResolverTest extends TestCase
     public static function getResolver(array $chainableResolvers = [], ?array $namedResolvers = null): ArgumentResolver
     {
         if (null !== $namedResolvers) {
-            $namedResolvers = new ServiceLocator(array_map(fn ($resolver) => fn () => $resolver, $namedResolvers));
+            $namedResolvers = new ServiceLocator(array_map(static fn ($resolver) => static fn () => $resolver, $namedResolvers));
         }
 
         return new ArgumentResolver(new ArgumentMetadataFactory(), $chainableResolvers, $namedResolvers);
@@ -88,7 +88,7 @@ class ArgumentResolverTest extends TestCase
     {
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
-        $controller = function ($foo) {};
+        $controller = static function ($foo) {};
 
         $this->assertEquals(['foo'], self::getResolver()->getArguments($request, $controller));
     }
@@ -97,7 +97,7 @@ class ArgumentResolverTest extends TestCase
     {
         $request = Request::create('/');
         $request->attributes->set('foo', 'foo');
-        $controller = function ($foo, $bar = 'bar') {};
+        $controller = static function ($foo, $bar = 'bar') {};
 
         $this->assertEquals(['foo', 'bar'], self::getResolver()->getArguments($request, $controller));
     }
@@ -230,7 +230,7 @@ class ArgumentResolverTest extends TestCase
 
     public function testGetSessionArgumentsWithInterface()
     {
-        $session = $this->createMock(SessionInterface::class);
+        $session = new Session(new MockArraySessionStorage());
         $request = Request::create('/');
         $request->setSession($session);
         $controller = (new ArgumentResolverTestController())->controllerWithSessionInterface(...);
@@ -241,7 +241,7 @@ class ArgumentResolverTest extends TestCase
     public function testGetSessionMissMatchWithInterface()
     {
         $this->expectException(\RuntimeException::class);
-        $session = $this->createMock(SessionInterface::class);
+        $session = new Session(new MockArraySessionStorage());
         $request = Request::create('/');
         $request->setSession($session);
         $controller = (new ArgumentResolverTestController())->controllerWithExtendingSession(...);

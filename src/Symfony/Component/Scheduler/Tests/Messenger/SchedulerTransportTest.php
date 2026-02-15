@@ -29,9 +29,9 @@ class SchedulerTransportTest extends TestCase
             (object) ['id' => 'first'],
             (object) ['id' => 'second'],
         ];
-        $generator = $this->createMock(MessageGeneratorInterface::class);
+        $generator = $this->createStub(MessageGeneratorInterface::class);
         $generator->method('getMessages')->willReturnCallback(function () use ($messages): \Generator {
-            $trigger = $this->createMock(TriggerInterface::class);
+            $trigger = $this->createStub(TriggerInterface::class);
             $triggerAt = new \DateTimeImmutable('2020-02-20T02:00:00', new \DateTimeZone('UTC'));
             yield (new MessageContext('default', 'id1', $trigger, $triggerAt)) => $messages[0];
             yield (new MessageContext('default', 'id2', $trigger, $triggerAt)) => $messages[1];
@@ -51,9 +51,9 @@ class SchedulerTransportTest extends TestCase
 
     public function testAddsStampToInnerRedispatchMessageEnvelope()
     {
-        $generator = $this->createMock(MessageGeneratorInterface::class);
+        $generator = $this->createStub(MessageGeneratorInterface::class);
         $generator->method('getMessages')->willReturnCallback(function (): \Generator {
-            yield new MessageContext('default', 'id', $this->createMock(TriggerInterface::class), new \DateTimeImmutable()) => new RedispatchMessage(new \stdClass(), ['transport']);
+            yield new MessageContext('default', 'id', $this->createStub(TriggerInterface::class), new \DateTimeImmutable()) => new RedispatchMessage(new \stdClass(), ['transport']);
         });
         $envelopes = iterator_to_array((new SchedulerTransport($generator))->get());
 
@@ -66,7 +66,7 @@ class SchedulerTransportTest extends TestCase
 
     public function testAckIgnored()
     {
-        $transport = new SchedulerTransport($this->createMock(MessageGeneratorInterface::class));
+        $transport = new SchedulerTransport($this->createStub(MessageGeneratorInterface::class));
 
         $this->expectNotToPerformAssertions();
         $transport->ack(new Envelope(new \stdClass()));
@@ -74,7 +74,7 @@ class SchedulerTransportTest extends TestCase
 
     public function testRejectException()
     {
-        $transport = new SchedulerTransport($this->createMock(MessageGeneratorInterface::class));
+        $transport = new SchedulerTransport($this->createStub(MessageGeneratorInterface::class));
 
         $this->expectNotToPerformAssertions();
         $transport->reject(new Envelope(new \stdClass()));
@@ -82,7 +82,7 @@ class SchedulerTransportTest extends TestCase
 
     public function testSendException()
     {
-        $transport = new SchedulerTransport($this->createMock(MessageGeneratorInterface::class));
+        $transport = new SchedulerTransport($this->createStub(MessageGeneratorInterface::class));
 
         $this->expectException(LogicException::class);
         $transport->send(new Envelope(new \stdClass()));

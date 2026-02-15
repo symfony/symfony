@@ -109,7 +109,7 @@ class MemcachedAdapter extends AbstractAdapter
                 if (!str_starts_with($dsn, 'memcached:')) {
                     throw new InvalidArgumentException('Invalid Memcached DSN: it does not start with "memcached:".');
                 }
-                $params = preg_replace_callback('#^memcached:(//)?(?:([^@]*+)@)?#', function ($m) use (&$username, &$password) {
+                $params = preg_replace_callback('#^memcached:(//)?(?:([^@]*+)@)?#', static function ($m) use (&$username, &$password) {
                     if (!empty($m[2])) {
                         [$username, $password] = explode(':', $m[2], 2) + [1 => null];
                         $username = rawurldecode($username);

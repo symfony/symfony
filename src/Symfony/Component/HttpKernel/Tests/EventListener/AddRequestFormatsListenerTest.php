@@ -47,7 +47,7 @@ class AddRequestFormatsListenerTest extends TestCase
     public function testSetAdditionalFormats()
     {
         $request = $this->createMock(Request::class);
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $request->expects($this->once())
             ->method('setFormat')

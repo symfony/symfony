@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * Validates that a value is a valid International Standard Serial Number (ISSN).
@@ -50,7 +50,6 @@ class Issn extends Constraint
      * @param bool|null     $requireHyphen Whether to require a hyphenated ISSN value (defaults to false)
      * @param string[]|null $groups
      */
-    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $message = null,
@@ -59,11 +58,11 @@ class Issn extends Constraint
         ?array $groups = null,
         mixed $payload = null,
     ) {
-        if (\is_array($options)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        if (null !== $options) {
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
         }
 
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->message = $message ?? $this->message;
         $this->caseSensitive = $caseSensitive ?? $this->caseSensitive;

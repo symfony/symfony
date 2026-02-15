@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
@@ -49,33 +48,19 @@ class Timezone extends Constraint
      *
      * @see \DateTimeZone
      */
-    #[HasNamedArguments]
     public function __construct(
-        int|array|null $zone = null,
+        ?int $zone = null,
         ?string $message = null,
         ?string $countryCode = null,
         ?bool $intlCompatible = null,
         ?array $groups = null,
         mixed $payload = null,
-        ?array $options = null,
     ) {
-        if (\is_array($zone)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-
-            $options = array_merge($zone, $options ?? []);
-        } elseif (null !== $zone) {
-            if (\is_array($options)) {
-                trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
-
-                $options['value'] = $zone;
-            }
-        }
-
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
         $this->zone = $zone ?? $this->zone;
         $this->message = $message ?? $this->message;
-        $this->countryCode = $countryCode ?? $this->countryCode;
+        $this->countryCode = $countryCode;
         $this->intlCompatible = $intlCompatible ?? $this->intlCompatible;
 
         if (null === $this->countryCode) {
@@ -88,17 +73,5 @@ class Timezone extends Constraint
         if ($this->intlCompatible && !class_exists(\IntlTimeZone::class)) {
             throw new ConstraintDefinitionException('The option "intlCompatible" can only be used when the PHP intl extension is available.');
         }
-    }
-
-    /**
-     * @deprecated since Symfony 7.4
-     */
-    public function getDefaultOption(): ?string
-    {
-        if (0 === \func_num_args() || func_get_arg(0)) {
-            trigger_deprecation('symfony/validator', '7.4', 'The %s() method is deprecated.', __METHOD__);
-        }
-
-        return 'zone';
     }
 }

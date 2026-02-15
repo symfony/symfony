@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\DumpNode;
 use Twig\Compiler;
 use Twig\Environment;
-use Twig\Loader\LoaderInterface;
+use Twig\Loader\ArrayLoader;
 use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Node\Nodes;
 
@@ -25,7 +25,7 @@ class DumpNodeTest extends TestCase
     {
         $node = new DumpNode('bar', null, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment(new ArrayLoader());
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -49,7 +49,7 @@ class DumpNodeTest extends TestCase
     {
         $node = new DumpNode('bar', null, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment(new ArrayLoader());
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -77,7 +77,7 @@ class DumpNodeTest extends TestCase
 
         $node = new DumpNode('bar', $vars, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment(new ArrayLoader());
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
@@ -101,7 +101,7 @@ class DumpNodeTest extends TestCase
         ]);
         $node = new DumpNode('bar', $vars, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment(new ArrayLoader());
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'

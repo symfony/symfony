@@ -492,7 +492,7 @@ class CompiledUrlMatcherDumperTest extends TestCase
         $routeCollection->add('_', new Route('/', [new \stdClass()]));
         $dumper = new CompiledUrlMatcherDumper($routeCollection);
 
-        $this->expectExceptionMessage('Symfony\Component\Routing\Route cannot contain objects');
+        $this->expectExceptionMessage('Symfony\Component\Routing\Route cannot contain objects, but "stdClass" given.');
         $this->expectException(\InvalidArgumentException::class);
 
         $dumper->dump();

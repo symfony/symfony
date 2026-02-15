@@ -12,6 +12,7 @@
 namespace Symfony\Component\Semaphore;
 
 use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
+use Symfony\Component\Semaphore\Exception\UnserializableKeyException;
 
 /**
  * Key is a container for the state of the semaphores in stores.
@@ -23,6 +24,7 @@ final class Key
 {
     private ?float $expiringTime = null;
     private array $state = [];
+    private bool $serializable = true;
 
     public function __construct(
         private string $resource,
@@ -80,6 +82,11 @@ final class Key
         $this->expiringTime = null;
     }
 
+    public function markUnserializable(): void
+    {
+        $this->serializable = false;
+    }
+
     public function reduceLifetime(float $ttlInSeconds): void
     {
         $newTime = microtime(true) + $ttlInSeconds;
@@ -100,5 +107,29 @@ final class Key
     public function isExpired(): bool
     {
         return null !== $this->expiringTime && $this->expiringTime <= microtime(true);
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->resource = $data['resource'] ?? $data["\0".self::class."\0resource"];
+        $this->limit = $data['limit'] ?? $data["\0".self::class."\0limit"];
+        $this->weight = $data['weight'] ?? $data["\0".self::class."\0weight"];
+        $this->expiringTime = $data['expiringTime'] ?? $data["\0".self::class."\0expiringTime"] ?? null;
+        $this->state = $data['state'] ?? $data["\0".self::class."\0state"] ?? [];
+    }
+
+    public function __serialize(): array
+    {
+        if (!$this->serializable) {
+            throw new UnserializableKeyException('The key cannot be serialized.');
+        }
+
+        return [
+            'resource' => $this->resource,
+            'limit' => $this->limit,
+            'weight' => $this->weight,
+            'expiringTime' => $this->expiringTime,
+            'state' => $this->state,
+        ];
     }
 }

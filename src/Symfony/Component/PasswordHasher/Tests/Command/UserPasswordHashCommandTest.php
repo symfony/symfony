@@ -18,7 +18,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\PasswordHasher\Command\UserPasswordHashCommand;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
-use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
 use Symfony\Component\Security\Core\User\InMemoryUser;
@@ -279,7 +278,7 @@ class UserPasswordHashCommandTest extends TestCase
 
     public function testThrowsExceptionOnNoConfiguredHashers()
     {
-        $tester = new CommandTester(new UserPasswordHashCommand($this->getMockBuilder(PasswordHasherFactoryInterface::class)->getMock(), []));
+        $tester = new CommandTester(new UserPasswordHashCommand(new PasswordHasherFactory([]), []));
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('There are no configured password hashers for the "security" extension.');
@@ -292,7 +291,7 @@ class UserPasswordHashCommandTest extends TestCase
     #[DataProvider('provideCompletionSuggestions')]
     public function testCompletionSuggestions(array $input, array $expectedSuggestions)
     {
-        $command = new UserPasswordHashCommand($this->createMock(PasswordHasherFactoryInterface::class), ['App\Entity\User']);
+        $command = new UserPasswordHashCommand(new PasswordHasherFactory([]), ['App\Entity\User']);
         $tester = new CommandCompletionTester($command);
 
         $this->assertSame($expectedSuggestions, $tester->complete($input));

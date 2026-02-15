@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
-use PHPUnit\Framework\Attributes\Group;
-use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Exception\MissingOptionsException;
@@ -46,15 +44,6 @@ class TypeTest extends TestCase
         $this->expectExceptionMessage(\sprintf('The options "type" must be set for constraint "%s".', Type::class));
 
         new Type(null);
-    }
-
-    #[IgnoreDeprecations]
-    #[Group('legacy')]
-    public function testTypeInOptionsArray()
-    {
-        $constraint = new Type(null, options: ['type' => 'digit']);
-
-        $this->assertSame('digit', $constraint->type);
     }
 }
 

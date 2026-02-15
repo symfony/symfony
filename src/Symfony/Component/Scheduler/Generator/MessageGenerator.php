@@ -77,7 +77,7 @@ final class MessageGenerator implements MessageGeneratorInterface
             $nextTime = $trigger->getNextRunDate($time);
 
             if ($this->schedule->shouldProcessOnlyLastMissedRun()) {
-                while ($nextTime < $this->clock->now()) {
+                while ($nextTime && $nextTime < $this->clock->now()) {
                     $nextTime = $trigger->getNextRunDate($nextTime);
                 }
             }

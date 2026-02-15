@@ -610,6 +610,10 @@ return [
             'EC$',
             'Ego Dollar obodo East Carribbean',
         ],
+        'XCG' => [
+            'Cg.',
+            'Ego Guilder Caribbean',
+        ],
         'XOF' => [
             'F CFA',
             'Ego CFA Franc obodo West Africa',
@@ -629,6 +633,10 @@ return [
         'ZMW' => [
             'ZMW',
             'Ego Kwacha Obodo Zambia',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'Ego Ọlaọcha Zimbabwe',
         ],
     ],
 ];

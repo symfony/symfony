@@ -239,12 +239,13 @@ class ArrayNodeTest extends TestCase
         $this->assertSame('"foo" is deprecated', $deprecation['message']);
         $this->assertSame('vendor/package', $deprecation['package']);
         $this->assertSame('1.1', $deprecation['version']);
+        $this->assertSame('Since vendor/package 1.1: "foo" is deprecated', $childNode->getDeprecationMessage());
 
         $node = new ArrayNode('root');
         $node->addChild($childNode);
 
         $deprecationTriggered = false;
-        $deprecationHandler = function ($level, $message, $file, $line) use (&$prevErrorHandler, &$deprecationTriggered) {
+        $deprecationHandler = static function ($level, $message, $file, $line) use (&$prevErrorHandler, &$deprecationTriggered) {
             if (\E_USER_DEPRECATED === $level) {
                 return $deprecationTriggered = true;
             }

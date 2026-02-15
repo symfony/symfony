@@ -1,0 +1,52 @@
+---------------------------------------------------------------------------
+
+by sylfabre at 2025-05-23T20:42:15Z
+
+I'm not sure how to test this change, any feedback/tips are welcome!
+
+---------------------------------------------------------------------------
+
+by stof at 2025-05-24T08:47:48Z
+
+This creates collisions for keys, as a long key is not considered the same resource than its hash.
+
+---------------------------------------------------------------------------
+
+by sylfabre at 2025-06-13T19:50:09Z
+
+@stof May you please elaborate on your comment?
+> This creates collisions for keys, as a long key is not considered the same resource than its hash.
+
+Before this change, collisions were possible if two keys shared the same hash (very unlikely, but still possible).
+
+With this change, collisions are possible if:
+* Two large keys shared the same hash (very unlikely, but still possible) => Same as before
+* [New] Or, a 64-character key matches the hash of a large key
+
+Was your comment about this last point?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-14T12:00:35Z
+
+@sylfabre yes, my comment is indeed about that point.
+
+---------------------------------------------------------------------------
+
+by sylfabre at 2025-06-18T19:40:41Z
+
+Thanks @stof
+
+I changed the PR
+* <64 chars => I use the plain string
+* \>= 64 => I use the hash
+
+This prevents a 64-character plain string from colliding with a hashed large string.
+
+This addresses the issue you pointed out, right?
+
+---------------------------------------------------------------------------
+
+by sylfabre at 2025-06-18T19:42:07Z
+
+Thanks @OskarStark for spotting the typos 👍

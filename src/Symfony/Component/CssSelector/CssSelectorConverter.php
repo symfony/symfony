@@ -55,6 +55,18 @@ class CssSelectorConverter
     }
 
     /**
+     * Clears the static caches of converted CSS selectors.
+     *
+     * This can be used to prevent unbounded memory growth when converting
+     * many different selectors in a long-running PHP process.
+     */
+    public static function clearCache(): void
+    {
+        self::$xmlCache = [];
+        self::$htmlCache = [];
+    }
+
+    /**
      * Translates a CSS expression to its XPath equivalent.
      *
      * Optionally, a prefix can be added to the resulting XPath

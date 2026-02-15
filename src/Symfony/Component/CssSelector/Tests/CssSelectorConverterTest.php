@@ -52,6 +52,20 @@ class CssSelectorConverterTest extends TestCase
         (new CssSelectorConverter())->toXPath('h1:');
     }
 
+    public function testClearCache()
+    {
+        $converter = new CssSelectorConverter();
+        $converter->toXPath('h1');
+
+        CssSelectorConverter::clearCache();
+
+        $cacheProperty = new \ReflectionProperty(CssSelectorConverter::class, 'htmlCache');
+        if (\PHP_VERSION_ID < 80100) {
+            $cacheProperty->setAccessible(true);
+        }
+        $this->assertSame([], $cacheProperty->getValue());
+    }
+
     #[DataProvider('getCssToXPathWithoutPrefixTestData')]
     public function testCssToXPathWithoutPrefix($css, $xpath)
     {

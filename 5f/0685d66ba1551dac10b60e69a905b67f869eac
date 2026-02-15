@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-08-19T19:48:36Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "7.4" but it seems your PR description refers to branch "6.4 (or 7.0)".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by mudassaralichouhan at 2025-08-25T10:18:50Z
+
+Hi @fabpot, all requested changes have been addressed. Could you please re-review when you have a chance?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-08-26T06:15:44Z
+
+Tests seem broken by your changes.
+You must also rebase your PR to get rid of the merge commit.
+
+---------------------------------------------------------------------------
+
+by mudassaralichouhan at 2025-08-26T10:30:27Z
+
+> Tests seem broken by your changes. You must also rebase your PR to get rid of the merge commit.
+
+You can now comment on the PR that the rebase is done and tests pass.
+
+---------------------------------------------------------------------------
+
+by mudassaralichouhan at 2025-08-27T15:55:30Z
+
+Re-applied the revert to RedisTrait.php — it’s now back as requested. Let me know if anything else needs adjusting.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-09-16T05:50:33Z
+
+@mudassaralichouhan Can you rebase on current 7.4 (first, to remove the merge commit, then to see if the tests pass). Thank you.
+
+---------------------------------------------------------------------------
+
+by mudassaralichouhan at 2025-09-20T21:07:15Z
+
+I’ve fixed the Redis `findAll()` implementation and updated the tests — everything is green locally now.
+
+---------------------------------------------------------------------------
+
+by mudassaralichouhan at 2025-09-21T19:58:35Z
+
+Thanks for the feedback. I’ve removed the old mock-based tests with unnecessary comments and replaced them with `RedisListableIntegrationTest`, which uses a real Redis server. This should cover the functionality in a more meaningful way.

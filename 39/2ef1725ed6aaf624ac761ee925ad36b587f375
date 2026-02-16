@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-16T07:16:40Z
+
+Thanks for bringing this. Did you experience the issue IRL?
+My issue with this is that this requires deciding when to call this method. Too often will degrade performance, so what's the best moment?
+What about using an LRU strategy instead, with a possibly configurable max number of elements in the cache ?
+
+---------------------------------------------------------------------------
+
+by arcangelini at 2026-02-16T07:54:10Z
+
+Hey @nicolas-grekas yes, we use this in our email rendering package. We hit a memory exhaustion error several times a week when sending digest emails that contain multiple large unique individual posts. Since they are unique we can not cache them to prevent rendering them on our end.
+
+> My issue with this is that this requires deciding when to call this method
+
+Yeah I realized this after I submitted the PR. I didn't really see a great place to call this either. I just resolved a similar issue in Emogifier but there was a clean up method that was already running at the end.
+
+> What about using an LRU strategy instead, with a possibly configurable max number of elements in the cache ?
+
+That sounds appropriate and was something I explored but stopped because it was getting late for me. Let me make some adjustments.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-16T08:01:46Z
+
+Implementation tip: always unset a key when accessing it and set it again, this will move last recently used items at the bottom of the array. An unset the first key when the limit is reached.

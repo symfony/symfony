@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by d-ph at 2026-02-16T18:16:58Z
+
+Many thanks for this PR, Nicolas. You exceeded ALL my expectations, and I like to believe that I am not a person easily impressed.
+
+In fact, I'm so impressed that I would love to hear how you managed to produce 500 lines of code within something like 12 hours of my last github comment. Are you able to briefly share your dev workflow that you applied for this PR, please? Did you use an LLM? Which one?
+
+Again, many thanks. You are a legend. You are fixing the world with this (and the other) PR. Well done.
+
+Regards,
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-16T19:15:53Z
+
+Thanks @d-ph for the new review.
+I teamed up with Opus 4.6 for this PR.
+I told it to start with your review and draft a plan for it, then I paired with it to complete everything.

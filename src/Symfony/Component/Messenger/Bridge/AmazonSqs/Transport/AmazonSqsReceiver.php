@@ -57,7 +57,7 @@ class AmazonSqsReceiver implements KeepaliveReceiverInterface, MessageCountAware
             throw $exception;
         }
 
-        yield $envelope->with(new AmazonSqsReceivedStamp($sqsEnvelope['id']));
+        yield $envelope->with(new AmazonSqsReceivedStamp($sqsEnvelope['id']), new AmazonSqsMessageSystemAttributeNamesStamp($sqsEnvelope['attributes']));
     }
 
     public function ack(Envelope $envelope): void

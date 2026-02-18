@@ -231,6 +231,7 @@ class Connection
                 'VisibilityTimeout' => $this->configuration['visibility_timeout'],
                 'MaxNumberOfMessages' => $this->configuration['buffer_size'],
                 'MessageAttributeNames' => ['All'],
+                'MessageSystemAttributeNames' => ['All'],
                 'WaitTimeSeconds' => $this->configuration['wait_time'],
             ]);
         }
@@ -267,6 +268,7 @@ class Connection
                 'id' => $message->getReceiptHandle(),
                 'body' => $message->getBody(),
                 'headers' => $headers,
+                'attributes' => $message->getAttributes(),
             ];
         }
 

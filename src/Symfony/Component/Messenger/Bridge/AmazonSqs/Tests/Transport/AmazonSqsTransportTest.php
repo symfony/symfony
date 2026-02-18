@@ -13,8 +13,10 @@ namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
 use AsyncAws\Core\Exception\Http\HttpException;
 use AsyncAws\Core\Exception\Http\ServerException;
+use AsyncAws\Sqs\Enum\MessageSystemAttributeName;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsMessageSystemAttributeNamesStamp;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceivedStamp;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceiver;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransport;
@@ -51,6 +53,7 @@ class AmazonSqsTransportTest extends TestCase
             'id' => '5',
             'body' => 'body',
             'headers' => ['my' => 'header'],
+            'attributes' => [MessageSystemAttributeName::APPROXIMATE_RECEIVE_COUNT => '1'],
         ];
 
         $serializer->expects($this->once())->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
@@ -58,6 +61,9 @@ class AmazonSqsTransportTest extends TestCase
 
         $envelopes = iterator_to_array($transport->get());
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());
+
+        $messageSystemAttributeNamesStamp = $envelopes[0]->last(AmazonSqsMessageSystemAttributeNamesStamp::class);
+        $this->assertSame(['ApproximateReceiveCount' => '1'], $messageSystemAttributeNamesStamp->getMessageSystemAttributeNames());
     }
 
     public function testTransportIsAMessageCountAware()

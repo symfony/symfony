@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+* Receive SQS `MessageSystemAttributeNames` to allow access to SQS message metadata and attach those to envelopes through `AmazonSqsMessageSystemAttributeNamesStamp`
+
 7.4
 ---
 

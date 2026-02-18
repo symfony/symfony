@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Transport;
 
+use AsyncAws\Sqs\Enum\MessageSystemAttributeName;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Tests\Fixtures\DummyMessage;
+use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsMessageSystemAttributeNamesStamp;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceivedStamp;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsReceiver;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\Connection;
@@ -38,6 +40,9 @@ class AmazonSqsReceiverTest extends TestCase
         $actualEnvelopes = iterator_to_array($receiver->get());
         $this->assertCount(1, $actualEnvelopes);
         $this->assertEquals(new DummyMessage('Hi'), $actualEnvelopes[0]->getMessage());
+
+        $messageSystemAttributeNamesStamp = $actualEnvelopes[0]->last(AmazonSqsMessageSystemAttributeNamesStamp::class);
+        $this->assertSame(['ApproximateReceiveCount' => '1'], $messageSystemAttributeNamesStamp->getMessageSystemAttributeNames());
     }
 
     public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException()
@@ -85,6 +90,9 @@ class AmazonSqsReceiverTest extends TestCase
             'body' => '{"message": "Hi"}',
             'headers' => [
                 'type' => DummyMessage::class,
+            ],
+            'attributes' => [
+                MessageSystemAttributeName::APPROXIMATE_RECEIVE_COUNT => '1',
             ],
         ];
     }

@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-02-17T12:25:45Z
+
+Could you please add some tests to prevent regressions ?
+
+---------------------------------------------------------------------------
+
+by TomasLudvik at 2026-02-17T13:10:00Z
+
+@stof Done
+
+---------------------------------------------------------------------------
+
+by mtarld at 2026-02-17T13:21:07Z
+
+To fix PHP 8.2 tests, please update `.github/patch-types.php` to add `/src/Symfony/Component/TypeInfo/Tests/Fixtures/`.

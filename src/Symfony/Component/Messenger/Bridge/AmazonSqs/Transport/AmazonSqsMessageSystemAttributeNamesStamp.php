@@ -11,18 +11,19 @@
 
 namespace Symfony\Component\Messenger\Bridge\AmazonSqs\Transport;
 
+use AsyncAws\Sqs\Enum\MessageSystemAttributeName;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
 
 /**
  * @author Ilaria Cangini <ilaria.cangini@kanbanbox.com>
  */
-readonly class AmazonSqsMessageSystemAttributeNamesStamp implements NonSendableStampInterface
+class AmazonSqsMessageSystemAttributeNamesStamp implements NonSendableStampInterface
 {
     /**
      * @param array<MessageSystemAttributeName::*, string> $messageSystemAttributeNames
      */
     public function __construct(
-        private array $messageSystemAttributeNames,
+        private readonly array $messageSystemAttributeNames,
     ) {
     }
 

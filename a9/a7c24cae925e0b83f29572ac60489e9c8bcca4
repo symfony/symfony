@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by vincentpabst at 2026-02-19T01:13:21Z
+
+tests should now pass :)
+
+---------------------------------------------------------------------------
+
+by norkunas at 2026-02-19T05:47:34Z
+
+I've seen people are using like `APP_ENV=stage` which won't work anymore, so it's a BC break, right? :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-02-19T09:21:16Z
+
+I don't think this should be merged. Symfony allows to declare as many env as you want, which is a powerful and widely used feature.

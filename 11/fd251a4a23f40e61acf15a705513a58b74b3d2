@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by vvaswani at 2026-02-20T15:20:39Z
+
+@nicolas-grekas thanks for approving, what should be done regarding the failed unit tests for 8.x? Since this fix is targeting 6.4, it's not clear to me whether these test failures are valid or not. Appreciate any advice.

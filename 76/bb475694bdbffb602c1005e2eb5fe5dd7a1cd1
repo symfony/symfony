@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by guillaumeVDP at 2026-02-20T07:56:32Z
+
+I see an issue with phpcsfixer on lines that I didn't change. Do I have or can I fix it ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-20T08:21:07Z
+
+No need to for the CS, unless it's in code you patched.
+Can this be tested?

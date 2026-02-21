@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-02-19T09:26:19Z
+
+I think this will require quite some refactoring on the docs side (first component I have in mind is Workflow, which has its whole doc based on this behavior). But that's just on a quick note.
+
+I'm in favor of this deprecation for the reasons in the description + the fact that it is more and more common in our docs to encourage decorrelation of the implementation and the name of the property for the injected service.
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-02-19T09:33:39Z
+
+> I think it's time to deprecate named autowiring aliases that don't use #[Target].
+
+Yes Yes Yes !
+
+I'm all in for this PR 👍🏼 (I didn't review the code tho)
+
+---------------------------------------------------------------------------
+
+by norkunas at 2026-02-19T12:06:32Z
+
+Will this deprecation be triggered in the bundles that uses like `$container->registerAliasForArgument($serviceId, Provider::class, "{$providerName}Geocoder");` but don't consume it by names, because it's just for the end users?
+
+---------------------------------------------------------------------------
+
+by stof at 2026-02-19T12:34:09Z
+
+@norkunas this deprecation is triggered for autowired services relying on named aliases by argument name. It is not triggered when *defining* a named autowiring alias (this is not deprecated, as `#[Target]` also relies on them)

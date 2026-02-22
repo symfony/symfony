@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-02-22T17:58:07Z
+
+> I also think this change should target 6.4, but I’m not sure whether that would be a BC break.
+
+It looks like more of a bugfix. If one uses worker mode, it is unexpected to have remaining data from a previous request.
+
+---------------------------------------------------------------------------
+
+by santysisi at 2026-02-22T18:24:57Z
+
+`rebase --onto` to 6.4 and tested with a fresh app using that version :+1:

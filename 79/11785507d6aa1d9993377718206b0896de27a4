@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-12-08T08:33:48Z
+
+Is there a way to test this fix?
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-12-08T09:32:18Z
+
+> Is there a way to test this fix?
+
+Couldn’t figure out how; looks like the issue also impact functional tests :confused:

@@ -1,0 +1,72 @@
+---------------------------------------------------------------------------
+
+by SHTIKOV at 2022-01-20T05:40:55Z
+
+Sorry to be off topic, but where is Fabien?) I would like to get approval in my MR)
+[#44787](https://github.com/symfony/symfony/pull/44787)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-02-21T16:39:54Z
+
+@SHTIKOV please don't spam PRs with unrelated comments!
+
+---------------------------------------------------------------------------
+
+by yceruto at 2022-08-02T13:42:10Z
+
+Agree for 6.2
+
+---------------------------------------------------------------------------
+
+by filiplikavcan at 2022-08-02T15:34:49Z
+
+Tests for php >=8.1 are all green.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-02T15:36:53Z
+
+Great thanks. OK to rebase+retarget for 6.2?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2022-08-02T17:09:40Z
+
+the test failures look related
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-08-30T16:06:59Z
+
+Status: needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2022-09-28T12:35:13Z
+
+Can you please rebase @filiplikavcan?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2022-09-29T21:09:27Z
+
+A form that consists of unchecked checkboxes only will not be recognized as being submitted with the standard `$form->handleRequest(...); if ($form->isSubmitted() ...) { ... }` pattern. Does this PR intend to address this, or does it cover other edge cases I am not aware of?
+
+If yes, you might want to mention #20210 in the list of tickets as well.
+
+Update: I have been looking at this code for over 10 minutes now and I am unable to figure out how it would be able to tell whether we're `GET`-requesting a page that contains a checkbox-only form, or if this form has been submitted with `method="GET"` and no checkbox was checked.
+
+---------------------------------------------------------------------------
+
+by filiplikavcan at 2022-10-04T18:11:42Z
+
+> Update: I have been looking at this code for over 10 minutes now and I am unable to figure out how it would be able to tell whether we're `GET`-requesting a page that contains a checkbox-only form, or if this form has been submitted with `method="GET"` and no checkbox was checked.
+
+I think it would not be possible to tell the two situations apart. Look at this test: https://github.com/symfony/symfony/blob/4dcd5a4c2badb1a6597d4e90eebe38779273d6a7/src/Symfony/Component/Form/Tests/AbstractRequestHandlerTest.php#L134-L145
+
+---------------------------------------------------------------------------
+
+by filiplikavcan at 2026-02-21T11:12:35Z
+
+I tweaked the code a bit and rebased to 8.1. Is this PR still potentially mergeable?

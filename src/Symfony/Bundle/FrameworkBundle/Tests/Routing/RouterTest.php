@@ -344,6 +344,62 @@ class RouterTest extends TestCase
         $router->getRouteCollection();
     }
 
+    public function testDynamicParameterInRouteWithSfContainer()
+    {
+        $routes = new RouteCollection();
+
+        $routes->add('foo', new Route('/%app.host%'));
+
+        $container = new class extends Container {
+            public function isParameterDynamic(string $name): bool
+            {
+                return 'app.host' === $name;
+            }
+        };
+
+        $loader = $this->createStub(LoaderInterface::class);
+        $loader->method('load')->willReturn($routes);
+        $container->set('routing.loader', $loader);
+        $container->setParameter('app.host', 'example.com');
+
+        $router = new Router($container, 'foo');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Using "%app.host%" is not allowed in routing configuration because the parameter "app.host" depends on an environment variable.');
+
+        $router->getRouteCollection();
+    }
+
+    public function testDynamicParameterInRouteWithContainerBag()
+    {
+        if (!method_exists(ContainerBag::class, 'isParameterDynamic')) {
+            $this->markTestSkipped('ContainerBag::isParameterDynamic() is not available.');
+        }
+
+        $routes = new RouteCollection();
+
+        $routes->add('foo', new Route('/%app.host%'));
+
+        $container = new class extends Container {
+            public function isParameterDynamic(string $name): bool
+            {
+                return 'app.host' === $name;
+            }
+        };
+
+        $container->setParameter('app.host', 'example.com');
+
+        $sc = $this->getPsr11ServiceContainer($routes);
+        $parameters = new ContainerBag($container);
+
+        $router = new Router($sc, 'foo', [], null, $parameters);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Using "%app.host%" is not allowed in routing configuration because the parameter "app.host" depends on an environment variable.');
+
+        $router->getRouteCollection();
+    }
+
     public function testHostPlaceholders()
     {
         $routes = new RouteCollection();

@@ -17,9 +17,11 @@ use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Resource\FileExistenceResource;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Config\ContainerParametersResource;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface as SymfonyContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\ParameterBag\ContainerBag;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
@@ -40,6 +42,7 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
      * @var \Closure(string):mixed
      */
     private \Closure $paramFetcher;
+    private ?\Closure $isParamDynamic = null;
 
     /**
      * @param mixed $resource The main resource to load
@@ -60,8 +63,14 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
 
         if ($parameters) {
             $this->paramFetcher = $parameters->get(...);
+            if ($parameters instanceof ContainerBag && method_exists($parameters, 'isParameterDynamic')) {
+                $this->isParamDynamic = $parameters->isParameterDynamic(...);
+            }
         } elseif ($container instanceof SymfonyContainerInterface) {
             $this->paramFetcher = $container->getParameter(...);
+            if ($container instanceof Container && method_exists($container, 'isParameterDynamic')) {
+                $this->isParamDynamic = $container->isParameterDynamic(...);
+            }
         } else {
             throw new \LogicException(\sprintf('You should either pass a "%s" instance or provide the $parameters argument of the "%s" method.', SymfonyContainerInterface::class, __METHOD__));
         }
@@ -178,6 +187,10 @@ class Router extends BaseRouter implements WarmableInterface, ServiceSubscriberI
             }
 
             $resolved = ($this->paramFetcher)($match[1]);
+
+            if ($this->isParamDynamic && ($this->isParamDynamic)($match[1])) {
+                throw new RuntimeException(\sprintf('Using "%%%s%%" is not allowed in routing configuration because the parameter "%s" depends on an environment variable.', $match[1], $match[1]));
+            }
 
             if (\is_scalar($resolved)) {
                 $this->collectedParameters[$match[1]] = $resolved;

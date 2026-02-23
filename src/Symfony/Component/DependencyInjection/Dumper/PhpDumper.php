@@ -936,7 +936,7 @@ class PhpDumper extends Dumper
             $c = $this->addServiceInclude($id, $definition, null !== $isProxyCandidate);
 
             if ('' !== $c && $isProxyCandidate && !$definition->isShared()) {
-                $c = implode("\n", array_map(fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
+                $c = implode("\n", array_map(static fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
                 $code .= "        static \$include = true;\n\n";
                 $code .= "        if (\$include) {\n";
                 $code .= $c;
@@ -949,7 +949,7 @@ class PhpDumper extends Dumper
             $c = $this->addInlineService($id, $definition);
 
             if (!$isProxyCandidate && !$definition->isShared()) {
-                $c = implode("\n", array_map(fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
+                $c = implode("\n", array_map(static fn ($line) => $line ? '    '.$line : $line, explode("\n", $c)));
                 $lazyloadInitialization = $definition->isLazy() ? ', $lazyLoad = true' : '';
 
                 $c = \sprintf("        %s = function (\$container%s) {\n%s        };\n\n        return %1\$s(\$container);\n", $factory, $lazyloadInitialization, $c);
@@ -1715,6 +1715,11 @@ class PhpDumper extends Dumper
             {$getDynamicParameter}
                 }
 
+                public function isParameterDynamic(string \$name): bool
+                {
+                    return isset(\$this->loadedDynamicParameters[\$name]);
+                }
+
                 protected function getDefaultParameters(): array
                 {
                     return $parameters;
@@ -1770,7 +1775,7 @@ class PhpDumper extends Dumper
         }
 
         // re-indent the wrapped code
-        $code = implode("\n", array_map(fn ($line) => $line ? '    '.$line : $line, explode("\n", $code)));
+        $code = implode("\n", array_map(static fn ($line) => $line ? '    '.$line : $line, explode("\n", $code)));
 
         return \sprintf("        if (%s) {\n%s        }\n", $condition, $code);
     }
@@ -2260,7 +2265,7 @@ class PhpDumper extends Dumper
         }
         if (\is_string($value) && str_contains($value, "\n")) {
             $cleanParts = explode("\n", $value);
-            $cleanParts = array_map(fn ($part) => var_export($part, true), $cleanParts);
+            $cleanParts = array_map(static fn ($part) => var_export($part, true), $cleanParts);
             $export = implode('."\n".', $cleanParts);
         } else {
             $export = var_export($value, true);

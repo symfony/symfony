@@ -114,6 +114,11 @@ class Symfony_DI_PhpDumper_Test_Unsupported_Characters extends Container
         throw new ParameterNotFoundException($name);
     }
 
+    public function isParameterDynamic(string $name): bool
+    {
+        return isset($this->loadedDynamicParameters[$name]);
+    }
+
     protected function getDefaultParameters(): array
     {
         return [

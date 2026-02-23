@@ -1,0 +1,32 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-10-17T09:37:01Z
+
+I'm not sure I understand the purpose. Why don't you use `new InputOption('foo', null, InputOption::VALUE_NONE | InputOption::VALUE_NEGATABLE)` if you don't want a value?
+
+---------------------------------------------------------------------------
+
+by jnoordsij at 2023-10-17T19:51:41Z
+
+> I'm not sure I understand the purpose. Why don't you use `new InputOption('foo', null, InputOption::VALUE_NONE | InputOption::VALUE_NEGATABLE)` if you don't want a value?
+
+I think passing an option for the negatable case does make sense, since it basically ensures the option resolves as boolean instead of nullable boolean, which could be useful or at least clearer in some applications.
+
+I do admit it looks slightly off when combined with an explicit `VALUE_NONE`, but the main issue I had with this was the inconsistency of how the options were handled, which prompted me to open #52055. To illustrate, the following docblock actually claims not setting `VALUE_REQUIRED` or `VALUE_OPTIONAL` is considered to be equal to actually setting `VALUE_NONE`:
+https://github.com/symfony/symfony/blob/5.4/src/Symfony/Component/Console/Input/InputOption.php#L130-L138
+
+So given this, I would expect `VALUE_NONE` and `VALUE_NONE | VALUE_NEGATABLE` to behave exactly the same in all cases, as `VALUE_NEGATABLE` in my eyes is just a slightly more specific variant of `VALUE_NONE`, i.e. an option that does not allow a manual value, but does allow passing the negated version.
+
+---------------------------------------------------------------------------
+
+by jnoordsij at 2025-06-12T13:03:22Z
+
+Retargeted to `6.4` and rebased
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-12T13:30:46Z
+
+we should probably validate also that the default value of a negatable option is a boolean.
+
+However, this looks more like a new feature than a bugfix to me, so it should probably go in 7.4.

@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by jnoordsij at 2023-10-14T09:18:06Z
+
+Tests failing due to issues fixed in #52058; I'll finish this after that is merged.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2023-12-29T22:04:48Z
+
+What is the status of this PR? If you still want to work on it, please rebase on top of `7.1` branch, thanks
+
+---------------------------------------------------------------------------
+
+by jnoordsij at 2023-12-30T10:59:06Z
+
+> What is the status of this PR? If you still want to work on it, please rebase on top of `7.1` branch, thanks
+
+Awaiting the results of #52058, which addresses the test failing here. Once a decision is reached there, I'll be rebasing and adjusting this further.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-23T16:53:55Z
+
+@jnoordsij I'm in the process of finishing this PR ;)
+
+---------------------------------------------------------------------------
+
+by jnoordsij at 2026-02-23T16:55:12Z
+
+@nicolas-grekas ah great, then I'll leave it be for now!

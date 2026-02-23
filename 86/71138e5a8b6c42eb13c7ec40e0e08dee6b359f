@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by alcohol at 2025-06-03T14:43:54Z
+
+~~I looked at writing an actual test for this issue, but was not sure what the best approach for that would be.~~
+
+So I managed to write a test, only to realize that my fix does not work because aliases are not localized and since they are unique, they will end up pointing to the last locale processed. This suggests that this probably cannot be fixed?

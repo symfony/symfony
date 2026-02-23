@@ -23,13 +23,13 @@ class ChainProviderTest extends TestCase
     {
         $this->provider = new ChainProvider([
             new InMemoryProvider([
-                'first' => fn () => true,
+                'first' => static fn () => true,
             ]),
             new InMemoryProvider([
-                'second' => fn () => 42,
+                'second' => static fn () => 42,
             ]),
             new InMemoryProvider([
-                'exception' => fn () => throw new \LogicException('Should not be called.'),
+                'exception' => static fn () => throw new \LogicException('Should not be called.'),
             ]),
         ]);
     }

@@ -21,10 +21,10 @@ class TraceableFeatureCheckerTest extends TestCase
     public function testTraces()
     {
         $featureChecker = new FeatureChecker(new InMemoryProvider([
-            'feature_true' => fn () => true,
-            'feature_false' => fn () => false,
-            'feature_integer' => fn () => 42,
-            'feature_random' => fn () => random_int(1, 42),
+            'feature_true' => static fn () => true,
+            'feature_false' => static fn () => false,
+            'feature_integer' => static fn () => 42,
+            'feature_random' => static fn () => random_int(1, 42),
         ]));
         $traceableFeatureChecker = new TraceableFeatureChecker($featureChecker);
 

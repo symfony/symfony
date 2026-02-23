@@ -21,9 +21,9 @@ class InMemoryProviderTest extends TestCase
     protected function setUp(): void
     {
         $this->provider = new InMemoryProvider([
-            'first' => fn () => true,
-            'second' => fn () => 42,
-            'exception' => fn () => throw new \LogicException('Should not be called.'),
+            'first' => static fn () => true,
+            'second' => static fn () => 42,
+            'exception' => static fn () => throw new \LogicException('Should not be called.'),
         ]);
     }
 

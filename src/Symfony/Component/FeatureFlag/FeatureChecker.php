@@ -40,7 +40,7 @@ final class FeatureChecker implements FeatureCheckerInterface, ResetInterface
             return $this->cache[$featureName];
         }
 
-        $feature = $this->provider->get($featureName) ?? fn () => false;
+        $feature = $this->provider->get($featureName) ?? static fn () => false;
 
         return $this->cache[$featureName] = $feature();
     }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Store the SES-assigned message ID via `SentMessage::addInfo('id', ...)` instead of overwriting `SentMessage::setMessageId()`, preserving the original MIME Message-ID
+
 7.3
 ---
 

@@ -33,4 +33,36 @@ class SentMessageTest extends TestCase
         $this->assertSame($r, $m->getOriginalMessage());
         $this->assertNotSame($r, $m->getMessage());
     }
+
+    public function testInfo()
+    {
+        $m = new SentMessage(
+            new RawMessage('Email'),
+            new Envelope(new Address('fabien@example.com'), [new Address('helene@example.com')])
+        );
+
+        $this->assertNull($m->getInfo('ses_message_id'));
+        $this->assertSame('default', $m->getInfo('ses_message_id', 'default'));
+        $this->assertSame([], $m->getAllInfo());
+
+        $m->addInfo('ses_message_id', 'ses-abc-123');
+        $m->addInfo('request_id', 'req-xyz-456');
+
+        $this->assertSame('ses-abc-123', $m->getInfo('ses_message_id'));
+        $this->assertSame('req-xyz-456', $m->getInfo('request_id'));
+        $this->assertSame(['ses_message_id' => 'ses-abc-123', 'request_id' => 'req-xyz-456'], $m->getAllInfo());
+    }
+
+    public function testInfoOverwrite()
+    {
+        $m = new SentMessage(
+            new RawMessage('Email'),
+            new Envelope(new Address('fabien@example.com'), [new Address('helene@example.com')])
+        );
+
+        $m->addInfo('key', 'first');
+        $m->addInfo('key', 'second');
+
+        $this->assertSame('second', $m->getInfo('key'));
+    }
 }

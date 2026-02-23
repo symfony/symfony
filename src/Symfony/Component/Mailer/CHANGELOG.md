@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `SentMessage::addInfo()`, `SentMessage::getInfo()`, and `SentMessage::getAllInfo()` to allow transports to store transport-specific metadata on a sent message
+
 8.0
 ---
 

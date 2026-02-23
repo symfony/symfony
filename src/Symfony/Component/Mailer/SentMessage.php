@@ -23,6 +23,7 @@ class SentMessage
     private RawMessage $raw;
     private string $messageId;
     private string $debug = '';
+    private array $info = [];
 
     /**
      * @internal
@@ -81,6 +82,21 @@ class SentMessage
     public function appendDebug(string $debug): void
     {
         $this->debug .= $debug;
+    }
+
+    public function addInfo(string $key, mixed $value): void
+    {
+        $this->info[$key] = $value;
+    }
+
+    public function getInfo(string $key, mixed $default = null): mixed
+    {
+        return $this->info[$key] ?? $default;
+    }
+
+    public function getAllInfo(): array
+    {
+        return $this->info;
     }
 
     public function toString(): string

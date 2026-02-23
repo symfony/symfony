@@ -28,9 +28,4 @@ final class InMemoryProvider implements ProviderInterface
     {
         return $this->features[$featureName] ?? null;
     }
-
-    public function getNames(): array
-    {
-        return array_keys($this->features);
-    }
 }

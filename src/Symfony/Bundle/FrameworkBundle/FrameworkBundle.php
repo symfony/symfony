@@ -48,6 +48,7 @@ use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
+use Symfony\Component\FeatureFlag\DependencyInjection\FeatureFlagPass;
 use Symfony\Component\Form\DependencyInjection\FormPass;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpClient\DependencyInjection\HttpClientPass;

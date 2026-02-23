@@ -28,6 +28,7 @@ final class FeatureFlagDataCollector extends DataCollector implements LateDataCo
         private readonly ProviderInterface $provider,
         private readonly TraceableFeatureChecker $featureChecker,
     ) {
+        $this->reset();
     }
 
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
@@ -36,36 +37,61 @@ final class FeatureFlagDataCollector extends DataCollector implements LateDataCo
 
     public function lateCollect(): void
     {
-        $this->data['resolved'] = [];
+        $this->data['features'] = [];
         foreach ($this->featureChecker->getResolvedValues() as $featureName => $info) {
-            $this->data['resolved'][$featureName] = [
-                'status' => $this->provider->get($featureName) ? $info['status'] : 'not_found',
+            $status = $this->provider->get($featureName) ? $info['status'] : TraceableFeatureChecker::STATUS_NOT_FOUND;
+            $this->data['features'][$featureName] = [
+                'status' => $status,
                 'value' => $this->cloneVar($info['value']),
                 'calls' => $info['calls'],
             ];
+            ++$this->data['count'][$status];
         }
-
-        $this->data['not_resolved'] = array_values(array_diff($this->provider->getNames(), array_keys($this->data['resolved'])));
     }
 
     /**
-     * @return array<string, array{status: 'not_found'|'resolved'|'enabled'|'disabled', value: Data, calls: int}>
+     * @return array<string, array{status: TraceableFeatureChecker::STATUS_*, value: Data, calls: int}>
      */
-    public function getResolved(): array
+    public function getFeatures(): array
     {
-        return $this->data['resolved'] ?? [];
+        return $this->data['features'];
     }
 
-    /**
-     * @return list<string>
-     */
-    public function getNotResolved(): array
+    public function getEnabledCount(): int
     {
-        return $this->data['not_resolved'] ?? [];
+        return $this->data['count'][TraceableFeatureChecker::STATUS_ENABLED];
+    }
+
+    public function getDisabledCount(): int
+    {
+        return $this->data['count'][TraceableFeatureChecker::STATUS_DISABLED];
+    }
+
+    public function getResolvedCount(): int
+    {
+        return $this->data['count'][TraceableFeatureChecker::STATUS_RESOLVED];
+    }
+
+    public function getNotFoundCount(): int
+    {
+        return $this->data['count'][TraceableFeatureChecker::STATUS_NOT_FOUND];
     }
 
     public function getName(): string
     {
         return 'feature_flag';
+    }
+
+    public function reset(): void
+    {
+        $this->data = [
+            'features' => [],
+            'count' => [
+                TraceableFeatureChecker::STATUS_ENABLED => 0,
+                TraceableFeatureChecker::STATUS_DISABLED => 0,
+                TraceableFeatureChecker::STATUS_RESOLVED => 0,
+                TraceableFeatureChecker::STATUS_NOT_FOUND => 0,
+            ],
+        ];
     }
 }

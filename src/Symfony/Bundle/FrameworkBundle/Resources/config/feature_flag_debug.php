@@ -20,14 +20,14 @@ return static function (ContainerConfigurator $container) {
         ->set('debug.feature_flag.feature_checker', TraceableFeatureChecker::class)
             ->decorate('feature_flag.feature_checker')
             ->args([
-                '$decorated' => service('debug.feature_flag.feature_checker.inner'),
+                service('debug.feature_flag.feature_checker.inner'),
             ])
             ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('feature_flag.data_collector', FeatureFlagDataCollector::class)
             ->args([
-                '$provider' => service('feature_flag.provider'),
-                '$featureChecker' => service('debug.feature_flag.feature_checker'),
+                service('feature_flag.provider'),
+                service('debug.feature_flag.feature_checker'),
             ])
             ->tag('data_collector', ['template' => '@WebProfiler/Collector/feature_flag.html.twig', 'id' => 'feature_flag'])
             ->tag('kernel.reset', ['method' => 'reset'])

@@ -32,16 +32,4 @@ final class ChainProvider implements ProviderInterface
 
         return null;
     }
-
-    public function getNames(): array
-    {
-        $names = [];
-        foreach ($this->providers as $provider) {
-            foreach ($provider->getNames() as $name) {
-                $names[$name] = true;
-            }
-        }
-
-        return array_keys($names);
-    }
 }

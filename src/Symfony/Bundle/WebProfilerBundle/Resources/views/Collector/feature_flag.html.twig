@@ -3,29 +3,31 @@
 {% block page_title 'Feature Flag' %}
 
 {% block toolbar %}
-    {% if 0 < collector.resolved|length %}
+    {% if 0 < collector.features|length %}
         {% set icon %}
             {{ source('@WebProfiler/Icon/feature-flag.svg') }}
-            <span class="sf-toolbar-value">{{ collector.resolved|length }}</span>
+            <span class="sf-toolbar-value">{{ collector.features|length }}</span>
         {% endset %}
 
         {% set text %}
-            <div class="sf-toolbar-info-group">
-                {% set color_map = {
-                    not_found: 'gray',
-                    resolved: 'green',
-                    disabled: 'red',
-                    enabled: 'green',
-                } %}
-                {% for feature_name, info in collector.resolved %}
-                    <div class="sf-toolbar-info-piece">
-                        <b>{{ feature_name }}</b>
-                        <span class="sf-toolbar-status sf-toolbar-status-{{ color_map[info.status] }}">
-                            {{ info.status|capitalize|replace({_: ' '}) }}
-                        </span>
-                        <br />
-                    </div>
-                {% endfor %}
+            <div class="sf-toolbar-info-piece">
+                <b>Enabled</b>
+                <span class="sf-toolbar-status  {{- collector.disabledCount ? ' sf-toolbar-status-green' }}">{{ collector.enabledCount }}</span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Resolved</b>
+                <span class="sf-toolbar-status  {{- collector.disabledCount ? ' sf-toolbar-status-green' }}">{{ collector.resolvedCount }}</span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Disabled</b>
+                <span class="sf-toolbar-status {{- collector.disabledCount ? ' sf-toolbar-status-red' }}">{{ collector.disabledCount }}</span>
+            </div>
+
+            <div class="sf-toolbar-info-piece">
+                <b>Not found</b>
+                <span class="sf-toolbar-status sf-toolbar-status-grey">{{ collector.notFoundCount }}</span>
             </div>
         {% endset %}
 
@@ -34,7 +36,7 @@
 {% endblock %}
 
 {% block menu %}
-    <span class="label {{ collector.resolved|length is same as(0) ? 'disabled' }}">
+    <span class="label {{ collector.features|length is same as(0) ? 'disabled' }}">
         <span class="icon">{{ source('@WebProfiler/Icon/feature-flag.svg') }}</span>
         <strong>Feature Flag</strong>
     </span>
@@ -66,83 +68,47 @@
 
 {% block panel %}
     <h2>Feature Flag</h2>
-    <div class="sf-tabs">
-        <div class="tab">
-            <h3 class="tab-title">Resolved <span class="badge">{{ collector.resolved|length }}</span></h3>
+    {% if collector.features|length > 0 %}
+        <table>
+            <thead>
+            <tr>
+                <th>Feature name</th>
+                <th>Enabled</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for feature_name, info in collector.features %}
+                <tr>
+                    <td>
+                        {{ feature_name }}
+                    </td>
+                    <td>
+                        {% set context_id = 'context-' ~ loop.index %}
+                        <div>
+                            <span class="badge badge-{{ info.status }}">{{ info.status|capitalize|replace({_: ' '}) }}</span>
+                            <span><button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide details">Show details</button></span>
+                        </div>
 
-            <div class="tab-content">
-                {% if collector.resolved|length > 0 %}
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Feature name</th>
-                            <th>Enabled</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for feature_name, info in collector.resolved %}
-                            <tr>
-                                <td>
-                                    {{ feature_name }}
-                                </td>
-                                <td>
-                                    {% set context_id = 'context-' ~ loop.index %}
-                                    <div>
-                                        <span class="badge badge-{{ info.status }}">{{ info.status|capitalize|replace({_: ' '}) }}</span>
-                                        <span><button type="button" class="btn btn-link text-small sf-toggle" data-toggle-selector="#{{ context_id }}" data-toggle-alt-content="Hide details">Show details</button></span>
-                                    </div>
-
-                                    <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
-                                        <table>
-                                            <tr>
-                                                <th>Value</th>
-                                                <td>{{ profiler_dump(info.value, maxDepth: 2) }}</td>
-                                            </tr>
-                                            <tr>
-                                                <th>Calls</th>
-                                                <td>{{ info.calls }}</td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                {% else %}
-                    <div class="empty">
-                        <p>No features resolved</p>
-                    </div>
-                {% endif %}
-            </div>
+                        <div id="{{ context_id }}" class="context sf-toggle-content sf-toggle-hidden">
+                            <table>
+                                <tr>
+                                    <th>Value</th>
+                                    <td>{{ profiler_dump(info.value, maxDepth: 2) }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Calls</th>
+                                    <td>{{ info.calls }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="empty">
+            <p>No features resolved</p>
         </div>
-        <div class="tab">
-            <h3 class="tab-title">Not resolved <span class="badge">{{ collector.notResolved|length }}</span></h3>
-
-            <div class="tab-content">
-                {% if collector.notResolved|length > 0 %}
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Feature name</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for feature_name in collector.notResolved %}
-                            <tr>
-                                <td>
-                                    {{ feature_name }}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                {% else %}
-                    <div class="empty">
-                        <p>All features resolved</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+    {% endif %}
 {% endblock %}

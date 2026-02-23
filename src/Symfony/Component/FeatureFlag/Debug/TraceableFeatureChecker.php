@@ -19,7 +19,12 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 final class TraceableFeatureChecker implements FeatureCheckerInterface
 {
-    /** @var array<string, array{status: 'resolved'|'enabled'|'disabled', value: mixed, calls: int}> */
+    public const STATUS_ENABLED = 'enabled';
+    public const STATUS_DISABLED = 'disabled';
+    public const STATUS_RESOLVED = 'resolved';
+    public const STATUS_NOT_FOUND = 'not_found';
+
+    /** @var array<string, array{status: self::STATUS_*, value: mixed, calls: int}> */
     private array $resolvedValues = [];
 
     public function __construct(
@@ -34,7 +39,7 @@ final class TraceableFeatureChecker implements FeatureCheckerInterface
         // Force logging value. It has no cost since value is cached by the decorated FeatureChecker.
         $this->getValue($featureName);
 
-        $this->resolvedValues[$featureName]['status'] = $isEnabled ? 'enabled' : 'disabled';
+        $this->resolvedValues[$featureName]['status'] = $isEnabled ? self::STATUS_ENABLED : self::STATUS_DISABLED;
 
         return $isEnabled;
     }
@@ -44,7 +49,7 @@ final class TraceableFeatureChecker implements FeatureCheckerInterface
         $value = $this->decorated->getValue($featureName);
 
         $this->resolvedValues[$featureName] ??= [
-            'status' => 'resolved',
+            'status' => self::STATUS_RESOLVED,
             'value' => $value,
             'calls' => 0,
         ];

@@ -14,17 +14,12 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FeatureFlag\ClassFeature;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FeatureFlag\ClassMethodFeature;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FeatureFlag\NamedFeature;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\FeatureFlag\FeatureCheckerInterface;
 
 class FeatureFlagTest extends AbstractWebTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        self::deleteTmpDir();
-    }
-
     public function testFeatureFlagAssertions()
     {
         static::bootKernel(['test_case' => 'FeatureFlag', 'root_config' => 'config.yml']);
@@ -49,7 +44,7 @@ class FeatureFlagTest extends AbstractWebTestCase
 
     public function testFeatureFlagAssertionsWithInvalidMethod()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid feature method "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FeatureFlag\InvalidMethodFeature": method "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FeatureFlag\InvalidMethodFeature::invalid_method()" does not exist.');
 
         static::bootKernel(['test_case' => 'FeatureFlag', 'root_config' => 'config_with_invalid_method.yml']);
@@ -57,7 +52,7 @@ class FeatureFlagTest extends AbstractWebTestCase
 
     public function testFeatureFlagAssertionsWithInvalidMethodVisibility()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid feature method "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FeatureFlag\InvalidMethodVisibilityFeature": method "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FeatureFlag\InvalidMethodVisibilityFeature::resolve()" must be public.');
 
         static::bootKernel(['test_case' => 'FeatureFlag', 'root_config' => 'config_with_invalid_method_visibility.yml']);
@@ -65,7 +60,7 @@ class FeatureFlagTest extends AbstractWebTestCase
 
     public function testFeatureFlagAssertionsWithDifferentMethod()
     {
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Using the #[Symfony\Component\FeatureFlag\Attribute\AsFeature(method: "different")] attribute on a method is not valid. Either remove the method value or move this to the top of the class (Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FeatureFlag\DifferentMethodFeature).');
 
         static::bootKernel(['test_case' => 'FeatureFlag', 'root_config' => 'config_with_different_method.yml']);
@@ -73,7 +68,7 @@ class FeatureFlagTest extends AbstractWebTestCase
 
     public function testFeatureFlagAssertionsWithDuplicate()
     {
-        $this->expectException(\RuntimeException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Feature "Symfony\Bundle\FrameworkBundle\Tests\Fixtures\FeatureFlag\ClassFeature" already defined in the "feature_flag.provider.in_memory" provider.');
 
         static::bootKernel(['test_case' => 'FeatureFlag', 'root_config' => 'config_with_duplicate.yml']);

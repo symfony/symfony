@@ -49,9 +49,4 @@ class InMemoryProviderTest extends TestCase
 
         $this->assertNull($feature);
     }
-
-    public function testGetNames()
-    {
-        $this->assertSame(['first', 'second', 'exception'], $this->provider->getNames());
-    }
 }

@@ -52,6 +52,8 @@ $featureChecker->isEnabled('not_a_feature'); // returns false
 
 // Retrieve a feature value
 $featureChecker->getValue('random'); // returns 1, 2 or 3
+
+// The resolved value of a feature must be immutable during the same request to avoid invalid behaviors
 $featureChecker->getValue('random'); // returns the same value as above
 ```
 

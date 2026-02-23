@@ -12,12 +12,12 @@
         {% set text %}
             <div class="sf-toolbar-info-piece">
                 <b>Enabled</b>
-                <span class="sf-toolbar-status  {{- collector.disabledCount ? ' sf-toolbar-status-green' }}">{{ collector.enabledCount }}</span>
+                <span class="sf-toolbar-status {{- collector.enabledCount ? ' sf-toolbar-status-green' }}">{{ collector.enabledCount }}</span>
             </div>
 
             <div class="sf-toolbar-info-piece">
                 <b>Resolved</b>
-                <span class="sf-toolbar-status  {{- collector.disabledCount ? ' sf-toolbar-status-green' }}">{{ collector.resolvedCount }}</span>
+                <span class="sf-toolbar-status {{- collector.resolvedCount ? ' sf-toolbar-status-green' }}">{{ collector.resolvedCount }}</span>
             </div>
 
             <div class="sf-toolbar-info-piece">

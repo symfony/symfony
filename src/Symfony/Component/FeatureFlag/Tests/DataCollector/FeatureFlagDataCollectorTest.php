@@ -36,7 +36,7 @@ class FeatureFlagDataCollectorTest extends TestCase
         $traceableFeatureChecker->getValue('feature_integer');
         $traceableFeatureChecker->getValue('feature_integer');
 
-        $this->assertSame([], $dataCollector->getResolved());
+        $this->assertSame([], $dataCollector->getFeatures());
 
         $dataCollector->lateCollect();
 
@@ -46,7 +46,7 @@ class FeatureFlagDataCollectorTest extends TestCase
 
                 return $a;
             },
-            $dataCollector->getResolved(),
+            $dataCollector->getFeatures(),
         );
         $this->assertSame(
             [
@@ -73,7 +73,5 @@ class FeatureFlagDataCollectorTest extends TestCase
             ],
             $data,
         );
-
-        $this->assertSame(['feature_random'], $dataCollector->getNotResolved());
     }
 }

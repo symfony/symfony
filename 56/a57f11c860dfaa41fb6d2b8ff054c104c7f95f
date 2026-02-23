@@ -1,0 +1,47 @@
+---------------------------------------------------------------------------
+
+by rosier at 2024-04-23T13:17:49Z
+
+This looks more like a configuration issue to me. For this feature the order of locales is important.
+
+https://symfony.com/doc/current/translation.html#selecting-the-language-preferred-by-the-user
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2024-04-23T13:24:01Z
+
+Indeed, just found this in the documentation.
+> If it can't find a perfect match between them, this method returns the first locale passed as argument (that's why the order of the passed locales is important).
+
+However, this behaviour looks wrong to me.
+IMO, if it can't find a perfect match, I think it should return the default locale, not the first of the list.
+
+And this PR fixes the issue by setting the default locale first in the list.
+
+---------------------------------------------------------------------------
+
+by rosier at 2024-04-23T13:41:41Z
+
+I may be missing something, but can't you put in your config the default as the first value of the list of `enabled_locales`
+
+---------------------------------------------------------------------------
+
+by karimmorel at 2024-04-23T14:26:08Z
+
+I was not aware of that part of the documentation, but when I noticed that behaviour, I thought it was weirdly designed.
+
+`default_locale` is used to set the locale, while `enabled_locales` is used to limit it. So to me, it is weird to use `enabled_locales` to set the locale.
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2024-04-26T08:26:16Z
+
+@karimmorel you should also open a PR to update the documentation in case this PR is merged:
+https://github.com/symfony/symfony-docs/edit/6.4/translation.rst
+
+---------------------------------------------------------------------------
+
+by Seb33300 at 2024-04-30T03:41:38Z
+
+Just realized that the documentation concerns the method `getPreferredLanguage()` and you did not change that method.
+So you dont need to update the doc.

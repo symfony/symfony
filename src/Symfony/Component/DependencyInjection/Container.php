@@ -130,6 +130,16 @@ class Container implements ContainerInterface, ResetInterface
     }
 
     /**
+     * Checks whether a parameter is dynamic (i.e. its value depends on environment variables).
+     *
+     * Compiled containers override this method to report parameters that resolve env vars.
+     */
+    public function isParameterDynamic(string $name): bool
+    {
+        return false;
+    }
+
+    /**
      * Sets a service.
      *
      * Setting a synthetic service to null resets it: has() returns false and get()

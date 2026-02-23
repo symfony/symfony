@@ -1603,6 +1603,21 @@ class ContainerBuilder extends Container implements TaggedContainerInterface
         $this->getCompiler()->log($pass, $this->resolveEnvPlaceholders($message));
     }
 
+    public function isParameterDynamic(string $name): bool
+    {
+        if (!$this->hasParameter($name)) {
+            return false;
+        }
+
+        $bag = $this->getParameterBag();
+        $value = $bag->resolveValue($bag->get($name));
+
+        $usedEnvs = [];
+        $this->resolveEnvPlaceholders($value, null, $usedEnvs);
+
+        return [] !== $usedEnvs;
+    }
+
     /**
      * Checks whether a class is available and will remain available in the "no-dev" mode of Composer.
      *

@@ -37,4 +37,9 @@ class ContainerBag extends FrozenParameterBag implements ContainerBagInterface
     {
         return $this->container->hasParameter($name);
     }
+
+    public function isParameterDynamic(string $name): bool
+    {
+        return $this->container->isParameterDynamic($name);
+    }
 }

@@ -100,6 +100,11 @@ class ProjectServiceContainer extends Container
         throw new ParameterNotFoundException($name);
     }
 
+    public function isParameterDynamic(string $name): bool
+    {
+        return isset($this->loadedDynamicParameters[$name]);
+    }
+
     protected function getDefaultParameters(): array
     {
         return [

@@ -116,6 +116,11 @@ class ProjectServiceContainer extends Container
         return $this->dynamicParameters[$name] = $value;
     }
 
+    public function isParameterDynamic(string $name): bool
+    {
+        return isset($this->loadedDynamicParameters[$name]);
+    }
+
     protected function getDefaultParameters(): array
     {
         return [

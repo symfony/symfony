@@ -4,6 +4,7 @@ CHANGELOG
 8.1
 ---
 
+ * Add `Container::isParameterDynamic()` to check if a parameter depends on environment variables
  * Add support for decorating all services with a specific tag using the `container.tag_decorator` resource tag or `#[AsTagDecorator]`
  * Add support for `SOURCE_DATE_EPOCH` environment variable
  * Deprecate configuring options `alias`, `parent`, `synthetic`, `file`, `arguments`, `properties`, `configurator` or `calls` when using `from_callable`

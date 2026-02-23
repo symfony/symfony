@@ -1715,6 +1715,11 @@ class PhpDumper extends Dumper
             {$getDynamicParameter}
                 }
 
+                public function isParameterDynamic(string \$name): bool
+                {
+                    return isset(\$this->loadedDynamicParameters[\$name]);
+                }
+
                 protected function getDefaultParameters(): array
                 {
                     return $parameters;

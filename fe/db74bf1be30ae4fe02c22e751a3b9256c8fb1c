@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2022-08-31T10:57:10Z
+
+Hey!
+
+I think @technojit has recently worked with this code. Maybe they can help review this?
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by wouterj at 2022-09-29T11:43:50Z
+
+> I am too dumb or tired to figure out what's going on in the CompletionInput class or its tests, so I'd appreciate input there :)
+
+The `CompletionInput` is a monster, so you sure shouldn't feel dumb if you cannot follow it (it also took me an hour to relearn enough of the logic to find the issue).
+
+In fact, you've found a bug that also exists on 5.4, I've submitted a fix: #47726 When that one is merged up, this one should work correctly.
+
+I've played a lot with this PR locally in order to find this bug. The behavior looks very promising to me! Thanks for working on these edge-cases.
+
+---------------------------------------------------------------------------
+
+by dmitryuk at 2025-07-31T15:52:11Z
+
+@Seldaek  may be close the PR since it too outdated?
+
+---------------------------------------------------------------------------
+
+by Seldaek at 2025-08-01T07:34:06Z
+
+It is outdated yes but the issues described in OP are still present as far as I can tell.
+
+---------------------------------------------------------------------------
+
+by dmitryuk at 2025-08-01T14:42:57Z
+
+It's 3 years and nobody looked into it yet 🤔

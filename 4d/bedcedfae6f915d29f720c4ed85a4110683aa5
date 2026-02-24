@@ -1,0 +1,75 @@
+---------------------------------------------------------------------------
+
+by stof at 2025-12-04T08:54:26Z
+
+> * run `make -C tests/yaml-test-suite data` to prepare the testsuite.
+
+this should not be needed. Use the `data` branch of the testsuite repo instead.
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2025-12-04T12:43:52Z
+
+Thanks @stof and @derrabus for your helpful input! Now i have a solution where the tests are also running without the submodule. To adjust the pipelines i dont have the permission.
+
+---------------------------------------------------------------------------
+
+by stof at 2025-12-04T12:46:38Z
+
+> * Add to the pipeline to checkout the submodule in the main repo => missing permissions to change that
+
+which permission are you missing ? You can update the `.github/workflows/` files
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2025-12-04T12:50:28Z
+
+When i want to push a change on `.github/workflows/ ` i get a permission denied. But might be a problem on my side then.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2025-12-04T12:58:23Z
+
+Weird. As long as you're pusing to your fork and not the original repository, you should not have permission problems. 🤔
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2025-12-04T13:17:44Z
+
+TIL: Was on me ... had this remote with https and not ssh ... for https tokens it's by default declined to change the workflows.
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2025-12-20T10:12:00Z
+
+@stof, @Spomky, @derrabus ... are you fine wih the changes now? Can we merge it?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-02-16T09:03:32Z
+
+Hi @maxbeckers, I think we should use the same approach as the one introduced in JsonPath to test against the RFC test suite: https://github.com/symfony/symfony/pull/62761. Instead of recursive clone, we used composer packages to do so.
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2026-02-16T10:26:20Z
+
+@alexandre-daubois you are right, that would make is easier. But for that we would need such a composer package.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-02-16T10:28:54Z
+
+Have a look at my PR and particularly the composer.json file: you can create a composer package from any GitHub repository 🙂 There is no _real_ composer package for the JsonPath test suite either
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2026-02-16T10:32:05Z
+
+Ok, will check. Thanks for the idea!
+
+---------------------------------------------------------------------------
+
+by maxbeckers at 2026-02-19T10:40:32Z
+
+Thanks again @alexandre-daubois for the hint. Working fine.

@@ -34,35 +34,35 @@ class SentMessageTest extends TestCase
         $this->assertNotSame($r, $m->getMessage());
     }
 
-    public function testInfo()
+    public function testMetadata()
     {
         $m = new SentMessage(
             new RawMessage('Email'),
             new Envelope(new Address('fabien@example.com'), [new Address('helene@example.com')])
         );
 
-        $this->assertNull($m->getInfo('ses_message_id'));
-        $this->assertSame('default', $m->getInfo('ses_message_id', 'default'));
-        $this->assertSame([], $m->getAllInfo());
+        $this->assertNull($m->getMetadata('ses_message_id'));
+        $this->assertSame('default', $m->getMetadata('ses_message_id', 'default'));
+        $this->assertSame([], $m->getAllMetadata());
 
-        $m->addInfo('ses_message_id', 'ses-abc-123');
-        $m->addInfo('request_id', 'req-xyz-456');
+        $m->addMetadata('ses_message_id', 'ses-abc-123');
+        $m->addMetadata('request_id', 'req-xyz-456');
 
-        $this->assertSame('ses-abc-123', $m->getInfo('ses_message_id'));
-        $this->assertSame('req-xyz-456', $m->getInfo('request_id'));
-        $this->assertSame(['ses_message_id' => 'ses-abc-123', 'request_id' => 'req-xyz-456'], $m->getAllInfo());
+        $this->assertSame('ses-abc-123', $m->getMetadata('ses_message_id'));
+        $this->assertSame('req-xyz-456', $m->getMetadata('request_id'));
+        $this->assertSame(['ses_message_id' => 'ses-abc-123', 'request_id' => 'req-xyz-456'], $m->getAllMetadata());
     }
 
-    public function testInfoOverwrite()
+    public function testMetadataOverwrite()
     {
         $m = new SentMessage(
             new RawMessage('Email'),
             new Envelope(new Address('fabien@example.com'), [new Address('helene@example.com')])
         );
 
-        $m->addInfo('key', 'first');
-        $m->addInfo('key', 'second');
+        $m->addMetadata('key', 'first');
+        $m->addMetadata('key', 'second');
 
-        $this->assertSame('second', $m->getInfo('key'));
+        $this->assertSame('second', $m->getMetadata('key'));
     }
 }

@@ -23,7 +23,7 @@ class SentMessage
     private RawMessage $raw;
     private string $messageId;
     private string $debug = '';
-    private array $info = [];
+    private array $metadata = [];
 
     /**
      * @internal
@@ -84,19 +84,19 @@ class SentMessage
         $this->debug .= $debug;
     }
 
-    public function addInfo(string $key, mixed $value): void
+    public function addMetadata(string $key, mixed $value): void
     {
-        $this->info[$key] = $value;
+        $this->metadata[$key] = $value;
     }
 
-    public function getInfo(string $key, mixed $default = null): mixed
+    public function getMetadata(string $key, mixed $default = null): mixed
     {
-        return $this->info[$key] ?? $default;
+        return $this->metadata[$key] ?? $default;
     }
 
-    public function getAllInfo(): array
+    public function getAllMetadata(): array
     {
-        return $this->info;
+        return $this->metadata;
     }
 
     public function toString(): string

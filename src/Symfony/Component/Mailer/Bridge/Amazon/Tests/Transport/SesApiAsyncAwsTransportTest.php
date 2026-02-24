@@ -121,7 +121,7 @@ class SesApiAsyncAwsTransportTest extends TestCase
 
         $message = $transport->send($mail);
 
-        $this->assertSame('foobar', $message->getInfo('id'));
+        $this->assertSame('foobar', $message->getMetadata('id'));
         $this->assertNotSame('foobar', $message->getMessageId());
     }
 

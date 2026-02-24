@@ -55,7 +55,7 @@ class SesHttpAsyncAwsTransport extends AbstractTransport
         $response = $result->info()['response'];
 
         try {
-            $message->addInfo('id', $result->getMessageId());
+            $message->addMetadata('id', $result->getMessageId());
             $message->appendDebug($response->getInfo('debug') ?? '');
         } catch (HttpException $e) {
             $exception = new HttpTransportException(\sprintf('Unable to send an email: %s (code %s).', $e->getAwsMessage() ?: $e->getMessage(), $e->getAwsCode() ?: $e->getCode()), $e->getResponse(), $e->getCode(), $e);

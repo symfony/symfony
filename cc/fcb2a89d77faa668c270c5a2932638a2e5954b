@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2026-02-24T09:51:22Z
+
+Since it’s a bug fix, shouldn’t this PR target an older branch like `7.4` or `8.0`?

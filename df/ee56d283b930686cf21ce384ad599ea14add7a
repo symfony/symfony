@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-22T11:52:06Z
+
+PR ready, this now also mirrors Guzzle's CurlMultiHandler::tick() and execute() methods to provide sweet integration with Guzzle's queue system.

@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by alex-dev at 2025-12-31T13:07:35Z
+
+### Implementation issue
+
+Failed message will be serialized wrapped in `SerializedEnvelopeMessage` by the failure transport, which will make it impossible to handle in the future. Sure the message was not deleted, it is still unusable by the application.
+
+### About the approach
+
+This feels like we are trying to bridge two approaches.
+1 - `TransportInterface` serializing
+2 - Middleware serialization
+Even if we don't implement the full middleware based serialization, being sure we want to go this way would ensure we are not adding more complexity in a component showing design issues.
+
+Lets consider what we now need to add a new transport: a `TransportInterface` implementation which must now use a `SerializerInterface`. Previously, it wasn't required.
+Lets consider all the potential states an envelope can now have: full PHP object with non-sendable stamps, serialized, full PHP object with sendable stamps only. These states can all transit through the middleware stack without being properly documented.
+
+I worry we are adding accidental complexity rather than reducing it.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-18T15:49:19Z
+
+Thanks for the review @alex-dev this should be improved now. Can you please have a second look?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-18T19:06:03Z
+
+Now ready for close human review, I did my part :)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-18T21:13:37Z
+
+The serializer can't route failures through the bus on its own: it has no access to that infrastructure. What it can do is throw, which is what it already does. The transport is the natural catch point since it owns the `decode()` call and the raw payload. The result (`FailedEnvelopeDecodingMessage`) is a thin value object with no transport knowledge; the actual re-decode logic lives in the middleware, which does have bus context. So responsibility is actually well separated: transport catches + wraps, middleware re-decodes + continues.
+
+The only way to move this concern really self-contained in the serializer would be to make it return an `Envelope<FailedEnvelopeDecodingMessage>` on failure instead of throwing. That'b be a BC break to `SerializerInterface`, and that'd force all custom serializers to know about `FailedEnvelopeDecodingMessage`. It'd conflate "I decoded this" with "I failed to decode this" in the same return type. That'd be worse separation IMHO, not better.
+
+---------------------------------------------------------------------------
+
+by alex-dev at 2026-02-20T13:46:11Z
+
+I still think a clean result type would be cleaner than an exception. Something like `Envelope<object{...}|object{error:Throwable,raw:string}>` would be good enough. No existing transport need to care about that one. Only the middleware throwing the throwable and the serializer need to care about these changes.
+
+So library adding transports don't need to update, library adding serializer only need to update if they care about decoding failure in theory.
+
+Also, I'd argue `PhpSerializer` is already shipping decoding failures on the `Envelope` in some cases: https://github.com/symfony/symfony/blob/8c1ab342d3ee5dc53a2c33f222a1ea5331e11106/src/Symfony/Component/Messenger/Transport/Serialization/PhpSerializer.php#L110C1-L111C1
+Standardizing this behaviour would be a good simplification.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-24T09:11:10Z
+
+@alex-dev thanks for the push back. I've now implement both strategies together, so that we get the best of both worlds. See also updated PR description.

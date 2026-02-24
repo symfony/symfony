@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-24T10:25:05Z
+
+The 8.0 target is suspicious, can you explain?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-02-24T10:28:28Z
+
+This code was valid until 7.4 with the deprecation, and it became invalid in 8.0 when the second argument of `lint()` changed from `?array` to `array`
+
+---------------------------------------------------------------------------
+
+by stof at 2026-02-24T10:29:46Z
+
+@alexandre-daubois if the code triggers a deprecation in 7.4, this is a good indication that we should actually apply the fix in the 7.4 branch to use the new way.
+
+---------------------------------------------------------------------------
+
+by D3strukt0r at 2026-02-24T10:32:28Z
+
+I agree that it should also be fixed in 7.4 and onward. thanks again for fixing :)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-02-24T10:32:29Z
+
+Right, I wasn't sure we should touch 7.4 as it "works" for this version. But indeed, the PR is rebased now

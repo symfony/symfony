@@ -21,6 +21,7 @@ use Symfony\Component\Scheduler\Generator\MessageGenerator;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
+use Symfony\Component\Scheduler\Trigger\GreedyTriggerInterface;
 use Symfony\Component\Scheduler\Trigger\TriggerInterface;
 
 class MessageGeneratorTest extends TestCase
@@ -260,6 +261,60 @@ class MessageGeneratorTest extends TestCase
         $this->assertCount(1, iterator_to_array($scheduler->getMessages(), false));
 
         $this->assertEquals(self::makeDateTime('22:23:10'), $clock->now());
+    }
+
+    public function testGreedyTriggerYieldsOneMessagePerPendingItem()
+    {
+        $clock = new MockClock(self::makeDateTime('22:12:00'));
+        $message = (object) ['id' => 'message'];
+
+        // Shared counter representing "items in queue".
+        // The trigger checks it; the foreach loop below decrements it to simulate handler work.
+        $counter = new \stdClass();
+        $counter->pending = 3;
+
+        $trigger = new class($counter) implements GreedyTriggerInterface {
+            public function __construct(private readonly \stdClass $counter)
+            {
+            }
+
+            public function __toString(): string
+            {
+                return 'greedy-trigger';
+            }
+
+            public function getNextRunDate(\DateTimeImmutable $run): ?\DateTimeImmutable
+            {
+                $scheduledTime = new \DateTimeImmutable('2020-02-20T22:13:00', new \DateTimeZone('UTC'));
+
+                if ($run < $scheduledTime) {
+                    return $scheduledTime;
+                }
+
+                // Return the same $run time when there is still work to do, null when done.
+                return $this->counter->pending > 0 ? $run : null;
+            }
+        };
+
+        $schedule = (new Schedule())->add(RecurringMessage::trigger($trigger, $message));
+        $schedule->stateful(new ArrayAdapter());
+
+        $scheduler = new MessageGenerator($schedule, 'dummy', $clock);
+
+        // Warmup – first run always returns nothing.
+        $this->assertSame([], iterator_to_array($scheduler->getMessages(), false));
+
+        $clock->modify('22:13:00');
+
+        // Collect messages while simulating handler work (decrement the counter).
+        $results = [];
+        foreach ($scheduler->getMessages() as $yielded) {
+            $results[] = $yielded;
+            --$counter->pending;
+        }
+
+        $this->assertCount(3, $results);
+        $this->assertSame(array_fill(0, 3, $message), $results);
     }
 
     public static function messagesProvider(): \Generator

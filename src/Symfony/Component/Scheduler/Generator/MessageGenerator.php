@@ -16,6 +16,7 @@ use Symfony\Component\Clock\Clock;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
+use Symfony\Component\Scheduler\Trigger\GreedyTriggerInterface;
 use Symfony\Component\Scheduler\Trigger\StatefulTriggerInterface;
 
 final class MessageGenerator implements MessageGeneratorInterface
@@ -72,6 +73,37 @@ final class MessageGenerator implements MessageGeneratorInterface
                 $yield = false;
             } elseif ($time == $lastTime && $index <= $lastIndex) {
                 $yield = false;
+            }
+
+            if ($trigger instanceof GreedyTriggerInterface) {
+                if ($yield) {
+                    // Greedy burst: yield first, then ask the trigger whether there is more
+                    // work at the same time. getNextRunDate() is intentionally called *after*
+                    // each yield so the trigger can inspect the state left by the handler.
+                    do {
+                        $context = new MessageContext($this->name, $id, $trigger, $time, null);
+                        try {
+                            foreach ($recurringMessage->getMessages($context) as $message) {
+                                yield $context => $message;
+                            }
+                        } finally {
+                            $checkpoint->save($time, $index);
+                        }
+                        $nextTime = $trigger->getNextRunDate($time);
+                    } while ($nextTime == $time);
+                } else {
+                    $nextTime = $trigger->getNextRunDate($time);
+                    // Skip same-time re-entry when the item was already processed.
+                    while ($nextTime == $time) {
+                        $nextTime = $trigger->getNextRunDate($time);
+                    }
+                }
+
+                if ($nextTime) {
+                    $heap->insert([$nextTime, $index, $recurringMessage]);
+                }
+
+                continue;
             }
 
             $nextTime = $trigger->getNextRunDate($time);

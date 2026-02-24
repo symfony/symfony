@@ -4,6 +4,7 @@ CHANGELOG
 8.1
 ---
 
+ * Add `GreedyTriggerInterface` to allow triggers to process pending items one-by-one by returning the same datetime from `getNextRunDate()`
  * Add `--sort` option to `debug:command` to order recurring messages by next run date
 
 7.3

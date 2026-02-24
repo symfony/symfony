@@ -1,0 +1,71 @@
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-03-11T14:06:44Z
+
+Will this also fix #39588?
+
+---------------------------------------------------------------------------
+
+by NeilPeyssard at 2024-03-11T14:35:38Z
+
+> Will this also fix #39588?
+
+Yes it will !
+
+To describe more in depth the behavior of this PR, let's take these controllers
+
+* `src/Controller/Foo/BarController`
+* `src/Controller/DebugController`
+* `src/Controller/DebugFooController`
+* `src/Controller/HelloController`
+
+The following configurations will exclude `DebugController` and `DebugFooController`
+
+```yaml
+# config/routes/annotations.yaml
+
+controllers:
+    resource: '../../src/Controller/'
+    type: annotation
+    exclude: '../../src/Controller/{Debug*Controller.php}'
+
+# or
+
+controllers:
+    resource: '../../src/Controller/**/*'
+    type: annotation
+    exclude: '../../src/Controller/{Debug*Controller.php}'
+```
+
+And the following configuration will exclude `DebugController`, `DebugFooController` and `Foo\BarController`:
+
+```yaml
+# config/routes/annotations.yaml
+controllers:
+    resource: '../../src/Controller/*'
+    type: annotation
+    exclude: '../../src/Controller/{Debug*Controller.php}'
+```
+
+---------------------------------------------------------------------------
+
+by NeilPeyssard at 2024-03-13T11:07:56Z
+
+Hello,
+
+Unfortunately, I realized the following exclude condition will not work in version 6.4:
+
+```yaml
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    exclude: '../src/Controller/{Debug*Controller.php}'
+    type: attribute
+```
+
+This declaration will be handled by the `Symfony\Component\Routing\Loader\Psr4DirectoryLoader`, which hasn't access to the exclude parameter.
+
+After digging a little deeper, I have the feeling there is a bad design here. In an ideal world each loader will have access to this exclude parameter, and deal with it to load or not their routes. But adding such a big change will involve some BC break...
+
+What do you think guys ?

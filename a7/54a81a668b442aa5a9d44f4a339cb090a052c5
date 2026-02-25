@@ -1,0 +1,218 @@
+---------------------------------------------------------------------------
+
+by AlexMinaev19 at 2024-06-18T08:36:38Z
+
+Unfortunately, it's not enough to fix the problem. My investigation showed me, that objects with composite structure (class A contains instance class B) do not process properly in this case. We have to adjust MetadataAwareNameConverter (normalization) and handle paths like `compositeB.internalField`.
+
+---------------------------------------------------------------------------
+
+by antten at 2024-06-18T18:35:51Z
+
+@AlexMinaev19 Thank you for your comment. It's true that I missed that case. I am going to fix that ASAP.
+
+---------------------------------------------------------------------------
+
+by antten at 2024-06-21T15:15:26Z
+
+I think there are two things.
+
+The MetadataAwareNameConverter class can use the SerializedName attribute when it normalizes a property name, but it doesn't work in the ConstraintViolationListNormalizer because the class parameter is needed. However, the MetadataAwareNameConverter cannot normalize nested property names.
+
+Therefore, I propose to keep this PR to fix the bug reported in the issue. Violations reported when there are constraint errors can use SerializedName instead of the property name.
+
+I would also like to propose a PR to fix the same problem on the 5.4 branch. Due to the attribute, this PR does not work on both branches.
+
+Finally, I propose to create a new feature PR to enable the normalization of nested properties with MetadataAwareNameConverter.
+
+Thank you in advance for your feedback.
+
+---------------------------------------------------------------------------
+
+by AlexMinaev19 at 2024-06-25T16:37:08Z
+
+I think, it's possible, but it will not solve the issue, just produces a new one and false feeling that `MetadataAwareNameConverter` works correctly with `ConstraintViolationListNormalizer`. I can help you find a solution for nested properties to solve an issue fully. What do you think?
+
+---------------------------------------------------------------------------
+
+by antten at 2024-06-26T13:04:06Z
+
+Thank you for your reply.
+
+I believe my proposal will solve the issue, including the case of nested properties. If I correctly understood your comment, your concern is that the fix for nested properties will not be merged into the 6.4 branch?
+
+I understand that this is problematic for you, but I believe the solution requires a change in the behavior of `MetadataAwareNameConverter` because it is not currently able to normalize nested properties. This new behavior is not possible in a patch release for the 6.4 branch. I would appreciate a response from a Symfony maintainer to confirm or correct me. @dunglas Maybe you can help us?
+
+---------------------------------------------------------------------------
+
+by AlexMinaev19 at 2024-07-02T08:42:10Z
+
+Thank you for helping!
+
+I need support for nested properties because I use them frequently for request objects.
+
+Why is it not possible to fix the 6.4 version? For me, 6.4 and 7.0 are not a problem at all. One problematic thing that I see is the 5.4 branch that is still under active support and with this, we need the help of Symfony maintainer.
+
+Correct me if I missed something and sorry for the long delay.
+
+---------------------------------------------------------------------------
+
+by antten at 2024-07-02T21:45:12Z
+
+Again, I could be wrong, and I would appreciate a response from a Symfony maintainer to correct me if needed.
+
+Currently, the `MetadataAwareNameConverter` class cannot handle nested properties during normalization. The fix required is to add this new behavior to Symfony. Indeed, this is a new feature, not a bug, and it modifies the current behavior of `MetadataAwareNameConverter`.
+
+Why is this problematic? Because Symfony uses [semantic versioning](https://semver.org) (SemVer), which follows the format MAJOR.MINOR.PATCH. For the 6.4 branch, only the patch version will be updated as it does not receive new features, only bug fixes, as stated on the [official Symfony releases page](https://symfony.com/releases).
+
+![image](https://github.com/symfony/symfony/assets/172025540/44c2d554-c657-4491-9faa-ac0ef54e8de7)
+
+When a Symfony user wants to update the patch version in their project to get the latest fixes, their application should not experience any behavioral changes due to the Symfony update. However, if this new feature is merged into the 6.4 branch, it would cause unexpected behavior changes.
+
+Therefore, I believe we cannot add this new feature to the 6.4.x version of Symfony, but only in the new 7.2 release.
+
+I have serious doubts about changing the normalization of the `PropertyPath` result in a 6.4.x Symfony release, as developers might see it as a regression, potentially requiring updates to their applications, which is not acceptable in a patch version.
+
+Maybe the change of the `propertyPath` value in violation return message is considered an acceptable change due to its minimal impact. In that case, I would be pleased to update this PR to include handling of nested properties.
+
+I hope my explanations have been helpful.
+
+---------------------------------------------------------------------------
+
+by AlexMinaev19 at 2024-07-03T09:37:30Z
+
+Thanks for the explanation. Now I understand what you mean and agree with you.
+
+In this case, we can proceed with this, but maybe we need to talk about it with somebody (Symfony maintainer) who can help us with further steps.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2024-07-03T10:28:15Z
+
+I am actually having trouble understanding the related issue. Could you please wrap it in an application that one can check out and play with to get a better understanding about what you are talking about?
+
+---------------------------------------------------------------------------
+
+by antten at 2024-07-03T20:39:31Z
+
+The problem related to this PR occurs when we have one or more validation constraints fail while trying to deserialize a JSON body string with the `MapRequestPayload` attribute for object properties that have the `SerializedName` attribute.
+
+On the next example, we have two classes:
+```php
+class UserDto
+{
+    public function __construct(
+        #[Assert\NotBlank]
+        #[Assert\Length(max: 10)]
+        #[SerializedName('first_name')]
+        private string $firstName,
+
+        #[Assert\NotBlank]
+        #[Assert\Valid]
+        #[SerializedName('child')]
+        private ?ChildDto $childDto,
+    ) {
+    }
+}
+
+class ChildDto
+{
+    public function __construct(
+        #[Assert\NotBlank]
+        #[Assert\Length(min: 5)]
+        #[SerializedName('first_name')]
+        private string $childFirstName,
+    ) {
+    }
+}
+```
+
+We want to retrieve the `UserDto` from request using this controller:
+```php
+class UserController extends AbstractController
+{
+    #[Route(path: '/users', name: 'create_user', methods: ['POST'], format: 'json')]
+    public function __invoke(
+        #[MapRequestPayload(acceptFormat: 'json')] UserDto $userDto
+    ): JsonResponse {
+        return new JsonResponse();
+    }
+}
+```
+We send the following JSON body of the request:
+```json
+{
+      "first_name": "supercalifragilisticexpialidocious",
+      "child": {
+          "first_name": "aaa"
+      }
+}
+```
+
+The values of both `first_name` properties are incorrect according to the constraints defined in the `UserDto` and `ChildDto` classes with attributes.
+
+When we try to request our controller, we get the following response:
+```json
+{
+  "type": "https://symfony.com/errors/validation",
+  "title": "Validation Failed",
+  "status": 422,
+  "detail": "firstName: This value is too long. It should have 10 characters or less.\nchildDto.childFirstName: This value is too short. It should have 5 characters or more.",
+  "violations": [
+    {
+      "propertyPath": "firstName",
+      "title": "This value is too long. It should have 10 characters or less.",
+      "template": "This value is too long. It should have {{ limit }} character or less.|This value is too long. It should have {{ limit }} characters or less.",
+      "parameters": {
+        "{{ value }}": "\"supercalifragilisticexpialidocious\"",
+        "{{ limit }}": "10",
+        "{{ value_length }}": "34"
+      },
+      "type": "urn:uuid:d94b19cc-114f-4f44-9cc4-4138e80a87b9"
+    },
+    {
+      "propertyPath": "childDto.childFirstName",
+      "title": "This value is too short. It should have 5 characters or more.",
+      "template": "This value is too short. It should have {{ limit }} character or more.|This value is too short. It should have {{ limit }} characters or more.",
+      "parameters": {
+        "{{ value }}": "\"aaa\"",
+        "{{ limit }}": "5",
+        "{{ value_length }}": "3"
+      },
+      "type": "urn:uuid:9ff3fdc4-b214-49db-8718-39c315e33d45"
+    }
+  ]
+}
+```
+You can see that the `detail` and violations `propertyPath` display the class property name instead of the expected `SerializedName`.
+
+I have created a [reproducer project](https://github.com/antten/symfony-issue-56962) with this example.
+
+To resolve this problem, I have identified two different issues.
+
+First, in the `ConstraintViolationListNormalizer`, which calls the name converter to normalize the property path related to the properties whose constraints fail, it does not work in this case because we need to pass the class parameter to the normalize method of the name converter.
+
+However, this fix won't work with nested properties (`child.first_name`) because the `MetadataAwareNameConverter` class cannot handle nested properties.
+
+Therefore, we need two different developments to resolve this problem. I think the first is the objective of this PR to the 6.4 branch, and the second is a new feature for the 7.2 branch. The target branches of these two fixes are the reason for our doubt.
+
+Thank you for your help, and I hope my explanations are clear and understandable.
+
+---------------------------------------------------------------------------
+
+by xeurun at 2025-02-13T22:58:29Z
+
+Hi, it seems to have become more actual, with 8.4 getters, for example like this:
+```php
+    public string $url {
+        get => $this->_url;
+    }
+
+    public function __construct(
+        #[SerializedName('url')]
+        #[Assert\NotBlank]
+        #[Assert\Type('string')]
+        #[Assert\Length(min: 10, max: 4096)]
+        private readonly mixed $_url,
+```
+result: `propertyPath: "_url"`
+temp workaround pretty simple - trim leading underscore

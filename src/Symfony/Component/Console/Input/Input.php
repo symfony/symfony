@@ -171,4 +171,29 @@ abstract class Input implements InputInterface, StreamableInputInterface
     {
         return $this->stream;
     }
+
+    /**
+     * Reads the contents of the input stream (stdin) non-blockingly.
+     *
+     * When using a real stdin (no stream injected), stream_select() is used to
+     * avoid blocking when no data has been piped or redirected.
+     * When a custom stream is injected (e.g. in tests), it is read directly.
+     */
+    public function readStdin(): string
+    {
+        if (isset($this->stream)) {
+            return stream_get_contents($this->stream) ?: '';
+        }
+
+        $stdin = fopen('php://stdin', 'r');
+        $reads = [$stdin];
+        $writes = [];
+        $excepts = [];
+
+        if (!stream_select($reads, $writes, $excepts, 0)) {
+            return '';
+        }
+
+        return stream_get_contents($stdin) ?: '';
+    }
 }

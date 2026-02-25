@@ -160,4 +160,24 @@ class InputTest extends TestCase
         $input->setStream($stream);
         $this->assertSame($stream, $input->getStream());
     }
+
+    public function testReadStdinReturnsContentFromInjectedStream()
+    {
+        $input = new ArrayInput([]);
+        $stream = fopen('php://memory', 'r+');
+        fwrite($stream, 'hello world');
+        rewind($stream);
+        $input->setStream($stream);
+
+        $this->assertSame('hello world', $input->readStdin());
+    }
+
+    public function testReadStdinReturnsEmptyStringFromEmptyInjectedStream()
+    {
+        $input = new ArrayInput([]);
+        $stream = fopen('php://memory', 'r+');
+        $input->setStream($stream);
+
+        $this->assertSame('', $input->readStdin());
+    }
 }

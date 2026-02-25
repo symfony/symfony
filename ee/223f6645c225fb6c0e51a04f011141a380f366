@@ -1,0 +1,84 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2022-02-28T08:42:20Z
+
+There is a possible mistake people might run into when they start using the `FallbackLocaleProvider`:
+
+The `Translator` needs to know when the fallback locales are changed in order to reset built-in caching. Re-configuring the `FallbackLocaleProvider` directly without going through `Translator::setFallbackLocales()` may lead to wrong results.
+
+One solution I see would be:
+
+* Deprecate `FallbackLocaleProvider::setFallbackLocales()`, create a new `FallbackLocaleProvider` instance instead. In 7.0, this will leave `FallbackLocaleProvider` immutable.
+* Deprecate `Translator::setFallbackLocales()`, use a new `setFallbackLocaleProvider()` method instead that sets the new instance.
+
+Would that be acceptable?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2022-02-28T09:51:53Z
+
+Additionally, we might get rid of `getFallbackLocales()` in `DataCollectorTranslator` and `LoggingTranslator` if the `FallbackLocaleProvider` were used directly.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2022-03-03T09:26:33Z
+
+I think I need some opinions and/or feedback on this before I can proceed. 👀 🙏🏻
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2022-07-29T17:38:40Z
+
+> There is a possible mistake people might run into when they start using the `FallbackLocaleProvider`:
+>
+> The `Translator` needs to know when the fallback locales are changed in order to reset built-in caching. Re-configuring the `FallbackLocaleProvider` directly without going through `Translator::setFallbackLocales()` may lead to wrong results.
+>
+> One solution I see would be:
+>
+>     * Deprecate `FallbackLocaleProvider::setFallbackLocales()`, create a new `FallbackLocaleProvider` instance instead. In 7.0, this will leave `FallbackLocaleProvider` immutable.
+
+As `FallbackLocaleProvider` is a new feature, we do not have to deprecate anything, just change it. IMHO, it's better to design well this feature, to avoid known issues later which makes us support a BC layer.
+
+>
+>     * Deprecate `Translator::setFallbackLocales()`, use a new `setFallbackLocaleProvider()` method instead that sets the new instance.
+>
+>
+> Would that be acceptable?
+
+I guess it's acceptable, but we need to provide a BC layer, to let `Translator::setFallbackLocales()` works until 7.0.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2022-08-01T08:57:30Z
+
+@welcoMattic and @rvanlaak Thanks for your initial reviews!
+
+I haven't dealt with deprecations and replacement code in Symfony for a long time. Do you think you could help me to get this straight?
+
+The `getFallbackLocales()` methods on the `DataCollectorTranslator` and `LoggingTranslator` are also somewhat strange, since they need to proxy methods that are not part of the `TranslatorInterface`... maybe this will get easier as well?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2022-08-01T09:00:09Z
+
+I also renamed `fallbackLocales` to `ultimateFallbackLocales` to make it more clear that in fact, these are not the only fallbacks – they are the last fallbacks after the ones derived based on ICU data.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2023-03-09T17:42:17Z
+
+What's the status here?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2023-03-10T11:33:21Z
+
+I am still interested in working on it and the use case still exists. Will have to think this through again, forgot about most of the parts. I hope I have all the feedback and information regarding the deprecation steps that I need.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2023-09-20T07:33:46Z
+
+This branch needs to be rebased on 6.4.
+
+Otherwise, I guess we are close to an acceptable feature. I think here we must stick to the existing feature but moved to its own class `FallbackLocaleProvider`. Then later another PR could be done to improve the fallback locales mechanism if needed.

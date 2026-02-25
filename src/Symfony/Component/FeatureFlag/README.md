@@ -39,7 +39,7 @@ $provider = new InMemoryProvider([
     'xmas' => new XmasFeature(), // could be any callable
     'universe' => fn() => 42,
     'random' => fn() => random_int(1, 3),
-];
+]);
 
 // Create the feature checker
 $featureChecker = new FeatureChecker($provider);

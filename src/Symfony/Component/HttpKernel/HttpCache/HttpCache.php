@@ -338,13 +338,19 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         if (null === $entry) {
             $this->record($request, 'miss');
 
-            return $this->fetch($request, $catch);
+            $response = $this->fetch($request, $catch);
+            $response->headers->addCacheStatusDirective('X-Symfony-Cache');
+            $response->headers->addCacheStatusDirective('fwd', 'uri-miss');
+
+            return $response;
         }
 
         if (!$this->isFreshEnough($request, $entry)) {
             $this->record($request, 'stale');
+            $response = $this->validate($request, $entry, $catch);
+            $response->headers->addCacheStatusDirective('fwd','stale');
 
-            return $this->validate($request, $entry, $catch);
+            return $response;
         }
 
         if ($entry->headers->hasCacheControlDirective('no-cache')) {
@@ -354,6 +360,10 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         $this->record($request, 'fresh');
 
         $entry->headers->set('Age', $entry->getAge());
+        $entry->headers->addCacheStatusDirective('X-Symfony-Cache');
+        $entry->headers->addCacheStatusDirective('hit');
+        $entry->headers->addCacheStatusDirective('ttl', $entry->getTTL());
+
 
         return $entry;
     }
@@ -393,6 +403,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
         if (304 == $response->getStatusCode()) {
             $this->record($request, 'valid');
+            $response->headers->addCacheStatusDirective('fwd', '304');
 
             // return the response and not the cache entry if the response is valid but not cached
             $etag = $response->getEtag();

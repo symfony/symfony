@@ -29,6 +29,8 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
     protected array $headers = [];
     protected array $cacheControl = [];
 
+    protected array $cacheStatus = [];
+
     public function __construct(array $headers = [])
     {
         foreach ($headers as $key => $values) {
@@ -150,6 +152,10 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
         if ('cache-control' === $key) {
             $this->cacheControl = $this->parseCacheControl(implode(', ', $this->headers[$key]));
         }
+
+        if ('cache-status' === $key) {
+            $this->cacheStatus = $this->parseCacheStatus(implode('; ', $this->headers[$key]));
+        }
     }
 
     /**
@@ -179,6 +185,10 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
 
         if ('cache-control' === $key) {
             $this->cacheControl = [];
+        }
+
+        if ('cache-status' === $key) {
+            $this->cacheStatus = [];
         }
     }
 
@@ -211,11 +221,29 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
     }
 
     /**
+     * Adds a custom Cache-Status directive.
+     */
+    public function addCacheStatusDirective(string $key, bool|string $value = true): void
+    {
+        $this->cacheStatus[$key] = $value;
+
+        $this->set('Cache-Status', $this->getCacheStatusHeader());
+    }
+
+    /**
      * Returns true if the Cache-Control directive is defined.
      */
     public function hasCacheControlDirective(string $key): bool
     {
         return \array_key_exists($key, $this->cacheControl);
+    }
+
+    /**
+     * Returns true if the Cache-Status directive is defined.
+     */
+    public function hasCacheStatusDirective(string $key): bool
+    {
+        return \array_key_exists($key, $this->cacheStatus);
     }
 
     /**
@@ -261,12 +289,29 @@ class HeaderBag implements \IteratorAggregate, \Countable, \Stringable
         return HeaderUtils::toString($this->cacheControl, ',');
     }
 
+    protected function getCacheStatusHeader(): string
+    {
+        ksort($this->cacheStatus);
+
+        return HeaderUtils::toString($this->cacheStatus, ';');
+    }
+
     /**
      * Parses a Cache-Control HTTP header.
      */
     protected function parseCacheControl(string $header): array
     {
         $parts = HeaderUtils::split($header, ',=');
+
+        return HeaderUtils::combine($parts);
+    }
+
+    /**
+     * Parses a Cache-Status HTTP header.
+     */
+    protected function parseCacheStatus(string $header): array
+    {
+        $parts = HeaderUtils::split($header, ';=');
 
         return HeaderUtils::combine($parts);
     }

@@ -634,11 +634,24 @@ class HttpCacheTest extends HttpCacheTestCase
         $this->assertLessThan(2, strtotime($this->responses[0]->headers->get('Date')) - strtotime($this->response->headers->get('Date')));
         $this->assertGreaterThan(0, $this->response->headers->get('Age'));
         $this->assertNotNull($this->response->headers->get('X-Content-Digest'));
-        $this->assertNotNull($this->response->headers->get('Cache-Status'));
-        $this->assertTraceContains('hit');
         $this->assertTraceContains('fresh');
         $this->assertTraceNotContains('store');
         $this->assertEquals('Hello World', $this->response->getContent());
+    }
+
+    public function testHitsCachedResponseAndHasCacheStatusHeader()
+    {
+        $time = \DateTimeImmutable::createFromFormat('U', time() - 5);
+        $this->setNextResponse(200, ['Date' => $time->format(\DATE_RFC2822), 'Cache-Control' => 'public, max-age=10']);
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsCalled();
+
+        $this->request('GET', '/');
+        $this->assertHttpKernelIsNotCalled();
+
+        $this->assertNotNull($this->response->headers->get('Cache-Status'));
+        $this->assertTrue($this->response->headers->hasCacheStatusDirective('hit'));
     }
 
     public function testDegradationWhenCacheLocked()

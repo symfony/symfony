@@ -348,7 +348,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         if (!$this->isFreshEnough($request, $entry)) {
             $this->record($request, 'stale');
             $response = $this->validate($request, $entry, $catch);
-            $response->headers->addCacheStatusDirective('fwd','stale');
+            $response->headers->addCacheStatusDirective('fwd', 'stale');
 
             return $response;
         }
@@ -363,7 +363,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         $entry->headers->addCacheStatusDirective('X-Symfony-Cache');
         $entry->headers->addCacheStatusDirective('hit');
         $entry->headers->addCacheStatusDirective('ttl', $entry->getTTL());
-
 
         return $entry;
     }

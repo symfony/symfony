@@ -239,7 +239,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
         [$accessorReflection, $prefix] = $this->getAccessorMethod($class, $property);
         $allowedPrefixes = array_diff($this->accessorPrefixes, ['is', 'can', 'has']);
-        if ($accessorReflection && \in_array($prefix, $allowedPrefixes, true)) {
+        if ($accessorReflection && (\in_array($prefix, $allowedPrefixes, true) || !property_exists($class, $property))) {
             try {
                 return $this->typeResolver->resolve($accessorReflection);
             } catch (UnsupportedException) {

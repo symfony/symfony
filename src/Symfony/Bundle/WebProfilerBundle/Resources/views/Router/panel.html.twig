@@ -15,7 +15,7 @@
             <p>No parameters.</p>
         </div>
     {% else %}
-        {{ include('@WebProfiler/Profiler/table.html.twig', { data: request.routeParams, labels: ['Name', 'Value'] }, with_context = false) }}
+        {{ include('@WebProfiler/Profiler/table.html.twig', {data: request.routeParams, labels: ['Name', 'Value']}, with_context: false) }}
     {% endif %}
 {% endif %}
 

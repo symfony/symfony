@@ -27,7 +27,7 @@ class NumberTypeTest extends BaseTypeTestCase
         parent::setUp();
 
         // we test against "de_DE", so we need the full implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this);
 
         $this->defaultLocale = \Locale::getDefault();
         \Locale::setDefault('de_DE');
@@ -35,7 +35,9 @@ class NumberTypeTest extends BaseTypeTestCase
 
     protected function tearDown(): void
     {
-        \Locale::setDefault($this->defaultLocale);
+        if (isset($this->defaultLocale)) {
+            \Locale::setDefault($this->defaultLocale);
+        }
     }
 
     public function testDefaultFormatting()

@@ -76,14 +76,9 @@ class XmlDescriptor extends Descriptor
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($dom->importNode($this->getContainerAliasDocument($alias, $options['id'] ?? null)->childNodes->item(0), true));
-
-        if (!$container) {
-            $this->writeDocument($dom);
-
-            return;
+        if ($container) {
+            $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($container->getDefinition((string) $alias), (string) $alias, false, $container)->childNodes->item(0), true));
         }
-
-        $dom->appendChild($dom->importNode($this->getContainerDefinitionDocument($container->getDefinition((string) $alias), (string) $alias, false, $container)->childNodes->item(0), true));
 
         $this->writeDocument($dom);
     }
@@ -288,6 +283,9 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
+    /**
+     * @param (callable(string):bool)|null $filter
+     */
     private function getContainerServicesDocument(ContainerBuilder $container, ?string $tag = null, bool $showHidden = false, ?callable $filter = null): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
@@ -311,7 +309,7 @@ class XmlDescriptor extends Descriptor
                 continue;
             }
 
-            $serviceXML = $this->getContainerServiceDocument($service, $serviceId, null);
+            $serviceXML = $this->getContainerServiceDocument($service, $serviceId, $service instanceof Definition ? $container : null);
             $containerXML->appendChild($containerXML->ownerDocument->importNode($serviceXML->childNodes->item(0), true));
         }
 
@@ -351,7 +349,7 @@ class XmlDescriptor extends Descriptor
             }
         }
 
-        $serviceXML->setAttribute('public', $definition->isPublic() && !$definition->isPrivate() ? 'true' : 'false');
+        $serviceXML->setAttribute('public', $definition->isPublic() ? 'true' : 'false');
         $serviceXML->setAttribute('synthetic', $definition->isSynthetic() ? 'true' : 'false');
         $serviceXML->setAttribute('lazy', $definition->isLazy() ? 'true' : 'false');
         $serviceXML->setAttribute('shared', $definition->isShared() ? 'true' : 'false');
@@ -383,7 +381,7 @@ class XmlDescriptor extends Descriptor
         }
 
         if (!$omitTags) {
-            if ($tags = $this->sortTagsByPriority($definition->getTags())) {
+            if ($tags = $this->sortTagsByPriority($container ? $this->resolvePriorityServiceTags($container, $definition) : $definition->getTags())) {
                 $serviceXML->appendChild($tagsXML = $dom->createElement('tags'));
                 foreach ($tags as $tagName => $tagData) {
                     foreach ($tagData as $parameters) {
@@ -406,6 +404,17 @@ class XmlDescriptor extends Descriptor
                 foreach ($edges as $edge) {
                     $usagesXML->appendChild($usageXML = $dom->createElement('usage'));
                     $usageXML->appendChild(new \DOMText($edge));
+                }
+            }
+
+            $stack = $this->getDecorationStack($container, $id);
+            if (\count($stack) > 1) {
+                $serviceXML->appendChild($stackXML = $dom->createElement('decoration-stack'));
+                foreach ($stack as $item) {
+                    $stackXML->appendChild($itemXML = $dom->createElement('service'));
+                    $itemXML->setAttribute('id', $item['id']);
+                    $itemXML->setAttribute('class', $item['class']);
+                    $itemXML->setAttribute('priority', $item['priority']);
                 }
             }
         }
@@ -474,7 +483,7 @@ class XmlDescriptor extends Descriptor
         }
 
         $aliasXML->setAttribute('service', (string) $alias);
-        $aliasXML->setAttribute('public', $alias->isPublic() && !$alias->isPrivate() ? 'true' : 'false');
+        $aliasXML->setAttribute('public', $alias->isPublic() ? 'true' : 'false');
 
         return $dom;
     }
@@ -508,7 +517,7 @@ class XmlDescriptor extends Descriptor
             $this->appendEventListenerDocument($eventDispatcher, $event, $eventDispatcherXML, $registeredListeners);
         } else {
             // Try to see if "events" exists
-            $registeredListeners = \array_key_exists('events', $options) ? array_combine($options['events'], array_map(fn ($event) => $eventDispatcher->getListeners($event), $options['events'])) : $eventDispatcher->getListeners();
+            $registeredListeners = \array_key_exists('events', $options) ? array_combine($options['events'], array_map(static fn ($event) => $eventDispatcher->getListeners($event), $options['events'])) : $eventDispatcher->getListeners();
             ksort($registeredListeners);
 
             foreach ($registeredListeners as $eventListened => $eventListeners) {

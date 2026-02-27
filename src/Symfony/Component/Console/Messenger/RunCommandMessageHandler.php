@@ -16,6 +16,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RunCommandFailedException;
 use Symfony\Component\Console\Input\StringInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Messenger\Exception\RecoverableExceptionInterface;
+use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -36,6 +38,8 @@ final class RunCommandMessageHandler
 
         try {
             $exitCode = $this->application->run($input, $output);
+        } catch (UnrecoverableExceptionInterface|RecoverableExceptionInterface $e) {
+            throw $e;
         } catch (\Throwable $e) {
             throw new RunCommandFailedException($e, new RunCommandContext($message, Command::FAILURE, $output->fetch()));
         }

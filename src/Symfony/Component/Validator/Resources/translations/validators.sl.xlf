@@ -466,13 +466,93 @@
                 <source>This value should not be after week "{{ max }}".</source>
                 <target>Ta vrednost ne sme biti po tednu "{{ max }}".</target>
             </trans-unit>
-            <trans-unit id="120">
-                <source>This value is not a valid slug.</source>
-                <target>Ta vrednost ni veljaven URL slug.</target>
-            </trans-unit>
             <trans-unit id="121">
                 <source>This value is not a valid Twig template.</source>
-                <target state="needs-translation">This value is not a valid Twig template.</target>
+                <target state="needs-review-translation">Ta vrednost ni veljavna predloga Twig.</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>This file is not a valid video.</source>
+                <target state="needs-review-translation">Ta datoteka ni veljaven video.</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>The size of the video could not be detected.</source>
+                <target state="needs-review-translation">Velikosti videoposnetka ni bilo mogoče zaznati.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target state="needs-review-translation">Širina videoposnetka je prevelika ({{ width }}px). Dovoljena največja širina je {{ max_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target state="needs-review-translation">Širina videa je premajhna ({{ width }}px). Pričakovana minimalna širina je {{ min_width }} px.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target state="needs-review-translation">Višina videa je prevelika ({{ height }}px). Dovoljena največja višina je {{ max_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target state="needs-review-translation">Višina videa je premajhna ({{ height }}px). Pričakovana najmanjša višina je {{ min_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target state="needs-review-translation">Video ima premalo slikovnih pik ({{ pixels }}). Pričakovana minimalna količina je {{ min_pixels }}.</target>
+            </trans-unit>
+            <trans-unit id="129">
+                <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target state="needs-review-translation">Video ima preveč slikovnih pik ({{ pixels }}). Pričakovano največje število je {{ max_pixels }}.</target>
+            </trans-unit>
+            <trans-unit id="130">
+                <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target state="needs-review-translation">Razmerje videa je preveliko ({{ ratio }}). Dovoljeno največje razmerje je {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="131">
+                <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target state="needs-review-translation">Razmerje videa je premajhno ({{ ratio }}). Pričakovano minimalno razmerje je {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="132">
+                <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
+                <target state="needs-review-translation">Video je kvadratno ({{ width }}x{{ height }}px). Kvadratni videoposnetki niso dovoljeni.</target>
+            </trans-unit>
+            <trans-unit id="133">
+                <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
+                <target state="needs-review-translation">Video je vodoravno orientiran ({{ width }}x{{ height }} px). Vodoravni videi niso dovoljeni.</target>
+            </trans-unit>
+            <trans-unit id="134">
+                <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
+                <target state="needs-review-translation">Video je usmerjeno pokonci ({{ width }}x{{ height }}px). Videi v pokončni usmeritvi niso dovoljeni.</target>
+            </trans-unit>
+            <trans-unit id="135">
+                <source>The video file is corrupted.</source>
+                <target state="needs-review-translation">Videodatoteka je poškodovana.</target>
+            </trans-unit>
+            <trans-unit id="136">
+                <source>The video contains multiple streams. Only one stream is allowed.</source>
+                <target state="needs-review-translation">Video vsebuje več tokov. Dovoljen je le en tok.</target>
+            </trans-unit>
+            <trans-unit id="137">
+                <source>Unsupported video codec "{{ codec }}".</source>
+                <target state="needs-review-translation">Nepodprti video kodek »{{ codec }}«.</target>
+            </trans-unit>
+            <trans-unit id="138">
+                <source>Unsupported video container "{{ container }}".</source>
+                <target state="needs-review-translation">Nepodprt videokontejner "{{ container }}".</target>
+            </trans-unit>
+            <trans-unit id="139">
+                <source>The image file is corrupted.</source>
+                <target state="needs-review-translation">Slikovna datoteka je poškodovana.</target>
+            </trans-unit>
+            <trans-unit id="140">
+                <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target state="needs-review-translation">Slika ima premalo slikovnih točk ({{ pixels }}). Pričakovana minimalna količina je {{ min_pixels }}.</target>
+            </trans-unit>
+            <trans-unit id="141">
+                <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target state="needs-review-translation">Slika ima preveč slikovnih pik ({{ pixels }}). Pričakovano največje število je {{ max_pixels }}.</target>
+            </trans-unit>
+            <trans-unit id="142">
+                <source>This filename does not match the expected charset.</source>
+                <target state="needs-review-translation">To ime datoteke ne ustreza pričakovanemu naboru znakov.</target>
             </trans-unit>
         </body>
     </file>

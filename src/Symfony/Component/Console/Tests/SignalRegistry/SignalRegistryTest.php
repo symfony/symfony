@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\Console\Tests\SignalRegistry;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\SignalRegistry\SignalRegistry;
 
-/**
- * @requires extension pcntl
- */
+#[RequiresPhpExtension('pcntl')]
 class SignalRegistryTest extends TestCase
 {
     protected function tearDown(): void
@@ -35,7 +34,7 @@ class SignalRegistryTest extends TestCase
         $signalRegistry = new SignalRegistry();
 
         $isHandled = false;
-        $signalRegistry->register(\SIGUSR1, function () use (&$isHandled) {
+        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled) {
             $isHandled = true;
         });
 
@@ -49,12 +48,12 @@ class SignalRegistryTest extends TestCase
         $signalRegistry = new SignalRegistry();
 
         $isHandled1 = false;
-        $signalRegistry->register(\SIGUSR1, function () use (&$isHandled1) {
+        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled1) {
             $isHandled1 = true;
         });
 
         $isHandled2 = false;
-        $signalRegistry->register(\SIGUSR1, function () use (&$isHandled2) {
+        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled2) {
             $isHandled2 = true;
         });
 
@@ -71,7 +70,7 @@ class SignalRegistryTest extends TestCase
         $isHandled1 = false;
         $isHandled2 = false;
 
-        $signalRegistry->register(\SIGUSR1, function () use (&$isHandled1) {
+        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled1) {
             $isHandled1 = true;
         });
 
@@ -80,7 +79,7 @@ class SignalRegistryTest extends TestCase
         $this->assertTrue($isHandled1);
         $this->assertFalse($isHandled2);
 
-        $signalRegistry->register(\SIGUSR2, function () use (&$isHandled2) {
+        $signalRegistry->register(\SIGUSR2, static function () use (&$isHandled2) {
             $isHandled2 = true;
         });
 
@@ -94,12 +93,12 @@ class SignalRegistryTest extends TestCase
         $signalRegistry = new SignalRegistry();
 
         $isHandled1 = false;
-        pcntl_signal(\SIGUSR1, function () use (&$isHandled1) {
+        pcntl_signal(\SIGUSR1, static function () use (&$isHandled1) {
             $isHandled1 = true;
         });
 
         $isHandled2 = false;
-        $signalRegistry->register(\SIGUSR1, function () use (&$isHandled2) {
+        $signalRegistry->register(\SIGUSR1, static function () use (&$isHandled2) {
             $isHandled2 = true;
         });
 
@@ -114,14 +113,14 @@ class SignalRegistryTest extends TestCase
         $signalRegistry1 = new SignalRegistry();
 
         $isHandled1 = false;
-        $signalRegistry1->register(\SIGUSR1, function () use (&$isHandled1) {
+        $signalRegistry1->register(\SIGUSR1, static function () use (&$isHandled1) {
             $isHandled1 = true;
         });
 
         $signalRegistry2 = new SignalRegistry();
 
         $isHandled2 = false;
-        $signalRegistry2->register(\SIGUSR1, function () use (&$isHandled2) {
+        $signalRegistry2->register(\SIGUSR1, static function () use (&$isHandled2) {
             $isHandled2 = true;
         });
 
@@ -129,5 +128,68 @@ class SignalRegistryTest extends TestCase
 
         $this->assertTrue($isHandled1);
         $this->assertTrue($isHandled2);
+    }
+
+    public function testPushPopIsolatesHandlers()
+    {
+        $registry = new SignalRegistry();
+
+        $signal = \SIGUSR1;
+
+        $handler1 = static function () {};
+        $handler2 = static function () {};
+
+        $registry->pushCurrentHandlers();
+        $registry->register($signal, $handler1);
+
+        $this->assertCount(1, $this->getHandlersForSignal($registry, $signal));
+
+        $registry->pushCurrentHandlers();
+        $registry->register($signal, $handler2);
+
+        $this->assertCount(1, $this->getHandlersForSignal($registry, $signal));
+        $this->assertSame([$handler2], $this->getHandlersForSignal($registry, $signal));
+
+        $registry->popPreviousHandlers();
+
+        $this->assertCount(1, $this->getHandlersForSignal($registry, $signal));
+        $this->assertSame([$handler1], $this->getHandlersForSignal($registry, $signal));
+
+        $registry->popPreviousHandlers();
+
+        $this->assertCount(0, $this->getHandlersForSignal($registry, $signal));
+    }
+
+    public function testRestoreOriginalOnEmptyAfterPop()
+    {
+        if (!\extension_loaded('pcntl')) {
+            $this->markTestSkipped('PCNTL extension required');
+        }
+
+        $registry = new SignalRegistry();
+
+        $signal = \SIGUSR2;
+
+        $original = pcntl_signal_get_handler($signal);
+
+        $handler = static function () {};
+
+        $registry->pushCurrentHandlers();
+        $registry->register($signal, $handler);
+
+        $this->assertNotEquals($original, pcntl_signal_get_handler($signal));
+
+        $registry->popPreviousHandlers();
+
+        $this->assertEquals($original, pcntl_signal_get_handler($signal));
+    }
+
+    private function getHandlersForSignal(SignalRegistry $registry, int $signal): array
+    {
+        $ref = new \ReflectionClass($registry);
+        $prop = $ref->getProperty('signalHandlers');
+        $handlers = $prop->getValue($registry);
+
+        return $handlers[$signal] ?? [];
     }
 }

@@ -42,7 +42,7 @@ if (!class_exists(Application::class)) {
     exit(1);
 }
 
-(new Application())->add($command = new LintCommand())
+(new Application())->addCommand($command = new LintCommand())
     ->getApplication()
     ->setDefaultCommand($command->getName(), true)
     ->run()

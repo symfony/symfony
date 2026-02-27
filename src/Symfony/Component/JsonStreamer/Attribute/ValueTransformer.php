@@ -12,14 +12,13 @@
 namespace Symfony\Component\JsonStreamer\Attribute;
 
 use Symfony\Component\JsonStreamer\Exception\LogicException;
+use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
 
 /**
- * Defines a callable or a {@see \Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface} service id
+ * Defines a callable or a {@see ValueTransformerInterface} service id
  * that will be used to transform the property data during stream reading/writing.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
- *
- * @experimental
  */
 #[\Attribute(\Attribute::TARGET_PROPERTY)]
 class ValueTransformer

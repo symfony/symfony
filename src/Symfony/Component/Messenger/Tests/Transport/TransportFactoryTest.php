@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
@@ -20,19 +21,17 @@ use Symfony\Component\Messenger\Transport\TransportInterface;
 
 class TransportFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider provideThrowsExceptionOnUnsupportedTransport
-     */
+    #[DataProvider('provideThrowsExceptionOnUnsupportedTransport')]
     public function testThrowsExceptionOnUnsupportedTransport(array $transportSupport, string $dsn, ?string $expectedMessage)
     {
         if (null !== $expectedMessage) {
             $this->expectException(InvalidArgumentException::class);
             $this->expectExceptionMessage($expectedMessage);
         }
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = $this->createStub(SerializerInterface::class);
         $factories = [];
         foreach ($transportSupport as $supported) {
-            $factory = $this->createMock(TransportFactoryInterface::class);
+            $factory = $this->createStub(TransportFactoryInterface::class);
             $factory->method('supports', $dsn, [])->willReturn($supported);
             $factories[] = $factory;
         }

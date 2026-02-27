@@ -39,7 +39,7 @@ class TransportFactory implements TransportFactoryInterface
 
         // Help the user to select Symfony packages based on protocol.
         $packageSuggestion = '';
-        if (str_starts_with($dsn, 'amqp://')) {
+        if (str_starts_with($dsn, 'amqp://') || str_starts_with($dsn, 'amqps://')) {
             $packageSuggestion = ' Run "composer require symfony/amqp-messenger" to install AMQP transport.';
         } elseif (str_starts_with($dsn, 'doctrine://')) {
             $packageSuggestion = ' Run "composer require symfony/doctrine-messenger" to install Doctrine transport.';

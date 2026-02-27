@@ -25,7 +25,6 @@ class TwigErrorRendererTest extends TestCase
     {
         $exception = new \Exception();
 
-        $twig = $this->createMock(Environment::class);
         $nativeRenderer = $this->createMock(HtmlErrorRenderer::class);
         $nativeRenderer
             ->expects($this->once())
@@ -33,7 +32,7 @@ class TwigErrorRendererTest extends TestCase
             ->with($exception)
         ;
 
-        (new TwigErrorRenderer($twig, $nativeRenderer, true))->render(new \Exception());
+        (new TwigErrorRenderer(new Environment(new ArrayLoader()), $nativeRenderer, true))->render(new \Exception());
     }
 
     public function testFallbackToNativeRendererIfCustomTemplateNotFound()

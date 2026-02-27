@@ -33,7 +33,7 @@ class AccessorishGetters
     {
     }
 
-    public function setField4()
+    public function setField4($value)
     {
     }
 }

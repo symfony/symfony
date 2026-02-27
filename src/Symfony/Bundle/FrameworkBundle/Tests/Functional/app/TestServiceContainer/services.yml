@@ -17,12 +17,22 @@ services:
             - '@Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\NonPublicService'
             - '@Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\PrivateService'
             - '@decorated'
+            - '@non_shared_service'
+            - '@non_shared_alias'
 
     decorator:
         class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\PrivateService
         decorates: decorated
         properties:
             inner: '@.inner'
+
+    non_shared_service:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\PrivateService
+        shared: false
+        properties:
+            inner: '@Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\PrivateService'
+
+    non_shared_alias: '@non_shared_service'
 
     Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\TestServiceContainer\ResettableService:
         public: true

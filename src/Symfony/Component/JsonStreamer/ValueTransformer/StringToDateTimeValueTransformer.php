@@ -20,8 +20,6 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  * Transforms string to DateTimeImmutable during stream reading.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
- *
- * @experimental
  */
 final class StringToDateTimeValueTransformer implements ValueTransformerInterface
 {

@@ -27,6 +27,7 @@ class ServiceReferenceGraphEdge
         private bool $lazy = false,
         private bool $weak = false,
         private bool $byConstructor = false,
+        private bool $byMultiUseArgument = false,
     ) {
     }
 
@@ -76,5 +77,10 @@ class ServiceReferenceGraphEdge
     public function isReferencedByConstructor(): bool
     {
         return $this->byConstructor;
+    }
+
+    public function isFromMultiUseArgument(): bool
+    {
+        return $this->byMultiUseArgument;
     }
 }

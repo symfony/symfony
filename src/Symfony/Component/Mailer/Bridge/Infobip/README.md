@@ -25,8 +25,9 @@ This transport supports the following custom headers:
 | `X-Infobip-MessageId`          | string  | The ID that uniquely identifies the message sent to a recipient.                        |
 | `X-Infobip-Track`              | boolean | Enable or disable open and click tracking.                                              |
 | `X-Infobip-TrackingUrl`        | string  | The URL on your callback server on which the open and click notifications will be sent. |
-| `X-Infobip-TrackClicks`        | boolean | Enable or disable track click feature..                                                 |
+| `X-Infobip-TrackClicks`        | boolean | Enable or disable track click feature.                                                  |
 | `X-Infobip-TrackOpens`         | boolean | Enable or disable open click feature.                                                   |
+| `X-Infobip-IpPoolId`           | string  | The ID of the dedicated IP pool that will be used to deliver the message.               |
 
 Resources
 ---------

@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Symfony Validation Mapping Schema",
+  "description": "JSON schema for Symfony's validation mapping",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "namespaces": {
+      "type": "object",
+      "description": "Namespace aliases for constraint classes",
+      "additionalProperties": {
+        "type": "string",
+        "description": "Full namespace path"
+      }
+    }
+  },
+  "patternProperties": {
+    "^[A-Za-z0-9\\\\_]+$": {
+      "type": "object",
+      "description": "Class metadata configuration",
+      "additionalProperties": false,
+      "properties": {
+        "group_sequence": {
+          "oneOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "Array of validation group names"
+            },
+            {
+              "type": "boolean"
+            }
+          ],
+          "description": "Validation group sequence or group sequence provider flag"
+        },
+        "group_sequence_provider": {
+          "oneOf": [
+            {
+              "type": "boolean",
+              "description": "Enable/disable group sequence provider"
+            },
+            {
+              "type": "string",
+              "description": "Class name of the group sequence provider"
+            }
+          ]
+        },
+        "constraints": {
+          "$ref": "#/definitions/constraintArray"
+        },
+        "properties": {
+          "type": "object",
+          "description": "Property-level constraints",
+          "additionalProperties": {
+            "$ref": "#/definitions/constraintArrayOrNull"
+          }
+        },
+        "getters": {
+          "type": "object",
+          "description": "Getter method constraints",
+          "additionalProperties": {
+            "$ref": "#/definitions/constraintArrayOrNull"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "constraintArray": {
+      "type": "array",
+      "description": "Array of constraints",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "description": "Constraint with options",
+            "minProperties": 1,
+            "maxProperties": 1,
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "array"
+                },
+                {
+                  "type": "object"
+                }
+              ]
+            }
+          },
+          {
+            "type": "string",
+            "description": "Simple constraint name"
+          }
+        ]
+      }
+    },
+    "constraintArrayOrNull": {
+      "oneOf": [
+        {
+          "type": "null",
+          "description": "No constraints"
+        },
+        {
+          "$ref": "#/definitions/constraintArray"
+        }
+      ]
+    }
+  }
+}

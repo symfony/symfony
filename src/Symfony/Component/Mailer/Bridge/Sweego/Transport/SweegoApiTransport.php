@@ -143,10 +143,9 @@ final class SweegoApiTransport extends AbstractApiTransport
     private function prepareHeaders(Headers $headers): array
     {
         $headersPrepared = [];
-        // Sweego API does not accept those headers.
-        $headersToBypass = ['To', 'From', 'Subject'];
         foreach ($headers->all() as $header) {
-            if (\in_array($header->getName(), $headersToBypass, true)) {
+            // Sweego API does not accept those headers.
+            if (\in_array($header->getName(), ['To', 'From', 'Subject'], true)) {
                 continue;
             }
 

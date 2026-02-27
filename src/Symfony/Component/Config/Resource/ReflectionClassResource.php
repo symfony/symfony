@@ -12,6 +12,7 @@
 namespace Symfony\Component\Config\Resource;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormTypeExtensionInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
 /**
@@ -59,17 +60,19 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         return 'reflection.'.$this->className;
     }
 
-    /**
-     * @internal
-     */
-    public function __sleep(): array
+    public function __serialize(): array
     {
         if (!isset($this->hash)) {
             $this->hash = $this->computeHash();
             $this->loadFiles($this->classReflector);
         }
 
-        return ['files', 'className', 'hash'];
+        return [
+            'files' => $this->files,
+            'className' => $this->className,
+            'excludedVendors' => $this->excludedVendors,
+            'hash' => $this->hash,
+        ];
     }
 
     private function loadFiles(\ReflectionClass $class): void
@@ -122,7 +125,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         yield print_r($attributes, true);
         $attributes = [];
 
-        yield $class->getDocComment();
+        yield $class->getDocComment() ?: '';
         yield (int) $class->isFinal();
         yield (int) $class->isAbstract();
 
@@ -132,6 +135,14 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
             yield print_r(class_parents($class->name), true);
             yield print_r(class_implements($class->name), true);
             yield print_r($class->getConstants(), true);
+        }
+
+        foreach ($class->getReflectionConstants() as $constant) {
+            foreach ($constant->getAttributes() as $a) {
+                $attributes[] = [$a->getName(), (string) $a];
+            }
+            yield $constant->name.print_r($attributes, true);
+            $attributes = [];
         }
 
         if (!$class->isInterface()) {
@@ -144,7 +155,7 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
                 yield print_r($attributes, true);
                 $attributes = [];
 
-                yield $p->getDocComment();
+                yield $p->getDocComment() ?: '';
                 yield $p->isDefault() ? '<default>' : '';
                 yield $p->isPublic() ? 'public' : 'protected';
                 yield $p->isStatic() ? 'static' : '';
@@ -200,6 +211,13 @@ class ReflectionClassResource implements SelfCheckingResourceInterface
         if (interface_exists(ServiceSubscriberInterface::class, false) && $class->isSubclassOf(ServiceSubscriberInterface::class)) {
             yield ServiceSubscriberInterface::class;
             yield print_r($class->name::getSubscribedServices(), true);
+        }
+
+        if (interface_exists(FormTypeExtensionInterface::class, false) && $class->isSubclassOf(FormTypeExtensionInterface::class)) {
+            yield FormTypeExtensionInterface::class;
+            foreach ($class->name::getExtendedTypes() as $key => $value) {
+                yield $key.print_r($value, true);
+            }
         }
     }
 }

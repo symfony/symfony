@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-/**
- * @requires extension intl
- */
+#[RequiresPhpExtension('intl')]
 class IntlCasterTest extends TestCase
 {
     use VarDumperTestTrait;
@@ -26,11 +25,11 @@ class IntlCasterTest extends TestCase
         $var = new \MessageFormatter('en', 'Hello {name}');
 
         $expected = <<<EOTXT
-MessageFormatter {
-  locale: "en"
-  pattern: "Hello {name}"
-}
-EOTXT;
+            MessageFormatter {
+              locale: "en"
+              pattern: "Hello {name}"
+            }
+            EOTXT;
         $this->assertDumpEquals($expected, $var);
     }
 
@@ -91,63 +90,63 @@ EOTXT;
         $expectedSymbol18 = $var->getSymbol(\NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL);
 
         $expected = <<<EOTXT
-NumberFormatter {
-  locale: "$expectedLocale"
-  pattern: "$expectedPattern"
-  attributes: {
-    PARSE_INT_ONLY: $expectedAttribute1
-    GROUPING_USED: $expectedAttribute2
-    DECIMAL_ALWAYS_SHOWN: $expectedAttribute3
-    MAX_INTEGER_DIGITS: $expectedAttribute4
-    MIN_INTEGER_DIGITS: $expectedAttribute5
-    INTEGER_DIGITS: $expectedAttribute6
-    MAX_FRACTION_DIGITS: $expectedAttribute7
-    MIN_FRACTION_DIGITS: $expectedAttribute8
-    FRACTION_DIGITS: $expectedAttribute9
-    MULTIPLIER: $expectedAttribute10
-    GROUPING_SIZE: $expectedAttribute11
-    ROUNDING_MODE: $expectedAttribute12
-    ROUNDING_INCREMENT: $expectedAttribute13
-    FORMAT_WIDTH: $expectedAttribute14
-    PADDING_POSITION: $expectedAttribute15
-    SECONDARY_GROUPING_SIZE: $expectedAttribute16
-    SIGNIFICANT_DIGITS_USED: $expectedAttribute17
-    MIN_SIGNIFICANT_DIGITS: $expectedAttribute18
-    MAX_SIGNIFICANT_DIGITS: $expectedAttribute19
-    LENIENT_PARSE: $expectedAttribute20
-  }
-  text_attributes: {
-    POSITIVE_PREFIX: "$expectedTextAttribute1"
-    POSITIVE_SUFFIX: "$expectedTextAttribute2"
-    NEGATIVE_PREFIX: "$expectedTextAttribute3"
-    NEGATIVE_SUFFIX: "$expectedTextAttribute4"
-    PADDING_CHARACTER: "$expectedTextAttribute5"
-    CURRENCY_CODE: "$expectedTextAttribute6"
-    DEFAULT_RULESET: $expectedTextAttribute7
-    PUBLIC_RULESETS: $expectedTextAttribute8
-  }
-  symbols: {
-    DECIMAL_SEPARATOR_SYMBOL: "$expectedSymbol1"
-    GROUPING_SEPARATOR_SYMBOL: "$expectedSymbol2"
-    PATTERN_SEPARATOR_SYMBOL: "$expectedSymbol3"
-    PERCENT_SYMBOL: "$expectedSymbol4"
-    ZERO_DIGIT_SYMBOL: "$expectedSymbol5"
-    DIGIT_SYMBOL: "$expectedSymbol6"
-    MINUS_SIGN_SYMBOL: "$expectedSymbol7"
-    PLUS_SIGN_SYMBOL: "$expectedSymbol8"
-    CURRENCY_SYMBOL: "$expectedSymbol9"
-    INTL_CURRENCY_SYMBOL: "$expectedSymbol10"
-    MONETARY_SEPARATOR_SYMBOL: "$expectedSymbol11"
-    EXPONENTIAL_SYMBOL: "$expectedSymbol12"
-    PERMILL_SYMBOL: "$expectedSymbol13"
-    PAD_ESCAPE_SYMBOL: "$expectedSymbol14"
-    INFINITY_SYMBOL: "$expectedSymbol15"
-    NAN_SYMBOL: "$expectedSymbol16"
-    SIGNIFICANT_DIGIT_SYMBOL: "$expectedSymbol17"
-    MONETARY_GROUPING_SEPARATOR_SYMBOL: "$expectedSymbol18"
-  }
-}
-EOTXT;
+            NumberFormatter {
+              locale: "$expectedLocale"
+              pattern: "$expectedPattern"
+              attributes: {
+                PARSE_INT_ONLY: $expectedAttribute1
+                GROUPING_USED: $expectedAttribute2
+                DECIMAL_ALWAYS_SHOWN: $expectedAttribute3
+                MAX_INTEGER_DIGITS: $expectedAttribute4
+                MIN_INTEGER_DIGITS: $expectedAttribute5
+                INTEGER_DIGITS: $expectedAttribute6
+                MAX_FRACTION_DIGITS: $expectedAttribute7
+                MIN_FRACTION_DIGITS: $expectedAttribute8
+                FRACTION_DIGITS: $expectedAttribute9
+                MULTIPLIER: $expectedAttribute10
+                GROUPING_SIZE: $expectedAttribute11
+                ROUNDING_MODE: $expectedAttribute12
+                ROUNDING_INCREMENT: $expectedAttribute13
+                FORMAT_WIDTH: $expectedAttribute14
+                PADDING_POSITION: $expectedAttribute15
+                SECONDARY_GROUPING_SIZE: $expectedAttribute16
+                SIGNIFICANT_DIGITS_USED: $expectedAttribute17
+                MIN_SIGNIFICANT_DIGITS: $expectedAttribute18
+                MAX_SIGNIFICANT_DIGITS: $expectedAttribute19
+                LENIENT_PARSE: $expectedAttribute20
+              }
+              text_attributes: {
+                POSITIVE_PREFIX: "$expectedTextAttribute1"
+                POSITIVE_SUFFIX: "$expectedTextAttribute2"
+                NEGATIVE_PREFIX: "$expectedTextAttribute3"
+                NEGATIVE_SUFFIX: "$expectedTextAttribute4"
+                PADDING_CHARACTER: "$expectedTextAttribute5"
+                CURRENCY_CODE: "$expectedTextAttribute6"
+                DEFAULT_RULESET: $expectedTextAttribute7
+                PUBLIC_RULESETS: $expectedTextAttribute8
+              }
+              symbols: {
+                DECIMAL_SEPARATOR_SYMBOL: "$expectedSymbol1"
+                GROUPING_SEPARATOR_SYMBOL: "$expectedSymbol2"
+                PATTERN_SEPARATOR_SYMBOL: "$expectedSymbol3"
+                PERCENT_SYMBOL: "$expectedSymbol4"
+                ZERO_DIGIT_SYMBOL: "$expectedSymbol5"
+                DIGIT_SYMBOL: "$expectedSymbol6"
+                MINUS_SIGN_SYMBOL: "$expectedSymbol7"
+                PLUS_SIGN_SYMBOL: "$expectedSymbol8"
+                CURRENCY_SYMBOL: "$expectedSymbol9"
+                INTL_CURRENCY_SYMBOL: "$expectedSymbol10"
+                MONETARY_SEPARATOR_SYMBOL: "$expectedSymbol11"
+                EXPONENTIAL_SYMBOL: "$expectedSymbol12"
+                PERMILL_SYMBOL: "$expectedSymbol13"
+                PAD_ESCAPE_SYMBOL: "$expectedSymbol14"
+                INFINITY_SYMBOL: "$expectedSymbol15"
+                NAN_SYMBOL: "$expectedSymbol16"
+                SIGNIFICANT_DIGIT_SYMBOL: "$expectedSymbol17"
+                MONETARY_GROUPING_SEPARATOR_SYMBOL: "$expectedSymbol18"
+              }
+            }
+            EOTXT;
         $this->assertDumpEquals($expected, $var);
     }
 
@@ -161,13 +160,13 @@ EOTXT;
         $expectedRawOffset = $var->getRawOffset();
 
         $expected = <<<EOTXT
-IntlTimeZone {
-  display_name: "$expectedDisplayName"
-  id: "$expectedID"
-  raw_offset: $expectedRawOffset
-  dst_savings: $expectedDSTSavings
-}
-EOTXT;
+            IntlTimeZone {
+              display_name: "$expectedDisplayName"
+              id: "$expectedID"
+              raw_offset: $expectedRawOffset
+              dst_savings: $expectedDSTSavings
+            }
+            EOTXT;
         $this->assertDumpEquals($expected, $var);
     }
 
@@ -180,12 +179,12 @@ EOTXT;
         $expectedRawOffset = $var->getRawOffset();
 
         $expected = <<<EOTXT
-IntlTimeZone {
-  display_name: "$expectedDisplayName"
-  id: "$expectedID"
-  raw_offset: $expectedRawOffset
-}
-EOTXT;
+            IntlTimeZone {
+              display_name: "$expectedDisplayName"
+              id: "$expectedID"
+              raw_offset: $expectedRawOffset
+            }
+            EOTXT;
         $this->assertDumpEquals($expected, $var);
     }
 
@@ -209,23 +208,23 @@ EOTXT;
         $expectedTimeZoneDSTSavings = $expectedTimeZone->getDSTSavings();
 
         $expected = <<<EOTXT
-IntlGregorianCalendar {
-  type: "$expectedType"
-  first_day_of_week: $expectedFirstDayOfWeek
-  minimal_days_in_first_week: $expectedMinimalDaysInFirstWeek
-  repeated_wall_time_option: $expectedRepeatedWallTimeOption
-  skipped_wall_time_option: $expectedSkippedWallTimeOption
-  time: $expectedTime
-  in_daylight_time: $expectedInDaylightTime
-  is_lenient: $expectedIsLenient
-  time_zone: IntlTimeZone {
-    display_name: "$expectedTimeZoneDisplayName"
-    id: "$expectedTimeZoneID"
-    raw_offset: $expectedTimeZoneRawOffset
-    dst_savings: $expectedTimeZoneDSTSavings
-  }
-}
-EOTXT;
+            IntlGregorianCalendar {
+              type: "$expectedType"
+              first_day_of_week: $expectedFirstDayOfWeek
+              minimal_days_in_first_week: $expectedMinimalDaysInFirstWeek
+              repeated_wall_time_option: $expectedRepeatedWallTimeOption
+              skipped_wall_time_option: $expectedSkippedWallTimeOption
+              time: $expectedTime
+              in_daylight_time: $expectedInDaylightTime
+              is_lenient: $expectedIsLenient
+              time_zone: IntlTimeZone {
+                display_name: "$expectedTimeZoneDisplayName"
+                id: "$expectedTimeZoneID"
+                raw_offset: $expectedTimeZoneRawOffset
+                dst_savings: $expectedTimeZoneDSTSavings
+              }
+            }
+            EOTXT;
         $this->assertDumpEquals($expected, $var);
     }
 
@@ -263,35 +262,35 @@ EOTXT;
         $expectedCalendarObjectTimeZoneDSTSavings = $expectedTimeZone->useDaylightTime() ? "\n      dst_savings: ".$expectedCalendarObjectTimeZone->getDSTSavings() : '';
 
         $expected = <<<EOTXT
-IntlDateFormatter {
-  locale: "$expectedLocale"
-  pattern: "$expectedPattern"
-  calendar: $expectedCalendar
-  time_zone_id: "$expectedTimeZoneId"
-  time_type: $expectedTimeType
-  date_type: $expectedDateType
-  calendar_object: IntlGregorianCalendar {
-    type: "$expectedCalendarObjectType"
-    first_day_of_week: $expectedCalendarObjectFirstDayOfWeek
-    minimal_days_in_first_week: $expectedCalendarObjectMinimalDaysInFirstWeek
-    repeated_wall_time_option: $expectedCalendarObjectRepeatedWallTimeOption
-    skipped_wall_time_option: $expectedCalendarObjectSkippedWallTimeOption
-    time: $expectedCalendarObjectTime
-    in_daylight_time: $expectedCalendarObjectInDaylightTime
-    is_lenient: $expectedCalendarObjectIsLenient
-    time_zone: IntlTimeZone {
-      display_name: "$expectedCalendarObjectTimeZoneDisplayName"
-      id: "$expectedCalendarObjectTimeZoneID"
-      raw_offset: $expectedCalendarObjectTimeZoneRawOffset$expectedCalendarObjectTimeZoneDSTSavings
-    }
-  }
-  time_zone: IntlTimeZone {
-    display_name: "$expectedTimeZoneDisplayName"
-    id: "$expectedTimeZoneID"
-    raw_offset: $expectedTimeZoneRawOffset$expectedTimeZoneDSTSavings
-  }
-}
-EOTXT;
+            IntlDateFormatter {
+              locale: "$expectedLocale"
+              pattern: "$expectedPattern"
+              calendar: $expectedCalendar
+              time_zone_id: "$expectedTimeZoneId"
+              time_type: $expectedTimeType
+              date_type: $expectedDateType
+              calendar_object: IntlGregorianCalendar {
+                type: "$expectedCalendarObjectType"
+                first_day_of_week: $expectedCalendarObjectFirstDayOfWeek
+                minimal_days_in_first_week: $expectedCalendarObjectMinimalDaysInFirstWeek
+                repeated_wall_time_option: $expectedCalendarObjectRepeatedWallTimeOption
+                skipped_wall_time_option: $expectedCalendarObjectSkippedWallTimeOption
+                time: $expectedCalendarObjectTime
+                in_daylight_time: $expectedCalendarObjectInDaylightTime
+                is_lenient: $expectedCalendarObjectIsLenient
+                time_zone: IntlTimeZone {
+                  display_name: "$expectedCalendarObjectTimeZoneDisplayName"
+                  id: "$expectedCalendarObjectTimeZoneID"
+                  raw_offset: $expectedCalendarObjectTimeZoneRawOffset$expectedCalendarObjectTimeZoneDSTSavings
+                }
+              }
+              time_zone: IntlTimeZone {
+                display_name: "$expectedTimeZoneDisplayName"
+                id: "$expectedTimeZoneID"
+                raw_offset: $expectedTimeZoneRawOffset$expectedTimeZoneDSTSavings
+              }
+            }
+            EOTXT;
         $this->assertDumpEquals($expected, $var);
     }
 

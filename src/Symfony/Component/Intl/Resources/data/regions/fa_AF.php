@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'UserAssignedNames' => [
+        'XK' => 'کوسوا',
+    ],
     'Names' => [
         'AD' => 'اندورا',
         'AG' => 'انتیگوا و باربودا',

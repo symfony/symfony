@@ -33,7 +33,7 @@ final class AliasDeprecatedPublicServicesPass extends AbstractRecursivePass
             }
 
             $definition = $container->getDefinition($id);
-            if (!$definition->isPublic() || $definition->isPrivate()) {
+            if ($definition->isPrivate()) {
                 continue;
             }
 

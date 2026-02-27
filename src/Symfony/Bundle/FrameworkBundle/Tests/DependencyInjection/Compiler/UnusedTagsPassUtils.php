@@ -19,6 +19,7 @@ class UnusedTagsPassUtils
     {
         $tags = [
             'proxy' => true,
+            'routing.controller' => true,
         ];
 
         // get all tags used in XML configs

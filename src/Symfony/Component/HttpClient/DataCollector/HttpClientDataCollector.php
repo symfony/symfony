@@ -45,8 +45,8 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
 
     public function lateCollect(): void
     {
-        $this->data['request_count'] = $this->data['request_count'] ?? 0;
-        $this->data['error_count'] = $this->data['error_count'] ?? 0;
+        $this->data['request_count'] ??= 0;
+        $this->data['error_count'] ??= 0;
         $this->data += ['clients' => []];
 
         foreach ($this->clients as $name => $client) {
@@ -64,7 +64,9 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
             $this->data['error_count'] += $errorCount;
             $this->data['clients'][$name]['error_count'] += $errorCount;
 
-            $client->reset();
+            if ($traces) {
+                $client->reset();
+            }
         }
     }
 
@@ -201,11 +203,14 @@ final class HttpClientDataCollector extends DataCollector implements LateDataCol
                 $dataArg[] = '--data-raw '.$this->escapePayload($body);
             } elseif (\is_array($body)) {
                 try {
-                    $body = explode('&', self::normalizeBody($body));
+                    $body = self::normalizeBody($body);
                 } catch (TransportException) {
                     return null;
                 }
-                foreach ($body as $value) {
+                if (!\is_string($body)) {
+                    return null;
+                }
+                foreach (explode('&', $body) as $value) {
                     $dataArg[] = '--data-raw '.$this->escapePayload(urldecode($value));
                 }
             } else {

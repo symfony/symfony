@@ -143,7 +143,7 @@ class RemoveUnusedDefinitionsPassTest extends TestCase
     public function testProcessWorksWithClosureErrorsInDefinitions()
     {
         $definition = new Definition();
-        $definition->addError(fn () => 'foo bar');
+        $definition->addError(static fn () => 'foo bar');
 
         $container = new ContainerBuilder();
         $container

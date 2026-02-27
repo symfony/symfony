@@ -61,7 +61,7 @@ class AppVariable
 
     public function setEnabledLocales(array $enabledLocales): void
     {
-        $this->enabledLocales = $enabledLocales;
+        $this->enabledLocales = array_filter($enabledLocales);
     }
 
     /**

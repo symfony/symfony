@@ -58,14 +58,14 @@ class RouterDebugCommand extends Command
                 new InputOption('method', null, InputOption::VALUE_REQUIRED, 'Filter by HTTP method', '', ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> displays the configured routes:
+                The <info>%command.name%</info> displays the configured routes:
 
-  <info>php %command.full_name%</info>
+                  <info>php %command.full_name%</info>
 
-The <info>--format</info> option specifies the format of the command output:
+                The <info>--format</info> option specifies the format of the command output:
 
-  <info>php %command.full_name% --format=json</info>
-EOF
+                  <info>php %command.full_name% --format=json</info>
+                EOF
             )
         ;
     }

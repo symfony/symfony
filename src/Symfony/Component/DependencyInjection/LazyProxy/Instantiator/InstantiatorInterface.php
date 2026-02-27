@@ -25,8 +25,10 @@ interface InstantiatorInterface
     /**
      * Instantiates a proxy object.
      *
-     * @param string            $id               Identifier of the requested service
-     * @param callable(object=) $realInstantiator A callback that is capable of producing the real service instance
+     * @param string                                        $id               Identifier of the requested service
+     * @param (callable(): object)|(callable(object): void) $realInstantiator A callback that creates or initializes the real service instance:
+     *                                                                        - For direct instantiation or value-holder proxies: Called without arguments and returns the service object.
+     *                                                                        - For ghost object proxies (using PHP's lazy objects): Called with the proxy as argument, initializes it in place and returns void.
      */
     public function instantiateProxy(ContainerInterface $container, Definition $definition, string $id, callable $realInstantiator): object;
 }

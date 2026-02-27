@@ -32,6 +32,7 @@ return [
         'ay' => 'aimará',
         'az' => 'acerbaixano',
         'ba' => 'baxkir',
+        'bal' => 'baluchi',
         'ban' => 'balinés',
         'bas' => 'basaa',
         'be' => 'belaruso',

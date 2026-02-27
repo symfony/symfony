@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Semaphore\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Semaphore\Exception\SemaphoreAcquiringException;
 use Symfony\Component\Semaphore\Exception\SemaphoreExpiredException;
@@ -240,7 +241,7 @@ class SemaphoreTest extends TestCase
 
     public function testExpiration()
     {
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = $this->createStub(PersistingStoreInterface::class);
 
         $key = new Key('key', 1);
         $semaphore = new Semaphore($key, $store);
@@ -252,12 +253,10 @@ class SemaphoreTest extends TestCase
         $this->assertTrue($semaphore->isExpired());
     }
 
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testExpirationResetAfter()
     {
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = $this->createStub(PersistingStoreInterface::class);
 
         $key = new Key('key', 1);
         $semaphore = new Semaphore($key, $store, 1);

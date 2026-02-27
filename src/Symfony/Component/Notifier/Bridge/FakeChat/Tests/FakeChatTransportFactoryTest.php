@@ -12,7 +12,10 @@
 namespace Symfony\Component\Notifier\Bridge\FakeChat\Tests;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Notifier\Bridge\FakeChat\FakeChatTransportFactory;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
@@ -61,7 +64,7 @@ final class FakeChatTransportFactoryTest extends AbstractTransportFactoryTestCas
 
     public function createFactory(): FakeChatTransportFactory
     {
-        return new FakeChatTransportFactory($this->createMock(MailerInterface::class), $this->createMock(LoggerInterface::class));
+        return new FakeChatTransportFactory(new Mailer(new NullTransport()), new NullLogger());
     }
 
     public static function createProvider(): iterable

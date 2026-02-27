@@ -32,7 +32,7 @@ namespace Symfony\Component\Security\Core\User;
  *         return $data;
  *     }
  *
- * Implement EquatableInteface if you need another logic.
+ * Implement EquatableInterface if you need another logic.
  *
  * @author Robin Chalas <robin.chalas@gmail.com>
  * @author Wouter de Jong <wouter@wouterj.nl>

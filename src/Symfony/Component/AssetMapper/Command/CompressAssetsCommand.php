@@ -38,12 +38,12 @@ final class CompressAssetsCommand extends Command
         $this
             ->addArgument('paths', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The files to compress')
             ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command compresses the given file in Brotli, Zstandard and gzip formats.
-This is especially useful to serve pre-compressed files through a web server.
+                The <info>%command.name%</info> command compresses the given file in Brotli, Zstandard and gzip formats.
+                This is especially useful to serve pre-compressed files through a web server.
 
-The existing file will be kept. The compressed files will be created in the same directory.
-The extension of the compression format will be appended to the original file name.
-EOT
+                The existing file will be kept. The compressed files will be created in the same directory.
+                The extension of the compression format will be appended to the original file name.
+                EOT
             );
     }
 

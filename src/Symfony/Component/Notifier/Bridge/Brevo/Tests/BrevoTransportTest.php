@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Brevo\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Brevo\BrevoTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -46,15 +47,7 @@ final class BrevoTransportTest extends TransportTestCase
 
     public function testSendWithErrorResponseThrowsTransportException()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(400);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['code' => 400, 'message' => 'bad request']));
-
-        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
+        $client = new MockHttpClient(static fn (): ResponseInterface => new MockResponse(json_encode(['code' => 400, 'message' => 'bad request']), ['http_code' => 400]));
 
         $transport = self::createTransport($client);
 

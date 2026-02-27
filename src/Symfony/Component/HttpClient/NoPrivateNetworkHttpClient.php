@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\HttpClient;
 
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\AsyncContext;
 use Symfony\Component\HttpClient\Response\AsyncResponse;
@@ -28,7 +26,7 @@ use Symfony\Contracts\Service\ResetInterface;
  * @author Hallison Boaventura <hallisonboaventura@gmail.com>
  * @author Nicolas Grekas <p@tchwork.com>
  */
-final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwareInterface, ResetInterface
+final class NoPrivateNetworkHttpClient implements HttpClientInterface, ResetInterface
 {
     use AsyncDecoratorTrait;
     use HttpClientTrait;
@@ -103,9 +101,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         $redirectHeaders['with_auth'] = $redirectHeaders['no_auth'] = $options['headers'];
 
         if (isset($options['normalized_headers']['host']) || isset($options['normalized_headers']['authorization']) || isset($options['normalized_headers']['cookie'])) {
-            $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], static function ($h) {
-                return 0 !== stripos($h, 'Host:') && 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:');
-            });
+            $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], static fn ($h) => 0 !== stripos($h, 'Host:') && 0 !== stripos($h, 'Authorization:') && 0 !== stripos($h, 'Cookie:'));
         }
 
         return new AsyncResponse($this->client, $method, $url, $options, static function (ChunkInterface $chunk, AsyncContext $context) use (&$method, &$options, $maxRedirects, &$redirectHeaders, $subnets, $ipFlags, $dnsCache): \Generator {
@@ -135,9 +131,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
                 unset($options['body'], $options['json']);
 
                 if (isset($options['normalized_headers']['content-length']) || isset($options['normalized_headers']['content-type']) || isset($options['normalized_headers']['transfer-encoding'])) {
-                    $filterContentHeaders = static function ($h) {
-                        return 0 !== stripos($h, 'Content-Length:') && 0 !== stripos($h, 'Content-Type:') && 0 !== stripos($h, 'Transfer-Encoding:');
-                    };
+                    $filterContentHeaders = static fn ($h) => 0 !== stripos($h, 'Content-Length:') && 0 !== stripos($h, 'Content-Type:') && 0 !== stripos($h, 'Transfer-Encoding:');
                     $options['headers'] = array_filter($options['headers'], $filterContentHeaders);
                     $redirectHeaders['no_auth'] = array_filter($redirectHeaders['no_auth'], $filterContentHeaders);
                     $redirectHeaders['with_auth'] = array_filter($redirectHeaders['with_auth'], $filterContentHeaders);
@@ -157,18 +151,6 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
                 $context->passthru();
             }
         });
-    }
-
-    /**
-     * @deprecated since Symfony 7.1, configure the logger on the wrapped HTTP client directly instead
-     */
-    public function setLogger(LoggerInterface $logger): void
-    {
-        trigger_deprecation('symfony/http-client', '7.1', 'Configure the logger on the wrapped HTTP client directly instead.');
-
-        if ($this->client instanceof LoggerAwareInterface) {
-            $this->client->setLogger($logger);
-        }
     }
 
     public function withOptions(array $options): static

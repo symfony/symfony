@@ -11,6 +11,8 @@
 
 namespace Symfony\Contracts\Tests\Service;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -19,9 +21,8 @@ use Symfony\Contracts\Service\ServiceLocatorTrait;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberTrait;
 
-/**
- * @group legacy
- */
+#[IgnoreDeprecations]
+#[Group('legacy')]
 class ServiceSubscriberTraitTest extends TestCase
 {
     public static function setUpBeforeClass(): void

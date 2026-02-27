@@ -12,15 +12,18 @@
 namespace Symfony\Component\Validator\Tests\Mapping\Loader;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Collection;
+use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\IsTrue;
+use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\Optional;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Constraints\Required;
 use Symfony\Component\Validator\Constraints\Traverse;
 use Symfony\Component\Validator\Exception\MappingException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -30,7 +33,6 @@ use Symfony\Component\Validator\Tests\Fixtures\Attribute\GroupProviderDto;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintB;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintWithRequiredArgument;
-use Symfony\Component\Validator\Tests\Fixtures\DummyEntityConstraintWithoutNamedArguments;
 use Symfony\Component\Validator\Tests\Fixtures\Entity_81;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\GroupSequenceProviderEntity;
@@ -39,8 +41,6 @@ use Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutV
 
 class XmlFileLoaderTest extends TestCase
 {
-    use ExpectUserDeprecationMessageTrait;
-
     public function testLoadClassMetadataReturnsTrueIfSuccessful()
     {
         $loader = new XmlFileLoader(__DIR__.'/constraint-mapping.xml');
@@ -76,13 +76,13 @@ class XmlFileLoaderTest extends TestCase
         $expected->addConstraint(new ConstraintWithNamedArguments(['foo', 'bar']));
         $expected->addConstraint(new ConstraintWithoutValueWithNamedArguments(['foo']));
         $expected->addPropertyConstraint('firstName', new NotNull());
-        $expected->addPropertyConstraint('firstName', new Range(min: 3));
-        $expected->addPropertyConstraint('firstName', new Choice(['A', 'B']));
         $expected->addPropertyConstraint('firstName', new All(constraints: [new NotNull(), new Range(min: 3)]));
         $expected->addPropertyConstraint('firstName', new All(constraints: [new NotNull(), new Range(min: 3)]));
         $expected->addPropertyConstraint('firstName', new Collection(fields: [
             'foo' => [new NotNull(), new Range(min: 3)],
             'bar' => [new Range(min: 5)],
+            'baz' => new Required([new Email()]),
+            'qux' => new Optional([new NotBlank()]),
         ]));
         $expected->addPropertyConstraint('firstName', new Choice(
             message: 'Must be one of %choices%',
@@ -174,18 +174,5 @@ class XmlFileLoaderTest extends TestCase
             $this->expectException(MappingException::class);
             $loader->loadClassMetadata($metadata);
         }
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testLoadConstraintWithoutNamedArgumentsSupport()
-    {
-        $loader = new XmlFileLoader(__DIR__.'/constraint-without-named-arguments-support.xml');
-        $metadata = new ClassMetadata(DummyEntityConstraintWithoutNamedArguments::class);
-
-        $this->expectUserDeprecationMessage('Since symfony/validator 7.3: Using constraints not supporting named arguments is deprecated. Try adding the HasNamedArguments attribute to Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutNamedArguments.');
-
-        $loader->loadClassMetadata($metadata);
     }
 }

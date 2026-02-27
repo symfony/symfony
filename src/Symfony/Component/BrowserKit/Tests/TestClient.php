@@ -47,11 +47,11 @@ class TestClient extends AbstractBrowser
         $path = $r->getFileName();
 
         return <<<EOF
-<?php
+            <?php
 
-require_once('$path');
+            require_once('$path');
 
-echo serialize($this->nextScript);
-EOF;
+            echo serialize($this->nextScript);
+            EOF;
     }
 }

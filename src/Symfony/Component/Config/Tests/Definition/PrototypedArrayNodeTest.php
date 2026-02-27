@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\ArrayNode;
 use Symfony\Component\Config\Definition\PrototypedArrayNode;
@@ -261,9 +262,8 @@ class PrototypedArrayNodeTest extends TestCase
      *         'option2' => 'value2'
      *     ]
      * ]
-     *
-     * @dataProvider getDataForKeyRemovedLeftValueOnly
      */
+    #[DataProvider('getDataForKeyRemovedLeftValueOnly')]
     public function testMappedAttributeKeyIsRemovedLeftValueOnly($value, array $children, array $expected)
     {
         $node = new PrototypedArrayNode('root');
@@ -339,9 +339,7 @@ class PrototypedArrayNodeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getPrototypedArrayNodeDataToMerge
-     */
+    #[DataProvider('getPrototypedArrayNodeDataToMerge')]
     public function testPrototypedArrayNodeMerge(array $left, array $right, array $expected)
     {
         $node = new PrototypedArrayNode('options');

@@ -55,7 +55,7 @@ class UsageTrackingTokenStorageTest extends TestCase
 
     public function testWithoutMainRequest()
     {
-        $locator = new class(['request_stack' => fn () => new RequestStack()]) implements ContainerInterface {
+        $locator = new class(['request_stack' => static fn () => new RequestStack()]) implements ContainerInterface {
             use ServiceLocatorTrait;
         };
         $tokenStorage = new TokenStorage();

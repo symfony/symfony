@@ -390,6 +390,10 @@ return [
             'EC$',
             'Dɔ́là Ilà Oòrùn Karíbíà',
         ],
+        'XCG' => [
+            'Cg.',
+            'Owó ìlú Kùrásɔ̀ àti Saint Mátìnì',
+        ],
         'XOF' => [
             'F CFA',
             'Faransì ìwɔ̀-oorùn Afíríkà',

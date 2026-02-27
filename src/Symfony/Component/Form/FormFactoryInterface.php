@@ -12,6 +12,9 @@
 namespace Symfony\Component\Form;
 
 use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
+use Symfony\Component\Form\Flow\FormFlowInterface;
+use Symfony\Component\Form\Flow\FormFlowTypeInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 /**
@@ -28,6 +31,8 @@ interface FormFactoryInterface
      *
      * @param mixed $data The initial data
      *
+     * @return ($type is class-string<FormFlowTypeInterface> ? FormFlowInterface : FormInterface)
+     *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
     public function create(string $type = FormType::class, mixed $data = null, array $options = []): FormInterface;
@@ -38,6 +43,8 @@ interface FormFactoryInterface
      * @see createNamedBuilder()
      *
      * @param mixed $data The initial data
+     *
+     * @return ($type is class-string<FormFlowTypeInterface> ? FormFlowInterface : FormInterface)
      *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
@@ -61,6 +68,8 @@ interface FormFactoryInterface
      *
      * @param mixed $data The initial data
      *
+     * @return ($type is class-string<FormFlowTypeInterface> ? FormFlowBuilderInterface : FormBuilderInterface)
+     *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */
     public function createBuilder(string $type = FormType::class, mixed $data = null, array $options = []): FormBuilderInterface;
@@ -69,6 +78,8 @@ interface FormFactoryInterface
      * Returns a form builder.
      *
      * @param mixed $data The initial data
+     *
+     * @return ($type is class-string<FormFlowTypeInterface> ? FormFlowBuilderInterface : FormBuilderInterface)
      *
      * @throws InvalidOptionsException if any given option is not applicable to the given type
      */

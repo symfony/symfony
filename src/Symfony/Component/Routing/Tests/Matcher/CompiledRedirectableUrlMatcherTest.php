@@ -19,10 +19,14 @@ use Symfony\Component\Routing\RouteCollection;
 
 class CompiledRedirectableUrlMatcherTest extends RedirectableUrlMatcherTest
 {
-    protected function getUrlMatcher(RouteCollection $routes, ?RequestContext $context = null)
+    protected function getUrlMatcher(RouteCollection $routes, ?RequestContext $context = null, bool $mock = false)
     {
         $dumper = new CompiledUrlMatcherDumper($routes);
         $compiledRoutes = $dumper->getCompiledRoutes();
+
+        if (!$mock) {
+            return new TestCompiledRedirectableUrlMatcher($compiledRoutes, $context ?? new RequestContext());
+        }
 
         return $this->getMockBuilder(TestCompiledRedirectableUrlMatcher::class)
             ->setConstructorArgs([$compiledRoutes, $context ?? new RequestContext()])

@@ -143,10 +143,7 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $this->clonesIndex = 0;
     }
 
-    /**
-     * @internal
-     */
-    public function __sleep(): array
+    public function __serialize(): array
     {
         if (!$this->dataCount) {
             $this->data = [];
@@ -161,16 +158,12 @@ class DumpDataCollector extends DataCollector implements DataDumperInterface
         $this->dataCount = 0;
         $this->isCollected = true;
 
-        return parent::__sleep();
+        return ['data' => $this->data];
     }
 
-    /**
-     * @internal
-     */
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
-        parent::__wakeup();
-
+        $this->data = array_pop($data) ?? [];
         $charset = array_pop($this->data);
         $fileLinkFormat = array_pop($this->data);
         $this->dataCount = \count($this->data);

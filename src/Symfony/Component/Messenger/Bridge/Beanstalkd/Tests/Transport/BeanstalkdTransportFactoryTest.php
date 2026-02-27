@@ -30,7 +30,7 @@ final class BeanstalkdTransportFactoryTest extends TestCase
     public function testCreateTransport()
     {
         $factory = new BeanstalkdTransportFactory();
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = $this->createStub(SerializerInterface::class);
 
         $this->assertEquals(
             new BeanstalkdTransport(Connection::fromDsn('beanstalkd://127.0.0.1'), $serializer),

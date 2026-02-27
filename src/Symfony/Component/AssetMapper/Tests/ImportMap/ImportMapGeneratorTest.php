@@ -11,7 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\AssetMapper\CompiledAssetMapperConfigReader;
@@ -27,9 +27,9 @@ use Symfony\Component\Filesystem\Path;
 
 class ImportMapGeneratorTest extends TestCase
 {
-    private AssetMapperInterface&MockObject $assetMapper;
-    private CompiledAssetMapperConfigReader&MockObject $compiledConfigReader;
-    private ImportMapConfigReader&MockObject $configReader;
+    private AssetMapperInterface $assetMapper;
+    private CompiledAssetMapperConfigReader $compiledConfigReader;
+    private ImportMapConfigReader $configReader;
 
     private Filesystem $filesystem;
     private static string $writableRoot = __DIR__.'/../Fixtures/importmap_generator';
@@ -254,17 +254,15 @@ class ImportMapGeneratorTest extends TestCase
         ], array_keys($actualImportMapData));
     }
 
-    /**
-     * @dataProvider getRawImportMapDataTests
-     */
+    #[DataProvider('getRawImportMapDataTests')]
     public function testGetRawImportMapData(array $importMapEntries, array $mappedAssets, array $expectedData)
     {
         $manager = $this->createImportMapGenerator();
         $this->mockImportMap($importMapEntries);
         $this->mockAssetMapper($mappedAssets);
-        $this->configReader->expects($this->any())
+        $this->configReader
             ->method('convertPathToFilesystemPath')
-            ->willReturnCallback(function (string $path) {
+            ->willReturnCallback(static function (string $path) {
                 if (!str_starts_with($path, '.')) {
                     return $path;
                 }
@@ -574,6 +572,7 @@ class ImportMapGeneratorTest extends TestCase
 
     public function testGetRawImportDataUsesCacheFile()
     {
+        $this->compiledConfigReader = $this->createMock(CompiledAssetMapperConfigReader::class);
         $manager = $this->createImportMapGenerator();
         $importmapData = [
             'app' => [
@@ -595,9 +594,7 @@ class ImportMapGeneratorTest extends TestCase
         $this->assertEquals($importmapData, $manager->getRawImportMapData());
     }
 
-    /**
-     * @dataProvider getEagerEntrypointImportsTests
-     */
+    #[DataProvider('getEagerEntrypointImportsTests')]
     public function testFindEagerEntrypointImports(MappedAsset $entryAsset, array $expected, array $mappedAssets = [])
     {
         $manager = $this->createImportMapGenerator();
@@ -693,6 +690,7 @@ class ImportMapGeneratorTest extends TestCase
 
     public function testFindEagerEntrypointImportsUsesCacheFile()
     {
+        $this->compiledConfigReader = $this->createMock(CompiledAssetMapperConfigReader::class);
         $manager = $this->createImportMapGenerator();
         $entrypointData = [
             'app',
@@ -711,14 +709,14 @@ class ImportMapGeneratorTest extends TestCase
 
     private function createImportMapGenerator(): ImportMapGenerator
     {
-        $this->compiledConfigReader = $this->createMock(CompiledAssetMapperConfigReader::class);
-        $this->assetMapper = $this->createMock(AssetMapperInterface::class);
-        $this->configReader = $this->createMock(ImportMapConfigReader::class);
+        $this->compiledConfigReader ??= $this->createStub(CompiledAssetMapperConfigReader::class);
+        $this->assetMapper = $this->createStub(AssetMapperInterface::class);
+        $this->configReader = $this->createStub(ImportMapConfigReader::class);
 
         // mock this to behave like normal
-        $this->configReader->expects($this->any())
+        $this->configReader
             ->method('createRemoteEntry')
-            ->willReturnCallback(function (string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint) {
+            ->willReturnCallback(static function (string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint) {
                 $path = '/path/to/vendor/'.$packageModuleSpecifier.'.js';
 
                 return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint);
@@ -733,7 +731,7 @@ class ImportMapGeneratorTest extends TestCase
 
     private function mockImportMap(array $importMapEntries): void
     {
-        $this->configReader->expects($this->any())
+        $this->configReader
             ->method('getEntries')
             ->willReturn(new ImportMapEntries($importMapEntries))
         ;
@@ -746,8 +744,8 @@ class ImportMapGeneratorTest extends TestCase
 
     private static function createRemoteEntry(string $importName, string $version, ?string $path = null, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry
     {
-        $packageSpecifier = $packageSpecifier ?? $importName;
-        $path = $path ?? '/vendor/any-path.js';
+        $packageSpecifier ??= $importName;
+        $path ??= '/vendor/any-path.js';
 
         return ImportMapEntry::createRemote($importName, $type, path: $path, version: $version, packageModuleSpecifier: $packageSpecifier, isEntrypoint: false);
     }
@@ -757,9 +755,9 @@ class ImportMapGeneratorTest extends TestCase
      */
     private function mockAssetMapper(array $mappedAssets): void
     {
-        $this->assetMapper->expects($this->any())
+        $this->assetMapper
             ->method('getAsset')
-            ->willReturnCallback(function (string $logicalPath) use ($mappedAssets) {
+            ->willReturnCallback(static function (string $logicalPath) use ($mappedAssets) {
                 foreach ($mappedAssets as $asset) {
                     if ($asset->logicalPath === $logicalPath) {
                         return $asset;
@@ -770,11 +768,11 @@ class ImportMapGeneratorTest extends TestCase
             })
         ;
 
-        $this->assetMapper->expects($this->any())
+        $this->assetMapper
             ->method('getAssetFromSourcePath')
-            ->willReturnCallback(function (string $sourcePath) use ($mappedAssets) {
+            ->willReturnCallback(static function (string $sourcePath) use ($mappedAssets) {
                 // collapse ../ in paths and ./ in paths to mimic the realpath AssetMapper uses
-                $unCollapsePath = function (string $path) {
+                $unCollapsePath = static function (string $path) {
                     $parts = explode('/', $path);
                     $newParts = [];
                     foreach ($parts as $part) {

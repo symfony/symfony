@@ -13,11 +13,11 @@ namespace Symfony\Component\Validator\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ObjectInitializerInterface;
 use Symfony\Component\Validator\Validator\RecursiveValidator;
 use Symfony\Component\Validator\ValidatorBuilder;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ValidatorBuilderTest extends TestCase
 {
@@ -31,7 +31,7 @@ class ValidatorBuilderTest extends TestCase
     public function testAddObjectInitializer()
     {
         $this->assertSame($this->builder, $this->builder->addObjectInitializer(
-            $this->createMock(ObjectInitializerInterface::class)
+            $this->createStub(ObjectInitializerInterface::class)
         ));
     }
 
@@ -77,21 +77,19 @@ class ValidatorBuilderTest extends TestCase
 
     public function testSetMappingCache()
     {
-        $this->assertSame($this->builder, $this->builder->setMappingCache($this->createMock(CacheItemPoolInterface::class)));
+        $this->assertSame($this->builder, $this->builder->setMappingCache($this->createStub(CacheItemPoolInterface::class)));
     }
 
     public function testSetConstraintValidatorFactory()
     {
         $this->assertSame($this->builder, $this->builder->setConstraintValidatorFactory(
-            $this->createMock(ConstraintValidatorFactoryInterface::class))
+            $this->createStub(ConstraintValidatorFactoryInterface::class))
         );
     }
 
     public function testSetTranslator()
     {
-        $this->assertSame($this->builder, $this->builder->setTranslator(
-            $this->createMock(TranslatorInterface::class))
-        );
+        $this->assertSame($this->builder, $this->builder->setTranslator(new IdentityTranslator()));
     }
 
     public function testSetTranslationDomain()
@@ -102,6 +100,11 @@ class ValidatorBuilderTest extends TestCase
     public function testDisableTranslation()
     {
         $this->assertSame($this->builder, $this->builder->disableTranslation());
+    }
+
+    public function testEnablePropertyMetadataExistenceCheck()
+    {
+        $this->assertSame($this->builder, $this->builder->enablePropertyMetadataExistenceCheck());
     }
 
     public function testGetValidator()

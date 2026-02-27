@@ -9,13 +9,17 @@ Configuration example:
 # SMTP
 MAILER_DSN=mailtrap+smtp://PASSWORD@default
 
-# API
+# API (Live)
 MAILER_DSN=mailtrap+api://TOKEN@default
+
+# API (Sandbox)
+MAILER_DSN=mailtrap+sandbox://TOKEN@default?inboxId=INBOX_ID
 ```
 
 where:
  - `PASSWORD` is your Mailtrap SMTP Password
  - `TOKEN` is your Mailtrap Server Token
+ - `INBOX_ID` is your Mailtrap sandbox inbox's ID
 
 Resources
 ---------

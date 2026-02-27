@@ -22,9 +22,9 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
  *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  *
- * @template-implements UserProviderInterface<UserInterface>
+ * @template-implements AttributesBasedUserProviderInterface<UserInterface>
  */
-class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterface
+class ChainUserProvider implements AttributesBasedUserProviderInterface, PasswordUpgraderInterface
 {
     /**
      * @param iterable<array-key, UserProviderInterface> $providers
@@ -46,10 +46,14 @@ class ChainUserProvider implements UserProviderInterface, PasswordUpgraderInterf
         return $this->providers;
     }
 
-    public function loadUserByIdentifier(string $identifier): UserInterface
+    public function loadUserByIdentifier(string $identifier, array $attributes = []): UserInterface
     {
         foreach ($this->providers as $provider) {
             try {
+                if ($provider instanceof AttributesBasedUserProviderInterface) {
+                    return $provider->loadUserByIdentifier($identifier, $attributes);
+                }
+
                 return $provider->loadUserByIdentifier($identifier);
             } catch (UserNotFoundException) {
                 // try next one

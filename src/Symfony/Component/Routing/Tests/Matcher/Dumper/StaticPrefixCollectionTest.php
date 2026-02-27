@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Routing\Tests\Matcher\Dumper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Matcher\Dumper\StaticPrefixCollection;
 use Symfony\Component\Routing\Route;
 
 class StaticPrefixCollectionTest extends TestCase
 {
-    /**
-     * @dataProvider routeProvider
-     */
+    #[DataProvider('routeProvider')]
     public function testGrouping(array $routes, $expected)
     {
         $collection = new StaticPrefixCollection('/');
@@ -44,10 +43,10 @@ class StaticPrefixCollectionTest extends TestCase
                     ['/leading/segment/', 'leading_segment'],
                 ],
                 <<<EOF
-root
-prefix_segment
-leading_segment
-EOF,
+                    root
+                    prefix_segment
+                    leading_segment
+                    EOF,
             ],
             'Nested - small group' => [
                 [
@@ -56,11 +55,11 @@ EOF,
                     ['/prefix/segment/bb', 'leading_segment'],
                 ],
                 <<<EOF
-root
-/prefix/segment/
--> prefix_segment
--> leading_segment
-EOF,
+                    root
+                    /prefix/segment/
+                    -> prefix_segment
+                    -> leading_segment
+                    EOF,
             ],
             'Nested - contains item at intersection' => [
                 [
@@ -69,11 +68,11 @@ EOF,
                     ['/prefix/segment/bb', 'leading_segment'],
                 ],
                 <<<EOF
-root
-/prefix/segment/
--> prefix_segment
--> leading_segment
-EOF,
+                    root
+                    /prefix/segment/
+                    -> prefix_segment
+                    -> leading_segment
+                    EOF,
             ],
             'Simple one level nesting' => [
                 [
@@ -83,12 +82,12 @@ EOF,
                     ['/group/other/', 'other_segment'],
                 ],
                 <<<EOF
-root
-/group/
--> nested_segment
--> some_segment
--> other_segment
-EOF,
+                    root
+                    /group/
+                    -> nested_segment
+                    -> some_segment
+                    -> other_segment
+                    EOF,
             ],
             'Retain matching order with groups' => [
                 [
@@ -101,16 +100,16 @@ EOF,
                     ['/group/ff/', 'ff'],
                 ],
                 <<<EOF
-/group/
--> aa
--> bb
--> cc
-root
-/group/
--> dd
--> ee
--> ff
-EOF,
+                    /group/
+                    -> aa
+                    -> bb
+                    -> cc
+                    root
+                    /group/
+                    -> dd
+                    -> ee
+                    -> ff
+                    EOF,
             ],
             'Retain complex matching order with groups at base' => [
                 [
@@ -127,22 +126,22 @@ EOF,
                     ['/aaa/333/', 'third_aaa'],
                 ],
                 <<<EOF
-/aaa/
--> first_aaa
--> second_aaa
--> third_aaa
-/prefixed/
--> /prefixed/group/
--> -> aa
--> -> bb
--> -> cc
--> root
--> /prefixed/group/
--> -> dd
--> -> ee
--> -> ff
--> parent
-EOF,
+                    /aaa/
+                    -> first_aaa
+                    -> second_aaa
+                    -> third_aaa
+                    /prefixed/
+                    -> /prefixed/group/
+                    -> -> aa
+                    -> -> bb
+                    -> -> cc
+                    -> root
+                    -> /prefixed/group/
+                    -> -> dd
+                    -> -> ee
+                    -> -> ff
+                    -> parent
+                    EOF,
             ],
 
             'Group regardless of segments' => [
@@ -155,15 +154,15 @@ EOF,
                     ['/group-cc/', 'g3'],
                 ],
                 <<<EOF
-/aaa-
--> a1
--> a2
--> a3
-/group-
--> g1
--> g2
--> g3
-EOF,
+                    /aaa-
+                    -> a1
+                    -> a2
+                    -> a3
+                    /group-
+                    -> g1
+                    -> g2
+                    -> g3
+                    EOF,
             ],
         ];
     }

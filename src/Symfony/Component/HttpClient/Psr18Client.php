@@ -53,6 +53,7 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
     private HttpClientInterface $client;
     private ResponseFactoryInterface $responseFactory;
     private StreamFactoryInterface $streamFactory;
+    private bool $autoUpgradeHttpVersion = true;
 
     public function __construct(?HttpClientInterface $client = null, ?ResponseFactoryInterface $responseFactory = null, ?StreamFactoryInterface $streamFactory = null)
     {
@@ -79,6 +80,10 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
     public function withOptions(array $options): static
     {
         $clone = clone $this;
+        if (\array_key_exists('auto_upgrade_http_version', $options)) {
+            $clone->autoUpgradeHttpVersion = $options['auto_upgrade_http_version'];
+            unset($options['auto_upgrade_http_version']);
+        }
         $clone->client = $clone->client->withOptions($options);
 
         return $clone;
@@ -128,8 +133,8 @@ final class Psr18Client implements ClientInterface, RequestFactoryInterface, Str
                 'body' => $body,
             ];
 
-            if ('1.0' === $request->getProtocolVersion()) {
-                $options['http_version'] = '1.0';
+            if (!$this->autoUpgradeHttpVersion || '1.0' === $request->getProtocolVersion()) {
+                $options['http_version'] = $request->getProtocolVersion();
             }
 
             $response = $this->client->request($request->getMethod(), (string) $request->getUri(), $options);

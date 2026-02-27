@@ -34,9 +34,8 @@ class SessionLogoutListenerTest extends TestCase
         $session = $this->createMock(Session::class);
         $session->expects($this->once())->method('invalidate');
 
-        $request = $this->createMock(Request::class);
-        $request->method('getSession')->willReturn($session);
-        $request->method('hasSession')->willReturn(true);
+        $request = new Request();
+        $request->setSession($session);
 
         $sessionLogoutListener = new SessionLogoutListener();
         $sessionLogoutListener->onLogout(new LogoutEvent($request, null));

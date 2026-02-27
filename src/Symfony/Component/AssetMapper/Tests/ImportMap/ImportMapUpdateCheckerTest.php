@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
@@ -29,7 +30,7 @@ class ImportMapUpdateCheckerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->importMapConfigReader = $this->createMock(ImportMapConfigReader::class);
+        $this->importMapConfigReader = $this->createStub(ImportMapConfigReader::class);
         $httpClient = new MockHttpClient();
         $httpClient->setResponseFactory(self::responseFactory(...));
         $this->updateChecker = new ImportMapUpdateChecker($this->importMapConfigReader, $httpClient);
@@ -110,19 +111,18 @@ class ImportMapUpdateCheckerTest extends TestCase
     }
 
     /**
-     * @dataProvider provideImportMapEntry
-     *
      * @param ImportMapEntry[]    $entries
      * @param PackageUpdateInfo[] $expectedUpdateInfo
      */
+    #[DataProvider('provideImportMapEntry')]
     public function testGetAvailableUpdatesForSinglePackage(array $entries, array $expectedUpdateInfo, ?\Exception $expectedException)
     {
         $this->importMapConfigReader->method('getEntries')->willReturn(new ImportMapEntries($entries));
         if (null !== $expectedException) {
             $this->expectException($expectedException::class);
-            $this->updateChecker->getAvailableUpdates(array_map(fn ($entry) => $entry->importName, $entries));
+            $this->updateChecker->getAvailableUpdates(array_map(static fn ($entry) => $entry->importName, $entries));
         } else {
-            $update = $this->updateChecker->getAvailableUpdates(array_map(fn ($entry) => $entry->importName, $entries));
+            $update = $this->updateChecker->getAvailableUpdates(array_map(static fn ($entry) => $entry->importName, $entries));
             $this->assertEquals($expectedUpdateInfo, $update);
         }
     }
@@ -207,7 +207,7 @@ class ImportMapUpdateCheckerTest extends TestCase
 
     private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry
     {
-        $packageSpecifier = $packageSpecifier ?? $importName;
+        $packageSpecifier ??= $importName;
 
         return ImportMapEntry::createRemote($importName, $type, path: '/vendor/any-path.js', version: $version, packageModuleSpecifier: $packageSpecifier, isEntrypoint: false);
     }

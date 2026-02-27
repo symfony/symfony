@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Amqp\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransport;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
@@ -28,13 +29,11 @@ class AmqpTransportFactoryTest extends TestCase
         $this->assertFalse($factory->supports('invalid-dsn', []));
     }
 
-    /**
-     * @requires extension amqp
-     */
+    #[RequiresPhpExtension('amqp')]
     public function testItCreatesTheTransport()
     {
         $factory = new AmqpTransportFactory();
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = $this->createStub(SerializerInterface::class);
 
         $expectedTransport = new AmqpTransport(Connection::fromDsn('amqp://localhost', ['host' => 'localhost']), $serializer);
 

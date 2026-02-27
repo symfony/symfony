@@ -129,9 +129,9 @@ trait WorkflowBuilderTrait
         $transitionsMetadata = new \SplObjectStorage();
         // PHP 7.2 doesn't allow this heredoc syntax in an array, use a dedicated variable instead
         $label = <<<'EOTXT'
-My custom transition
-label 3
-EOTXT;
+            My custom transition
+            label 3
+            EOTXT;
         $transitionsMetadata[$transitionWithMetadataDumpStyle] = [
             'label' => $label,
             'color' => 'Grey',

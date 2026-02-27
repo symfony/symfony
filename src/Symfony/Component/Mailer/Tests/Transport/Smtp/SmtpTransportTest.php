@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport\Smtp;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
@@ -28,9 +29,7 @@ use Symfony\Component\Mime\Part\File;
 use Symfony\Component\Mime\RawMessage;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class SmtpTransportTest extends TestCase
 {
     public function testToString()
@@ -144,7 +143,8 @@ class SmtpTransportTest extends TestCase
     {
         $calls = 0;
         $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
-        $eventDispatcher->expects($this->any())
+        $eventDispatcher
+            ->expects($this->exactly(2))
             ->method('dispatch')
             ->with($this->callback(static function ($event) use (&$calls): bool {
                 ++$calls;

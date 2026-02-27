@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Cookie;
 
@@ -19,9 +21,8 @@ use Symfony\Component\HttpFoundation\Cookie;
  *
  * @author John Kary <john@johnkary.net>
  * @author Hugo Hamon <hugo.hamon@sensio.com>
- *
- * @group time-sensitive
  */
+#[Group('time-sensitive')]
 class CookieTest extends TestCase
 {
     public static function namesWithSpecialCharacters()
@@ -38,27 +39,21 @@ class CookieTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider namesWithSpecialCharacters
-     */
+    #[DataProvider('namesWithSpecialCharacters')]
     public function testInstantiationThrowsExceptionIfRawCookieNameContainsSpecialCharacters($name)
     {
         $this->expectException(\InvalidArgumentException::class);
         Cookie::create($name, null, 0, null, null, null, false, true);
     }
 
-    /**
-     * @dataProvider namesWithSpecialCharacters
-     */
+    #[DataProvider('namesWithSpecialCharacters')]
     public function testWithRawThrowsExceptionIfCookieNameContainsSpecialCharacters($name)
     {
         $this->expectException(\InvalidArgumentException::class);
         Cookie::create($name)->withRaw();
     }
 
-    /**
-     * @dataProvider namesWithSpecialCharacters
-     */
+    #[DataProvider('namesWithSpecialCharacters')]
     public function testInstantiationSucceedNonRawCookieNameContainsSpecialCharacters($name)
     {
         $this->assertInstanceOf(Cookie::class, Cookie::create($name));

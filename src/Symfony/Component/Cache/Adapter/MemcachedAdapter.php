@@ -15,6 +15,7 @@ use Symfony\Component\Cache\Exception\CacheException;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Marshaller\DefaultMarshaller;
 use Symfony\Component\Cache\Marshaller\MarshallerInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * @author Rob Frawley 2nd <rmf@src.run>
@@ -24,7 +25,7 @@ class MemcachedAdapter extends AbstractAdapter
 {
     /**
      * We are replacing characters that are illegal in Memcached keys with reserved characters from
-     * {@see \Symfony\Contracts\Cache\ItemInterface::RESERVED_CHARACTERS} that are legal in Memcached.
+     * {@see ItemInterface::RESERVED_CHARACTERS} that are legal in Memcached.
      * Note: don’t use {@see AbstractAdapter::NS_SEPARATOR}.
      */
     private const RESERVED_MEMCACHED = " \n\r\t\v\f\0";
@@ -108,7 +109,7 @@ class MemcachedAdapter extends AbstractAdapter
                 if (!str_starts_with($dsn, 'memcached:')) {
                     throw new InvalidArgumentException('Invalid Memcached DSN: it does not start with "memcached:".');
                 }
-                $params = preg_replace_callback('#^memcached:(//)?(?:([^@]*+)@)?#', function ($m) use (&$username, &$password) {
+                $params = preg_replace_callback('#^memcached:(//)?(?:([^@]*+)@)?#', static function ($m) use (&$username, &$password) {
                     if (!empty($m[2])) {
                         [$username, $password] = explode(':', $m[2], 2) + [1 => null];
                         $username = rawurldecode($username);

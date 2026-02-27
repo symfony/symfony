@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection\Security\Factory;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AbstractFactory;
 use Symfony\Component\DependencyInjection\ChildDefinition;
@@ -25,9 +26,7 @@ class AbstractFactoryTest extends TestCase
         $this->container = new ContainerBuilder();
     }
 
-    /**
-     * @dataProvider getFailureHandlers
-     */
+    #[DataProvider('getFailureHandlers')]
     public function testDefaultFailureHandler($serviceId, $defaultHandlerInjection)
     {
         $options = [
@@ -68,9 +67,7 @@ class AbstractFactoryTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getSuccessHandlers
-     */
+    #[DataProvider('getSuccessHandlers')]
     public function testDefaultSuccessHandler($serviceId, $defaultHandlerInjection)
     {
         $options = [

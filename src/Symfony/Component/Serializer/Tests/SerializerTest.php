@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Serializer\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -52,9 +54,11 @@ use Symfony\Component\Serializer\Normalizer\PropertyNormalizer;
 use Symfony\Component\Serializer\Normalizer\UidNormalizer;
 use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\Tests\Fixtures\AsymmetricVisibilityDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummyFirstChild;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\AbstractDummySecondChild;
+use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupClassDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\SerializedNameAttributeDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DenormalizableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
@@ -66,6 +70,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyNullableInt;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumConstructor;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyObjectWithEnumProperty;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyWithObjectOrNull;
+use Symfony\Component\Serializer\Tests\Fixtures\DummyWithUnion;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyWithVariadicParameter;
 use Symfony\Component\Serializer\Tests\Fixtures\FalseBuiltInDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\FooImplementationDummy;
@@ -75,6 +80,7 @@ use Symfony\Component\Serializer\Tests\Fixtures\ObjectCollectionPropertyDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Full;
 use Symfony\Component\Serializer\Tests\Fixtures\Php80WithOptionalConstructorParameter;
 use Symfony\Component\Serializer\Tests\Fixtures\Php80WithPromotedTypedConstructor;
+use Symfony\Component\Serializer\Tests\Fixtures\StringBackedEnumDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TraversableDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\TrueBuiltInDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\WithTypedConstructor;
@@ -101,7 +107,7 @@ class SerializerTest extends TestCase
 
     public function testNormalizeNoMatch()
     {
-        $serializer = new Serializer([$this->createMock(NormalizerInterface::class)]);
+        $serializer = new Serializer([$this->createStub(NormalizerInterface::class)]);
 
         $this->expectException(UnexpectedValueException::class);
 
@@ -133,7 +139,7 @@ class SerializerTest extends TestCase
 
     public function testDenormalizeNoMatch()
     {
-        $serializer = new Serializer([$this->createMock(NormalizerInterface::class)]);
+        $serializer = new Serializer([$this->createStub(NormalizerInterface::class)]);
 
         $this->expectException(UnexpectedValueException::class);
 
@@ -169,13 +175,13 @@ class SerializerTest extends TestCase
 
     public function testNormalizeWithSupportOnData()
     {
-        $normalizer1 = $this->createMock(NormalizerInterface::class);
+        $normalizer1 = $this->createStub(NormalizerInterface::class);
         $normalizer1->method('getSupportedTypes')->willReturn(['*' => false]);
         $normalizer1->method('supportsNormalization')
-            ->willReturnCallback(fn ($data, $format) => isset($data->test));
+            ->willReturnCallback(static fn ($data, $format) => isset($data->test));
         $normalizer1->method('normalize')->willReturn('test1');
 
-        $normalizer2 = $this->createMock(NormalizerInterface::class);
+        $normalizer2 = $this->createStub(NormalizerInterface::class);
         $normalizer2->method('getSupportedTypes')->willReturn(['*' => false]);
         $normalizer2->method('supportsNormalization')
             ->willReturn(true);
@@ -192,13 +198,13 @@ class SerializerTest extends TestCase
 
     public function testDenormalizeWithSupportOnData()
     {
-        $denormalizer1 = $this->createMock(DenormalizerInterface::class);
+        $denormalizer1 = $this->createStub(DenormalizerInterface::class);
         $denormalizer1->method('getSupportedTypes')->willReturn(['*' => false]);
         $denormalizer1->method('supportsDenormalization')
-            ->willReturnCallback(fn ($data, $type, $format) => isset($data['test1']));
+            ->willReturnCallback(static fn ($data, $type, $format) => isset($data['test1']));
         $denormalizer1->method('denormalize')->willReturn('test1');
 
-        $denormalizer2 = $this->createMock(DenormalizerInterface::class);
+        $denormalizer2 = $this->createStub(DenormalizerInterface::class);
         $denormalizer2->method('getSupportedTypes')->willReturn(['*' => false]);
         $denormalizer2->method('supportsDenormalization')
             ->willReturn(true);
@@ -454,7 +460,7 @@ class SerializerTest extends TestCase
         $discriminatorResolver = new ClassDiscriminatorFromClassMetadata($loaderMock);
         $serializer = new Serializer([new ObjectNormalizer(null, null, null, new PhpDocExtractor(), $discriminatorResolver)], ['json' => new JsonEncoder()]);
 
-        $jsonData = '{"type":"first","quux":{"value":"quux"},"bar":"bar-value","foo":"foo-value"}';
+        $jsonData = '{"type":"first","quux":{"value":"quux"},"bar":"bar-value","baz":null,"foo":"foo-value"}';
 
         $deserialized = $serializer->deserialize($jsonData, AbstractDummy::class, 'json');
         $this->assertEquals($example, $deserialized);
@@ -639,14 +645,14 @@ class SerializerTest extends TestCase
         yield [$serializer, $data];
     }
 
-    /** @dataProvider provideObjectOrCollectionTests */
+    #[DataProvider('provideObjectOrCollectionTests')]
     public function testNormalizeWithCollection(Serializer $serializer, array $data)
     {
         $expected = '{"a1":[],"a2":{"k":"v"},"b1":[],"b2":{"k":"v"},"c1":{"nested":[]},"c2":{"nested":{"k":"v"}},"d1":{"nested":[]},"d2":{"nested":{"k":"v"}},"e1":{"map":[]},"e2":{"map":{"k":"v"}},"f1":{"map":[]},"f2":{"map":{"k":"v"}},"g1":{"list":[],"settings":[]},"g2":{"list":["greg"],"settings":[]}}';
         $this->assertSame($expected, $serializer->serialize($data, 'json'));
     }
 
-    /** @dataProvider provideObjectOrCollectionTests */
+    #[DataProvider('provideObjectOrCollectionTests')]
     public function testNormalizePreserveEmptyArrayObject(Serializer $serializer, array $data)
     {
         $expected = '{"a1":{},"a2":{"k":"v"},"b1":[],"b2":{"k":"v"},"c1":{"nested":{}},"c2":{"nested":{"k":"v"}},"d1":{"nested":[]},"d2":{"nested":{"k":"v"}},"e1":{"map":[]},"e2":{"map":{"k":"v"}},"f1":{"map":{}},"f2":{"map":{"k":"v"}},"g1":{"list":{},"settings":[]},"g2":{"list":["greg"],"settings":[]}}';
@@ -655,7 +661,7 @@ class SerializerTest extends TestCase
         ]));
     }
 
-    /** @dataProvider provideObjectOrCollectionTests */
+    #[DataProvider('provideObjectOrCollectionTests')]
     public function testNormalizeEmptyArrayAsObject(Serializer $serializer, array $data)
     {
         $expected = '{"a1":[],"a2":{"k":"v"},"b1":{},"b2":{"k":"v"},"c1":{"nested":[]},"c2":{"nested":{"k":"v"}},"d1":{"nested":{}},"d2":{"nested":{"k":"v"}},"e1":{"map":{}},"e2":{"map":{"k":"v"}},"f1":{"map":[]},"f2":{"map":{"k":"v"}},"g1":{"list":[],"settings":{}},"g2":{"list":["greg"],"settings":{}}}';
@@ -664,7 +670,7 @@ class SerializerTest extends TestCase
         ]));
     }
 
-    /** @dataProvider provideObjectOrCollectionTests */
+    #[DataProvider('provideObjectOrCollectionTests')]
     public function testNormalizeEmptyArrayAsObjectAndPreserveEmptyArrayObject(Serializer $serializer, array $data)
     {
         $expected = '{"a1":{},"a2":{"k":"v"},"b1":{},"b2":{"k":"v"},"c1":{"nested":{}},"c2":{"nested":{"k":"v"}},"d1":{"nested":{}},"d2":{"nested":{"k":"v"}},"e1":{"map":{}},"e2":{"map":{"k":"v"}},"f1":{"map":{}},"f2":{"map":{"k":"v"}},"g1":{"list":{},"settings":{}},"g2":{"list":["greg"],"settings":{}}}';
@@ -924,9 +930,7 @@ class SerializerTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideCollectDenormalizationErrors
-     */
+    #[DataProvider('provideCollectDenormalizationErrors')]
     public function testCollectDenormalizationErrors(?ClassMetadataFactory $classMetadataFactory)
     {
         $json = '
@@ -988,7 +992,7 @@ class SerializerTest extends TestCase
 
         $this->assertInstanceOf(Php74Full::class, $th->getData());
 
-        $exceptionsAsArray = array_map(fn (NotNormalizableValueException $e): array => [
+        $exceptionsAsArray = array_map(static fn (NotNormalizableValueException $e): array => [
             'currentType' => $e->getCurrentType(),
             'expectedTypes' => $e->getExpectedTypes(),
             'path' => $e->getPath(),
@@ -1163,9 +1167,7 @@ class SerializerTest extends TestCase
         $this->assertSame($expected, $exceptionsAsArray);
     }
 
-    /**
-     * @dataProvider provideCollectDenormalizationErrors
-     */
+    #[DataProvider('provideCollectDenormalizationErrors')]
     public function testCollectDenormalizationErrors2(?ClassMetadataFactory $classMetadataFactory)
     {
         $json = '
@@ -1202,7 +1204,7 @@ class SerializerTest extends TestCase
         $this->assertInstanceOf(Php74Full::class, $th->getData()[0]);
         $this->assertInstanceOf(Php74Full::class, $th->getData()[1]);
 
-        $exceptionsAsArray = array_map(fn (NotNormalizableValueException $e): array => [
+        $exceptionsAsArray = array_map(static fn (NotNormalizableValueException $e): array => [
             'currentType' => $e->getCurrentType(),
             'expectedTypes' => $e->getExpectedTypes(),
             'path' => $e->getPath(),
@@ -1257,7 +1259,7 @@ class SerializerTest extends TestCase
 
         $this->assertInstanceOf(Php74Full::class, $th->getData());
 
-        $exceptionsAsArray = array_map(fn (NotNormalizableValueException $e): array => [
+        $exceptionsAsArray = array_map(static fn (NotNormalizableValueException $e): array => [
             'currentType' => $e->getCurrentType(),
             'expectedTypes' => $e->getExpectedTypes(),
             'path' => $e->getPath(),
@@ -1298,9 +1300,7 @@ class SerializerTest extends TestCase
         $this->assertSame($expected, $exceptionsAsArray);
     }
 
-    /**
-     * @dataProvider provideCollectDenormalizationErrors
-     */
+    #[DataProvider('provideCollectDenormalizationErrors')]
     public function testCollectDenormalizationErrorsWithConstructor(?ClassMetadataFactory $classMetadataFactory)
     {
         $json = '{"bool": "bool"}';
@@ -1326,7 +1326,7 @@ class SerializerTest extends TestCase
 
         $this->assertInstanceOf(Php80WithPromotedTypedConstructor::class, $th->getData());
 
-        $exceptionsAsArray = array_map(fn (NotNormalizableValueException $e): array => [
+        $exceptionsAsArray = array_map(static fn (NotNormalizableValueException $e): array => [
             'currentType' => $e->getCurrentType(),
             'expectedTypes' => $e->getExpectedTypes(),
             'path' => $e->getPath(),
@@ -1394,15 +1394,13 @@ class SerializerTest extends TestCase
         $this->assertTrue($object->bool);
         $this->assertSame(1, $object->int);
 
-        $exceptionsAsArray = array_map(function (NotNormalizableValueException $e): array {
-            return [
-                'currentType' => $e->getCurrentType(),
-                'expectedTypes' => $e->getExpectedTypes(),
-                'path' => $e->getPath(),
-                'useMessageForUser' => $e->canUseMessageForUser(),
-                'message' => $e->getMessage(),
-            ];
-        }, $th->getErrors());
+        $exceptionsAsArray = array_map(static fn (NotNormalizableValueException $e): array => [
+            'currentType' => $e->getCurrentType(),
+            'expectedTypes' => $e->getExpectedTypes(),
+            'path' => $e->getPath(),
+            'useMessageForUser' => $e->canUseMessageForUser(),
+            'message' => $e->getMessage(),
+        ], $th->getErrors());
 
         $expected = [
             [
@@ -1428,6 +1426,60 @@ class SerializerTest extends TestCase
         $this->assertSame($expected, $exceptionsAsArray);
     }
 
+    public function testCollectDenormalizationErrorsWithUnionConstructorTypes()
+    {
+        $json = '{}';
+
+        $serializer = new Serializer(
+            [new ObjectNormalizer()],
+            ['json' => new JsonEncoder()]
+        );
+
+        try {
+            $serializer->deserialize(
+                $json,
+                DummyWithUnion::class,
+                'json',
+                [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true]
+            );
+
+            $this->fail();
+        } catch (\Throwable $th) {
+            $this->assertInstanceOf(PartialDenormalizationException::class, $th);
+        }
+
+        $exceptionsAsArray = array_map(static fn (NotNormalizableValueException $e): array => [
+            'currentType' => $e->getCurrentType(),
+            'expectedTypes' => $e->getExpectedTypes(),
+            'path' => $e->getPath(),
+            'useMessageForUser' => $e->canUseMessageForUser(),
+            'message' => $e->getMessage(),
+        ], $th->getErrors());
+
+        $expected = [
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'int', 'float',
+                ],
+                'path' => 'value',
+                'useMessageForUser' => true,
+                'message' => 'Failed to create object because the class misses the "value" property.',
+            ],
+            [
+                'currentType' => 'null',
+                'expectedTypes' => [
+                    'string', 'int',
+                ],
+                'path' => 'value2',
+                'useMessageForUser' => true,
+                'message' => 'Failed to create object because the class misses the "value2" property.',
+            ],
+        ];
+
+        $this->assertSame($expected, $exceptionsAsArray);
+    }
+
     public function testCollectDenormalizationErrorsWithEnumConstructor()
     {
         $serializer = new Serializer(
@@ -1446,7 +1498,7 @@ class SerializerTest extends TestCase
             $this->assertInstanceOf(PartialDenormalizationException::class, $th);
         }
 
-        $exceptionsAsArray = array_map(fn (NotNormalizableValueException $e): array => [
+        $exceptionsAsArray = array_map(static fn (NotNormalizableValueException $e): array => [
             'currentType' => $e->getCurrentType(),
             'useMessageForUser' => $e->canUseMessageForUser(),
             'message' => $e->getMessage(),
@@ -1485,26 +1537,24 @@ class SerializerTest extends TestCase
             $this->assertInstanceOf(PartialDenormalizationException::class, $e);
         }
 
-        $exceptionsAsArray = array_map(function (NotNormalizableValueException $e): array {
-            return [
-                'currentType' => $e->getCurrentType(),
-                'useMessageForUser' => $e->canUseMessageForUser(),
-                'message' => $e->getMessage(),
-            ];
-        }, $e->getErrors());
+        $exceptionsAsArray = array_map(static fn (NotNormalizableValueException $e): array => [
+            'currentType' => $e->getCurrentType(),
+            'useMessageForUser' => $e->canUseMessageForUser(),
+            'message' => $e->getMessage(),
+        ], $e->getErrors());
 
         $expected = [
             [
                 'currentType' => 'string',
                 'useMessageForUser' => true,
-                'message' => 'The data must belong to a backed enumeration of type Symfony\Component\Serializer\Tests\Fixtures\StringBackedEnumDummy',
+                'message' => 'The data must belong to a backed enumeration of type '.StringBackedEnumDummy::class,
             ],
         ];
 
         $this->assertSame($expected, $exceptionsAsArray);
     }
 
-    public function testNoCollectDenormalizationErrorsWithWrongEnumOnConstructor()
+    public function testCollectDenormalizationErrorsWithWrongEnumOnConstructor()
     {
         $serializer = new Serializer(
             [
@@ -1518,15 +1568,29 @@ class SerializerTest extends TestCase
             $serializer->deserialize('{"get": "POST"}', DummyObjectWithEnumConstructor::class, 'json', [
                 DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true,
             ]);
-        } catch (\Throwable $th) {
-            $this->assertNotInstanceOf(PartialDenormalizationException::class, $th);
-            $this->assertInstanceOf(InvalidArgumentException::class, $th);
+            self::fail(\sprintf('Failed asserting that exception of type "%s" is thrown.', PartialDenormalizationException::class));
+        } catch (PartialDenormalizationException $e) {
+            $exceptionsAsArray = array_map(static fn (NotNormalizableValueException $error): array => [
+                'currentType' => $error->getCurrentType(),
+                'path' => $error->getPath(),
+                'useMessageForUser' => $error->canUseMessageForUser(),
+                'message' => $error->getMessage(),
+            ], $e->getErrors());
+
+            $this->assertSame([
+                [
+                    'currentType' => 'string',
+                    'path' => 'get',
+                    'useMessageForUser' => true,
+                    'message' => 'The data must belong to a backed enumeration of type Symfony\Component\Serializer\Tests\Fixtures\StringBackedEnumDummy',
+                ],
+            ], $exceptionsAsArray);
         }
     }
 
     public function testGroupsOnClassSerialization()
     {
-        $obj = new Fixtures\Attributes\GroupClassDummy();
+        $obj = new GroupClassDummy();
         $obj->setFoo('foo');
         $obj->setBar('bar');
         $obj->setBaz('baz');
@@ -1651,15 +1715,13 @@ class SerializerTest extends TestCase
         $this->assertFalse(isset($object->two));
         $this->assertSame('three string', $object->three);
 
-        $exceptionsAsArray = array_map(function (NotNormalizableValueException $e): array {
-            return [
-                'currentType' => $e->getCurrentType(),
-                'expectedTypes' => $e->getExpectedTypes(),
-                'path' => $e->getPath(),
-                'useMessageForUser' => $e->canUseMessageForUser(),
-                'message' => $e->getMessage(),
-            ];
-        }, $th->getErrors());
+        $exceptionsAsArray = array_map(static fn (NotNormalizableValueException $e): array => [
+            'currentType' => $e->getCurrentType(),
+            'expectedTypes' => $e->getExpectedTypes(),
+            'path' => $e->getPath(),
+            'useMessageForUser' => $e->canUseMessageForUser(),
+            'message' => $e->getMessage(),
+        ], $th->getErrors());
 
         $expected = [
             [
@@ -1713,6 +1775,94 @@ class SerializerTest extends TestCase
         $this->expectException(PartialDenormalizationException::class);
 
         $serializer->denormalize($data, DummyWithVariadicParameter::class);
+    }
+
+    public function testDenormalizationFailsWithMultipleErrorsInDefaultContext()
+    {
+        $serializer = new Serializer(
+            [new DateTimeNormalizer(), new ObjectNormalizer()],
+            [],
+            [DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => true]
+        );
+
+        $data = ['date' => '', 'unknown' => null];
+
+        try {
+            $serializer->denormalize($data, DummyEntityWithStringAndDateTime::class);
+            $this->fail('Expected PartialDenormalizationException was not thrown');
+        } catch (PartialDenormalizationException $e) {
+            $this->assertIsArray($e->getErrors());
+            $this->assertCount(2, $e->getErrors(), 'Expected two denormalization errors');
+
+            $exceptionsAsArray = array_map(static fn (NotNormalizableValueException $ex): array => [
+                'currentType' => $ex->getCurrentType(),
+                'expectedTypes' => $ex->getExpectedTypes(),
+                'path' => $ex->getPath(),
+                'useMessageForUser' => $ex->canUseMessageForUser(),
+                'message' => $ex->getMessage(),
+            ], $e->getErrors());
+
+            $expected = [
+                [
+                    'currentType' => 'null',
+                    'expectedTypes' => ['string'],
+                    'path' => 'bar',
+                    'useMessageForUser' => true,
+                    'message' => 'Failed to create object because the class misses the "bar" property.',
+                ],
+                [
+                    'currentType' => 'string',
+                    'expectedTypes' => ['string'],
+                    'path' => 'date',
+                    'useMessageForUser' => true,
+                    'message' => 'The data is either not an string, an empty string, or null; you should pass a string that can be parsed with the passed format or a valid DateTime string.',
+                ],
+            ];
+
+            $this->assertSame($expected, $exceptionsAsArray);
+        }
+    }
+
+    public function testDeserializeObjectWithAsymmetricPropertyVisibility()
+    {
+        $serializer = new Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()]);
+        /** @var AsymmetricVisibilityDummy $object */
+        $object = $serializer->deserialize(json_encode(['type' => 'This value must not be changed because the property has a private setter', 'item' => 'one']), AsymmetricVisibilityDummy::class, 'json');
+
+        $this->assertSame('one', $object->item);
+        $this->assertSame('final', $object->type); // Value set in the constructor; must not be changed during deserialization
+    }
+
+    public function testPartialDenormalizationWithInvalidEnumAndAllowInvalid()
+    {
+        $factory = new ClassMetadataFactory(new AttributeLoader());
+        $extractor = new PropertyInfoExtractor(
+            [new SerializerExtractor($factory)],
+            [new ReflectionExtractor()]
+        );
+        $serializer = new Serializer(
+            [
+                new ArrayDenormalizer(),
+                new BackedEnumNormalizer(),
+                new ObjectNormalizer($factory, null, null, $extractor),
+            ],
+        );
+
+        $context = [
+            'collect_denormalization_errors' => true,
+            'allow_invalid_values' => true,
+        ];
+
+        try {
+            $serializer->denormalize(['id' => 123, 'status' => null], SerializerTestRequestDto::class, null, $context);
+            $this->fail('PartialDenormalizationException was not thrown.');
+        } catch (PartialDenormalizationException $exception) {
+            $this->assertCount(1, $exception->getErrors());
+            $error = $exception->getErrors()[0];
+
+            $this->assertSame('status', $error->getPath());
+            $this->assertSame(['int', 'string'], $error->getExpectedTypes());
+        }
     }
 }
 
@@ -1777,6 +1927,15 @@ class Bar
     public function __construct($value)
     {
         $this->value = $value;
+    }
+}
+
+class DummyEntityWithStringAndDateTime
+{
+    public function __construct(
+        public string $bar,
+        public \DateTimeInterface $date,
+    ) {
     }
 }
 
@@ -1879,4 +2038,19 @@ interface NormalizerAwareNormalizer extends NormalizerInterface, NormalizerAware
 
 interface DenormalizerAwareDenormalizer extends DenormalizerInterface, DenormalizerAwareInterface
 {
+}
+
+enum SerializerTestBackedEnum: string
+{
+    case PENDING = 'pending';
+    case ACTIVE = 'active';
+}
+
+class SerializerTestRequestDto
+{
+    public function __construct(
+        public int $id,
+        public SerializerTestBackedEnum $status,
+    ) {
+    }
 }

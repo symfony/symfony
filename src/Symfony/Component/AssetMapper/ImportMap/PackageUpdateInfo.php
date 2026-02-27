@@ -29,6 +29,6 @@ class PackageUpdateInfo
 
     public function hasUpdate(): bool
     {
-        return !\in_array($this->updateType, [self::UPDATE_TYPE_DOWNGRADE, self::UPDATE_TYPE_DOWNGRADE, self::UPDATE_TYPE_UP_TO_DATE]);
+        return !\in_array($this->updateType, [self::UPDATE_TYPE_DOWNGRADE, self::UPDATE_TYPE_DOWNGRADE, self::UPDATE_TYPE_UP_TO_DATE], true);
     }
 }

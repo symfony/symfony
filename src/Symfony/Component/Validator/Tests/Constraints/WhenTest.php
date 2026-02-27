@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Length;
@@ -26,15 +27,12 @@ use Symfony\Component\Validator\Tests\Constraints\Fixtures\WhenTestWithClosure;
 
 final class WhenTest extends TestCase
 {
-    /**
-     * @group legacy
-     */
-    public function testMissingOptionsExceptionIsThrown()
+    public function testMissingConstraints()
     {
         $this->expectException(MissingOptionsException::class);
-        $this->expectExceptionMessage('The options "expression", "constraints" must be set for constraint "Symfony\Component\Validator\Constraints\When".');
+        $this->expectExceptionMessage('The options "constraints" must be set for constraint "Symfony\Component\Validator\Constraints\When".');
 
-        new When([]);
+        new When('true');
     }
 
     public function testNonConstraintsAreRejected()
@@ -63,7 +61,7 @@ final class WhenTest extends TestCase
         ], $classConstraint->constraints);
         self::assertSame([], $classConstraint->otherwise);
 
-        [$fooConstraint] = $metadata->properties['foo']->getConstraints();
+        [$fooConstraint] = $metadata->getPropertyMetadata('foo')[0]->getConstraints();
 
         self::assertInstanceOf(When::class, $fooConstraint);
         self::assertSame('true', $fooConstraint->expression);
@@ -74,7 +72,7 @@ final class WhenTest extends TestCase
         self::assertSame([], $fooConstraint->otherwise);
         self::assertSame(['Default', 'WhenTestWithAttributes'], $fooConstraint->groups);
 
-        [$barConstraint] = $metadata->properties['bar']->getConstraints();
+        [$barConstraint] = $metadata->getPropertyMetadata('bar')[0]->getConstraints();
 
         self::assertInstanceOf(When::class, $barConstraint);
         self::assertSame('false', $barConstraint->expression);
@@ -85,7 +83,7 @@ final class WhenTest extends TestCase
         self::assertSame([], $barConstraint->otherwise);
         self::assertSame(['foo'], $barConstraint->groups);
 
-        [$quxConstraint] = $metadata->properties['qux']->getConstraints();
+        [$quxConstraint] = $metadata->getPropertyMetadata('qux')[0]->getConstraints();
 
         self::assertInstanceOf(When::class, $quxConstraint);
         self::assertSame('true', $quxConstraint->expression);
@@ -93,7 +91,7 @@ final class WhenTest extends TestCase
         self::assertSame([], $quxConstraint->otherwise);
         self::assertSame(['foo'], $quxConstraint->groups);
 
-        [$bazConstraint] = $metadata->getters['baz']->getConstraints();
+        [$bazConstraint] = $metadata->getPropertyMetadata('baz')[0]->getConstraints();
 
         self::assertInstanceOf(When::class, $bazConstraint);
         self::assertSame('true', $bazConstraint->expression);
@@ -104,7 +102,7 @@ final class WhenTest extends TestCase
         self::assertSame([], $bazConstraint->otherwise);
         self::assertSame(['Default', 'WhenTestWithAttributes'], $bazConstraint->groups);
 
-        [$quuxConstraint] = $metadata->properties['quux']->getConstraints();
+        [$quuxConstraint] = $metadata->getPropertyMetadata('quux')[0]->getConstraints();
 
         self::assertInstanceOf(When::class, $quuxConstraint);
         self::assertSame('true', $quuxConstraint->expression);
@@ -113,9 +111,7 @@ final class WhenTest extends TestCase
         self::assertSame(['foo'], $quuxConstraint->groups);
     }
 
-    /**
-     * @requires PHP 8.5
-     */
+    #[RequiresPhp('>=8.5')]
     public function testAttributesWithClosure()
     {
         $loader = new AttributeLoader();
@@ -135,7 +131,7 @@ final class WhenTest extends TestCase
         ], $classConstraint->constraints);
         self::assertSame([], $classConstraint->otherwise);
 
-        [$fooConstraint] = $metadata->properties['foo']->getConstraints();
+        [$fooConstraint] = $metadata->getPropertyMetadata('foo')[0]->getConstraints();
 
         self::assertInstanceOf(When::class, $fooConstraint);
         self::assertInstanceOf(\Closure::class, $fooConstraint->expression);

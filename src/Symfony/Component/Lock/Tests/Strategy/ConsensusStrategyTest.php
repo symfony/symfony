@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Lock\Tests\Strategy;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Strategy\ConsensusStrategy;
 
@@ -70,17 +71,13 @@ class ConsensusStrategyTest extends TestCase
         yield [0, 0, 2, true];
     }
 
-    /**
-     * @dataProvider provideMetResults
-     */
+    #[DataProvider('provideMetResults')]
     public function testMet($success, $failure, $total, $isMet)
     {
         $this->assertSame($isMet, $this->strategy->isMet($success, $total));
     }
 
-    /**
-     * @dataProvider provideIndeterminate
-     */
+    #[DataProvider('provideIndeterminate')]
     public function testCanBeMet($success, $failure, $total, $isMet)
     {
         $this->assertSame($isMet, $this->strategy->canBeMet($failure, $total));

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HtmlSanitizer\Tests\TextSanitizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HtmlSanitizer\TextSanitizer\StringSanitizer;
 
@@ -30,9 +31,7 @@ class StringSanitizerTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideHtmlLower
-     */
+    #[DataProvider('provideHtmlLower')]
     public function testHtmlLower(string $input, string $expected)
     {
         $this->assertSame($expected, StringSanitizer::htmlLower($input));
@@ -66,9 +65,7 @@ class StringSanitizerTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideEncodeHtmlEntites
-     */
+    #[DataProvider('provideEncodeHtmlEntites')]
     public function testEncodeHtmlEntites(string $input, string $expected)
     {
         $this->assertSame($expected, StringSanitizer::encodeHtmlEntities($input));

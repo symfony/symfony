@@ -39,12 +39,12 @@ class ClassExistenceResourceTest extends TestCase
         $this->assertTrue($res->isFresh(time()));
 
         eval(<<<EOF
-namespace Symfony\Component\Config\Tests\Fixtures;
+            namespace Symfony\Component\Config\Tests\Fixtures;
 
-class BarClass
-{
-}
-EOF
+            class BarClass
+            {
+            }
+            EOF
         );
 
         $this->assertFalse($res->isFresh(time()));
@@ -59,7 +59,7 @@ EOF
 
     public function testExistsKo()
     {
-        spl_autoload_register($autoloader = function ($class) use (&$loadedClass) { $loadedClass = $class; });
+        spl_autoload_register($autoloader = static function ($class) use (&$loadedClass) { $loadedClass = $class; });
 
         try {
             $res = new ClassExistenceResource('MissingFooClass');

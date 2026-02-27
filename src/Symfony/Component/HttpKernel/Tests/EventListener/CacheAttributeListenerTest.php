@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -102,18 +104,18 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertFalse($this->response->headers->hasCacheControlDirective('no-store'));
     }
 
-    public function testResponseIsPrivateIfConfigurationIsPublicTrueNoStoreTrue()
+    public function testResponseKeepPublicIfConfigurationIsPublicTrueNoStoreTrue()
     {
         $request = $this->createRequest(new Cache(public: true, noStore: true));
 
         $this->listener->onKernelResponse($this->createEventMock($request, $this->response));
 
-        $this->assertFalse($this->response->headers->hasCacheControlDirective('public'));
-        $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
+        $this->assertTrue($this->response->headers->hasCacheControlDirective('public'));
+        $this->assertFalse($this->response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-store'));
     }
 
-    public function testResponseIsPrivateNoStoreIfConfigurationIsNoStoreTrue()
+    public function testResponseKeepPrivateNoStoreIfConfigurationIsNoStoreTrue()
     {
         $request = $this->createRequest(new Cache(noStore: true));
 
@@ -124,14 +126,14 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-store'));
     }
 
-    public function testResponseIsPrivateIfSharedMaxAgeSetAndNoStoreIsTrue()
+    public function testResponseIsPublicIfSharedMaxAgeSetAndNoStoreIsTrue()
     {
         $request = $this->createRequest(new Cache(smaxage: 1, noStore: true));
 
         $this->listener->onKernelResponse($this->createEventMock($request, $this->response));
 
-        $this->assertFalse($this->response->headers->hasCacheControlDirective('public'));
-        $this->assertTrue($this->response->headers->hasCacheControlDirective('private'));
+        $this->assertTrue($this->response->headers->hasCacheControlDirective('public'));
+        $this->assertFalse($this->response->headers->hasCacheControlDirective('private'));
         $this->assertTrue($this->response->headers->hasCacheControlDirective('no-store'));
     }
 
@@ -217,10 +219,10 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame('86400', $this->response->headers->getCacheControlDirective('stale-if-error'));
     }
 
-    /**
-     * @testWith ["test.getDate()"]
-     *           ["date"]
-     */
+    #[TestWith(['test.getDate()'])]
+    #[TestWith(['date'])]
+    #[TestWith(['args["test"].getDate()'])]
+    #[TestWith(['request.attributes.get("date")'])]
     public function testLastModifiedNotModifiedResponse(string $expression)
     {
         $entity = new TestEntity();
@@ -230,7 +232,7 @@ class CacheAttributeListenerTest extends TestCase
         $request->headers->add(['If-Modified-Since' => 'Fri, 23 Aug 2013 00:00:00 GMT']);
 
         $listener = new CacheAttributeListener();
-        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), fn (TestEntity $test) => new Response(), [$entity], $request, null);
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), static fn (TestEntity $test) => new Response(), [$entity], $request, null);
 
         $listener->onKernelControllerArguments($controllerArgumentsEvent);
         $response = $controllerArgumentsEvent->getController()($entity);
@@ -238,10 +240,10 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame(304, $response->getStatusCode());
     }
 
-    /**
-     * @testWith ["test.getDate()"]
-     *           ["date"]
-     */
+    #[TestWith(['test.getDate()'])]
+    #[TestWith(['date'])]
+    #[TestWith(['args["test"].getDate()'])]
+    #[TestWith(['request.attributes.get("date")'])]
     public function testLastModifiedHeader(string $expression)
     {
         $entity = new TestEntity();
@@ -250,7 +252,7 @@ class CacheAttributeListenerTest extends TestCase
         $request->attributes->set('date', new \DateTimeImmutable('Fri, 23 Aug 2013 00:00:00 GMT'));
 
         $listener = new CacheAttributeListener();
-        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), fn (TestEntity $test) => new Response(), [$entity], $request, null);
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), static fn (TestEntity $test) => new Response(), [$entity], $request, null);
         $listener->onKernelControllerArguments($controllerArgumentsEvent);
 
         $controllerResponse = $controllerArgumentsEvent->getController()($entity);
@@ -264,10 +266,10 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame('Fri, 23 Aug 2013 00:00:00 GMT', $response->headers->get('Last-Modified'));
     }
 
-    /**
-     * @testWith ["test.getId()"]
-     *           ["id"]
-     */
+    #[TestWith(['test.getId()'])]
+    #[TestWith(['id'])]
+    #[TestWith(['args["test"].getId()'])]
+    #[TestWith(['request.attributes.get("id")'])]
     public function testEtagNotModifiedResponse(string $expression)
     {
         $entity = new TestEntity();
@@ -277,7 +279,7 @@ class CacheAttributeListenerTest extends TestCase
         $request->headers->add(['If-None-Match' => \sprintf('"%s"', hash('sha256', $entity->getId()))]);
 
         $listener = new CacheAttributeListener();
-        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), fn (TestEntity $test) => new Response(), [$entity], $request, null);
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), static fn (TestEntity $test) => new Response(), [$entity], $request, null);
 
         $listener->onKernelControllerArguments($controllerArgumentsEvent);
         $response = $controllerArgumentsEvent->getController()($entity);
@@ -285,10 +287,10 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame(304, $response->getStatusCode());
     }
 
-    /**
-     * @testWith ["test.getId()"]
-     *           ["id"]
-     */
+    #[TestWith(['test.getId()'])]
+    #[TestWith(['id'])]
+    #[TestWith(['args["test"].getId()'])]
+    #[TestWith(['request.attributes.get("id")'])]
     public function testEtagHeader(string $expression)
     {
         $entity = new TestEntity();
@@ -297,7 +299,7 @@ class CacheAttributeListenerTest extends TestCase
         $request->attributes->set('id', '12345');
 
         $listener = new CacheAttributeListener();
-        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), fn (TestEntity $test) => new Response(), [$entity], $request, null);
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), static fn (TestEntity $test) => new Response(), [$entity], $request, null);
         $listener->onKernelControllerArguments($controllerArgumentsEvent);
 
         $controllerResponse = $controllerArgumentsEvent->getController()($entity);
@@ -309,6 +311,45 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertTrue($response->headers->has('Etag'));
         $this->assertStringContainsString(hash('sha256', $entity->getId()), $response->headers->get('Etag'));
+    }
+
+    #[DataProvider('provideLastModifiedHeaderAndEtagClosureCases')]
+    public function testLastModifiedHeaderAndEtagHeadersClosures(\Closure $lastModifiedClosure, \Closure $etagClosure)
+    {
+        $entity = new TestEntity();
+
+        $request = $this->createRequest(new Cache(lastModified: $lastModifiedClosure, etag: $etagClosure));
+        $request->attributes->set('date', new \DateTimeImmutable('Fri, 23 Aug 2013 00:00:00 GMT'));
+        $request->attributes->set('id', '12345');
+
+        $listener = new CacheAttributeListener();
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), static fn (TestEntity $test) => new Response(), [$entity], $request, null);
+        $listener->onKernelControllerArguments($controllerArgumentsEvent);
+
+        $controllerResponse = $controllerArgumentsEvent->getController()($entity);
+        $responseEvent = new ResponseEvent($this->getKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $controllerResponse);
+        $listener->onKernelResponse($responseEvent);
+
+        $response = $responseEvent->getResponse();
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertTrue($response->headers->has('Last-Modified'));
+        $this->assertSame('Fri, 23 Aug 2013 00:00:00 GMT', $response->headers->get('Last-Modified'));
+        $this->assertTrue($response->headers->has('Etag'));
+        $this->assertStringContainsString(hash('sha256', $entity->getId()), $response->headers->get('Etag'));
+    }
+
+    public static function provideLastModifiedHeaderAndEtagClosureCases(): iterable
+    {
+        yield 'using arguments' => [
+            static fn (array $arguments, Request $request) => $arguments['test']->getDate(),
+            static fn (array $arguments, Request $request) => $arguments['test']->getId(),
+        ];
+
+        yield 'using request attributes' => [
+            static fn (array $arguments, Request $request) => $request->attributes->get('date'),
+            static fn (array $arguments, Request $request) => $request->attributes->get('id'),
+        ];
     }
 
     public function testConfigurationDoesNotOverrideAlreadySetResponseHeaders()
@@ -365,9 +406,179 @@ class CacheAttributeListenerTest extends TestCase
         $this->assertSame(CacheAttributeController::CLASS_SMAXAGE, $response->getMaxAge());
     }
 
-    private function createRequest(Cache $cache): Request
+    #[DataProvider('provideVaryHeaderScenarios')]
+    public function testHasRelevantVaryHeaderBehavior(array $responseVary, array $cacheVary, bool $varyByLanguage, array $expectedVary)
     {
-        return new Request([], [], ['_cache' => [$cache]]);
+        $request = $this->createRequest(new Cache(vary: $cacheVary));
+        $request->attributes->set('_vary_by_language', $varyByLanguage);
+
+        $response = new Response();
+        $response->setVary($responseVary);
+
+        $listener = new CacheAttributeListener();
+        $event = new ResponseEvent($this->getKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $response);
+        $listener->onKernelResponse($event);
+
+        $this->assertSame($expectedVary, $response->getVary());
+    }
+
+    public function testAttributeRespectsExplicitPrivateFromController()
+    {
+        $request = $this->createRequest(new Cache(public: true));
+        $response = new Response();
+        $response->setPrivate();
+
+        $this->listener->onKernelResponse($this->createEventMock($request, $response));
+
+        $this->assertTrue($response->headers->hasCacheControlDirective('private'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('public'));
+    }
+
+    public function testAttributeRespectsExplicitPublicFromController()
+    {
+        $request = $this->createRequest(new Cache(public: false));
+        $response = new Response();
+        $response->setPublic();
+
+        $this->listener->onKernelResponse($this->createEventMock($request, $response));
+
+        $this->assertTrue($response->headers->hasCacheControlDirective('public'));
+        $this->assertFalse($response->headers->hasCacheControlDirective('private'));
+    }
+
+    public static function provideVaryHeaderScenarios(): \Traversable
+    {
+        yield 'no vary headers at all' => [
+            'responseVary' => [],
+            'cacheVary' => ['X-Foo'],
+            'varyByLanguage' => false,
+            'expectedVary' => ['X-Foo'],
+        ];
+        yield 'response vary accept-language only, vary_by_language true (append new)' => [
+            'responseVary' => ['Accept-Language'],
+            'cacheVary' => ['X-Bar'],
+            'varyByLanguage' => true,
+            'expectedVary' => ['Accept-Language', 'X-Bar'], // X-Bar is added
+        ];
+        yield 'response vary accept-language only, vary_by_language false (no append)' => [
+            'responseVary' => ['Accept-Language'],
+            'cacheVary' => ['X-Bar'],
+            'varyByLanguage' => false,
+            'expectedVary' => ['Accept-Language'], // no append
+        ];
+        yield 'response vary multiple including accept-language, vary_by_language true (no append)' => [
+            'responseVary' => ['Accept-Language', 'User-Agent'],
+            'cacheVary' => ['X-Baz'],
+            'varyByLanguage' => true,
+            'expectedVary' => ['Accept-Language', 'User-Agent'], // no append
+        ];
+        yield 'cache vary is empty' => [
+            'responseVary' => ['X-Existing'],
+            'cacheVary' => [],
+            'varyByLanguage' => true,
+            'expectedVary' => ['X-Existing'], // nothing to add
+        ];
+        yield 'vary * (no append) — vary_by_language=true' => [
+            'responseVary' => ['*'],
+            'cacheVary' => ['X-Foo'],
+            'varyByLanguage' => true,
+            'expectedVary' => ['*'],
+        ];
+        yield 'vary * (no append) — vary_by_language=false' => [
+            'responseVary' => ['*'],
+            'cacheVary' => ['X-Foo'],
+            'varyByLanguage' => false,
+            'expectedVary' => ['*'],
+        ];
+    }
+
+    #[DataProvider('provideCacheIfCases')]
+    public function testCacheAppliedOnlyWhenIfEvaluatesToTrue(string|\Closure $if1, string|\Closure $if2, bool $sMaxAge, bool $public, bool $maxAge, bool $private)
+    {
+        $entity = new TestEntity();
+
+        $request = $this->createRequest(
+            new Cache(smaxage: '1 days', public: true, if: $if1),
+            new Cache(maxage: '10 days', public: false, if: $if2),
+        );
+
+        $listener = new CacheAttributeListener();
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), [new TestController(true), '__invoke'], [$entity], $request, null);
+        $listener->onKernelControllerArguments($controllerArgumentsEvent);
+
+        $controllerResponse = $controllerArgumentsEvent->getController()($entity);
+        $responseEvent = new ResponseEvent($this->getKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $controllerResponse);
+        $listener->onKernelResponse($responseEvent);
+
+        $response = $responseEvent->getResponse();
+
+        $this->assertSame(200, $response->getStatusCode());
+
+        $this->assertSame($sMaxAge, $response->headers->hasCacheControlDirective('s-maxage'));
+        $this->assertSame($public, $response->headers->hasCacheControlDirective('public'));
+        $this->assertSame($maxAge, $response->headers->hasCacheControlDirective('max-age'));
+        $this->assertSame($private, $response->headers->hasCacheControlDirective('private'));
+    }
+
+    public static function provideCacheIfCases(): iterable
+    {
+        yield 'expression' => [
+            'args["test"].getId() <= 0',
+            'args["test"].getId() > 0',
+            false,
+            false,
+            true,
+            true,
+        ];
+
+        yield 'expression accessing controller' => [
+            'this.cache',
+            'not this.cache',
+            true,
+            true,
+            false,
+            false,
+        ];
+
+        yield 'closure' => [
+            static fn (array $arguments, Request $request, ?object $controller) => $arguments['test']->getDate() <= new \DateTimeImmutable(),
+            static fn (array $arguments, Request $request, ?object $controller) => $arguments['test']->getDate() > new \DateTimeImmutable(),
+            true,
+            true,
+            false,
+            false,
+        ];
+
+        yield 'closure accessing controller' => [
+            static fn (array $arguments, Request $request, ?object $controller) => $controller->cache,
+            static fn (array $arguments, Request $request, ?object $controller) => !$controller->cache,
+            true,
+            true,
+            false,
+            false,
+        ];
+    }
+
+    public function testErrorIsThrownWhenIfEvaluatesToNonBool()
+    {
+        $entity = new TestEntity();
+
+        $request = $this->createRequest(
+            new Cache(smaxage: '1 days', public: true, if: static fn (array $arguments, Request $request) => 'foo'),
+        );
+
+        $listener = new CacheAttributeListener();
+        $controllerArgumentsEvent = new ControllerArgumentsEvent($this->getKernel(), static fn (TestEntity $test) => new Response(), [$entity], $request, null);
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage(\sprintf('The value of the "$if" option of the "%s" attribute must evaluate to a boolean, "string" given.', Cache::class));
+
+        $listener->onKernelControllerArguments($controllerArgumentsEvent);
+    }
+
+    private function createRequest(Cache ...$cache): Request
+    {
+        return new Request([], [], ['_cache' => $cache]);
     }
 
     private function createEventMock(Request $request, Response $response): ResponseEvent
@@ -375,9 +586,9 @@ class CacheAttributeListenerTest extends TestCase
         return new ResponseEvent($this->getKernel(), $request, HttpKernelInterface::MAIN_REQUEST, $response);
     }
 
-    private function getKernel(): MockObject&HttpKernelInterface
+    private function getKernel(): Stub&HttpKernelInterface
     {
-        return $this->createMock(HttpKernelInterface::class);
+        return $this->createStub(HttpKernelInterface::class);
     }
 }
 
@@ -391,5 +602,17 @@ class TestEntity
     public function getId()
     {
         return '12345';
+    }
+}
+
+class TestController
+{
+    public function __construct(public bool $cache)
+    {
+    }
+
+    public function __invoke(TestEntity $test)
+    {
+        return new Response();
     }
 }

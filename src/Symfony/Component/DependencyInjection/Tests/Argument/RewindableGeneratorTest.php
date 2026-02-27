@@ -18,14 +18,14 @@ class RewindableGeneratorTest extends TestCase
 {
     public function testImplementsCountable()
     {
-        $this->assertInstanceOf(\Countable::class, new RewindableGenerator(function () {
+        $this->assertInstanceOf(\Countable::class, new RewindableGenerator(static function () {
             yield 1;
         }, 1));
     }
 
     public function testCountUsesProvidedValue()
     {
-        $generator = new RewindableGenerator(function () {
+        $generator = new RewindableGenerator(static function () {
             yield 1;
         }, 3);
 
@@ -35,9 +35,9 @@ class RewindableGeneratorTest extends TestCase
     public function testCountUsesProvidedValueAsCallback()
     {
         $called = 0;
-        $generator = new RewindableGenerator(function () {
+        $generator = new RewindableGenerator(static function () {
             yield 1;
-        }, function () use (&$called) {
+        }, static function () use (&$called) {
             ++$called;
 
             return 3;

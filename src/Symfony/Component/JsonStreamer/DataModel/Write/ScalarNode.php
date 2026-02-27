@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\JsonStreamer\DataModel\Write;
 
-use Symfony\Component\JsonStreamer\DataModel\DataAccessorInterface;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 
 /**
@@ -26,12 +25,12 @@ use Symfony\Component\TypeInfo\Type\BuiltinType;
 final class ScalarNode implements DataModelNodeInterface
 {
     public function __construct(
-        private DataAccessorInterface $accessor,
+        private string $accessor,
         private BuiltinType $type,
     ) {
     }
 
-    public function withAccessor(DataAccessorInterface $accessor): self
+    public function withAccessor(string $accessor): self
     {
         return new self($accessor, $this->type);
     }
@@ -41,7 +40,7 @@ final class ScalarNode implements DataModelNodeInterface
         return (string) $this->getType();
     }
 
-    public function getAccessor(): DataAccessorInterface
+    public function getAccessor(): string
     {
         return $this->accessor;
     }

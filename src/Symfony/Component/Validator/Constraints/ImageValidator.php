@@ -235,8 +235,6 @@ class ImageValidator extends FileValidator
 
                 return;
             }
-
-            imagedestroy($resource);
         }
     }
 

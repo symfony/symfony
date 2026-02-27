@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\JavaScriptImport;
 use Symfony\Component\AssetMapper\MappedAsset;
@@ -24,9 +25,7 @@ class MappedAssetTest extends TestCase
         $this->assertSame('foo.css', $asset->logicalPath);
     }
 
-    /**
-     * @dataProvider getExtensionTests
-     */
+    #[DataProvider('getExtensionTests')]
     public function testGetExtension(string $filename, string $expectedExtension)
     {
         $asset = new MappedAsset('anything', publicPathWithoutDigest: $filename);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -39,10 +40,10 @@ class ProfilerListenerTest extends TestCase
             ->method('collect')
             ->willReturn($profile);
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = $this->createStub(HttpKernelInterface::class);
         $mainRequest = new Request();
         $subRequest = new Request();
-        $response = $this->createMock(Response::class);
+        $response = new Response();
 
         $requestStack = new RequestStack();
         $requestStack->push($mainRequest);
@@ -60,9 +61,7 @@ class ProfilerListenerTest extends TestCase
         $listener->onKernelTerminate(new TerminateEvent($kernel, $mainRequest, $response));
     }
 
-    /**
-     * @dataProvider collectRequestProvider
-     */
+    #[DataProvider('collectRequestProvider')]
     public function testCollectParameter(Request $request, ?bool $enable)
     {
         $profile = new Profile('token');
@@ -76,7 +75,7 @@ class ProfilerListenerTest extends TestCase
             ->expects(null === $enable ? $this->never() : $this->once())
             ->method($enable ? 'enable' : 'disable');
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = $this->createStub(HttpKernelInterface::class);
         $response = new Response();
 
         $requestStack = new RequestStack();

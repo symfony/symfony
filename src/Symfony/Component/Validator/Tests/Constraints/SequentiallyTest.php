@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\Sequentially;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 class SequentiallyTest extends TestCase
 {
@@ -34,5 +35,21 @@ class SequentiallyTest extends TestCase
         new Sequentially([
             new Valid(),
         ]);
+    }
+
+    public function testMissingConstraints()
+    {
+        $this->expectException(MissingOptionsException::class);
+        $this->expectExceptionMessage(\sprintf('The options "constraints" must be set for constraint "%s".', Sequentially::class));
+
+        new Sequentially(null);
+    }
+
+    public function testMissingConstraintsDoctrineStyle()
+    {
+        $this->expectException(MissingOptionsException::class);
+        $this->expectExceptionMessage(\sprintf('The options "constraints" must be set for constraint "%s".', Sequentially::class));
+
+        new Sequentially([]);
     }
 }

@@ -12,7 +12,7 @@ return [
         'Africa/Freetown' => 'Palogare ya nako ya ngwaga le ngwaga ya Greenwich (Freetown)',
         'Africa/Gaborone' => 'Botswana (Gaborone)',
         'Africa/Johannesburg' => 'Aforika Borwa (Johannesburg)',
-        'Africa/Lome' => 'Palogare ya nako ya ngwaga le ngwaga ya Greenwich (Lome)',
+        'Africa/Lome' => 'Palogare ya nako ya ngwaga le ngwaga ya Greenwich (Lomé)',
         'Africa/Monrovia' => 'Palogare ya nako ya ngwaga le ngwaga ya Greenwich (Monrovia)',
         'Africa/Nouakchott' => 'Palogare ya nako ya ngwaga le ngwaga ya Greenwich (Nouakchott)',
         'Africa/Ouagadougou' => 'Palogare ya nako ya ngwaga le ngwaga ya Greenwich (Ouagadougou)',

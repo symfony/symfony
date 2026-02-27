@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\ProxyAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\CacheItem;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 class ProxyAdapterAndRedisAdapterTest extends AbstractRedisAdapterTestCase
 {
     protected $skippedTests = [
@@ -51,7 +50,7 @@ class ProxyAdapterAndRedisAdapterTest extends AbstractRedisAdapterTestCase
 
         $cache = $this->createCachePool(1);
         $cache->clear();
-        $value = rand();
+        $value = random_int(0, \PHP_INT_MAX);
         $item = $cache->getItem('foo');
         $setCacheItemExpiry($item, 0);
         $cache->save($item->set($value));

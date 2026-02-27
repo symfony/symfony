@@ -31,6 +31,7 @@ final class ResponseEvent extends KernelEvent
         Request $request,
         int $requestType,
         private Response $response,
+        public readonly ?ControllerArgumentsMetadata $controllerMetadata = null,
     ) {
         parent::__construct($kernel, $request, $requestType);
     }

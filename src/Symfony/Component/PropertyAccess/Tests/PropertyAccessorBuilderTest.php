@@ -100,7 +100,7 @@ class PropertyAccessorBuilderTest extends TestCase
 
     public function testUseReadInfoExtractor()
     {
-        $readInfoExtractor = $this->createMock(PropertyReadInfoExtractorInterface::class);
+        $readInfoExtractor = $this->createStub(PropertyReadInfoExtractorInterface::class);
 
         $this->builder->setReadInfoExtractor($readInfoExtractor);
 
@@ -110,7 +110,7 @@ class PropertyAccessorBuilderTest extends TestCase
 
     public function testUseWriteInfoExtractor()
     {
-        $writeInfoExtractor = $this->createMock(PropertyWriteInfoExtractorInterface::class);
+        $writeInfoExtractor = $this->createStub(PropertyWriteInfoExtractorInterface::class);
 
         $this->builder->setWriteInfoExtractor($writeInfoExtractor);
 

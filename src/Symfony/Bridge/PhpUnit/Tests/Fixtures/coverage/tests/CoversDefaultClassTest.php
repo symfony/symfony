@@ -9,11 +9,13 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversDefaultClass \DateTime
  */
+#[CoversClass(DateTime::class)]
 class CoversDefaultClassTest extends TestCase
 {
     public function test()

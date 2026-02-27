@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Alias;
 use Symfony\Component\Routing\Exception\LogicException;
@@ -18,6 +19,7 @@ use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AbstractClassCont
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\ActionPathController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasClassController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasInvokableController;
+use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasLocalizedRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\AliasRouteController;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\BazClass;
 use Symfony\Component\Routing\Tests\Fixtures\AttributeFixtures\DefaultValueController;
@@ -67,9 +69,7 @@ class AttributeClassLoaderTest extends TestCase
         $loader->getResolver();
     }
 
-    /**
-     * @dataProvider provideTestSupportsChecksResource
-     */
+    #[DataProvider('provideTestSupportsChecksResource')]
     public function testSupportsChecksResource($resource, $expectedSupports)
     {
         $this->assertSame($expectedSupports, $this->loader->supports($resource), '->supports() returns true if the resource is loadable');
@@ -171,12 +171,16 @@ class AttributeClassLoaderTest extends TestCase
     public function testDefaultValuesForMethods()
     {
         $routes = $this->loader->load(DefaultValueController::class);
-        $this->assertCount(5, $routes);
+        $this->assertCount(7, $routes);
         $this->assertEquals('/{default}/path', $routes->get('action')->getPath());
         $this->assertEquals('value', $routes->get('action')->getDefault('default'));
         $this->assertEquals('Symfony', $routes->get('hello_with_default')->getDefault('name'));
         $this->assertEquals('World', $routes->get('hello_without_default')->getDefault('name'));
         $this->assertEquals('diamonds', $routes->get('string_enum_action')->getDefault('default'));
+        $this->assertArrayHasKey('libelle', $routes->get('defaultMappedParam_default')->getDefaults());
+        $this->assertNull($routes->get('defaultMappedParam_default')->getDefault('libelle'));
+        $this->assertArrayHasKey('barLibelle', $routes->get('defaultAdvancedMappedParam_default')->getDefaults());
+        $this->assertNull($routes->get('defaultAdvancedMappedParam_default')->getDefault('barLibelle'));
         $this->assertEquals(20, $routes->get('int_enum_action')->getDefault('default'));
     }
 
@@ -331,8 +335,10 @@ class AttributeClassLoaderTest extends TestCase
 
         $this->setUp('some-env');
         $routes = $this->loader->load(RouteWithEnv::class);
-        $this->assertCount(1, $routes);
+        $this->assertCount(3, $routes);
         $this->assertSame('/path', $routes->get('action')->getPath());
+        $this->assertSame('/path4', $routes->get('action4')->getPath());
+        $this->assertSame('/path5', $routes->get('action5')->getPath());
     }
 
     public function testMethodsAndSchemes()
@@ -379,6 +385,22 @@ class AttributeClassLoaderTest extends TestCase
         $this->assertSame('/path', $route->getPath());
         $this->assertEquals(new Alias('action_with_alias'), $routes->getAlias('alias'));
         $this->assertEquals(new Alias('action_with_alias'), $routes->getAlias('completely_different_name'));
+    }
+
+    public function testLocalizedRouteWithAliases()
+    {
+        $routes = $this->loader->load(AliasLocalizedRouteController::class);
+        $this->assertCount(2, $routes);
+
+        $routeNl = $routes->get('localized_route.nl_NL');
+        $routeFr = $routes->get('localized_route.fr_FR');
+
+        $this->assertSame('/nl/localized', $routeNl->getPath());
+        $this->assertSame('/fr/localized', $routeFr->getPath());
+
+        $this->assertNull($routes->getAlias('localized_alias'));
+        $this->assertEquals(new Alias('localized_route.nl_NL'), $routes->getAlias('localized_alias.nl_NL'));
+        $this->assertEquals(new Alias('localized_route.fr_FR'), $routes->getAlias('localized_alias.fr_FR'));
     }
 
     public function testThrowsWithAliasesOnClass()

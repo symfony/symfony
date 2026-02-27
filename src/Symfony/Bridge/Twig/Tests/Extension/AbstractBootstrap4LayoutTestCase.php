@@ -41,14 +41,12 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
             '/div
     [
         ./label[@for="name"]
-        [
-            ./span[@class="alert alert-danger d-block"]
-                [./span[@class="d-block"]
-                    [./span[.="[trans]Error[/trans]"]]
-                    [./span[.="[trans]Error![/trans]"]]
-                ]
-                [count(./span)=1]
+        /following-sibling::span[@class="alert alert-danger d-block mb-1"]
+        [./span[@class="d-block"]
+            [./span[.="[trans]Error[/trans]"]]
+            [./span[.="[trans]Error![/trans]"]]
         ]
+        [count(./span)=1]
         /following-sibling::input[@id="name"]
     ]
 '
@@ -324,7 +322,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
 
         $this->assertMatchesXpath($html,
             '/span
-    [@class="alert alert-danger d-block"]
+    [@class="alert alert-danger d-block mb-1"]
     [
         ./span[@class="d-block"]
             [./span[.="[trans]Error[/trans]"]]
@@ -536,7 +534,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'],
-            'choice_label' => function ($choice, $label, $value) {
+            'choice_label' => static function ($choice, $label, $value) {
                 if ('&b' === $choice) {
                     return false;
                 }
@@ -580,7 +578,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
-            'choice_label' => fn () => false,
+            'choice_label' => static fn () => false,
             'multiple' => false,
             'expanded' => true,
         ]);
@@ -855,7 +853,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'],
-            'choice_label' => function ($choice, $label, $value) {
+            'choice_label' => static function ($choice, $label, $value) {
                 if ('&b' === $choice) {
                     return false;
                 }
@@ -899,7 +897,7 @@ abstract class AbstractBootstrap4LayoutTestCase extends AbstractBootstrap3Layout
     {
         $form = $this->factory->createNamed('name', ChoiceType::class, ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
-            'choice_label' => fn () => false,
+            'choice_label' => static fn () => false,
             'multiple' => true,
             'expanded' => true,
         ]);

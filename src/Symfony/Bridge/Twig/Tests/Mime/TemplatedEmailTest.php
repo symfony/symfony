@@ -66,42 +66,42 @@ class TemplatedEmailTest extends TestCase
         $expected = clone $e;
 
         $expectedJson = <<<EOF
-{
-    "htmlTemplate": "email.html.twig",
-    "textTemplate": "email.txt.twig",
-    "locale": "en",
-    "context": {
-        "foo": "bar"
-    },
-    "text": null,
-    "textCharset": null,
-    "html": null,
-    "htmlCharset": null,
-    "attachments": [
-        {%A
-            "body": "Some Text file",%A
-            "name": "test.txt",%A
-        }
-    ],
-    "headers": {
-        "to": [
             {
-                "addresses": [
-                    {
-                        "address": "you@example.com",
-                        "name": ""
+                "htmlTemplate": "email.html.twig",
+                "textTemplate": "email.txt.twig",
+                "locale": "en",
+                "context": {
+                    "foo": "bar"
+                },
+                "text": null,
+                "textCharset": null,
+                "html": null,
+                "htmlCharset": null,
+                "attachments": [
+                    {%A
+                        "body": "Some Text file",%A
+                        "name": "test.txt",%A
                     }
                 ],
-                "name": "To",
-                "lineLength": 76,
-                "lang": null,
-                "charset": "utf-8"
+                "headers": {
+                    "to": [
+                        {
+                            "addresses": [
+                                {
+                                    "address": "you@example.com",
+                                    "name": ""
+                                }
+                            ],
+                            "name": "To",
+                            "lineLength": 76,
+                            "lang": null,
+                            "charset": "utf-8"
+                        }
+                    ]
+                },
+                "body": null
             }
-        ]
-    },
-    "body": null
-}
-EOF;
+            EOF;
 
         $extractor = new PhpDocExtractor();
         $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);

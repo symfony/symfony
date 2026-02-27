@@ -22,7 +22,7 @@ final class InspectUlidCommandTest extends TestCase
         $commandTester = new CommandTester(new InspectUlidCommand());
 
         $this->assertSame(1, $commandTester->execute(['ulid' => 'foobar']));
-        $this->assertStringContainsString('Invalid ULID: "foobar"', $commandTester->getDisplay());
+        $this->assertStringContainsString('Invalid ULID.', $commandTester->getDisplay());
 
         foreach ([
             '01E439TP9XJZ9RPFH3T1PYBCR8',
@@ -31,20 +31,21 @@ final class InspectUlidCommandTest extends TestCase
         ] as $ulid) {
             $this->assertSame(0, $commandTester->execute(['ulid' => $ulid]));
             $this->assertSame(<<<EOF
- ---------------------- -------------------------------------- 
-  Label                  Value                                 
- ---------------------- -------------------------------------- 
-  toBase32 (canonical)   01E439TP9XJZ9RPFH3T1PYBCR8            
-  toBase58               1BKocMc5BnrVcuq2ti4Eqm                
-  toRfc4122              0171069d-593d-97d3-8b3e-23d06de5b308  
-  toHex                  0x0171069d593d97d38b3e23d06de5b308    
- ---------------------- -------------------------------------- 
-  Time                   2020-03-23 08:58:27.517 UTC           
- ---------------------- -------------------------------------- 
+                 ---------------------- -------------------------------------- 
+                  Label                  Value                                 
+                 ---------------------- -------------------------------------- 
+                  toBase32 (canonical)   01E439TP9XJZ9RPFH3T1PYBCR8            
+                  toBase58               1BKocMc5BnrVcuq2ti4Eqm                
+                  toRfc4122              0171069d-593d-97d3-8b3e-23d06de5b308  
+                  toHex                  0x0171069d593d97d38b3e23d06de5b308    
+                 ---------------------- -------------------------------------- 
+                  Time                   2020-03-23 08:58:27.517 UTC           
+                 ---------------------- -------------------------------------- 
 
 
-EOF
-                , $commandTester->getDisplay(true));
+                EOF,
+                $commandTester->getDisplay(true)
+            );
         }
     }
 }

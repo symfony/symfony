@@ -57,14 +57,4 @@ class WebProfilerExtension extends Extension
         $container->getDefinition('debug.file_link_formatter')
             ->replaceArgument(3, new ServiceClosureArgument(new Reference('debug.file_link_formatter.url_format')));
     }
-
-    public function getXsdValidationBasePath(): string|false
-    {
-        return __DIR__.'/../Resources/config/schema';
-    }
-
-    public function getNamespace(): string
-    {
-        return 'http://symfony.com/schema/dic/webprofiler';
-    }
 }

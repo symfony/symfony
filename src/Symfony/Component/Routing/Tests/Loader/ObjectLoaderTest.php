@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Loader\ObjectLoader;
 use Symfony\Component\Routing\Route;
@@ -40,9 +41,7 @@ class ObjectLoaderTest extends TestCase
         $this->assertNotEmpty($actualRoutes->getResources());
     }
 
-    /**
-     * @dataProvider getBadResourceStrings
-     */
+    #[DataProvider('getBadResourceStrings')]
     public function testExceptionWithoutSyntax(string $resourceString)
     {
         $loader = new TestObjectLoader();

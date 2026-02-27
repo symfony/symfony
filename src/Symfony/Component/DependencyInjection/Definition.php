@@ -61,6 +61,13 @@ class Definition
      */
     public ?int $decorationOnInvalid = null;
 
+    /**
+     * @internal
+     *
+     * Used to store the priority of the decoration
+     */
+    public ?int $decorationPriority = null;
+
     public function __construct(?string $class = null, array $arguments = [])
     {
         if (null !== $class) {
@@ -465,8 +472,7 @@ class Definition
     public function addResourceTag(string $name, array $attributes = []): static
     {
         return $this->addTag($name, $attributes)
-            ->addTag('container.excluded', ['source' => \sprintf('by tag "%s"', $name)])
-            ->setAbstract(true);
+            ->addTag('container.excluded', ['source' => \sprintf('by tag "%s"', $name)]);
     }
 
     /**
@@ -819,5 +825,21 @@ class Definition
     public function hasErrors(): bool
     {
         return (bool) $this->errors;
+    }
+
+    public function __serialize(): array
+    {
+        $data = [];
+        foreach ((array) $this as $k => $v) {
+            if (false !== $i = strrpos($k, "\0")) {
+                $k = substr($k, 1 + $i);
+            }
+            if (!$v xor 'shared' === $k) {
+                continue;
+            }
+            $data[$k] = $v;
+        }
+
+        return $data;
     }
 }

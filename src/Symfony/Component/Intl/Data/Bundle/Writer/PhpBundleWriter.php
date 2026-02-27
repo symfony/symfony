@@ -25,17 +25,17 @@ class PhpBundleWriter implements BundleWriterInterface
     public function write(string $path, string $locale, mixed $data): void
     {
         $template = <<<'TEMPLATE'
-<?php
+            <?php
 
-return %s;
+            return %s;
 
-TEMPLATE;
+            TEMPLATE;
 
         if ($data instanceof \Traversable) {
             $data = iterator_to_array($data);
         }
 
-        array_walk_recursive($data, function (&$value) {
+        array_walk_recursive($data, static function (&$value) {
             if ($value instanceof \Traversable) {
                 $value = iterator_to_array($value);
             }

@@ -1,0 +1,15 @@
+<?php
+
+$container->loadFromExtension('framework', [
+    'enabled_locales' => ['es'],
+    'translator' => [
+        'providers' => [
+            'foo_provider' => [
+                'locales' => ['en', 'fr'],
+            ],
+            'bar_provider' => [
+                'locales' => ['de', 'pl'],
+            ]
+        ]
+    ],
+]);

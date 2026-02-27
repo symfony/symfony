@@ -108,7 +108,7 @@ class JsonDescriptor extends Descriptor
             'is_value_required' => false,
             'is_multiple' => false,
             'description' => 'Negate the "--'.$option->getName().'" option',
-            'default' => false,
+            'default' => null === $option->getDefault() ? null : !$option->getDefault(),
         ] : [
             'name' => '--'.$option->getName(),
             'shortcut' => $option->getShortcut() ? '-'.str_replace('|', '|-', $option->getShortcut()) : '',

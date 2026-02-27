@@ -41,8 +41,8 @@ class EnvPlaceholderParameterBag extends ParameterBag
                     return $placeholder; // return first result
                 }
             }
-            if (!preg_match('/^(?:[-.\w\\\\]*+:)*+\w*+$/', $env)) {
-                throw new InvalidArgumentException(\sprintf('The given env var name "%s" contains invalid characters (allowed characters: letters, digits, hyphens, backslashes and colons).', $name));
+            if (!preg_match('/^(?:[-.\w\\\\]*+:)*+[\w.]*+$/', $env)) {
+                throw new InvalidArgumentException(\sprintf('The given env var name "%s" contains invalid characters (allowed characters: letters, digits, hyphens, backslashes, dots and colons).', $name));
             }
             if ($this->has($name) && null !== ($defaultValue = parent::get($name)) && !\is_string($defaultValue)) {
                 throw new RuntimeException(\sprintf('The default value of an env() parameter must be a string or null, but "%s" given to "%s".', get_debug_type($defaultValue), $name));
@@ -65,7 +65,7 @@ class EnvPlaceholderParameterBag extends ParameterBag
     {
         if (!isset($this->envPlaceholderUniquePrefix)) {
             $reproducibleEntropy = unserialize(serialize($this->parameters));
-            array_walk_recursive($reproducibleEntropy, function (&$v) { $v = null; });
+            array_walk_recursive($reproducibleEntropy, static function (&$v) { $v = null; });
             $this->envPlaceholderUniquePrefix = 'env_'.substr(hash('xxh128', serialize($reproducibleEntropy)), -16);
         }
 

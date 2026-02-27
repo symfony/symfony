@@ -40,6 +40,7 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
     private $passthru;
     private ?\Iterator $stream = null;
     private ?int $yieldedState = null;
+    private bool $hasThrown = false;
 
     /**
      * @param ?callable(ChunkInterface, AsyncContext): ?\Iterator $passthru
@@ -64,7 +65,7 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
 
             while (true) {
                 foreach (self::stream([$response], $timeout) as $chunk) {
-                    if ($chunk->isTimeout() && $response->passthru) {
+                    if ($chunk->isTimeout() && ($response->passthru || $response = self::findInnerPassthru($response))) {
                         // Timeouts thrown during initialization are transport errors
                         foreach (self::passthru($response->client, $response, new ErrorChunk($response->offset, new TransportException($chunk->getError()))) as $chunk) {
                             if ($chunk->isFirst()) {
@@ -187,7 +188,7 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
     {
         $httpException = null;
 
-        if ($this->initializer && null === $this->getInfo('error')) {
+        if ($this->initializer && null === $this->getInfo('error') && !$this->hasThrown) {
             try {
                 self::initialize($this, -0.0);
                 $this->getHeaders(true);
@@ -274,7 +275,8 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
                     }
                 }
 
-                if (!$r->passthru) {
+                $innerR = null;
+                if (!$r->passthru && !$innerR = null !== $chunk->getError() ? self::findInnerPassthru($r) : null) {
                     $r->stream = (static fn () => yield $chunk)();
                     yield from self::passthruStream($response, $r, $asyncMap);
 
@@ -289,11 +291,12 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
                     throw new \LogicException(\sprintf('Instance of "%s" is already consumed and cannot be managed by "%s". A decorated client should not call any of the response\'s methods in its "request()" method.', get_debug_type($response), $class ?? static::class));
                 }
 
-                foreach (self::passthru($r->client, $r, $chunk, $asyncMap) as $chunk) {
+                $innerR ??= $r;
+                foreach (self::passthru($innerR->client, $innerR, $chunk, $asyncMap) as $chunk) {
                     yield $r => $chunk;
                 }
 
-                if ($r->response !== $response && isset($asyncMap[$response])) {
+                if ($innerR->response !== $response && isset($asyncMap[$response])) {
                     break;
                 }
             }
@@ -313,7 +316,7 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
                 $r = $asyncMap[$response];
 
                 if (null !== $r->client) {
-                    $responses[] = $asyncMap[$response];
+                    $responses[] = $r;
                 }
             }
         }
@@ -341,6 +344,21 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
         $r->stream = $stream;
 
         yield from self::passthruStream($response, $r, $asyncMap);
+    }
+
+    private static function findInnerPassthru(self $response): ?self
+    {
+        $innerResponse = $response->response ?? null;
+
+        while ($innerResponse instanceof self) {
+            if ($innerResponse->passthru) {
+                return $innerResponse;
+            }
+
+            $innerResponse = $innerResponse->response ?? null;
+        }
+
+        return null;
     }
 
     /**
@@ -437,6 +455,8 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
                         $chunk = new ErrorChunk($chunk->getOffset(), $e);
                     }
                 }
+
+                $r->hasThrown = true;
 
                 yield $r => $chunk;
                 $chunk->didThrow() ?: $chunk->getContent();

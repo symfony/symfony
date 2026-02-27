@@ -12,6 +12,7 @@
 namespace Symfony\Component\ErrorHandler\Tests\ErrorEnhancer;
 
 use Composer\Autoload\ClassLoader as ComposerClassLoader;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
 use Symfony\Component\ErrorHandler\Error\ClassNotFoundError;
@@ -43,9 +44,7 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provideClassNotFoundData
-     */
+    #[DataProvider('provideClassNotFoundData')]
     public function testEnhance(string $originalMessage, string $enhancedMessage, $autoloader = null)
     {
         try {
@@ -133,7 +132,7 @@ class ClassNotFoundErrorEnhancerTest extends TestCase
             [
                 'Class \'Foo\\Bar\\UndefinedFunctionError\' not found',
                 "Attempted to load class \"UndefinedFunctionError\" from namespace \"Foo\\Bar\".\nDid you forget a \"use\" statement for another namespace?",
-                function ($className) { /* do nothing here */ },
+                static function ($className) { /* do nothing here */ },
             ],
         ];
     }

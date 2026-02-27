@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Security\Csrf\TokenStorage;
 
+use Symfony\Component\Security\Csrf\Exception\TokenNotFoundException;
+
 /**
  * Stores CSRF tokens.
  *
@@ -21,7 +23,7 @@ interface TokenStorageInterface
     /**
      * Reads a stored CSRF token.
      *
-     * @throws \Symfony\Component\Security\Csrf\Exception\TokenNotFoundException If the token ID does not exist
+     * @throws TokenNotFoundException If the token ID does not exist
      */
     public function getToken(string $tokenId): string;
 

@@ -48,7 +48,7 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache = $this->createCachePool();
         $cache->clear();
 
-        $value = mt_rand();
+        $value = random_int(0, \PHP_INT_MAX);
 
         $this->assertSame($value, $cache->get('foo', function (CacheItem $item) use ($value) {
             $this->assertSame('foo', $item->getKey());
@@ -60,7 +60,7 @@ abstract class AdapterTestCase extends CachePoolTest
         $this->assertSame($value, $item->get());
 
         $isHit = true;
-        $this->assertSame($value, $cache->get('foo', function (CacheItem $item) use (&$isHit) { $isHit = false; }, 0));
+        $this->assertSame($value, $cache->get('foo', static function (CacheItem $item) use (&$isHit) { $isHit = false; }, 0));
         $this->assertTrue($isHit);
 
         $this->assertNull($cache->get('foo', function (CacheItem $item) use (&$isHit, $value) {
@@ -95,16 +95,16 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $cache = $this->createCachePool(0, __FUNCTION__);
 
-        $v = $cache->get('k1', function () use (&$counter, $cache) {
-            $cache->get('k2', function () use (&$counter) { return ++$counter; });
-            $v = $cache->get('k2', function () use (&$counter) { return ++$counter; }); // ensure the callback is called once
+        $v = $cache->get('k1', static function () use (&$counter, $cache) {
+            $cache->get('k2', static function () use (&$counter) { return ++$counter; });
+            $v = $cache->get('k2', static function () use (&$counter) { return ++$counter; }); // ensure the callback is called once
 
             return $v;
         });
 
         $this->assertSame(1, $counter);
         $this->assertSame(1, $v);
-        $this->assertSame(1, $cache->get('k2', fn () => 2));
+        $this->assertSame(1, $cache->get('k2', static fn () => 2));
     }
 
     public function testDontSaveWhenAskedNotTo()
@@ -115,14 +115,14 @@ abstract class AdapterTestCase extends CachePoolTest
 
         $cache = $this->createCachePool(0, __FUNCTION__);
 
-        $v1 = $cache->get('some-key', function ($item, &$save) {
+        $v1 = $cache->get('some-key', static function ($item, &$save) {
             $save = false;
 
             return 1;
         });
         $this->assertSame($v1, 1);
 
-        $v2 = $cache->get('some-key', fn () => 2);
+        $v2 = $cache->get('some-key', static fn () => 2);
         $this->assertSame($v2, 2, 'First value was cached and should not have been');
 
         $v3 = $cache->get('some-key', function () {
@@ -140,7 +140,7 @@ abstract class AdapterTestCase extends CachePoolTest
         $cache = $this->createCachePool(0, __FUNCTION__);
 
         $cache->deleteItem('foo');
-        $cache->get('foo', function ($item) {
+        $cache->get('foo', static function ($item) {
             $item->expiresAfter(10);
             usleep(999000);
 
@@ -233,7 +233,7 @@ abstract class AdapterTestCase extends CachePoolTest
         /** @var PruneableInterface|CacheItemPoolInterface $cache */
         $cache = $this->createCachePool();
 
-        $doSet = function ($name, $value, ?\DateInterval $expiresAfter = null) use ($cache) {
+        $doSet = static function ($name, $value, ?\DateInterval $expiresAfter = null) use ($cache) {
             $item = $cache->getItem($name);
             $item->set($value);
 
@@ -399,7 +399,7 @@ abstract class AdapterTestCase extends CachePoolTest
 
 class NotUnserializable
 {
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
         throw new \Exception(__CLASS__);
     }

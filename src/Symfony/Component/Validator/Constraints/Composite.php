@@ -13,6 +13,7 @@ namespace Symfony\Component\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
 /**
  * A constraint that is composed of other constraints.
@@ -51,12 +52,16 @@ abstract class Composite extends Constraint
      */
     public function __construct(mixed $options = null, ?array $groups = null, mixed $payload = null)
     {
-        parent::__construct($options, $groups, $payload);
+        if (null !== $options) {
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
+        }
+
+        parent::__construct(null, $groups, $payload);
 
         $this->initializeNestedConstraints();
 
         foreach ((array) $this->getCompositeOption() as $option) {
-            /* @var Constraint[] $nestedConstraints */
+            /** @var Constraint[] $nestedConstraints */
             $nestedConstraints = $this->$option;
 
             if (!\is_array($nestedConstraints)) {

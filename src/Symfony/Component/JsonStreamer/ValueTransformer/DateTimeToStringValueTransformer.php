@@ -20,8 +20,6 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  * Transforms DateTimeInterface to string during stream writing.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
- *
- * @experimental
  */
 final class DateTimeToStringValueTransformer implements ValueTransformerInterface
 {

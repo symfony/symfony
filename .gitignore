@@ -3,6 +3,9 @@ composer.lock
 phpunit.xml
 .php-cs-fixer.cache
 .php-cs-fixer.php
+.twig-cs-fixer.cache
+.twig-cs-fixer.php
+.phpunit.cache
 .phpunit.result.cache
 composer.phar
 package.tar

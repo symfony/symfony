@@ -16,9 +16,6 @@ use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Bridge\PhpUnit\Tests\Fixtures\ExistingEnum;
 use Symfony\Bridge\PhpUnit\Tests\Fixtures\ExistingEnumReal;
 
-/**
- * @requires PHP 8.1
- */
 class EnumExistsMockTest extends TestCase
 {
     public static function setUpBeforeClass(): void

@@ -1,4 +1,4 @@
-{% use "bootstrap_3_layout.html.twig" %}
+{% use 'bootstrap_3_layout.html.twig' %}
 
 {% block form_start -%}
     {% set attr = attr|merge({class: (attr.class|default('') ~ ' form-horizontal')|trim}) %}
@@ -22,11 +22,7 @@ col-sm-2
 
 {# Rows #}
 
-{% block form_row -%}
-    {%- set widget_attr = {} -%}
-    {%- if help is not empty -%}
-        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
-    {%- endif -%}
+{% block form_row_render -%}
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' form-group' ~ ((not compound or force_error|default(false)) and not valid ? ' has-error'))|trim})} %}{{ block('attributes') }}{% endwith %}>
         {{- form_label(form) -}}
         <div class="{{ block('form_group_class') }}">
@@ -35,7 +31,7 @@ col-sm-2
             {{- form_errors(form) -}}
         </div>
 {##}</div>
-{%- endblock form_row %}
+{%- endblock form_row_render -%}
 
 {% block submit_row -%}
     <div{% with {attr: row_attr|merge({class: (row_attr.class|default('') ~ ' form-group')|trim})} %}{{ block('attributes') }}{% endwith %}>{#--#}

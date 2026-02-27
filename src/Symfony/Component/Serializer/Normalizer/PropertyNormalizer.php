@@ -13,6 +13,7 @@ namespace Symfony\Component\Serializer\Normalizer;
 
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
+use Symfony\Component\Serializer\Exception\LogicException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
@@ -98,6 +99,10 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
             return false;
         }
 
+        if ($this->classDiscriminatorResolver?->getMappingForMappedObject($classOrObject)?->getTypeProperty() === $attribute) {
+            return true;
+        }
+
         try {
             $reflectionProperty = $this->getReflectionProperty($classOrObject, $attribute);
         } catch (\ReflectionException) {
@@ -181,7 +186,22 @@ final class PropertyNormalizer extends AbstractObjectNormalizer
             return;
         }
 
-        $reflectionProperty->setValue($object, $value);
+        if (!$reflectionProperty->isReadOnly()) {
+            $reflectionProperty->setValue($object, $value);
+
+            return;
+        }
+
+        if (!$reflectionProperty->isInitialized($object)) {
+            $declaringClass = $reflectionProperty->getDeclaringClass();
+            $declaringClass->getProperty($reflectionProperty->getName())->setValue($object, $value);
+
+            return;
+        }
+
+        if ($reflectionProperty->getValue($object) !== $value) {
+            throw new LogicException(\sprintf('Attempting to change readonly property "%s"::$%s.', $object::class, $reflectionProperty->getName()));
+        }
     }
 
     /**

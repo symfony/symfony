@@ -2,7 +2,6 @@ imports:
     - { resource: ../config/default.yml }
 
 framework:
-    http_method_override: false
     translator: true
     serializer:
         enabled: true
@@ -10,9 +9,7 @@ framework:
         max_depth_handler: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Serializer\MaxDepthHandler
         default_context:
             enable_max_depth: true
-    property_info:
-        enabled: true
-        with_constructor_extractor: true
+    property_info: { enabled: true }
 
 services:
     serializer.alias:

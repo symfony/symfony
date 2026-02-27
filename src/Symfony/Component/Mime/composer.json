@@ -16,26 +16,24 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "symfony/polyfill-intl-idn": "^1.10",
         "symfony/polyfill-mbstring": "^1.0"
     },
     "require-dev": {
         "egulias/email-validator": "^2.1.10|^3.1|^4",
         "league/html-to-markdown": "^5.0",
-        "phpdocumentor/reflection-docblock": "^3.0|^4.0|^5.0",
-        "symfony/dependency-injection": "^6.4|^7.0",
-        "symfony/process": "^6.4|^7.0",
-        "symfony/property-access": "^6.4|^7.0",
-        "symfony/property-info": "^6.4|^7.0",
-        "symfony/serializer": "^6.4.3|^7.0.3"
+        "phpdocumentor/reflection-docblock": "^5.2|^6.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/process": "^7.4|^8.0",
+        "symfony/property-access": "^7.4|^8.0",
+        "symfony/property-info": "^7.4|^8.0",
+        "symfony/serializer": "^7.4|^8.0"
     },
     "conflict": {
         "egulias/email-validator": "~3.0.0",
-        "phpdocumentor/reflection-docblock": "<3.2.2",
-        "phpdocumentor/type-resolver": "<1.4.0",
-        "symfony/mailer": "<6.4",
-        "symfony/serializer": "<6.4.3|>7.0,<7.0.3"
+        "phpdocumentor/reflection-docblock": "<5.2|>=7",
+        "phpdocumentor/type-resolver": "<1.5.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mime\\": "" },

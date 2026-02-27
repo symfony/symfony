@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add `confirm` option to `button` method in `SlackActionsBlock` block
+
 7.2
 ---
 

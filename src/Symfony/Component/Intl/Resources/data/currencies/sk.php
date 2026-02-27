@@ -1078,6 +1078,10 @@ return [
             'EC$',
             'východokaribský dolár',
         ],
+        'XCG' => [
+            'Cg',
+            'karibský gulden',
+        ],
         'XEU' => [
             'XEU',
             'európska menová jednotka',
@@ -1153,6 +1157,10 @@ return [
         'ZWD' => [
             'ZWD',
             'zimbabwiansky dolár (1980 – 2008)',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'zimbabwiansky zlatý',
         ],
         'ZWL' => [
             'ZWL',

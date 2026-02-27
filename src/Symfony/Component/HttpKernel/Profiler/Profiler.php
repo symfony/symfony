@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\DataCollector\DataCollectorInterface;
 use Symfony\Component\HttpKernel\DataCollector\LateDataCollectorInterface;
+use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -94,6 +95,15 @@ class Profiler implements ResetInterface
             }
         }
 
+        // Update hasErrors flag to include error-level logs (available after lateCollect)
+        if (!$profile->hasErrors()
+            && $profile->hasCollector('logger')
+            && ($logger = $profile->getCollector('logger')) instanceof LoggerDataCollector
+            && $logger->countErrors() > 0
+        ) {
+            $profile->setHasErrors(true);
+        }
+
         if (!($ret = $this->storage->write($profile)) && null !== $this->logger) {
             $this->logger->warning('Unable to store the profiler information.', ['configured_storage' => $this->storage::class]);
         }
@@ -147,6 +157,8 @@ class Profiler implements ResetInterface
         if ($request->attributes->has('_virtual_type')) {
             $profile->setVirtualType($request->attributes->get('_virtual_type'));
         }
+
+        $profile->setHasErrors(null !== $exception);
 
         if ($prevToken = $response->headers->get('X-Debug-Token')) {
             $response->headers->set('X-Previous-Debug-Token', $prevToken);

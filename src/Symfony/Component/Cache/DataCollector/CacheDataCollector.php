@@ -143,6 +143,8 @@ class CacheDataCollector extends DataCollector implements LateDataCollectorInter
                     }
                 } elseif ('save' === $call->name) {
                     ++$statistics[$name]['writes'];
+                } elseif ('saveDeferred' === $call->name) {
+                    ++$statistics[$name]['writes'];
                 } elseif ('deleteItem' === $call->name) {
                     ++$statistics[$name]['deletes'];
                 }

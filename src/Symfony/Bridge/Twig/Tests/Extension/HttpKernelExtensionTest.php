@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Bridge\Twig\Extension\HttpKernelRuntime;
 use Symfony\Bundle\FrameworkBundle\Controller\TemplateController;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,8 +24,9 @@ use Symfony\Component\HttpKernel\Fragment\FragmentHandler;
 use Symfony\Component\HttpKernel\Fragment\FragmentRendererInterface;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGenerator;
 use Twig\Environment;
+use Twig\Error\RuntimeError;
 use Twig\Loader\ArrayLoader;
-use Twig\RuntimeLoader\RuntimeLoaderInterface;
+use Twig\RuntimeLoader\ContainerRuntimeLoader;
 
 class HttpKernelExtensionTest extends TestCase
 {
@@ -32,7 +34,7 @@ class HttpKernelExtensionTest extends TestCase
     {
         $renderer = $this->getFragmentHandler(new \Exception('foo'));
 
-        $this->expectException(\Twig\Error\RuntimeError::class);
+        $this->expectException(RuntimeError::class);
 
         $this->renderTemplate($renderer);
     }
@@ -68,16 +70,17 @@ class HttpKernelExtensionTest extends TestCase
 
         $loader = new ArrayLoader([
             'index' => \sprintf(<<<TWIG
-{{ fragment_uri(controller("%s::templateAction", {template: "foo.html.twig"})) }}
-TWIG
-                , str_replace('\\', '\\\\', TemplateController::class)), ]);
+                {{ fragment_uri(controller("%s::templateAction", {template: "foo.html.twig"})) }}
+                TWIG,
+                str_replace('\\', '\\\\', TemplateController::class)
+            ),
+        ]);
         $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
         $twig->addExtension(new HttpKernelExtension());
 
-        $loader = $this->createMock(RuntimeLoaderInterface::class);
-        $loader->expects($this->any())->method('load')->willReturnMap([
-            [HttpKernelRuntime::class, $kernelRuntime],
-        ]);
+        $loader = new ContainerRuntimeLoader(new ServiceLocator([
+            HttpKernelRuntime::class => static fn () => $kernelRuntime,
+        ]));
         $twig->addRuntimeLoader($loader);
 
         $this->assertMatchesRegularExpression('#/_fragment\?_hash=.+&amp;_path=template%3Dfoo.html.twig%26_format%3Dhtml%26_locale%3Den%26_controller%3DSymfony%255CBundle%255CFrameworkBundle%255CController%255CTemplateController%253A%253AtemplateAction$#', $twig->render('index'));
@@ -108,10 +111,9 @@ TWIG
         $twig = new Environment($loader, ['debug' => true, 'cache' => false]);
         $twig->addExtension(new HttpKernelExtension());
 
-        $loader = $this->createMock(RuntimeLoaderInterface::class);
-        $loader->expects($this->any())->method('load')->willReturnMap([
-            ['Symfony\Bridge\Twig\Extension\HttpKernelRuntime', new HttpKernelRuntime($renderer)],
-        ]);
+        $loader = new ContainerRuntimeLoader(new ServiceLocator([
+            HttpKernelRuntime::class => static fn () => new HttpKernelRuntime($renderer),
+        ]));
         $twig->addRuntimeLoader($loader);
 
         return $twig->render('index');

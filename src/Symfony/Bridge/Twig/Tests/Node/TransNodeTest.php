@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\TransNode;
 use Twig\Compiler;
 use Twig\Environment;
-use Twig\Loader\LoaderInterface;
+use Twig\Loader\ArrayLoader;
 use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Node\TextNode;
 
@@ -30,7 +30,7 @@ class TransNodeTest extends TestCase
         $vars = new ContextVariable('foo', 0);
         $node = new TransNode($body, null, null, $vars);
 
-        $env = new Environment($this->createMock(LoaderInterface::class), ['strict_variables' => true]);
+        $env = new Environment(new ArrayLoader(), ['strict_variables' => true]);
         $compiler = new Compiler($env);
 
         $this->assertEquals(

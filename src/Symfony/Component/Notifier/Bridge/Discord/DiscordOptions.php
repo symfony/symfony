@@ -17,9 +17,15 @@ use Symfony\Component\Notifier\Message\MessageOptionsInterface;
 
 /**
  * @author Karoly Gossler <connor@connor.hu>
+ * @author Tomas Norkūnas <norkunas.tom@gmail.com>
  */
 final class DiscordOptions implements MessageOptionsInterface
 {
+    /**
+     * @var non-empty-string|null
+     */
+    private ?string $recipientId = null;
+
     public function __construct(
         private array $options = [],
     ) {
@@ -30,9 +36,24 @@ final class DiscordOptions implements MessageOptionsInterface
         return $this->options;
     }
 
-    public function getRecipientId(): string
+    /**
+     * @param non-empty-string $id
+     *
+     * @return $this
+     */
+    public function recipient(string $id): static
     {
-        return '';
+        $this->recipientId = $id;
+
+        return $this;
+    }
+
+    /**
+     * @return non-empty-string|null
+     */
+    public function getRecipientId(): ?string
+    {
+        return $this->recipientId;
     }
 
     /**

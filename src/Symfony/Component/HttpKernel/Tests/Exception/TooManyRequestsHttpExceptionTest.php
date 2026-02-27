@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Exception;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
@@ -35,9 +36,7 @@ class TooManyRequestsHttpExceptionTest extends HttpExceptionTest
         $this->assertSame($headers, $exception->getHeaders());
     }
 
-    /**
-     * @dataProvider headerDataProvider
-     */
+    #[DataProvider('headerDataProvider')]
     public function testHeadersSetter($headers)
     {
         $exception = new TooManyRequestsHttpException(10);

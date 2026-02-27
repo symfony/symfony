@@ -33,13 +33,13 @@
         "symfony/translation-implementation": "2.3|3.0"
     },
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "composer-runtime-api": ">=2.1",
         "composer/semver": "^3.0",
         "ext-xml": "*",
         "doctrine/event-manager": "^2",
         "doctrine/persistence": "^3.1|^4",
-        "twig/twig": "^3.12",
+        "twig/twig": "^3.21",
         "psr/cache": "^2.0|^3.0",
         "psr/clock": "^1.0",
         "psr/container": "^1.1|^2.0",
@@ -47,14 +47,14 @@
         "psr/http-message": "^1.0|^2.0",
         "psr/link": "^1.1|^2.0",
         "psr/log": "^1|^2|^3",
-        "symfony/contracts": "^3.6",
-        "symfony/polyfill-ctype": "~1.8",
-        "symfony/polyfill-intl-grapheme": "~1.0",
-        "symfony/polyfill-intl-icu": "~1.0",
+        "symfony/contracts": "^3.7",
+        "symfony/polyfill-ctype": "^1.8",
+        "symfony/polyfill-intl-grapheme": "^1.33",
+        "symfony/polyfill-intl-icu": "^1.0",
         "symfony/polyfill-intl-idn": "^1.10",
-        "symfony/polyfill-intl-normalizer": "~1.0",
-        "symfony/polyfill-mbstring": "~1.0",
-        "symfony/polyfill-php83": "^1.28",
+        "symfony/polyfill-intl-normalizer": "^1.0",
+        "symfony/polyfill-mbstring": "^1.0",
+        "symfony/polyfill-php85": "^1.32",
         "symfony/polyfill-uuid": "^1.15"
     },
     "replace": {
@@ -125,58 +125,63 @@
         "symfony/yaml": "self.version"
     },
     "require-dev": {
-        "amphp/http-client": "^4.2.1|^5.0",
-        "amphp/http-tunnel": "^1.0|^2.0",
+        "amphp/http-client": "^5.0",
+        "amphp/http-tunnel": "^2.0",
+        "async-aws/dynamo-db": "^3.0",
         "async-aws/ses": "^1.0",
         "async-aws/sqs": "^1.0|^2.0",
         "async-aws/sns": "^1.0",
         "cache/integration-tests": "dev-master",
         "doctrine/collections": "^1.8|^2.0",
-        "doctrine/data-fixtures": "^1.1",
-        "doctrine/dbal": "^3.6|^4",
-        "doctrine/orm": "^2.15|^3",
+        "doctrine/data-fixtures": "^1.1|^2",
+        "doctrine/dbal": "^4.3",
+        "doctrine/orm": "^3.4",
         "dragonmantank/cron-expression": "^3.1",
         "egulias/email-validator": "^2.1.10|^3.1|^4",
-        "guzzlehttp/promises": "^1.4|^2.0",
+        "guzzlehttp/guzzle": "^7.10",
         "jolicode/jolinotif": "^2.7.2|^3.0",
+        "jsonpath-standard/jsonpath-compliance-test-suite": "*",
         "league/html-to-markdown": "^5.0",
         "league/uri": "^6.5|^7.0",
         "masterminds/html5": "^2.7.2",
         "monolog/monolog": "^3.0",
         "nikic/php-parser": "^5.0",
         "nyholm/psr7": "^1.0",
-        "pda/pheanstalk": "^5.1|^7.0",
+        "pda/pheanstalk": "^5.1|^7.0|^8.0",
         "php-http/discovery": "^1.15",
         "php-http/httplug": "^1.0|^2.0",
-        "phpdocumentor/reflection-docblock": "^5.2",
+        "phpdocumentor/reflection-docblock": "^5.2|^6.0",
         "phpstan/phpdoc-parser": "^1.0|^2.0",
         "predis/predis": "^1.1|^2.0",
         "psr/http-client": "^1.0",
         "psr/simple-cache": "^1.0|^2.0|^3.0",
         "seld/jsonlint": "^1.10",
-        "symfony/amphp-http-client-meta": "^1.0|^2.0",
-        "symfony/mercure-bundle": "^0.3",
-        "symfony/phpunit-bridge": "^6.4|^7.0",
+        "symfony/mercure-bundle": "^0.3|^0.4",
+        "symfony/phpunit-bridge": "^7.4|^8.0",
         "symfony/runtime": "self.version",
-        "symfony/security-acl": "~2.8|~3.0",
+        "symfony/security-acl": "^2.8|^3.0",
         "symfony/webpack-encore-bundle": "^1.0|^2.0",
         "twig/cssinliner-extra": "^3",
         "twig/inky-extra": "^3",
         "twig/markdown-extra": "^3",
-        "web-token/jwt-library": "^3.3.2|^4.0"
+        "web-token/jwt-library": "^3.3.2|^4.0",
+        "yaml/yaml-test-suite": "*"
     },
     "conflict": {
         "ext-psr": "<1.1|>=2",
-        "amphp/amp": "<2.5",
+        "ext-redis": "<6.1",
+        "ext-relay": "<0.12.1",
+        "amphp/amp": "<3",
         "async-aws/core": "<1.5",
         "doctrine/collections": "<1.8",
-        "doctrine/dbal": "<3.6",
-        "doctrine/orm": "<2.15",
+        "doctrine/dbal": "<4.3",
+        "doctrine/orm": "<3.4",
         "egulias/email-validator": "~3.0.0",
         "masterminds/html5": "<2.6",
-        "phpdocumentor/reflection-docblock": "<5.2",
+        "phpdocumentor/reflection-docblock": "<5.2|>=7",
         "phpdocumentor/type-resolver": "<1.5.1",
-        "phpunit/phpunit": "<7.5|9.1.2"
+        "phpunit/phpunit": "<7.5|9.1.2",
+        "symfony/flex": "<2.10"
     },
     "config": {
         "allow-plugins": {
@@ -220,13 +225,37 @@
             "url": "src/Symfony/Contracts",
             "options": {
                 "versions": {
-                    "symfony/contracts": "3.6.x-dev"
+                    "symfony/contracts": "3.7.x-dev"
                 }
             }
         },
         {
             "type": "path",
             "url": "src/Symfony/Component/Runtime"
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "jsonpath-standard/jsonpath-compliance-test-suite",
+                "version": "2025.11.23",
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/jsonpath-standard/jsonpath-compliance-test-suite.git",
+                    "reference": "b9d7153e58711ad38bb8e35ece69c13f4b2f7d63"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "yaml/yaml-test-suite",
+                "version": "2022.01.17",
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/yaml/yaml-test-suite.git",
+                    "reference": "6ad3d2c62885d82fc349026c136ef560838fdf3d"
+                }
+            }
         }
     ],
     "minimum-stability": "dev"

@@ -11,19 +11,17 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\EmojiExtension;
 
-/**
- * @requires extension intl
- */
+#[RequiresPhpExtension('intl')]
 class EmojiExtensionTest extends TestCase
 {
-    /**
-     * @testWith ["🅰️", ":a:"]
-     *           ["🅰️", ":a:", "slack"]
-     *           ["🅰", ":a:", "github"]
-     */
+    #[TestWith(['🅰️', ':a:'])]
+    #[TestWith(['🅰️', ':a:', 'slack'])]
+    #[TestWith(['🅰', ':a:', 'github'])]
     public function testEmojify(string $expected, string $string, ?string $catalog = null)
     {
         $extension = new EmojiExtension();

@@ -20,6 +20,10 @@ use Symfony\Component\Workflow\WorkflowInterface;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
+ *
+ * @template T of object
+ *
+ * @extends Event<T>
  */
 final class GuardEvent extends Event
 {
@@ -29,6 +33,9 @@ final class GuardEvent extends Event
 
     private TransitionBlockerList $transitionBlockerList;
 
+    /**
+     * @param T $subject
+     */
     public function __construct(object $subject, Marking $marking, Transition $transition, ?WorkflowInterface $workflow = null)
     {
         parent::__construct($subject, $marking, $transition, $workflow);

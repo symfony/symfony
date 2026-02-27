@@ -42,7 +42,7 @@ class CsrfTokenManager implements CsrfTokenManagerInterface
         $this->generator = $generator ?? new UriSafeTokenGenerator();
         $this->storage = $storage ?? new NativeSessionTokenStorage();
 
-        $superGlobalNamespaceGenerator = fn () => !empty($_SERVER['HTTPS']) && 'off' !== strtolower($_SERVER['HTTPS']) ? 'https-' : '';
+        $superGlobalNamespaceGenerator = static fn () => !empty($_SERVER['HTTPS']) && 'off' !== strtolower($_SERVER['HTTPS']) ? 'https-' : '';
 
         if (null === $namespace) {
             $this->namespace = $superGlobalNamespaceGenerator;

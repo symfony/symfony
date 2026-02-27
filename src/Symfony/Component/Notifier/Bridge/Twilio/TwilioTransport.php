@@ -57,7 +57,7 @@ final class TwilioTransport extends AbstractTransport
 
         $from = $message->getFrom() ?: $this->from;
 
-        if (!preg_match('/^[a-zA-Z0-9\s]{2,11}$/', $from) && !preg_match('/^\+[1-9]\d{1,14}$/', $from)) {
+        if (!preg_match('/^[a-zA-Z0-9\s]{2,11}$/', $from) && !preg_match('/^(?:whatsapp:)?\+[1-9]\d{1,14}$/', $from)) {
             throw new InvalidArgumentException(\sprintf('The "From" number "%s" is not a valid phone number, shortcode, or alphanumeric sender ID.', $from));
         }
 

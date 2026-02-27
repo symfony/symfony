@@ -11,7 +11,7 @@ return [
         'Africa/Dakar' => 'Greenwich Mean Time (Dakar)',
         'Africa/Freetown' => 'Greenwich Mean Time (Freetown)',
         'Africa/Kigali' => 'U Rwanda (Kigali)',
-        'Africa/Lome' => 'Greenwich Mean Time (Lome)',
+        'Africa/Lome' => 'Greenwich Mean Time (Lomé)',
         'Africa/Monrovia' => 'Greenwich Mean Time (Monrovia)',
         'Africa/Nouakchott' => 'Greenwich Mean Time (Nouakchott)',
         'Africa/Ouagadougou' => 'Greenwich Mean Time (Ouagadougou)',

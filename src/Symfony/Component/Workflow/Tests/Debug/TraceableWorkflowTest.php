@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Workflow\Tests\Debug;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -38,9 +39,7 @@ class TraceableWorkflowTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideFunctionNames
-     */
+    #[DataProvider('provideFunctionNames')]
     public function testCallsInner(string $function, array $args, mixed $returnValue)
     {
         $this->innerWorkflow->expects($this->once())
@@ -96,5 +95,15 @@ class TraceableWorkflowTest extends TestCase
         yield ['getEnabledTransitions', [$subject], []];
 
         yield ['getEnabledTransition', [$subject, 'foo'], null];
+    }
+
+    public function testReset()
+    {
+        $this->innerWorkflow->expects($this->once())->method('can')->willReturn(true);
+        $this->traceableWorkflow->can(new \stdClass(), 'foo');
+        $this->assertCount(1, $this->traceableWorkflow->getCalls());
+
+        $this->traceableWorkflow->reset();
+        $this->assertCount(0, $this->traceableWorkflow->getCalls());
     }
 }

@@ -11,21 +11,19 @@
 
 namespace Symfony\Component\Security\Http\Tests\AccessToken\Oidc;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\OidcUser;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcUserInfoTokenHandler;
-use Symfony\Component\Security\Http\Authenticator\FallbackUserLoader;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class OidcUserInfoTokenHandlerTest extends TestCase
 {
-    /**
-     * @dataProvider getClaims
-     */
+    #[DataProvider('getClaims')]
     public function testGetsUserIdentifierFromOidcServerResponse(string $claim, string $expected)
     {
         $accessToken = 'a-secret-token';
@@ -48,7 +46,9 @@ class OidcUserInfoTokenHandlerTest extends TestCase
         $userBadge = (new OidcUserInfoTokenHandler($clientMock, null, $claim))->getUserBadgeFrom($accessToken);
         $actualUser = $userBadge->getUserLoader()();
 
-        $this->assertEquals(new UserBadge($expected, new FallbackUserLoader(fn () => $expectedUser), $claims), $userBadge);
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
+        $this->assertSame($expected, $userBadge->getUserIdentifier());
+        $this->assertSame($claims, $userBadge->getAttributes());
         $this->assertInstanceOf(OidcUser::class, $actualUser);
         $this->assertEquals($expectedUser, $actualUser);
         $this->assertEquals($claims, $userBadge->getAttributes());

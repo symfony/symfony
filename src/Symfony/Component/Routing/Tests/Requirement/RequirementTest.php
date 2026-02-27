@@ -11,21 +11,21 @@
 
 namespace Symfony\Component\Routing\Tests\Requirement;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Routing\Route;
 
 class RequirementTest extends TestCase
 {
-    /**
-     * @testWith    ["FOO"]
-     *              ["foo"]
-     *              ["1987"]
-     *              ["42-42"]
-     *              ["fo2o-bar"]
-     *              ["foo-bA198r-Ccc"]
-     *              ["fo10O-bar-CCc-fooba187rccc"]
-     */
+    #[TestWith(['FOO'])]
+    #[TestWith(['foo'])]
+    #[TestWith(['1987'])]
+    #[TestWith(['42-42'])]
+    #[TestWith(['fo2o-bar'])]
+    #[TestWith(['foo-bA198r-Ccc'])]
+    #[TestWith(['fo10O-bar-CCc-fooba187rccc'])]
     public function testAsciiSlugOK(string $slug)
     {
         $this->assertMatchesRegularExpression(
@@ -34,16 +34,14 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["-"]
-     *              ["fôo"]
-     *              ["-FOO"]
-     *              ["foo-"]
-     *              ["-foo-"]
-     *              ["-foo-bar-"]
-     *              ["foo--bar"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['-'])]
+    #[TestWith(['fôo'])]
+    #[TestWith(['-FOO'])]
+    #[TestWith(['foo-'])]
+    #[TestWith(['-foo-'])]
+    #[TestWith(['-foo-bar-'])]
+    #[TestWith(['foo--bar'])]
     public function testAsciiSlugKO(string $slug)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -52,11 +50,9 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["foo"]
-     *              ["foo/bar/ccc"]
-     *              ["///"]
-     */
+    #[TestWith(['foo'])]
+    #[TestWith(['foo/bar/ccc'])]
+    #[TestWith(['///'])]
     public function testCatchAllOK(string $path)
     {
         $this->assertMatchesRegularExpression(
@@ -65,9 +61,7 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     */
+    #[TestWith([''])]
     public function testCatchAllKO(string $path)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -76,13 +70,11 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["0000-01-01"]
-     *              ["9999-12-31"]
-     *              ["2022-04-15"]
-     *              ["2024-02-29"]
-     *              ["1243-04-31"]
-     */
+    #[TestWith(['0000-01-01'])]
+    #[TestWith(['9999-12-31'])]
+    #[TestWith(['2022-04-15'])]
+    #[TestWith(['2024-02-29'])]
+    #[TestWith(['1243-04-31'])]
     public function testDateYmdOK(string $date)
     {
         $this->assertMatchesRegularExpression(
@@ -91,14 +83,12 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["0000-01-00"]
-     *              ["9999-00-31"]
-     *              ["2022-02-30"]
-     *              ["2022-02-31"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['foo'])]
+    #[TestWith(['0000-01-00'])]
+    #[TestWith(['9999-00-31'])]
+    #[TestWith(['2022-02-30'])]
+    #[TestWith(['2022-02-31'])]
     public function testDateYmdKO(string $date)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -107,14 +97,12 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["0"]
-     *              ["012"]
-     *              ["1"]
-     *              ["42"]
-     *              ["42198"]
-     *              ["999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"]
-     */
+    #[TestWith(['0'])]
+    #[TestWith(['012'])]
+    #[TestWith(['1'])]
+    #[TestWith(['42'])]
+    #[TestWith(['42198'])]
+    #[TestWith(['999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999'])]
     public function testDigitsOK(string $digits)
     {
         $this->assertMatchesRegularExpression(
@@ -123,12 +111,10 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["-1"]
-     *              ["3.14"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['foo'])]
+    #[TestWith(['-1'])]
+    #[TestWith(['3.14'])]
     public function testDigitsKO(string $digits)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -137,10 +123,8 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["67c8b7d295c70befc3070bf2"]
-     *              ["000000000000000000000000"]
-     */
+    #[TestWith(['67c8b7d295c70befc3070bf2'])]
+    #[TestWith(['000000000000000000000000'])]
     public function testMongoDbIdOK(string $id)
     {
         $this->assertMatchesRegularExpression(
@@ -149,12 +133,10 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["67C8b7D295C70BEFC3070BF2"]
-     *              ["67c8b7d295c70befc3070bg2"]
-     *              ["67c8b7d295c70befc3070bf2a"]
-     *              ["67c8b7d295c70befc3070bf"]
-     */
+    #[TestWith(['67C8b7D295C70BEFC3070BF2'])]
+    #[TestWith(['67c8b7d295c70befc3070bg2'])]
+    #[TestWith(['67c8b7d295c70befc3070bf2a'])]
+    #[TestWith(['67c8b7d295c70befc3070bf'])]
     public function testMongoDbIdKO(string $id)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -163,12 +145,10 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["1"]
-     *              ["42"]
-     *              ["42198"]
-     *              ["999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999"]
-     */
+    #[TestWith(['1'])]
+    #[TestWith(['42'])]
+    #[TestWith(['42198'])]
+    #[TestWith(['999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999'])]
     public function testPositiveIntOK(string $digits)
     {
         $this->assertMatchesRegularExpression(
@@ -177,14 +157,12 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["0"]
-     *              ["045"]
-     *              ["foo"]
-     *              ["-1"]
-     *              ["3.14"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['0'])]
+    #[TestWith(['045'])]
+    #[TestWith(['foo'])]
+    #[TestWith(['-1'])]
+    #[TestWith(['3.14'])]
     public function testPositiveIntKO(string $digits)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -193,12 +171,10 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["00000000000000000000000000"]
-     *              ["ZZZZZZZZZZZZZZZZZZZZZZZZZZ"]
-     *              ["01G0P4XH09KW3RCF7G4Q57ESN0"]
-     *              ["05CSACM1MS9RB9H5F61BYA146Q"]
-     */
+    #[TestWith(['00000000000000000000000000'])]
+    #[TestWith(['ZZZZZZZZZZZZZZZZZZZZZZZZZZ'])]
+    #[TestWith(['01G0P4XH09KW3RCF7G4Q57ESN0'])]
+    #[TestWith(['05CSACM1MS9RB9H5F61BYA146Q'])]
     public function testUidBase32OK(string $uid)
     {
         $this->assertMatchesRegularExpression(
@@ -207,12 +183,10 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["01G0P4XH09KW3RCF7G4Q57ESN"]
-     *              ["01G0P4XH09KW3RCF7G4Q57ESNU"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['foo'])]
+    #[TestWith(['01G0P4XH09KW3RCF7G4Q57ESN'])]
+    #[TestWith(['01G0P4XH09KW3RCF7G4Q57ESNU'])]
     public function testUidBase32KO(string $uid)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -221,12 +195,10 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["1111111111111111111111"]
-     *              ["zzzzzzzzzzzzzzzzzzzzzz"]
-     *              ["1BkPBX6T19U8TUAjBTtgwH"]
-     *              ["1fg491dt8eQpf2TU42o2bY"]
-     */
+    #[TestWith(['1111111111111111111111'])]
+    #[TestWith(['zzzzzzzzzzzzzzzzzzzzzz'])]
+    #[TestWith(['1BkPBX6T19U8TUAjBTtgwH'])]
+    #[TestWith(['1fg491dt8eQpf2TU42o2bY'])]
     public function testUidBase58OK(string $uid)
     {
         $this->assertMatchesRegularExpression(
@@ -235,12 +207,10 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["1BkPBX6T19U8TUAjBTtgw"]
-     *              ["1BkPBX6T19U8TUAjBTtgwI"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['foo'])]
+    #[TestWith(['1BkPBX6T19U8TUAjBTtgw'])]
+    #[TestWith(['1BkPBX6T19U8TUAjBTtgwI'])]
     public function testUidBase58KO(string $uid)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -249,9 +219,7 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideUidRfc4122
-     */
+    #[DataProvider('provideUidRfc4122')]
     public function testUidRfc4122OK(string $uid)
     {
         $this->assertMatchesRegularExpression(
@@ -260,9 +228,7 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideUidRfc4122KO
-     */
+    #[DataProvider('provideUidRfc4122KO')]
     public function testUidRfc4122KO(string $uid)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -271,9 +237,7 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideUidRfc4122
-     */
+    #[DataProvider('provideUidRfc4122')]
     public function testUidRfc9562OK(string $uid)
     {
         $this->assertMatchesRegularExpression(
@@ -282,9 +246,7 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideUidRfc4122KO
-     */
+    #[DataProvider('provideUidRfc4122KO')]
     public function testUidRfc9562KO(string $uid)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -310,11 +272,9 @@ class RequirementTest extends TestCase
         yield ['01802c4ec4099f07863cf025ca7766a0'];
     }
 
-    /**
-     * @testWith    ["00000000000000000000000000"]
-     *              ["7ZZZZZZZZZZZZZZZZZZZZZZZZZ"]
-     *              ["01G0P4ZPM69QTD4MM4ENAEA4EW"]
-     */
+    #[TestWith(['00000000000000000000000000'])]
+    #[TestWith(['7ZZZZZZZZZZZZZZZZZZZZZZZZZ'])]
+    #[TestWith(['01G0P4ZPM69QTD4MM4ENAEA4EW'])]
     public function testUlidOK(string $ulid)
     {
         $this->assertMatchesRegularExpression(
@@ -323,12 +283,10 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["8ZZZZZZZZZZZZZZZZZZZZZZZZZ"]
-     *              ["01G0P4ZPM69QTD4MM4ENAEA4E"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['foo'])]
+    #[TestWith(['8ZZZZZZZZZZZZZZZZZZZZZZZZZ'])]
+    #[TestWith(['01G0P4ZPM69QTD4MM4ENAEA4E'])]
     public function testUlidKO(string $ulid)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -337,15 +295,13 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["00000000-0000-1000-8000-000000000000"]
-     *              ["ffffffff-ffff-6fff-bfff-ffffffffffff"]
-     *              ["8c670a1c-bc95-11ec-8422-0242ac120002"]
-     *              ["61c86569-e477-3ed9-9e3b-1562edb03277"]
-     *              ["e55a29be-ba25-46e0-a5e5-85b78a6f9a11"]
-     *              ["bad98960-f1a1-530e-9a82-07d0b6c4e62f"]
-     *              ["1ecbc9a8-432d-6b14-af93-715adc3b830c"]
-     */
+    #[TestWith(['00000000-0000-1000-8000-000000000000'])]
+    #[TestWith(['ffffffff-ffff-6fff-bfff-ffffffffffff'])]
+    #[TestWith(['8c670a1c-bc95-11ec-8422-0242ac120002'])]
+    #[TestWith(['61c86569-e477-3ed9-9e3b-1562edb03277'])]
+    #[TestWith(['e55a29be-ba25-46e0-a5e5-85b78a6f9a11'])]
+    #[TestWith(['bad98960-f1a1-530e-9a82-07d0b6c4e62f'])]
+    #[TestWith(['1ecbc9a8-432d-6b14-af93-715adc3b830c'])]
     public function testUuidOK(string $uuid)
     {
         $this->assertMatchesRegularExpression(
@@ -354,15 +310,13 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["01802c74-d78c-b085-0cdf-7cbad87c70a3"]
-     *              ["e55a29be-ba25-46e0-a5e5-85b78a6f9a1"]
-     *              ["e55a29bh-ba25-46e0-a5e5-85b78a6f9a11"]
-     *              ["e55a29beba2546e0a5e585b78a6f9a11"]
-     *              ["21902510-bc96-21ec-8422-0242ac120002"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['foo'])]
+    #[TestWith(['01802c74-d78c-b085-0cdf-7cbad87c70a3'])]
+    #[TestWith(['e55a29be-ba25-46e0-a5e5-85b78a6f9a1'])]
+    #[TestWith(['e55a29bh-ba25-46e0-a5e5-85b78a6f9a11'])]
+    #[TestWith(['e55a29beba2546e0a5e585b78a6f9a11'])]
+    #[TestWith(['21902510-bc96-21ec-8422-0242ac120002'])]
     public function testUuidKO(string $uuid)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -371,13 +325,11 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["00000000-0000-1000-8000-000000000000"]
-     *              ["ffffffff-ffff-1fff-bfff-ffffffffffff"]
-     *              ["21902510-bc96-11ec-8422-0242ac120002"]
-     *              ["a8ff8f60-088e-1099-a09d-53afc49918d1"]
-     *              ["b0ac612c-9117-17a1-901f-53afc49918d1"]
-     */
+    #[TestWith(['00000000-0000-1000-8000-000000000000'])]
+    #[TestWith(['ffffffff-ffff-1fff-bfff-ffffffffffff'])]
+    #[TestWith(['21902510-bc96-11ec-8422-0242ac120002'])]
+    #[TestWith(['a8ff8f60-088e-1099-a09d-53afc49918d1'])]
+    #[TestWith(['b0ac612c-9117-17a1-901f-53afc49918d1'])]
     public function testUuidV1OK(string $uuid)
     {
         $this->assertMatchesRegularExpression(
@@ -386,14 +338,12 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["a3674b89-0170-3e30-8689-52939013e39c"]
-     *              ["e0040090-3cb0-4bf9-a868-407770c964f9"]
-     *              ["2e2b41d9-e08c-53d2-b435-818b9c323942"]
-     *              ["2a37b67a-5eaa-6424-b5d6-ffc9ba0f2a13"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['foo'])]
+    #[TestWith(['a3674b89-0170-3e30-8689-52939013e39c'])]
+    #[TestWith(['e0040090-3cb0-4bf9-a868-407770c964f9'])]
+    #[TestWith(['2e2b41d9-e08c-53d2-b435-818b9c323942'])]
+    #[TestWith(['2a37b67a-5eaa-6424-b5d6-ffc9ba0f2a13'])]
     public function testUuidV1KO(string $uuid)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -402,12 +352,10 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["00000000-0000-3000-8000-000000000000"]
-     *              ["ffffffff-ffff-3fff-bfff-ffffffffffff"]
-     *              ["2b3f1427-33b2-30a9-8759-07355007c204"]
-     *              ["c38e7b09-07f7-3901-843d-970b0186b873"]
-     */
+    #[TestWith(['00000000-0000-3000-8000-000000000000'])]
+    #[TestWith(['ffffffff-ffff-3fff-bfff-ffffffffffff'])]
+    #[TestWith(['2b3f1427-33b2-30a9-8759-07355007c204'])]
+    #[TestWith(['c38e7b09-07f7-3901-843d-970b0186b873'])]
     public function testUuidV3OK(string $uuid)
     {
         $this->assertMatchesRegularExpression(
@@ -416,14 +364,12 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["e24d9c0e-bc98-11ec-9924-53afc49918d1"]
-     *              ["1c240248-7d0b-41a4-9d20-61ad2915a58c"]
-     *              ["4816b668-385b-5a65-808d-bca410f45090"]
-     *              ["1d2f3104-dff6-64c6-92ff-0f74b1d0e2af"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['foo'])]
+    #[TestWith(['e24d9c0e-bc98-11ec-9924-53afc49918d1'])]
+    #[TestWith(['1c240248-7d0b-41a4-9d20-61ad2915a58c'])]
+    #[TestWith(['4816b668-385b-5a65-808d-bca410f45090'])]
+    #[TestWith(['1d2f3104-dff6-64c6-92ff-0f74b1d0e2af'])]
     public function testUuidV3KO(string $uuid)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -432,12 +378,10 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["00000000-0000-4000-8000-000000000000"]
-     *              ["ffffffff-ffff-4fff-bfff-ffffffffffff"]
-     *              ["b8f15bf4-46e2-4757-bbce-11ae83f7a6ea"]
-     *              ["eaf51230-1ce2-40f1-ab18-649212b26198"]
-     */
+    #[TestWith(['00000000-0000-4000-8000-000000000000'])]
+    #[TestWith(['ffffffff-ffff-4fff-bfff-ffffffffffff'])]
+    #[TestWith(['b8f15bf4-46e2-4757-bbce-11ae83f7a6ea'])]
+    #[TestWith(['eaf51230-1ce2-40f1-ab18-649212b26198'])]
     public function testUuidV4OK(string $uuid)
     {
         $this->assertMatchesRegularExpression(
@@ -446,14 +390,12 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["15baaab2-f310-11d2-9ecf-53afc49918d1"]
-     *              ["acd44dc8-d2cc-326c-9e3a-80a3305a25e8"]
-     *              ["7fc2705f-a8a4-5b31-99a8-890686d64189"]
-     *              ["1ecbc991-3552-6920-998e-efad54178a98"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['foo'])]
+    #[TestWith(['15baaab2-f310-11d2-9ecf-53afc49918d1'])]
+    #[TestWith(['acd44dc8-d2cc-326c-9e3a-80a3305a25e8'])]
+    #[TestWith(['7fc2705f-a8a4-5b31-99a8-890686d64189'])]
+    #[TestWith(['1ecbc991-3552-6920-998e-efad54178a98'])]
     public function testUuidV4KO(string $uuid)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -462,12 +404,10 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["00000000-0000-5000-8000-000000000000"]
-     *              ["ffffffff-ffff-5fff-bfff-ffffffffffff"]
-     *              ["49f4d32c-28b3-5802-8717-a2896180efbd"]
-     *              ["58b3c62e-a7df-5a82-93a6-fbe5fda681c1"]
-     */
+    #[TestWith(['00000000-0000-5000-8000-000000000000'])]
+    #[TestWith(['ffffffff-ffff-5fff-bfff-ffffffffffff'])]
+    #[TestWith(['49f4d32c-28b3-5802-8717-a2896180efbd'])]
+    #[TestWith(['58b3c62e-a7df-5a82-93a6-fbe5fda681c1'])]
     public function testUuidV5OK(string $uuid)
     {
         $this->assertMatchesRegularExpression(
@@ -476,14 +416,12 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["b99ad578-fdd3-1135-9d3b-53afc49918d1"]
-     *              ["b3ee3071-7a2b-3e17-afdf-6b6aec3acf85"]
-     *              ["2ab4f5a7-6412-46c1-b3ab-1fe1ed391e27"]
-     *              ["135fdd3d-e193-653e-865d-67e88cf12e44"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['foo'])]
+    #[TestWith(['b99ad578-fdd3-1135-9d3b-53afc49918d1'])]
+    #[TestWith(['b3ee3071-7a2b-3e17-afdf-6b6aec3acf85'])]
+    #[TestWith(['2ab4f5a7-6412-46c1-b3ab-1fe1ed391e27'])]
+    #[TestWith(['135fdd3d-e193-653e-865d-67e88cf12e44'])]
     public function testUuidV5KO(string $uuid)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -492,13 +430,11 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["00000000-0000-6000-8000-000000000000"]
-     *              ["ffffffff-ffff-6fff-bfff-ffffffffffff"]
-     *              ["2c51caad-c72f-66b2-b6d7-8766d36c73df"]
-     *              ["17941ebb-48fa-6bfe-9bbd-43929f8784f5"]
-     *              ["1ecbc993-f6c2-67f2-8fbe-295ed594b344"]
-     */
+    #[TestWith(['00000000-0000-6000-8000-000000000000'])]
+    #[TestWith(['ffffffff-ffff-6fff-bfff-ffffffffffff'])]
+    #[TestWith(['2c51caad-c72f-66b2-b6d7-8766d36c73df'])]
+    #[TestWith(['17941ebb-48fa-6bfe-9bbd-43929f8784f5'])]
+    #[TestWith(['1ecbc993-f6c2-67f2-8fbe-295ed594b344'])]
     public function testUuidV6OK(string $uuid)
     {
         $this->assertMatchesRegularExpression(
@@ -507,14 +443,12 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["821040f4-7b67-12a3-9770-53afc49918d1"]
-     *              ["802dc245-aaaa-3649-98c6-31c549b0df86"]
-     *              ["92d2e5ad-bc4e-4947-a8d9-77706172ca83"]
-     *              ["6e124559-d260-511e-afdc-e57c7025fed0"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['foo'])]
+    #[TestWith(['821040f4-7b67-12a3-9770-53afc49918d1'])]
+    #[TestWith(['802dc245-aaaa-3649-98c6-31c549b0df86'])]
+    #[TestWith(['92d2e5ad-bc4e-4947-a8d9-77706172ca83'])]
+    #[TestWith(['6e124559-d260-511e-afdc-e57c7025fed0'])]
     public function testUuidV6KO(string $uuid)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -523,11 +457,9 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["00000000-0000-7000-8000-000000000000"]
-     *              ["ffffffff-ffff-7fff-bfff-ffffffffffff"]
-     *              ["01910577-4898-7c47-966e-68d127dde2ac"]
-     */
+    #[TestWith(['00000000-0000-7000-8000-000000000000'])]
+    #[TestWith(['ffffffff-ffff-7fff-bfff-ffffffffffff'])]
+    #[TestWith(['01910577-4898-7c47-966e-68d127dde2ac'])]
     public function testUuidV7OK(string $uuid)
     {
         $this->assertMatchesRegularExpression(
@@ -536,14 +468,12 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["15baaab2-f310-11d2-9ecf-53afc49918d1"]
-     *              ["acd44dc8-d2cc-326c-9e3a-80a3305a25e8"]
-     *              ["7fc2705f-a8a4-5b31-99a8-890686d64189"]
-     *              ["1ecbc991-3552-6920-998e-efad54178a98"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['foo'])]
+    #[TestWith(['15baaab2-f310-11d2-9ecf-53afc49918d1'])]
+    #[TestWith(['acd44dc8-d2cc-326c-9e3a-80a3305a25e8'])]
+    #[TestWith(['7fc2705f-a8a4-5b31-99a8-890686d64189'])]
+    #[TestWith(['1ecbc991-3552-6920-998e-efad54178a98'])]
     public function testUuidV7KO(string $uuid)
     {
         $this->assertDoesNotMatchRegularExpression(
@@ -552,11 +482,9 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    ["00000000-0000-8000-8000-000000000000"]
-     *              ["ffffffff-ffff-8fff-bfff-ffffffffffff"]
-     *              ["01910577-4898-8c47-966e-68d127dde2ac"]
-     */
+    #[TestWith(['00000000-0000-8000-8000-000000000000'])]
+    #[TestWith(['ffffffff-ffff-8fff-bfff-ffffffffffff'])]
+    #[TestWith(['01910577-4898-8c47-966e-68d127dde2ac'])]
     public function testUuidV8OK(string $uuid)
     {
         $this->assertMatchesRegularExpression(
@@ -565,14 +493,12 @@ class RequirementTest extends TestCase
         );
     }
 
-    /**
-     * @testWith    [""]
-     *              ["foo"]
-     *              ["15baaab2-f310-11d2-9ecf-53afc49918d1"]
-     *              ["acd44dc8-d2cc-326c-9e3a-80a3305a25e8"]
-     *              ["7fc2705f-a8a4-5b31-99a8-890686d64189"]
-     *              ["1ecbc991-3552-6920-998e-efad54178a98"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['foo'])]
+    #[TestWith(['15baaab2-f310-11d2-9ecf-53afc49918d1'])]
+    #[TestWith(['acd44dc8-d2cc-326c-9e3a-80a3305a25e8'])]
+    #[TestWith(['7fc2705f-a8a4-5b31-99a8-890686d64189'])]
+    #[TestWith(['1ecbc991-3552-6920-998e-efad54178a98'])]
     public function testUuidV8KO(string $uuid)
     {
         $this->assertDoesNotMatchRegularExpression(

@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\TypeInfo\Tests\TypeResolver;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\InvalidArgumentException;
 use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyBackedEnum;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyBackedEnumInterface;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyEnum;
 use Symfony\Component\TypeInfo\Tests\Fixtures\ReflectionExtractableDummy;
 use Symfony\Component\TypeInfo\Type;
@@ -33,9 +35,7 @@ class ReflectionTypeResolverTest extends TestCase
         $this->resolver = new ReflectionTypeResolver();
     }
 
-    /**
-     * @dataProvider resolveDataProvider
-     */
+    #[DataProvider('resolveDataProvider')]
     public function testResolve(Type $expectedType, \ReflectionType $reflection, ?TypeContext $typeContext = null)
     {
         $this->assertEquals($expectedType, $this->resolver->resolve($reflection, $typeContext));
@@ -67,6 +67,7 @@ class ReflectionTypeResolverTest extends TestCase
         yield [Type::nullable(Type::enum(DummyEnum::class)), $reflection->getProperty('nullableEnum')->getType()];
         yield [Type::enum(DummyBackedEnum::class), $reflection->getProperty('backedEnum')->getType()];
         yield [Type::nullable(Type::enum(DummyBackedEnum::class)), $reflection->getProperty('nullableBackedEnum')->getType()];
+        yield [Type::object(DummyBackedEnumInterface::class), $reflection->getProperty('backedEnumInterface')->getType()];
         yield [Type::union(Type::int(), Type::string()), $reflection->getProperty('union')->getType()];
         yield [Type::intersection(Type::object(\Traversable::class), Type::object(\Stringable::class)), $reflection->getProperty('intersection')->getType()];
     }

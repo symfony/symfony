@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -20,9 +21,7 @@ class ConstraintValidatorTest extends TestCase
 {
     use IcuCompatibilityTrait;
 
-    /**
-     * @dataProvider formatValueProvider
-     */
+    #[DataProvider('formatValueProvider')]
     public function testFormatValue(string $expected, mixed $value, int $format = 0)
     {
         \Locale::setDefault('en');

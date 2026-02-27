@@ -24,7 +24,7 @@ class ImportMapUpdateChecker
         private readonly ImportMapConfigReader $importMapConfigReader,
         ?HttpClientInterface $httpClient = null,
     ) {
-        $this->httpClient = $httpClient ?? HttpClient::create();
+        $this->httpClient = new BatchHttpClient($httpClient ?? HttpClient::create());
     }
 
     /**

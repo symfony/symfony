@@ -92,6 +92,13 @@
                 </span>
             </div>
 
+            {% if collector.runnerClass is defined and collector.runnerClass is not null %}
+                <div class="sf-toolbar-info-piece sf-toolbar-info-runner">
+                    <b>Runner</b>
+                    <span>{{ collector.runnerClass|abbr_class }}</span>
+                </div>
+            {% endif %}
+
             {% if 'n/a' is not same as(collector.env) %}
                 <div class="sf-toolbar-info-piece">
                     <b>Environment</b>
@@ -118,13 +125,15 @@
 
             <div class="sf-toolbar-info-piece sf-toolbar-info-php-ext">
                 <b>PHP Extensions</b>
-                {% if collector.hasXdebugInfo %}
-                    <a href="{{ path('_profiler_xdebug') }}" title="View xdebug_info()">
-                {% endif %}
-                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasXdebug ? 'green' : 'gray' }}">Xdebug {{ collector.hasXdebug ? '✓' : '✗' }}</span>
-                {% if collector.hasXdebugInfo %}
-                    </a>
-                {% endif %}
+                <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasXdebug ? 'green' : 'gray' }}">
+                    {% if collector.hasXdebugInfo %}
+                        <a href="{{ path('_profiler_xdebug') }}" title="View xdebug_info()">
+                    {% endif %}
+                    Xdebug {{ collector.hasXdebug ? '✓' : '✗' }}
+                    {% if collector.hasXdebugInfo %}
+                        </a>
+                    {% endif %}
+                </span>
                 <span class="sf-toolbar-status sf-toolbar-status-{{ collector.hasapcu ? 'green' : 'gray' }}">APCu {{ collector.hasapcu ? '✓' : '✗' }}</span>
                 <span class="sf-toolbar-status sf-toolbar-status-{{ collector.haszendopcache ? 'green' : 'red' }}">OPcache {{ collector.haszendopcache ? '✓' : '✗' }}</span>
             </div>
@@ -157,7 +166,7 @@
         </div>
     {% endset %}
 
-    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: true, name: 'config', status: block_status, additional_classes: 'sf-toolbar-block-right' }) }}
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', {link: true, name: 'config', status: block_status, additional_classes: 'sf-toolbar-block-right'}) }}
 {% endblock %}
 
 {% block menu %}
@@ -169,6 +178,15 @@
 
 {% block panel %}
     <h2>Symfony Configuration</h2>
+
+    {% if collector.runnerClass is defined and collector.runnerClass is not null %}
+        <div class="metrics">
+            <div class="metric">
+                <span class="value">{{ collector.runnerClass|abbr_class }}</span>
+                <span class="label">Runner</span>
+            </div>
+        </div>
+    {% endif %}
 
     <div class="metrics">
         <div class="metric">
@@ -197,8 +215,8 @@
         {% endif %}
     </div>
 
-    {% set symfony_status = { dev: 'In Development', stable: 'Maintained', eom: 'Security Fixes Only', eol: 'Unmaintained' } %}
-    {% set symfony_status_class = { dev: 'warning', stable: 'success', eom: 'warning', eol: 'error' } %}
+    {% set symfony_status = {dev: 'In Development', stable: 'Maintained', eom: 'Security Fixes Only', eol: 'Unmaintained'} %}
+    {% set symfony_status_class = {dev: 'warning', stable: 'success', eom: 'warning', eol: 'error'} %}
 
     <div class="metrics">
         <div class="metric-group">
@@ -268,8 +286,14 @@
             </div>
 
             <div class="metric">
+                {% if collector.hasXdebugInfo %}
+                    <a href="{{ path('_profiler_xdebug') }}" title="View xdebug_info()" class="link">
+                {% endif %}
                 <span class="value value-is-icon {{ not collector.hasxdebug ? 'value-shows-no-color' }}" title="{{ collector.xdebugstatus|default('') }}">{{ source('@WebProfiler/Icon/' ~ (collector.hasxdebug ? 'yes' : 'no') ~ '.svg') }}</span>
                 <span class="label">Xdebug</span>
+                {% if collector.hasXdebugInfo %}
+                    </a>
+                {% endif %}
             </div>
         </div>
     </div>

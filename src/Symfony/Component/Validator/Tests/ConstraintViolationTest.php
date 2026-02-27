@@ -30,9 +30,9 @@ class ConstraintViolationTest extends TestCase
         );
 
         $expected = <<<'EOF'
-Root.property.path:
-    Array
-EOF;
+            Root.property.path:
+                Array
+            EOF;
 
         $this->assertSame($expected, (string) $violation);
     }
@@ -49,9 +49,9 @@ EOF;
         );
 
         $expected = <<<'EOF'
-Array.some_value:
-    42 cannot be used here
-EOF;
+            Array.some_value:
+                42 cannot be used here
+            EOF;
 
         $this->assertSame($expected, (string) $violation);
     }
@@ -70,9 +70,9 @@ EOF;
         );
 
         $expected = <<<'EOF'
-Array.some_value:
-    42 cannot be used here (code 0)
-EOF;
+            Array.some_value:
+                42 cannot be used here (code 0)
+            EOF;
 
         $this->assertSame($expected, (string) $violation);
     }
@@ -80,9 +80,9 @@ EOF;
     public function testToStringOmitsEmptyCodes()
     {
         $expected = <<<'EOF'
-Array.some_value:
-    42 cannot be used here
-EOF;
+            Array.some_value:
+                42 cannot be used here
+            EOF;
 
         $violation = new ConstraintViolation(
             '42 cannot be used here',
@@ -124,9 +124,9 @@ EOF;
         );
 
         $expected = <<<'EOF'
-Root.property.path:
-    toString
-EOF;
+            Root.property.path:
+                toString
+            EOF;
         $this->assertSame($expected, (string) $violation);
         $this->assertSame($message, $violation->getMessage());
     }

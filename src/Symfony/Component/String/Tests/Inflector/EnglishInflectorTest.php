@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\String\Tests\Inflector;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\Inflector\EnglishInflector;
 
@@ -103,6 +104,7 @@ class EnglishInflectorTest extends TestCase
             ['indices', ['index', 'indix', 'indice']],
             ['ions', 'ion'],
             ['irises', ['iris', 'irise', 'irisis']],
+            ['issues', 'issue'],
             ['kisses', 'kiss'],
             ['knives', 'knife'],
             ['lamps', 'lamp'],
@@ -122,8 +124,10 @@ class EnglishInflectorTest extends TestCase
             ['nebulae', 'nebula'],
             ['neuroses', ['neuros', 'neurose', 'neurosis']],
             ['news', 'news'],
+            ['nodes', 'node'],
             ['oases', ['oas', 'oase', 'oasis']],
             ['objectives', 'objective'],
+            ['outages', 'outage'],
             ['oxen', 'ox'],
             ['parties', 'party'],
             ['people', 'person'],
@@ -168,16 +172,15 @@ class EnglishInflectorTest extends TestCase
             ['waltzes', ['waltz', 'waltze']],
             ['wives', 'wife'],
             ['zombies', 'zombie'],
+            ['passersby', 'passerby'],
+            ['rattles', 'rattle'],
+            ['insignia', 'insigne'],
+            ['insignias', 'insigne'],
 
             // test casing: if the first letter was uppercase, it should remain so
             ['Men', 'Man'],
             ['GrandChildren', 'GrandChild'],
             ['SubTrees', 'SubTree'],
-
-            // Known issues
-            // ['insignia', 'insigne'],
-            // ['insignias', 'insigne'],
-            // ['rattles', 'rattle'],
         ];
     }
 
@@ -259,8 +262,10 @@ class EnglishInflectorTest extends TestCase
             ['house', 'houses'],
             ['icon', 'icons'],
             ['index', ['indicies', 'indexes']],
+            ['insigne', ['insignia', 'insignias']],
             ['ion', 'ions'],
             ['iris', 'irises'],
+            ['issue', 'issues'],
             ['kiss', 'kisses'],
             ['knife', 'knives'],
             ['lamp', 'lamps'],
@@ -278,10 +283,12 @@ class EnglishInflectorTest extends TestCase
             ['nebula', 'nebulae'],
             ['neurosis', 'neuroses'],
             ['news', 'news'],
+            ['node', 'nodes'],
             ['oasis', 'oases'],
             ['objective', 'objectives'],
             ['ox', 'oxen'],
             ['party', 'parties'],
+            ['passerby', 'passersby'],
             ['person', ['persons', 'people']],
             ['phenomenon', 'phenomena'],
             ['photo', 'photos'],
@@ -293,6 +300,7 @@ class EnglishInflectorTest extends TestCase
             ['quiz', 'quizzes'],
             ['quorum', ['quora', 'quorums']],
             ['radius', 'radii'],
+            ['rattle', 'rattles'],
             ['roof', ['roofs', 'rooves']],
             ['rose', 'roses'],
             ['sandwich', 'sandwiches'],
@@ -333,17 +341,13 @@ class EnglishInflectorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider singularizeProvider
-     */
+    #[DataProvider('singularizeProvider')]
     public function testSingularize(string $plural, $singular)
     {
         $this->assertSame(\is_array($singular) ? $singular : [$singular], (new EnglishInflector())->singularize($plural));
     }
 
-    /**
-     * @dataProvider pluralizeProvider
-     */
+    #[DataProvider('pluralizeProvider')]
     public function testPluralize(string $singular, $plural)
     {
         $this->assertSame(\is_array($plural) ? $plural : [$plural], (new EnglishInflector())->pluralize($singular));

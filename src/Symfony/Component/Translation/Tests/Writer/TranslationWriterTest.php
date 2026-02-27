@@ -13,6 +13,8 @@ namespace Symfony\Component\Translation\Tests\Writer;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Dumper\DumperInterface;
+use Symfony\Component\Translation\Dumper\XliffFileDumper;
+use Symfony\Component\Translation\Dumper\YamlFileDumper;
 use Symfony\Component\Translation\Exception\InvalidArgumentException;
 use Symfony\Component\Translation\Exception\RuntimeException;
 use Symfony\Component\Translation\MessageCatalogue;
@@ -35,8 +37,8 @@ class TranslationWriterTest extends TestCase
     public function testGetFormats()
     {
         $writer = new TranslationWriter();
-        $writer->addDumper('foo', $this->createMock(DumperInterface::class));
-        $writer->addDumper('bar', $this->createMock(DumperInterface::class));
+        $writer->addDumper('foo', new YamlFileDumper());
+        $writer->addDumper('bar', new XliffFileDumper());
 
         $this->assertEquals(['foo', 'bar'], $writer->getFormats());
     }
@@ -53,7 +55,7 @@ class TranslationWriterTest extends TestCase
     public function testUnwritableDirectory()
     {
         $writer = new TranslationWriter();
-        $writer->addDumper('foo', $this->createMock(DumperInterface::class));
+        $writer->addDumper('foo', new YamlFileDumper());
 
         $path = tempnam(sys_get_temp_dir(), '');
         file_put_contents($path, '');

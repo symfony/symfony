@@ -634,6 +634,10 @@ return [
             'EC$',
             'Sharqiy Karib dollari',
         ],
+        'XCG' => [
+            'Cg.',
+            'Karib guldeni',
+        ],
         'XOF' => [
             'F CFA',
             'G‘arbiy Afrika CFA franki',
@@ -653,6 +657,10 @@ return [
         'ZMW' => [
             'ZMW',
             'Zambiya kvachasi',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'Zimbabve oltini',
         ],
     ],
 ];

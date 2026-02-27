@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,9 +20,7 @@ use Symfony\Component\Security\Http\EventListener\ClearSiteDataLogoutListener;
 
 class ClearSiteDataLogoutListenerTest extends TestCase
 {
-    /**
-     * @dataProvider provideClearSiteDataConfig
-     */
+    #[DataProvider('provideClearSiteDataConfig')]
     public function testLogout(array $clearSiteDataConfig, string $expectedHeader)
     {
         $response = new Response();
@@ -44,5 +43,6 @@ class ClearSiteDataLogoutListenerTest extends TestCase
     {
         yield [['*'], '"*"'];
         yield [['cache', 'cookies', 'storage', 'executionContexts'], '"cache", "cookies", "storage", "executionContexts"'];
+        yield [['clientHints', 'executionContexts', 'prefetchCache', 'prerenderCache'], '"clientHints", "executionContexts", "prefetchCache", "prerenderCache"'];
     }
 }

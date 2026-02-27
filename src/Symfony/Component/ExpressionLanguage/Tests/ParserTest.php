@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Lexer;
 use Symfony\Component\ExpressionLanguage\Node;
@@ -59,9 +60,7 @@ class ParserTest extends TestCase
         $parser->parse($tokenized);
     }
 
-    /**
-     * @dataProvider getParseData
-     */
+    #[DataProvider('getParseData')]
     public function testParse($node, $expression, $names = [])
     {
         $lexer = new Lexer();
@@ -186,6 +185,11 @@ class ParserTest extends TestCase
                 ['foo'],
             ],
             [
+                new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode(0), new Node\ArgumentsNode(), Node\GetAttrNode::ARRAY_CALL, true),
+                'foo?.[0]',
+                ['foo'],
+            ],
+            [
                 new Node\NullCoalesceNode(new Node\GetAttrNode(new Node\NameNode('foo'), new Node\ConstantNode('bar', true), new Node\ArgumentsNode(), Node\GetAttrNode::PROPERTY_CALL), new Node\ConstantNode('default')),
                 'foo.bar ?? "default"',
                 ['foo'],
@@ -269,9 +273,7 @@ class ParserTest extends TestCase
         return new Node\GetAttrNode($node, new Node\ConstantNode($item, Node\GetAttrNode::ARRAY_CALL !== $type), new Node\ArgumentsNode(), $type);
     }
 
-    /**
-     * @dataProvider getInvalidPostfixData
-     */
+    #[DataProvider('getInvalidPostfixData')]
     public function testParseWithInvalidPostfixData($expr, $names = [])
     {
         $this->expectException(SyntaxError::class);
@@ -312,9 +314,7 @@ class ParserTest extends TestCase
         $parser->parse($lexer->tokenize('foo > bar'), ['foo', 'baz']);
     }
 
-    /**
-     * @dataProvider getLintData
-     */
+    #[DataProvider('getLintData')]
     public function testLint($expression, $names, int $checks = 0, ?string $exception = null)
     {
         if ($exception) {
@@ -326,7 +326,7 @@ class ParserTest extends TestCase
         $parser = new Parser([]);
         $parser->lint($lexer->tokenize($expression), $names, $checks);
 
-        // Parser does't return anything when the correct expression is passed
+        // Parser doesn't return anything when the correct expression is passed
         $this->expectNotToPerformAssertions();
     }
 

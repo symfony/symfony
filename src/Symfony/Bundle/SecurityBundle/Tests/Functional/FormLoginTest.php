@@ -11,11 +11,12 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+
 class FormLoginTest extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider provideClientOptions
-     */
+    #[DataProvider('provideClientOptions')]
     public function testFormLogin(array $options)
     {
         $client = $this->createClient($options);
@@ -32,9 +33,7 @@ class FormLoginTest extends AbstractWebTestCase
         $this->assertStringContainsString('You\'re browsing to path "/profile".', $text);
     }
 
-    /**
-     * @dataProvider provideClientOptions
-     */
+    #[DataProvider('provideClientOptions')]
     public function testFormLogout(array $options)
     {
         $client = $this->createClient($options);
@@ -65,9 +64,7 @@ class FormLoginTest extends AbstractWebTestCase
         $this->assertSame($logoutLinks[1]->getUri(), $logoutLinks[5]->getUri());
     }
 
-    /**
-     * @dataProvider provideClientOptions
-     */
+    #[DataProvider('provideClientOptions')]
     public function testFormLoginWithCustomTargetPath(array $options)
     {
         $client = $this->createClient($options);
@@ -85,9 +82,7 @@ class FormLoginTest extends AbstractWebTestCase
         $this->assertStringContainsString('You\'re browsing to path "/foo".', $text);
     }
 
-    /**
-     * @dataProvider provideClientOptions
-     */
+    #[DataProvider('provideClientOptions')]
     public function testFormLoginRedirectsToProtectedResourceAfterLogin(array $options)
     {
         $client = $this->createClient($options);
@@ -106,9 +101,7 @@ class FormLoginTest extends AbstractWebTestCase
         $this->assertStringContainsString('You\'re browsing to path "/protected_resource".', $text);
     }
 
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testLoginThrottling()
     {
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'login_throttling.yml']);

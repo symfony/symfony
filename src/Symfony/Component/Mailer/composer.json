@@ -16,26 +16,22 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "egulias/email-validator": "^2.1.10|^3|^4",
         "psr/event-dispatcher": "^1",
         "psr/log": "^1|^2|^3",
-        "symfony/event-dispatcher": "^6.4|^7.0",
-        "symfony/mime": "^7.2",
+        "symfony/event-dispatcher": "^7.4|^8.0",
+        "symfony/mime": "^7.4|^8.0",
         "symfony/service-contracts": "^2.5|^3"
     },
     "require-dev": {
-        "symfony/console": "^6.4|^7.0",
-        "symfony/http-client": "^6.4|^7.0",
-        "symfony/messenger": "^6.4|^7.0",
-        "symfony/twig-bridge": "^6.4|^7.0"
+        "symfony/console": "^7.4|^8.0",
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/messenger": "^7.4|^8.0",
+        "symfony/twig-bridge": "^7.4|^8.0"
     },
     "conflict": {
-        "symfony/http-client-contracts": "<2.5",
-        "symfony/http-kernel": "<6.4",
-        "symfony/messenger": "<6.4",
-        "symfony/mime": "<6.4",
-        "symfony/twig-bridge": "<6.4"
+        "symfony/http-client-contracts": "<2.5"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Mailer\\": "" },

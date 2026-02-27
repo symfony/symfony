@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Transport\FailoverTransport;
@@ -18,9 +19,7 @@ use Symfony\Component\Mailer\Transport\RoundRobinTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mime\RawMessage;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class FailoverTransportTest extends TestCase
 {
     public function testSendNoTransports()
@@ -84,11 +83,11 @@ class FailoverTransportTest extends TestCase
 
     public function testSendOneDeadAndRecoveryWithinRetryPeriod()
     {
-        $t1 = $this->createMock(TransportInterface::class);
+        $t1 = $this->createStub(TransportInterface::class);
 
-        $t1->expects($this->any())
+        $t1
             ->method('send')
-            ->willReturnCallback(function () {
+            ->willReturnCallback(static function () {
                 static $call = 0;
 
                 if (1 === ++$call) {
@@ -101,7 +100,7 @@ class FailoverTransportTest extends TestCase
         $t2 = $this->createMock(TransportInterface::class);
         $t2->expects($this->exactly(4))
             ->method('send')
-            ->willReturnCallback(function () {
+            ->willReturnCallback(static function () {
                 static $call = 0;
 
                 if (4 === ++$call) {
@@ -136,7 +135,7 @@ class FailoverTransportTest extends TestCase
         $t2 = $this->createMock(TransportInterface::class);
         $t2->expects($this->exactly(3))
             ->method('send')
-            ->willReturnCallback(function () {
+            ->willReturnCallback(static function () {
                 static $call = 0;
 
                 if (3 === ++$call) {
@@ -157,8 +156,8 @@ class FailoverTransportTest extends TestCase
 
     public function testSendOneDeadButRecover()
     {
-        $t1 = $this->createMock(TransportInterface::class);
-        $t1->expects($this->any())->method('send')->willReturnCallback(function () {
+        $t1 = $this->createStub(TransportInterface::class);
+        $t1->method('send')->willReturnCallback(static function () {
             static $call = 0;
 
             if (1 === ++$call) {
@@ -171,7 +170,7 @@ class FailoverTransportTest extends TestCase
         $t2 = $this->createMock(TransportInterface::class);
         $t2->expects($this->exactly(3))
             ->method('send')
-            ->willReturnCallback(function () {
+            ->willReturnCallback(static function () {
                 static $call = 0;
 
                 if (3 === ++$call) {

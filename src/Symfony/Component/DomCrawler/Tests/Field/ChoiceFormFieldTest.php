@@ -112,6 +112,24 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         }
     }
 
+    public function testAddChoiceToSingleSelect()
+    {
+        $node = $this->createSelectNode(['foo' => false, 'bar' => false]);
+        $field = new ChoiceFormField($node);
+
+        $option = $this->createNode('option', 'Hello World', ['value' => 'hello_world']);
+        $field->addChoice($option);
+
+        $this->assertNotSame('hello_world', $field->getValue());
+        $field->setValue('hello_world');
+        $this->assertSame('hello_world', $field->getValue(), '->setValue() changes the selected option to dynamically added one');
+
+        $option = $this->createNode('option', 'Mr. Robot', ['value' => 'mr_robot', 'selected' => true]);
+        $field->addChoice($option);
+
+        $this->assertSame('mr_robot', $field->getValue(), '->addChoice() changes the value to added choice if selected attribute is set');
+    }
+
     public function testSelectWithEmptyBooleanAttribute()
     {
         $node = $this->createSelectNode(['foo' => false, 'bar' => true], [], '');

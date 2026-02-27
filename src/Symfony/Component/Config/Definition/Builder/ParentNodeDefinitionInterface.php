@@ -20,6 +20,8 @@ interface ParentNodeDefinitionInterface extends BuilderAwareInterface
 {
     /**
      * Returns a builder to add children nodes.
+     *
+     * @return NodeBuilder<static>
      */
     public function children(): NodeBuilder;
 
@@ -43,7 +45,7 @@ interface ParentNodeDefinitionInterface extends BuilderAwareInterface
     /**
      * Gets the child node definitions.
      *
-     * @return NodeDefinition[]
+     * @return NodeDefinition<static>[]
      */
     public function getChildNodeDefinitions(): array;
 }

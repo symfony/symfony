@@ -61,23 +61,23 @@
             </trans-unit>
             <trans-unit id="13">
                 <source>This value is not a valid email address.</source>
-                <target>Kjo vlerë nuk është adresë email-i e vlefshme.</target>
+                <target>Kjo vlerë nuk është email adresë e vlefshme.</target>
             </trans-unit>
             <trans-unit id="14">
                 <source>The file could not be found.</source>
-                <target>Skeda nuk u gjet.</target>
+                <target>Fajli nuk u gjet.</target>
             </trans-unit>
             <trans-unit id="15">
                 <source>The file is not readable.</source>
-                <target>Skeda nuk është e lexueshme.</target>
+                <target>Fajli nuk është e lexueshme.</target>
             </trans-unit>
             <trans-unit id="16">
                 <source>The file is too large ({{ size }} {{ suffix }}). Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>Skeda është shumë e madhe ({{ size }} {{ suffix }}). Madhësia maksimale e lejuar është {{ limit }} {{ suffix }}.</target>
+                <target>Fajli është shumë e madhe ({{ size }} {{ suffix }}). Madhësia maksimale e lejuar është {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="17">
                 <source>The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.</source>
-                <target>Lloji “mime” i skedës është i pavlefshëm ({{ type }}). Llojet “mime” të lejuara janë {{ types }}.</target>
+                <target>Lloji “mime” i fajlit është i pavlefshëm ({{ type }}). Llojet “mime” të lejuara janë {{ types }}.</target>
             </trans-unit>
             <trans-unit id="18">
                 <source>This value should be {{ limit }} or less.</source>
@@ -125,15 +125,15 @@
             </trans-unit>
             <trans-unit id="32">
                 <source>The file is too large. Allowed maximum size is {{ limit }} {{ suffix }}.</source>
-                <target>Kjo skedë është shumë e madhe. Madhësia maksimale e lejuar është {{ limit }} {{ suffix }}.</target>
+                <target>Ky fajl është shumë i madhë. Madhësia maksimale e lejuar është {{ limit }} {{ suffix }}.</target>
             </trans-unit>
             <trans-unit id="33">
                 <source>The file is too large.</source>
-                <target>Kjo skedë është shumë e madhe.</target>
+                <target>Ky fajl është shumë i madhë.</target>
             </trans-unit>
             <trans-unit id="34">
                 <source>The file could not be uploaded.</source>
-                <target>Kjo skedë nuk mund të ngarkohet.</target>
+                <target>Ky fajl nuk mund të ngarkohet.</target>
             </trans-unit>
             <trans-unit id="35">
                 <source>This value should be a valid number.</source>
@@ -141,7 +141,7 @@
             </trans-unit>
             <trans-unit id="36">
                 <source>This file is not a valid image.</source>
-                <target>Kjo skedë nuk është një imazh i vlefshëm.</target>
+                <target>Ky fajl nuk është një imazh i vlefshëm.</target>
             </trans-unit>
             <trans-unit id="37" resname="This is not a valid IP address.">
                 <source>This value is not a valid IP address.</source>
@@ -193,19 +193,19 @@
             </trans-unit>
             <trans-unit id="49">
                 <source>The file was only partially uploaded.</source>
-                <target>Kjo skedë është ngarkuar pjesërisht.</target>
+                <target>Ky fajl është ngarkuar pjesërisht.</target>
             </trans-unit>
             <trans-unit id="50">
                 <source>No file was uploaded.</source>
-                <target>Nuk është ngarkuar ndonjë skedë.</target>
+                <target>Nuk është ngarkuar ndonjë fajl.</target>
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target>Nuk është konfiguruar asnjë skedar i përkohshëm në php.ini, ose skedari i konfiguruar nuk ekziston.</target>
+                <target>Nuk është konfiguruar asnjë dosje e përkohshëm në php.ini, ose dosja e konfiguruar nuk ekziston.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
-                <target>Nuk mund të shkruhet skeda e përkohshme në disk.</target>
+                <target>Nuk mund të shkruhet fajli e përkohshme në disk.</target>
             </trans-unit>
             <trans-unit id="53">
                 <source>A PHP extension caused the upload to fail.</source>
@@ -229,7 +229,7 @@
             </trans-unit>
             <trans-unit id="58">
                 <source>Unsupported card type or invalid card number.</source>
-                <target>Lloj karte i papranuar ose numër karte i pavlefshëm.</target>
+                <target>Lloji i kartës i papërkrahur ose numër kartës i pavlefshëm.</target>
             </trans-unit>
             <trans-unit id="59" resname="This is not a valid International Bank Account Number (IBAN).">
                 <source>This value is not a valid International Bank Account Number (IBAN).</source>
@@ -309,7 +309,7 @@
             </trans-unit>
             <trans-unit id="78">
                 <source>An empty file is not allowed.</source>
-                <target>Një skedë e zbrazët nuk lejohet.</target>
+                <target>Një fajl i zbrazët nuk lejohet.</target>
             </trans-unit>
             <trans-unit id="79">
                 <source>The host could not be resolved.</source>
@@ -413,7 +413,7 @@
             </trans-unit>
             <trans-unit id="104">
                 <source>The filename is too long. It should have {{ filename_max_length }} character or less.|The filename is too long. It should have {{ filename_max_length }} characters or less.</source>
-                <target>Emri i skedës është shumë i gjatë. Duhet të ketë maksimumi {{ filename_max_length }} karakter ose më pak.|Emri i skedës është shumë i gjatë. Duhet të ketë maksimumi {{ filename_max_length }} karaktere ose më pak.</target>
+                <target>Emri i fajlit është shumë i gjatë. Duhet të ketë maksimumi {{ filename_max_length }} karakter ose më pak.|Emri i fajlit është shumë i gjatë. Duhet të ketë maksimumi {{ filename_max_length }} karaktere ose më pak.</target>
             </trans-unit>
             <trans-unit id="105">
                 <source>The password strength is too low. Please use a stronger password.</source>
@@ -437,7 +437,7 @@
             </trans-unit>
             <trans-unit id="110">
                 <source>The extension of the file is invalid ({{ extension }}). Allowed extensions are {{ extensions }}.</source>
-                <target>Shtesa e skedarit është e pavlefshme ({{ extension }}). Shtesat e lejuara janë {{ extensions }}.</target>
+                <target>Shtesa e fajlit është e pavlefshme ({{ extension }}). Shtesat e lejuara janë {{ extensions }}.</target>
             </trans-unit>
             <trans-unit id="111">
                 <source>The detected character encoding is invalid ({{ detected }}). Allowed encodings are {{ encodings }}.</source>
@@ -449,7 +449,7 @@
             </trans-unit>
             <trans-unit id="113">
                 <source>This URL is missing a top-level domain.</source>
-                <target state="needs-review-translation">Kësaj URL i mungon një domain i nivelit të lartë.</target>
+                <target>Kësaj URL-je i mungon një domain i nivelit të sipërm.</target>
             </trans-unit>
             <trans-unit id="114">
                 <source>This value is too short. It should contain at least one word.|This value is too short. It should contain at least {{ min }} words.</source>
@@ -475,13 +475,93 @@
                 <source>This value should not be after week "{{ max }}".</source>
                 <target>Kjo vlerë nuk duhet të jetë pas javës "{{ max }}".</target>
             </trans-unit>
-            <trans-unit id="120">
-                <source>This value is not a valid slug.</source>
-                <target state="needs-review-translation">Kjo vlerë nuk është një slug i vlefshëm.</target>
-            </trans-unit>
             <trans-unit id="121">
                 <source>This value is not a valid Twig template.</source>
-                <target state="needs-translation">This value is not a valid Twig template.</target>
+                <target>Kjo vlerë nuk është një shabllon Twig i vlefshëm.</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>This file is not a valid video.</source>
+                <target>Ky fajl nuk është video e vlefshme.</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>The size of the video could not be detected.</source>
+                <target>Madhësia e videos nuk mund të zbulohej.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target>Gjerësia e videos është shumë e madhe ({{ width }}px). Gjerësia maksimale e lejuar është {{ max_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target>Gjerësia e videos është shumë e vogël ({{ width }}px). Gjerësia minimale e pritur është {{ min_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target>Lartësia e videos është shumë e madhe ({{ height }}px). Lartësia maksimale e lejuar është {{ max_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target>Lartësia e videos është shumë e vogël ({{ height }}px). Lartësia minimale e pritur është {{ min_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target>Video ka shumë pak pikselë ({{ pixels }}). Sasia minimale e pritur është {{ min_pixels }}px.</target>
+            </trans-unit>
+            <trans-unit id="129">
+                <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target>Videoja ka tepër piksele ({{ pixels }}). Sasia maksimale e pritur është {{ max_pixels }}px.</target>
+            </trans-unit>
+            <trans-unit id="130">
+                <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target>Raporti i videos është shumë i madh ({{ ratio }}). Raporti maksimal i lejuar është {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="131">
+                <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target>Raporti i videos është shumë i vogël ({{ ratio }}). Raporti minimal i pritur është {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="132">
+                <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
+                <target>Videoja është katrore ({{ width }}x{{ height }}px). Videot katrore nuk lejohen.</target>
+            </trans-unit>
+            <trans-unit id="133">
+                <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
+                <target>Videoja është me orientim horizontal ({{ width }}x{{ height }}px). Videot horizontale nuk lejohen.</target>
+            </trans-unit>
+            <trans-unit id="134">
+                <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
+                <target>Videoja është me orientim portret ({{ width }}x{{ height }}px). Videot me orientim portret nuk lejohen.</target>
+            </trans-unit>
+            <trans-unit id="135">
+                <source>The video file is corrupted.</source>
+                <target>Fajli i videos është i korruptuar.</target>
+            </trans-unit>
+            <trans-unit id="136">
+                <source>The video contains multiple streams. Only one stream is allowed.</source>
+                <target>Videoja përmban disa rrjedha. Lejohet vetëm një rrjedhë.</target>
+            </trans-unit>
+            <trans-unit id="137">
+                <source>Unsupported video codec "{{ codec }}".</source>
+                <target>Kodeku videos është i pambështetur „{{ codec }}“.</target>
+            </trans-unit>
+            <trans-unit id="138">
+                <source>Unsupported video container "{{ container }}".</source>
+                <target>Kontejneri videos është i pambështetur "{{ container }}".</target>
+            </trans-unit>
+            <trans-unit id="139">
+                <source>The image file is corrupted.</source>
+                <target>Fajli i imazhit është korruptuar.</target>
+            </trans-unit>
+            <trans-unit id="140">
+                <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target>Imazhi ka shumë pak pikselë ({{ pixels }}). Sasia minimale e pritur është {{ min_pixels }}px.</target>
+            </trans-unit>
+            <trans-unit id="141">
+                <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target>Imazhi ka shumë pikselë ({{ pixels }}). Shuma maksimale e pritur është {{ max_pixels }}px.</target>
+            </trans-unit>
+            <trans-unit id="142">
+                <source>This filename does not match the expected charset.</source>
+                <target>Ky emër fajlit nuk përputhet me grupin e pritur të karaktereve.</target>
             </trans-unit>
         </body>
     </file>

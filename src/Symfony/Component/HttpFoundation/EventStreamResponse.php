@@ -48,7 +48,7 @@ class EventStreamResponse extends StreamedResponse
             'Cache-Control' => 'private, no-cache, no-store, must-revalidate, max-age=0',
             'X-Accel-Buffering' => 'no',
             'Pragma' => 'no-cache',
-            'Expire' => '0',
+            'Expires' => '0',
         ];
 
         parent::__construct($callback, $status, $headers);

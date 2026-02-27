@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\InvalidArgumentException;
@@ -24,9 +25,7 @@ use Symfony\Component\Mime\RawMessage;
 
 class TransportTest extends TestCase
 {
-    /**
-     * @dataProvider fromStringProvider
-     */
+    #[DataProvider('fromStringProvider')]
     public function testFromString(string $dsn, TransportInterface $transport)
     {
         $transportFactory = new Transport([new DummyTransportFactory()]);
@@ -65,9 +64,7 @@ class TransportTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fromDsnProvider
-     */
+    #[DataProvider('fromDsnProvider')]
     public function testFromDsn(string $dsn, TransportInterface $transport)
     {
         $this->assertEquals($transport, Transport::fromDsn($dsn));
@@ -81,9 +78,7 @@ class TransportTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fromWrongStringProvider
-     */
+    #[DataProvider('fromWrongStringProvider')]
     public function testFromWrongString(string $dsn, string $error)
     {
         $transportFactory = new Transport([new DummyTransportFactory()]);

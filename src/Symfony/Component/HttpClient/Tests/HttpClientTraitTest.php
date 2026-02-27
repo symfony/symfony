@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\HttpClient;
@@ -23,9 +27,7 @@ class HttpClientTraitTest extends TestCase
 
     private const RFC3986_BASE = 'http://a/b/c/d;p?q';
 
-    /**
-     * @dataProvider providePrepareRequestUrl
-     */
+    #[DataProvider('providePrepareRequestUrl')]
     public function testPrepareRequestUrl(string $expected, string $url, array $query = [])
     {
         $defaults = [
@@ -112,13 +114,9 @@ class HttpClientTraitTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
-    /**
-     * @group network
-     *
-     * @requires extension openssl
-     *
-     * @dataProvider provideNormalizeBodyMultipartForwardStream
-     */
+    #[RequiresPhpExtension('openssl')]
+    #[DataProvider('provideNormalizeBodyMultipartForwardStream')]
+    #[Group('network')]
     public function testNormalizeBodyMultipartForwardStream($stream)
     {
         $body = [
@@ -157,9 +155,7 @@ class HttpClientTraitTest extends TestCase
         yield 'symfony' => [static fn () => HttpClient::create()->request('GET', 'https://github.githubassets.com/images/icons/emoji/unicode/1f44d.png')->toStream()];
     }
 
-    /**
-     * @dataProvider provideResolveUrl
-     */
+    #[DataProvider('provideResolveUrl')]
     public function testResolveUrl(string $base, string $url, string $expected)
     {
         $this->assertSame($expected, implode('', self::resolveUrl(self::parseUrl($url), self::parseUrl($base))));
@@ -247,18 +243,18 @@ class HttpClientTraitTest extends TestCase
         self::resolveUrl(self::parseUrl('/foo'), self::parseUrl('localhost:8081'));
     }
 
-    /**
-     * @testWith ["http://foo.com\\bar"]
-     *           ["\\\\foo.com/bar"]
-     *           ["a\rb"]
-     *           ["a\nb"]
-     *           ["a\tb"]
-     *           ["\u0000foo"]
-     *           ["foo\u0000"]
-     *           [" foo"]
-     *           ["foo "]
-     *           ["//"]
-     */
+    #[TestWith(['http://foo.com\bar'])]
+    #[TestWith(['\\\foo.com/bar'])]
+    #[TestWith(['a
+b'])]
+    #[TestWith(['a
+b'])]
+    #[TestWith(['a	b'])]
+    #[TestWith([' foo'])]
+    #[TestWith(['foo '])]
+    #[TestWith([' foo'])]
+    #[TestWith(['foo '])]
+    #[TestWith(['//'])]
     public function testParseMalformedUrl(string $url)
     {
         $this->expectException(InvalidArgumentException::class);
@@ -266,9 +262,7 @@ class HttpClientTraitTest extends TestCase
         self::parseUrl($url);
     }
 
-    /**
-     * @dataProvider provideParseUrl
-     */
+    #[DataProvider('provideParseUrl')]
     public function testParseUrl(array $expected, string $url, array $query = [])
     {
         $expected = array_combine(['scheme', 'authority', 'path', 'query', 'fragment'], $expected);
@@ -297,9 +291,7 @@ class HttpClientTraitTest extends TestCase
         yield [['https:', '//xn--fuball-cta.test', null, null, null], 'https://fußball.test'];
     }
 
-    /**
-     * @dataProvider provideRemoveDotSegments
-     */
+    #[DataProvider('provideRemoveDotSegments')]
     public function testRemoveDotSegments($expected, $url)
     {
         $this->assertSame($expected, self::removeDotSegments($url));
@@ -362,9 +354,7 @@ class HttpClientTraitTest extends TestCase
         yield [['foo'], 'Zm9v'];
     }
 
-    /**
-     * @dataProvider providePrepareAuthBasic
-     */
+    #[DataProvider('providePrepareAuthBasic')]
     public function testPrepareAuthBasic($arg, $result)
     {
         [, $options] = $this->prepareRequest('POST', 'http://example.com', ['auth_basic' => $arg], HttpClientInterface::OPTIONS_DEFAULTS);
@@ -381,9 +371,7 @@ class HttpClientTraitTest extends TestCase
         yield ['AAAA:BBBB:CCCC:DDDD:EEEE:FFFF:GGGG:HHHH:IIII:JJJJ:KKKK', ['pin-sha256' => ['AAAABBBBCCCCDDDDEEEEFFFFGGGGHHHHIIIIJJJJKKKK']]];
     }
 
-    /**
-     * @dataProvider provideFingerprints
-     */
+    #[DataProvider('provideFingerprints')]
     public function testNormalizePeerFingerprint($fingerprint, $expected)
     {
         self::assertSame($expected, $this->normalizePeerFingerprint($fingerprint));

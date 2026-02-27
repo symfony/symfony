@@ -69,19 +69,19 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
     public function ack(Envelope $envelope): void
     {
         $this->withRetryableExceptionRetry(function () use ($envelope) {
-            $this->connection->ack($this->findDoctrineReceivedStamp($envelope)->getId());
+            $this->connection->ack($this->findDoctrineReceivedStampId($envelope));
         });
     }
 
     public function keepalive(Envelope $envelope, ?int $seconds = null): void
     {
-        $this->connection->keepalive($this->findDoctrineReceivedStamp($envelope)->getId(), $seconds);
+        $this->connection->keepalive($this->findDoctrineReceivedStampId($envelope), $seconds);
     }
 
     public function reject(Envelope $envelope): void
     {
         $this->withRetryableExceptionRetry(function () use ($envelope) {
-            $this->connection->reject($this->findDoctrineReceivedStamp($envelope)->getId());
+            $this->connection->reject($this->findDoctrineReceivedStampId($envelope));
         });
     }
 
@@ -122,37 +122,26 @@ class DoctrineReceiver implements ListableReceiverInterface, MessageCountAwareIn
         return $this->createEnvelopeFromData($doctrineEnvelope);
     }
 
-    private function findDoctrineReceivedStamp(Envelope $envelope): DoctrineReceivedStamp
+    private function findDoctrineReceivedStampId(Envelope $envelope): string
     {
-        /** @var DoctrineReceivedStamp|null $doctrineReceivedStamp */
-        $doctrineReceivedStamp = $envelope->last(DoctrineReceivedStamp::class);
-
-        if (null === $doctrineReceivedStamp) {
-            throw new LogicException('No DoctrineReceivedStamp found on the Envelope.');
-        }
-
-        return $doctrineReceivedStamp;
+        return $envelope->last(DoctrineReceivedStamp::class)?->getId() ?? throw new LogicException('No DoctrineReceivedStamp found on the Envelope.');
     }
 
     private function createEnvelopeFromData(array $data): Envelope
     {
+        $stamps = [
+            new DoctrineReceivedStamp($data['id']),
+            new TransportMessageIdStamp($data['id']),
+        ];
+
         try {
-            $envelope = $this->serializer->decode([
+            return $this->serializer->decode($data = [
                 'body' => $data['body'],
                 'headers' => $data['headers'],
-            ]);
-        } catch (MessageDecodingFailedException $exception) {
-            $this->connection->reject($data['id']);
-
-            throw $exception;
+            ])->withoutAll(TransportMessageIdStamp::class)->with(...$stamps);
+        } catch (MessageDecodingFailedException $e) {
+            return MessageDecodingFailedException::wrap($data, $e->getMessage(), $e->getCode(), $e)->with(...$stamps);
         }
-
-        return $envelope
-            ->withoutAll(TransportMessageIdStamp::class)
-            ->with(
-                new DoctrineReceivedStamp($data['id']),
-                new TransportMessageIdStamp($data['id'])
-            );
     }
 
     private function withRetryableExceptionRetry(callable $callable): void

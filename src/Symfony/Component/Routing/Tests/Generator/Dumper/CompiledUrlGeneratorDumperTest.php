@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\Routing\Tests\Generator\Dumper;
 
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\Routing\Exception\RouteCircularReferenceException;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\CompiledUrlGenerator;
@@ -24,8 +24,6 @@ use Symfony\Component\Routing\RouteCollection;
 
 class CompiledUrlGeneratorDumperTest extends TestCase
 {
-    use ExpectUserDeprecationMessageTrait;
-
     private RouteCollection $routeCollection;
     private CompiledUrlGeneratorDumper $generatorDumper;
     private string $testTmpFilepath;
@@ -244,6 +242,25 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->assertSame('/amusant', $compiledUrlGenerator->generate('fun.fr', ['_locale' => 'en']));
     }
 
+    public function testLocalizedAliasRouteGeneratesCorrectUrlPerLocale()
+    {
+        $this->routeCollection->add('foo.en', (new Route('/en/fork'))->setDefault('_locale', 'en')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'en'));
+        $this->routeCollection->add('foo.fr', (new Route('/fr/fourchette'))->setDefault('_locale', 'fr')->setDefault('_canonical_route', 'foo')->setRequirement('_locale', 'fr'));
+        $this->routeCollection->addAlias('bar.en', 'foo.en');
+        $this->routeCollection->addAlias('bar.fr', 'foo.fr');
+
+        file_put_contents($this->testTmpFilepath, $this->generatorDumper->dump());
+
+        $requestContext = new RequestContext();
+        $requestContext->setParameter('_locale', 'fr');
+
+        $compiledUrlGenerator = new CompiledUrlGenerator(require $this->testTmpFilepath, $requestContext, null, null);
+
+        $this->assertSame('/fr/fourchette', $compiledUrlGenerator->generate('bar'));
+        $this->assertSame('/en/fork', $compiledUrlGenerator->generate('bar', ['_locale' => 'en']));
+        $this->assertSame('/fr/fourchette', $compiledUrlGenerator->generate('bar', ['_locale' => 'fr']));
+    }
+
     public function testAliases()
     {
         $subCollection = new RouteCollection();
@@ -338,9 +355,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $this->generatorDumper->dump();
     }
 
-    /**
-     * @group legacy
-     */
+    #[IgnoreDeprecations]
     public function testDeprecatedAlias()
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: The "b" route alias is deprecated. You should stop using it, as it will be removed in the future.');
@@ -356,9 +371,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $compiledUrlGenerator->generate('b');
     }
 
-    /**
-     * @group legacy
-     */
+    #[IgnoreDeprecations]
     public function testDeprecatedAliasWithCustomMessage()
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: foo b.');
@@ -374,9 +387,7 @@ class CompiledUrlGeneratorDumperTest extends TestCase
         $compiledUrlGenerator->generate('b');
     }
 
-    /**
-     * @group legacy
-     */
+    #[IgnoreDeprecations]
     public function testTargettingADeprecatedAliasShouldTriggerDeprecation()
     {
         $this->expectUserDeprecationMessage('Since foo/bar 1.0.0: foo b.');

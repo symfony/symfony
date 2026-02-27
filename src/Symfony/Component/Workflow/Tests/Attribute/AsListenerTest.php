@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Workflow\Tests\Attribute;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Workflow\Attribute;
 use Symfony\Component\Workflow\Exception\LogicException;
 
 class AsListenerTest extends TestCase
 {
-    /**
-     * @dataProvider provideOkTests
-     */
+    #[DataProvider('provideOkTests')]
     public function testOk(string $class, string $expectedEvent, ?string $workflow = null, ?string $node = null)
     {
         $attribute = new $class($workflow, $node);
@@ -58,9 +57,7 @@ class AsListenerTest extends TestCase
         yield [Attribute\AsTransitionListener::class, 'workflow.w.transition.n', 'w', 'n'];
     }
 
-    /**
-     * @dataProvider provideTransitionThrowException
-     */
+    #[DataProvider('provideTransitionThrowException')]
     public function testTransitionThrowException(string $class)
     {
         $this->expectException(LogicException::class);
@@ -71,15 +68,13 @@ class AsListenerTest extends TestCase
 
     public static function provideTransitionThrowException(): iterable
     {
-        yield [Attribute\AsAnnounceListener::class, 'workflow.announce'];
-        yield [Attribute\AsCompletedListener::class, 'workflow.completed'];
-        yield [Attribute\AsGuardListener::class, 'workflow.guard'];
-        yield [Attribute\AsTransitionListener::class, 'workflow.transition'];
+        yield [Attribute\AsAnnounceListener::class];
+        yield [Attribute\AsCompletedListener::class];
+        yield [Attribute\AsGuardListener::class];
+        yield [Attribute\AsTransitionListener::class];
     }
 
-    /**
-     * @dataProvider providePlaceThrowException
-     */
+    #[DataProvider('providePlaceThrowException')]
     public function testPlaceThrowException(string $class)
     {
         $this->expectException(LogicException::class);
@@ -90,8 +85,8 @@ class AsListenerTest extends TestCase
 
     public static function providePlaceThrowException(): iterable
     {
-        yield [Attribute\AsEnteredListener::class, 'workflow.entered'];
-        yield [Attribute\AsEnterListener::class, 'workflow.enter'];
-        yield [Attribute\AsLeaveListener::class, 'workflow.leave'];
+        yield [Attribute\AsEnteredListener::class];
+        yield [Attribute\AsEnterListener::class];
+        yield [Attribute\AsLeaveListener::class];
     }
 }

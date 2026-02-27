@@ -28,14 +28,8 @@ final class MockClock implements ClockInterface
      */
     public function __construct(\DateTimeImmutable|string $now = 'now', \DateTimeZone|string|null $timezone = null)
     {
-        if (\PHP_VERSION_ID >= 80300 && \is_string($timezone)) {
+        if (\is_string($timezone)) {
             $timezone = new \DateTimeZone($timezone);
-        } elseif (\is_string($timezone)) {
-            try {
-                $timezone = new \DateTimeZone($timezone);
-            } catch (\Exception $e) {
-                throw new \DateInvalidTimeZoneException($e->getMessage(), $e->getCode(), $e);
-            }
         }
 
         if (\is_string($now)) {
@@ -54,6 +48,10 @@ final class MockClock implements ClockInterface
 
     public function sleep(float|int $seconds): void
     {
+        if (0 >= $seconds) {
+            return;
+        }
+
         $now = (float) $this->now->format('Uu') + $seconds * 1e6;
         $now = substr_replace(\sprintf('@%07.0F', $now), '.', -6, 0);
         $timezone = $this->now->getTimezone();
@@ -66,12 +64,6 @@ final class MockClock implements ClockInterface
      */
     public function modify(string $modifier): void
     {
-        if (\PHP_VERSION_ID < 80300) {
-            $this->now = @$this->now->modify($modifier) ?: throw new \DateMalformedStringException(error_get_last()['message'] ?? \sprintf('Invalid modifier: "%s". Could not modify MockClock.', $modifier));
-
-            return;
-        }
-
         $this->now = $this->now->modify($modifier);
     }
 
@@ -80,14 +72,8 @@ final class MockClock implements ClockInterface
      */
     public function withTimeZone(\DateTimeZone|string $timezone): static
     {
-        if (\PHP_VERSION_ID >= 80300 && \is_string($timezone)) {
+        if (\is_string($timezone)) {
             $timezone = new \DateTimeZone($timezone);
-        } elseif (\is_string($timezone)) {
-            try {
-                $timezone = new \DateTimeZone($timezone);
-            } catch (\Exception $e) {
-                throw new \DateInvalidTimeZoneException($e->getMessage(), $e->getCode(), $e);
-            }
         }
 
         $clone = clone $this;

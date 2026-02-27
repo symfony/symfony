@@ -49,7 +49,7 @@ class WindowsPipes extends AbstractPipes
             ];
             $tmpDir = sys_get_temp_dir();
             $lastError = 'unknown reason';
-            set_error_handler(function ($type, $msg) use (&$lastError) { $lastError = $msg; });
+            set_error_handler(static function ($type, $msg) use (&$lastError) { $lastError = $msg; });
             for ($i = 0;; ++$i) {
                 foreach ($pipes as $pipe => $name) {
                     $file = \sprintf('%s\\sf_proc_%02X.%s', $tmpDir, $i, $name);
@@ -87,12 +87,12 @@ class WindowsPipes extends AbstractPipes
         parent::__construct($input);
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }

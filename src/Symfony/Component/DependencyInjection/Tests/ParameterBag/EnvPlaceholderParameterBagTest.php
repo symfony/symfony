@@ -31,7 +31,7 @@ class EnvPlaceholderParameterBagTest extends TestCase
     {
         $bag = new EnvPlaceholderParameterBag();
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The given env var name "env(%foo%)" contains invalid characters (allowed characters: letters, digits, hyphens, backslashes and colons).');
+        $this->expectExceptionMessage('The given env var name "env(%foo%)" contains invalid characters (allowed characters: letters, digits, hyphens, backslashes, dots and colons).');
         $bag->get('env(%foo%)');
     }
 
@@ -181,6 +181,16 @@ class EnvPlaceholderParameterBagTest extends TestCase
         $bag->resolve();
 
         $this->assertNull($bag->all()['env(NULL_VAR)']);
+    }
+
+    public function testGetEnvAllowsDot()
+    {
+        $bag = new EnvPlaceholderParameterBag();
+        $bag->set('env(dynamic.var)', 'foo');
+        $bag->get('env(dynamic.var)');
+        $bag->resolve();
+
+        $this->assertSame('foo', $bag->all()['env(dynamic.var)']);
     }
 
     public function testGetThrowsOnBadDefaultValue()

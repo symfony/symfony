@@ -55,6 +55,16 @@ class PostalTransportFactoryTest extends AbstractTransportFactoryTestCase
             new Dsn('postal', 'postal.localhost', null, self::PASSWORD),
             new PostalApiTransport(self::PASSWORD, 'postal.localhost', new MockHttpClient(), null, $logger),
         ];
+
+        yield [
+            new Dsn('postal+api', 'postal.localhost', self::USER),
+            new PostalApiTransport(self::USER, 'postal.localhost', new MockHttpClient(), null, $logger),
+        ];
+
+        yield [
+            new Dsn('postal', 'postal.localhost', self::USER),
+            new PostalApiTransport(self::USER, 'postal.localhost', new MockHttpClient(), null, $logger),
+        ];
     }
 
     public static function unsupportedSchemeProvider(): iterable

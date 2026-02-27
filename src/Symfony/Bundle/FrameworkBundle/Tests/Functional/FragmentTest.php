@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class FragmentTest extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider getConfigs
-     */
+    #[DataProvider('getConfigs')]
     public function testFragment($insulate)
     {
         $client = $this->createClient(['test_case' => 'Fragment', 'root_config' => 'config.yml', 'debug' => true]);
@@ -26,15 +26,16 @@ class FragmentTest extends AbstractWebTestCase
         $client->request('GET', '/fragment_home');
 
         $this->assertEquals(<<<TXT
-bar txt
---
-html
---
-es
---
-fr
-TXT
-            , $client->getResponse()->getContent());
+            bar txt
+            --
+            html
+            --
+            es
+            --
+            fr
+            TXT,
+            $client->getResponse()->getContent()
+        );
     }
 
     public static function getConfigs()

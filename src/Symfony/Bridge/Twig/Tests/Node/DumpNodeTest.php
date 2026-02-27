@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\DumpNode;
 use Twig\Compiler;
 use Twig\Environment;
-use Twig\Loader\LoaderInterface;
+use Twig\Loader\ArrayLoader;
 use Twig\Node\Expression\Variable\ContextVariable;
 use Twig\Node\Nodes;
 
@@ -25,22 +25,22 @@ class DumpNodeTest extends TestCase
     {
         $node = new DumpNode('bar', null, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment(new ArrayLoader());
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
-if ($this->env->isDebug()) {
-    $barvars = [];
-    foreach ($context as $barkey => $barval) {
-        if (!$barval instanceof \Twig\Template) {
-            $barvars[$barkey] = $barval;
-        }
-    }
-    // line 7
-    \Symfony\Component\VarDumper\VarDumper::dump($barvars);
-}
+            if ($this->env->isDebug()) {
+                $barvars = [];
+                foreach ($context as $barkey => $barval) {
+                    if (!$barval instanceof \Twig\Template) {
+                        $barvars[$barkey] = $barval;
+                    }
+                }
+                // line 7
+                \Symfony\Component\VarDumper\VarDumper::dump($barvars);
+            }
 
-EOTXT;
+            EOTXT;
 
         $this->assertSame($expected, $compiler->compile($node)->getSource());
     }
@@ -49,22 +49,22 @@ EOTXT;
     {
         $node = new DumpNode('bar', null, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment(new ArrayLoader());
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
-    if ($this->env->isDebug()) {
-        $barvars = [];
-        foreach ($context as $barkey => $barval) {
-            if (!$barval instanceof \Twig\Template) {
-                $barvars[$barkey] = $barval;
-            }
-        }
-        // line 7
-        \Symfony\Component\VarDumper\VarDumper::dump($barvars);
-    }
+                if ($this->env->isDebug()) {
+                    $barvars = [];
+                    foreach ($context as $barkey => $barval) {
+                        if (!$barval instanceof \Twig\Template) {
+                            $barvars[$barkey] = $barval;
+                        }
+                    }
+                    // line 7
+                    \Symfony\Component\VarDumper\VarDumper::dump($barvars);
+                }
 
-EOTXT;
+            EOTXT;
 
         $this->assertSame($expected, $compiler->compile($node, 1)->getSource());
     }
@@ -77,16 +77,16 @@ EOTXT;
 
         $node = new DumpNode('bar', $vars, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment(new ArrayLoader());
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
-if ($this->env->isDebug()) {
-    // line 7
-    \Symfony\Component\VarDumper\VarDumper::dump(%foo%);
-}
+            if ($this->env->isDebug()) {
+                // line 7
+                \Symfony\Component\VarDumper\VarDumper::dump(%foo%);
+            }
 
-EOTXT;
+            EOTXT;
 
         $expected = preg_replace('/%(.*?)%/', '($context["$1"] ?? null)', $expected);
 
@@ -101,19 +101,19 @@ EOTXT;
         ]);
         $node = new DumpNode('bar', $vars, 7);
 
-        $env = new Environment($this->createMock(LoaderInterface::class));
+        $env = new Environment(new ArrayLoader());
         $compiler = new Compiler($env);
 
         $expected = <<<'EOTXT'
-if ($this->env->isDebug()) {
-    // line 7
-    \Symfony\Component\VarDumper\VarDumper::dump([
-        "foo" => %foo%,
-        "bar" => %bar%,
-    ]);
-}
+            if ($this->env->isDebug()) {
+                // line 7
+                \Symfony\Component\VarDumper\VarDumper::dump([
+                    "foo" => %foo%,
+                    "bar" => %bar%,
+                ]);
+            }
 
-EOTXT;
+            EOTXT;
 
         $expected = preg_replace('/%(.*?)%/', '($context["$1"] ?? null)', $expected);
 

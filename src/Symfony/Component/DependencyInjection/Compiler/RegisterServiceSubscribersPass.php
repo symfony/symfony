@@ -20,6 +20,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\TypedReference;
 use Symfony\Contracts\Service\Attribute\SubscribedService;
+use Symfony\Contracts\Service\ServiceCollectionInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -134,6 +135,7 @@ class RegisterServiceSubscribersPass extends AbstractRecursivePass
         $value->setBindings([
             PsrContainerInterface::class => new BoundArgument($locatorRef, false),
             ServiceProviderInterface::class => new BoundArgument($locatorRef, false),
+            ServiceCollectionInterface::class => new BoundArgument($locatorRef, false),
         ] + $value->getBindings());
 
         return parent::processValue($value);

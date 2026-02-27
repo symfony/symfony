@@ -28,15 +28,41 @@ class DoctrinePingConnectionMiddleware extends AbstractDoctrineMiddleware
     protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope
     {
         if (null !== $envelope->last(ConsumedByWorkerStamp::class)) {
-            $this->pingConnection($entityManager);
+            foreach ($this->getTargetEntityManagers($entityManager) as $name => $targetEntityManager) {
+                $this->pingConnection($targetEntityManager, $name);
+            }
         }
 
         return $stack->next()->handle($envelope, $stack);
     }
 
-    private function pingConnection(EntityManagerInterface $entityManager): void
+    /**
+     * @return iterable<string|null, EntityManagerInterface>
+     */
+    private function getTargetEntityManagers(EntityManagerInterface $entityManager): iterable
+    {
+        if (null !== $this->entityManagerName) {
+            yield $this->entityManagerName => $entityManager;
+
+            return;
+        }
+
+        foreach ($this->managerRegistry->getManagerNames() as $name => $serviceId) {
+            $manager = $this->managerRegistry->getManager($name);
+
+            if ($manager instanceof EntityManagerInterface) {
+                yield $name => $manager;
+            }
+        }
+    }
+
+    private function pingConnection(EntityManagerInterface $entityManager, ?string $entityManagerName = null): void
     {
         $connection = $entityManager->getConnection();
+
+        if (!$connection->isConnected()) {
+            return;
+        }
 
         try {
             $this->executeDummySql($connection);
@@ -47,7 +73,7 @@ class DoctrinePingConnectionMiddleware extends AbstractDoctrineMiddleware
         }
 
         if (!$entityManager->isOpen()) {
-            $this->managerRegistry->resetManager($this->entityManagerName);
+            $this->managerRegistry->resetManager($entityManagerName ?? $this->entityManagerName);
         }
     }
 

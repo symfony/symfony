@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Translation\Tests\Exception;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClassExistsMock;
 use Symfony\Component\Translation\Bridge\Crowdin\CrowdinProviderFactory;
@@ -20,9 +22,7 @@ use Symfony\Component\Translation\Bridge\Phrase\PhraseProviderFactory;
 use Symfony\Component\Translation\Exception\UnsupportedSchemeException;
 use Symfony\Component\Translation\Provider\Dsn;
 
-/**
- * @runTestsInSeparateProcesses
- */
+#[RunTestsInSeparateProcesses]
 final class UnsupportedSchemeExceptionTest extends TestCase
 {
     public static function setUpBeforeClass(): void
@@ -36,9 +36,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         ]);
     }
 
-    /**
-     * @dataProvider messageWhereSchemeIsPartOfSchemeToPackageMapProvider
-     */
+    #[DataProvider('messageWhereSchemeIsPartOfSchemeToPackageMapProvider')]
     public function testMessageWhereSchemeIsPartOfSchemeToPackageMap(string $scheme, string $package)
     {
         $dsn = new Dsn(\sprintf('%s://localhost', $scheme));
@@ -57,9 +55,7 @@ final class UnsupportedSchemeExceptionTest extends TestCase
         yield ['phrase', 'symfony/phrase-translation-provider'];
     }
 
-    /**
-     * @dataProvider messageWhereSchemeIsNotPartOfSchemeToPackageMapProvider
-     */
+    #[DataProvider('messageWhereSchemeIsNotPartOfSchemeToPackageMapProvider')]
     public function testMessageWhereSchemeIsNotPartOfSchemeToPackageMap(string $expected, Dsn $dsn, ?string $name, array $supported)
     {
         $this->assertSame(

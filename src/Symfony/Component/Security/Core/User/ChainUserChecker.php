@@ -29,16 +29,10 @@ final class ChainUserChecker implements UserCheckerInterface
         }
     }
 
-    public function checkPostAuth(UserInterface $user /* , TokenInterface $token */): void
+    public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void
     {
-        $token = 1 < \func_num_args() ? func_get_arg(1) : null;
-
         foreach ($this->checkers as $checker) {
-            if ($token instanceof TokenInterface) {
-                $checker->checkPostAuth($user, $token);
-            } else {
-                $checker->checkPostAuth($user);
-            }
+            $checker->checkPostAuth($user, $token);
         }
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Extension\Core\Type\WeekType;
 use Symfony\Component\Form\FormError;
 
@@ -300,9 +301,7 @@ class WeekTypeTest extends BaseTypeTestCase
         $this->assertSame(['year' => null, 'week' => null], $form->getData());
     }
 
-    /**
-     * @dataProvider provideEmptyData
-     */
+    #[DataProvider('provideEmptyData')]
     public function testSubmitNullUsesDateEmptyDataString($widget, $emptyData, $expectedData)
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [

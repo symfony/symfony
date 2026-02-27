@@ -7,10 +7,10 @@
 | Host         | localhost                                                                                     |
 | Host Regex   | #HOST_REGEX#                                                                                  |
 | Scheme       | http|https                                                                                    |
-| Method       | PUT|POST                                                                                      |
+| Method       | [33mPUT[39m|[32mPOST[39m                                                                                      |
 | Requirements | NO CUSTOM                                                                                     |
 | Class        | Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\RouteStub                             |
-| Defaults     | _controller: ]8;;myeditor://open?file=[:file:]&line=58\Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\MyController::__invoke()]8;;\ |
+| Defaults     | _controller: ]8;;myeditor://open?file=[:file:]&line=59\Symfony\Bundle\FrameworkBundle\Tests\Console\Descriptor\MyController::__invoke()]8;;\ |
 | Options      | compiler_class: Symfony\Component\Routing\RouteCompiler                                       |
 |              | opt1: val1                                                                                    |
 |              | opt2: val2                                                                                    |

@@ -18,4 +18,9 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional\app\TypeInfo;
 class Dummy
 {
     public string $name;
+
+    /**
+     * @var CustomAlias
+     */
+    public mixed $customAlias;
 }

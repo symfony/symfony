@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\RateLimiter\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
 use Symfony\Component\RateLimiter\RateLimit;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class RateLimitTest extends TestCase
 {
     public function testEnsureAcceptedDoesNotThrowExceptionIfAccepted()

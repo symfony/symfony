@@ -21,32 +21,30 @@
         "symfony/cache-implementation": "1.1|2.0|3.0"
     },
     "require": {
-        "php": ">=8.2",
+        "php": ">=8.4",
         "psr/cache": "^2.0|^3.0",
         "psr/log": "^1.1|^2|^3",
         "symfony/cache-contracts": "^3.6",
-        "symfony/deprecation-contracts": "^2.5|^3.0",
         "symfony/service-contracts": "^2.5|^3",
-        "symfony/var-exporter": "^6.4|^7.0"
+        "symfony/var-exporter": "^7.4|^8.0"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",
-        "doctrine/dbal": "^3.6|^4",
+        "doctrine/dbal": "^4.3",
         "predis/predis": "^1.1|^2.0",
         "psr/simple-cache": "^1.0|^2.0|^3.0",
-        "symfony/clock": "^6.4|^7.0",
-        "symfony/config": "^6.4|^7.0",
-        "symfony/dependency-injection": "^6.4|^7.0",
-        "symfony/filesystem": "^6.4|^7.0",
-        "symfony/http-kernel": "^6.4|^7.0",
-        "symfony/messenger": "^6.4|^7.0",
-        "symfony/var-dumper": "^6.4|^7.0"
+        "symfony/clock": "^7.4|^8.0",
+        "symfony/config": "^7.4|^8.0",
+        "symfony/dependency-injection": "^7.4|^8.0",
+        "symfony/filesystem": "^7.4|^8.0",
+        "symfony/http-kernel": "^7.4|^8.0",
+        "symfony/messenger": "^7.4|^8.0",
+        "symfony/var-dumper": "^7.4|^8.0"
     },
     "conflict": {
-        "doctrine/dbal": "<3.6",
-        "symfony/dependency-injection": "<6.4",
-        "symfony/http-kernel": "<6.4",
-        "symfony/var-dumper": "<6.4"
+        "ext-redis": "<6.1",
+        "ext-relay": "<0.12.1",
+        "doctrine/dbal": "<4.3"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Cache\\": "" },

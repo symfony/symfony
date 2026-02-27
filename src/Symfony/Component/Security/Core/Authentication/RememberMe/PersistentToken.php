@@ -21,15 +21,11 @@ final class PersistentToken implements PersistentTokenInterface
     private \DateTimeImmutable $lastUsed;
 
     public function __construct(
-        private string $class,
         private string $userIdentifier,
         private string $series,
         #[\SensitiveParameter] private string $tokenValue,
         \DateTimeInterface $lastUsed,
     ) {
-        if (!$class) {
-            throw new \InvalidArgumentException('$class must not be empty.');
-        }
         if ('' === $userIdentifier) {
             throw new \InvalidArgumentException('$userIdentifier must not be empty.');
         }
@@ -41,11 +37,6 @@ final class PersistentToken implements PersistentTokenInterface
         }
 
         $this->lastUsed = \DateTimeImmutable::createFromInterface($lastUsed);
-    }
-
-    public function getClass(): string
-    {
-        return $this->class;
     }
 
     public function getUserIdentifier(): string

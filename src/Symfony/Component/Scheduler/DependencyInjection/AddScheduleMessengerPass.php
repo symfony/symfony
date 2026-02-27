@@ -12,6 +12,7 @@
 namespace Symfony\Component\Scheduler\DependencyInjection;
 
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Messenger\RunCommandMessage;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -46,6 +47,11 @@ class AddScheduleMessengerPass implements CompilerPassInterface
         $scheduleProviderIds = [];
         foreach ($container->findTaggedServiceIds('scheduler.schedule_provider') as $serviceId => $tags) {
             $name = $tags[0]['name'];
+
+            if (isset($scheduleProviderIds[$name])) {
+                throw new InvalidArgumentException(\sprintf('Schedule provider service "%s" can not replace already registered service "%s" for schedule "%s". Make sure to register only one provider per schedule name.', $serviceId, $scheduleProviderIds[$name], $name), 1);
+            }
+
             $scheduleProviderIds[$name] = $serviceId;
         }
 
@@ -58,7 +64,14 @@ class AddScheduleMessengerPass implements CompilerPassInterface
                 if ($serviceDefinition->hasTag('console.command')) {
                     /** @var AsCommand|null $attribute */
                     $attribute = ($container->getReflectionClass($serviceDefinition->getClass())->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
-                    $message = new Definition(RunCommandMessage::class, [$attribute?->name ?? $serviceDefinition->getClass()::getDefaultName().(empty($tagAttributes['arguments']) ? '' : " {$tagAttributes['arguments']}")]);
+                    $commandName = $attribute?->name;
+
+                    if (\is_array($arguments = $tagAttributes['arguments'] ?? '')) {
+                        $input = (string) new ArrayInput(['command' => $commandName, ...$arguments]);
+                    } else {
+                        $input = $commandName.('' !== $arguments ? " $arguments" : '');
+                    }
+                    $message = new Definition(RunCommandMessage::class, [$input]);
                 } else {
                     $message = new Definition(ServiceCallMessage::class, [$serviceId, $tagAttributes['method'] ?? '__invoke', (array) ($tagAttributes['arguments'] ?? [])]);
                 }
@@ -79,7 +92,7 @@ class AddScheduleMessengerPass implements CompilerPassInterface
                         '$expression' => $tagAttributes['expression'] ?? throw new InvalidArgumentException(\sprintf('Tag "scheduler.task" is missing attribute "expression" on service "%s".', $serviceId)),
                         '$timezone' => $tagAttributes['timezone'] ?? null,
                     ],
-                }, fn ($value) => null !== $value);
+                }, static fn ($value) => null !== $value);
 
                 $tasksPerSchedule[$scheduleName][] = $taskDefinition = (new Definition(RecurringMessage::class))
                     ->setFactory([RecurringMessage::class, $tagAttributes['trigger']])

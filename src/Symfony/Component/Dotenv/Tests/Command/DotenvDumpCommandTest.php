@@ -20,15 +20,18 @@ class DotenvDumpCommandTest extends TestCase
 {
     protected function setUp(): void
     {
+        unset($_SERVER['SYMFONY_DOTENV_PATH']);
+        unset($_SERVER['APP_RUNTIME_OPTIONS']);
+
         file_put_contents(__DIR__.'/.env', <<<EOF
-APP_ENV=dev
-APP_SECRET=abc123
-EOF
+            APP_ENV=dev
+            APP_SECRET=abc123
+            EOF
         );
 
         file_put_contents(__DIR__.'/.env.local', <<<EOF
-APP_LOCAL=yes
-EOF
+            APP_LOCAL=yes
+            EOF
         );
     }
 
@@ -36,8 +39,14 @@ EOF
     {
         @unlink(__DIR__.'/.env');
         @unlink(__DIR__.'/.env.local');
+        @unlink(__DIR__.'/.env.path');
+        @unlink(__DIR__.'/.env.path.local');
         @unlink(__DIR__.'/.env.local.php');
+        @unlink(__DIR__.'/.env.path.local.php');
         @unlink(__DIR__.'/composer.json');
+
+        unset($_SERVER['SYMFONY_DOTENV_PATH']);
+        unset($_SERVER['APP_RUNTIME_OPTIONS']);
     }
 
     public function testExecute()
@@ -73,8 +82,8 @@ EOF
     public function testExecuteTestEnvs()
     {
         file_put_contents(__DIR__.'/composer.json', <<<EOF
-{"extra":{"runtime":{"test_envs":[]}}}
-EOF
+            {"extra":{"runtime":{"test_envs":[]}}}
+            EOF
         );
 
         $command = $this->createCommand();
@@ -92,10 +101,39 @@ EOF
         ], $vars);
     }
 
+    public function testExecuteWithRuntimeOptionsDotenvPath()
+    {
+        file_put_contents(__DIR__.'/.env.path', <<<EOF
+            APP_ENV=test
+            APP_SECRET=newpath123
+            EOF
+        );
+        file_put_contents(__DIR__.'/.env.path.local', <<<EOF
+            LOCAL_PATH=yes
+            EOF
+        );
+
+        $_SERVER['APP_RUNTIME_OPTIONS'] = ['dotenv_path' => '.env.path'];
+
+        $command = $this->createCommand();
+        $command->execute([
+            'env' => 'dev',
+        ]);
+
+        $this->assertFileExists(__DIR__.'/.env.path.local.php');
+
+        $vars = require __DIR__.'/.env.path.local.php';
+        $this->assertSame([
+            'APP_ENV' => 'dev',
+            'APP_SECRET' => 'newpath123',
+            'LOCAL_PATH' => 'yes',
+        ], $vars);
+    }
+
     private function createCommand(): CommandTester
     {
         $application = new Application();
-        $application->add(new DotenvDumpCommand(__DIR__));
+        $application->addCommand(new DotenvDumpCommand(__DIR__));
 
         return new CommandTester($application->find('dotenv:dump'));
     }

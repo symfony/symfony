@@ -13,6 +13,7 @@ namespace Symfony\Component\JsonStreamer;
 
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
@@ -29,26 +30,40 @@ use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  *
- * @implements StreamWriterInterface<array<string, mixed>>
+ * @psalm-type Options = array{
+ *     include_null_properties?: bool,
+ *     ...<string, mixed>,
+ * }
  *
- * @experimental
+ * @implements StreamWriterInterface<Options>
  */
 final class JsonStreamWriter implements StreamWriterInterface
 {
     private StreamWriterGenerator $streamWriterGenerator;
 
+    /**
+     * @var array<string, callable>
+     */
+    private array $streamWriters = [];
+
+    /**
+     * @param Options $defaultOptions
+     */
     public function __construct(
         private ContainerInterface $valueTransformers,
         PropertyMetadataLoaderInterface $propertyMetadataLoader,
         string $streamWritersDir,
+        ?ConfigCacheFactoryInterface $configCacheFactory = null,
+        private array $defaultOptions = [],
     ) {
-        $this->streamWriterGenerator = new StreamWriterGenerator($propertyMetadataLoader, $streamWritersDir);
+        $this->streamWriterGenerator = new StreamWriterGenerator($propertyMetadataLoader, $streamWritersDir, $configCacheFactory);
     }
 
     public function write(mixed $data, Type $type, array $options = []): \Traversable&\Stringable
     {
+        $options += $this->defaultOptions;
         $path = $this->streamWriterGenerator->generate($type, $options);
-        $chunks = (require $path)($data, $this->valueTransformers, $options);
+        $chunks = ($this->streamWriters[$path] ??= require $path)($data, $this->valueTransformers, $options);
 
         return new
         /**

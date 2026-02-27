@@ -17,6 +17,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Routing\Loader\AttributeFileLoader;
 use Symfony\Component\Routing\Loader\DirectoryLoader;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
+use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Tests\Fixtures\TraceableAttributeClassLoader;
 
@@ -53,7 +54,7 @@ class DirectoryLoaderTest extends TestCase
         $routes = $collection->all();
 
         $this->assertCount(3, $routes, 'Three routes are loaded');
-        $this->assertContainsOnly('Symfony\Component\Routing\Route', $routes);
+        $this->assertContainsOnlyInstancesOf(Route::class, $routes);
 
         for ($i = 1; $i <= 3; ++$i) {
             $this->assertSame('/route/'.$i, $routes['route'.$i]->getPath());

@@ -59,6 +59,7 @@ class TranslationExtractCommand extends Command
         private array $codePaths = [],
         private array $enabledLocales = [],
     ) {
+        $this->enabledLocales = array_filter($enabledLocales);
         parent::__construct();
 
         if (!method_exists($writer, 'getFormats')) {
@@ -72,45 +73,45 @@ class TranslationExtractCommand extends Command
             ->setDefinition([
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
-                new InputOption('prefix', null, InputOption::VALUE_OPTIONAL, 'Override the default prefix', '__'),
+                new InputOption('prefix', null, InputOption::VALUE_REQUIRED, 'Override the default prefix', '__'),
                 new InputOption('no-fill', null, InputOption::VALUE_NONE, 'Extract translation keys without filling in values'),
-                new InputOption('format', null, InputOption::VALUE_OPTIONAL, 'Override the default output format', 'xlf12'),
+                new InputOption('format', null, InputOption::VALUE_REQUIRED, 'Override the default output format', 'xlf12'),
                 new InputOption('dump-messages', null, InputOption::VALUE_NONE, 'Should the messages be dumped in the console'),
                 new InputOption('force', null, InputOption::VALUE_NONE, 'Should the extract be done'),
                 new InputOption('clean', null, InputOption::VALUE_NONE, 'Should clean not found messages'),
-                new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'Specify the domain to extract'),
-                new InputOption('sort', null, InputOption::VALUE_OPTIONAL, 'Return list of messages sorted alphabetically'),
-                new InputOption('as-tree', null, InputOption::VALUE_OPTIONAL, 'Dump the messages as a tree-like structure: The given value defines the level where to switch to inline YAML'),
+                new InputOption('domain', null, InputOption::VALUE_REQUIRED, 'Specify the domain to extract'),
+                new InputOption('sort', null, InputOption::VALUE_REQUIRED, 'Return list of messages sorted alphabetically'),
+                new InputOption('as-tree', null, InputOption::VALUE_REQUIRED, 'Dump the messages as a tree-like structure: The given value defines the level where to switch to inline YAML'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command extracts translation strings from templates
-of a given bundle or the default translations directory. It can display them or merge
-the new ones into the translation files.
+                The <info>%command.name%</info> command extracts translation strings from templates
+                of a given bundle or the default translations directory. It can display them or merge
+                the new ones into the translation files.
 
-When new translation strings are found it can automatically add a prefix to the translation
-message. However, if the <comment>--no-fill</comment> option is used, the <comment>--prefix</comment>
-option has no effect, since the translation values are left empty.
+                When new translation strings are found it can automatically add a prefix to the translation
+                message. However, if the <info>--no-fill</info> option is used, the <info>--prefix</info>
+                option has no effect, since the translation values are left empty.
 
-Example running against a Bundle (AcmeBundle)
+                Example running against a Bundle (AcmeBundle)
 
-  <info>php %command.full_name% --dump-messages en AcmeBundle</info>
-  <info>php %command.full_name% --force --prefix="new_" fr AcmeBundle</info>
+                  <info>php %command.full_name% --dump-messages en AcmeBundle</info>
+                  <info>php %command.full_name% --force --prefix="new_" fr AcmeBundle</info>
 
-Example running against default messages directory
+                Example running against default messages directory
 
-  <info>php %command.full_name% --dump-messages en</info>
-  <info>php %command.full_name% --force --prefix="new_" fr</info>
+                  <info>php %command.full_name% --dump-messages en</info>
+                  <info>php %command.full_name% --force --prefix="new_" fr</info>
 
-You can sort the output with the <comment>--sort</> flag:
+                You can sort the output with the <info>--sort</> flag:
 
-    <info>php %command.full_name% --dump-messages --sort=asc en AcmeBundle</info>
-    <info>php %command.full_name% --force --sort=desc fr</info>
+                    <info>php %command.full_name% --dump-messages --sort=asc en AcmeBundle</info>
+                    <info>php %command.full_name% --force --sort=desc fr</info>
 
-You can dump a tree-like structure using the yaml format with <comment>--as-tree</> flag:
+                You can dump a tree-like structure using the yaml format with <info>--as-tree</> flag:
 
-    <info>php %command.full_name% --force --format=yaml --as-tree=3 en AcmeBundle</info>
+                    <info>php %command.full_name% --force --format=yaml --as-tree=3 en AcmeBundle</info>
 
-EOF
+                EOF
             )
         ;
     }
@@ -228,8 +229,8 @@ EOF
 
                 $list = array_merge(
                     array_diff($allKeys, $newKeys),
-                    array_map(fn ($id) => \sprintf('<fg=green>%s</>', $id), $newKeys),
-                    array_map(fn ($id) => \sprintf('<fg=red>%s</>', $id), array_keys($operation->getObsoleteMessages($domain)))
+                    array_map(static fn ($id) => \sprintf('<fg=green>%s</>', $id), $newKeys),
+                    array_map(static fn ($id) => \sprintf('<fg=red>%s</>', $id), array_keys($operation->getObsoleteMessages($domain)))
                 );
 
                 $domainMessagesCount = \count($list);

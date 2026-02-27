@@ -14,8 +14,6 @@ namespace Symfony\Component\ObjectMapper\Metadata;
 /**
  * Factory to create Mapper metadata.
  *
- * @experimental
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 interface ObjectMapperMetadataFactoryInterface

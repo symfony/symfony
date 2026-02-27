@@ -20,6 +20,8 @@ interface BuilderAwareInterface
 {
     /**
      * Sets a custom children builder.
+     *
+     * @param NodeBuilder<static> $builder
      */
     public function setBuilder(NodeBuilder $builder): void;
 }

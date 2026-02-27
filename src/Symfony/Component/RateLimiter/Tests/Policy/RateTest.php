@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\RateLimiter\Tests\Policy;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\RateLimiter\Policy\Rate;
 
 class RateTest extends TestCase
 {
-    /**
-     * @dataProvider provideRate
-     */
+    #[DataProvider('provideRate')]
     public function testFromString(Rate $rate)
     {
         $this->assertEquals($rate, Rate::fromString((string) $rate));

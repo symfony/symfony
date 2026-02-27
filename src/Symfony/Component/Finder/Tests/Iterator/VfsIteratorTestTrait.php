@@ -108,7 +108,7 @@ trait VfsIteratorTestTrait
                 $isDir = $providerFx($path, 'is_dir');
                 \assert(\is_bool($isDir));
 
-                return ['mode' => $isDir ? 0040755 : 0100644];
+                return ['mode' => $isDir ? 0o040755 : 0o100644];
             }
         });
         self::$vfsProviders = &$vfsWrapperClass::$vfsProviders;

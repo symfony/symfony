@@ -39,7 +39,15 @@ class ReplaceAliasByActualDefinitionPass extends AbstractRecursivePass
         $seenAliasTargets = [];
         $replacements = [];
 
-        foreach ($container->getAliases() as $definitionId => $target) {
+        // Sort aliases so non-deprecated ones come first. This ensures that when
+        // multiple aliases point to the same private definition, non-deprecated
+        // aliases get priority for renaming. Otherwise, the definition might be
+        // renamed to a deprecated alias ID, causing the original service ID to
+        // become an alias to the deprecated one (inverting the alias chain).
+        $aliases = $container->getAliases();
+        uasort($aliases, static fn ($a, $b) => $a->isDeprecated() <=> $b->isDeprecated());
+
+        foreach ($aliases as $definitionId => $target) {
             $targetId = (string) $target;
             // Special case: leave this target alone
             if ('service_container' === $targetId) {

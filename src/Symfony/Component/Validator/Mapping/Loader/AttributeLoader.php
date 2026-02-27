@@ -27,9 +27,40 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 class AttributeLoader implements LoaderInterface
 {
+    /**
+     * @param array<class-string, class-string[]> $mappedClasses
+     */
+    public function __construct(
+        private bool $allowAnyClass = true,
+        private array $mappedClasses = [],
+    ) {
+    }
+
+    /**
+     * @return class-string[]
+     */
+    public function getMappedClasses(): array
+    {
+        return array_keys($this->mappedClasses);
+    }
+
     public function loadClassMetadata(ClassMetadata $metadata): bool
     {
-        $reflClass = $metadata->getReflectionClass();
+        if (!$sourceClasses = $this->mappedClasses[$metadata->getClassName()] ??= $this->allowAnyClass ? [$metadata->getClassName()] : []) {
+            return false;
+        }
+
+        $success = false;
+        foreach ($sourceClasses as $sourceClass) {
+            $reflClass = $metadata->getClassName() === $sourceClass ? $metadata->getReflectionClass() : new \ReflectionClass($sourceClass);
+            $success = $this->doLoadClassMetadata($reflClass, $metadata) || $success;
+        }
+
+        return $success;
+    }
+
+    private function doLoadClassMetadata(\ReflectionClass $reflClass, ClassMetadata $metadata): bool
+    {
         $className = $reflClass->name;
         $success = false;
 
@@ -47,7 +78,7 @@ class AttributeLoader implements LoaderInterface
         }
 
         foreach ($reflClass->getProperties() as $property) {
-            if ($property->getDeclaringClass()->name === $className) {
+            if ($property->class === $className) {
                 foreach ($this->getAttributes($property) as $constraint) {
                     if ($constraint instanceof Constraint) {
                         $metadata->addPropertyConstraint($property->name, $constraint);
@@ -59,7 +90,7 @@ class AttributeLoader implements LoaderInterface
         }
 
         foreach ($reflClass->getMethods() as $method) {
-            if ($method->getDeclaringClass()->name === $className) {
+            if ($method->class === $className) {
                 foreach ($this->getAttributes($method) as $constraint) {
                     if ($constraint instanceof Callback) {
                         $constraint->callback = $method->getName();

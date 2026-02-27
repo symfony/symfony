@@ -60,6 +60,7 @@ class TranslationDebugCommand extends Command
         private array $codePaths = [],
         private array $enabledLocales = [],
     ) {
+        $this->enabledLocales = array_filter($enabledLocales);
         parent::__construct();
     }
 
@@ -69,41 +70,41 @@ class TranslationDebugCommand extends Command
             ->setDefinition([
                 new InputArgument('locale', InputArgument::REQUIRED, 'The locale'),
                 new InputArgument('bundle', InputArgument::OPTIONAL, 'The bundle name or directory where to load the messages'),
-                new InputOption('domain', null, InputOption::VALUE_OPTIONAL, 'The messages domain'),
+                new InputOption('domain', null, InputOption::VALUE_REQUIRED, 'The messages domain'),
                 new InputOption('only-missing', null, InputOption::VALUE_NONE, 'Display only missing messages'),
                 new InputOption('only-unused', null, InputOption::VALUE_NONE, 'Display only unused messages'),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Load messages from all registered bundles'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command helps finding unused or missing translation
-messages and comparing them with the fallback ones by inspecting the
-templates and translation files of a given bundle or the default translations directory.
+                The <info>%command.name%</info> command helps finding unused or missing translation
+                messages and comparing them with the fallback ones by inspecting the
+                templates and translation files of a given bundle or the default translations directory.
 
-You can display information about bundle translations in a specific locale:
+                You can display information about bundle translations in a specific locale:
 
-  <info>php %command.full_name% en AcmeDemoBundle</info>
+                  <info>php %command.full_name% en AcmeDemoBundle</info>
 
-You can also specify a translation domain for the search:
+                You can also specify a translation domain for the search:
 
-  <info>php %command.full_name% --domain=messages en AcmeDemoBundle</info>
+                  <info>php %command.full_name% --domain=messages en AcmeDemoBundle</info>
 
-You can only display missing messages:
+                You can only display missing messages:
 
-  <info>php %command.full_name% --only-missing en AcmeDemoBundle</info>
+                  <info>php %command.full_name% --only-missing en AcmeDemoBundle</info>
 
-You can only display unused messages:
+                You can only display unused messages:
 
-  <info>php %command.full_name% --only-unused en AcmeDemoBundle</info>
+                  <info>php %command.full_name% --only-unused en AcmeDemoBundle</info>
 
-You can display information about application translations in a specific locale:
+                You can display information about application translations in a specific locale:
 
-  <info>php %command.full_name% en</info>
+                  <info>php %command.full_name% en</info>
 
-You can display information about translations in all registered bundles in a specific locale:
+                You can display information about translations in all registered bundles in a specific locale:
 
-  <info>php %command.full_name% --all en</info>
+                  <info>php %command.full_name% --all en</info>
 
-EOF
+                EOF
             )
         ;
     }

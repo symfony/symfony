@@ -11,17 +11,19 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\Store\ZookeeperStore;
+use Symfony\Component\Lock\Test\AbstractStoreTestCase;
 
 /**
  * @author Ganesh Chandrasekaran <gchandrasekaran@wayfair.com>
- *
- * @requires extension zookeeper
- *
- * @group integration
  */
+#[RequiresPhpExtension('zookeeper')]
+#[Group('integration')]
 class ZookeeperStoreTest extends AbstractStoreTestCase
 {
     use UnserializableTestTrait;
@@ -35,9 +37,7 @@ class ZookeeperStoreTest extends AbstractStoreTestCase
         return StoreFactory::createStore($zookeeper);
     }
 
-    /**
-     * @dataProvider provideValidConnectionString
-     */
+    #[DataProvider('provideValidConnectionString')]
     public function testCreateConnection(string $connectionString)
     {
         $this->assertInstanceOf(\Zookeeper::class, ZookeeperStore::createConnection($connectionString));

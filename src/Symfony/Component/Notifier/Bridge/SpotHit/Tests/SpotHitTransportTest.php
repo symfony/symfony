@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\SpotHit\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
 use Symfony\Component\Notifier\Bridge\SpotHit\SpotHitTransport;
@@ -91,13 +92,11 @@ final class SpotHitTransportTest extends TransportTestCase
         ];
     }
 
-    /**
-     * @dataProvider argumentsProvider
-     */
+    #[DataProvider('argumentsProvider')]
     public function testShouldForwardArgumentToRequest($setupTransport, $assertions)
     {
         $expectedRequest = [
-            function ($method, $url, $options) use ($assertions) {
+            static function ($method, $url, $options) use ($assertions) {
                 $bodyFields = [];
                 parse_str($options['body'], $bodyFields);
                 $assertions($bodyFields);

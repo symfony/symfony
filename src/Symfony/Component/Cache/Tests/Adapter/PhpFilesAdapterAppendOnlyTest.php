@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\PhpFilesAdapter;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class PhpFilesAdapterAppendOnlyTest extends PhpFilesAdapterTest
 {
     protected $skippedTests = [

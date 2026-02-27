@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Runtime\RunnerInterface;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Component\VarDumper\Cloner\Data;
 
@@ -64,6 +65,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
             'zend_opcache_status' => \extension_loaded('Zend OPcache') ? (filter_var(\ini_get('opcache.enable'), \FILTER_VALIDATE_BOOLEAN) ? 'Enabled' : 'Not enabled') : 'Not installed',
             'bundles' => [],
             'sapi_name' => \PHP_SAPI,
+            'runner_class' => $this->determineRunnerClass(),
         ];
 
         if (isset($this->kernel)) {
@@ -249,6 +251,11 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         return $this->data['sapi_name'];
     }
 
+    public function getRunnerClass(): ?string
+    {
+        return $this->data['runner_class'];
+    }
+
     public function getName(): string
     {
         return 'config';
@@ -271,5 +278,20 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
         }
 
         return $versionState;
+    }
+
+    private function determineRunnerClass(): ?string
+    {
+        $stack = debug_backtrace(\DEBUG_BACKTRACE_IGNORE_ARGS);
+        for ($frame = end($stack); $frame; $frame = prev($stack)) {
+            if (!$class = $frame['class'] ?? null) {
+                continue;
+            }
+            if (is_a($class, RunnerInterface::class, true)) {
+                return $class;
+            }
+        }
+
+        return null;
     }
 }

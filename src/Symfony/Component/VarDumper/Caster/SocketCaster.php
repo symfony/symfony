@@ -26,19 +26,17 @@ final class SocketCaster
         socket_getsockname($socket, $addr, $port);
         $info = stream_get_meta_data(socket_export_stream($socket));
 
-        if (\PHP_VERSION_ID >= 80300) {
-            $uri = ($info['uri'] ?? '//');
-            if (str_starts_with($uri, 'unix://')) {
-                $uri .= $addr;
-            } else {
-                $uri .= \sprintf(str_contains($addr, ':') ? '[%s]:%s' : '%s:%s', $addr, $port);
-            }
+        $uri = ($info['uri'] ?? '//');
+        if (str_starts_with($uri, 'unix://')) {
+            $uri .= $addr;
+        } else {
+            $uri .= \sprintf(str_contains($addr, ':') ? '[%s]:%s' : '%s:%s', $addr, $port);
+        }
 
-            $a[Caster::PREFIX_VIRTUAL.'uri'] = $uri;
+        $a[Caster::PREFIX_VIRTUAL.'uri'] = $uri;
 
-            if (@socket_atmark($socket)) {
-                $a[Caster::PREFIX_VIRTUAL.'atmark'] = true;
-            }
+        if (@socket_atmark($socket)) {
+            $a[Caster::PREFIX_VIRTUAL.'atmark'] = true;
         }
 
         $a += [

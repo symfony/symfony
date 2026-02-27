@@ -14,6 +14,7 @@ namespace Symfony\Component\Mailer\Bridge\Amazon\Tests\Transport;
 use AsyncAws\Core\Configuration;
 use AsyncAws\Core\Credentials\NullProvider;
 use AsyncAws\Ses\SesClient;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -26,9 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class SesHttpAsyncAwsTransportTest extends TestCase
 {
-    /**
-     * @dataProvider getTransportData
-     */
+    #[DataProvider('getTransportData')]
     public function testToString(SesHttpAsyncAwsTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);
@@ -118,7 +117,7 @@ class SesHttpAsyncAwsTransportTest extends TestCase
 
     public function testSendThrowsForErrorResponse()
     {
-        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+        $client = new MockHttpClient(static function (string $method, string $url, array $options): ResponseInterface {
             $json = json_encode([
                 'message' => 'i\'m a teapot',
                 'type' => 'sender',

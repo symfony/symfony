@@ -60,7 +60,7 @@ class EarlyExpirationHandler
         static $setMetadata;
 
         $setMetadata ??= \Closure::bind(
-            function (CacheItem $item, float $startTime) {
+            static function (CacheItem $item, float $startTime) {
                 if ($item->expiry > $endTime = microtime(true)) {
                     $item->newMetadata[CacheItem::METADATA_EXPIRY] = $item->expiry;
                     $item->newMetadata[CacheItem::METADATA_CTIME] = (int) ceil(1000 * ($endTime - $startTime));

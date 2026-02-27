@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @return Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null
+ */
 return static function (string|\Stringable $string, \Psr\Container\ContainerInterface $valueTransformers, \Symfony\Component\JsonStreamer\Read\Instantiator $instantiator, array $options): mixed {
     $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum'] = static function ($data) {
         return \Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum::from($data);
@@ -11,7 +14,7 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
         if (null === $data) {
             return null;
         }
-        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null".', \get_debug_type($data)));
+        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null'));
     };
     return $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null'](\Symfony\Component\JsonStreamer\Read\Decoder::decodeString((string) $string));
 };

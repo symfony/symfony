@@ -21,9 +21,11 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\OAuth2User;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Controller\UserValueResolver;
+use Symfony\Component\Security\Http\Tests\Fixtures\CustomUser;
 
 class UserValueResolverTest extends TestCase
 {
@@ -109,9 +111,22 @@ class UserValueResolverTest extends TestCase
         $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
     }
 
+    public function testResolveSucceedsWithUnionTypedAttribute()
+    {
+        $user = new InMemoryUser('username', 'password');
+        $token = new UsernamePasswordToken($user, 'provider');
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken($token);
+
+        $resolver = new UserValueResolver($tokenStorage);
+        $metadata = new ArgumentMetadata('foo', InMemoryUser::class.'|'.OAuth2User::class, false, false, null, false, [new CurrentUser()]);
+
+        $this->assertSame([$user], $resolver->resolve(Request::create('/'), $metadata));
+    }
+
     public function testResolveThrowsAccessDeniedWithWrongUserClass()
     {
-        $user = $this->createMock(UserInterface::class);
+        $user = new CustomUser('John', ['ROLE_USER'], 'password', 'hash');
         $token = new UsernamePasswordToken($user, 'provider');
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken($token);
@@ -154,7 +169,7 @@ class UserValueResolverTest extends TestCase
         $tokenStorage->setToken($token);
 
         $argumentResolver = new ArgumentResolver(null, [new UserValueResolver($tokenStorage)]);
-        $this->assertSame([$user], $argumentResolver->getArguments(Request::create('/'), function (UserInterface $user) {}));
+        $this->assertSame([$user], $argumentResolver->getArguments(Request::create('/'), static function (UserInterface $user) {}));
     }
 
     public function testIntegrationNoUser()
@@ -162,6 +177,6 @@ class UserValueResolverTest extends TestCase
         $tokenStorage = new TokenStorage();
 
         $argumentResolver = new ArgumentResolver(null, [new UserValueResolver($tokenStorage), new DefaultValueResolver()]);
-        $this->assertSame([null], $argumentResolver->getArguments(Request::create('/'), function (?UserInterface $user = null) {}));
+        $this->assertSame([null], $argumentResolver->getArguments(Request::create('/'), static function (?UserInterface $user = null) {}));
     }
 }

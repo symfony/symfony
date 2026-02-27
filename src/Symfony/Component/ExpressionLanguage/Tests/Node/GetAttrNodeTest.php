@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
+use Symfony\Component\ExpressionLanguage\Node\ArgumentsNode;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\ConstantNode;
 use Symfony\Component\ExpressionLanguage\Node\GetAttrNode;
@@ -28,6 +29,7 @@ class GetAttrNodeTest extends AbstractNodeTestCase
 
             ['baz', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo'), self::getArrayNode(), GetAttrNode::METHOD_CALL), ['foo' => new Obj()]],
             ['a', new GetAttrNode(new NameNode('foo'), new NameNode('index'), self::getArrayNode(), GetAttrNode::ARRAY_CALL), ['foo' => ['b' => 'a', 'b'], 'index' => 'b']],
+            [null, new GetAttrNode(new NameNode('foo'), new ConstantNode(0), new ArgumentsNode(), GetAttrNode::ARRAY_CALL, true), ['foo' => null]],
         ];
     }
 
@@ -50,10 +52,13 @@ class GetAttrNodeTest extends AbstractNodeTestCase
             ['foo[0]', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), self::getArrayNode(), GetAttrNode::ARRAY_CALL)],
             ['foo["b"]', new GetAttrNode(new NameNode('foo'), new ConstantNode('b'), self::getArrayNode(), GetAttrNode::ARRAY_CALL)],
 
-            ['foo.foo', new GetAttrNode(new NameNode('foo'), new NameNode('foo'), self::getArrayNode(), GetAttrNode::PROPERTY_CALL), ['foo' => new Obj()]],
+            ['foo.foo', new GetAttrNode(new NameNode('foo'), new NameNode('foo'), self::getArrayNode(), GetAttrNode::PROPERTY_CALL)],
 
-            ['foo.foo({"b": "a", 0: "b"})', new GetAttrNode(new NameNode('foo'), new NameNode('foo'), self::getArrayNode(), GetAttrNode::METHOD_CALL), ['foo' => new Obj()]],
+            ['foo.foo({"b": "a", 0: "b"})', new GetAttrNode(new NameNode('foo'), new NameNode('foo'), self::getArrayNode(), GetAttrNode::METHOD_CALL)],
             ['foo[index]', new GetAttrNode(new NameNode('foo'), new NameNode('index'), self::getArrayNode(), GetAttrNode::ARRAY_CALL)],
+
+            ['foo?.foo()', new GetAttrNode(new NameNode('foo'), new ConstantNode('foo', true, true), new ArgumentsNode(), GetAttrNode::METHOD_CALL)],
+            ['foo?.[0]', new GetAttrNode(new NameNode('foo'), new ConstantNode(0), new ArgumentsNode(), GetAttrNode::ARRAY_CALL, true)],
         ];
     }
 

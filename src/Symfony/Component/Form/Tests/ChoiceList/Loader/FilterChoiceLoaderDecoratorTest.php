@@ -14,26 +14,29 @@ namespace Symfony\Component\Form\Tests\ChoiceList\Loader;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\ChoiceList\ArrayChoiceList;
 use Symfony\Component\Form\ChoiceList\Loader\FilterChoiceLoaderDecorator;
+use Symfony\Component\Form\Tests\ChoiceList\ChoiceListAssertionTrait;
 use Symfony\Component\Form\Tests\Fixtures\ArrayChoiceLoader;
 
 class FilterChoiceLoaderDecoratorTest extends TestCase
 {
+    use ChoiceListAssertionTrait;
+
     public function testLoadChoiceList()
     {
-        $filter = fn ($choice) => 0 === $choice % 2;
+        $filter = static fn ($choice) => 0 === $choice % 2;
 
         $loader = new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(range(1, 4)), $filter);
 
-        $this->assertEquals(new ArrayChoiceList([1 => 2, 3 => 4]), $loader->loadChoiceList());
+        $this->assertEqualsArrayChoiceList(new ArrayChoiceList([1 => 2, 3 => 4]), $loader->loadChoiceList());
     }
 
     public function testLoadChoiceListWithGroupedChoices()
     {
-        $filter = fn ($choice) => $choice < 9 && 0 === $choice % 2;
+        $filter = static fn ($choice) => $choice < 9 && 0 === $choice % 2;
 
         $loader = new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(['units' => range(1, 9), 'tens' => range(10, 90, 10)]), $filter);
 
-        $this->assertEquals(new ArrayChoiceList([
+        $this->assertEqualsArrayChoiceList(new ArrayChoiceList([
             'units' => [
                 1 => 2,
                 3 => 4,
@@ -45,12 +48,12 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
 
     public function testLoadChoiceListMixedWithGroupedAndNonGroupedChoices()
     {
-        $filter = fn ($choice) => 0 === $choice % 2;
+        $filter = static fn ($choice) => 0 === $choice % 2;
 
         $choices = array_merge(range(1, 9), ['grouped' => range(10, 40, 5)]);
         $loader = new FilterChoiceLoaderDecorator(new ArrayChoiceLoader($choices), $filter);
 
-        $this->assertEquals(new ArrayChoiceList([
+        $this->assertEqualsArrayChoiceList(new ArrayChoiceList([
             1 => 2,
             3 => 4,
             5 => 6,
@@ -68,7 +71,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
     {
         $evenValues = [1 => '2', 3 => '4'];
 
-        $filter = fn ($choice) => 0 === $choice % 2;
+        $filter = static fn ($choice) => 0 === $choice % 2;
 
         $loader = new FilterChoiceLoaderDecorator(new ArrayChoiceLoader([range(1, 4)]), $filter);
 
@@ -80,7 +83,7 @@ class FilterChoiceLoaderDecoratorTest extends TestCase
         $evenChoices = [1 => 2, 3 => 4];
         $values = array_map('strval', range(1, 4));
 
-        $filter = fn ($choice) => 0 === $choice % 2;
+        $filter = static fn ($choice) => 0 === $choice % 2;
 
         $loader = new FilterChoiceLoaderDecorator(new ArrayChoiceLoader(range(1, 4)), $filter);
 

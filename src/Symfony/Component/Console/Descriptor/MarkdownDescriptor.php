@@ -106,7 +106,7 @@ class MarkdownDescriptor extends Descriptor
                 .str_repeat('-', Helper::width($command->getName()) + 2)."\n\n"
                 .($command->getDescription() ? $command->getDescription()."\n\n" : '')
                 .'### Usage'."\n\n"
-                .array_reduce($command->getAliases(), fn ($carry, $usage) => $carry.'* `'.$usage.'`'."\n")
+                .array_reduce($command->getAliases(), static fn ($carry, $usage) => $carry.'* `'.$usage.'`'."\n")
             );
 
             return;
@@ -119,7 +119,7 @@ class MarkdownDescriptor extends Descriptor
             .str_repeat('-', Helper::width($command->getName()) + 2)."\n\n"
             .($command->getDescription() ? $command->getDescription()."\n\n" : '')
             .'### Usage'."\n\n"
-            .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), fn ($carry, $usage) => $carry.'* `'.$usage.'`'."\n")
+            .array_reduce(array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()), static fn ($carry, $usage) => $carry.'* `'.$usage.'`'."\n")
         );
 
         if ($help = $command->getProcessedHelp()) {
@@ -149,7 +149,7 @@ class MarkdownDescriptor extends Descriptor
             }
 
             $this->write("\n\n");
-            $this->write(implode("\n", array_map(fn ($commandName) => \sprintf('* [`%s`](#%s)', $commandName, str_replace(':', '', $description->getCommand($commandName)->getName())), $namespace['commands'])));
+            $this->write(implode("\n", array_map(static fn ($commandName) => \sprintf('* [`%s`](#%s)', $commandName, str_replace(':', '', $description->getCommand($commandName)->getName())), $namespace['commands'])));
         }
 
         foreach ($description->getCommands() as $command) {

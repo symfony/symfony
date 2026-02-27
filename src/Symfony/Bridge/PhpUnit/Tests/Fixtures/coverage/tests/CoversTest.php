@@ -9,13 +9,15 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers \DateTime
+ */
+#[CoversClass(DateTime::class)]
 class CoversTest extends TestCase
 {
-    /**
-     * @covers \DateTime
-     */
     public function test()
     {
         $this->assertTrue(true);

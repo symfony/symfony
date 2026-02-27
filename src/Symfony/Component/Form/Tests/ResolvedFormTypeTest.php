@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\AbstractType;
@@ -151,9 +152,7 @@ class ResolvedFormTypeTest extends TestCase
         $this->assertSame('configurable_form_prefix', $resolvedType->getBlockPrefix());
     }
 
-    /**
-     * @dataProvider provideTypeClassBlockPrefixTuples
-     */
+    #[DataProvider('provideTypeClassBlockPrefixTuples')]
     public function testBlockPrefixDefaultsToFQCNIfNoName($typeClass, $blockPrefix)
     {
         $resolvedType = new ResolvedFormType(new $typeClass());

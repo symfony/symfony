@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
@@ -22,8 +22,6 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class ImportMapConfigReaderTest extends TestCase
 {
-    use ExpectUserDeprecationMessageTrait;
-
     private Filesystem $filesystem;
 
     protected function setUp(): void
@@ -42,35 +40,33 @@ class ImportMapConfigReaderTest extends TestCase
     public function testGetEntriesAndWriteEntries()
     {
         $importMap = <<<EOF
-<?php
-return [
-    'remote_package' => [
-        'version' => '3.2.1',
-    ],
-    'local_package' => [
-        'path' => 'app.js',
-    ],
-    'type_css' => [
-        'path' => 'styles/app.css',
-        'type' => 'css',
-    ],
-    'entry_point' => [
-        'path' => 'entry.js',
-        'entrypoint' => true,
-    ],
-    'package/with_file.js' => [
-        'version' => '1.0.0',
-    ],
-];
-EOF;
+            <?php
+            return [
+                'remote_package' => [
+                    'version' => '3.2.1',
+                ],
+                'local_package' => [
+                    'path' => 'app.js',
+                ],
+                'type_css' => [
+                    'path' => 'styles/app.css',
+                    'type' => 'css',
+                ],
+                'entry_point' => [
+                    'path' => 'entry.js',
+                    'entrypoint' => true,
+                ],
+                'package/with_file.js' => [
+                    'version' => '1.0.0',
+                ],
+            ];
+            EOF;
         file_put_contents(__DIR__.'/../Fixtures/importmap_config_reader/importmap.php', $importMap);
 
-        $remotePackageStorage = $this->createMock(RemotePackageStorage::class);
-        $remotePackageStorage->expects($this->any())
+        $remotePackageStorage = $this->createStub(RemotePackageStorage::class);
+        $remotePackageStorage
             ->method('getDownloadPath')
-            ->willReturnCallback(static function (string $packageModuleSpecifier, ImportMapType $type) {
-                return '/path/to/vendor/'.$packageModuleSpecifier.'.'.$type->value;
-            });
+            ->willReturnCallback(static fn (string $packageModuleSpecifier, ImportMapType $type) => '/path/to/vendor/'.$packageModuleSpecifier.'.'.$type->value);
         $reader = new ImportMapConfigReader(
             __DIR__.'/../Fixtures/importmap_config_reader/importmap.php',
             $remotePackageStorage,
@@ -109,12 +105,10 @@ EOF;
         $this->assertSame($originalImportMapData, $newImportMapData);
     }
 
-    /**
-     * @dataProvider getPathToFilesystemPathTests
-     */
+    #[DataProvider('getPathToFilesystemPathTests')]
     public function testConvertPathToFilesystemPath(string $path, string $expectedPath)
     {
-        $configReader = new ImportMapConfigReader(realpath(__DIR__.'/../Fixtures/importmap.php'), $this->createMock(RemotePackageStorage::class));
+        $configReader = new ImportMapConfigReader(realpath(__DIR__.'/../Fixtures/importmap.php'), new RemotePackageStorage(sys_get_temp_dir()));
         // normalize path separators for comparison
         $expectedPath = str_replace('\\', '/', $expectedPath);
         $this->assertSame($expectedPath, $configReader->convertPathToFilesystemPath($path));
@@ -133,12 +127,10 @@ EOF;
         ];
     }
 
-    /**
-     * @dataProvider getFilesystemPathToPathTests
-     */
+    #[DataProvider('getFilesystemPathToPathTests')]
     public function testConvertFilesystemPathToPath(string $path, ?string $expectedPath)
     {
-        $configReader = new ImportMapConfigReader(__DIR__.'/../Fixtures/importmap.php', $this->createMock(RemotePackageStorage::class));
+        $configReader = new ImportMapConfigReader(__DIR__.'/../Fixtures/importmap.php', new RemotePackageStorage(sys_get_temp_dir()));
         $this->assertSame($expectedPath, $configReader->convertFilesystemPathToPath($path));
     }
 
@@ -157,18 +149,9 @@ EOF;
 
     public function testFindRootImportMapEntry()
     {
-        $configReader = new ImportMapConfigReader(__DIR__.'/../Fixtures/importmap.php', $this->createMock(RemotePackageStorage::class));
+        $configReader = new ImportMapConfigReader(__DIR__.'/../Fixtures/importmap.php', new RemotePackageStorage(sys_get_temp_dir()));
         $entry = $configReader->findRootImportMapEntry('file2');
         $this->assertSame('file2', $entry->importName);
         $this->assertSame('file2.js', $entry->path);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testDeprecatedMethodTriggerDeprecation()
-    {
-        $this->expectUserDeprecationMessage('Since symfony/asset-mapper 7.1: The method "Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader::splitPackageNameAndFilePath()" is deprecated and will be removed in 8.0. Use ImportMapEntry::splitPackageNameAndFilePath() instead.');
-        ImportMapConfigReader::splitPackageNameAndFilePath('foo');
     }
 }

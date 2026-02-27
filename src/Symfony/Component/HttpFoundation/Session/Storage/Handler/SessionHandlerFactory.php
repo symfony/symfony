@@ -64,6 +64,7 @@ class SessionHandlerFactory
                     throw new \InvalidArgumentException('Unsupported Redis or Memcached DSN. Try running "composer require symfony/cache".');
                 }
                 $handlerClass = str_starts_with($connection, 'memcached:') ? MemcachedSessionHandler::class : RedisSessionHandler::class;
+                $connection = preg_replace('/([?&])prefix=[^&]*+&?/', '\1', $connection);
                 $connection = AbstractAdapter::createConnection($connection, ['lazy' => true]);
 
                 return new $handlerClass($connection, array_intersect_key($options, ['prefix' => 1, 'ttl' => 1]));

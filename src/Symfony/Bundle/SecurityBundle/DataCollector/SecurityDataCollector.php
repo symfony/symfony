@@ -101,10 +101,12 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
             }
 
             $logoutUrl = null;
-            try {
-                $logoutUrl = $this->logoutUrlGenerator?->getLogoutPath();
-            } catch (\Exception) {
-                // fail silently when the logout URL cannot be generated
+            if ($this->logoutUrlGenerator && method_exists($token, 'getFirewallName')) {
+                try {
+                    $logoutUrl = $this->logoutUrlGenerator->getLogoutPath($token->getFirewallName());
+                } catch (\Exception) {
+                    // fail silently when the logout URL cannot be generated
+                }
             }
 
             $this->data = [

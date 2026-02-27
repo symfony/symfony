@@ -105,7 +105,7 @@ class TextPartTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The encoding must be one of "quoted-printable", "base64", "8bit", "upper_encoder" ("this_encoding_does_not_exist" given).');
 
-        $upperEncoder = $this->createMock(ContentEncoderInterface::class);
+        $upperEncoder = $this->createStub(ContentEncoderInterface::class);
         $upperEncoder->method('getName')->willReturn('upper_encoder');
 
         TextPart::addEncoder($upperEncoder);
@@ -117,7 +117,7 @@ class TextPartTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('You are not allowed to change the default encoders ("quoted-printable", "base64", and "8bit").');
 
-        $base64Encoder = $this->createMock(ContentEncoderInterface::class);
+        $base64Encoder = $this->createStub(ContentEncoderInterface::class);
         $base64Encoder->method('getName')->willReturn('base64');
 
         TextPart::addEncoder($base64Encoder);

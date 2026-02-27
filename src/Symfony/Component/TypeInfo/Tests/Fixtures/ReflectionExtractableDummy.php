@@ -37,6 +37,8 @@ final class ReflectionExtractableDummy extends AbstractDummy
     public DummyBackedEnum $backedEnum;
     public ?DummyBackedEnum $nullableBackedEnum;
 
+    public DummyBackedEnumInterface $backedEnumInterface;
+
     public int|string $union;
     public \Traversable&\Stringable $intersection;
 

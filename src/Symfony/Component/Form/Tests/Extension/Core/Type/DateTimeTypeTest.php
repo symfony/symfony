@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormError;
@@ -60,6 +62,37 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $dateTime = new \DateTime('2010-06-02 03:04:00 UTC');
 
         $this->assertEquals($dateTime, $form->getData());
+    }
+
+    public function testSubmitDatePoint()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'model_timezone' => 'UTC',
+            'view_timezone' => 'UTC',
+            'date_widget' => 'choice',
+            'years' => [2010],
+            'time_widget' => 'choice',
+            'input' => 'date_point',
+        ]);
+
+        $input = [
+            'date' => [
+                'day' => '2',
+                'month' => '6',
+                'year' => '2010',
+            ],
+            'time' => [
+                'hour' => '3',
+                'minute' => '4',
+            ],
+        ];
+
+        $form->submit($input);
+
+        $this->assertInstanceOf(DatePoint::class, $form->getData());
+        $datePoint = DatePoint::createFromMutable(new \DateTime('2010-06-02 03:04:00 UTC'));
+        $this->assertEquals($datePoint, $form->getData());
+        $this->assertEquals($input, $form->getViewData());
     }
 
     public function testSubmitDateTimeImmutable()
@@ -701,9 +734,7 @@ class DateTimeTypeTest extends BaseTypeTestCase
         $this->assertSame($expectedData, $form->getData());
     }
 
-    /**
-     * @dataProvider provideEmptyData
-     */
+    #[DataProvider('provideEmptyData')]
     public function testSubmitNullUsesDateEmptyData($widget, $emptyData, $expectedData)
     {
         $form = $this->factory->create(static::TESTED_TYPE, null, [

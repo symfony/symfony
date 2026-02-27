@@ -99,4 +99,34 @@ class HistoryTest extends TestCase
 
         $this->assertSame('http://www.example1.com/', $history->current()->getUri(), '->forward() returns the next request in the history');
     }
+
+    public function testIsFirstPage()
+    {
+        $history = new History();
+        $history->add(new Request('http://www.example.com/', 'get'));
+        $history->add(new Request('http://www.example1.com/', 'get'));
+        $history->back();
+
+        $this->assertFalse($history->isLastPage());
+        $this->assertTrue($history->isFirstPage());
+    }
+
+    public function testIsLastPage()
+    {
+        $history = new History();
+        $history->add(new Request('http://www.example.com/', 'get'));
+        $history->add(new Request('http://www.example1.com/', 'get'));
+
+        $this->assertTrue($history->isLastPage());
+        $this->assertFalse($history->isFirstPage());
+    }
+
+    public function testIsFirstAndLastPage()
+    {
+        $history = new History();
+        $history->add(new Request('http://www.example.com/', 'get'));
+
+        $this->assertTrue($history->isLastPage());
+        $this->assertTrue($history->isFirstPage());
+    }
 }

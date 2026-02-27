@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Console\Descriptor;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -41,7 +42,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
-    /** @dataProvider getDescribeDefaultsTestData */
+    #[DataProvider('getDescribeDefaultsTestData')]
     public function testDescribeDefaults($object, array $options, $fixtureName)
     {
         $describedObject = $this->getObjectDescription($object, $options);
@@ -54,7 +55,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         }
     }
 
-    /** @dataProvider getDescribeResolvedFormTypeTestData */
+    #[DataProvider('getDescribeResolvedFormTypeTestData')]
     public function testDescribeResolvedFormType(ResolvedFormTypeInterface $type, array $options, $fixtureName)
     {
         $describedObject = $this->getObjectDescription($type, $options);
@@ -67,7 +68,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         }
     }
 
-    /** @dataProvider getDescribeOptionTestData */
+    #[DataProvider('getDescribeOptionTestData')]
     public function testDescribeOption(OptionsResolver $optionsResolver, array $options, $fixtureName)
     {
         $describedObject = $this->getObjectDescription($optionsResolver, $options);
@@ -169,15 +170,19 @@ class FooType extends AbstractType
         $resolver->setRequired('foo');
         $resolver->setDefined('bar');
         $resolver->setDeprecated('bar', 'vendor/package', '1.1');
-        $resolver->setDefault('empty_data', function (Options $options, $value) {
+        $resolver->setDefault('empty_data', static function (Options $options, $value) {
             $foo = $options['foo'];
 
-            return fn (FormInterface $form) => $form->getConfig()->getCompound() ? [$foo] : $foo;
+            return static fn (FormInterface $form) => $form->getConfig()->getCompound() ? [$foo] : $foo;
         });
         $resolver->setAllowedTypes('foo', 'string');
         $resolver->setAllowedValues('foo', ['bar', 'baz']);
-        $resolver->setNormalizer('foo', fn (Options $options, $value) => (string) $value);
-        $resolver->setOptions('baz', function (OptionsResolver $baz) {
+        $resolver->setNormalizer('foo', function (Options $options, $value) {
+            \assert(null !== $this); // explicitly test non-static normalizer
+
+            return (string) $value;
+        });
+        $resolver->setOptions('baz', static function (OptionsResolver $baz) {
             $baz->setRequired('foo');
             $baz->setDefaults(['foo' => true, 'bar' => true]);
         });

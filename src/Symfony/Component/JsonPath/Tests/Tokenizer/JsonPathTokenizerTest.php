@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonPath\Tests\Tokenizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\JsonPath\Exception\InvalidJsonPathException;
 use Symfony\Component\JsonPath\JsonPath;
@@ -19,9 +20,7 @@ use Symfony\Component\JsonPath\Tokenizer\TokenType;
 
 class JsonPathTokenizerTest extends TestCase
 {
-    /**
-     * @dataProvider simplePathProvider
-     */
+    #[DataProvider('simplePathProvider')]
     public function testSimplePath(string $path, array $expectedTokens)
     {
         $jsonPath = new JsonPath($path);
@@ -62,9 +61,7 @@ class JsonPathTokenizerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider bracketNotationProvider
-     */
+    #[DataProvider('bracketNotationProvider')]
     public function testBracketNotation(string $path, array $expectedTokens)
     {
         $jsonPath = new JsonPath($path);
@@ -102,9 +99,7 @@ class JsonPathTokenizerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider filterExpressionProvider
-     */
+    #[DataProvider('filterExpressionProvider')]
     public function testFilterExpressions(string $path, array $expectedTokens)
     {
         $jsonPath = new JsonPath($path);
@@ -147,9 +142,7 @@ class JsonPathTokenizerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider complexPathProvider
-     */
+    #[DataProvider('complexPathProvider')]
     public function testComplexPaths(string $path, array $expectedTokens)
     {
         $jsonPath = new JsonPath($path);
@@ -297,7 +290,7 @@ class JsonPathTokenizerTest extends TestCase
     public function testTokenizeThrowsExceptionForInvalidFilterSyntax()
     {
         $this->expectException(InvalidJsonPathException::class);
-        $this->expectExceptionMessage('JSONPath syntax error at position 22: unclosed bracket.');
+        $this->expectExceptionMessage('JSONPath syntax error at position 22: unclosed parenthesis.');
 
         JsonPathTokenizer::tokenize(new JsonPath('$.store[?(@.price > 10]'));
     }
@@ -310,9 +303,7 @@ class JsonPathTokenizerTest extends TestCase
         JsonPathTokenizer::tokenize(new JsonPath('$.store...name'));
     }
 
-    /**
-     * @dataProvider provideValidUtf8Chars
-     */
+    #[DataProvider('provideValidUtf8Chars')]
     public function testUtf8ValidChars(string $propertyName)
     {
         $jsonPath = new JsonPath(\sprintf('$.%s', $propertyName));
@@ -337,9 +328,7 @@ class JsonPathTokenizerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideInvalidUtf8PropertyName
-     */
+    #[DataProvider('provideInvalidUtf8PropertyName')]
     public function testUtf8InvalidPropertyName(string $propertyName)
     {
         $this->expectException(InvalidJsonPathException::class);
@@ -355,11 +344,23 @@ class JsonPathTokenizerTest extends TestCase
             'special char first' => ['#test'],
             'start with digit' => ['123test'],
             'asterisk' => ['test*test'],
-            'space not allowed' => [' test'],
             'at sign not allowed' => ['@test'],
-            'start control char' => ["\0test"],
             'ending control char' => ["test\xFF\xFA"],
             'dash sign' => ['-test'],
         ];
+    }
+
+    public function testQuotedTrueFalseNullShouldNotThrow()
+    {
+        foreach (['True', 'False', 'Null'] as $value) {
+            JsonPathTokenizer::tokenize(
+                new JsonPath(\sprintf('$[?@.a=="%s"]', $value))
+            );
+            JsonPathTokenizer::tokenize(
+                new JsonPath(\sprintf('$[?@.a==\'%s\']', $value))
+            );
+        }
+
+        $this->expectNotToPerformAssertions();
     }
 }

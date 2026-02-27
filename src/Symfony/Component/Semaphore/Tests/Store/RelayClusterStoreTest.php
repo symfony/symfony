@@ -11,11 +11,10 @@
 
 namespace Symfony\Component\Semaphore\Tests\Store;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Relay\Cluster as RelayCluster;
 
-/**
- * @requires extension relay
- */
+#[RequiresPhpExtension('relay')]
 class RelayClusterStoreTest extends AbstractRedisStoreTestCase
 {
     public static function setUpBeforeClass(): void

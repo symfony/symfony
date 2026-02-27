@@ -18,7 +18,3 @@ namespace Symfony\Component\Serializer\Attribute;
 class Ignore
 {
 }
-
-if (!class_exists(\Symfony\Component\Serializer\Annotation\Ignore::class, false)) {
-    class_alias(Ignore::class, \Symfony\Component\Serializer\Annotation\Ignore::class);
-}

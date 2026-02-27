@@ -41,15 +41,16 @@ final class GzipCompressor implements SupportedCompressorInterface
 
     public function compress(string $path): void
     {
-        if (null === $reason = $this->zopfliCompressor->getUnsupportedReason()) {
-            $this->zopfliCompressor->compress($path);
+        $unsupportedReason = $this->zopfliCompressor->getUnsupportedReason();
+
+        if (null !== $unsupportedReason) {
+            $this->logger?->warning($unsupportedReason);
+            $this->baseCompress($path);
 
             return;
-        } else {
-            $this->logger?->warning($reason);
         }
 
-        $this->baseCompress($path);
+        $this->zopfliCompressor->compress($path);
     }
 
     public function getUnsupportedReason(): ?string

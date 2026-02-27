@@ -15,13 +15,12 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Doctrine\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Doctrine\Transport\Connection;
 
-/**
- * @requires extension pdo_sqlite
- */
+#[RequiresPhpExtension('pdo_sqlite')]
 class DoctrineIntegrationTest extends TestCase
 {
     private \Doctrine\DBAL\Connection $driverConnection;
@@ -61,8 +60,7 @@ class DoctrineIntegrationTest extends TestCase
             ->where('m.body = :body')
             ->setParameter('body', '{"message": "Hi i am delayed"}');
 
-        // DBAL 2 compatibility
-        $result = method_exists($qb, 'executeQuery') ? $qb->executeQuery() : $qb->execute();
+        $result = $qb->executeQuery();
 
         $availableAt = new \DateTimeImmutable($result->fetchOne(), new \DateTimeZone('UTC'));
 
@@ -80,8 +78,7 @@ class DoctrineIntegrationTest extends TestCase
             ->where('m.body = :body')
             ->setParameter('body', '{"message": "Hi, I am not actually delayed"}');
 
-        // DBAL 2 compatibility
-        $result = method_exists($qb, 'executeQuery') ? $qb->executeQuery() : $qb->execute();
+        $result = $qb->executeQuery();
 
         $availableAt = new \DateTimeImmutable($result->fetchOne(), new \DateTimeZone('UTC'));
 

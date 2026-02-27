@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Tests\Event;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Event\SentMessageEvent;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -19,17 +20,13 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 
 final class SentMessageEventTest extends TestCase
 {
-    /**
-     * @dataProvider messagesProvider
-     */
+    #[DataProvider('messagesProvider')]
     public function testConstruct(SentMessage $message, SentMessageEvent $event)
     {
         $this->assertEquals($event, new SentMessageEvent($message));
     }
 
-    /**
-     * @dataProvider messagesProvider
-     */
+    #[DataProvider('messagesProvider')]
     public function testGetMessage(SentMessage $message, SentMessageEvent $event)
     {
         $this->assertSame($message, $event->getMessage());

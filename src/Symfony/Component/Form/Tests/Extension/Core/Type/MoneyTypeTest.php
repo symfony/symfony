@@ -25,7 +25,7 @@ class MoneyTypeTest extends BaseTypeTestCase
     {
         // we test against different locales, so we need the full
         // implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this);
 
         parent::setUp();
 
@@ -34,7 +34,9 @@ class MoneyTypeTest extends BaseTypeTestCase
 
     protected function tearDown(): void
     {
-        \Locale::setDefault($this->defaultLocale);
+        if (isset($this->defaultLocale)) {
+            \Locale::setDefault($this->defaultLocale);
+        }
     }
 
     public function testPassMoneyPatternToView()
@@ -113,7 +115,7 @@ class MoneyTypeTest extends BaseTypeTestCase
     public function testHtml5EnablesSpecificFormatting()
     {
         // Since we test against "de_CH", we need the full implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this);
 
         \Locale::setDefault('de_CH');
 
@@ -122,6 +124,46 @@ class MoneyTypeTest extends BaseTypeTestCase
 
         $this->assertSame('12345.60', $form->createView()->vars['value']);
         $this->assertSame('number', $form->createView()->vars['type']);
+    }
+
+    public function testHtml5AddsStepAttributeIfNotSet()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => true,
+        ]);
+        $view = $form->createView();
+        $this->assertSame('any', $view->vars['attr']['step']);
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => false,
+            'scale' => 2,
+        ]);
+        $view = $form->createView();
+        $this->assertSame('decimal', $view->vars['attr']['inputmode']);
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => false,
+            'scale' => 0,
+        ]);
+        $view = $form->createView();
+        $this->assertSame('numeric', $view->vars['attr']['inputmode']);
+    }
+
+    public function testHtml5DoesNotOverrideUserProvidedStep()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => true,
+            'attr' => ['step' => '0.01'],
+        ]);
+        $view = $form->createView();
+        $this->assertSame('0.01', $view->vars['attr']['step']);
+
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'html5' => false,
+            'scale' => 2,
+        ]);
+        $view = $form->createView();
+        $this->assertSame('decimal', $view->vars['attr']['inputmode']);
     }
 
     public function testDefaultInput()

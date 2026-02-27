@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use PHPStan\PhpDocParser\Parser\PhpDocParser;
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\app\TypeInfo\Dummy;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\TypeInfo\Type;
 
 class TypeInfoTest extends AbstractWebTestCase
@@ -28,5 +29,10 @@ class TypeInfoTest extends AbstractWebTestCase
         }
 
         $this->assertEquals(Type::int(), static::getContainer()->get('type_info.resolver')->resolve('int'));
+
+        if (Kernel::VERSION_ID >= 70400) {
+            $this->assertEquals(Type::int(), static::getContainer()->get('type_info.resolver')->resolve(new \ReflectionProperty(Dummy::class, 'customAlias')));
+            $this->assertEquals(Type::int(), static::getContainer()->get('type_info.resolver')->resolve('CustomAlias'));
+        }
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Asset\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Context\ContextInterface;
 use Symfony\Component\Asset\PathPackage;
@@ -19,9 +20,7 @@ use Symfony\Component\Asset\VersionStrategy\VersionStrategyInterface;
 
 class PathPackageTest extends TestCase
 {
-    /**
-     * @dataProvider getConfigs
-     */
+    #[DataProvider('getConfigs')]
     public function testGetUrl($basePath, $format, $path, $expected)
     {
         $package = new PathPackage($basePath, new StaticVersionStrategy('v1', $format));
@@ -50,9 +49,7 @@ class PathPackageTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getContextConfigs
-     */
+    #[DataProvider('getContextConfigs')]
     public function testGetUrlWithContext($basePathRequest, $basePath, $format, $path, $expected)
     {
         $package = new PathPackage($basePath, new StaticVersionStrategy('v1', $format), $this->getContext($basePathRequest));
@@ -79,8 +76,8 @@ class PathPackageTest extends TestCase
 
     public function testVersionStrategyGivesAbsoluteURL()
     {
-        $versionStrategy = $this->createMock(VersionStrategyInterface::class);
-        $versionStrategy->expects($this->any())
+        $versionStrategy = $this->createStub(VersionStrategyInterface::class);
+        $versionStrategy
             ->method('applyVersion')
             ->willReturn('https://cdn.com/bar/main.css');
         $package = new PathPackage('/subdirectory', $versionStrategy, $this->getContext('/bar'));
@@ -90,8 +87,8 @@ class PathPackageTest extends TestCase
 
     private function getContext($basePath)
     {
-        $context = $this->createMock(ContextInterface::class);
-        $context->expects($this->any())->method('getBasePath')->willReturn($basePath);
+        $context = $this->createStub(ContextInterface::class);
+        $context->method('getBasePath')->willReturn($basePath);
 
         return $context;
     }

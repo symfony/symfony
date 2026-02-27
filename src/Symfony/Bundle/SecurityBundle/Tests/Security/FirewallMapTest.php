@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Security;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallContext;
@@ -57,22 +58,14 @@ class FirewallMapTest extends TestCase
         $this->assertFalse($request->attributes->has('_stateless'));
     }
 
-    /** @dataProvider providesStatefulStatelessRequests */
+    #[DataProvider('providesStatefulStatelessRequests')]
     public function testGetListeners(Request $request, bool $expectedState)
     {
-        $firewallContext = $this->createMock(FirewallContext::class);
-
         $firewallConfig = new FirewallConfig('main', 'user_checker', null, true, true);
-        $firewallContext->expects($this->once())->method('getConfig')->willReturn($firewallConfig);
-
-        $listener = function () {};
-        $firewallContext->expects($this->once())->method('getListeners')->willReturn([$listener]);
-
-        $exceptionListener = $this->createMock(ExceptionListener::class);
-        $firewallContext->expects($this->once())->method('getExceptionListener')->willReturn($exceptionListener);
-
-        $logoutListener = $this->createMock(LogoutListener::class);
-        $firewallContext->expects($this->once())->method('getLogoutListener')->willReturn($logoutListener);
+        $listener = static function () {};
+        $exceptionListener = $this->createStub(ExceptionListener::class);
+        $logoutListener = $this->createStub(LogoutListener::class);
+        $firewallContext = new FirewallContext([$listener], $exceptionListener, $logoutListener, $firewallConfig);
 
         $matcher = $this->createMock(RequestMatcherInterface::class);
         $matcher->expects($this->once())
@@ -80,8 +73,8 @@ class FirewallMapTest extends TestCase
             ->with($request)
             ->willReturn(true);
 
-        $container = $this->createMock(Container::class);
-        $container->expects($this->exactly(2))->method('get')->willReturn($firewallContext);
+        $container = new Container();
+        $container->set('security.firewall.map.context.foo', $firewallContext);
 
         $firewallMap = new FirewallMap($container, ['security.firewall.map.context.foo' => $matcher]);
 

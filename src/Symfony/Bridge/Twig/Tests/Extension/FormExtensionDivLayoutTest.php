@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bridge\Twig\Extension\FormExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
@@ -18,7 +19,7 @@ use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -84,9 +85,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         ];
     }
 
-    /**
-     * @dataProvider isSelectedChoiceProvider
-     */
+    #[DataProvider('isSelectedChoiceProvider')]
     public function testIsChoiceSelected($expected, $choice, $value)
     {
         $choice = new ChoiceView($choice, $choice, $choice.' label');
@@ -126,9 +125,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
         ];
     }
 
-    /**
-     * @dataProvider isRootFormProvider
-     */
+    #[DataProvider('isRootFormProvider')]
     public function testIsRootForm($expected, FormView $formView)
     {
         $this->assertSame($expected, \Symfony\Bridge\Twig\Extension\twig_is_root_form($formView));
@@ -148,7 +145,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
             'form_div_layout.html.twig',
             'custom_widgets.html.twig',
         ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->createMock(CsrfTokenManagerInterface::class));
+        $this->renderer = new FormRenderer($rendererEngine, new CsrfTokenManager());
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
 
         $view = $this->factory
@@ -156,7 +153,7 @@ class FormExtensionDivLayoutTest extends AbstractDivLayoutTestCase
             ->createView()
         ;
 
-        $this->assertSame('&euro; <input type="text" id="name" name="name" required="required" />', $this->renderWidget($view));
+        $this->assertSame('&euro; <input type="text" id="name" name="name" required="required" inputmode="decimal" />', $this->renderWidget($view));
     }
 
     public function testHelpAttr()

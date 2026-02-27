@@ -75,8 +75,13 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
         $idReader = null;
         if (\is_array($value) && $value[0] instanceof IdReader) {
             $idReader = $value[0];
-        } elseif ($value instanceof \Closure && ($rThis = (new \ReflectionFunction($value))->getClosureThis()) instanceof IdReader) {
-            $idReader = $rThis;
+        } elseif ($value instanceof \Closure) {
+            $ref = new \ReflectionFunction($value);
+            if (($rThis = $ref->getClosureThis()) instanceof IdReader) {
+                $idReader = $rThis;
+            } elseif (($usedVariables = $ref->getClosureUsedVariables()) && ($usedVariables['idReader'] ?? null) instanceof IdReader) {
+                $idReader = $usedVariables['idReader'];
+            }
         }
 
         // Optimize performance in case we have an object loader and
@@ -90,7 +95,7 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
             // "INDEX BY" clause to the Doctrine query in the loader,
             // but I'm not sure whether that's doable in a generic fashion.
             foreach ($this->objectLoader->getEntitiesByIds($idReader->getIdField(), $values) as $object) {
-                $objectsById[$idReader->getIdValue($object)] = $object;
+                $objectsById[$value($object) ?? ''] = $object;
             }
 
             foreach ($values as $i => $id) {

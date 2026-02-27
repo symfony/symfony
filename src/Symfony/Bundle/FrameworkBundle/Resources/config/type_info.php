@@ -23,7 +23,10 @@ return static function (ContainerConfigurator $container) {
     $container->services()
         // type context
         ->set('type_info.type_context_factory', TypeContextFactory::class)
-            ->args([service('type_info.resolver.string')->nullOnInvalid()])
+            ->args([
+                service('type_info.resolver.string')->nullOnInvalid(),
+                [],
+            ])
 
         // type resolvers
         ->set('type_info.resolver', TypeResolver::class)

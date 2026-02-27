@@ -20,6 +20,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Messenger\RunCommandMessage;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Messenger\Exception\RecoverableExceptionInterface;
+use Symfony\Component\Messenger\Exception\RecoverableMessageHandlingException;
+use Symfony\Component\Messenger\Exception\UnrecoverableExceptionInterface;
+use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -81,6 +85,38 @@ final class RunCommandMessageHandlerTest extends TestCase
         $this->fail('Exception not thrown.');
     }
 
+    public function testExecutesCommandThatThrownUnrecoverableException()
+    {
+        $handler = new RunCommandMessageHandler($this->createApplicationWithCommand());
+
+        try {
+            $handler(new RunCommandMessage('test:command --throw-unrecoverable'));
+        } catch (UnrecoverableExceptionInterface $e) {
+            $this->assertSame('Unrecoverable exception message', $e->getMessage());
+            $this->assertNull($e->getPrevious());
+
+            return;
+        }
+
+        $this->fail('Exception not thrown.');
+    }
+
+    public function testExecutesCommandThatThrownRecoverableException()
+    {
+        $handler = new RunCommandMessageHandler($this->createApplicationWithCommand());
+
+        try {
+            $handler(new RunCommandMessage('test:command --throw-recoverable'));
+        } catch (RecoverableExceptionInterface $e) {
+            $this->assertSame('Recoverable exception message', $e->getMessage());
+            $this->assertNull($e->getPrevious());
+
+            return;
+        }
+
+        $this->fail('Exception not thrown.');
+    }
+
     private function createApplicationWithCommand(): Application
     {
         $application = new Application();
@@ -92,6 +128,8 @@ final class RunCommandMessageHandlerTest extends TestCase
                     $this
                         ->setName('test:command')
                         ->addOption('throw')
+                        ->addOption('throw-unrecoverable')
+                        ->addOption('throw-recoverable')
                         ->addOption('exit', null, InputOption::VALUE_REQUIRED, 0)
                     ;
                 }
@@ -99,6 +137,14 @@ final class RunCommandMessageHandlerTest extends TestCase
                 protected function execute(InputInterface $input, OutputInterface $output): int
                 {
                     $output->write('some message');
+
+                    if ($input->getOption('throw-unrecoverable')) {
+                        throw new UnrecoverableMessageHandlingException('Unrecoverable exception message');
+                    }
+
+                    if ($input->getOption('throw-recoverable')) {
+                        throw new RecoverableMessageHandlingException('Recoverable exception message');
+                    }
 
                     if ($input->getOption('throw')) {
                         throw new \RuntimeException('exception message');

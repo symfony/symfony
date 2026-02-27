@@ -20,12 +20,12 @@ final class DatePointType extends DateTimeImmutableType
     public const NAME = 'date_point';
 
     /**
-      * @param T $value
-      *
-      * @return (T is null ? null : DatePoint)
-      *
-      * @template T
-      */
+     * @param T $value
+     *
+     * @return (T is null ? null : DatePoint)
+     *
+     * @template T
+     */
     public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?DatePoint
     {
         if (null === $value || $value instanceof DatePoint) {

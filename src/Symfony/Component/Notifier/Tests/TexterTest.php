@@ -23,12 +23,10 @@ use Symfony\Component\Notifier\Transport\TransportInterface;
 class TexterTest extends TestCase
 {
     private MockObject&TransportInterface $transport;
-    private MockObject&MessageBusInterface $bus;
 
     protected function setUp(): void
     {
         $this->transport = $this->createMock(TransportInterface::class);
-        $this->bus = $this->createMock(MessageBusInterface::class);
     }
 
     public function testSendWithoutBus()
@@ -56,13 +54,14 @@ class TexterTest extends TestCase
             ->method('send')
             ->with($message);
 
-        $this->bus
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus
             ->expects($this->once())
             ->method('dispatch')
             ->with($message)
             ->willReturn(new Envelope(new \stdClass()));
 
-        $texter = new Texter($this->transport, $this->bus);
+        $texter = new Texter($this->transport, $bus);
         $this->assertNull($texter->send($message));
     }
 }

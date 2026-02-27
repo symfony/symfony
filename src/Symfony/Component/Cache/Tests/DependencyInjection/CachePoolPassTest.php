@@ -11,12 +11,15 @@
 
 namespace Symfony\Component\Cache\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -102,15 +105,16 @@ class CachePoolPassTest extends TestCase
         $this->assertSame('mVXLns1cYU', $cachePool->getArgument(0));
     }
 
-    public function testNamespaceArgumentIsNotReplacedIfArrayAdapterIsUsed()
+    #[DataProvider('providerAdaptersNotNamespace')]
+    public function testNamespaceArgumentIsNotReplacedIfAdapterWithoutNamespace(string $adapterClass)
     {
         $container = new ContainerBuilder();
         $container->setParameter('kernel.container_class', 'app');
         $container->setParameter('kernel.project_dir', 'foo');
 
-        $container->register('cache.adapter.array', ArrayAdapter::class)->addArgument(0);
+        $container->register('cache.adapter', $adapterClass)->addArgument(0);
 
-        $cachePool = new ChildDefinition('cache.adapter.array');
+        $cachePool = new ChildDefinition('cache.adapter');
         $cachePool->addTag('cache.pool');
         $container->setDefinition('app.cache_pool', $cachePool);
 
@@ -119,21 +123,11 @@ class CachePoolPassTest extends TestCase
         $this->assertCount(0, $container->getDefinition('app.cache_pool')->getArguments());
     }
 
-    public function testNamespaceArgumentIsNotReplacedIfNullAdapterIsUsed()
+    public static function providerAdaptersNotNamespace(): iterable
     {
-        $container = new ContainerBuilder();
-        $container->setParameter('kernel.container_class', 'app');
-        $container->setParameter('kernel.project_dir', 'foo');
-
-        $container->register('cache.adapter.null', NullAdapter::class);
-
-        $cachePool = new ChildDefinition('cache.adapter.null');
-        $cachePool->addTag('cache.pool');
-        $container->setDefinition('app.cache_pool', $cachePool);
-
-        $this->cachePoolPass->process($container);
-
-        $this->assertCount(0, $container->getDefinition('app.cache_pool')->getArguments());
+        yield [ArrayAdapter::class];
+        yield [NullAdapter::class];
+        yield [TagAwareAdapter::class];
     }
 
     public function testArgsAreReplaced()
@@ -209,7 +203,8 @@ class CachePoolPassTest extends TestCase
         $container->register('cache.adapter.apcu', ApcuAdapter::class)
             ->setArguments([null, 0, null])
             ->addTag('cache.pool');
-        $container->register('cache.chain', ChainAdapter::class)
+        $container->register('cache.adapter.chain', ChainAdapter::class);
+        $container->setDefinition('cache.chain', new ChildDefinition('cache.adapter.chain'))
             ->addArgument(['cache.adapter.array', 'cache.adapter.apcu'])
             ->addTag('cache.pool');
         $container->setDefinition('cache.app', new ChildDefinition('cache.chain'))
@@ -224,7 +219,7 @@ class CachePoolPassTest extends TestCase
         $this->assertSame('cache.chain', $appCachePool->getParent());
 
         $chainCachePool = $container->getDefinition('cache.chain');
-        $this->assertNotInstanceOf(ChildDefinition::class, $chainCachePool);
+        $this->assertInstanceOf(ChildDefinition::class, $chainCachePool);
         $this->assertCount(2, $chainCachePool->getArgument(0));
         $this->assertInstanceOf(ChildDefinition::class, $chainCachePool->getArgument(0)[0]);
         $this->assertSame('cache.adapter.array', $chainCachePool->getArgument(0)[0]->getParent());
@@ -234,6 +229,80 @@ class CachePoolPassTest extends TestCase
         $doctrineCachePool = $container->getDefinition('doctrine.result_cache_pool');
         $this->assertInstanceOf(ChildDefinition::class, $doctrineCachePool);
         $this->assertSame('cache.app', $doctrineCachePool->getParent());
+    }
+
+    public function testChainChildDefinitionGetsOwnNamespace()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('cache.prefix.seed', 'test');
+
+        $container->register('cache.adapter.filesystem', FilesystemAdapter::class)
+            ->setAbstract(true)
+            ->setArguments([null, 0, null]);
+        $container->register('cache.adapter.chain', ChainAdapter::class)
+            ->setAbstract(true);
+
+        $container->setDefinition('cache.parent.chain', new ChildDefinition('cache.adapter.chain'))
+            ->addArgument(['cache.adapter.filesystem'])
+            ->addTag('cache.pool');
+
+        $container->setDefinition('foobar.chained.cache', new ChildDefinition('cache.parent.chain'))
+            ->addTag('cache.pool');
+
+        $this->cachePoolPass->process($container);
+
+        $parentChain = $container->getDefinition('cache.parent.chain');
+        $childChain = $container->getDefinition('foobar.chained.cache');
+
+        $parentNamespace = $parentChain->getArgument(0)[0]->getArgument(0);
+        $childNamespace = $childChain->getArgument(0)[0]->getArgument(0);
+
+        $this->assertNotSame($parentNamespace, $childNamespace);
+    }
+
+    public function testCustomMarshallerForPool()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('cache.prefix.seed', 'test');
+
+        $container->register('cache.default_marshaller');
+        $container->register('app.custom_marshaller');
+
+        $container->register('cache.adapter.filesystem', FilesystemAdapter::class)
+            ->setAbstract(true)
+            ->setArguments([null, 0, null, new Reference('cache.default_marshaller')])
+            ->addTag('cache.pool');
+
+        $container->register('cache.adapter.apcu', ApcuAdapter::class)
+            ->setAbstract(true)
+            ->setArguments([null, 0, null, new Reference('cache.default_marshaller')])
+            ->addTag('cache.pool');
+
+        $container->register('cache.adapter.array', ArrayAdapter::class)
+            ->setAbstract(true)
+            ->addTag('cache.pool');
+
+        $container->register('cache.adapter.chain', ChainAdapter::class)
+            ->setAbstract(true);
+
+        $container->setDefinition('cache.with_marshaller', new ChildDefinition('cache.adapter.filesystem'))
+            ->addTag('cache.pool', ['marshaller' => 'app.custom_marshaller']);
+        $container->setDefinition('cache.apcu_with_marshaller', new ChildDefinition('cache.adapter.apcu'))
+            ->addTag('cache.pool', ['marshaller' => 'app.custom_marshaller']);
+        $container->setDefinition('cache.chain_with_marshaller', new ChildDefinition('cache.adapter.chain'))
+            ->addArgument(['cache.adapter.array', 'cache.adapter.filesystem'])
+            ->addTag('cache.pool', ['marshaller' => 'app.custom_marshaller']);
+
+        $this->cachePoolPass->process($container);
+
+        $expectedMarshallerRef = new Reference('app.custom_marshaller');
+
+        $this->assertEquals($expectedMarshallerRef, $container->getDefinition('cache.with_marshaller')->getArgument(3));
+        $this->assertEquals($expectedMarshallerRef, $container->getDefinition('cache.apcu_with_marshaller')->getArgument(3));
+
+        $adapters = $container->getDefinition('cache.chain_with_marshaller')->getArgument(0);
+        $this->assertArrayNotHasKey('index_3', $adapters[0]->getArguments());
+        $this->assertEquals($expectedMarshallerRef, $adapters[1]->getArgument(3));
     }
 
     public function testGlobalClearerAlias()

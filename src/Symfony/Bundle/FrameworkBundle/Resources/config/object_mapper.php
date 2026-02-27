@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\ObjectMapper\Metadata\ObjectMapperMetadataFactoryInterface;
 use Symfony\Component\ObjectMapper\Metadata\ReflectionObjectMapperMetadataFactory;
+use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\ObjectMapper;
 use Symfony\Component\ObjectMapper\ObjectMapperInterface;
 
@@ -20,6 +21,13 @@ return static function (ContainerConfigurator $container) {
     $container->services()
         ->set('object_mapper.metadata_factory', ReflectionObjectMapperMetadataFactory::class)
         ->alias(ObjectMapperMetadataFactoryInterface::class, 'object_mapper.metadata_factory')
+
+        ->set('object_mapper.metadata_factory.reverse_class', ReverseClassObjectMapperMetadataFactory::class)
+            ->decorate('object_mapper.metadata_factory')
+            ->args([
+                service('.inner'),
+                abstract_arg('class_map'),
+            ])
 
         ->set('object_mapper', ObjectMapper::class)
             ->args([

@@ -11,13 +11,14 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 
-/**
- * @group functional
- */
+#[Group('functional')]
 class RouterDebugCommandTest extends AbstractWebTestCase
 {
     private Application $application;
@@ -89,21 +90,17 @@ class RouterDebugCommandTest extends AbstractWebTestCase
         $tester->execute(['name' => 'gerard'], ['interactive' => true]);
     }
 
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
         $tester = new CommandCompletionTester($this->application->get('debug:router'));
         $this->assertSame($expectedSuggestions, $tester->complete($input));
     }
 
-    /**
-     * @testWith    ["txt"]
-     *              ["xml"]
-     *              ["json"]
-     *              ["md"]
-     */
+    #[TestWith(['txt'])]
+    #[TestWith(['xml'])]
+    #[TestWith(['json'])]
+    #[TestWith(['md'])]
     public function testShowAliases(string $format)
     {
         $tester = $this->createCommandTester();

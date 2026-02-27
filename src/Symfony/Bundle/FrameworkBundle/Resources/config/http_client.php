@@ -15,9 +15,11 @@ use Http\Client\HttpAsyncClient;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpClient\HttplugClient;
 use Symfony\Component\HttpClient\Messenger\PingWebhookMessageHandler;
+use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpClient\Retry\GenericRetryStrategy;
 use Symfony\Component\HttpClient\UriTemplateHttpClient;
@@ -25,6 +27,14 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
+        ->set('cache.http_client.pool')
+            ->parent('cache.app')
+            ->tag('cache.pool')
+
+        ->set('cache.http_client', TagAwareAdapter::class)
+            ->args([service('cache.http_client.pool')])
+            ->tag('cache.taggable', ['pool' => 'cache.http_client.pool'])
+
         ->set('http_client.transport', HttpClientInterface::class)
             ->factory([HttpClient::class, 'create'])
             ->args([
@@ -34,6 +44,9 @@ return static function (ContainerConfigurator $container) {
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
             ->tag('monolog.logger', ['channel' => 'http_client'])
             ->tag('kernel.reset', ['method' => 'reset', 'on_invalid' => 'ignore'])
+
+        ->set('http_client.mock_transport', MockHttpClient::class)
+            ->tag('kernel.reset', ['method' => 'reset'])
 
         ->set('http_client', HttpClientInterface::class)
             ->factory('current')

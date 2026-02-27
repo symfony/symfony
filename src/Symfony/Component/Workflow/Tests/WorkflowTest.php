@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\Workflow\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Workflow\Arc;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Event\EnteredEvent;
 use Symfony\Component\Workflow\Event\Event;
@@ -27,6 +30,7 @@ use Symfony\Component\Workflow\Transition;
 use Symfony\Component\Workflow\TransitionBlocker;
 use Symfony\Component\Workflow\Workflow;
 use Symfony\Component\Workflow\WorkflowEvents;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class WorkflowTest extends TestCase
 {
@@ -121,7 +125,7 @@ class WorkflowTest extends TestCase
         $definition = $this->createComplexWorkflowDefinition();
         $subject = new Subject();
         $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
+        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', static function (GuardEvent $event) {
             $event->setBlocked(true);
         });
         $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher, 'workflow_name');
@@ -141,10 +145,10 @@ class WorkflowTest extends TestCase
         $workflow->apply($subject, 't1');
         $workflow->apply($subject, 't2');
 
-        $eventDispatcher->addListener('workflow.workflow_name.guard.t3', function () use (&$dispatchedEvents) {
+        $eventDispatcher->addListener('workflow.workflow_name.guard.t3', static function () use (&$dispatchedEvents) {
             $dispatchedEvents[] = 'workflow_name.guard.t3';
         });
-        $eventDispatcher->addListener('workflow.workflow_name.guard.t4', function () use (&$dispatchedEvents) {
+        $eventDispatcher->addListener('workflow.workflow_name.guard.t4', static function () use (&$dispatchedEvents) {
             $dispatchedEvents[] = 'workflow_name.guard.t4';
         });
 
@@ -225,17 +229,17 @@ class WorkflowTest extends TestCase
         $dispatcher = new EventDispatcher();
         $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher);
 
-        $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
+        $dispatcher->addListener('workflow.guard', static function (GuardEvent $event) {
             $event->addTransitionBlocker(new TransitionBlocker('Transition blocker 1', 'blocker_1'));
             $event->addTransitionBlocker(new TransitionBlocker('Transition blocker 2', 'blocker_2'));
         });
-        $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
+        $dispatcher->addListener('workflow.guard', static function (GuardEvent $event) {
             $event->addTransitionBlocker(new TransitionBlocker('Transition blocker 3', 'blocker_3'));
         });
-        $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
+        $dispatcher->addListener('workflow.guard', static function (GuardEvent $event) {
             $event->setBlocked(true);
         });
-        $dispatcher->addListener('workflow.guard', function (GuardEvent $event) {
+        $dispatcher->addListener('workflow.guard', static function (GuardEvent $event) {
             $event->setBlocked(true, 'You should not pass !!');
         });
 
@@ -439,9 +443,7 @@ class WorkflowTest extends TestCase
         yield [true, []];
     }
 
-    /**
-     * @dataProvider provideApplyWithEventDispatcherForAnnounceTests
-     */
+    #[DataProvider('provideApplyWithEventDispatcherForAnnounceTests')]
     public function testApplyWithEventDispatcherForAnnounce(bool $fired, array $context)
     {
         $definition = $this->createComplexWorkflowDefinition();
@@ -579,7 +581,7 @@ class WorkflowTest extends TestCase
         $definition = $this->createComplexWorkflowDefinition();
         $subject = new Subject();
         $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addListener('workflow.transition', function (TransitionEvent $event) {
+        $eventDispatcher->addListener('workflow.transition', static function (TransitionEvent $event) {
             $event->setContext(array_merge($event->getContext(), ['user' => 'admin']));
         });
         $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher);
@@ -656,7 +658,7 @@ class WorkflowTest extends TestCase
 
         $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher);
 
-        $dispatcher->addListener('workflow.transition', function (TransitionEvent $event) {
+        $dispatcher->addListener('workflow.transition', static function (TransitionEvent $event) {
             $event->setContext(['foo' => 'bar']);
         });
 
@@ -715,7 +717,7 @@ class WorkflowTest extends TestCase
         $workflow = new Workflow($definition, new MethodMarkingStore(), $dispatcher, $name);
 
         $calls = [];
-        $listener = function (Event $event) use (&$calls) {
+        $listener = static function (Event $event) use (&$calls) {
             $calls[] = $event;
         };
         $dispatcher->addListener("workflow.$name.entered.A", $listener);
@@ -768,7 +770,7 @@ class WorkflowTest extends TestCase
         $definition = $this->createComplexWorkflowDefinition();
         $subject = new Subject();
         $eventDispatcher = new EventDispatcher();
-        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', function (GuardEvent $event) {
+        $eventDispatcher->addListener('workflow.workflow_name.guard.t1', static function (GuardEvent $event) {
             $event->setBlocked(true);
         });
         $workflow = new Workflow($definition, new MethodMarkingStore(), $eventDispatcher, 'workflow_name');
@@ -820,10 +822,8 @@ class WorkflowTest extends TestCase
         $this->assertSame('to_a', $transitions[2]->getName());
     }
 
-    /**
-     * @@testWith ["back1"]
-     *            ["back2"]
-     */
+    #[TestWith(['back1'])]
+    #[TestWith(['back2'])]
     public function testApplyWithSameNameBackTransition(string $transition)
     {
         $definition = $this->createWorkflowWithSameNameBackTransition();
@@ -870,6 +870,133 @@ class WorkflowTest extends TestCase
         ], $marking);
     }
 
+    public function testWithArcAndWeight()
+    {
+        //              ┌───────────────────┐     ┌─────────────┐     ┌─────────────┐  4
+        //              │    prepare_leg    │ ──▶ │  build_leg  │ ──▶ │ leg_created │ ───────────────────────────┐
+        //              └───────────────────┘     └─────────────┘     └─────────────┘                            │
+        //                ▲                                                                                      │
+        //                │ 4                                                                                    │
+        //                │                                                                                      ▼
+        // ┌──────┐     ┌───────────────────┐     ┌─────────────┐     ┌─────────────┐      ┌─────────────┐     ┌──────┐     ┌──────────┐
+        // │ init │ ──▶ │       start       │ ──▶ │ prepare_top │ ──▶ │  build_top  │ ───▶ │ top_created │ ──▶ │ join │ ──▶ │ finished │
+        // └──────┘     └───────────────────┘     └─────────────┘     └─────────────┘      └─────────────┘     └──────┘     └──────────┘
+        //                │                                                                                      ▲
+        //                │                                                                                      │
+        //                ▼                                                                                      │
+        //              ┌───────────────────┐                                                                    │
+        //              │ stopwatch_running │ ───────────────────────────────────────────────────────────────────┘
+        //              └───────────────────┘
+        //
+        // make_table:
+        //     transitions:
+        //         start:
+        //             from: init
+        //             to:
+        //                 -   place: prepare_leg
+        //                     weight: 4
+        //                 -   place: prepare_top
+        //                     weight: 1
+        //                 -   place: stopwatch_running
+        //                     weight: 1
+        //         build_leg:
+        //             from: prepare_leg
+        //             to: leg_created
+        //         build_top:
+        //             from: prepare_top
+        //             to: top_created
+        //         join:
+        //             from:
+        //                 - place: leg_created
+        //                   weight: 4
+        //                 - top_created
+        //                 - stopwatch_running
+        //             to: finished
+
+        $definition = new Definition(
+            [],
+            [
+                new Transition('start', 'init', [new Arc('prepare_leg', 4), 'prepare_top', 'stopwatch_running']),
+                new Transition('build_leg', 'prepare_leg', 'leg_created'),
+                new Transition('build_top', 'prepare_top', 'top_created'),
+                new Transition('join', [new Arc('leg_created', 4), 'top_created', 'stopwatch_running'], 'finished'),
+            ]
+        );
+
+        $subject = new Subject();
+        $workflow = new Workflow($definition);
+
+        $this->assertTrue($workflow->can($subject, 'start'));
+        $this->assertFalse($workflow->can($subject, 'build_leg'));
+        $this->assertFalse($workflow->can($subject, 'build_top'));
+        $this->assertFalse($workflow->can($subject, 'join'));
+
+        $workflow->apply($subject, 'start');
+
+        $this->assertSame([
+            'prepare_leg' => 4,
+            'prepare_top' => 1,
+            'stopwatch_running' => 1,
+        ], $subject->getMarking());
+        $this->assertTrue($workflow->can($subject, 'build_leg'));
+        $this->assertTrue($workflow->can($subject, 'build_top'));
+        $this->assertFalse($workflow->can($subject, 'join'));
+
+        $workflow->apply($subject, 'build_leg');
+
+        $this->assertSame([
+            'prepare_leg' => 3,
+            'prepare_top' => 1,
+            'stopwatch_running' => 1,
+            'leg_created' => 1,
+        ], $subject->getMarking());
+        $this->assertTrue($workflow->can($subject, 'build_leg'));
+        $this->assertTrue($workflow->can($subject, 'build_top'));
+        $this->assertFalse($workflow->can($subject, 'join'));
+
+        $workflow->apply($subject, 'build_top');
+
+        $this->assertSame([
+            'prepare_leg' => 3,
+            'stopwatch_running' => 1,
+            'leg_created' => 1,
+            'top_created' => 1,
+        ], $subject->getMarking());
+        $this->assertTrue($workflow->can($subject, 'build_leg'));
+        $this->assertFalse($workflow->can($subject, 'build_top'));
+        $this->assertFalse($workflow->can($subject, 'join'));
+
+        $workflow->apply($subject, 'build_leg');
+
+        $this->assertSame([
+            'prepare_leg' => 2,
+            'stopwatch_running' => 1,
+            'leg_created' => 2,
+            'top_created' => 1,
+        ], $subject->getMarking());
+        $this->assertTrue($workflow->can($subject, 'build_leg'));
+        $this->assertFalse($workflow->can($subject, 'build_top'));
+        $this->assertFalse($workflow->can($subject, 'join'));
+
+        $workflow->apply($subject, 'build_leg');
+        $workflow->apply($subject, 'build_leg');
+
+        $this->assertSame([
+            'stopwatch_running' => 1,
+            'leg_created' => 4,
+            'top_created' => 1,
+        ], $subject->getMarking());
+        $this->assertFalse($workflow->can($subject, 'build_leg'));
+        $this->assertFalse($workflow->can($subject, 'build_top'));
+        $this->assertTrue($workflow->can($subject, 'join'));
+
+        $workflow->apply($subject, 'join');
+
+        $this->assertSame([
+            'finished' => 1,
+        ], $subject->getMarking());
+    }
+
     private function assertPlaces(array $expected, Marking $marking)
     {
         $places = $marking->getPlaces();
@@ -878,7 +1005,7 @@ class WorkflowTest extends TestCase
     }
 }
 
-class EventDispatcherMock implements \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
+class EventDispatcherMock implements EventDispatcherInterface
 {
     public array $dispatchedEvents = [];
 

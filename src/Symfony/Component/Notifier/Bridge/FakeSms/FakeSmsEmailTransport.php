@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Notifier\Bridge\FakeSms;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -20,6 +19,7 @@ use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\SentMessage;
 use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Transport\AbstractTransport;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -62,7 +62,7 @@ final class FakeSmsEmailTransport extends AbstractTransport
         }
 
         $email = (new Email())
-            ->from($message->getFrom() ?: $this->from)
+            ->from($this->from)
             ->to($this->to)
             ->subject(\sprintf('New SMS on phone number: %s', $message->getPhone()))
             ->html($message->getSubject())

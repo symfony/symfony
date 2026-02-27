@@ -89,13 +89,13 @@ class DotenvVault extends AbstractVault
 
         foreach ($_ENV as $k => $v) {
             if ('' !== ($v ?? '') && preg_match('/^\w+$/D', $k)) {
-                $secrets[$k] = $reveal ? $v : null;
+                $secrets[$k] = \is_string($v) && $reveal ? $v : null;
             }
         }
 
         foreach ($_SERVER as $k => $v) {
             if ('' !== ($v ?? '') && preg_match('/^\w+$/D', $k)) {
-                $secrets[$k] = $reveal ? $v : null;
+                $secrets[$k] = \is_string($v) && $reveal ? $v : null;
             }
         }
 

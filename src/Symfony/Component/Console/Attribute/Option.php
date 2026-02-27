@@ -11,24 +11,31 @@
 
 namespace Symfony\Component\Console\Attribute;
 
+use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Exception\LogicException;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\String\UnicodeString;
 
-#[\Attribute(\Attribute::TARGET_PARAMETER)]
+#[\Attribute(\Attribute::TARGET_PARAMETER | \Attribute::TARGET_PROPERTY)]
 class Option
 {
-    private const ALLOWED_TYPES = ['string', 'bool', 'int', 'float', 'array'];
-    private const ALLOWED_UNION_TYPES = ['bool|string', 'bool|int', 'bool|float'];
+    public const ALLOWED_UNION_TYPES = ['bool|string', 'bool|int', 'bool|float'];
+    public mixed $default = null;
+    public array|\Closure $suggestedValues;
 
-    private string|bool|int|float|array|null $default = null;
-    private array|\Closure $suggestedValues;
+    /**
+     * @internal
+     *
+     * @var string|class-string<\BackedEnum>
+     */
+    public string $typeName = '';
+    /** @internal */
+    public bool $allowNull = false;
     private ?int $mode = null;
-    private string $typeName = '';
-    private bool $allowNull = false;
+    private string $memberName = '';
+    private string $sourceName = '';
 
     /**
      * Represents a console command --option definition.
@@ -50,47 +57,48 @@ class Option
     /**
      * @internal
      */
-    public static function tryFrom(\ReflectionParameter $parameter): ?self
+    public static function tryFrom(\ReflectionParameter|\ReflectionProperty $member): ?self
     {
-        /** @var self $self */
-        if (null === $self = ($parameter->getAttributes(self::class, \ReflectionAttribute::IS_INSTANCEOF)[0] ?? null)?->newInstance()) {
+        $reflection = new ReflectionMember($member);
+
+        if (!$self = $reflection->getAttribute(self::class)) {
             return null;
         }
 
-        $name = $parameter->getName();
-        $type = $parameter->getType();
+        $self->memberName = $reflection->getMemberName();
+        $self->sourceName = $reflection->getSourceName();
 
-        if (!$parameter->isDefaultValueAvailable()) {
-            throw new LogicException(\sprintf('The option parameter "$%s" must declare a default value.', $name));
+        $name = $reflection->getName();
+        $type = $reflection->getType();
+
+        // Variadic parameters implicitly default to an empty array
+        if (!$reflection->isVariadic() && !$reflection->hasDefaultValue()) {
+            throw new LogicException(\sprintf('The option %s "$%s" of "%s" must declare a default value.', $self->memberName, $name, $self->sourceName));
         }
 
         if (!$self->name) {
             $self->name = (new UnicodeString($name))->kebab();
         }
 
-        $self->default = $parameter->getDefaultValue();
-        $self->allowNull = $parameter->allowsNull();
+        $self->default = $reflection->isVariadic() ? [] : $reflection->getDefaultValue();
+        $self->allowNull = $reflection->isNullable();
 
         if ($type instanceof \ReflectionUnionType) {
             return $self->handleUnion($type);
         }
 
         if (!$type instanceof \ReflectionNamedType) {
-            throw new LogicException(\sprintf('The parameter "$%s" must have a named type. Untyped or Intersection types are not supported for command options.', $name));
+            throw new LogicException(\sprintf('The %s "$%s" of "%s" must have a named type. Untyped or Intersection types are not supported for command options.', $self->memberName, $name, $self->sourceName));
         }
 
         $self->typeName = $type->getName();
 
-        if (!\in_array($self->typeName, self::ALLOWED_TYPES, true)) {
-            throw new LogicException(\sprintf('The type "%s" of parameter "$%s" is not supported as a command option. Only "%s" types are allowed.', $self->typeName, $name, implode('", "', self::ALLOWED_TYPES)));
-        }
-
         if ('bool' === $self->typeName && $self->allowNull && \in_array($self->default, [true, false], true)) {
-            throw new LogicException(\sprintf('The option parameter "$%s" must not be nullable when it has a default boolean value.', $name));
+            throw new LogicException(\sprintf('The option %s "$%s" of "%s" must not be nullable when it has a default boolean value.', $self->memberName, $name, $self->sourceName));
         }
 
         if ($self->allowNull && null !== $self->default) {
-            throw new LogicException(\sprintf('The option parameter "$%s" must either be not-nullable or have a default of null.', $name));
+            throw new LogicException(\sprintf('The option %s "$%s" of "%s" must either be not-nullable or have a default of null.', $self->memberName, $name, $self->sourceName));
         }
 
         if ('bool' === $self->typeName) {
@@ -98,14 +106,18 @@ class Option
             if (false !== $self->default) {
                 $self->mode |= InputOption::VALUE_NEGATABLE;
             }
-        } elseif ('array' === $self->typeName) {
+        } elseif ('array' === $self->typeName || $reflection->isVariadic()) {
             $self->mode = InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY;
         } else {
             $self->mode = InputOption::VALUE_REQUIRED;
         }
 
-        if (\is_array($self->suggestedValues) && !\is_callable($self->suggestedValues) && 2 === \count($self->suggestedValues) && ($instance = $parameter->getDeclaringFunction()->getClosureThis()) && $instance::class === $self->suggestedValues[0] && \is_callable([$instance, $self->suggestedValues[1]])) {
+        if (\is_array($self->suggestedValues) && !\is_callable($self->suggestedValues) && 2 === \count($self->suggestedValues) && ($instance = $reflection->getSourceThis()) && $instance::class === $self->suggestedValues[0] && \is_callable([$instance, $self->suggestedValues[1]])) {
             $self->suggestedValues = [$instance, $self->suggestedValues[1]];
+        }
+
+        if (is_subclass_of($self->typeName, \BackedEnum::class) && !$self->suggestedValues) {
+            $self->suggestedValues = array_column($self->typeName::cases(), 'value');
         }
 
         return $self;
@@ -122,36 +134,10 @@ class Option
         return new InputOption($this->name, $this->shortcut, $this->mode, $this->description, $default, $suggestedValues);
     }
 
-    /**
-     * @internal
-     */
-    public function resolveValue(InputInterface $input): mixed
-    {
-        $value = $input->getOption($this->name);
-
-        if (null === $value && \in_array($this->typeName, self::ALLOWED_UNION_TYPES, true)) {
-            return true;
-        }
-
-        if ('array' === $this->typeName && $this->allowNull && [] === $value) {
-            return null;
-        }
-
-        if ('bool' !== $this->typeName) {
-            return $value;
-        }
-
-        if ($this->allowNull && null === $value) {
-            return null;
-        }
-
-        return $value ?? $this->default;
-    }
-
     private function handleUnion(\ReflectionUnionType $type): self
     {
         $types = array_map(
-            static fn(\ReflectionType $t) => $t instanceof \ReflectionNamedType ? $t->getName() : null,
+            static fn (\ReflectionType $t) => $t instanceof \ReflectionNamedType ? $t->getName() : null,
             $type->getTypes(),
         );
 
@@ -160,11 +146,11 @@ class Option
         $this->typeName = implode('|', array_filter($types));
 
         if (!\in_array($this->typeName, self::ALLOWED_UNION_TYPES, true)) {
-            throw new LogicException(\sprintf('The union type for parameter "$%s" is not supported as a command option. Only "%s" types are allowed.', $this->name, implode('", "', self::ALLOWED_UNION_TYPES)));
+            throw new LogicException(\sprintf('The union type for %s "$%s" of "%s" is not supported as a command option. Only "%s" types are allowed.', $this->memberName, $this->name, $this->sourceName, implode('", "', self::ALLOWED_UNION_TYPES)));
         }
 
         if (false !== $this->default) {
-            throw new LogicException(\sprintf('The option parameter "$%s" must have a default value of false.', $this->name));
+            throw new LogicException(\sprintf('The option %s "$%s" of "%s" must have a default value of false.', $this->memberName, $this->name, $this->sourceName));
         }
 
         $this->mode = InputOption::VALUE_OPTIONAL;

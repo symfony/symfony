@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\Week;
 use Symfony\Component\Validator\Constraints\WeekValidator;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
@@ -24,9 +25,7 @@ class WeekValidatorTest extends ConstraintValidatorTestCase
         return new WeekValidator();
     }
 
-    /**
-     * @dataProvider provideWeekNumber
-     */
+    #[DataProvider('provideWeekNumber')]
     public function testWeekIsValidWeekNumber(string|\Stringable $value, bool $expectedViolation)
     {
         $constraint = new Week();
@@ -96,9 +95,7 @@ class WeekValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider provideInvalidValues
-     */
+    #[DataProvider('provideInvalidValues')]
     public function testInvalidValues(string $value)
     {
         $this->validator->validate($value, new Week());
@@ -108,9 +105,7 @@ class WeekValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider provideInvalidTypes
-     */
+    #[DataProvider('provideInvalidTypes')]
     public function testNonStringValues(mixed $value)
     {
         $this->expectException(UnexpectedValueException::class);

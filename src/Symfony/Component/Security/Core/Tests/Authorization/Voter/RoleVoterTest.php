@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
@@ -20,9 +21,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 class RoleVoterTest extends TestCase
 {
-    /**
-     * @dataProvider getVoteTests
-     */
+    #[DataProvider('getVoteTests')]
     public function testVoteUsingTokenThatReturnsRoleNames($roles, $attributes, $expected)
     {
         $voter = new RoleVoter();
@@ -46,9 +45,7 @@ class RoleVoterTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideAttributes
-     */
+    #[DataProvider('provideAttributes')]
     public function testSupportsAttribute(string $prefix, string $attribute, bool $expected)
     {
         $voter = new RoleVoter($prefix);

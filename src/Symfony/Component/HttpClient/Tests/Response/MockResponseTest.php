@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests\Response;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\JsonException;
@@ -47,9 +48,7 @@ class MockResponseTest extends TestCase
         $this->assertSame($data, $response->toArray());
     }
 
-    /**
-     * @dataProvider toArrayErrors
-     */
+    #[DataProvider('toArrayErrors')]
     public function testToArrayError($content, $responseHeaders, $message)
     {
         $this->expectException(JsonException::class);
@@ -84,13 +83,13 @@ class MockResponseTest extends TestCase
         yield [
             'content' => 'not json',
             'responseHeaders' => [],
-            'message' => 'Syntax error for "https://example.com/file.json".',
+            'message' => \PHP_VERSION_ID < 80600 ? 'Syntax error for "https://example.com/file.json".' : 'Syntax error near location 1:1 for "https://example.com/file.json".',
         ];
 
         yield [
             'content' => '[1,2}',
             'responseHeaders' => [],
-            'message' => 'State mismatch (invalid or malformed JSON) for "https://example.com/file.json".',
+            'message' => \PHP_VERSION_ID < 80600 ? 'State mismatch (invalid or malformed JSON) for "https://example.com/file.json".' : 'State mismatch (invalid or malformed JSON) near location 1:5 for "https://example.com/file.json".',
         ];
 
         yield [

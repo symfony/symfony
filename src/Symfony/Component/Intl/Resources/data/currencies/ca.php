@@ -1070,6 +1070,10 @@ return [
             'XCD',
             'dòlar del Carib Oriental',
         ],
+        'XCG' => [
+            'XCG',
+            'florí de les Antilles',
+        ],
         'XEU' => [
             'XEU',
             'unitat de moneda europea',
@@ -1145,6 +1149,10 @@ return [
         'ZWD' => [
             'ZWD',
             'dòlar zimbabuès (1980–2008)',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'or de Zimbàbue',
         ],
         'ZWL' => [
             'ZWL',

@@ -162,7 +162,13 @@ class ProjectServiceContainer extends Container
      */
     protected static function getBazService($container)
     {
-        $container->services['baz'] = $instance = new \Baz();
+        $instance = new \Baz();
+
+        if (isset($container->services['baz'])) {
+            return $container->services['baz'];
+        }
+
+        $container->services['baz'] = $instance;
 
         $instance->setFoo(($container->services['foo_with_inline'] ?? self::getFooWithInlineService($container)));
 
@@ -310,7 +316,13 @@ class ProjectServiceContainer extends Container
      */
     protected static function getFooWithInlineService($container)
     {
-        $container->services['foo_with_inline'] = $instance = new \Foo();
+        $instance = new \Foo();
+
+        if (isset($container->services['foo_with_inline'])) {
+            return $container->services['foo_with_inline'];
+        }
+
+        $container->services['foo_with_inline'] = $instance;
 
         $a = new \Bar();
         $a->pub = 'pub';
@@ -440,14 +452,12 @@ class ProjectServiceContainer extends Container
 
     public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
     {
-        if (!(isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters))) {
-            throw new ParameterNotFoundException($name);
-        }
-
         if (isset($this->loadedDynamicParameters[$name])) {
             $value = $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
-        } else {
+        } elseif (\array_key_exists($name, $this->parameters) && '.' !== ($name[0] ?? '')) {
             $value = $this->parameters[$name];
+        } else {
+            throw new ParameterNotFoundException($name);
         }
 
         return $value;
@@ -455,7 +465,7 @@ class ProjectServiceContainer extends Container
 
     public function hasParameter(string $name): bool
     {
-        return isset($this->parameters[$name]) || isset($this->loadedDynamicParameters[$name]) || \array_key_exists($name, $this->parameters);
+        return \array_key_exists($name, $this->parameters) || isset($this->loadedDynamicParameters[$name]);
     }
 
     public function setParameter(string $name, $value): void

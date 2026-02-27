@@ -27,10 +27,10 @@ interface FileLocatorInterface
      *
      * @return string|string[] The full path to the file or an array of file paths
      *
+     * @psalm-return ($first is true ? string : string[])
+     *
      * @throws \InvalidArgumentException        If $name is empty
      * @throws FileLocatorFileNotFoundException If a file is not found
-     *
-     * @psalm-return ($first is true ? string : string[])
      */
     public function locate(string $name, ?string $currentPath = null, bool $first = true): string|array;
 }

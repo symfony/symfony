@@ -57,11 +57,10 @@ class AutowireRequiredMethodsPass extends AbstractRecursivePass
                     }
                     break;
                 }
-                try {
-                    $r = $r->getPrototype();
-                } catch (\ReflectionException) {
-                    break; // method has no prototype
+                if (!$r->hasPrototype()) {
+                    break;
                 }
+                $r = $r->getPrototype();
             }
         }
 

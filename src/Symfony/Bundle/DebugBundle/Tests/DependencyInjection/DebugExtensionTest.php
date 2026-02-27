@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\DebugBundle\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\DebugBundle\DebugBundle;
 use Symfony\Bundle\DebugBundle\DependencyInjection\DebugExtension;
@@ -80,9 +81,7 @@ class DebugExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideServicesUsingDumpDestinationCreation
-     */
+    #[DataProvider('provideServicesUsingDumpDestinationCreation')]
     public function testServicesUsingDumpDestinationCreation(?string $dumpDestination, string $expectedHost, ?string $expectedOutput)
     {
         $container = $this->createContainer();

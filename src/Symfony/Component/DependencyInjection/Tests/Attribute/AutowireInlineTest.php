@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Attribute;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Attribute\AutowireInline;
 use Symfony\Component\DependencyInjection\Reference;
@@ -24,9 +25,7 @@ class AutowireInlineTest extends TestCase
         self::assertSame([123, 456], $autowireInline->value['factory']);
     }
 
-    /**
-     * @dataProvider provideInvalidCalls
-     */
+    #[DataProvider('provideInvalidCalls')]
     public function testInvalidCallsArray(array $calls)
     {
         $autowireInline = new AutowireInline('someClass', calls: $calls);
@@ -86,9 +85,7 @@ class AutowireInlineTest extends TestCase
         self::assertTrue($attribute->lazy);
     }
 
-    /**
-     * @dataProvider provideFactories
-     */
+    #[DataProvider('provideFactories')]
     public function testFactory(string|array $factory, string|array $expectedResult)
     {
         $attribute = new AutowireInline($factory);
@@ -101,9 +98,7 @@ class AutowireInlineTest extends TestCase
         self::assertFalse($attribute->lazy);
     }
 
-    /**
-     * @dataProvider provideFactories
-     */
+    #[DataProvider('provideFactories')]
     public function testFactoryAndParams(string|array $factory, string|array $expectedResult)
     {
         $attribute = new AutowireInline($factory, ['someParam']);
@@ -116,9 +111,7 @@ class AutowireInlineTest extends TestCase
         self::assertFalse($attribute->lazy);
     }
 
-    /**
-     * @dataProvider provideFactories
-     */
+    #[DataProvider('provideFactories')]
     public function testFactoryAndParamsLazy(string|array $factory, string|array $expectedResult)
     {
         $attribute = new AutowireInline($factory, ['someParam'], lazy: true);
@@ -143,9 +136,7 @@ class AutowireInlineTest extends TestCase
         yield '@reference with method' => [['@someClass', 'someMethod'], [new Reference('someClass'), 'someMethod']];
     }
 
-    /**
-     * @dataProvider provideCalls
-     */
+    #[DataProvider('provideCalls')]
     public function testCalls(string|array $calls, array $expectedResult)
     {
         $attribute = new AutowireInline('someClass', calls: $calls);

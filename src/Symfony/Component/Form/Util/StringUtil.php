@@ -37,6 +37,14 @@ class StringUtil
     }
 
     /**
+     * Converts both CRLF and CR to LF.
+     */
+    public static function normalizeNewlines(string $string): string
+    {
+        return str_replace(["\r\n", "\r"], "\n", $string);
+    }
+
+    /**
      * Converts a fully-qualified class name to a block prefix.
      *
      * @param string $fqcn The fully-qualified class name

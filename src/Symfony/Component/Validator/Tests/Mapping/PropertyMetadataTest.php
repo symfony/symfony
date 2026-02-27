@@ -53,8 +53,10 @@ class PropertyMetadataTest extends TestCase
     public function testGetPropertyValueFromRemovedProperty()
     {
         $entity = new Entity('foobar');
-        $metadata = new PropertyMetadata(self::CLASSNAME, 'internal');
-        $metadata->name = 'test';
+
+        // simulate out-of-sync metadata
+        $metadata = 'O:52:"Symfony\Component\Validator\Mapping\PropertyMetadata":3:{s:5:"class";s:65:"Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity";s:4:"name";s:7:"missing";s:8:"property";s:7:"missing";}';
+        $metadata = unserialize($metadata);
 
         $this->expectException(ValidatorException::class);
         $metadata->getPropertyValue($entity);

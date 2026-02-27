@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\CompoundLimiter;
@@ -18,9 +19,7 @@ use Symfony\Component\RateLimiter\Exception\ReserveNotSupportedException;
 use Symfony\Component\RateLimiter\Policy\FixedWindowLimiter;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class CompoundLimiterTest extends TestCase
 {
     private InMemoryStorage $storage;

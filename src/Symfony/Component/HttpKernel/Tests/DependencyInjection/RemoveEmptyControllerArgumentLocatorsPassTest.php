@@ -35,7 +35,7 @@ class RemoveEmptyControllerArgumentLocatorsPassTest extends TestCase
         $pass->process($container);
 
         $controllers = $container->getDefinition((string) $resolver->getArgument(0))->getArgument(0);
-        $getLocator = fn ($controllers, $k) => $container->getDefinition((string) $container->getDefinition((string) $controllers[$k]->getValues()[0])->getFactory()[0])->getArgument(0);
+        $getLocator = static fn ($controllers, $k) => $container->getDefinition((string) $container->getDefinition((string) $controllers[$k]->getValues()[0])->getFactory()[0])->getArgument(0);
 
         $this->assertCount(2, $getLocator($controllers, 'c1::fooAction'));
         $this->assertCount(1, $getLocator($controllers, 'c2::setTestCase'));

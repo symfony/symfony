@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Scheduler\Tests\Messenger\Serializer\Normalizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Scheduler\Messenger\Serializer\Normalizer\SchedulerTriggerNormalizer;
 use Symfony\Component\Scheduler\Trigger\CallbackTrigger;
@@ -26,9 +27,7 @@ class SchedulerTriggerNormalizerTest extends TestCase
         $this->normalizer = new SchedulerTriggerNormalizer();
     }
 
-    /**
-     * @dataProvider normalizeProvider
-     */
+    #[DataProvider('normalizeProvider')]
     public function testNormalize(mixed $data, mixed $expected)
     {
         self::assertSame($expected, $this->normalizer->normalize($data));
@@ -36,13 +35,11 @@ class SchedulerTriggerNormalizerTest extends TestCase
 
     public static function normalizeProvider(): iterable
     {
-        yield 'CallbackTrigger' => [new CallbackTrigger(fn () => null, 'test1'), 'test1'];
+        yield 'CallbackTrigger' => [new CallbackTrigger(static fn () => null, 'test1'), 'test1'];
         yield 'PeriodicalTrigger' => [new PeriodicalTrigger(5), 'every 5 seconds'];
     }
 
-    /**
-     * @dataProvider supportsNormalizationProvider
-     */
+    #[DataProvider('supportsNormalizationProvider')]
     public function testSupportsNormalization(mixed $data, array $context, bool $expected)
     {
         self::assertSame($expected, $this->normalizer->supportsNormalization($data, 'json', $context));
@@ -50,17 +47,15 @@ class SchedulerTriggerNormalizerTest extends TestCase
 
     public static function supportsNormalizationProvider(): iterable
     {
-        yield 'CallbackTrigger, messenger context' => [new CallbackTrigger(fn () => null, 'test1'), ['messenger_serialization' => true], true];
-        yield 'CallbackTrigger, normal context' => [new CallbackTrigger(fn () => null, 'test1'), [], false];
+        yield 'CallbackTrigger, messenger context' => [new CallbackTrigger(static fn () => null, 'test1'), ['messenger_serialization' => true], true];
+        yield 'CallbackTrigger, normal context' => [new CallbackTrigger(static fn () => null, 'test1'), [], false];
         yield 'PeriodicalTrigger, messenger context' => [new PeriodicalTrigger(5), ['messenger_serialization' => true], true];
         yield 'PeriodicalTrigger, normal context' => [new PeriodicalTrigger(5), [], false];
         yield 'stdClass, messenger context' => [new \stdClass(), ['messenger_serialization' => true], false];
         yield 'stdClass, normal context' => [new \stdClass(), [], false];
     }
 
-    /**
-     * @dataProvider supportsDenormalizationProvider
-     */
+    #[DataProvider('supportsDenormalizationProvider')]
     public function testSupportsDenormalization(mixed $data, string $type, array $context, bool $expected)
     {
         self::assertSame($expected, $this->normalizer->supportsDenormalization($data, $type, 'json', $context));

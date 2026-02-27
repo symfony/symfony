@@ -36,10 +36,6 @@ class AssetMapperTestAppKernel extends Kernel
     {
         $loader->load(static function (ContainerBuilder $container) {
             $container->loadFromExtension('framework', [
-                'annotations' => false,
-                'http_method_override' => false,
-                'handle_all_throwables' => true,
-                'php_errors' => ['log' => true],
                 'http_client' => true,
                 'assets' => null,
                 'asset_mapper' => [

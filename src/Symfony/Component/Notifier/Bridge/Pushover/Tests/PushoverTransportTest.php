@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Pushover\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Pushover\PushoverTransport;
 use Symfony\Component\Notifier\Message\ChatMessage;
 use Symfony\Component\Notifier\Message\PushMessage;
@@ -49,16 +50,6 @@ final class PushoverTransportTest extends TransportTestCase
         $messageSubject = 'testMessageSubject';
         $messageContent = 'testMessageContent';
 
-        $response = $this->createMock(ResponseInterface::class);
-
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['status' => 1, 'request' => 'uuid']));
-
         $expectedBody = http_build_query([
             'message' => 'testMessageContent',
             'title' => 'testMessageSubject',
@@ -67,12 +58,11 @@ final class PushoverTransportTest extends TransportTestCase
         ], '', '&');
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use (
-            $response,
             $expectedBody
         ): ResponseInterface {
             $this->assertSame($expectedBody, $options['body']);
 
-            return $response;
+            return new MockResponse(json_encode(['status' => 1, 'request' => 'uuid']));
         });
         $transport = self::createTransport($client);
 
@@ -86,16 +76,6 @@ final class PushoverTransportTest extends TransportTestCase
         $messageSubject = 'testMessageSubject';
         $messageContent = 'testMessageContent';
 
-        $response = $this->createMock(ResponseInterface::class);
-
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['status' => 1, 'request' => 'uuid']));
-
         $notification = (new Notification($messageSubject))->content($messageContent);
         $pushMessage = PushMessage::fromNotification($notification);
 
@@ -107,12 +87,11 @@ final class PushoverTransportTest extends TransportTestCase
         ]);
 
         $client = new MockHttpClient(function (string $method, string $url, array $options = []) use (
-            $response,
             $expectedBody
         ): ResponseInterface {
             $this->assertSame($expectedBody, $options['body']);
 
-            return $response;
+            return new MockResponse(json_encode(['status' => 1, 'request' => 'uuid']));
         });
         $transport = self::createTransport($client);
 

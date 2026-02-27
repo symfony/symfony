@@ -51,13 +51,29 @@ class History
     }
 
     /**
+     * Returns true if the stack is on the first page.
+     */
+    public function isFirstPage(): bool
+    {
+        return $this->position < 1;
+    }
+
+    /**
+     * Returns true if the stack is on the last page.
+     */
+    public function isLastPage(): bool
+    {
+        return $this->position > \count($this->stack) - 2;
+    }
+
+    /**
      * Goes back in the history.
      *
      * @throws LogicException if the stack is already on the first page
      */
     public function back(): Request
     {
-        if ($this->position < 1) {
+        if ($this->isFirstPage()) {
             throw new LogicException('You are already on the first page.');
         }
 
@@ -71,7 +87,7 @@ class History
      */
     public function forward(): Request
     {
-        if ($this->position > \count($this->stack) - 2) {
+        if ($this->isLastPage()) {
             throw new LogicException('You are already on the last page.');
         }
 

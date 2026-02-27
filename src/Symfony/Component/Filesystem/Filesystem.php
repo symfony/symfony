@@ -70,7 +70,7 @@ class Filesystem
 
             if ($originIsLocal) {
                 // Like `cp`, preserve executable permission bits
-                self::box('chmod', $targetFile, fileperms($targetFile) | (fileperms($originFile) & 0111));
+                self::box('chmod', $targetFile, fileperms($targetFile) | (fileperms($originFile) & 0o111));
 
                 // Like `cp`, preserve the file modification time
                 self::box('touch', $targetFile, filemtime($originFile));
@@ -87,7 +87,7 @@ class Filesystem
      *
      * @throws IOException On any directory creation failure
      */
-    public function mkdir(string|iterable $dirs, int $mode = 0777): void
+    public function mkdir(string|iterable $dirs, int $mode = 0o777): void
     {
         foreach ($this->toIterable($dirs) as $dir) {
             if (is_dir($dir)) {
@@ -208,7 +208,7 @@ class Filesystem
      *
      * @throws IOException When the change fails
      */
-    public function chmod(string|iterable $files, int $mode, int $umask = 0000, bool $recursive = false): void
+    public function chmod(string|iterable $files, int $mode, int $umask = 0o000, bool $recursive = false): void
     {
         foreach ($this->toIterable($files) as $file) {
             if (!self::box('chmod', $file, $mode & ~$umask)) {
@@ -225,7 +225,7 @@ class Filesystem
      *
      * This method always throws on Windows, as the underlying PHP function is not supported.
      *
-     * @see https://www.php.net/chown
+     * @see https://php.net/chown
      *
      * @param string|int $user      A user name or number
      * @param bool       $recursive Whether change the owner recursively or not
@@ -255,7 +255,7 @@ class Filesystem
      *
      * This method always throws on Windows, as the underlying PHP function is not supported.
      *
-     * @see https://www.php.net/chgrp
+     * @see https://php.net/chgrp
      *
      * @param string|int $group     A group name or number
      * @param bool       $recursive Whether change the group recursively or not
@@ -443,17 +443,19 @@ class Filesystem
             throw new InvalidArgumentException(\sprintf('The end path "%s" is not absolute.', $endPath));
         }
 
+        $originalEndPath = $endPath;
+
         // Normalize separators on Windows
         if ('\\' === \DIRECTORY_SEPARATOR) {
             $endPath = str_replace('\\', '/', $endPath);
             $startPath = str_replace('\\', '/', $startPath);
         }
 
-        $splitDriveLetter = fn ($path) => (\strlen($path) > 2 && ':' === $path[1] && '/' === $path[2] && ctype_alpha($path[0]))
+        $splitDriveLetter = static fn ($path) => (\strlen($path) > 2 && ':' === $path[1] && '/' === $path[2] && ctype_alpha($path[0]))
             ? [substr($path, 2), strtoupper($path[0])]
             : [$path, null];
 
-        $splitPath = function ($path) {
+        $splitPath = static function ($path) {
             $result = [];
 
             foreach (explode('/', trim($path, '/')) as $segment) {
@@ -499,6 +501,11 @@ class Filesystem
         // Construct $endPath from traversing to the common path, then to the remaining $endPath
         $relativePath = $traverser.('' !== $endPathRemainder ? $endPathRemainder.'/' : '');
 
+        // Remove ending "/" if $endPath points to an existing file
+        if (str_ends_with($relativePath, '/') && is_file($originalEndPath)) {
+            $relativePath = substr($relativePath, 0, -1);
+        }
+
         return '' === $relativePath ? './' : $relativePath;
     }
 
@@ -514,13 +521,17 @@ class Filesystem
      * @param array             $options  An array of boolean options
      *                                    Valid options are:
      *                                    - $options['override'] If true, target files newer than origin files are overwritten (see copy(), defaults to false)
-     *                                    - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink(), defaults to false)
+     *                                    - $options['follow_symlinks'] Whether to copy files instead of links, esp. useful on Windows (see symlink(), defaults to false)
      *                                    - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
      *
      * @throws IOException When file type is unknown
      */
     public function mirror(string $originDir, string $targetDir, ?\Traversable $iterator = null, array $options = []): void
     {
+        if (isset($options['copy_on_windows'])) {
+            trigger_deprecation('symfony/filesystem', '8.1', 'Calling "%s()" with option "copy_on_windows" is deprecated, use "follow_symlinks" option instead.', __METHOD__);
+        }
+
         $targetDir = rtrim($targetDir, '/\\');
         $originDir = rtrim($originDir, '/\\');
         $originDirLen = \strlen($originDir);
@@ -545,10 +556,10 @@ class Filesystem
             }
         }
 
-        $copyOnWindows = $options['copy_on_windows'] ?? false;
+        $followSymlinks = $options['follow_symlinks'] ?? $options['copy_on_windows'] ?? false;
 
         if (null === $iterator) {
-            $flags = $copyOnWindows ? \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS : \FilesystemIterator::SKIP_DOTS;
+            $flags = $followSymlinks ? \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS : \FilesystemIterator::SKIP_DOTS;
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
         }
 
@@ -563,7 +574,7 @@ class Filesystem
             $target = $targetDir.substr($file->getPathname(), $originDirLen);
             $filesCreatedWhileMirroring[$target] = true;
 
-            if (!$copyOnWindows && is_link($file)) {
+            if (!$followSymlinks && is_link($file)) {
                 $this->symlink($file->getLinkTarget(), $target);
             } elseif (is_dir($file)) {
                 $this->mkdir($target);
@@ -576,17 +587,11 @@ class Filesystem
     }
 
     /**
-     * Returns whether the file path is an absolute path.
+     * Returns whether the given path is absolute.
      */
     public function isAbsolutePath(string $file): bool
     {
-        return '' !== $file && (strspn($file, '/\\', 0, 1)
-            || (\strlen($file) > 3 && ctype_alpha($file[0])
-                && ':' === $file[1]
-                && strspn($file, '/\\', 2, 1)
-            )
-            || null !== parse_url($file, \PHP_URL_SCHEME)
-        );
+        return Path::isAbsolute($file);
     }
 
     /**
@@ -670,13 +675,13 @@ class Filesystem
                 throw new IOException(\sprintf('Failed to write file "%s": ', $filename).self::$lastError, 0, null, $filename);
             }
 
-            self::box('chmod', $tmpFile, self::box('fileperms', $filename) ?: 0666 & ~umask());
+            self::box('chmod', $tmpFile, self::box('fileperms', $filename) ?: 0o666 & ~umask());
 
             $this->rename($tmpFile, $filename, true);
         } finally {
             if (file_exists($tmpFile)) {
                 if ('\\' === \DIRECTORY_SEPARATOR && !is_writable($tmpFile)) {
-                    self::box('chmod', $tmpFile, self::box('fileperms', $tmpFile) | 0200);
+                    self::box('chmod', $tmpFile, self::box('fileperms', $tmpFile) | 0o200);
                 }
 
                 self::box('unlink', $tmpFile);

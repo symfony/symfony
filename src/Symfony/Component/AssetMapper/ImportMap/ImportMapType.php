@@ -15,4 +15,5 @@ enum ImportMapType: string
 {
     case JS = 'js';
     case CSS = 'css';
+    case JSON = 'json';
 }

@@ -34,4 +34,11 @@ class SkippingResourceChecker implements ResourceCheckerInterface
     {
         return true;
     }
+
+    public function __serialize(): array
+    {
+        return [
+            'skippedResourceTypes' => $this->skippedResourceTypes,
+        ];
+    }
 }

@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\Messenger\Bridge\Amqp\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpStamp;
 
-/**
- * @requires extension amqp
- */
+#[RequiresPhpExtension('amqp')]
 class AmqpStampTest extends TestCase
 {
     public function testRoutingKeyOnly()
@@ -37,7 +36,7 @@ class AmqpStampTest extends TestCase
 
     public function testCreateFromAmqpEnvelope()
     {
-        $amqpEnvelope = $this->createMock(\AMQPEnvelope::class);
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
         $amqpEnvelope->method('getRoutingKey')->willReturn('routingkey');
         $amqpEnvelope->method('getDeliveryMode')->willReturn(2);
         $amqpEnvelope->method('getPriority')->willReturn(5);
@@ -56,7 +55,7 @@ class AmqpStampTest extends TestCase
 
     public function testCreateFromAmqpEnvelopeWithPreviousStamp()
     {
-        $amqpEnvelope = $this->createMock(\AMQPEnvelope::class);
+        $amqpEnvelope = $this->createStub(\AMQPEnvelope::class);
         $amqpEnvelope->method('getRoutingKey')->willReturn('routingkey');
         $amqpEnvelope->method('getDeliveryMode')->willReturn(2);
         $amqpEnvelope->method('getPriority')->willReturn(5);

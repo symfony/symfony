@@ -46,8 +46,8 @@ class RouterMatchCommandTest extends TestCase
     private function createCommandTester(): CommandTester
     {
         $application = new Application($this->getKernel());
-        $application->add(new RouterMatchCommand($this->getRouter()));
-        $application->add(new RouterDebugCommand($this->getRouter()));
+        $application->addCommand(new RouterMatchCommand($this->getRouter()));
+        $application->addCommand(new RouterDebugCommand($this->getRouter()));
 
         return new CommandTester($application->find('router:match'));
     }
@@ -57,13 +57,11 @@ class RouterMatchCommandTest extends TestCase
         $routeCollection = new RouteCollection();
         $routeCollection->add('foo', new Route('foo'));
         $requestContext = new RequestContext();
-        $router = $this->createMock(RouterInterface::class);
+        $router = $this->createStub(RouterInterface::class);
         $router
-            ->expects($this->any())
             ->method('getRouteCollection')
             ->willReturn($routeCollection);
         $router
-            ->expects($this->any())
             ->method('getContext')
             ->willReturn($requestContext);
 
@@ -74,7 +72,6 @@ class RouterMatchCommandTest extends TestCase
     {
         $kernel = $this->createMock(KernelInterface::class);
         $kernel
-            ->expects($this->any())
             ->method('getContainer')
             ->willReturn(new Container())
         ;

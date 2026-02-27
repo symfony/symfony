@@ -57,13 +57,15 @@ class MessagePart extends DataPart
         return $this->message->toIterable();
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
-        return ['message'];
+        return ['message' => $this->message];
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
+        $this->message = $data['message'] ?? $data["\0".self::class."\0message"];
+
         $this->__construct($this->message);
     }
 }

@@ -94,7 +94,7 @@ class StreamedJsonResponse extends StreamedResponse
     {
         $generators = [];
 
-        array_walk_recursive($data, function (&$item, $key) use (&$generators) {
+        array_walk_recursive($data, static function (&$item, $key) use (&$generators) {
             if (self::PLACEHOLDER === $key) {
                 // if the placeholder is already in the structure it should be replaced with a new one that explode
                 // works like expected for the structure

@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Console\Tests\Question;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 class ConfirmationQuestionTest extends TestCase
 {
-    /**
-     * @dataProvider normalizerUsecases
-     */
+    #[DataProvider('normalizerUsecases')]
     public function testDefaultRegexUsecases($default, $answers, $expected, $message)
     {
         $sut = new ConfirmationQuestion('A question', $default);

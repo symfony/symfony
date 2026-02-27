@@ -13,6 +13,7 @@ namespace Symfony\Component\AssetMapper\ImportMap\Resolver;
 
 use Symfony\Component\AssetMapper\Compiler\CssAssetUrlCompiler;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
+use Symfony\Component\AssetMapper\ImportMap\BatchHttpClient;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
 use Symfony\Component\AssetMapper\ImportMap\PackageRequireOptions;
@@ -20,6 +21,7 @@ use Symfony\Component\Filesystem\Path;
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class JsDelivrEsmResolver implements PackageResolverInterface
 {
@@ -32,12 +34,12 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
     private const ES_MODULE_SHIMS = 'es-module-shims';
 
-    private HttpClientInterface $httpClient;
+    private readonly HttpClientInterface $httpClient;
 
     public function __construct(
         ?HttpClientInterface $httpClient = null,
     ) {
-        $this->httpClient = $httpClient ?? HttpClient::create();
+        $this->httpClient = new BatchHttpClient($httpClient ?? HttpClient::create());
     }
 
     public function resolvePackages(array $packagesToRequire): array
@@ -165,6 +167,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
      */
     public function downloadPackages(array $importMapEntries, ?callable $progressCallback = null): array
     {
+        /** @var array<string, array{0: ResponseInterface, 1: ImportMapEntry}> $responses */
         $responses = [];
         foreach ($importMapEntries as $package => $entry) {
             if (!$entry->isRemotePackage()) {
@@ -196,7 +199,6 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
 
             $dependencies = [];
             $extraFiles = [];
-            /* @var ImportMapEntry $entry */
             $contents[$package] = [
                 'content' => $this->makeImportsBare($response->getContent(), $dependencies, $extraFiles, $entry->type, $entry->getPackagePathString()),
                 'dependencies' => $dependencies,
@@ -300,7 +302,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
     private function makeImportsBare(string $content, array &$dependencies, array &$extraFiles, ImportMapType $type, string $sourceFilePath): string
     {
         if (ImportMapType::JS === $type) {
-            $content = preg_replace_callback(self::IMPORT_REGEX, function ($matches) use (&$dependencies) {
+            $content = preg_replace_callback(self::IMPORT_REGEX, static function ($matches) use (&$dependencies) {
                 $packageName = $matches[2].$matches[4]; // add the path if any
                 $dependencies[] = $packageName;
 
@@ -318,7 +320,7 @@ final class JsDelivrEsmResolver implements PackageResolverInterface
         }
 
         preg_match_all(CssAssetUrlCompiler::ASSET_URL_PATTERN, $content, $matches);
-        foreach ($matches[1] as $path) {
+        foreach ($matches[2] as $path) {
             if (str_starts_with($path, 'data:')) {
                 continue;
             }

@@ -12,7 +12,7 @@
 namespace Symfony\Component\Messenger\Tests\Transport\Sync;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\Transport\Serialization\SerializerInterface;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransportFactory;
@@ -21,9 +21,8 @@ class SyncTransportFactoryTest extends TestCase
 {
     public function testCreateTransport()
     {
-        $serializer = $this->createMock(SerializerInterface::class);
-        $bus = $this->createMock(MessageBusInterface::class);
-        $factory = new SyncTransportFactory($bus);
+        $serializer = $this->createStub(SerializerInterface::class);
+        $factory = new SyncTransportFactory(new MessageBus());
         $transport = $factory->createTransport('sync://', [], $serializer);
         $this->assertInstanceOf(SyncTransport::class, $transport);
     }

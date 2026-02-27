@@ -15,134 +15,81 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestMatcher\SchemeRequestMatcher;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Security\Http\AccessMapInterface;
+use Symfony\Component\Security\Http\AccessMap;
 use Symfony\Component\Security\Http\Firewall\ChannelListener;
 
 class ChannelListenerTest extends TestCase
 {
     public function testHandleWithNotSecuredRequestAndHttpChannel()
     {
-        $request = $this->createMock(Request::class);
-        $request
-            ->expects($this->any())
-            ->method('isSecure')
-            ->willReturn(false)
-        ;
+        $request = Request::create('http://symfony.com');
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
-        $accessMap
-            ->expects($this->any())
-            ->method('getPatterns')
-            ->with($this->equalTo($request))
-            ->willReturn([[], 'http'])
-        ;
-
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $accessMap = new AccessMap();
+        $accessMap->add(new SchemeRequestMatcher('https'), [], 'http');
 
         $listener = new ChannelListener($accessMap);
-        $listener($event);
-
-        $this->assertNull($event->getResponse());
+        $this->assertFalse($listener->supports($request));
     }
 
     public function testHandleWithSecuredRequestAndHttpsChannel()
     {
-        $request = $this->createMock(Request::class);
-        $request
-            ->expects($this->any())
-            ->method('isSecure')
-            ->willReturn(true)
-        ;
+        $request = Request::create('https://symfony.com');
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
-        $accessMap
-            ->expects($this->any())
-            ->method('getPatterns')
-            ->with($this->equalTo($request))
-            ->willReturn([[], 'https'])
-        ;
-
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $accessMap = new AccessMap();
+        $accessMap->add(new SchemeRequestMatcher('http'), [], 'https');
 
         $listener = new ChannelListener($accessMap);
-        $listener($event);
-
-        $this->assertNull($event->getResponse());
+        $this->assertFalse($listener->supports($request));
     }
 
     public function testHandleWithNotSecuredRequestAndHttpsChannel()
     {
-        $request = $this->createMock(Request::class);
-        $request
-            ->expects($this->any())
-            ->method('isSecure')
-            ->willReturn(false)
-        ;
+        $request = Request::create('http://symfony.com');
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
-        $accessMap
-            ->expects($this->any())
-            ->method('getPatterns')
-            ->with($this->equalTo($request))
-            ->willReturn([[], 'https'])
-        ;
+        $accessMap = new AccessMap();
+        $accessMap->add(new SchemeRequestMatcher('http'), [], 'https');
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener = new ChannelListener($accessMap);
-        $listener($event);
+        $this->assertTrue($listener->supports($request));
+
+        $listener->authenticate($event);
 
         $response = $event->getResponse();
         $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertEquals('https://', $response->getTargetUrl());
+        $this->assertEquals('https://symfony.com/', $response->getTargetUrl());
     }
 
     public function testHandleWithSecuredRequestAndHttpChannel()
     {
-        $request = $this->createMock(Request::class);
-        $request
-            ->expects($this->any())
-            ->method('isSecure')
-            ->willReturn(true)
-        ;
+        $request = Request::create('https://symfony.com');
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
-        $accessMap
-            ->expects($this->any())
-            ->method('getPatterns')
-            ->with($this->equalTo($request))
-            ->willReturn([[], 'http'])
-        ;
+        $accessMap = new AccessMap();
+        $accessMap->add(new SchemeRequestMatcher('https'), [], 'http');
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
 
         $listener = new ChannelListener($accessMap);
-        $listener($event);
+        $this->assertTrue($listener->supports($request));
+
+        $listener->authenticate($event);
 
         $response = $event->getResponse();
         $this->assertInstanceOf(RedirectResponse::class, $response);
-        $this->assertEquals('http://', $response->getTargetUrl());
+        $this->assertEquals('http://symfony.com/', $response->getTargetUrl());
     }
 
     public function testSupportsWithoutHeaders()
     {
-        $request = $this->createMock(Request::class);
-        $request
-            ->expects($this->any())
-            ->method('isSecure')
-            ->willReturn(false)
-        ;
+        $request = Request::create('http://symfony.com');
         $request->headers = new HeaderBag();
 
-        $accessMap = $this->createMock(AccessMapInterface::class);
-        $accessMap
-            ->expects($this->any())
-            ->method('getPatterns')
-            ->with($this->equalTo($request))
-            ->willReturn([[], 'https'])
-        ;
+        $accessMap = new AccessMap();
+        $accessMap->add(new SchemeRequestMatcher('http'), [], 'https');
 
         $listener = new ChannelListener($accessMap);
 

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Middleware;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\Exception\LogicException;
@@ -77,9 +78,7 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
         $this->fail('Exception not thrown.');
     }
 
-    /**
-     * @dataProvider itAddsHandledStampsProvider
-     */
+    #[DataProvider('itAddsHandledStampsProvider')]
     public function testItAddsHandledStamps(array $handlers, array $expectedStamps, bool $nextIsCalled)
     {
         $message = new DummyMessage('Hey');
@@ -174,10 +173,8 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
     public function testMessageAlreadyHandled()
     {
-        $handler = $this->createPartialMock(HandleMessageMiddlewareTestCallable::class, ['__invoke']);
-
         $middleware = new HandleMessageMiddleware(new HandlersLocator([
-            DummyMessage::class => [$handler],
+            DummyMessage::class => [new HandleMessageMiddlewareTestCallable()],
         ]));
 
         $envelope = new Envelope(new DummyMessage('Hey'));
@@ -319,6 +316,54 @@ class HandleMessageMiddlewareTest extends MiddlewareTestCase
 
         $message = new DummyMessage('Hey');
         $middleware->handle(new Envelope($message), new StackMiddleware());
+
+        $this->assertSame([$message], $handler->processedMessages);
+    }
+
+    public function testBatchHandlerFlushFalseDoesNotFlushPartialBatch()
+    {
+        $handler = new class implements BatchHandlerInterface {
+            public array $processedMessages = [];
+
+            use BatchHandlerTrait;
+
+            public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
+            {
+                return $this->handle($message, $ack);
+            }
+
+            private function getBatchSize(): int
+            {
+                return 3;
+            }
+
+            private function process(array $jobs): void
+            {
+                $this->processedMessages = array_column($jobs, 0);
+
+                foreach ($jobs as [$job, $ack]) {
+                    $ack->ack($job);
+                }
+            }
+        };
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($handler)],
+        ]));
+
+        $ack = static function () {};
+
+        $message = new DummyMessage('Hey');
+        $envelope = $middleware->handle(new Envelope($message, [new AckStamp($ack)]), new StackMiddleware());
+
+        $this->assertSame([], $handler->processedMessages);
+        $this->assertCount(1, $envelope->all(NoAutoAckStamp::class));
+
+        $handler->flush(false);
+
+        $this->assertSame([], $handler->processedMessages);
+
+        $handler->flush(true);
 
         $this->assertSame([$message], $handler->processedMessages);
     }

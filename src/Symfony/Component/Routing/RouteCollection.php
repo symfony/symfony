@@ -228,7 +228,13 @@ class RouteCollection implements \IteratorAggregate, \Countable
         }
 
         foreach ($this->aliases as $name => $alias) {
-            $prefixedAliases[$prefix.$name] = $alias->withId($prefix.$alias->getId());
+            $targetId = $alias->getId();
+
+            if (isset($this->routes[$targetId]) || isset($this->aliases[$targetId])) {
+                $targetId = $prefix.$targetId;
+            }
+
+            $prefixedAliases[$prefix.$name] = $alias->withId($targetId);
         }
 
         $this->routes = $prefixedRoutes;

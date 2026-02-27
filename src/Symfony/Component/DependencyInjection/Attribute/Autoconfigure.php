@@ -20,16 +20,17 @@ namespace Symfony\Component\DependencyInjection\Attribute;
 class Autoconfigure
 {
     /**
-     * @param array<array-key, array<array-key, mixed>>|string[]|null $tags         The tags to add to the service
-     * @param array<array<mixed>>|null                                $calls        The calls to be made when instantiating the service
-     * @param array<string, mixed>|null                               $bind         The bindings to declare for the service
-     * @param bool|string|null                                        $lazy         Whether the service is lazy-loaded
-     * @param bool|null                                               $public       Whether to declare the service as public
-     * @param bool|null                                               $shared       Whether to declare the service as shared
-     * @param bool|null                                               $autowire     Whether to declare the service as autowired
-     * @param array<string, mixed>|null                               $properties   The properties to define when creating the service
-     * @param array{string, string}|string|null                       $configurator A PHP function, reference or an array containing a class/reference and a method to call after the service is fully initialized
-     * @param string|null                                             $constructor  The public static method to use to instantiate the service
+     * @param array<array<mixed>>|string[]|null $tags         The tags to add to the service
+     * @param array<array<mixed>>|null          $calls        The calls to be made when instantiating the service
+     * @param array<string, mixed>|null         $bind         The bindings to declare for the service
+     * @param bool|string|null                  $lazy         Whether the service is lazy-loaded
+     * @param bool|null                         $public       Whether to declare the service as public
+     * @param bool|null                         $shared       Whether to declare the service as shared
+     * @param bool|null                         $autowire     Whether to declare the service as autowired
+     * @param array<string, mixed>|null         $properties   The properties to define when creating the service
+     * @param array{string, string}|string|null $configurator A PHP function, reference or an array containing a class/reference and a method to call after the service is fully initialized
+     * @param string|null                       $constructor  The public static method to use to instantiate the service
+     * @param array<array<mixed>>|string[]|null $resourceTags The resource tags to add to the service
      */
     public function __construct(
         public ?array $tags = null,
@@ -42,6 +43,7 @@ class Autoconfigure
         public ?array $properties = null,
         public array|string|null $configurator = null,
         public ?string $constructor = null,
+        public ?array $resourceTags = null,
     ) {
     }
 }

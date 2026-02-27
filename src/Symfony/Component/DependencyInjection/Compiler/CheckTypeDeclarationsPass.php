@@ -76,7 +76,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
 
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
-        if (isset($this->skippedIds[$this->currentId])) {
+        if (isset($this->skippedIds[$this->currentId ?? ''])) {
             return $value;
         }
 
@@ -139,13 +139,14 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
             if (!$p->hasType() || $p->isVariadic()) {
                 continue;
             }
+            $key = $i;
             if (\array_key_exists($p->name, $values)) {
-                $i = $p->name;
+                $key = $p->name;
             } elseif (!\array_key_exists($i, $values)) {
                 continue;
             }
 
-            $this->checkType($checkedDefinition, $values[$i], $p, $envPlaceholderUniquePrefix);
+            $this->checkType($checkedDefinition, $values[$key], $p, $envPlaceholderUniquePrefix);
         }
 
         if ($reflectionFunction->isVariadic() && ($lastParameter = end($reflectionParameters))->hasType()) {
@@ -202,7 +203,7 @@ final class CheckTypeDeclarationsPass extends AbstractRecursivePass
         }
 
         if ('self' === $type) {
-            $type = $parameter->getDeclaringClass()->getName();
+            $type = $parameter->getDeclaringClass()->name;
         }
 
         if ('static' === $type) {

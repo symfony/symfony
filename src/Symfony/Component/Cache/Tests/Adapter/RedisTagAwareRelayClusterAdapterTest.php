@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\RedisTagAwareAdapter;
 use Symfony\Component\Cache\Traits\RelayClusterProxy;
 
-/**
- * @requires extension relay
- *
- * @group integration
- */
+#[RequiresPhpExtension('relay')]
+#[Group('integration')]
 class RedisTagAwareRelayClusterAdapterTest extends RelayClusterAdapterTest
 {
     use TagAwareTestTrait;

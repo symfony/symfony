@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\RequestMatcher;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\QueryParameterRequestMatcher;
 
 class QueryParameterRequestMatcherTest extends TestCase
 {
-    /**
-     * @dataProvider getDataForArray
-     */
+    #[DataProvider('getDataForArray')]
     public function testArray(string $uri, bool $matches)
     {
         $matcher = new QueryParameterRequestMatcher(['foo', 'bar']);
@@ -27,9 +26,7 @@ class QueryParameterRequestMatcherTest extends TestCase
         $this->assertSame($matches, $matcher->matches($request));
     }
 
-    /**
-     * @dataProvider getDataForArray
-     */
+    #[DataProvider('getDataForArray')]
     public function testCommaSeparatedString(string $uri, bool $matches)
     {
         $matcher = new QueryParameterRequestMatcher('foo, bar');
@@ -37,9 +34,7 @@ class QueryParameterRequestMatcherTest extends TestCase
         $this->assertSame($matches, $matcher->matches($request));
     }
 
-    /**
-     * @dataProvider getDataForSingleString
-     */
+    #[DataProvider('getDataForSingleString')]
     public function testSingleString(string $uri, bool $matches)
     {
         $matcher = new QueryParameterRequestMatcher('foo');

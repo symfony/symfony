@@ -22,11 +22,11 @@ use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  */
-final readonly class ReflectionPropertyTypeResolver implements TypeResolverInterface
+final class ReflectionPropertyTypeResolver implements TypeResolverInterface
 {
     public function __construct(
-        private ReflectionTypeResolver $reflectionTypeResolver,
-        private TypeContextFactory $typeContextFactory,
+        private readonly ReflectionTypeResolver $reflectionTypeResolver,
+        private readonly TypeContextFactory $typeContextFactory,
     ) {
     }
 
@@ -41,7 +41,7 @@ final readonly class ReflectionPropertyTypeResolver implements TypeResolverInter
         try {
             return $this->reflectionTypeResolver->resolve($subject->getType(), $typeContext);
         } catch (UnsupportedException $e) {
-            $path = \sprintf('%s::$%s', $subject->getDeclaringClass()->getName(), $subject->getName());
+            $path = \sprintf('%s::$%s', $subject->class, $subject->getName());
 
             throw new UnsupportedException(\sprintf('Cannot resolve type for "%s".', $path), $subject, previous: $e);
         }

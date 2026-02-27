@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Mailer\Transport;
 
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -36,6 +38,7 @@ class RoundRobinTransport implements TransportInterface
     public function __construct(
         private array $transports,
         private int $retryPeriod = 60,
+        private LoggerInterface $logger = new NullLogger(),
     ) {
         if (!$transports) {
             throw new TransportException(\sprintf('"%s" must have at least one transport configured.', static::class));
@@ -50,10 +53,11 @@ class RoundRobinTransport implements TransportInterface
 
         while ($transport = $this->getNextTransport()) {
             try {
-                return $transport->send($message, $envelope);
+                return $transport->send(clone $message, $envelope);
             } catch (TransportExceptionInterface $e) {
                 $exception ??= new TransportException('All transports failed.');
                 $exception->appendDebug(\sprintf("Transport \"%s\": %s\n", $transport, $e->getDebug()));
+                $this->logger->error(\sprintf('Transport "%s" failed.', $transport), ['exception' => $e]);
                 $this->deadTransports[$transport] = microtime(true);
             }
         }
@@ -84,7 +88,7 @@ class RoundRobinTransport implements TransportInterface
             }
 
             if ((microtime(true) - $this->deadTransports[$transport]) > $this->retryPeriod) {
-                $this->deadTransports->detach($transport);
+                unset($this->deadTransports[$transport]);
 
                 break;
             }
@@ -101,14 +105,14 @@ class RoundRobinTransport implements TransportInterface
 
     protected function isTransportDead(TransportInterface $transport): bool
     {
-        return $this->deadTransports->contains($transport);
+        return $this->deadTransports->offsetExists($transport);
     }
 
     protected function getInitialCursor(): int
     {
         // the cursor initial value is randomized so that
         // when are not in a daemon, we are still rotating the transports
-        return mt_rand(0, \count($this->transports) - 1);
+        return random_int(0, \count($this->transports) - 1);
     }
 
     protected function getNameSymbol(): string

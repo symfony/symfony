@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Logger;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -54,9 +55,7 @@ class ConsoleLoggerTest extends TestCase
         return $this->output->getLogs();
     }
 
-    /**
-     * @dataProvider provideOutputMappingParams
-     */
+    #[DataProvider('provideOutputMappingParams')]
     public function testOutputMapping($logLevel, $outputVerbosity, $isOutput, $addVerbosityLevelMap = [])
     {
         $out = new BufferedOutput($outputVerbosity);
@@ -104,9 +103,7 @@ class ConsoleLoggerTest extends TestCase
         $this->assertInstanceOf(LoggerInterface::class, $this->getLogger());
     }
 
-    /**
-     * @dataProvider provideLevelsAndMessages
-     */
+    #[DataProvider('provideLevelsAndMessages')]
     public function testLogsAtAllLevels($level, $message)
     {
         $logger = $this->getLogger();
@@ -151,10 +148,7 @@ class ConsoleLoggerTest extends TestCase
 
     public function testObjectCastToString()
     {
-        $dummy = $this->createPartialMock(DummyTest::class, ['__toString']);
-        $dummy->method('__toString')->willReturn('DUMMY');
-
-        $this->getLogger()->warning($dummy);
+        $this->getLogger()->warning(new DummyTest());
 
         $expected = ['warning DUMMY'];
         $this->assertEquals($expected, $this->getLogs());
@@ -197,5 +191,6 @@ class DummyTest
 {
     public function __toString(): string
     {
+        return 'DUMMY';
     }
 }

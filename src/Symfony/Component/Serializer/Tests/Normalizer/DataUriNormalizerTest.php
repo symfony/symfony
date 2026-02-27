@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
@@ -46,9 +48,7 @@ class DataUriNormalizerTest extends TestCase
         $this->assertTrue($this->normalizer->supportsNormalization(new \SplFileObject('data:,Hello%2C%20World!')));
     }
 
-    /**
-     * @requires extension fileinfo
-     */
+    #[RequiresPhpExtension('fileinfo')]
     public function testNormalizeHttpFoundationFile()
     {
         $file = new File(__DIR__.'/../Fixtures/test.gif');
@@ -56,9 +56,7 @@ class DataUriNormalizerTest extends TestCase
         $this->assertSame(self::TEST_GIF_DATA, $this->normalizer->normalize($file));
     }
 
-    /**
-     * @requires extension fileinfo
-     */
+    #[RequiresPhpExtension('fileinfo')]
     public function testNormalizeSplFileInfo()
     {
         $file = new \SplFileInfo(__DIR__.'/../Fixtures/test.gif');
@@ -66,9 +64,7 @@ class DataUriNormalizerTest extends TestCase
         $this->assertSame(self::TEST_GIF_DATA, $this->normalizer->normalize($file));
     }
 
-    /**
-     * @requires extension fileinfo
-     */
+    #[RequiresPhpExtension('fileinfo')]
     public function testNormalizeText()
     {
         $file = new \SplFileObject(__DIR__.'/../Fixtures/test.txt');
@@ -118,9 +114,7 @@ class DataUriNormalizerTest extends TestCase
         $this->normalizer->denormalize('/etc/shadow', 'SplFileObject');
     }
 
-    /**
-     * @dataProvider invalidUriProvider
-     */
+    #[DataProvider('invalidUriProvider')]
     public function testInvalidData(?string $uri)
     {
         $this->expectException(UnexpectedValueException::class);
@@ -145,9 +139,7 @@ class DataUriNormalizerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider validUriProvider
-     */
+    #[DataProvider('validUriProvider')]
     public function testValidData(string $uri)
     {
         $this->assertInstanceOf(\SplFileObject::class, $this->normalizer->denormalize($uri, 'SplFileObject'));

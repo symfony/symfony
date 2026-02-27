@@ -11,8 +11,9 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator\Passport\Badge;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\String\Slugger\AsciiSlugger;
@@ -22,31 +23,23 @@ use function Symfony\Component\String\u;
 
 class UserBadgeTest extends TestCase
 {
-    use ExpectUserDeprecationMessageTrait;
-
     public function testUserNotFound()
     {
-        $badge = new UserBadge('dummy', fn () => null);
+        $badge = new UserBadge('dummy', static fn () => null);
         $this->expectException(UserNotFoundException::class);
         $badge->getUser();
     }
 
-    /**
-     * @group legacy
-     */
     public function testEmptyUserIdentifier()
     {
-        $this->expectUserDeprecationMessage('Since symfony/security-http 7.2: Using an empty string as user identifier is deprecated and will throw an exception in Symfony 8.0.');
-        // $this->expectException(BadCredentialsException::class)
-        new UserBadge('', fn () => null);
+        $this->expectException(BadCredentialsException::class);
+        new UserBadge('', static fn () => null);
     }
 
-    /**
-     * @dataProvider provideUserIdentifierNormalizationData
-     */
+    #[DataProvider('provideUserIdentifierNormalizationData')]
     public function testUserIdentifierNormalization(string $identifier, string $expectedNormalizedIdentifier, callable $normalizer)
     {
-        $badge = new UserBadge($identifier, fn () => null, identifierNormalizer: $normalizer);
+        $badge = new UserBadge($identifier, static fn () => null, identifierNormalizer: $normalizer);
 
         static::assertSame($expectedNormalizedIdentifier, $badge->getUserIdentifier());
     }
@@ -65,8 +58,18 @@ class UserBadgeTest extends TestCase
         if (!\extension_loaded('intl')) {
             return;
         }
-        $upperAndAscii = fn (string $identifier) => u($identifier)->ascii()->upper()->toString();
+        $upperAndAscii = static fn (string $identifier) => u($identifier)->ascii()->upper()->toString();
         yield 'Greek to ASCII' => ['ΝιΚόΛΑος', 'NIKOLAOS', $upperAndAscii];
         yield 'Katakana to ASCII' => ['たなかそういち', 'TANAKASOUICHI', $upperAndAscii];
+    }
+
+    public function testUserIdentifierNormalizationEnforcesMaxLength()
+    {
+        $badge = new UserBadge('valid_input', null, null, static fn () => str_repeat('a', UserBadge::MAX_USERNAME_LENGTH + 1));
+
+        $this->expectException(BadCredentialsException::class);
+        $this->expectExceptionMessage('Username too long.');
+
+        $badge->getUserIdentifier();
     }
 }

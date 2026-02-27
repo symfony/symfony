@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Wire the `$profilerDumper` argument in `DumpListener`
+
 4.1.0
 -----
 

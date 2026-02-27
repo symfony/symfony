@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Command;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -23,11 +24,10 @@ use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 use Symfony\Component\Messenger\Transport\Receiver\ReceiverInterface;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class FailedMessagesShowCommandTest extends TestCase
 {
     private string|false $colSize;
@@ -58,29 +58,25 @@ class FailedMessagesShowCommandTest extends TestCase
         $receiver->expects($this->once())->method('find')->with(15)->willReturn($envelope);
 
         $failureTransportName = 'failure_receiver';
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
 
         $command = new FailedMessagesShowCommand(
             $failureTransportName,
-            $serviceLocator
+            new ServiceLocator([$failureTransportName => static fn () => $receiver])
         );
 
         $tester = new CommandTester($command);
         $tester->execute(['id' => 15]);
 
-        $this->assertStringContainsString(sprintf(<<<EOF
-------------- --------------------- 
-  Class         stdClass             
-  Message Id    15                   
-  Failed at     %s  
-  Error         Things are bad!      
-  Error Code    123                  
-  Error Class   Exception            
-  Transport     async
-EOF
-            ,
+        $this->assertStringContainsString(\sprintf(<<<EOF
+            ------------- --------------------- 
+              Class         stdClass             
+              Message Id    15                   
+              Failed at     %s  
+              Error         Things are bad!      
+              Error Code    123                  
+              Error Class   Exception            
+              Transport     async
+            EOF,
             $redeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')),
             $tester->getDisplay(true));
     }
@@ -102,42 +98,35 @@ EOF
         $receiver->expects($this->once())->method('find')->with(15)->willReturn($envelope);
 
         $failureTransportName = 'failure_receiver';
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
 
         $command = new FailedMessagesShowCommand(
             $failureTransportName,
-            $serviceLocator
+            new ServiceLocator([$failureTransportName => static fn () => $receiver])
         );
         $tester = new CommandTester($command);
         $tester->execute(['id' => 15]);
-        $this->assertStringContainsString(sprintf(<<<EOF
- ------------- --------------------- 
-  Class         stdClass             
-  Message Id    15                   
-  Failed at     %s  
-  Error         Things are bad!      
-  Error Code    123                  
-  Error Class   Exception            
-  Transport     async
-EOF
-            ,
+        $this->assertStringContainsString(\sprintf(<<<EOF
+             ------------- --------------------- 
+              Class         stdClass             
+              Message Id    15                   
+              Failed at     %s  
+              Error         Things are bad!      
+              Error Code    123                  
+              Error Class   Exception            
+              Transport     async
+            EOF,
             $redeliveryStamp2->getRedeliveredAt()->format('Y-m-d H:i:s')),
             $tester->getDisplay(true));
     }
 
     public function testReceiverShouldBeListableWithServiceLocator()
     {
-        $receiver = $this->createMock(ReceiverInterface::class);
+        $receiver = $this->createStub(ReceiverInterface::class);
         $failureTransportName = 'failure_receiver';
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
 
         $command = new FailedMessagesShowCommand(
             $failureTransportName,
-            $serviceLocator
+            new ServiceLocator([$failureTransportName => static fn () => $receiver])
         );
 
         $this->expectExceptionMessage('The "failure_receiver" receiver does not support listing or showing specific messages.');
@@ -161,32 +150,27 @@ EOF
         $receiver->expects($this->once())->method('all')->with()->willReturn([$envelope]);
 
         $failureTransportName = 'failure_receiver';
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
-        $serviceLocator->method('getProvidedServices')->willReturn([
-            $failureTransportName => [],
-            'failure_receiver_2' => [],
-            'failure_receiver_3' => [],
-        ]);
         $command = new FailedMessagesShowCommand(
             $failureTransportName,
-            $serviceLocator
+            new ServiceLocator([
+                $failureTransportName => static fn () => $receiver,
+                'failure_receiver_2' => static fn () => $receiver,
+                'failure_receiver_3' => static fn () => $receiver,
+            ])
         );
         $tester = new CommandTester($command);
         $tester->setInputs([0]);
         $tester->execute([]);
 
-        $this->assertStringContainsString(sprintf(<<<EOF
-15   stdClass   %s   Things are bad!
-EOF
-            ,
+        $this->assertStringContainsString(\sprintf(<<<EOF
+            15   stdClass   %s   Things are bad!
+            EOF,
             $redeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')),
             $tester->getDisplay(true));
 
         $expectedLoadingMessage = <<<EOF
-> Available failure transports are: failure_receiver, failure_receiver_2, failure_receiver_3
-EOF;
+            > Available failure transports are: failure_receiver, failure_receiver_2, failure_receiver_3
+            EOF;
 
         $this->assertStringContainsString($expectedLoadingMessage, $tester->getDisplay());
         $this->assertStringContainsString('Run messenger:failed:show {id} --transport=failure_receiver -vv to see message details.', $tester->getDisplay());
@@ -197,13 +181,10 @@ EOF;
         $receiver = $this->createMock(ListableReceiverInterface::class);
         $receiver->expects($this->once())->method('all')->with()->willReturn([]);
         $failureTransportName = 'failure_receiver';
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
 
         $command = new FailedMessagesShowCommand(
             $failureTransportName,
-            $serviceLocator
+            new ServiceLocator([$failureTransportName => static fn () => $receiver])
         );
 
         $tester = new CommandTester($command);
@@ -224,13 +205,10 @@ EOF;
         $receiver->expects($this->once())->method('all')->with()->willReturn([$envelope]);
 
         $failureTransportName = 'failure_receiver';
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
 
         $command = new FailedMessagesShowCommand(
             $failureTransportName,
-            $serviceLocator
+            new ServiceLocator([$failureTransportName => static fn () => $receiver])
         );
 
         $tester = new CommandTester($command);
@@ -248,14 +226,11 @@ EOF;
             ErrorDetailsStamp::create(new \RuntimeException('Things are bad!')),
         ]);
         $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->method('all')->with()->willReturn([$envelope]);
+        $receiver->expects($this->exactly(3))->method('all')->with()->willReturn([$envelope]);
 
         $failureTransportName = 'failure_receiver';
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
 
-        $command = new FailedMessagesShowCommand('failure_receiver', $serviceLocator);
+        $command = new FailedMessagesShowCommand('failure_receiver', new ServiceLocator([$failureTransportName => static fn () => $receiver]));
 
         $tester = new CommandTester($command);
         $tester->execute([]);
@@ -280,14 +255,11 @@ EOF;
             ErrorDetailsStamp::create(new \RuntimeException('Things are bad!')),
         ]);
         $receiver = $this->createMock(ListableReceiverInterface::class);
-        $receiver->method('all')->with()->willReturn([$envelope, $envelope]);
+        $receiver->expects($this->once())->method('all')->with()->willReturn([$envelope, $envelope]);
 
         $failureTransportName = 'failure_receiver';
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
 
-        $command = new FailedMessagesShowCommand('failure_receiver', $serviceLocator);
+        $command = new FailedMessagesShowCommand('failure_receiver', new ServiceLocator([$failureTransportName => static fn () => $receiver]));
 
         $tester = new CommandTester($command);
         $tester->execute(['--stats' => 1]);
@@ -296,16 +268,13 @@ EOF;
 
     public function testInvalidMessagesThrowsExceptionWithServiceLocator()
     {
-        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver = $this->createStub(ListableReceiverInterface::class);
 
         $failureTransportName = 'failure_receiver';
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
 
         $command = new FailedMessagesShowCommand(
             $failureTransportName,
-            $serviceLocator
+            new ServiceLocator([$failureTransportName => static fn () => $receiver])
         );
 
         $this->expectExceptionMessage('The message "15" was not found.');
@@ -328,34 +297,24 @@ EOF;
         $receiver->expects($this->once())->method('find')->with(42)->willReturn($envelope);
 
         $failureTransportName = 'failure_receiver';
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
 
-        $command = new FailedMessagesShowCommand($failureTransportName, $serviceLocator);
+        $command = new FailedMessagesShowCommand($failureTransportName, new ServiceLocator([$failureTransportName => static fn () => $receiver]));
         $tester = new CommandTester($command);
         $tester->execute(['id' => 42], ['verbosity' => OutputInterface::VERBOSITY_VERY_VERBOSE]);
-        $this->assertStringMatchesFormat(sprintf(<<<'EOF'
-%%A
-Exception:
-==========
+        $this->assertStringMatchesFormat(\sprintf(<<<'EOF'
+            %%A
+            Exception:
+            ==========
 
-RuntimeException {
-  message: "Things are bad!"
-  code: 0
-  file: "%s"
-  line: %d
-  trace: {
-    %%s%%eTests%%eCommand%%eFailedMessagesShowCommandTest.php:%d {
-      Symfony\Component\Messenger\Tests\Command\FailedMessagesShowCommandTest->testVeryVerboseOutputForSingleMessageContainsExceptionWithTraceWithServiceLocator()
-      › {
-      ›     $exception = new \RuntimeException('Things are bad!');
-      ›     $exceptionLine = __LINE__ - 1;
-    }
-%%A
-EOF
-            ,
-            __FILE__, $exceptionLine, $exceptionLine),
+            RuntimeException {
+              message: "Things are bad!"
+              code: 0
+              file: "%s"
+              line: %%d
+              trace: {
+            %%A
+            EOF,
+            __FILE__, $exceptionLine),
             $tester->getDisplay(true));
     }
 
@@ -374,41 +333,33 @@ EOF
         $receiver->expects($this->once())->method('all')->with()->willReturn([$envelope]);
 
         $failureTransportName = 'failure_receiver_another';
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
 
         $command = new FailedMessagesShowCommand(
             'global_but_not_used',
-            $serviceLocator
+            new ServiceLocator([$failureTransportName => static fn () => $receiver])
         );
 
         $tester = new CommandTester($command);
         $tester->execute(['--transport' => $failureTransportName]);
-        $this->assertStringContainsString(sprintf(<<<EOF
-15   stdClass   %s   Things are bad!
-EOF
-            ,
+        $this->assertStringContainsString(\sprintf(<<<EOF
+            15   stdClass   %s   Things are bad!
+            EOF,
             $redeliveryStamp->getRedeliveredAt()->format('Y-m-d H:i:s')),
             $tester->getDisplay(true));
     }
-
 
     public function testCompletingTransport()
     {
         $globalFailureReceiverName = 'failure_receiver';
 
-        $receiver = $this->createMock(ListableReceiverInterface::class);
-
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('getProvidedServices')->willReturn([
-            'global_receiver' => $receiver,
-            $globalFailureReceiverName => $receiver,
-        ]);
+        $receiver = $this->createStub(ListableReceiverInterface::class);
 
         $command = new FailedMessagesShowCommand(
             $globalFailureReceiverName,
-            $serviceLocator
+            new ServiceLocator([
+                'global_receiver' => $receiver,
+                $globalFailureReceiverName => static fn () => $receiver,
+            ])
         );
         $tester = new CommandCompletionTester($command);
 
@@ -426,13 +377,9 @@ EOF
             Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('78c2da843723')]),
         ]);
 
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
-        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
-
         $command = new FailedMessagesShowCommand(
             $globalFailureReceiverName,
-            $serviceLocator
+            new ServiceLocator([$globalFailureReceiverName => static fn () => $receiver])
         );
         $tester = new CommandCompletionTester($command);
 
@@ -452,18 +399,82 @@ EOF
             Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('78c2da843723')]),
         ]);
 
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('has')->with($anotherFailureReceiverName)->willReturn(true);
-        $serviceLocator->expects($this->any())->method('get')->with($anotherFailureReceiverName)->willReturn($receiver);
-
         $command = new FailedMessagesShowCommand(
             $globalFailureReceiverName,
-            $serviceLocator
+            new ServiceLocator([$anotherFailureReceiverName => static fn () => $receiver])
         );
         $tester = new CommandCompletionTester($command);
 
         $suggestions = $tester->complete(['--transport', $anotherFailureReceiverName, ' ']);
 
         $this->assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
+    }
+
+    public function testTableOutputGoesToStdout()
+    {
+        $envelope = new Envelope(new \stdClass(), [
+            new TransportMessageIdStamp('2ab50dfa1fbf'),
+            new SentToFailureTransportStamp('async'),
+            new RedeliveryStamp(0),
+        ]);
+
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->with(50)->willReturn([$envelope]);
+
+        $command = new FailedMessagesShowCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]));
+        $tester = new CommandTester($command);
+        $tester->execute([], ['capture_stderr_separately' => true]);
+
+        $stdout = $tester->getDisplay();
+        $stderr = $tester->getErrorOutput();
+
+        $this->assertStringContainsString('2ab50dfa1fbf', $stdout);
+        $this->assertStringContainsString('messenger:failed:show', $stderr);
+        $this->assertStringNotContainsString('2ab50dfa1fbf', $stderr);
+    }
+
+    public function testPendingMessageCountGoesToStdout()
+    {
+        $receiver = new class implements ListableReceiverInterface, MessageCountAwareInterface {
+            public function get(): iterable
+            {
+                return [];
+            }
+
+            public function ack(Envelope $envelope): void
+            {
+            }
+
+            public function reject(Envelope $envelope): void
+            {
+            }
+
+            public function find(mixed $id): ?Envelope
+            {
+                return null;
+            }
+
+            public function all(?int $limit = null): iterable
+            {
+                return [];
+            }
+
+            public function getMessageCount(): int
+            {
+                return 3;
+            }
+        };
+
+        $command = new FailedMessagesShowCommand('failure_receiver', new ServiceLocator(['failure_receiver' => static fn () => $receiver]));
+        $tester = new CommandTester($command);
+        $tester->execute(['--max' => 5], ['capture_stderr_separately' => true]);
+
+        $stdout = $tester->getDisplay();
+        $stderr = $tester->getErrorOutput();
+
+        $this->assertStringContainsString('There are', $stdout);
+        $this->assertStringContainsString('3', $stdout);
+        $this->assertStringContainsString('messages pending', $stdout);
+        $this->assertStringNotContainsString('messages pending', $stderr);
     }
 }

@@ -77,7 +77,7 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
                 $formatter = new \IntlDateFormatter(\Locale::getDefault(), \IntlDateFormatter::MEDIUM, \IntlDateFormatter::SHORT, 'UTC');
 
                 return $formatter->format(new \DateTimeImmutable(
-                    $value->format('Y-m-d H:i:s.u'),
+                    ($value->format('y') > 0 ? '+' : '').$value->format('Y-m-d H:i:s.u'),
                     new \DateTimeZone('UTC')
                 ));
             }
@@ -119,6 +119,10 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
 
         if (true === $value) {
             return 'true';
+        }
+
+        if (is_nan($value)) {
+            return 'NAN';
         }
 
         return (string) $value;

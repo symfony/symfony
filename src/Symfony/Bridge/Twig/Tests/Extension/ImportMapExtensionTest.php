@@ -9,15 +9,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Extension;
+namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\ImportMapExtension;
 use Symfony\Bridge\Twig\Extension\ImportMapRuntime;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapRenderer;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
-use Twig\RuntimeLoader\RuntimeLoaderInterface;
+use Twig\RuntimeLoader\ContainerRuntimeLoader;
 
 class ImportMapExtensionTest extends TestCase
 {
@@ -35,14 +36,10 @@ class ImportMapExtensionTest extends TestCase
             ->willReturn($expected);
         $runtime = new ImportMapRuntime($importMapRenderer);
 
-        $mockRuntimeLoader = $this->createMock(RuntimeLoaderInterface::class);
-        $mockRuntimeLoader
-            ->method('load')
-            ->willReturnMap([
-                [ImportMapRuntime::class, $runtime],
-            ])
-        ;
-        $twig->addRuntimeLoader($mockRuntimeLoader);
+        $runtimeLoader = new ContainerRuntimeLoader(new ServiceLocator([
+            ImportMapRuntime::class => static fn () => $runtime,
+        ]));
+        $twig->addRuntimeLoader($runtimeLoader);
 
         $this->assertSame($expected, $twig->render('template'));
     }

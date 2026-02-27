@@ -642,6 +642,10 @@ return [
             'EC$',
             'dollar del Caribes Oriental',
         ],
+        'XCG' => [
+            'Cg.',
+            'florino caribe',
+        ],
         'XOF' => [
             'F CFA',
             'franco CFA de Africa Occidental',
@@ -661,6 +665,10 @@ return [
         'ZMW' => [
             'ZMW',
             'kwacha zambian',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'auro de Zimbwabwe',
         ],
     ],
 ];

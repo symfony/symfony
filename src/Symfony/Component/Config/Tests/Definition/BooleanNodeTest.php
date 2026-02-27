@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\BooleanNode;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 
 class BooleanNodeTest extends TestCase
 {
-    /**
-     * @dataProvider getValidValues
-     */
+    #[DataProvider('getValidValues')]
     public function testNormalize(bool $value)
     {
         $node = new BooleanNode('test');
@@ -53,9 +52,7 @@ class BooleanNodeTest extends TestCase
         $node->normalize(123);
     }
 
-    /**
-     * @dataProvider getValidValues
-     */
+    #[DataProvider('getValidValues')]
     public function testValidNonEmptyValues(bool $value)
     {
         $node = new BooleanNode('test');
@@ -72,9 +69,7 @@ class BooleanNodeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getInvalidValues
-     */
+    #[DataProvider('getInvalidValues')]
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
         $node = new BooleanNode('test');

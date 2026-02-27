@@ -22,7 +22,7 @@ trait FactoryTrait
      *
      * @return $this
      */
-    final public function factory(string|array|ReferenceConfigurator|Expression $factory): static
+    final public function factory(string|array|\Closure|ReferenceConfigurator|Expression $factory): static
     {
         if (\is_string($factory) && 1 === substr_count($factory, ':')) {
             $factoryParts = explode(':', $factory);

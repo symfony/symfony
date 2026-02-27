@@ -18,9 +18,6 @@ use Symfony\Component\Mime\Header\Headers;
  */
 class SMimePart extends AbstractPart
 {
-    /** @internal */
-    protected Headers $_headers;
-
     public function __construct(
         private iterable|string $body,
         private string $type,
@@ -84,22 +81,28 @@ class SMimePart extends AbstractPart
         return $headers;
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
         // convert iterables to strings for serialization
         if (is_iterable($this->body)) {
             $this->body = $this->bodyToString();
         }
 
-        $this->_headers = $this->getHeaders();
-
-        return ['_headers', 'body', 'type', 'subtype', 'parameters'];
+        return [
+            '_headers' => $this->getHeaders(),
+            'body' => $this->body,
+            'type' => $this->type,
+            'subtype' => $this->subtype,
+            'parameters' => $this->parameters,
+        ];
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
-        $r = new \ReflectionProperty(AbstractPart::class, 'headers');
-        $r->setValue($this, $this->_headers);
-        unset($this->_headers);
+        parent::__unserialize(['headers' => $data['_headers'] ?? $data["\0*\0_headers"]]);
+        $this->body = $data['body'] ?? $data["\0".self::class."\0body"];
+        $this->type = $data['type'] ?? $data["\0".self::class."\0type"];
+        $this->subtype = $data['subtype'] ?? $data["\0".self::class."\0subtype"];
+        $this->parameters = $data['parameters'] ?? $data["\0".self::class."\0parameters"];
     }
 }

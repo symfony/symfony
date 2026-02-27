@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToStringTransformer;
@@ -64,9 +65,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
         ];
     }
 
-    /**
-     * @dataProvider dataProvider
-     */
+    #[DataProvider('dataProvider')]
     public function testTransform($format, $output, $input)
     {
         $transformer = new DateTimeToStringTransformer('UTC', 'UTC', $format);
@@ -114,9 +113,7 @@ class DateTimeToStringTransformerTest extends BaseDateTimeTransformerTestCase
         $transformer->transform('1234');
     }
 
-    /**
-     * @dataProvider dataProvider
-     */
+    #[DataProvider('dataProvider')]
     public function testReverseTransform($format, $input, $output)
     {
         $reverseTransformer = new DateTimeToStringTransformer('UTC', 'UTC', $format);

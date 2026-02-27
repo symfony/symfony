@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add support for property hook settable types in `ReflectionExtractor`
+
 7.3
 ---
 

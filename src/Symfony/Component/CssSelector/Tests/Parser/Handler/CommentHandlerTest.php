@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\CssSelector\Tests\Parser\Handler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\CssSelector\Parser\Handler\CommentHandler;
 use Symfony\Component\CssSelector\Parser\Reader;
 use Symfony\Component\CssSelector\Parser\Token;
@@ -18,7 +19,7 @@ use Symfony\Component\CssSelector\Parser\TokenStream;
 
 class CommentHandlerTest extends AbstractHandlerTestCase
 {
-    /** @dataProvider getHandleValueTestData */
+    #[DataProvider('getHandleValueTestData')]
     public function testHandleValue($value, Token $unusedArgument, $remainingContent)
     {
         $reader = new Reader($value);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\GoIp\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\GoIp\GoIpOptions;
@@ -68,10 +69,9 @@ final class GoIpTransportTest extends TransportTestCase
     }
 
     /**
-     * @dataProvider goipErrorsProvider
-     *
      * @throws TransportExceptionInterface
      */
+    #[DataProvider('goipErrorsProvider')]
     public function testSendMessageWithUnsuccessfulReplyFromGoipThrows(string $goipError)
     {
         $this->expectException(TransportException::class);

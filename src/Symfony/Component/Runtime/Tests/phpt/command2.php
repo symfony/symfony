@@ -15,7 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 require __DIR__.'/autoload.php';
 
-return function (Command $command, InputInterface $input, OutputInterface $output, array $context) {
+return static function (Command $command, InputInterface $input, OutputInterface $output, array $context) {
     $command->addArgument('name', null, 'Who should I greet?', 'World');
 
     return static function () use ($input, $output, $context) {

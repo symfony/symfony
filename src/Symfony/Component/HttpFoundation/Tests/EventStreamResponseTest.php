@@ -29,9 +29,17 @@ class EventStreamResponseTest extends TestCase
         $this->assertNull($response->getRetry());
     }
 
+    public function testPresentOfExpiresHeader()
+    {
+        $response = new EventStreamResponse();
+
+        $this->assertTrue($response->headers->has('Expires'));
+        $this->assertSame('0', $response->headers->get('Expires'));
+    }
+
     public function testStreamSingleEvent()
     {
-        $response = new EventStreamResponse(function () {
+        $response = new EventStreamResponse(static function () {
             yield new ServerEvent(
                 data: 'foo',
                 type: 'bar',
@@ -42,14 +50,14 @@ class EventStreamResponseTest extends TestCase
         });
 
         $expected = <<<STR
-: bla bla
-id: 1
-retry: 100
-event: bar
-data: foo
+            : bla bla
+            id: 1
+            retry: 100
+            event: bar
+            data: foo
 
 
-STR;
+            STR;
 
         $this->assertSameResponseContent($expected, $response);
     }
@@ -62,58 +70,80 @@ STR;
             yield 'third line';
         };
 
-        $response = new EventStreamResponse(function () use ($data) {
+        $response = new EventStreamResponse(static function () use ($data) {
             yield new ServerEvent('single line');
             yield new ServerEvent(['first line', 'second line']);
             yield new ServerEvent($data());
         });
 
         $expected = <<<STR
-data: single line
+            data: single line
 
-data: first line
-data: second line
+            data: first line
+            data: second line
 
-data: first line
-data: second line
-data: third line
+            data: first line
+            data: second line
+            data: third line
 
 
-STR;
+            STR;
 
         $this->assertSameResponseContent($expected, $response);
     }
 
     public function testStreamEventsWithRetryFallback()
     {
-        $response = new EventStreamResponse(function () {
+        $response = new EventStreamResponse(static function () {
             yield new ServerEvent('foo');
             yield new ServerEvent('bar');
             yield new ServerEvent('baz', retry: 1000);
         }, retry: 1500);
 
         $expected = <<<STR
-retry: 1500
-data: foo
+            retry: 1500
+            data: foo
 
-data: bar
+            data: bar
 
-retry: 1000
-data: baz
+            retry: 1000
+            data: baz
 
 
-STR;
+            STR;
 
         $this->assertSameResponseContent($expected, $response);
     }
 
     public function testStreamEventWithSendMethod()
     {
-        $response = new EventStreamResponse(function (EventStreamResponse $response) {
+        $response = new EventStreamResponse(static function (EventStreamResponse $response) {
             $response->sendEvent(new ServerEvent('foo'));
         });
 
         $this->assertSameResponseContent("data: foo\n\n", $response);
+    }
+
+    public function testStreamEventWith0Data()
+    {
+        $response = new EventStreamResponse(static function () {
+            yield new ServerEvent(
+                data: '0',
+            );
+        });
+
+        $this->assertSameResponseContent("data: 0\n\n", $response);
+    }
+
+    public function testStreamEventEmptyStringIgnored()
+    {
+        $response = new EventStreamResponse(static function () {
+            yield new ServerEvent(
+                data: '',
+            );
+        });
+
+        $this->assertSameResponseContent("\n", $response);
     }
 
     private function assertSameResponseContent(string $expected, EventStreamResponse $response): void

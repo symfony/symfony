@@ -12,17 +12,22 @@
 namespace Symfony\Component\Messenger\Stamp;
 
 use Symfony\Component\Lock\Key;
+use Symfony\Component\Messenger\Exception\LogicException;
 
 final class DeduplicateStamp implements StampInterface
 {
     private Key $key;
 
     public function __construct(
-        string $key,
+        string|Key $key,
         private ?float $ttl = 300.0,
         private bool $onlyDeduplicateInQueue = false,
     ) {
-        $this->key = new Key($key);
+        if (!class_exists(Key::class)) {
+            throw new LogicException(\sprintf('You cannot use the "%s" as the Lock component is not installed. Try running "composer require symfony/lock".', self::class));
+        }
+
+        $this->key = \is_string($key) ? new Key($key) : $key;
     }
 
     public function onlyDeduplicateInQueue(): bool

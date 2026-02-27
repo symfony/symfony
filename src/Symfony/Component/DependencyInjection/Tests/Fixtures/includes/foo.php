@@ -48,3 +48,13 @@ class FooClass
         $this->otherInstances = $otherInstances;
     }
 }
+
+namespace Acme;
+
+class Foo
+{
+}
+
+class WithShortCutArgs
+{
+}

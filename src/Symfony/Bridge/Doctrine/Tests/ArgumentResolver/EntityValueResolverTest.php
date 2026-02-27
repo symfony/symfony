@@ -13,10 +13,9 @@ namespace Symfony\Bridge\Doctrine\Tests\ArgumentResolver;
 
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\Persistence\Mapping\ClassMetadata;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -31,7 +30,7 @@ class EntityValueResolverTest extends TestCase
 {
     public function testResolveWithoutClass()
     {
-        $manager = $this->createMock(ObjectManager::class);
+        $manager = $this->createStub(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
@@ -43,7 +42,7 @@ class EntityValueResolverTest extends TestCase
 
     public function testResolveWithoutAttribute()
     {
-        $manager = $this->createMock(ObjectManager::class);
+        $manager = $this->createStub(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry, null, new MapEntity(disabled: true));
 
@@ -64,22 +63,17 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
-    /**
-     * @group legacy
-     */
     public function testResolveWithNoIdAndDataOptional()
     {
-        $manager = $this->createMock(ObjectManager::class);
+        $manager = $this->createStub(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
         $request = new Request();
         $argument = $this->createArgument(null, new MapEntity(), 'arg', true);
 
-        if (class_exists(NearMissValueResolverException::class)) {
-            $this->expectException(NearMissValueResolverException::class);
-            $this->expectExceptionMessage('Cannot find mapping for "stdClass": declare one using either the #[MapEntity] attribute or mapped route parameters.');
-        }
+        $this->expectException(NearMissValueResolverException::class);
+        $this->expectExceptionMessage('Cannot find mapping for "stdClass": declare one using either the #[MapEntity] attribute or mapped route parameters.');
 
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
@@ -100,17 +94,13 @@ class EntityValueResolverTest extends TestCase
         $manager->expects($this->never())
             ->method('getRepository');
 
-        if (class_exists(NearMissValueResolverException::class)) {
-            $this->expectException(NearMissValueResolverException::class);
-            $this->expectExceptionMessage('Cannot find mapping for "stdClass": declare one using either the #[MapEntity] attribute or mapped route parameters.');
-        }
+        $this->expectException(NearMissValueResolverException::class);
+        $this->expectExceptionMessage('Cannot find mapping for "stdClass": declare one using either the #[MapEntity] attribute or mapped route parameters.');
 
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
 
-    /**
-     * @dataProvider idsProvider
-     */
+    #[DataProvider('idsProvider')]
     public function testResolveWithId(string|int $id)
     {
         $manager = $this->createMock(ObjectManager::class);
@@ -136,12 +126,10 @@ class EntityValueResolverTest extends TestCase
         $this->assertSame([$object], $resolver->resolve($request, $argument));
     }
 
-    /**
-     * @dataProvider idsProvider
-     */
+    #[DataProvider('idsProvider')]
     public function testResolveWithIdAndTypeAlias(string|int $id)
     {
-        $manager = $this->getMockBuilder(ObjectManager::class)->getMock();
+        $manager = $this->createMock(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver(
             $registry,
@@ -174,7 +162,7 @@ class EntityValueResolverTest extends TestCase
 
     public function testResolveWithNullId()
     {
-        $manager = $this->createMock(ObjectManager::class);
+        $manager = $this->createStub(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
@@ -188,7 +176,7 @@ class EntityValueResolverTest extends TestCase
 
     public function testResolveWithArrayIdNullValue()
     {
-        $manager = $this->createMock(ObjectManager::class);
+        $manager = $this->createStub(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
@@ -230,7 +218,7 @@ class EntityValueResolverTest extends TestCase
 
     public function testUsedProperIdentifier()
     {
-        $manager = $this->createMock(ObjectManager::class);
+        $manager = $this->createStub(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
@@ -251,9 +239,6 @@ class EntityValueResolverTest extends TestCase
         yield ['foo'];
     }
 
-    /**
-     * @group legacy
-     */
     public function testResolveGuessOptional()
     {
         $manager = $this->createMock(ObjectManager::class);
@@ -265,18 +250,11 @@ class EntityValueResolverTest extends TestCase
 
         $argument = $this->createArgument('stdClass', new MapEntity(), 'arg', true);
 
-        $metadata = $this->createMock(ClassMetadata::class);
-        $manager->expects($this->once())
-            ->method('getClassMetadata')
-            ->with('stdClass')
-            ->willReturn($metadata);
-
+        $manager->expects($this->never())->method('getClassMetadata');
         $manager->expects($this->never())->method('getRepository');
 
-        if (class_exists(NearMissValueResolverException::class)) {
-            $this->expectException(NearMissValueResolverException::class);
-            $this->expectExceptionMessage('Cannot find mapping for "stdClass": declare one using either the #[MapEntity] attribute or mapped route parameters.');
-        }
+        $this->expectException(NearMissValueResolverException::class);
+        $this->expectExceptionMessage('Cannot find mapping for "stdClass": declare one using either the #[MapEntity] attribute or mapped route parameters.');
 
         $this->assertSame([], $resolver->resolve($request, $argument));
     }
@@ -333,15 +311,15 @@ class EntityValueResolverTest extends TestCase
         $conference = new \stdClass();
         $article = new \stdClass();
 
-        $repository = $this->createMock(ObjectRepository::class);
-        $repository->expects($this->any())
+        $repository = $this->createStub(ObjectRepository::class);
+        $repository
             ->method('findOneBy')
             ->willReturnCallback(static fn ($v) => match ($v) {
                 ['slug' => 'vienna-2024'] => $conference,
                 ['title' => 'foo'] => $article,
             });
 
-        $manager->expects($this->any())
+        $manager
             ->method('getRepository')
             ->willReturn($repository);
 
@@ -351,7 +329,7 @@ class EntityValueResolverTest extends TestCase
 
     public function testExceptionWithExpressionIfNoLanguageAvailable()
     {
-        $manager = $this->createMock(ObjectManager::class);
+        $manager = $this->createStub(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
@@ -514,7 +492,7 @@ class EntityValueResolverTest extends TestCase
 
     public function testAlreadyResolved()
     {
-        $manager = $this->createMock(ObjectManager::class);
+        $manager = $this->createStub(ObjectManager::class);
         $registry = $this->createRegistry($manager);
         $resolver = new EntityValueResolver($registry);
 
@@ -531,11 +509,11 @@ class EntityValueResolverTest extends TestCase
         return new ArgumentMetadata($name, $class ?? \stdClass::class, false, false, null, $isNullable, $entity ? [$entity] : []);
     }
 
-    private function createRegistry(?ObjectManager $manager = null): ManagerRegistry&MockObject
+    private function createRegistry(?ObjectManager $manager = null): ManagerRegistry
     {
-        $registry = $this->createMock(ManagerRegistry::class);
+        $registry = $this->createStub(ManagerRegistry::class);
 
-        $registry->expects($this->any())
+        $registry
             ->method('getManagerForClass')
             ->willReturn($manager);
 

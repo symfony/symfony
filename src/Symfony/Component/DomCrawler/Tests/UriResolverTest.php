@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\DomCrawler\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DomCrawler\UriResolver;
 
 class UriResolverTest extends TestCase
 {
-    /**
-     * @dataProvider provideResolverTests
-     */
+    #[DataProvider('provideResolverTests')]
     public function testResolver(string $uri, string $baseUri, string $expected)
     {
         $this->assertEquals($expected, UriResolver::resolve($uri, $baseUri));

@@ -25,7 +25,7 @@ final class MercureTransportFactoryTest extends AbstractTransportFactoryTestCase
 {
     public function createFactory(): MercureTransportFactory
     {
-        $hub = $this->createMock(HubInterface::class);
+        $hub = $this->createStub(HubInterface::class);
         $hubRegistry = new HubRegistry($hub, ['hubId' => $hub]);
 
         return new MercureTransportFactory($hubRegistry);
@@ -62,7 +62,7 @@ final class MercureTransportFactoryTest extends AbstractTransportFactoryTestCase
 
     public function testNotFoundHubThrows()
     {
-        $hub = $this->createMock(HubInterface::class);
+        $hub = $this->createStub(HubInterface::class);
         $hubRegistry = new HubRegistry($hub, ['hubId' => $hub, 'anotherHubId' => $hub]);
         $factory = new MercureTransportFactory($hubRegistry);
 

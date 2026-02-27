@@ -9,7 +9,7 @@
 
 {% block body %}
     <div class="container">
-        {{ include('@WebProfiler/Profiler/header.html.twig', with_context = false) }}
+        {{ include('@WebProfiler/Profiler/header.html.twig', with_context: false) }}
 
         {% set source = file_info.pathname|file_excerpt(line, -1) %}
         <div id="content">
@@ -36,7 +36,7 @@
 
                         <dt>Size:</dt>
                         {% set file_size_in_kb = file_info.size / 1024 %}
-                        {% set file_num_lines = source|split("\n")|length - 1 %}
+                        {% set file_num_lines = source|split('\n')|length - 1 %}
                         <dd>
                             {{ file_size_in_kb < 1 ? file_info.size ~ ' bytes' : file_size_in_kb|number_format(0) ~ ' KB' }}
                             / {{ file_num_lines }} lines

@@ -13,6 +13,7 @@ use Symfony\Component\Runtime\SymfonyRuntime;
 
 $_SERVER['APP_RUNTIME_OPTIONS'] ??= [];
 $_SERVER['APP_RUNTIME_OPTIONS'] += [
+    'error_handler' => false,
     'project_dir' => __DIR__,
 ] + ($_SERVER['APP_RUNTIME_OPTIONS'] ?? []);
 

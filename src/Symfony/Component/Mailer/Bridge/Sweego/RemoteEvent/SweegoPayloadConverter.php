@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Sweego\RemoteEvent;
 
 use Symfony\Component\RemoteEvent\Event\Mailer\AbstractMailerEvent;
 use Symfony\Component\RemoteEvent\Event\Mailer\MailerDeliveryEvent;
+use Symfony\Component\RemoteEvent\Event\Mailer\MailerEngagementEvent;
 use Symfony\Component\RemoteEvent\Exception\ParseException;
 use Symfony\Component\RemoteEvent\PayloadConverterInterface;
 
@@ -20,13 +21,24 @@ final class SweegoPayloadConverter implements PayloadConverterInterface
 {
     public function convert(array $payload): AbstractMailerEvent
     {
-        if (\in_array($payload['event_type'], ['email_sent', 'delivered'], true)) {
+        if (\in_array($payload['event_type'], ['email_sent', 'delivered', 'soft-bounce', 'hard_bounce'], true)) {
             $name = match ($payload['event_type']) {
                 'email_sent' => MailerDeliveryEvent::RECEIVED,
                 'delivered' => MailerDeliveryEvent::DELIVERED,
+                'soft-bounce', 'hard_bounce' => MailerDeliveryEvent::BOUNCE,
             };
 
             $event = new MailerDeliveryEvent($name, $payload['headers']['x-transaction-id'], $payload);
+        } else {
+            $name = match ($payload['event_type']) {
+                'list_unsub' => MailerEngagementEvent::UNSUBSCRIBE,
+                'complaint' => MailerEngagementEvent::SPAM,
+                'email_clicked' => MailerEngagementEvent::CLICK,
+                'email_opened' => MailerEngagementEvent::OPEN,
+                default => throw new ParseException(\sprintf('Unsupported event "%s".', $payload['event_type'])),
+            };
+
+            $event = new MailerEngagementEvent($name, $payload['headers']['x-transaction-id'], $payload);
         }
 
         if (!$date = \DateTimeImmutable::createFromFormat(\DATE_ATOM, $payload['timestamp'])) {

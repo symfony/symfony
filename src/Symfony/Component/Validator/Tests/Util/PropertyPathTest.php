@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Validator\Tests\Util;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Util\PropertyPath;
 
 class PropertyPathTest extends TestCase
 {
-    /**
-     * @dataProvider provideAppendPaths
-     */
+    #[DataProvider('provideAppendPaths')]
     public function testAppend($basePath, $subPath, $expectedPath, $message)
     {
         $this->assertSame($expectedPath, PropertyPath::append($basePath, $subPath), $message);

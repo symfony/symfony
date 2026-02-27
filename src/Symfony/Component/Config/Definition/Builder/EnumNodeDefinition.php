@@ -16,6 +16,10 @@ use Symfony\Component\Config\Definition\EnumNode;
 /**
  * Enum Node Definition.
  *
+ * @template TParent of NodeParentInterface|null
+ *
+ * @extends ScalarNodeDefinition<TParent>
+ *
  * @author Johannes M. Schmitt <schmittjoh@gmail.com>
  */
 class EnumNodeDefinition extends ScalarNodeDefinition
@@ -54,9 +58,7 @@ class EnumNodeDefinition extends ScalarNodeDefinition
     }
 
     /**
-     * Instantiate a Node.
-     *
-     * @throws \RuntimeException
+     * @throws \RuntimeException when no values or enumFqcn is set
      */
     protected function instantiateNode(): EnumNode
     {

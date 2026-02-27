@@ -11,18 +11,16 @@
 
 namespace Symfony\Component\Emoji\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Emoji\EmojiTransliterator;
 use Symfony\Component\Finder\Finder;
 
-/**
- * @requires extension intl
- */
+#[RequiresPhpExtension('intl')]
 class EmojiTransliteratorTest extends TestCase
 {
-    /**
-     * @dataProvider provideTransliterateTests
-     */
+    #[DataProvider('provideTransliterateTests')]
     public function testTransliterate(string $locale, string $input, string $expected)
     {
         $tr = EmojiTransliterator::create('emoji-'.$locale);
@@ -87,9 +85,7 @@ class EmojiTransliteratorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideLocaleTest
-     */
+    #[DataProvider('provideLocaleTest')]
     public function testAllTransliterator(string $locale)
     {
         $tr = EmojiTransliterator::create($locale);
@@ -114,7 +110,8 @@ class EmojiTransliteratorTest extends TestCase
     public function testTransliterateWithInvalidLocale()
     {
         $this->expectException(\IntlException::class);
-        $this->expectExceptionMessage('transliterator_create: unable to open ICU transliterator with id "emoji-invalid"');
+
+        $this->expectExceptionMessage(\sprintf('%s: unable to open ICU transliterator with id "emoji-invalid":', \PHP_VERSION_ID >= 80500 ? 'Transliterator::create()' : 'transliterator_create'));
 
         EmojiTransliterator::create('invalid');
     }
@@ -139,7 +136,7 @@ class EmojiTransliteratorTest extends TestCase
 
         try {
             $this->assertFalse($tr->transliterate("Not \xE9 UTF-8"));
-            $this->assertSame('String conversion of string to UTF-16 failed: U_INVALID_CHAR_FOUND', intl_get_error_message());
+            $this->assertSame(\sprintf('%sString conversion of string to UTF-16 failed: U_INVALID_CHAR_FOUND', \PHP_VERSION_ID >= 80500 ? 'Transliterator::transliterate(): ' : ''), intl_get_error_message());
 
             ini_set('intl.use_exceptions', 1);
 
@@ -160,12 +157,12 @@ class EmojiTransliteratorTest extends TestCase
 
         try {
             $this->assertFalse($tr->transliterate('Abc', 1, 5));
-            $this->assertSame('transliterator_transliterate: Neither "start" nor the "end" arguments can exceed the number of UTF-16 code units (in this case, 3): U_ILLEGAL_ARGUMENT_ERROR', intl_get_error_message());
+            $this->assertSame(\sprintf('%s: Neither "start" nor the "end" arguments can exceed the number of UTF-16 code units (in this case, 3): U_ILLEGAL_ARGUMENT_ERROR', \PHP_VERSION_ID >= 80500 ? 'Transliterator::transliterate()' : 'transliterator_transliterate'), intl_get_error_message());
 
             ini_set('intl.use_exceptions', 1);
 
             $this->expectException(\IntlException::class);
-            $this->expectExceptionMessage('transliterator_transliterate: Neither "start" nor the "end" arguments can exceed the number of UTF-16 code units (in this case, 3)');
+            $this->expectExceptionMessage(\sprintf('%s: Neither "start" nor the "end" arguments can exceed the number of UTF-16 code units (in this case, 3)', \PHP_VERSION_ID >= 80500 ? 'Transliterator::transliterate()' : 'transliterator_transliterate'));
 
             $this->assertFalse($tr->transliterate('Abc', 1, 5));
         } finally {

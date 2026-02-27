@@ -78,7 +78,13 @@ class ProjectServiceContainer extends Container
      */
     protected static function getDbService($container)
     {
-        $container->services['App\\Db'] = $instance = new \App\Db();
+        $instance = new \App\Db();
+
+        if (isset($container->services['App\\Db'])) {
+            return $container->services['App\\Db'];
+        }
+
+        $container->services['App\\Db'] = $instance;
 
         $instance->schema = ($container->privates['App\\Schema'] ?? self::getSchemaService($container));
 
@@ -98,6 +104,12 @@ class ProjectServiceContainer extends Container
             return $container->privates['App\\Schema'];
         }
 
-        return $container->privates['App\\Schema'] = new \App\Schema($a);
+        $instance = new \App\Schema($a);
+
+        if (isset($container->privates['App\\Schema'])) {
+            return $container->privates['App\\Schema'];
+        }
+
+        return $container->privates['App\\Schema'] = $instance;
     }
 }

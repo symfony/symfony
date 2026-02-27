@@ -20,6 +20,7 @@ use Symfony\Component\Serializer\Attribute\DiscriminatorMap;
     'one' => DummyMessageNumberOne::class,
     'two' => DummyMessageNumberTwo::class,
     'three' => DummyMessageNumberThree::class,
+    'four' => DummyMessageNumberFour::class,
 ])]
 interface DummyMessageInterface
 {

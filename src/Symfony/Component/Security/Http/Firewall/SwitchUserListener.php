@@ -65,7 +65,7 @@ class SwitchUserListener extends AbstractListener
     public function supports(Request $request): ?bool
     {
         // usernames can be falsy
-        $username = $request->get($this->usernameParameter);
+        $username = $request->query->get($this->usernameParameter) ?? (!\in_array($request->getMethod(), ['GET', 'HEAD'], true) ? $request->request->get($this->usernameParameter) : null);
 
         if (null === $username || '' === $username) {
             $username = $request->headers->get($this->usernameParameter);
@@ -111,7 +111,7 @@ class SwitchUserListener extends AbstractListener
         if (!$this->stateless) {
             $request->query->remove($this->usernameParameter);
             $request->server->set('QUERY_STRING', http_build_query($request->query->all(), '', '&'));
-            $response = new RedirectResponse($this->urlGenerator && $this->targetRoute ? $this->urlGenerator->generate($this->targetRoute) : $request->getUri(), 302);
+            $response = new RedirectResponse($this->urlGenerator && $this->targetRoute && self::EXIT_VALUE !== $username ? $this->urlGenerator->generate($this->targetRoute) : $request->getUri(), 302);
 
             $event->setResponse($response);
         }

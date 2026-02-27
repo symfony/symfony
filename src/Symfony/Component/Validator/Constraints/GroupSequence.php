@@ -77,6 +77,6 @@ class GroupSequence
      */
     public function __construct(array $groups)
     {
-        $this->groups = $groups['value'] ?? $groups;
+        $this->groups = $groups;
     }
 }

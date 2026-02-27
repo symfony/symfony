@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -31,14 +32,14 @@ final class NativeTransportFactoryTest extends TestCase
         $current = static::class;
 
         $eval = <<<EOT
-namespace $namespace;
+            namespace $namespace;
 
-function ini_get(\$key)
-{
-    \$vals = \\$current::\$fakeConfiguration;
-    return \$vals[\$key] ?? '';
-}
-EOT;
+            function ini_get(\$key)
+            {
+                \$vals = \\$current::\$fakeConfiguration;
+                return \$vals[\$key] ?? '';
+            }
+            EOT;
         eval($eval);
     }
 
@@ -71,9 +72,7 @@ EOT;
         yield ['native://default', '', '', '25'];
     }
 
-    /**
-     * @dataProvider provideCreateSendmailWithNoHostOrNoPort
-     */
+    #[DataProvider('provideCreateSendmailWithNoHostOrNoPort')]
     public function testCreateSendmailWithNoHostOrNoPort(string $dsn, string $sendmaiPath, string $smtp, string $smtpPort)
     {
         if ('\\' !== \DIRECTORY_SEPARATOR) {
@@ -111,9 +110,7 @@ EOT;
         }
     }
 
-    /**
-     * @dataProvider provideCreate
-     */
+    #[DataProvider('provideCreate')]
     public function testCreate(string $dsn, string $sendmailPath, string $smtp, string $smtpPort, TransportInterface $expectedTransport)
     {
         self::$fakeConfiguration = [

@@ -417,7 +417,7 @@ return [
         'en_CA' => 'Ingarihi Kānata',
         'en_GB' => 'Ingarihi Piritene',
         'en_US' => 'Ingarihi Amerikana',
-        'es_419' => 'Pāniora Amerikana ki te Tonga',
+        'es_419' => 'Pāniora o Amerika Rātini',
         'es_ES' => 'Pāniora Ūropi',
         'es_MX' => 'Pāniora Mehikana',
         'fa_AF' => 'Tāri',

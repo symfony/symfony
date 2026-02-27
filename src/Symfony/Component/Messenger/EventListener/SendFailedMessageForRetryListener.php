@@ -149,14 +149,13 @@ class SendFailedMessageForRetryListener implements EventSubscriberInterface
     private function getWaitingTime(Envelope $envelope, \Throwable $throwable, RetryStrategyInterface $retryStrategy): int
     {
         $delay = null;
-        if ($throwable instanceof RecoverableExceptionInterface && method_exists($throwable, 'getRetryDelay')) {
+        if ($throwable instanceof RecoverableExceptionInterface) {
             $delay = $throwable->getRetryDelay();
         }
 
         if ($throwable instanceof HandlerFailedException) {
             foreach ($throwable->getWrappedExceptions() as $nestedException) {
                 if (!$nestedException instanceof RecoverableExceptionInterface
-                    || !method_exists($nestedException, 'getRetryDelay')
                     || 0 > $retryDelay = $nestedException->getRetryDelay() ?? -1
                 ) {
                     continue;

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\ErrorHandler\Tests\Command;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -37,7 +36,7 @@ class ErrorDumpCommandTest extends TestCase
 
     public function testDumpPages()
     {
-        $tester = $this->getCommandTester($this->getKernel(), []);
+        $tester = $this->getCommandTester($this->createStub(KernelInterface::class), []);
         $tester->execute([
             'path' => $this->tmpDir,
         ]);
@@ -52,7 +51,7 @@ class ErrorDumpCommandTest extends TestCase
         $fs->mkdir($this->tmpDir);
         $fs->touch($this->tmpDir.\DIRECTORY_SEPARATOR.'test.html');
 
-        $tester = $this->getCommandTester($this->getKernel());
+        $tester = $this->getCommandTester($this->createStub(KernelInterface::class));
         $tester->execute([
             'path' => $this->tmpDir,
             'status-codes' => ['400', '500'],
@@ -71,7 +70,7 @@ class ErrorDumpCommandTest extends TestCase
         $fs->mkdir($this->tmpDir);
         $fs->touch($this->tmpDir.\DIRECTORY_SEPARATOR.'test.html');
 
-        $tester = $this->getCommandTester($this->getKernel());
+        $tester = $this->getCommandTester($this->createStub(KernelInterface::class));
         $tester->execute([
             'path' => $this->tmpDir,
             '--force' => true,
@@ -81,17 +80,12 @@ class ErrorDumpCommandTest extends TestCase
         $this->assertFileExists($this->tmpDir.\DIRECTORY_SEPARATOR.'404.html');
     }
 
-    private function getKernel(): MockObject&KernelInterface
-    {
-        return $this->createMock(KernelInterface::class);
-    }
-
     private function getCommandTester(KernelInterface $kernel): CommandTester
     {
         $errorRenderer = $this->createStub(ErrorRendererInterface::class);
         $errorRenderer
             ->method('render')
-            ->willReturnCallback(function (HttpException $e) {
+            ->willReturnCallback(static function (HttpException $e) {
                 $exception = FlattenException::createFromThrowable($e);
                 $exception->setAsString(\sprintf('<html><body>Error %s</body></html>', $e->getStatusCode()));
 
@@ -99,10 +93,10 @@ class ErrorDumpCommandTest extends TestCase
             })
         ;
 
-        $entrypointLookup = $this->createMock(EntrypointLookupInterface::class);
+        $entrypointLookup = $this->createStub(EntrypointLookupInterface::class);
 
         $application = new Application($kernel);
-        $application->add(new ErrorDumpCommand(
+        $application->addCommand(new ErrorDumpCommand(
             new Filesystem(),
             $errorRenderer,
             $entrypointLookup,

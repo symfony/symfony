@@ -11,23 +11,12 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 class ArrayDenormalizerTest extends TestCase
 {
-    private ArrayDenormalizer $denormalizer;
-    private MockObject&DenormalizerInterface $serializer;
-
-    protected function setUp(): void
-    {
-        $this->serializer = $this->createMock(DenormalizerInterface::class);
-        $this->denormalizer = new ArrayDenormalizer();
-        $this->denormalizer->setDenormalizer($this->serializer);
-    }
-
     public function testDenormalize()
     {
         $series = [
@@ -35,7 +24,8 @@ class ArrayDenormalizerTest extends TestCase
             [[['foo' => 'three', 'bar' => 'four']], new ArrayDummy('three', 'four')],
         ];
 
-        $this->serializer->expects($this->exactly(2))
+        $nestedDenormalizer = $this->createMock(DenormalizerInterface::class);
+        $nestedDenormalizer->expects($this->exactly(2))
             ->method('denormalize')
             ->willReturnCallback(function ($data) use (&$series) {
                 [$expectedArgs, $return] = array_shift($series);
@@ -45,7 +35,9 @@ class ArrayDenormalizerTest extends TestCase
             })
         ;
 
-        $result = $this->denormalizer->denormalize(
+        $denormalizer = new ArrayDenormalizer();
+        $denormalizer->setDenormalizer($nestedDenormalizer);
+        $result = $denormalizer->denormalize(
             [
                 ['foo' => 'one', 'bar' => 'two'],
                 ['foo' => 'three', 'bar' => 'four'],
@@ -64,13 +56,16 @@ class ArrayDenormalizerTest extends TestCase
 
     public function testSupportsValidArray()
     {
-        $this->serializer->expects($this->once())
+        $nestedDenormalizer = $this->createMock(DenormalizerInterface::class);
+        $nestedDenormalizer->expects($this->once())
             ->method('supportsDenormalization')
             ->with($this->anything(), ArrayDummy::class, 'json', ['con' => 'text'])
             ->willReturn(true);
+        $denormalizer = new ArrayDenormalizer();
+        $denormalizer->setDenormalizer($nestedDenormalizer);
 
         $this->assertTrue(
-            $this->denormalizer->supportsDenormalization(
+            $denormalizer->supportsDenormalization(
                 [
                     ['foo' => 'one', 'bar' => 'two'],
                     ['foo' => 'three', 'bar' => 'four'],
@@ -84,12 +79,15 @@ class ArrayDenormalizerTest extends TestCase
 
     public function testSupportsInvalidArray()
     {
-        $this->serializer->expects($this->any())
+        $nestedDenormalizer = $this->createStub(DenormalizerInterface::class);
+        $nestedDenormalizer
             ->method('supportsDenormalization')
             ->willReturn(false);
+        $denormalizer = new ArrayDenormalizer();
+        $denormalizer->setDenormalizer($nestedDenormalizer);
 
         $this->assertFalse(
-            $this->denormalizer->supportsDenormalization(
+            $denormalizer->supportsDenormalization(
                 [
                     ['foo' => 'one', 'bar' => 'two'],
                     ['foo' => 'three', 'bar' => 'four'],
@@ -101,8 +99,11 @@ class ArrayDenormalizerTest extends TestCase
 
     public function testSupportsNoArray()
     {
+        $denormalizer = new ArrayDenormalizer();
+        $denormalizer->setDenormalizer($this->createStub(DenormalizerInterface::class));
+
         $this->assertFalse(
-            $this->denormalizer->supportsDenormalization(
+            $denormalizer->supportsDenormalization(
                 ['foo' => 'one', 'bar' => 'two'],
                 ArrayDummy::class
             )

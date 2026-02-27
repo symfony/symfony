@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
@@ -25,9 +26,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class MockHttpClientTest extends HttpClientTestCase
 {
-    /**
-     * @dataProvider mockingProvider
-     */
+    #[DataProvider('mockingProvider')]
     public function testMocking($factory, array $expectedResponses)
     {
         $client = new MockHttpClient($factory);
@@ -96,9 +95,7 @@ class MockHttpClientTest extends HttpClientTestCase
         ];
     }
 
-    /**
-     * @dataProvider validResponseFactoryProvider
-     */
+    #[DataProvider('validResponseFactoryProvider')]
     public function testValidResponseFactory($responseFactory)
     {
         (new MockHttpClient($responseFactory))->request('GET', 'https://foo.bar');
@@ -118,9 +115,7 @@ class MockHttpClientTest extends HttpClientTestCase
         ];
     }
 
-    /**
-     * @dataProvider transportExceptionProvider
-     */
+    #[DataProvider('transportExceptionProvider')]
     public function testTransportExceptionThrowsIfPerformedMoreRequestsThanConfigured($factory)
     {
         $client = new MockHttpClient($factory);
@@ -158,9 +153,7 @@ class MockHttpClientTest extends HttpClientTestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidResponseFactoryProvider
-     */
+    #[DataProvider('invalidResponseFactoryProvider')]
     public function testInvalidResponseFactory($responseFactory, string $expectedExceptionMessage)
     {
         $this->expectException(TransportException::class);
@@ -364,6 +357,7 @@ class MockHttpClientTest extends HttpClientTestCase
 
             case 'testTimeoutOnInitialize':
             case 'testTimeoutOnDestruct':
+            case 'testMaxConnectDuration':
                 $this->markTestSkipped('Real transport required');
                 break;
 
@@ -427,7 +421,7 @@ class MockHttpClientTest extends HttpClientTestCase
             case 'testResolve':
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
                 $responses[] = new MockResponse($body, ['response_headers' => $headers]);
-                $responses[] = new MockResponse((function () { yield ''; })(), ['response_headers' => $headers]);
+                $responses[] = new MockResponse((static function () { yield ''; })(), ['response_headers' => $headers]);
                 break;
 
             case 'testTimeoutOnStream':
@@ -438,7 +432,7 @@ class MockHttpClientTest extends HttpClientTestCase
                 break;
 
             case 'testInformationalResponseStream':
-                $client = $this->createMock(HttpClientInterface::class);
+                $client = $this->createStub(HttpClientInterface::class);
                 $response = new MockResponse('Here the body', ['response_headers' => [
                     'HTTP/1.1 103 ',
                     'Link: </style.css>; rel=preload; as=style',
@@ -448,23 +442,23 @@ class MockHttpClientTest extends HttpClientTestCase
                 ]]);
                 $client->method('request')->willReturn($response);
                 $client->method('stream')->willReturn(new ResponseStream((function () use ($response) {
-                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk = $this->createStub(ChunkInterface::class);
                     $chunk->method('getInformationalStatus')
                         ->willReturn([103, ['link' => ['</style.css>; rel=preload; as=style', '</script.js>; rel=preload; as=script']]]);
 
                     yield $response => $chunk;
 
-                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk = $this->createStub(ChunkInterface::class);
                     $chunk->method('isFirst')->willReturn(true);
 
                     yield $response => $chunk;
 
-                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk = $this->createStub(ChunkInterface::class);
                     $chunk->method('getContent')->willReturn('Here the body');
 
                     yield $response => $chunk;
 
-                    $chunk = $this->createMock(ChunkInterface::class);
+                    $chunk = $this->createStub(ChunkInterface::class);
                     $chunk->method('isLast')->willReturn(true);
 
                     yield $response => $chunk;
@@ -475,7 +469,7 @@ class MockHttpClientTest extends HttpClientTestCase
             case 'testNonBlockingStream':
             case 'testSeekAsyncStream':
                 $responses[] = new MockResponse(
-                    (function () {
+                    (static function () {
                         yield '<1>';
                         yield '';
                         yield '<2>';
@@ -489,6 +483,10 @@ class MockHttpClientTest extends HttpClientTestCase
                     '',
                     ['error' => 'Max duration was reached.']
                 );
+                break;
+
+            case 'testMaxConnectDurationInfo':
+                $responses[] = new MockResponse('');
                 break;
         }
 
@@ -512,7 +510,7 @@ class MockHttpClientTest extends HttpClientTestCase
 
     public function testChangeResponseFactory()
     {
-        /* @var MockHttpClient $client */
+        /** @var MockHttpClient $client */
         $client = $this->getHttpClient(__METHOD__);
         $expectedBody = '{"foo": "bar"}';
         $client->setResponseFactory(new MockResponse($expectedBody));
@@ -590,6 +588,16 @@ class MockHttpClientTest extends HttpClientTestCase
         $client = new MockHttpClient([new MockResponse()]);
         $client->request('GET', 'https://example.com');
         $client->request('GET', 'https://example.com');
+    }
+
+    public function testDoesNotThrowOnDestructIfExceptionCaughtEarlierWithGetStatusCode()
+    {
+        $this->markTestSkipped('Not supported');
+    }
+
+    public function testDoesNotThrowOnDestructIfExceptionCaughtEarlierEvenWithoutGetStatusCode()
+    {
+        $this->markTestSkipped('Not supported');
     }
 
     public function testMockStartTimeInfo()

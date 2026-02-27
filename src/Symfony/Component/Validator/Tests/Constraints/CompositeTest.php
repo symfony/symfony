@@ -24,19 +24,16 @@ class ConcreteComposite extends Composite
 {
     public array|Constraint $constraints = [];
 
-    public function __construct(mixed $options = null, public array|Constraint $otherNested = [])
+    public function __construct(array|Constraint $constraints = [], public array|Constraint $otherNested = [], ?array $groups = null)
     {
-        parent::__construct($options);
+        $this->constraints = $constraints;
+
+        parent::__construct(null, $groups);
     }
 
     protected function getCompositeOption(): array
     {
         return ['constraints', 'otherNested'];
-    }
-
-    public function getDefaultOption(): ?string
-    {
-        return 'constraints';
     }
 }
 
@@ -89,16 +86,14 @@ class CompositeTest extends TestCase
 
     public function testSetImplicitNestedGroupsIfExplicitParentGroup()
     {
-        $constraint = new ConcreteComposite([
-            'constraints' => [
+        $constraint = new ConcreteComposite(
+            [
                 new NotNull(),
                 new NotBlank(),
             ],
-            'otherNested' => [
-                new Length(exactly: 10),
-            ],
-            'groups' => ['Default', 'Strict'],
-        ]);
+            new Length(exactly: 10),
+            ['Default', 'Strict'],
+        );
 
         $this->assertEquals(['Default', 'Strict'], $constraint->groups);
         $this->assertEquals(['Default', 'Strict'], $constraint->constraints[0]->groups);
@@ -108,16 +103,14 @@ class CompositeTest extends TestCase
 
     public function testExplicitNestedGroupsMustBeSubsetOfExplicitParentGroups()
     {
-        $constraint = new ConcreteComposite([
-            'constraints' => [
+        $constraint = new ConcreteComposite(
+            [
                 new NotNull(groups: ['Default']),
                 new NotBlank(groups: ['Strict']),
             ],
-            'otherNested' => [
-                new Length(exactly: 10, groups: ['Strict']),
-            ],
-            'groups' => ['Default', 'Strict'],
-        ]);
+            new Length(exactly: 10, groups: ['Strict']),
+            ['Default', 'Strict']
+        );
 
         $this->assertEquals(['Default', 'Strict'], $constraint->groups);
         $this->assertEquals(['Default'], $constraint->constraints[0]->groups);
@@ -128,26 +121,13 @@ class CompositeTest extends TestCase
     public function testFailIfExplicitNestedGroupsNotSubsetOfExplicitParentGroups()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        new ConcreteComposite([
-            'constraints' => [
-                new NotNull(groups: ['Default', 'Foobar']),
-            ],
-            'groups' => ['Default', 'Strict'],
-        ]);
+        new ConcreteComposite(new NotNull(groups: ['Default', 'Foobar']), [], ['Default', 'Strict']);
     }
 
     public function testFailIfExplicitNestedGroupsNotSubsetOfExplicitParentGroupsInOtherNested()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        new ConcreteComposite([
-            'constraints' => [
-                new NotNull(groups: ['Default']),
-            ],
-            'otherNested' => [
-                new NotNull(groups: ['Default', 'Foobar']),
-            ],
-            'groups' => ['Default', 'Strict'],
-        ]);
+        new ConcreteComposite(new NotNull(groups: ['Default']), new NotNull(groups: ['Default', 'Foobar']), ['Default', 'Strict']);
     }
 
     public function testImplicitGroupNamesAreForwarded()

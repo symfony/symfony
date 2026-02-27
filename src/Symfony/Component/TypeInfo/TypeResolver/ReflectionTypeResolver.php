@@ -76,7 +76,7 @@ final class ReflectionTypeResolver implements TypeResolverInterface
             default => $identifier,
         };
 
-        if (is_subclass_of($className, \UnitEnum::class)) {
+        if (is_subclass_of($className, \UnitEnum::class) && !interface_exists($className)) {
             $type = Type::enum($className);
         } else {
             $type = Type::object($className);

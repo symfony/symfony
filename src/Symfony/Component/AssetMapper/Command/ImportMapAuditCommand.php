@@ -51,10 +51,10 @@ class ImportMapAuditCommand extends Command
                 default: 'txt',
             )
             ->setHelp(<<<'EOT'
-The <info>--format</info> option specifies the format of the command output:
+                The <info>--format</info> option specifies the format of the command output:
 
-  <info>php %command.full_name% --format=json</info>
-EOT
+                  <info>php %command.full_name% --format=json</info>
+                EOT
             );
     }
 
@@ -81,7 +81,7 @@ EOT
         $rows = [];
 
         $packagesWithoutVersion = [];
-        $vulnerabilitiesCount = array_map(fn () => 0, self::SEVERITY_COLORS);
+        $vulnerabilitiesCount = array_map(static fn () => 0, self::SEVERITY_COLORS);
         foreach ($audit as $packageAudit) {
             if (!$packageAudit->version) {
                 $packagesWithoutVersion[] = $packageAudit->package;
@@ -158,7 +158,7 @@ EOT
 
     private function displayJson(array $audit): int
     {
-        $vulnerabilitiesCount = array_map(fn () => 0, self::SEVERITY_COLORS);
+        $vulnerabilitiesCount = array_map(static fn () => 0, self::SEVERITY_COLORS);
 
         $json = [
             'packages' => [],
@@ -169,7 +169,7 @@ EOT
             $json['packages'][] = [
                 'package' => $packageAudit->package,
                 'version' => $packageAudit->version,
-                'vulnerabilities' => array_map(fn (ImportMapPackageAuditVulnerability $v) => [
+                'vulnerabilities' => array_map(static fn (ImportMapPackageAuditVulnerability $v) => [
                     'ghsa_id' => $v->ghsaId,
                     'cve_id' => $v->cveId,
                     'url' => $v->url,

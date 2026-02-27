@@ -40,14 +40,14 @@ final class SecretsDecryptToLocalCommand extends Command
         $this
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force overriding of secrets that already exist in the local vault')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command decrypts all secrets and copies them in the local vault.
+                The <info>%command.name%</info> command decrypts all secrets and copies them in the local vault.
 
-    <info>%command.full_name%</info>
+                    <info>%command.full_name%</info>
 
-When the <info>--force</info> option is provided, secrets that already exist in the local vault are overridden.
+                When the <info>--force</info> option is provided, secrets that already exist in the local vault are overridden.
 
-    <info>%command.full_name% --force</info>
-EOF
+                    <info>%command.full_name% --force</info>
+                EOF
             )
         ;
     }

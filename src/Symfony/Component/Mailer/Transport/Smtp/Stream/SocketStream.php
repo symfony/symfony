@@ -167,7 +167,7 @@ final class SocketStream extends AbstractStream
 
     public function startTLS(): bool
     {
-        set_error_handler(function ($type, $msg) {
+        set_error_handler(static function ($type, $msg) {
             throw new TransportException('Unable to connect with STARTTLS: '.$msg);
         });
         try {

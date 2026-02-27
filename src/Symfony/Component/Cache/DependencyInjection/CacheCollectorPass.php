@@ -49,9 +49,7 @@ class CacheCollectorPass implements CompilerPassInterface
         $collectorDefinition = $container->getDefinition('data_collector.cache');
         $recorder = new Definition(is_subclass_of($definition->getClass(), TagAwareAdapterInterface::class) ? TraceableTagAwareAdapter::class : TraceableAdapter::class);
         $recorder->setTags($definition->getTags());
-        if (!$definition->isPublic() || !$definition->isPrivate()) {
-            $recorder->setPublic($definition->isPublic());
-        }
+        $recorder->setPublic($definition->isPublic());
         $recorder->setArguments([new Reference($innerId = $id.'.recorder_inner'), new Reference('profiler.is_disabled_state_checker', ContainerBuilder::IGNORE_ON_INVALID_REFERENCE)]);
 
         foreach ($definition->getMethodCalls() as [$method, $args]) {

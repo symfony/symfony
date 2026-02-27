@@ -12,12 +12,9 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
-use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
 class IntegerTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
-    use ValidatorExtensionTrait;
-
     protected function createForm(array $options = [])
     {
         return $this->factory->create(IntegerType::class, null, $options);

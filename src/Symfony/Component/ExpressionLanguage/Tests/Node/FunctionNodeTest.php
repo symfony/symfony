@@ -34,15 +34,15 @@ class FunctionNodeTest extends AbstractNodeTestCase
     public static function getDumpData(): array
     {
         return [
-            ['foo("bar")', new FunctionNode('foo', new Node([new ConstantNode('bar')])), ['foo' => static::getCallables()]],
+            ['foo("bar")', new FunctionNode('foo', new Node([new ConstantNode('bar')]))],
         ];
     }
 
     protected static function getCallables(): array
     {
         return [
-            'compiler' => fn ($arg) => \sprintf('foo(%s)', $arg),
-            'evaluator' => fn ($variables, $arg) => $arg,
+            'compiler' => static fn ($arg) => \sprintf('foo(%s)', $arg),
+            'evaluator' => static fn ($variables, $arg) => $arg,
         ];
     }
 }

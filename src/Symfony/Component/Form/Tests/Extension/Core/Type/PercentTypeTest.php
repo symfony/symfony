@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\Type\PercentType;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Intl\Util\IntlTestHelper;
@@ -23,9 +24,11 @@ class PercentTypeTest extends TypeTestCase
 
     protected function setUp(): void
     {
+        $this->dispatcher = new EventDispatcher();
+
         // we test against different locales, so we need the full
         // implementation
-        IntlTestHelper::requireFullIntl($this, false);
+        IntlTestHelper::requireFullIntl($this);
 
         parent::setUp();
 
@@ -34,7 +37,9 @@ class PercentTypeTest extends TypeTestCase
 
     protected function tearDown(): void
     {
-        \Locale::setDefault($this->defaultLocale);
+        if (isset($this->defaultLocale)) {
+            \Locale::setDefault($this->defaultLocale);
+        }
     }
 
     public function testSubmitWithRoundingMode()

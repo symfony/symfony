@@ -31,9 +31,12 @@ class Configuration implements ConfigurationInterface
     ) {
     }
 
+    /**
+     * @return TreeBuilder<'array'>
+     */
     public function getConfigTreeBuilder(): TreeBuilder
     {
-        $treeBuilder = new TreeBuilder($this->alias);
+        $treeBuilder = new TreeBuilder($this->alias, 'array');
         $file = (new \ReflectionObject($this->subject))->getFileName();
         $loader = new DefinitionFileLoader($treeBuilder, new FileLocator(\dirname($file)), $this->container);
         $configurator = new DefinitionConfigurator($treeBuilder, $loader, $file, $file);

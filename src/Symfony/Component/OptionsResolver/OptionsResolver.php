@@ -65,13 +65,6 @@ class OptionsResolver implements Options
     private array $nested = [];
 
     /**
-     * BC layer. Remove in Symfony 8.0.
-     *
-     * @var array<string, true>
-     */
-    private array $deprecatedNestedOptions = [];
-
-    /**
      * The names of required options.
      */
     private array $required = [];
@@ -222,38 +215,12 @@ class OptionsResolver implements Options
                 // Make sure the option is processed
                 unset($this->resolved[$option]);
 
-                // BC layer. Remove in Symfony 8.0.
-                if (isset($this->deprecatedNestedOptions[$option])) {
-                    unset($this->nested[$option]);
-                }
-
-                return $this;
-            }
-
-            // Remove in Symfony 8.0.
-            if (isset($params[0]) && ($type = $params[0]->getType()) instanceof \ReflectionNamedType && self::class === $type->getName() && (!isset($params[1]) || (($type = $params[1]->getType()) instanceof \ReflectionNamedType && Options::class === $type->getName()))) {
-                trigger_deprecation('symfony/options-resolver', '7.3', 'Defining nested options via "%s()" is deprecated and will be removed in Symfony 8.0, use "setOptions()" method instead.', __METHOD__);
-                $this->deprecatedNestedOptions[$option] = true;
-
-                // Store closure for later evaluation
-                $this->nested[$option][] = $value;
-                $this->defaults[$option] = [];
-                $this->defined[$option] = true;
-
-                // Make sure the option is processed and is not lazy anymore
-                unset($this->resolved[$option], $this->lazy[$option]);
-
                 return $this;
             }
         }
 
         // This option is not lazy anymore
         unset($this->lazy[$option]);
-
-        // BC layer. Remove in Symfony 8.0.
-        if (isset($this->deprecatedNestedOptions[$option])) {
-            unset($this->nested[$option]);
-        }
 
         // Yet undefined options can be marked as resolved, because we only need
         // to resolve options with lazy closures, normalizers or validation
@@ -834,7 +801,7 @@ class OptionsResolver implements Options
 
         foreach ((array) $optionNames as $option) {
             unset($this->defined[$option], $this->defaults[$option], $this->required[$option], $this->resolved[$option]);
-            unset($this->lazy[$option], $this->normalizers[$option], $this->allowedTypes[$option], $this->allowedValues[$option], $this->info[$option]);
+            unset($this->lazy[$option], $this->normalizers[$option], $this->allowedTypes[$option], $this->allowedValues[$option], $this->info[$option], $this->deprecated[$option]);
         }
 
         return $this;
@@ -1011,6 +978,11 @@ class OptionsResolver implements Options
                 $resolver = new self();
                 $resolver->prototype = false;
                 $resolver->parentsOptions = $this->parentsOptions;
+
+                if ($this->prototype && null !== $this->prototypeIndex && null !== ($parentOptionKey = array_key_last($resolver->parentsOptions))) {
+                    $resolver->parentsOptions[$parentOptionKey] .= \sprintf('[%s]', $this->prototypeIndex);
+                }
+
                 $resolver->parentsOptions[] = $option;
                 foreach ($this->nested[$option] as $closure) {
                     $closure($resolver, $this);
@@ -1215,33 +1187,31 @@ class OptionsResolver implements Options
      */
     private function splitOutsideParenthesis(string $type): array
     {
-        $parts = [];
-        $currentPart = '';
-        $parenthesisLevel = 0;
+        return preg_split(<<<'EOF'
+                    /
+                    # Define a recursive subroutine for matching balanced parentheses
+                    (?(DEFINE)
+                        (?<balanced>
+                            \(                          # Match an opening parenthesis
+                            (?:                         # Start a non-capturing group for the contents
+                                [^()]                   # Match any character that is not a parenthesis
+                                |                       # OR
+                                (?&balanced)            # Recursively match a nested balanced group
+                            )*                          # Repeat the group for all contents
+                            \)                          # Match the final closing parenthesis
+                        )
+                    )
 
-        $typeLength = \strlen($type);
-        for ($i = 0; $i < $typeLength; ++$i) {
-            $char = $type[$i];
+                    # Match any balanced parenthetical group, then skip it
+                    (?&balanced)(*SKIP)(*FAIL)          # Use the defined subroutine and discard the match
 
-            if ('(' === $char) {
-                ++$parenthesisLevel;
-            } elseif (')' === $char) {
-                --$parenthesisLevel;
-            }
+                    | # OR
 
-            if ('|' === $char && 0 === $parenthesisLevel) {
-                $parts[] = $currentPart;
-                $currentPart = '';
-            } else {
-                $currentPart .= $char;
-            }
-        }
-
-        if ('' !== $currentPart) {
-            $parts[] = $currentPart;
-        }
-
-        return $parts;
+                    \|                                  # Match the pipe delimiter (only if not inside a skipped group)
+                    /x
+            EOF,
+            $type
+        );
     }
 
     /**

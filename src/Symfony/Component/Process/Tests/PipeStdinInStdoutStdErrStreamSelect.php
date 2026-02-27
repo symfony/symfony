@@ -17,9 +17,9 @@ define('ERR_WRITE_FAILED', 4);
 $read = [\STDIN];
 $write = [\STDOUT, \STDERR];
 
-stream_set_blocking(\STDIN, 0);
-stream_set_blocking(\STDOUT, 0);
-stream_set_blocking(\STDERR, 0);
+stream_set_blocking(\STDIN, false);
+stream_set_blocking(\STDOUT, false);
+stream_set_blocking(\STDERR, false);
 
 $out = $err = '';
 while ($read || $write) {

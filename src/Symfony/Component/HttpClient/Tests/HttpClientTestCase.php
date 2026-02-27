@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
@@ -18,6 +20,7 @@ use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\ClientState;
 use Symfony\Component\HttpClient\NoPrivateNetworkHttpClient;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
+use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
@@ -382,7 +385,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $client = $this->getHttpClient(__FUNCTION__);
 
         $traceInfo = [];
-        $client->request('GET', 'http://localhost:8057', ['on_progress' => function (int $dlNow, int $dlSize, array $info) use (&$traceInfo) {
+        $client->request('GET', 'http://localhost:8057', ['on_progress' => static function (int $dlNow, int $dlSize, array $info) use (&$traceInfo) {
             $traceInfo = $info;
         }]);
 
@@ -603,9 +606,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertSame(302, $response->getStatusCode());
     }
 
-    /**
-     * @dataProvider getRedirectWithAuthTests
-     */
+    #[DataProvider('getRedirectWithAuthTests')]
     public function testRedirectWithAuth(string $url, bool $redirectWithAuth)
     {
         $p = TestHttpServer::start(8067);
@@ -657,6 +658,55 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertSame(['abc' => 'def', 'content-type' => 'application/json', 'REQUEST_METHOD' => 'POST'], $response->toArray());
     }
 
+    public function testDoesNotThrowOnDestructIfExceptionCaughtEarlierWithGetStatusCode()
+    {
+        $client = new RetryableHttpClient($this->getHttpClient(__FUNCTION__));
+        $client = $client->withOptions([
+            'max_duration' => 0.1,
+            'timeout' => 0.1,
+        ]);
+
+        $response = $client->request('GET', 'https://127.0.0.1:8000/api/cheeses');
+
+        try {
+            $response->getStatusCode();
+            $this->fail('TransportException expected');
+        } catch (TransportException) {
+        }
+
+        try {
+            unset($response);
+        } catch (TransportException $e) {
+            $this->fail('Caught '.$e::class.'('.$e->getMessage().') but destruct should not throw');
+        }
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testDoesNotThrowOnDestructIfExceptionCaughtEarlierEvenWithoutGetStatusCode()
+    {
+        $client = new RetryableHttpClient($this->getHttpClient(__FUNCTION__));
+        $client = $client->withOptions([
+            'max_duration' => 0.1,
+            'timeout' => 0.1,
+        ]);
+
+        $response = $client->request('GET', 'https://127.0.0.1:8000/api/cheeses');
+
+        try {
+            foreach ($client->stream($response) as $chunk) {
+            }
+            $this->fail('TransportException expected');
+        } catch (TransportException) {
+        }
+
+        try {
+            unset($response);
+        } catch (TransportException $e) {
+            $this->fail('Caught '.$e::class.'('.$e->getMessage().') but destruct should not throw');
+        }
+        $this->expectNotToPerformAssertions();
+    }
+
     public function testHeadRequestWithClosureBody()
     {
         $p = TestHttpServer::start(8067);
@@ -665,7 +715,7 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
             $client = $this->getHttpClient(__FUNCTION__);
 
             $response = $client->request('HEAD', 'http://localhost:8057/head', [
-                'body' => fn () => '',
+                'body' => static fn () => '',
             ]);
             $headers = $response->getHeaders();
         } finally {
@@ -679,11 +729,9 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
         $this->assertSame('HEAD', $vars['REQUEST_METHOD']);
     }
 
-    /**
-     * @testWith [301]
-     *           [302]
-     *           [303]
-     */
+    #[TestWith([301])]
+    #[TestWith([302])]
+    #[TestWith([303])]
     public function testPostToGetRedirect(int $status)
     {
         $p = TestHttpServer::start(8067);
@@ -732,5 +780,15 @@ abstract class HttpClientTestCase extends BaseHttpClientTestCase
 
         $info = $response->getInfo();
         $this->assertSame('/run/docker.sock', $info['primary_ip']);
+    }
+
+    public function testMaxConnectDurationInfo()
+    {
+        $this->markTestSkipped('The "max_connect_duration" option is not supported in this version of the HttpClient component.');
+    }
+
+    public function testMaxConnectDuration()
+    {
+        $this->markTestSkipped('The "max_connect_duration" option is not supported in this version of the HttpClient component.');
     }
 }

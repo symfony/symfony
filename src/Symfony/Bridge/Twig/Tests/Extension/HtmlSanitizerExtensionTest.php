@@ -42,8 +42,8 @@ class HtmlSanitizerExtensionTest extends TestCase
             ->willReturn('bar');
 
         $twig->addExtension(new HtmlSanitizerExtension(new ServiceLocator([
-            'foo' => fn () => $fooSanitizer,
-            'bar' => fn () => $barSanitizer,
+            'foo' => static fn () => $fooSanitizer,
+            'bar' => static fn () => $barSanitizer,
         ]), 'foo'));
 
         $this->assertSame('foo', $twig->render('foo'));

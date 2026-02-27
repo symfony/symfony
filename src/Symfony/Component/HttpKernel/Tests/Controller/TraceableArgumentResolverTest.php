@@ -38,7 +38,7 @@ class TraceableArgumentResolverTest extends TestCase
         $traceableResolver = new TraceableArgumentResolver($resolver, $stopwatch);
 
         try {
-            $traceableResolver->getArguments(new Request(), function () {});
+            $traceableResolver->getArguments(new Request(), static function () {});
         } catch (\Exception $ex) {
         }
     }

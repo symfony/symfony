@@ -28,13 +28,17 @@ final class LockStoreSchemaListener extends AbstractSchemaListener
     public function postGenerateSchema(GenerateSchemaEventArgs $event): void
     {
         $connection = $event->getEntityManager()->getConnection();
+        $schema = $event->getSchema();
 
         foreach ($this->stores as $store) {
             if (!$store instanceof DoctrineDbalStore) {
                 continue;
             }
 
-            $store->configureSchema($event->getSchema(), $this->getIsSameDatabaseChecker($connection));
+            $isSameDatabaseChecker = $this->getIsSameDatabaseChecker($connection);
+            $this->filterSchemaChanges($schema, $connection, static function () use ($store, $schema, $isSameDatabaseChecker) {
+                $store->configureSchema($schema, $isSameDatabaseChecker);
+            });
         }
     }
 }

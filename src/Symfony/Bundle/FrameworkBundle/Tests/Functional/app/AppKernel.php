@@ -89,14 +89,16 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
         $container->registerExtension(new TestDumpExtension());
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
-        return ['varDir', 'testCase', 'rootConfig', 'environment', 'debug'];
+        return [$this->varDir, $this->testCase, $this->rootConfig, $this->environment, $this->debug];
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
-        foreach ($this as $k => $v) {
+        [$this->varDir, $this->testCase, $this->rootConfig, $this->environment, $this->debug] = $data;
+
+        foreach ($this as $v) {
             if (\is_object($v)) {
                 throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
             }
@@ -117,7 +119,10 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
     {
         $treeBuilder = new TreeBuilder('foo');
         $rootNode = $treeBuilder->getRootNode();
-        $rootNode->children()->scalarNode('foo')->defaultValue('bar')->end()->end();
+        $rootNode->children()
+            ->scalarNode('foo')->defaultValue('bar')->end()
+            ->scalarNode('vault_test_secret')->defaultValue('')->end()
+        ->end();
 
         return $treeBuilder;
     }
@@ -126,11 +131,17 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
     {
     }
 
+    /**
+     * To be removed when symfony/dependency-injection is bumped to 8.0+.
+     */
     public function getNamespace(): string
     {
         return '';
     }
 
+    /**
+     * To be removed when symfony/dependency-injection is bumped to 8.0+.
+     */
     public function getXsdValidationBasePath(): string|false
     {
         return false;

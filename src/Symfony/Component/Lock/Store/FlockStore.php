@@ -30,7 +30,7 @@ use Symfony\Component\Lock\SharedLockStoreInterface;
  */
 class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
 {
-    private ?string $lockPath;
+    private readonly string $lockPath;
 
     /**
      * @param string|null $lockPath the directory to store the lock, defaults to the system's temporary directory
@@ -40,7 +40,7 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
     public function __construct(?string $lockPath = null)
     {
         if (!is_dir($lockPath ??= sys_get_temp_dir())) {
-            if (false === @mkdir($lockPath, 0777, true) && !is_dir($lockPath)) {
+            if (false === @mkdir($lockPath, 0o777, true) && !is_dir($lockPath)) {
                 throw new InvalidArgumentException(\sprintf('The FlockStore directory "%s" does not exists and cannot be created.', $lockPath));
             }
         } elseif (!is_writable($lockPath)) {
@@ -90,11 +90,11 @@ class FlockStore implements BlockingStoreInterface, SharedLockStoreInterface
             );
 
             // Silence error reporting
-            set_error_handler(function ($type, $msg) use (&$error) { $error = $msg; });
+            set_error_handler(static function ($type, $msg) use (&$error) { $error = $msg; });
             try {
                 if (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
                     if ($handle = fopen($fileName, 'x')) {
-                        chmod($fileName, 0666);
+                        chmod($fileName, 0o666);
                     } elseif (!$handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r')) {
                         usleep(100); // Give some time for chmod() to complete
                         $handle = fopen($fileName, 'r+') ?: fopen($fileName, 'r');

@@ -53,7 +53,16 @@ final class SweegoRequestParser extends AbstractRequestParser
             throw new RejectWebhookException(406, 'Payload is malformed.');
         }
 
-        $this->validateSignature($request, $secret);
+        if ($secret) {
+            if (!$request->headers->get('webhook-id')
+                && !$request->headers->get('webhook-timestamp')
+                && !$request->headers->get('webhook-signature')
+            ) {
+                throw new RejectWebhookException(406, 'Signature is required.');
+            }
+
+            $this->validateSignature($request, $secret);
+        }
 
         try {
             return $this->converter->convert($content);
@@ -71,9 +80,10 @@ final class SweegoRequestParser extends AbstractRequestParser
             $request->getContent(),
         );
 
+        // see https://learn.sweego.io/docs/webhooks/webhook_signature
         $computedSignature = base64_encode(hash_hmac('sha256', $contentToSign, base64_decode($secret), true));
 
-        if (!hash_equals($computedSignature, $request->headers->get('webhook-signature'))) {
+        if (!hash_equals($request->headers->get('webhook-signature'), $computedSignature)) {
             throw new RejectWebhookException(403, 'Invalid signature.');
         }
     }

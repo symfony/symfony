@@ -171,8 +171,8 @@ class TraceableSerializer implements SerializerInterface, NormalizerInterface, D
                 && $method === $trace[$i]['function']
                 && is_a($trace[$i]['class'], $interface, true)
             ) {
-                $file = $trace[$i]['file'];
-                $line = $trace[$i]['line'];
+                $file = $trace[$i]['file'] ?? $trace[$i + 1]['file'];
+                $line = $trace[$i]['line'] ?? $trace[$i + 1]['line'];
 
                 break;
             }

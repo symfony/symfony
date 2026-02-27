@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Symfony\Component\Console\ConsoleEvents;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\VarDumper\Cloner\ClonerInterface;
 use Symfony\Component\VarDumper\Dumper\DataDumperInterface;
@@ -25,17 +26,24 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 class DumpListener implements EventSubscriberInterface
 {
+    /**
+     * @param ?DataDumperInterface $profilerDumper The dumper to use when CLI profiling is enabled.
+     *                                             If null, the default $dumper will be used instead.
+     */
     public function __construct(
         private ClonerInterface $cloner,
         private DataDumperInterface $dumper,
         private ?Connection $connection = null,
+        private ?DataDumperInterface $profilerDumper = null,
     ) {
     }
 
-    public function configure(): void
+    public function configure(?ConsoleCommandEvent $event = null): void
     {
+        $input = $event?->getInput();
+
         $cloner = $this->cloner;
-        $dumper = $this->dumper;
+        $dumper = !$this->profilerDumper || !$input?->hasOption('profile') || !$input?->getOption('profile') ? $this->dumper : $this->profilerDumper;
         $connection = $this->connection;
 
         VarDumper::setHandler(static function ($var, ?string $label = null) use ($cloner, $dumper, $connection) {

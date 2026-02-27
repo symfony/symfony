@@ -50,8 +50,8 @@ class FixedFilterListener implements EventSubscriberInterface
     {
         $data = $event->getData();
 
-        if (isset($this->mapping['preSetData'][$data])) {
-            $event->setData($this->mapping['preSetData'][$data]);
+        if (isset($this->mapping['preSetData'][$data ?? ''])) {
+            $event->setData($this->mapping['preSetData'][$data ?? '']);
         }
     }
 

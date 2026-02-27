@@ -1,16 +1,25 @@
 <?php
 
-eval(<<<'EOPHP'
-namespace PHPUnit\Util;
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
-class Test
-{
-    public static function getGroups()
+eval(<<<'EOPHP'
+    namespace PHPUnit\Util;
+
+    class Test
     {
-        return array();
+        public static function getGroups()
+        {
+            return array();
+        }
     }
-}
-EOPHP
+    EOPHP
 );
 
 @trigger_error('root deprecation', \E_USER_DEPRECATED);
@@ -35,3 +44,6 @@ class FooTestCase
 $foo = new FooTestCase();
 $foo->testLegacyFoo();
 $foo->testNonLegacyBar();
+
+// @php-cs-fixer-ignore error_suppression Explicit trigger_error tests
+// @php-cs-fixer-ignore psr_autoloading

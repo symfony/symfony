@@ -36,6 +36,12 @@ class ExceptionDataCollectorTest extends TestCase
         $this->assertSame(500, $c->getCode());
         $this->assertSame('exception', $c->getName());
         $this->assertSame($trace, $c->getTrace());
+
+        $c->collect(new Request(), new Response(), new class extends \Exception {
+            protected $code = 'non-integer-code';
+        });
+
+        $this->assertSame('non-integer-code', $c->getCode());
     }
 
     public function testCollectWithoutException()

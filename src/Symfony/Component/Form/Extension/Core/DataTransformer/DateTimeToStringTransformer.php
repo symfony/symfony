@@ -67,14 +67,6 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
         }
     }
 
-    /**
-     * Transforms a DateTime object into a date string with the configured format
-     * and timezone.
-     *
-     * @param \DateTimeInterface $dateTime A DateTimeInterface object
-     *
-     * @throws TransformationFailedException If the given value is not a \DateTimeInterface
-     */
     public function transform(mixed $dateTime): string
     {
         if (null === $dateTime) {
@@ -91,14 +83,6 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
         return $dateTime->format($this->generateFormat);
     }
 
-    /**
-     * Transforms a date string in the configured timezone into a DateTime object.
-     *
-     * @param string $value A value as produced by PHP's date() function
-     *
-     * @throws TransformationFailedException If the given value is not a string,
-     *                                       or could not be transformed
-     */
     public function reverseTransform(mixed $value): ?\DateTime
     {
         if (!$value) {
@@ -110,7 +94,7 @@ class DateTimeToStringTransformer extends BaseDateTimeTransformer
         }
 
         if (str_contains($value, "\0")) {
-            throw new TransformationFailedException('Null bytes not allowed');
+            throw new TransformationFailedException('Null bytes not allowed.');
         }
 
         $outputTz = new \DateTimeZone($this->outputTimezone);

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapConfigReader;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntries;
@@ -24,9 +25,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 class ImportMapVersionCheckerTest extends TestCase
 {
-    /**
-     * @dataProvider getCheckVersionsTests
-     */
+    #[DataProvider('getCheckVersionsTests')]
     public function testCheckVersions(array $importMapEntries, array $dependencies, array $expectedRequests, array $expectedProblems)
     {
         $configReader = $this->createMock(ImportMapConfigReader::class);
@@ -37,7 +36,7 @@ class ImportMapVersionCheckerTest extends TestCase
         $remoteDownloader = $this->createMock(RemotePackageDownloader::class);
         $remoteDownloader->expects($this->exactly(\count($importMapEntries)))
             ->method('getDependencies')
-            ->with($this->callback(function ($importName) use ($importMapEntries) {
+            ->with($this->callback(static function ($importName) use ($importMapEntries) {
                 foreach ($importMapEntries as $entry) {
                     if ($entry->importName === $importName) {
                         return true;
@@ -46,7 +45,7 @@ class ImportMapVersionCheckerTest extends TestCase
 
                 return false;
             }))
-            ->willReturnCallback(function ($importName) use ($dependencies) {
+            ->willReturnCallback(static function ($importName) use ($dependencies) {
                 if (!isset($dependencies[$importName])) {
                     throw new \InvalidArgumentException(\sprintf('Missing dependencies in test for "%s"', $importName));
                 }
@@ -283,9 +282,7 @@ class ImportMapVersionCheckerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getNpmSpecificVersionConstraints
-     */
+    #[DataProvider('getNpmSpecificVersionConstraints')]
     public function testNpmSpecificConstraints(string $npmConstraint, ?string $expectedComposerConstraint)
     {
         $this->assertSame($expectedComposerConstraint, ImportMapVersionChecker::convertNpmConstraint($npmConstraint));
@@ -427,7 +424,7 @@ class ImportMapVersionCheckerTest extends TestCase
 
     private static function createRemoteEntry(string $importName, string $version, ?string $packageModuleSpecifier = null): ImportMapEntry
     {
-        $packageModuleSpecifier = $packageModuleSpecifier ?? $importName;
+        $packageModuleSpecifier ??= $importName;
 
         return ImportMapEntry::createRemote($importName, ImportMapType::JS, '/path/to/'.$importName, $version, $packageModuleSpecifier, false);
     }

@@ -13,6 +13,7 @@ namespace Symfony\Component\Mailer\Bridge\Sendgrid\Transport;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Bridge\Sendgrid\Header\SuppressionGroupHeader;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -22,6 +23,7 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Header\DateHeader;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -79,7 +81,7 @@ class SendgridApiTransport extends AbstractApiTransport
 
     private function getPayload(Email $email, Envelope $envelope): array
     {
-        $addressStringifier = function (Address $address) {
+        $addressStringifier = static function (Address $address) {
             $stringified = ['email' => $address->getAddress()];
 
             if ($address->getName()) {
@@ -118,31 +120,42 @@ class SendgridApiTransport extends AbstractApiTransport
         $customArguments = [];
         $categories = [];
 
-        // these headers can't be overwritten according to Sendgrid docs
-        // see https://sendgrid.api-docs.io/v3.0/mail-send/mail-send-errors#-Headers-Errors
-        $headersToBypass = ['x-sg-id', 'x-sg-eid', 'received', 'dkim-signature', 'content-transfer-encoding', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to'];
         foreach ($email->getHeaders()->all() as $name => $header) {
-            if (\in_array($name, $headersToBypass, true)) {
+            // these headers can't be overwritten according to Sendgrid docs
+            // see https://sendgrid.api-docs.io/v3.0/mail-send/mail-send-errors#-Headers-Errors
+            if (\in_array($name, ['x-sg-id', 'x-sg-eid', 'received', 'dkim-signature', 'content-transfer-encoding', 'from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'reply-to'], true)) {
                 continue;
             }
 
-            if ($header instanceof TagHeader) {
+            if ('send-at' === $name) {
+                if (!$header instanceof DateHeader) {
+                    throw new TransportException(\sprintf('The "Send-At" header must be a "%s" instance.', DateHeader::class));
+                }
+                $payload['send_at'] = $header->getDateTime()->getTimestamp();
+            } elseif ($header instanceof TagHeader) {
                 if (10 === \count($categories)) {
                     throw new TransportException(\sprintf('Too many "%s" instances present in the email headers. Sendgrid does not accept more than 10 categories on an email.', TagHeader::class));
                 }
                 $categories[] = mb_substr($header->getValue(), 0, 255);
             } elseif ($header instanceof MetadataHeader) {
                 $customArguments[$header->getKey()] = $header->getValue();
+            } elseif ($header instanceof SuppressionGroupHeader) {
+                $payload['asm'] = [
+                    'group_id' => $header->getGroupId(),
+                ];
+                if ($groupsToDisplay = $header->getGroupsToDisplay()) {
+                    $payload['asm']['groups_to_display'] = $groupsToDisplay;
+                }
             } else {
                 $payload['headers'][$header->getName()] = $header->getBodyAsString();
             }
         }
 
-        if (\count($categories) > 0) {
+        if ($categories) {
             $payload['categories'] = $categories;
         }
 
-        if (\count($customArguments) > 0) {
+        if ($customArguments) {
             $personalization['custom_args'] = $customArguments;
         }
 
@@ -192,7 +205,7 @@ class SendgridApiTransport extends AbstractApiTransport
     private function getEndpoint(): ?string
     {
         $host = $this->host ?: str_replace('%region_dot%', '', self::HOST);
-        if (null !== $this->region && null === $this->host) {
+        if (null !== $this->region && 'global' !== $this->region && null === $this->host) {
             $host = str_replace('%region_dot%', $this->region.'.', self::HOST);
         }
 

@@ -11,13 +11,14 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
+
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
- *
- * @requires extension redis
- *
- * @group integration
  */
+#[RequiresPhpExtension('redis')]
+#[Group('integration')]
 class RedisClusterStoreTest extends AbstractRedisStoreTestCase
 {
     public static function setUpBeforeClass(): void

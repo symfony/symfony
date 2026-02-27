@@ -1,4 +1,0 @@
-Symfony\Component\Validator\Tests\Fixtures\DummyEntityConstraintWithoutNamedArguments:
-    constraints:
-        - Symfony\Component\Validator\Tests\Mapping\Loader\Fixtures\ConstraintWithoutNamedArguments:
-              groups: foo

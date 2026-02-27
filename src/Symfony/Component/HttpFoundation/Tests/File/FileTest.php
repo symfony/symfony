@@ -11,13 +11,13 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\File;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 
-/**
- * @requires extension fileinfo
- */
+#[RequiresPhpExtension('fileinfo')]
 class FileTest extends TestCase
 {
     public function testGetMimeTypeUsesMimeTypeGuessers()
@@ -103,9 +103,7 @@ class FileTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getFilenameFixtures
-     */
+    #[DataProvider('getFilenameFixtures')]
     public function testMoveWithNonLatinName($filename, $sanitizedFilename)
     {
         $path = __DIR__.'/Fixtures/'.$sanitizedFilename;

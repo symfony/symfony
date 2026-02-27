@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\CssSelector\Tests\Parser;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
 use Symfony\Component\CssSelector\Node\FunctionNode;
@@ -20,15 +21,15 @@ use Symfony\Component\CssSelector\Parser\Token;
 
 class ParserTest extends TestCase
 {
-    /** @dataProvider getParserTestData */
+    #[DataProvider('getParserTestData')]
     public function testParser($source, $representation)
     {
         $parser = new Parser();
 
-        $this->assertEquals($representation, array_map(fn (SelectorNode $node) => (string) $node->getTree(), $parser->parse($source)));
+        $this->assertEquals($representation, array_map(static fn (SelectorNode $node) => (string) $node->getTree(), $parser->parse($source)));
     }
 
-    /** @dataProvider getParserExceptionTestData */
+    #[DataProvider('getParserExceptionTestData')]
     public function testParserException($source, $message)
     {
         $parser = new Parser();
@@ -41,7 +42,7 @@ class ParserTest extends TestCase
         }
     }
 
-    /** @dataProvider getPseudoElementsTestData */
+    #[DataProvider('getPseudoElementsTestData')]
     public function testPseudoElements($source, $element, $pseudo)
     {
         $parser = new Parser();
@@ -54,7 +55,7 @@ class ParserTest extends TestCase
         $this->assertEquals($pseudo, (string) $selector->getPseudoElement());
     }
 
-    /** @dataProvider getSpecificityTestData */
+    #[DataProvider('getSpecificityTestData')]
     public function testSpecificity($source, $value)
     {
         $parser = new Parser();
@@ -66,7 +67,7 @@ class ParserTest extends TestCase
         $this->assertEquals($value, $selector->getSpecificity()->getValue());
     }
 
-    /** @dataProvider getParseSeriesTestData */
+    #[DataProvider('getParseSeriesTestData')]
     public function testParseSeries($series, $a, $b)
     {
         $parser = new Parser();
@@ -78,7 +79,7 @@ class ParserTest extends TestCase
         $this->assertEquals([$a, $b], Parser::parseSeries($function->getArguments()));
     }
 
-    /** @dataProvider getParseSeriesExceptionTestData */
+    #[DataProvider('getParseSeriesExceptionTestData')]
     public function testParseSeriesException($series)
     {
         $parser = new Parser();
@@ -134,6 +135,7 @@ class ParserTest extends TestCase
             ['div:contains("foo")', ["Function[Element[div]:contains(['foo'])]"]],
             ['div#foobar', ['Hash[Element[div]#foobar]']],
             ['div:not(div.foo)', ['Negation[Element[div]:not(Class[Element[div].foo])]']],
+            ['div:has(div.foo)', ['Relation[Element[div]:has(Selector[Class[Element[div].foo]])]']],
             ['td ~ th', ['CombinedSelector[Element[td] ~ Element[th]]']],
             ['.foo[data-bar][data-baz=0]', ["Attribute[Attribute[Class[Element[*].foo][data-bar]][data-baz = '0']]"]],
             ['div#foo\.bar', ['Hash[Element[div]#foo.bar]']],

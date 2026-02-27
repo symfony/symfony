@@ -31,6 +31,9 @@ abstract class AbstractVault
 
     abstract public function remove(string $name): bool;
 
+    /**
+     * @return array<string, string|null>
+     */
     abstract public function list(bool $reveal = false): array;
 
     protected function validateName(string $name): void

@@ -11,11 +11,11 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 trait ValidComparisonToValueTrait
 {
-    /**
-     * @dataProvider provideAllValidComparisons
-     */
+    #[DataProvider('provideAllValidComparisons')]
     public function testValidComparisonToValue($dirtyValue, $comparisonValue)
     {
         $constraint = $this->createConstraint(['value' => $comparisonValue]);

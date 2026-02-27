@@ -34,11 +34,29 @@ class TreeNodeTest extends TestCase
         $this->assertSame($child, iterator_to_array($root->getChildren())[0]);
     }
 
+    public function testAddingChildrenAsString()
+    {
+        $root = new TreeNode('Root');
+
+        $root->addChild('Child 1');
+        $root->addChild('Child 2');
+
+        $this->assertSame(2, iterator_count($root->getChildren()));
+
+        $children = iterator_to_array($root->getChildren());
+
+        $this->assertSame(0, iterator_count($children[0]->getChildren()));
+        $this->assertSame(0, iterator_count($children[1]->getChildren()));
+
+        $this->assertSame('Child 1', $children[0]->getValue());
+        $this->assertSame('Child 2', $children[1]->getValue());
+    }
+
     public function testAddingChildrenWithGenerators()
     {
         $root = new TreeNode('Root');
 
-        $root->addChild(function () {
+        $root->addChild(static function () {
             yield new TreeNode('Generated Child 1');
             yield new TreeNode('Generated Child 2');
         });

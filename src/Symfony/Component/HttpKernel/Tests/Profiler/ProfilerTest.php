@@ -47,7 +47,7 @@ class ProfilerTest extends TestCase
         $collector = $this->getMockBuilder(DataCollectorInterface::class)
             ->onlyMethods(['collect', 'getName', 'reset'])
             ->getMock();
-        $collector->expects($this->any())->method('getName')->willReturn('mock');
+        $collector->method('getName')->willReturn('mock');
         $collector->expects($this->once())->method('reset');
 
         $profiler = new Profiler($this->storage);

@@ -60,7 +60,7 @@ class AssetMapperTest extends TestCase
 
         $this->mappedAssetFactory->expects($this->exactly(8))
             ->method('createMappedAsset')
-            ->willReturnCallback(function (string $logicalPath, string $filePath) {
+            ->willReturnCallback(static function (string $logicalPath, string $filePath) {
                 $asset = new MappedAsset($logicalPath, publicPath: '/final-assets/'.$logicalPath);
 
                 return $asset;
@@ -90,12 +90,11 @@ class AssetMapperTest extends TestCase
     {
         $dirs = ['dir1' => '', 'dir2' => '', 'dir3' => ''];
         $repository = new AssetMapperRepository($dirs, __DIR__.'/Fixtures');
-        $compiledConfigReader = $this->createMock(CompiledAssetMapperConfigReader::class);
-        $compiledConfigReader->expects($this->any())
+        $compiledConfigReader = $this->createStub(CompiledAssetMapperConfigReader::class);
+        $compiledConfigReader
             ->method('configExists')
-            ->with(AssetMapper::MANIFEST_FILE_NAME)
             ->willReturn(true);
-        $compiledConfigReader->expects($this->any())
+        $compiledConfigReader
             ->method('loadConfig')
             ->willReturn(['file4.js' => '/final-assets/file4.checksumfrommanifest.js']);
 

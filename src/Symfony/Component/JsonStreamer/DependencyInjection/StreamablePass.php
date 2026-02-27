@@ -29,28 +29,17 @@ class StreamablePass implements CompilerPassInterface
 
         $streamable = [];
 
-        // retrieve concrete services tagged with "json_streamer.streamable" tag
-        foreach ($container->getDefinitions() as $id => $definition) {
-            if (!$tag = ($definition->getTag('json_streamer.streamable')[0] ?? null)) {
-                continue;
-            }
-
-            if (($className = $container->getDefinition($id)->getClass()) && !$container->getDefinition($id)->isAbstract()) {
-                $streamable[$className] = [
-                    'object' => $tag['object'],
-                    'list' => $tag['list'],
-                ];
-            }
+        foreach ($container->findTaggedResourceIds('json_streamer.streamable') as $id => $tag) {
+            $class = $container->getDefinition($id)->getClass();
+            $streamable[$class] = [
+                'object' => $tag[0]['object'],
+                'list' => $tag[0]['list'],
+            ];
 
             $container->removeDefinition($id);
         }
 
         $container->getDefinition('.json_streamer.cache_warmer.streamer')
             ->replaceArgument(0, $streamable);
-
-        if ($container->hasDefinition('.json_streamer.cache_warmer.lazy_ghost')) {
-            $container->getDefinition('.json_streamer.cache_warmer.lazy_ghost')
-                ->replaceArgument(0, array_keys($streamable));
-        }
     }
 }

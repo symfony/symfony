@@ -27,24 +27,12 @@
     <issueHandlers>
         <UndefinedClass>
             <errorLevel type="suppress">
-                <!-- These classes have been added in PHP 8.1 -->
-                <referencedClass name="BackedEnum"/>
-                <referencedClass name="ReflectionIntersectionType"/>
-                <referencedClass name="UnitEnum"/>
-                <!-- These classes have been added in PHP 8.2 -->
-                <referencedClass name="Random\*"/>
                 <!-- These classes have been added in PHP 8.4 -->
                 <referencedClass name="BcMath\Number"/>
+                <!-- These classes have been added in PHP 8.5 -->
+                <referencedClass name="CurlSharePersistentHandle"/>
             </errorLevel>
         </UndefinedClass>
-        <UndefinedDocblockClass>
-            <errorLevel type="suppress">
-                <!-- These classes have been added in PHP 8.1 -->
-                <referencedClass name="BackedEnum"/>
-                <referencedClass name="ReflectionIntersectionType"/>
-                <referencedClass name="UnitEnum"/>
-            </errorLevel>
-        </UndefinedDocblockClass>
         <UnusedClass>
             <errorLevel type="suppress">
                 <!--
@@ -63,12 +51,12 @@
                 <directory name="src/Symfony" />
             </errorLevel>
         </UnusedConstructor>
-        <UndefinedAttributeClass>
+        <UndefinedFunction>
             <errorLevel type="suppress">
-                <!-- These classes have been added in PHP 8.2 -->
-                <referencedClass name="SensitiveParameter"/>
+                <!-- These functions have been added in PHP 8.5 -->
+                <referencedFunction name="curl_share_init_persistent"/>
             </errorLevel>
-        </UndefinedAttributeClass>
+        </UndefinedFunction>
     </issueHandlers>
 
     <forbiddenFunctions>

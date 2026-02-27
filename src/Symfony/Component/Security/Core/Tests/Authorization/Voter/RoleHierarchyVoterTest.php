@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization\Voter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Security\Core\Authorization\Voter\RoleHierarchyVoter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 
 class RoleHierarchyVoterTest extends RoleVoterTest
 {
-    /**
-     * @dataProvider getVoteTests
-     */
+    #[DataProvider('getVoteTests')]
     public function testVoteUsingTokenThatReturnsRoleNames($roles, $attributes, $expected)
     {
         $voter = new RoleHierarchyVoter(new RoleHierarchy(['ROLE_FOO' => ['ROLE_FOOBAR']]));
@@ -34,9 +33,7 @@ class RoleHierarchyVoterTest extends RoleVoterTest
         ]);
     }
 
-    /**
-     * @dataProvider getVoteWithEmptyHierarchyTests
-     */
+    #[DataProvider('getVoteWithEmptyHierarchyTests')]
     public function testVoteWithEmptyHierarchyUsingTokenThatReturnsRoleNames($roles, $attributes, $expected)
     {
         $voter = new RoleHierarchyVoter(new RoleHierarchy([]));

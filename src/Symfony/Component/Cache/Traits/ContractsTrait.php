@@ -54,7 +54,7 @@ trait ContractsTrait
         }
 
         $previousWrapper = $this->callbackWrapper;
-        $this->callbackWrapper = $callbackWrapper ?? static fn (callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, \Closure $setMetadata, ?LoggerInterface $logger) => $callback($item, $save);
+        $this->callbackWrapper = $callbackWrapper ?? static fn (callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, \Closure $setMetadata, ?LoggerInterface $logger, ?float $beta = null) => $callback($item, $save);
 
         return $previousWrapper;
     }
@@ -82,7 +82,7 @@ trait ContractsTrait
 
         $this->callbackWrapper ??= LockRegistry::compute(...);
 
-        return $this->contractsGet($pool, $key, function (CacheItem $item, bool &$save) use ($pool, $callback, $setMetadata, &$metadata, $key) {
+        return $this->contractsGet($pool, $key, function (CacheItem $item, bool &$save) use ($pool, $callback, $setMetadata, &$metadata, $key, $beta) {
             // don't wrap nor save recursive calls
             if (isset($this->computing[$key])) {
                 $value = $callback($item, $save);
@@ -99,9 +99,9 @@ trait ContractsTrait
             }
 
             try {
-                $value = ($this->callbackWrapper)($callback, $item, $save, $pool, function (CacheItem $item) use ($setMetadata, $startTime, &$metadata) {
+                $value = ($this->callbackWrapper)($callback, $item, $save, $pool, static function (CacheItem $item) use ($setMetadata, $startTime, &$metadata) {
                     $setMetadata($item, $startTime, $metadata);
-                }, $this->logger ?? null);
+                }, $this->logger ?? null, $beta);
                 $setMetadata($item, $startTime, $metadata);
 
                 return $value;

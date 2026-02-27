@@ -98,9 +98,16 @@ class FirePHPHandlerTest extends TestCase
 
     private function createHandler(): FirePHPHandler
     {
-        $handler = $this->getMockBuilder(FirePHPHandler::class)
-            ->onlyMethods(['isWebRequest'])
-            ->getMock();
+        if (method_exists($this, 'getStubBuilder')) {
+            $handler = self::getStubBuilder(FirePHPHandler::class)
+                ->onlyMethods(['isWebRequest'])
+                ->getStub();
+        } else {
+            $handler = $this->getMockBuilder(FirePHPHandler::class)
+                ->onlyMethods(['isWebRequest'])
+                ->getMock();
+        }
+
         // Disable web request detection
         $handler->method('isWebRequest')->willReturn(true);
 
@@ -115,7 +122,7 @@ class FirePHPHandlerTest extends TestCase
         $request->headers->remove('User-Agent');
 
         $error = null;
-        set_error_handler(function ($type, $message) use (&$error) { $error = $message; }, \E_DEPRECATED);
+        set_error_handler(static function ($type, $message) use (&$error) { $error = $message; }, \E_DEPRECATED);
 
         $this->dispatchResponseEvent($handler, $request);
         restore_error_handler();

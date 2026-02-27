@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
@@ -20,9 +21,7 @@ trait FilterBoolTestTrait
 {
     abstract protected function getNormalizerForFilterBool(): DenormalizerInterface;
 
-    /**
-     * @dataProvider provideObjectWithBoolArguments
-     */
+    #[DataProvider('provideObjectWithBoolArguments')]
     public function testObjectWithBoolArguments(?bool $expectedValue, ?string $parameterValue)
     {
         $normalizer = $this->getNormalizerForFilterBool();

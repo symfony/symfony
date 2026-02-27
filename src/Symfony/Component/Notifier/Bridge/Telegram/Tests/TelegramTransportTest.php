@@ -11,8 +11,11 @@
 
 namespace Symfony\Component\Notifier\Bridge\Telegram\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramOptions;
 use Symfony\Component\Notifier\Bridge\Telegram\TelegramTransport;
 use Symfony\Component\Notifier\Exception\MultipleExclusiveOptionsUsedException;
@@ -28,15 +31,17 @@ final class TelegramTransportTest extends TransportTestCase
 {
     private const FIXTURE_FILE = __DIR__.'/Fixtures/image.png';
 
-    public static function createTransport(?HttpClientInterface $client = null, ?string $channel = null): TelegramTransport
+    public static function createTransport(?HttpClientInterface $client = null, ?string $channel = null, bool $disableHttps = false): TelegramTransport
     {
-        return new TelegramTransport('token', $channel, $client ?? new MockHttpClient());
+        return new TelegramTransport('token', $channel, $client ?? new MockHttpClient(), disableHttps: $disableHttps);
     }
 
     public static function toStringProvider(): iterable
     {
         yield ['telegram://api.telegram.org', self::createTransport()];
         yield ['telegram://api.telegram.org?channel=testChannel', self::createTransport(null, 'testChannel')];
+        yield ['telegram://api.telegram.org?sslmode=disable', self::createTransport(null, null, true)];
+        yield ['telegram://api.telegram.org?channel=testChannel&sslmode=disable', self::createTransport(null, 'testChannel', true)];
     }
 
     public static function supportedMessagesProvider(): iterable
@@ -55,15 +60,7 @@ final class TelegramTransportTest extends TransportTestCase
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/post.+testDescription.+400/');
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(400);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['description' => 'testDescription', 'error_code' => 400]));
-
-        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
+        $client = new MockHttpClient(new MockResponse(json_encode(['description' => 'testDescription', 'error_code' => 400]), ['http_code' => 400]));
 
         $transport = self::createTransport($client, 'testChannel');
 
@@ -75,15 +72,7 @@ final class TelegramTransportTest extends TransportTestCase
         $this->expectException(TransportException::class);
         $this->expectExceptionMessageMatches('/edit.+testDescription.+404/');
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(400);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['description' => 'testDescription', 'error_code' => 404]));
-
-        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
+        $client = new MockHttpClient(new MockResponse(json_encode(['description' => 'testDescription', 'error_code' => 404]), ['http_code' => 400]));
 
         $transport = $this->createTransport($client, 'testChannel');
         $transport->send(new ChatMessage(
@@ -430,9 +419,7 @@ final class TelegramTransportTest extends TransportTestCase
         ];
     }
 
-    /**
-     * @dataProvider sendFileByHttpUrlProvider
-     */
+    #[DataProvider('sendFileByHttpUrlProvider')]
     public function testSendFileByHttpUrlWithOptions(
         TelegramOptions $messageOptions,
         string $endpoint,
@@ -578,9 +565,7 @@ final class TelegramTransportTest extends TransportTestCase
         ];
     }
 
-    /**
-     * @dataProvider sendFileByFileIdProvider
-     */
+    #[DataProvider('sendFileByFileIdProvider')]
     public function testSendFileByFileIdWithOptions(
         TelegramOptions $messageOptions,
         string $endpoint,
@@ -779,11 +764,8 @@ final class TelegramTransportTest extends TransportTestCase
         ];
     }
 
-    /**
-     * @dataProvider sendFileByUploadProvider
-     *
-     * @requires extension fileinfo
-     */
+    #[DataProvider('sendFileByUploadProvider')]
+    #[RequiresPhpExtension('fileinfo')]
     public function testSendFileByUploadWithOptions(
         TelegramOptions $messageOptions,
         string $endpoint,
@@ -985,14 +967,14 @@ final class TelegramTransportTest extends TransportTestCase
     public function testSendContactWithOptions()
     {
         $vCard = <<<V_CARD
-BEGIN:VCARD
-VERSION:3.0
-N:Doe;John;;;
-FN:John Doe
-EMAIL;type=INTERNET;type=WORK;type=pref:johnDoe@example.org
-TEL;type=WORK;type=pref:+330186657200
-END:VCARD
-V_CARD;
+            BEGIN:VCARD
+            VERSION:3.0
+            N:Doe;John;;;
+            FN:John Doe
+            EMAIL;type=INTERNET;type=WORK;type=pref:johnDoe@example.org
+            TEL;type=WORK;type=pref:+330186657200
+            END:VCARD
+            V_CARD;
 
         $response = new JsonMockResponse([
             'ok' => true,
@@ -1076,12 +1058,10 @@ V_CARD;
         ];
     }
 
-    /**
-     * @dataProvider exclusiveOptionsDataProvider
-     */
+    #[DataProvider('exclusiveOptionsDataProvider')]
     public function testUsingMultipleExclusiveOptionsWillProvideExceptions(TelegramOptions $messageOptions)
     {
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
+        $client = new MockHttpClient(static function (string $method, string $url, array $options = []): ResponseInterface {
             self::fail('Telegram API should not be called');
         });
         $transport = self::createTransport($client, 'testChannel');

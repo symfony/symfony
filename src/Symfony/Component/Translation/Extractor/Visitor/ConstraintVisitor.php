@@ -78,7 +78,6 @@ final class ConstraintVisitor extends AbstractVisitor implements NodeVisitor
             $messages = [];
             $options = $arg->value;
 
-            /** @var Node\Expr\ArrayItem $item */
             foreach ($options->items as $item) {
                 if (!$item->key instanceof Node\Scalar\String_) {
                     continue;

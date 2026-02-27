@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\PackageInterface;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
@@ -26,27 +27,23 @@ class MapperAwareAssetPackageTest extends TestCase
             ->with('foo')
             ->willReturn('2.0');
 
-        $assetMapperPackage = new MapperAwareAssetPackage($inner, $this->createMock(AssetMapperInterface::class));
+        $assetMapperPackage = new MapperAwareAssetPackage($inner, $this->createStub(AssetMapperInterface::class));
 
         $this->assertSame('2.0', $assetMapperPackage->getVersion('foo'));
     }
 
-    /**
-     * @dataProvider getUrlTests
-     */
+    #[DataProvider('getUrlTests')]
     public function testGetUrl(string $path, string $expectedPathSentToInner)
     {
         $inner = $this->createMock(PackageInterface::class);
         $inner->expects($this->once())
             ->method('getUrl')
             ->with($expectedPathSentToInner)
-            ->willReturnCallback(function ($path) {
-                return '/'.$path;
-            });
-        $assetMapper = $this->createMock(AssetMapperInterface::class);
-        $assetMapper->expects($this->any())
+            ->willReturnCallback(static fn ($path) => '/'.$path);
+        $assetMapper = $this->createStub(AssetMapperInterface::class);
+        $assetMapper
             ->method('getPublicPath')
-            ->willReturnCallback(function ($path) {
+            ->willReturnCallback(static function ($path) {
                 switch ($path) {
                     case 'images/foo.png':
                         return '/assets/images/foo.123456.png';

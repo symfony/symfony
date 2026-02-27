@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Semaphore\Store;
 
+use Relay\Cluster as RelayCluster;
 use Relay\Relay;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
+use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Semaphore\Exception\InvalidArgumentException;
 use Symfony\Component\Semaphore\PersistingStoreInterface;
 
@@ -26,8 +28,12 @@ class StoreFactory
     public static function createStore(#[\SensitiveParameter] object|string $connection): PersistingStoreInterface
     {
         switch (true) {
+            case $connection instanceof LockFactory:
+                return new LockStore($connection);
+
             case $connection instanceof \Redis:
             case $connection instanceof Relay:
+            case $connection instanceof RelayCluster:
             case $connection instanceof \RedisArray:
             case $connection instanceof \RedisCluster:
             case $connection instanceof \Predis\ClientInterface:

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\BrowserKit\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\BrowserKit\CookieJar;
 use Symfony\Component\BrowserKit\History;
 use Symfony\Component\BrowserKit\HttpBrowser;
@@ -26,9 +27,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         return new TestHttpClient($server, $history, $cookieJar);
     }
 
-    /**
-     * @dataProvider validContentTypes
-     */
+    #[DataProvider('validContentTypes')]
     public function testRequestHeaders(array $requestArguments, array $expectedArguments)
     {
         $client = $this->createMock(HttpClientInterface::class);
@@ -36,7 +35,7 @@ class HttpBrowserTest extends AbstractBrowserTest
             ->expects($this->once())
             ->method('request')
             ->with(...$expectedArguments)
-            ->willReturn($this->createMock(ResponseInterface::class));
+            ->willReturn($this->createStub(ResponseInterface::class));
 
         $browser = new HttpBrowser($client);
         $browser->request(...$requestArguments);
@@ -104,7 +103,7 @@ class HttpBrowserTest extends AbstractBrowserTest
 
                 return true;
             }))
-            ->willReturn($this->createMock(ResponseInterface::class));
+            ->willReturn($this->createStub(ResponseInterface::class));
 
         $browser = new HttpBrowser($client);
         $path = tempnam(sys_get_temp_dir(), 'http');
@@ -186,9 +185,7 @@ class HttpBrowserTest extends AbstractBrowserTest
         ]);
     }
 
-    /**
-     * @dataProvider forwardSlashesRequestPathProvider
-     */
+    #[DataProvider('forwardSlashesRequestPathProvider')]
     public function testMultipleForwardSlashesRequestPath(string $requestPath)
     {
         $client = $this->createMock(HttpClientInterface::class);
@@ -196,7 +193,7 @@ class HttpBrowserTest extends AbstractBrowserTest
             ->expects($this->once())
             ->method('request')
             ->with('GET', 'http://localhost'.$requestPath)
-            ->willReturn($this->createMock(ResponseInterface::class));
+            ->willReturn($this->createStub(ResponseInterface::class));
         $browser = new HttpBrowser($client);
         $browser->request('GET', $requestPath);
     }
@@ -272,7 +269,7 @@ class HttpBrowserTest extends AbstractBrowserTest
 
                 return true;
             }))
-            ->willReturn($this->createMock(ResponseInterface::class));
+            ->willReturn($this->createStub(ResponseInterface::class));
     }
 
     protected function expectClientToNotSendRequestWithFiles(HttpClientInterface $client, $fileContents)
@@ -290,6 +287,6 @@ class HttpBrowserTest extends AbstractBrowserTest
 
                 return true;
             }))
-            ->willReturn($this->createMock(ResponseInterface::class));
+            ->willReturn($this->createStub(ResponseInterface::class));
     }
 }

@@ -59,7 +59,7 @@ class RouterDataCollectorTest extends TestCase
 
     protected function createControllerEvent(Request $request): ControllerEvent
     {
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = $this->createStub(KernelInterface::class);
 
         return new ControllerEvent($kernel, new RedirectController(), $request, null);
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -76,9 +77,7 @@ class RequestDataCollectorTest extends TestCase
         $this->assertEquals([], $c->getRouteParams());
     }
 
-    /**
-     * @dataProvider provideControllerCallables
-     */
+    #[DataProvider('provideControllerCallables')]
     public function testControllerInspection($name, $callable, $expected)
     {
         $c = new RequestDataCollector();
@@ -115,9 +114,9 @@ class RequestDataCollectorTest extends TestCase
 
             [
                 'Closure',
-                fn () => 'foo',
+                static fn () => 'foo',
                 [
-                    'class' => \PHP_VERSION_ID >= 80400 ? \sprintf('{closure:%s():%d}', __METHOD__, __LINE__ - 2) : __NAMESPACE__.'\{closure}',
+                    'class' => \sprintf('{closure:%s():%d}', __METHOD__, __LINE__ - 2),
                     'method' => null,
                     'file' => __FILE__,
                     'line' => __LINE__ - 5,
@@ -221,7 +220,7 @@ class RequestDataCollectorTest extends TestCase
             'sf_redirect' => '{}',
         ]);
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = $this->createStub(HttpKernelInterface::class);
 
         $c = new RequestDataCollector();
         $c->onKernelResponse(new ResponseEvent($kernel, $request, HttpKernelInterface::MAIN_REQUEST, $this->createResponse()));
@@ -279,7 +278,7 @@ class RequestDataCollectorTest extends TestCase
 
         $collector->reset();
 
-        $session = $this->createMock(SessionInterface::class);
+        $session = $this->createStub(SessionInterface::class);
         $session->method('getMetadataBag')->willReturnCallback(static function () use ($collector) {
             $collector->collectSessionUsage();
 
@@ -397,8 +396,8 @@ class RequestDataCollectorTest extends TestCase
      */
     protected function injectController($collector, $controller, $request)
     {
-        $resolver = $this->createMock(ControllerResolverInterface::class);
-        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->createMock(ArgumentResolverInterface::class));
+        $resolver = $this->createStub(ControllerResolverInterface::class);
+        $httpKernel = new HttpKernel(new EventDispatcher(), $resolver, null, $this->createStub(ArgumentResolverInterface::class));
         $event = new ControllerEvent($httpKernel, $controller, $request, HttpKernelInterface::MAIN_REQUEST);
         $collector->onKernelController($event);
     }
@@ -414,9 +413,7 @@ class RequestDataCollectorTest extends TestCase
         throw new \InvalidArgumentException(\sprintf('Cookie named "%s" is not in response', $name));
     }
 
-    /**
-     * @dataProvider provideJsonContentTypes
-     */
+    #[DataProvider('provideJsonContentTypes')]
     public function testIsJson($contentType, $expected)
     {
         $response = $this->createResponse();
@@ -442,9 +439,7 @@ class RequestDataCollectorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providePrettyJson
-     */
+    #[DataProvider('providePrettyJson')]
     public function testGetPrettyJsonValidity($content, $expected)
     {
         $response = $this->createResponse();
@@ -466,5 +461,112 @@ class RequestDataCollectorTest extends TestCase
             ['{ "abc" }', null],
             ['', null],
         ];
+    }
+
+    public function testCurlCommandGet()
+    {
+        $request = Request::create('http://test.com/foo?bar=baz');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringStartsWith("curl \\\n  --compressed", $curlCommand);
+        $this->assertStringContainsString('--url '.('\\' === \DIRECTORY_SEPARATOR ? '"http://test.com/foo?bar=baz"' : "'http://test.com/foo?bar=baz'"), $curlCommand);
+        $this->assertStringNotContainsString('--request', $curlCommand);
+    }
+
+    public function testCurlCommandPost()
+    {
+        $request = Request::create('http://test.com/foo', 'POST', [], [], [], [], '{"key":"value"}');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringContainsString('--request POST', $curlCommand);
+        $this->assertStringContainsString('--data-raw', $curlCommand);
+        $this->assertStringContainsString('\\' === \DIRECTORY_SEPARATOR ? '"{""key"":""value""}"' : '\'{"key":"value"}\'', $curlCommand);
+    }
+
+    public function testCurlCommandHead()
+    {
+        $request = Request::create('http://test.com/foo', 'HEAD');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringContainsString('--head', $curlCommand);
+        $this->assertStringNotContainsString('--request', $curlCommand);
+    }
+
+    public function testCurlCommandWithHeaders()
+    {
+        $request = Request::create('http://test.com/foo');
+        $request->headers->set('Accept', 'application/json');
+        $request->headers->set('X-Custom-Header', 'custom-value');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringContainsString('--header '.('\\' === \DIRECTORY_SEPARATOR ? '"Accept: application/json"' : "'Accept: application/json'"), $curlCommand);
+        $this->assertStringContainsString('--header '.('\\' === \DIRECTORY_SEPARATOR ? '"X-Custom-Header: custom-value"' : "'X-Custom-Header: custom-value'"), $curlCommand);
+        $this->assertStringNotContainsString('Host:', $curlCommand);
+    }
+
+    public function testCurlCommandWithCookies()
+    {
+        $request = Request::create('http://test.com/foo', 'GET', [], ['session' => 'abc123', 'lang' => 'en']);
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringContainsString('--cookie', $curlCommand);
+        $this->assertStringContainsString('session=abc123', $curlCommand);
+        $this->assertStringContainsString('lang=en', $curlCommand);
+    }
+
+    public function testCurlCommandPutWithBody()
+    {
+        $request = Request::create('http://test.com/resource/1', 'PUT', [], [], [], [], 'updated data');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringContainsString('--request PUT', $curlCommand);
+        $this->assertStringContainsString('--data-raw', $curlCommand);
+    }
+
+    public function testCurlCommandDoesNotDuplicateQueryString()
+    {
+        $request = Request::create('http://test.com/path?foo=bar&baz=qux');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertSame(1, substr_count($curlCommand, 'foo=bar'));
+        $this->assertSame(1, substr_count($curlCommand, 'baz=qux'));
+    }
+
+    public function testCurlCommandGetWithNoBody()
+    {
+        $request = Request::create('http://test.com/foo', 'GET');
+
+        $c = new RequestDataCollector();
+        $c->collect($request, $this->createResponse());
+
+        $curlCommand = $c->getCurlCommand();
+        $this->assertStringNotContainsString('--data-raw', $curlCommand);
+    }
+
+    public function testCurlCommandIsEmptyStringWhenNotCollected()
+    {
+        $c = new RequestDataCollector();
+        $this->assertSame('', $c->getCurlCommand());
     }
 }

@@ -88,7 +88,7 @@ class SecurityBundle extends Bundle
         $extension->addUserProviderFactory(new LdapFactory());
         $container->addCompilerPass(new AddExpressionLanguageProvidersPass());
         $container->addCompilerPass(new AddSecurityVotersPass());
-        $container->addCompilerPass(new AddSessionDomainConstraintPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $container->addCompilerPass(new AddSessionDomainConstraintPass());
         $container->addCompilerPass(new CleanRememberMeVerifierPass());
         $container->addCompilerPass(new RegisterCsrfFeaturesPass());
         $container->addCompilerPass(new RegisterTokenUsageTrackingPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);

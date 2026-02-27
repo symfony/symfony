@@ -34,17 +34,17 @@ class MacAddressTest extends TestCase
         $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertSame('myMessage', $aConstraint->message);
         self::assertEquals(trim(...), $aConstraint->normalizer);
         self::assertSame(MacAddress::ALL, $aConstraint->type);
         self::assertSame(['Default', 'MacAddressDummy'], $aConstraint->groups);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame(MacAddress::LOCAL_UNICAST, $bConstraint->type);
         self::assertSame(['Default', 'MacAddressDummy'], $bConstraint->groups);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }

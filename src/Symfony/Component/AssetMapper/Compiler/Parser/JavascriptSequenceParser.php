@@ -48,7 +48,7 @@ final class JavascriptSequenceParser
         $this->contentEnd = \strlen($content);
 
         $this->pattern ??= '/'.implode('|', array_map(
-            fn (string $ch): string => preg_quote($ch, '/'),
+            static fn (string $ch): string => preg_quote($ch, '/'),
             self::COMMENT_SEPARATORS
         )).'/';
     }
@@ -133,15 +133,27 @@ final class JavascriptSequenceParser
                 continue;
             }
 
-            // Single-line string
-            if ('"' === $matchChar || "'" === $matchChar) {
-                if (false === $endPos = strpos($this->content, $matchChar, $matchPos + 1)) {
+            if ('"' === $matchChar || "'" === $matchChar || '`' === $matchChar) {
+                $endPos = $matchPos + 1;
+                while (false !== $endPos = strpos($this->content, $matchChar, $endPos)) {
+                    $backslashes = 0;
+                    $i = $endPos - 1;
+                    while ($i >= 0 && '\\' === $this->content[$i]) {
+                        ++$backslashes;
+                        --$i;
+                    }
+
+                    if (0 === $backslashes % 2) {
+                        break;
+                    }
+
+                    ++$endPos;
+                }
+
+                if (false === $endPos) {
                     $this->endsWithSequence(self::STATE_STRING, $position);
 
                     return;
-                }
-                while (false !== $endPos && '\\' == $this->content[$endPos - 1]) {
-                    $endPos = strpos($this->content, $matchChar, $endPos + 1);
                 }
 
                 $this->cursor = min($endPos + 1, $position);
@@ -149,20 +161,8 @@ final class JavascriptSequenceParser
                 continue;
             }
 
-            // Multi-line string
-            if ('`' === $matchChar) {
-                if (false === $endPos = strpos($this->content, $matchChar, $matchPos + 1)) {
-                    $this->endsWithSequence(self::STATE_STRING, $position);
-
-                    return;
-                }
-                while (false !== $endPos && '\\' == $this->content[$endPos - 1]) {
-                    $endPos = strpos($this->content, $matchChar, $endPos + 1);
-                }
-
-                $this->cursor = min($endPos + 1, $position);
-                $this->setSequence(self::STATE_STRING, $endPos + 1);
-            }
+            // Fallback
+            $this->cursor = $matchPos + 1;
         }
     }
 

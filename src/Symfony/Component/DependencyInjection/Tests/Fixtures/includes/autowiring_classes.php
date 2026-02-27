@@ -2,8 +2,11 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Contracts\Service\Attribute\Required;
 
 require __DIR__.'/uniontype_classes.php';
@@ -138,6 +141,15 @@ class CollisionB implements CollisionInterface
 {
 }
 
+class UnionClassesWithTarget
+{
+    public function __construct(
+        #[Target('collision')]
+        CollisionA|CollisionB $any,
+    ) {
+    }
+}
+
 class CannotBeAutowired
 {
     public function __construct(CollisionInterface $collision)
@@ -215,6 +227,15 @@ class UnderscoreNamedArgument
     }
 }
 
+class UnderscoreNamedArgumentWithTarget
+{
+    public function __construct(
+        #[Target('now_datetime')]
+        public \DateTimeImmutable $dt,
+    ) {
+    }
+}
+
 /*
  * Classes used for testing createResourceForClass
  */
@@ -247,6 +268,14 @@ class SetterInjectionCollision
         // The CollisionInterface cannot be autowired - there are multiple
 
         // should throw an exception
+    }
+}
+
+class SetterInjectionCollisionWithTarget
+{
+    #[Required]
+    public function setMultipleInstancesForOneArg(#[Target('collision')] CollisionInterface $col)
+    {
     }
 }
 
@@ -462,6 +491,11 @@ class MyCallable
     public function __invoke(): void
     {
     }
+
+    public static function theMethodImpl(): int
+    {
+        return 124;
+    }
 }
 
 class MyInlineService
@@ -517,5 +551,123 @@ class MyFactory
     public static function staticCreateFooWithParam(mixed $someParam): MyInlineService
     {
         return new MyInlineService($someParam);
+    }
+}
+
+interface LazyProxyTestInterface
+{
+    public function getSelf(): self;
+}
+
+final class FinalLazyProxyImplementation implements LazyProxyTestInterface
+{
+    public function getSelf(): self
+    {
+        return $this;
+    }
+}
+
+class BaseLazyProxyClass
+{
+    public function getSelf(): self
+    {
+        return $this;
+    }
+}
+
+class ExtendedLazyProxyClass extends BaseLazyProxyClass
+{
+    public function getSelf(): self
+    {
+        return $this;
+    }
+}
+
+class LazyProxyInterfaceConsumer
+{
+    public function __construct(#[Autowire(lazy: true)] private readonly LazyProxyTestInterface $dep)
+    {
+    }
+
+    public function getDep(): LazyProxyTestInterface
+    {
+        return $this->dep;
+    }
+}
+
+class LazyProxyInheritanceConsumer
+{
+    public function __construct(#[Autowire(lazy: true)] private readonly BaseLazyProxyClass $dep)
+    {
+    }
+
+    public function getDependency(): BaseLazyProxyClass
+    {
+        return $this->dep;
+    }
+}
+
+class Listener1
+{
+    public function __construct(
+        #[AutowireCallable(service: MyInlineService::class, method: 'someMethod1')]
+        public \Closure $closure,
+    ) {
+    }
+}
+
+class Listener2
+{
+    public function __construct(
+        #[AutowireCallable(service: MyInlineService::class, method: 'someMethod2')]
+        public \Closure $closure,
+        public \stdClass $someOtherService,
+    ) {
+    }
+}
+
+class ListenerResolver
+{
+    public function __construct(public ContainerInterface $container)
+    {
+    }
+}
+
+interface SomeServiceInterface
+{
+    public function getValue(): string;
+}
+
+class SomeServiceClass implements SomeServiceInterface
+{
+    public function getValue(): string
+    {
+        return 'original';
+    }
+}
+
+class DecoratedSomeServiceClass implements SomeServiceInterface
+{
+    public function __construct(private SomeServiceInterface $inner)
+    {
+    }
+
+    public function getValue(): string
+    {
+        return 'decorated:'.$this->inner->getValue();
+    }
+}
+
+class LazyDecoratedServiceConsumer
+{
+    public function __construct(
+        #[Autowire(service: 'some_service', lazy: true)]
+        private SomeServiceInterface $service,
+    ) {
+    }
+
+    public function getValue(): string
+    {
+        return $this->service->getValue();
     }
 }

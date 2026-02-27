@@ -21,17 +21,27 @@ use Symfony\Component\ObjectMapper\Exception\MappingException;
  */
 final class ReflectionObjectMapperMetadataFactory implements ObjectMapperMetadataFactoryInterface
 {
+    private array $reflectionClassCache = [];
+    private array $attributesCache = [];
+
     public function create(object $object, ?string $property = null, array $context = []): array
     {
         try {
-            $refl = new \ReflectionClass($object);
-            $mapTo = [];
-            foreach (($property ? $refl->getProperty($property) : $refl)->getAttributes(Map::class, \ReflectionAttribute::IS_INSTANCEOF) as $mapAttribute) {
-                $map = $mapAttribute->newInstance();
-                $mapTo[] = new Mapping($map->target, $map->source, $map->if, $map->transform);
+            $key = $object::class.($property ?? '');
+
+            if (isset($this->attributesCache[$key])) {
+                return $this->attributesCache[$key];
             }
 
-            return $mapTo;
+            $refl = $this->reflectionClassCache[$object::class] ??= new \ReflectionClass($object);
+            $attributes = ($property ? $refl->getProperty($property) : $refl)->getAttributes(Map::class, \ReflectionAttribute::IS_INSTANCEOF);
+            $mappings = [];
+            foreach ($attributes as $attribute) {
+                $map = $attribute->newInstance();
+                $mappings[] = new Mapping($map->target, $map->source, $map->if, $map->transform);
+            }
+
+            return $this->attributesCache[$key] = $mappings;
         } catch (\ReflectionException $e) {
             throw new MappingException($e->getMessage(), $e->getCode(), $e);
         }

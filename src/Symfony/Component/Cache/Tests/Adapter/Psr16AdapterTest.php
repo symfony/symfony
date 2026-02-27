@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\Psr16Adapter;
 use Symfony\Component\Cache\Psr16Cache;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class Psr16AdapterTest extends AdapterTestCase
 {
     protected $skippedTests = [

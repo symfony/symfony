@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Translation;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator;
 use Symfony\Component\Config\Resource\DirectoryResource;
@@ -130,7 +131,7 @@ class TranslatorTest extends TestCase
         new Translator(new Container(), new MessageFormatter(), 'en', [], ['foo' => 'bar']);
     }
 
-    /** @dataProvider getDebugModeAndCacheDirCombinations */
+    #[DataProvider('getDebugModeAndCacheDirCombinations')]
     public function testResourceFilesOptionLoadsBeforeOtherAddedResources($debug, $enableCache)
     {
         $someCatalogue = $this->getCatalogue('some_locale', []);

@@ -13,7 +13,6 @@ namespace Symfony\Component\Notifier\Bridge\Discord\Tests\Embeds;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Bridge\Discord\Embeds\DiscordFooterEmbedObject;
-use Symfony\Component\Notifier\Exception\LengthException;
 
 final class DiscordFooterEmbedObjectTest extends TestCase
 {
@@ -29,13 +28,5 @@ final class DiscordFooterEmbedObjectTest extends TestCase
             'icon_url' => 'http://icon-ur.l',
             'proxy_icon_url' => 'http://proxy-icon-ur.l',
         ], $author->toArray());
-    }
-
-    public function testThrowsWhenTextExceedsCharacterLimit()
-    {
-        $this->expectException(LengthException::class);
-        $this->expectExceptionMessage('Maximum length for the text is 2048 characters.');
-
-        (new DiscordFooterEmbedObject())->text(str_repeat('š', 2049));
     }
 }

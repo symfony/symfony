@@ -23,7 +23,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['8.2']
+        php: ['8.4']
       fail-fast: false
 
     services:
@@ -34,7 +34,7 @@ jobs:
         env:
           POSTGRES_PASSWORD: 'password'
       ldap:
-        image: bitnami/openldap
+        image: bitnamilegacy/openldap
         ports:
           - 3389:3389
         env:
@@ -74,7 +74,7 @@ jobs:
         env:
           STANDALONE: 1
       redis-sentinel:
-        image: bitnami/redis-sentinel:6.2.8
+        image: bitnamilegacy/redis-sentinel:6.2.8
         ports:
           - 26379:26379
         env:
@@ -82,7 +82,7 @@ jobs:
           REDIS_MASTER_SET: redis_sentinel
           REDIS_SENTINEL_QUORUM: 1
       redis-primary:
-        image: bitnami/redis:latest
+        image: bitnamilegacy/redis:latest
         ports:
           - 16381:6379
         env:
@@ -91,7 +91,7 @@ jobs:
         options: >-
           --name=redis-primary
       redis-replica:
-        image: bitnami/redis:latest
+        image: bitnamilegacy/redis:latest
         ports:
           - 16382:6379
         env:
@@ -121,14 +121,14 @@ jobs:
           - 8093:8093
           - 8094:8094
           - 11210:11210
-      sqs:
+      aws:
         image: localstack/localstack:3.0.2
         ports:
           - 4566:4566
       zookeeper:
         image: zookeeper
       kafka:
-        image: bitnami/kafka:3.7
+        image: bitnamilegacy/kafka:3.7
         ports:
           - 9092:9092
         env:
@@ -208,7 +208,7 @@ jobs:
         with:
           coverage: "none"
           extensions: "json,couchbase-3.2.2,memcached,mongodb-1.12.0,redis,rdkafka,xsl,ldap,relay"
-          ini-values: date.timezone=UTC,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1
+          ini-values: date.timezone=UTC,memory_limit=-1,default_socket_timeout=10,session.gc_probability=0,apc.enable_cli=1,zend.assertions=1,intl.default_locale=en,intl.error_level=0
           php-version: "${{ matrix.php }}"
           tools: pecl
 
@@ -218,7 +218,7 @@ jobs:
           php -i
 
       - name: Load fixtures
-        uses: docker://bitnami/openldap
+        uses: docker://bitnamilegacy/openldap
         with:
           entrypoint: /bin/bash
           args: -c "(/opt/bitnami/openldap/bin/ldapwhoami -H ldap://ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony||sleep 5) && /opt/bitnami/openldap/bin/ldapadd -H ldap://ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony -f src/Symfony/Component/Ldap/Tests/Fixtures/data/fixtures.ldif && /opt/bitnami/openldap/bin/ldapdelete -H ldap://ldap:3389 -D cn=admin,dc=symfony,dc=com -w symfony cn=a,ou=users,dc=symfony,dc=com"
@@ -251,9 +251,10 @@ jobs:
           git diff --exit-code src/ || (echo '::error::Run "php .github/sync-translations.php" to fix XLIFF files.' && exit 1)
 
       - name: Run tests
-        run: ./phpunit --group integration -v
+        run: ./phpunit --group integration
         env:
           INTEGRATION_FTP_URL: 'ftp://test:test@localhost'
+          LOCK_DYNAMODB_DSN: "dynamodb://localhost:4566/lock_keys?sslmode=disable"
           REDIS_HOST: 'localhost:16379'
           REDIS_AUTHENTICATED_HOST: 'localhost:16380'
           REDIS_CLUSTER_HOSTS: 'localhost:7000 localhost:7001 localhost:7002 localhost:7003 localhost:7004 localhost:7005'
@@ -261,18 +262,10 @@ jobs:
           REDIS_SENTINEL_SERVICE: redis_sentinel
           REDIS_REPLICATION_HOSTS: 'localhost:16382 localhost:16381'
           MESSENGER_REDIS_DSN: redis://127.0.0.1:7006/messages
+          MESSENGER_REDIS_SENTINEL_MASTER: redis_sentinel
           MESSENGER_AMQP_DSN: amqp://localhost/%2f/messages
           MESSENGER_SQS_DSN: "sqs://localhost:4566/messages?sslmode=disable&poll_timeout=0.01"
           MESSENGER_SQS_FIFO_QUEUE_DSN: "sqs://localhost:4566/messages.fifo?sslmode=disable&poll_timeout=0.01"
           KAFKA_BROKER: 127.0.0.1:9092
           POSTGRES_HOST: localhost
           PGBOUNCER_HOST: localhost:6432
-
-      #- name: Run HTTP push tests
-      #  if: matrix.php == '8.2'
-      #  run: |
-      #    [ -d .phpunit ] && mv .phpunit .phpunit.bak
-      #    wget -q https://github.com/symfony/binary-utils/releases/download/v0.1/vulcain_0.1.3_Linux_x86_64.tar.gz -O - | tar xz && mv vulcain /usr/local/bin
-      #    docker run --rm -e COMPOSER_ROOT_VERSION -v $(pwd):/app -v $(which composer):/usr/local/bin/composer -v $(which vulcain):/usr/local/bin/vulcain -w /app php:8.1-alpine ./phpunit src/Symfony/Component/HttpClient/Tests/CurlHttpClientTest.php --filter testHttp2Push
-      #    sudo rm -rf .phpunit
-      #    [ -d .phpunit.bak ] && mv .phpunit.bak .phpunit

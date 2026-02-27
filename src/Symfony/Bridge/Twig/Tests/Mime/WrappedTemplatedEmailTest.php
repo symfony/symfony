@@ -14,7 +14,9 @@ namespace Symfony\Bridge\Twig\Tests\Mime;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Mime\BodyRenderer;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Bridge\Twig\Mime\WrappedTemplatedEmail;
 use Twig\Environment;
+use Twig\Loader\ArrayLoader;
 use Twig\Loader\FilesystemLoader;
 
 /**
@@ -31,25 +33,25 @@ class WrappedTemplatedEmailTest extends TestCase
 
         $part1 = str_replace("\n", "\r\n",
             <<<PART
-            Content-ID: <$contentId1>
-            Content-Type: image/png; name="$contentId1"
-            Content-Transfer-Encoding: base64
-            Content-Disposition: inline;
-             name="$contentId1";
-             filename="@assets/images/logo1.png"
+                Content-ID: <$contentId1>
+                Content-Type: image/png; name="$contentId1"
+                Content-Transfer-Encoding: base64
+                Content-Disposition: inline;
+                 name="$contentId1";
+                 filename="@assets/images/logo1.png"
 
-            PART
+                PART
         );
 
         $part2 = str_replace("\n", "\r\n",
             <<<PART
-            Content-ID: <$contentId2>
-            Content-Type: image/png; name="$contentId2"
-            Content-Transfer-Encoding: base64
-            Content-Disposition: inline;
-             name="$contentId2"; filename=image.png
+                Content-ID: <$contentId2>
+                Content-Type: image/png; name="$contentId2"
+                Content-Transfer-Encoding: base64
+                Content-Disposition: inline;
+                 name="$contentId2"; filename=image.png
 
-            PART
+                PART
         );
 
         self::assertStringContainsString('![](cid:@assets/images/logo1.png)![](cid:image.png)', $body);
@@ -64,20 +66,20 @@ class WrappedTemplatedEmailTest extends TestCase
 
         $part1 = str_replace("\n", "\r\n",
             <<<PART
-            Content-Type: image/png; name=logo1.png
-            Content-Transfer-Encoding: base64
-            Content-Disposition: attachment; name=logo1.png; filename=logo1.png
+                Content-Type: image/png; name=logo1.png
+                Content-Transfer-Encoding: base64
+                Content-Disposition: attachment; name=logo1.png; filename=logo1.png
 
-            PART
+                PART
         );
 
         $part2 = str_replace("\n", "\r\n",
             <<<PART
-            Content-Type: image/png; name=image.png
-            Content-Transfer-Encoding: base64
-            Content-Disposition: attachment; name=image.png; filename=image.png
+                Content-Type: image/png; name=image.png
+                Content-Transfer-Encoding: base64
+                Content-Disposition: attachment; name=image.png; filename=image.png
 
-            PART
+                PART
         );
 
         self::assertStringContainsString($part1, $body);
@@ -98,5 +100,21 @@ class WrappedTemplatedEmailTest extends TestCase
         $renderer->render($email);
 
         return $email;
+    }
+
+    public function testGetReturnPathWhenNull()
+    {
+        $message = new TemplatedEmail();
+        $email = new WrappedTemplatedEmail(new Environment(new ArrayLoader()), $message);
+
+        $this->assertSame('', $email->getReturnPath());
+    }
+
+    public function testGetReturnPathWhenSet()
+    {
+        $message = (new TemplatedEmail())->returnPath('test@example.com');
+        $email = new WrappedTemplatedEmail(new Environment(new ArrayLoader()), $message);
+
+        $this->assertSame('test@example.com', $email->getReturnPath());
     }
 }

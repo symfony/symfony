@@ -466,13 +466,93 @@
                 <source>This value should not be after week "{{ max }}".</source>
                 <target>Ez az érték nem lehet a "{{ max }}". hétnél későbbi.</target>
             </trans-unit>
-            <trans-unit id="120">
-                <source>This value is not a valid slug.</source>
-                <target>Ez az érték nem érvényes slug.</target>
-            </trans-unit>
             <trans-unit id="121">
                 <source>This value is not a valid Twig template.</source>
-                <target state="needs-translation">This value is not a valid Twig template.</target>
+                <target state="needs-review-translation">Ez az érték nem érvényes Twig sablon.</target>
+            </trans-unit>
+            <trans-unit id="122">
+                <source>This file is not a valid video.</source>
+                <target state="needs-review-translation">Ez a fájl nem érvényes videó.</target>
+            </trans-unit>
+            <trans-unit id="123">
+                <source>The size of the video could not be detected.</source>
+                <target state="needs-review-translation">A videó méretét nem sikerült megállapítani.</target>
+            </trans-unit>
+            <trans-unit id="124">
+                <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
+                <target state="needs-review-translation">A videó szélessége túl nagy ({{ width }}px). A megengedett maximális szélesség {{ max_width }}px.</target>
+            </trans-unit>
+            <trans-unit id="125">
+                <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
+                <target state="needs-review-translation">A videó szélessége túl kicsi ({{ width }}px). A várható minimális szélesség {{ min_width }} px.</target>
+            </trans-unit>
+            <trans-unit id="126">
+                <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
+                <target state="needs-review-translation">A videó magassága túl nagy ({{ height }}px). A megengedett maximális magasság {{ max_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="127">
+                <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
+                <target state="needs-review-translation">A videó magassága túl kicsi ({{ height }}px). A minimálisan elvárt magasság {{ min_height }}px.</target>
+            </trans-unit>
+            <trans-unit id="128">
+                <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target state="needs-review-translation">A videóban túl kevés a képpont ({{ pixels }}). Az elvárt minimális mennyiség {{ min_pixels }}.</target>
+            </trans-unit>
+            <trans-unit id="129">
+                <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target state="needs-review-translation">A videóban túl sok a képpont ({{ pixels }}). A várható maximális mennyiség {{ max_pixels }}.</target>
+            </trans-unit>
+            <trans-unit id="130">
+                <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
+                <target state="needs-review-translation">A videó aránya túl nagy ({{ ratio }}). A megengedett maximális arány {{ max_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="131">
+                <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
+                <target state="needs-review-translation">A videó képaránya túl kicsi ({{ ratio }}). A minimálisan elvárt arány {{ min_ratio }}.</target>
+            </trans-unit>
+            <trans-unit id="132">
+                <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
+                <target state="needs-review-translation">A videó négyzetes ({{ width }}x{{ height }}px). A négyzetes videók nem engedélyezettek.</target>
+            </trans-unit>
+            <trans-unit id="133">
+                <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
+                <target state="needs-review-translation">A videó fekvő tájolású ({{ width }}x{{ height }} px). Fekvő tájolású videók nem engedélyezettek.</target>
+            </trans-unit>
+            <trans-unit id="134">
+                <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
+                <target state="needs-review-translation">A videó álló tájolású ({{ width }}x{{ height }} px). Álló tájolású videók nem engedélyezettek.</target>
+            </trans-unit>
+            <trans-unit id="135">
+                <source>The video file is corrupted.</source>
+                <target state="needs-review-translation">A videófájl sérült.</target>
+            </trans-unit>
+            <trans-unit id="136">
+                <source>The video contains multiple streams. Only one stream is allowed.</source>
+                <target state="needs-review-translation">A videó több adatfolyamot tartalmaz. Csak egy adatfolyam engedélyezett.</target>
+            </trans-unit>
+            <trans-unit id="137">
+                <source>Unsupported video codec "{{ codec }}".</source>
+                <target state="needs-review-translation">Nem támogatott videokodek „{{ codec }}”.</target>
+            </trans-unit>
+            <trans-unit id="138">
+                <source>Unsupported video container "{{ container }}".</source>
+                <target state="needs-review-translation">Nem támogatott videokonténer "{{ container }}".</target>
+            </trans-unit>
+            <trans-unit id="139">
+                <source>The image file is corrupted.</source>
+                <target state="needs-review-translation">A képfájl sérült.</target>
+            </trans-unit>
+            <trans-unit id="140">
+                <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
+                <target state="needs-review-translation">A képen túl kevés pixel van ({{ pixels }}). Az elvárt minimum {{ min_pixels }}.</target>
+            </trans-unit>
+            <trans-unit id="141">
+                <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
+                <target state="needs-review-translation">A kép túl sok pixelt tartalmaz ({{ pixels }}). A várható maximális mennyiség {{ max_pixels }}.</target>
+            </trans-unit>
+            <trans-unit id="142">
+                <source>This filename does not match the expected charset.</source>
+                <target state="needs-review-translation">Ez a fájlnév nem felel meg a várt karakterkészletnek.</target>
             </trans-unit>
         </body>
     </file>

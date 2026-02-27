@@ -65,6 +65,14 @@ class Security implements AuthorizationCheckerInterface, UserAuthorizationChecke
             ->isGranted($attributes, $subject, $accessDecision);
     }
 
+    public function getAccessDecision(mixed $attributes, mixed $subject = null): AccessDecision
+    {
+        $accessDecision = new AccessDecision();
+        $this->isGranted($attributes, $subject, $accessDecision);
+
+        return $accessDecision;
+    }
+
     /**
      * Checks if the attribute is granted against the user and optionally supplied subject.
      *
@@ -74,6 +82,14 @@ class Security implements AuthorizationCheckerInterface, UserAuthorizationChecke
     {
         return $this->container->get('security.user_authorization_checker')
             ->isGrantedForUser($user, $attribute, $subject, $accessDecision);
+    }
+
+    public function getAccessDecisionForUser(UserInterface $user, mixed $attributes, mixed $subject = null): AccessDecision
+    {
+        $accessDecision = new AccessDecision();
+        $this->isGrantedForUser($user, $attributes, $subject, $accessDecision);
+
+        return $accessDecision;
     }
 
     public function getToken(): ?TokenInterface
@@ -171,7 +187,7 @@ class Security implements AuthorizationCheckerInterface, UserAuthorizationChecke
         $firewallAuthenticatorLocator = $this->authenticators[$firewallName];
 
         if (!$authenticatorName) {
-            $authenticatorIds = array_filter(array_keys($firewallAuthenticatorLocator->getProvidedServices()), fn (string $authenticatorId) => $authenticatorId !== \sprintf('security.authenticator.remember_me.%s', $firewallName));
+            $authenticatorIds = array_filter(array_keys($firewallAuthenticatorLocator->getProvidedServices()), static fn (string $authenticatorId) => $authenticatorId !== \sprintf('security.authenticator.remember_me.%s', $firewallName));
             if (!$authenticatorIds) {
                 throw new LogicException(\sprintf('No authenticator was found for the firewall "%s".', $firewallName));
             }

@@ -1,6 +1,28 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add support for XLIFF 2.1 and 2.2
+ * Add support for XLIFF 2.2 PGS (Plural, Gender, and Select Module)
+ * Add `LocaleFallbackProvider`
+
+8.0
+---
+
+ * Remove the `$escape` parameter from `CsvFileLoader::setCsvControl()`
+ * Make `DataCollectorTranslator` class `final`
+ * Remove `ProviderFactoryTestCase`, extend `AbstractProviderFactoryTestCase` instead
+ * Remove `TranslatableMessage::__toString()` method, use `trans()` or `getMessage()` instead
+
+7.4
+---
+
+ * Make the extractor alias optional
+ * Deprecate `TranslatableMessage::__toString`
+ * Add `Symfony\Component\Translation\StaticMessage`
+
 7.3
 ---
 

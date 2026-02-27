@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\RequestMatcher;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\HeaderRequestMatcher;
 
 class HeaderRequestMatcherTest extends TestCase
 {
-    /**
-     * @dataProvider getDataForArray
-     */
+    #[DataProvider('getDataForArray')]
     public function testArray(array $headers, bool $matches)
     {
         $matcher = new HeaderRequestMatcher(['x-foo', 'bar']);
@@ -32,9 +31,7 @@ class HeaderRequestMatcherTest extends TestCase
         $this->assertSame($matches, $matcher->matches($request));
     }
 
-    /**
-     * @dataProvider getDataForArray
-     */
+    #[DataProvider('getDataForArray')]
     public function testCommaSeparatedString(array $headers, bool $matches)
     {
         $matcher = new HeaderRequestMatcher('x-foo, bar');
@@ -47,9 +44,7 @@ class HeaderRequestMatcherTest extends TestCase
         $this->assertSame($matches, $matcher->matches($request));
     }
 
-    /**
-     * @dataProvider getDataForSingleString
-     */
+    #[DataProvider('getDataForSingleString')]
     public function testSingleString(array $headers, bool $matches)
     {
         $matcher = new HeaderRequestMatcher('x-foo');

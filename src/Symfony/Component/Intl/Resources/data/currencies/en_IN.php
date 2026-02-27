@@ -14,9 +14,9 @@ return [
             'VEF',
             'Venezuelan Bolívar',
         ],
-        'VES' => [
-            'VES',
-            'VEF',
+        'XCG' => [
+            'Cg.',
+            'Caribbean Guilder',
         ],
     ],
 ];

@@ -1,6 +1,51 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `TraceableValueResolver` to help inspecting value resolvers performances
+ * [BC BREAK] Add `object` support to input options and arguments' default by changing the `$default` type to `mixed` in `InputArgument`, `InputOption`, `#[Argument]` and `#[Option]`
+ * Add support for pasting images with `#[Ask]` on `InputFile` types, supporting Kitty Graphics and iTerm2 protocols
+ * Add `FileQuestion`, `InputFile`, `InputFileValueResolver`, and `SymfonyStyle::askFile()` for file input handling
+ * Add `Question::setConstraints()` and `ValidateQuestionInputListener` to validate question input using Validator constraints
+ * Add `#[AskChoice]` attribute for interactive choice questions in invokable commands
+ * Add support for method-based commands with `#[AsCommand]` attribute
+ * Add argument resolver support
+ * Add `BackedEnum` and `DateTimeInterface` support to `#[MapInput]`
+ * Add `TesterTrait::assertCommandFailed()` to test command
+ * Add `TesterTrait::assertCommandIsInvalid()` to test command
+ * Add a result-based testing API with `CommandTester::run()`, `ExecutionResult`, and `ConsoleAssertionsTrait` to assert output and error streams together
+ * Add optional `$format` argument to `SymfonyStyle::createProgressBar()`, `SymfonyStyle::progressStart()`, and `SymfonyStyle::progressIterate()` to allow passing a custom `ProgressBar` format string
+ * Allow setting a boolean default value on `InputOption::VALUE_NEGATABLE` options
+ * Deprecate passing both `InputArgument::REQUIRED` and `InputArgument::OPTIONAL` modes to `InputArgument` constructor
+ * Deprecate passing more than one out of `InputOption::VALUE_NONE`, `InputOption::VALUE_REQUIRED` and `InputOption::VALUE_OPTIONAL` modes to `InputOption` constructor
+
+8.0
+---
+
+ * Make `AsCommand` attribute class `final`
+ * Remove methods `Command::getDefaultName()` and `Command::getDefaultDescription()` in favor of the `#[AsCommand]` attribute
+ * Ensure closures set via `Command::setCode()` method have proper parameter and return types
+ * Add method `isSilent()` to `OutputInterface`
+ * Remove deprecated `Symfony\Component\Console\Application::add()` method in favor of `Symfony\Component\Console\Application::addCommand()`
+ * Add argument `$finishedIndicator` to `ProgressIndicator::finish()`
+
+7.4
+---
+
+ * Add `Command::getCode()` to get the code set via `setCode()`
+ * Allow setting aliases and the hidden flag via the command name passed to the constructor
+ * Introduce `Symfony\Component\Console\Application::addCommand()` to simplify using invokable commands when the component is used standalone
+ * Deprecate `Symfony\Component\Console\Application::add()` in favor of `Symfony\Component\Console\Application::addCommand()`
+ * Add `BackedEnum` support with `#[Argument]` and `#[Option]` inputs in invokable commands
+ * Allow Usages to be specified via `#[AsCommand]` attribute.
+ * Allow passing invokable commands to `Symfony\Component\Console\Tester\CommandTester`
+ * Add `#[MapInput]` attribute to support DTOs in commands
+ * Add optional timeout for interaction in `QuestionHelper`
+ * Add support for interactive invokable commands with `#[Interact]` and `#[Ask]` attributes
+ * Add support for `Cursor` helper in invokable commands
+
 7.3
 ---
 

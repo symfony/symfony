@@ -37,7 +37,7 @@ class ExpressionCacheWarmerTest extends TestCase
                 $this->assertSame($expectedExpression, $expression);
                 $this->assertSame($expectedNames, $names);
 
-                return $this->createMock(ParsedExpression::class);
+                return $this->createStub(ParsedExpression::class);
             })
         ;
 

@@ -76,42 +76,42 @@ abstract class TranslationProviderTestCase extends TestCase
             $transUnits = '';
             foreach ($messages as $key => $value) {
                 $transUnits .= <<<XLIFF
-<trans-unit id="$key">
-    <source>$key</source>
-    <target>$value</target>
-</trans-unit>
-XLIFF;
+                    <trans-unit id="$key">
+                        <source>$key</source>
+                        <target>$value</target>
+                    </trans-unit>
+                    XLIFF;
             }
             $xliffContent = <<<XLIFF
-<?xml version="1.0"?>
-<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" target-language="$targetLanguage" datatype="plaintext" original="file.ext">
-        <body>
-            $transUnits
-        </body>
-    </file>
-</xliff>
-XLIFF;
+                <?xml version="1.0"?>
+                <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+                    <file source-language="en" target-language="$targetLanguage" datatype="plaintext" original="file.ext">
+                        <body>
+                            $transUnits
+                        </body>
+                    </file>
+                </xliff>
+                XLIFF;
         } else {
             $units = '';
             foreach ($messages as $key => $value) {
                 $units .= <<<XLIFF
-<unit id="$key">
-  <segment>
-    <source>$key</source>
-    <target>$value</target>
-  </segment>
-</unit>
-XLIFF;
+                    <unit id="$key">
+                      <segment>
+                        <source>$key</source>
+                        <target>$value</target>
+                      </segment>
+                    </unit>
+                    XLIFF;
             }
             $xliffContent = <<<XLIFF
-<?xml version="1.0" encoding="utf-8"?>
-<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en" trgLang="$targetLanguage">
-  <file id="messages.$targetLanguage">
-    $units
-  </file>
-</xliff>
-XLIFF;
+                <?xml version="1.0" encoding="utf-8"?>
+                <xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" version="2.0" srcLang="en" trgLang="$targetLanguage">
+                  <file id="messages.$targetLanguage">
+                    $units
+                  </file>
+                </xliff>
+                XLIFF;
         }
 
         $filename = \sprintf('%s/%s', $this->translationAppDir.'/translations', str_replace('%locale%', $targetLanguage, $fileNamePattern));

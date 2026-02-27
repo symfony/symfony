@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\Lexer;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
@@ -26,9 +27,7 @@ class LexerTest extends TestCase
         $this->lexer = new Lexer();
     }
 
-    /**
-     * @dataProvider getTokenizeData
-     */
+    #[DataProvider('getTokenizeData')]
     public function testTokenize($tokens, $expression)
     {
         $tokens[] = new Token('end of expression', null, \strlen($expression) + 1);
@@ -101,6 +100,10 @@ class LexerTest extends TestCase
             [
                 [new Token('string', 'foo', 1)],
                 '"foo"',
+            ],
+            [
+                [new Token('string', 'foo"bar\\baz', 1)],
+                '"foo\"bar\\\\baz"',
             ],
             [
                 [new Token('number', 3, 1)],

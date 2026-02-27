@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\CacheWarmer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\CacheWarmer\SerializerCacheWarmer;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\Cache\Adapter\NullAdapter;
@@ -21,9 +22,24 @@ use Symfony\Component\Serializer\Mapping\Loader\YamlFileLoader;
 
 class SerializerCacheWarmerTest extends TestCase
 {
-    /**
-     * @dataProvider loaderProvider
-     */
+    private PhpArrayAdapter $arrayPool;
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        if (isset($this->arrayPool)) {
+            $this->arrayPool->clear();
+            unset($this->arrayPool);
+        }
+    }
+
+    private function getArrayPool(string $file): PhpArrayAdapter
+    {
+        return $this->arrayPool = new PhpArrayAdapter($file, new NullAdapter());
+    }
+
+    #[DataProvider('loaderProvider')]
     public function testWarmUp(array $loaders)
     {
         $file = sys_get_temp_dir().'/cache-serializer.php';
@@ -34,15 +50,13 @@ class SerializerCacheWarmerTest extends TestCase
 
         $this->assertFileExists($file);
 
-        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
+        $arrayPool = $this->getArrayPool($file);
 
         $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
         $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
     }
 
-    /**
-     * @dataProvider loaderProvider
-     */
+    #[DataProvider('loaderProvider')]
     public function testWarmUpAbsoluteFilePath(array $loaders)
     {
         $file = sys_get_temp_dir().'/0/cache-serializer.php';
@@ -56,15 +70,13 @@ class SerializerCacheWarmerTest extends TestCase
         $this->assertFileExists($file);
         $this->assertFileDoesNotExist($cacheDir.'/cache-serializer.php');
 
-        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
+        $arrayPool = $this->getArrayPool($file);
 
         $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
         $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
     }
 
-    /**
-     * @dataProvider loaderProvider
-     */
+    #[DataProvider('loaderProvider')]
     public function testWarmUpWithoutBuildDir(array $loaders)
     {
         $file = sys_get_temp_dir().'/cache-serializer.php';
@@ -75,10 +87,10 @@ class SerializerCacheWarmerTest extends TestCase
 
         $this->assertFileDoesNotExist($file);
 
-        $arrayPool = new PhpArrayAdapter($file, new NullAdapter());
+        $arrayPool = $this->getArrayPool($file);
 
-        $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
-        $this->assertTrue($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
+        $this->assertFalse($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Person')->isHit());
+        $this->assertFalse($arrayPool->getItem('Symfony_Bundle_FrameworkBundle_Tests_Fixtures_Serialization_Author')->isHit());
     }
 
     public static function loaderProvider(): array
@@ -125,7 +137,7 @@ class SerializerCacheWarmerTest extends TestCase
 
         $warmer = new SerializerCacheWarmer([new YamlFileLoader(__DIR__.'/../Fixtures/Serialization/Resources/does_not_exist.yaml')], $file);
 
-        spl_autoload_register($classLoader = function ($class) use ($mappedClass) {
+        spl_autoload_register($classLoader = static function ($class) use ($mappedClass) {
             if ($class === $mappedClass) {
                 throw new \DomainException('This exception should be caught by the warmer.');
             }

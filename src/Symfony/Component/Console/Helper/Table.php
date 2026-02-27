@@ -561,10 +561,7 @@ class Table
         }
 
         // str_pad won't work properly with multi-byte strings, we need to fix the padding
-        if (false !== $encoding = mb_detect_encoding($cell, null, true)) {
-            $width += \strlen($cell) - mb_strwidth($cell, $encoding);
-        }
-
+        $width += \strlen($cell) - Helper::width($cell) - substr_count($cell, "\0");
         $style = $this->getColumnStyle($column);
 
         if ($cell instanceof TableSeparator) {
@@ -629,8 +626,48 @@ class Table
             foreach ($rows[$rowKey] as $column => $cell) {
                 $colspan = $cell instanceof TableCell ? $cell->getColspan() : 1;
 
-                if (isset($this->columnMaxWidths[$column]) && Helper::width(Helper::removeDecoration($formatter, $cell)) > $this->columnMaxWidths[$column]) {
-                    $cell = $formatter->formatAndWrap($cell, $this->columnMaxWidths[$column] * $colspan);
+                $minWrappedWidth = 0;
+                $widthApplied = [];
+                $lengthColumnBorder = $this->getColumnSeparatorWidth() + Helper::width($this->style->getCellRowContentFormat()) - 2;
+                for ($i = $column; $i < ($column + $colspan); ++$i) {
+                    if (isset($this->columnMaxWidths[$i])) {
+                        $minWrappedWidth += $this->columnMaxWidths[$i];
+                        $widthApplied[] = ['type' => 'max', 'column' => $i];
+                    } elseif (($this->columnWidths[$i] ?? 0) > 0 && $colspan > 1) {
+                        $minWrappedWidth += $this->columnWidths[$i];
+                        $widthApplied[] = ['type' => 'min', 'column' => $i];
+                    }
+                }
+                if (1 === \count($widthApplied)) {
+                    if ($colspan > 1) {
+                        $minWrappedWidth *= $colspan;  // previous logic
+                    }
+                } elseif (\count($widthApplied) > 1) {
+                    $minWrappedWidth += (\count($widthApplied) - 1) * $lengthColumnBorder;
+                }
+
+                $cellWidth = Helper::width(Helper::removeDecoration($formatter, $cell));
+                if ($minWrappedWidth && $cellWidth > $minWrappedWidth) {
+                    $cell = $formatter->formatAndWrap($cell, $minWrappedWidth);
+                }
+                // update minimal columnWidths for spanned columns
+                if ($colspan > 1 && $minWrappedWidth > 0) {
+                    $columnsMinWidthProcessed = [];
+                    $cellWidth = min($cellWidth, $minWrappedWidth);
+                    foreach ($widthApplied as $item) {
+                        if ('max' === $item['type'] && $cellWidth >= $this->columnMaxWidths[$item['column']]) {
+                            $minWidthColumn = $this->columnMaxWidths[$item['column']];
+                            $this->columnWidths[$item['column']] = $minWidthColumn;
+                            $columnsMinWidthProcessed[$item['column']] = true;
+                            $cellWidth -= $minWidthColumn + $lengthColumnBorder;
+                        }
+                    }
+                    for ($i = $column; $i < ($column + $colspan); ++$i) {
+                        if (isset($columnsMinWidthProcessed[$i])) {
+                            continue;
+                        }
+                        $this->columnWidths[$i] = $cellWidth + $lengthColumnBorder;
+                    }
                 }
                 if (!str_contains($cell ?? '', "\n")) {
                     continue;

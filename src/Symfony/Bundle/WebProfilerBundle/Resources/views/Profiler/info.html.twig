@@ -1,11 +1,11 @@
 {% extends '@WebProfiler/Profiler/layout.html.twig' %}
 
 {% set messages = {
-    'no_token' : {
-        status:  'error',
-        title:   (token|default('') == 'latest') ? 'There are no profiles' : 'Token not found',
-        message: (token|default('') == 'latest') ? 'No profiles found.' : 'Token "' ~ token|default('') ~ '" not found.'
-    }
+    no_token: {
+        status: 'error',
+        title: (token|default('') == 'latest') ? 'There are no profiles' : 'Token not found',
+        message: (token|default('') == 'latest') ? 'No profiles found.' : 'Token "' ~ token|default('') ~ '" not found.',
+    },
 } %}
 
 {% block summary %}

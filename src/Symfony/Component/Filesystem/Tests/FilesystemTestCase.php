@@ -59,7 +59,7 @@ class FilesystemTestCase extends TestCase
         $this->umask = umask(0);
         $this->filesystem = new Filesystem();
         $this->workspace = sys_get_temp_dir().'/'.microtime(true).'.'.mt_rand();
-        mkdir($this->workspace, 0777, true);
+        mkdir($this->workspace, 0o777, true);
         $this->workspace = realpath($this->workspace);
     }
 
@@ -103,7 +103,7 @@ class FilesystemTestCase extends TestCase
     {
         $this->markAsSkippedIfPosixIsMissing();
 
-        return ($datas = posix_getpwuid($this->getFileOwnerId($filepath))) ? $datas['name'] : null;
+        return ($data = posix_getpwuid($this->getFileOwnerId($filepath))) ? $data['name'] : null;
     }
 
     protected function getFileGroupId($filepath)
@@ -119,8 +119,8 @@ class FilesystemTestCase extends TestCase
     {
         $this->markAsSkippedIfPosixIsMissing();
 
-        if ($datas = posix_getgrgid($this->getFileGroupId($filepath))) {
-            return $datas['name'];
+        if ($data = posix_getgrgid($this->getFileGroupId($filepath))) {
+            return $data['name'];
         }
 
         $this->markTestSkipped('Unable to retrieve file group name');
@@ -144,7 +144,7 @@ class FilesystemTestCase extends TestCase
         }
 
         // https://bugs.php.net/69473
-        if ($relative && '\\' === \DIRECTORY_SEPARATOR && 1 === \PHP_ZTS) {
+        if ($relative && '\\' === \DIRECTORY_SEPARATOR && \PHP_ZTS) {
             $this->markTestSkipped('symlink does not support relative paths on thread safe Windows PHP versions');
         }
     }

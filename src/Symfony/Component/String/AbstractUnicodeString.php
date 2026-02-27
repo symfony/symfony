@@ -264,7 +264,7 @@ abstract class AbstractUnicodeString extends AbstractString
 
     public function normalize(int $form = self::NFC): static
     {
-        if (!\in_array($form, [self::NFC, self::NFD, self::NFKC, self::NFKD])) {
+        if (!\in_array($form, [self::NFC, self::NFD, self::NFKC, self::NFKD], true)) {
             throw new InvalidArgumentException('Unsupported normalization form.');
         }
 
@@ -360,7 +360,7 @@ abstract class AbstractUnicodeString extends AbstractString
     public function reverse(): static
     {
         $str = clone $this;
-        $str->string = implode('', array_reverse(preg_split('/(\X)/u', $str->string, -1, \PREG_SPLIT_DELIM_CAPTURE | \PREG_SPLIT_NO_EMPTY)));
+        $str->string = implode('', array_reverse(grapheme_str_split($str->string)));
 
         return $str;
     }
@@ -575,6 +575,8 @@ abstract class AbstractUnicodeString extends AbstractString
     private function wcswidth(string $string): int
     {
         $width = 0;
+        $lastChar = null;
+        $lastWidth = null;
 
         foreach (preg_split('//u', $string, -1, \PREG_SPLIT_NO_EMPTY) as $c) {
             $codePoint = mb_ord($c, 'UTF-8');
@@ -595,6 +597,20 @@ abstract class AbstractUnicodeString extends AbstractString
                 || (0x07F <= $codePoint && 0x0A0 > $codePoint) // C1 control characters and DEL
             ) {
                 return -1;
+            }
+
+            if (0xFE0F === $codePoint) {
+                if (\PCRE_VERSION_MAJOR < 10 || \PCRE_VERSION_MAJOR === 10 && \PCRE_VERSION_MINOR < 40) {
+                    $regex = '/\p{So}/u';
+                } else {
+                    $regex = '/\p{Emoji}/u';
+                }
+                if (null !== $lastChar && 1 === $lastWidth && preg_match($regex, $lastChar)) {
+                    ++$width;
+                    $lastWidth = 2;
+                }
+
+                continue;
             }
 
             self::$tableZero ??= require __DIR__.'/Resources/data/wcswidth_table_zero.php';
@@ -627,6 +643,8 @@ abstract class AbstractUnicodeString extends AbstractString
                         $ubound = $mid - 1;
                     } else {
                         $width += 2;
+                        $lastChar = $c;
+                        $lastWidth = 2;
 
                         continue 2;
                     }
@@ -634,6 +652,8 @@ abstract class AbstractUnicodeString extends AbstractString
             }
 
             ++$width;
+            $lastChar = $c;
+            $lastWidth = 1;
         }
 
         return $width;

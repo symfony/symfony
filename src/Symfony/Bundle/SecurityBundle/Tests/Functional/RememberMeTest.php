@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\SecurityBundle\Tests\Functional\Bundle\RememberMeBundle\Security\UserChangingUserProvider;
 
 class RememberMeTest extends AbstractWebTestCase
@@ -20,9 +21,7 @@ class RememberMeTest extends AbstractWebTestCase
         UserChangingUserProvider::$changePassword = false;
     }
 
-    /**
-     * @dataProvider provideConfigs
-     */
+    #[DataProvider('provideConfigs')]
     public function testRememberMe(array $options)
     {
         $client = $this->createClient(array_merge_recursive(['root_config' => 'config.yml', 'test_case' => 'RememberMe'], $options));

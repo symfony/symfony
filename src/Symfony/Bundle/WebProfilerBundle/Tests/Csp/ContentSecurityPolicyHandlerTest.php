@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Csp;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
 use Symfony\Bundle\WebProfilerBundle\Csp\NonceGenerator;
@@ -19,9 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ContentSecurityPolicyHandlerTest extends TestCase
 {
-    /**
-     * @dataProvider provideRequestAndResponses
-     */
+    #[DataProvider('provideRequestAndResponses')]
     public function testGetNonces($nonce, $expectedNonce, Request $request, Response $response)
     {
         $cspHandler = new ContentSecurityPolicyHandler($this->mockNonceGenerator($nonce));
@@ -29,9 +28,7 @@ class ContentSecurityPolicyHandlerTest extends TestCase
         $this->assertSame($expectedNonce, $cspHandler->getNonces($request, $response));
     }
 
-    /**
-     * @dataProvider provideRequestAndResponsesForOnKernelResponse
-     */
+    #[DataProvider('provideRequestAndResponsesForOnKernelResponse')]
     public function testOnKernelResponse($nonce, $expectedNonce, Request $request, Response $response, array $expectedCsp)
     {
         $cspHandler = new ContentSecurityPolicyHandler($this->mockNonceGenerator($nonce));
@@ -211,9 +208,9 @@ class ContentSecurityPolicyHandlerTest extends TestCase
 
     private function mockNonceGenerator($value)
     {
-        $generator = $this->createMock(NonceGenerator::class);
+        $generator = $this->createStub(NonceGenerator::class);
 
-        $generator->expects($this->any())
+        $generator
             ->method('generate')
             ->willReturn($value);
 

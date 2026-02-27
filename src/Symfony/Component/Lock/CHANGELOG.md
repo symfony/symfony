@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add support for scoping semaphore stores by project ID (e.g. `semaphore://<project-id>`)
+
+7.4
+---
+
+ * Add `LockKeyNormalizer`
+
 7.3
 ---
 

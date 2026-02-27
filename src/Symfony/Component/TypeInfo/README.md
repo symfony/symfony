@@ -41,7 +41,7 @@ $type->isIdentifiedBy(Foo::class, Bar::class);
 $type->isIdentifiedBy(TypeIdentifier::OBJECT);
 $type->isIdentifiedBy('float');
 
-// You can also check that a type satifies specific conditions
+// You can also check that a type satisfies specific conditions
 $type->isSatisfiedBy(fn (Type $type): bool => !$type->isNullable() && $type->isIdentifiedBy(TypeIdentifier::INT));
 ```
 

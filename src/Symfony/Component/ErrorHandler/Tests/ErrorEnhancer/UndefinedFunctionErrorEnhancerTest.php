@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\ErrorHandler\Tests\ErrorEnhancer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Error\UndefinedFunctionError;
 use Symfony\Component\ErrorHandler\ErrorEnhancer\UndefinedFunctionErrorEnhancer;
 
 class UndefinedFunctionErrorEnhancerTest extends TestCase
 {
-    /**
-     * @dataProvider provideUndefinedFunctionData
-     */
+    #[DataProvider('provideUndefinedFunctionData')]
     public function testEnhance(string $originalMessage, string $enhancedMessage)
     {
         $enhancer = new UndefinedFunctionErrorEnhancer();

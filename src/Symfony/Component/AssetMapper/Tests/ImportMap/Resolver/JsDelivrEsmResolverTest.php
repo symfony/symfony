@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap\Resolver;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapEntry;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapType;
@@ -21,9 +22,7 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 class JsDelivrEsmResolverTest extends TestCase
 {
-    /**
-     * @dataProvider provideResolvePackagesTests
-     */
+    #[DataProvider('provideResolvePackagesTests')]
     public function testResolvePackages(array $packages, array $expectedRequests, array $expectedResolvedPackages)
     {
         $responses = [];
@@ -265,9 +264,7 @@ class JsDelivrEsmResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideDownloadPackagesTests
-     */
+    #[DataProvider('provideDownloadPackagesTests')]
     public function testDownloadPackages(array $importMapEntries, array $expectedRequests, array $expectedReturn)
     {
         $responses = [];
@@ -441,16 +438,16 @@ class JsDelivrEsmResolverTest extends TestCase
                 [
                     'url' => '/es-module-shims@1.8.2',
                     'body' => <<<'EOF'
-const je="\n//# sourceURL=",Ue="\n//# sourceMappingURL=",Me=/^(text|application)\/(x-)?javascript(;|$)/,_e=/^(application)\/wasm(;|$)/,Ie=/^(text|application)\/json(;|$)/,Re=/^(text|application)\/css(;|$)/,Te=/url\(\s*(?:(["'])((?:\\.|[^\n\\"'])+)\1|((?:\\.|[^\s,"'()\\])+))\s*\)/g;
-//# sourceMappingURL=/sm/ef3916de598f421a779ba0e69af94655b2043095cde2410cc01893452d893338.map
-EOF,
+                        const je="\n//# sourceURL=",Ue="\n//# sourceMappingURL=",Me=/^(text|application)\/(x-)?javascript(;|$)/,_e=/^(application)\/wasm(;|$)/,Ie=/^(text|application)\/json(;|$)/,Re=/^(text|application)\/css(;|$)/,Te=/url\(\s*(?:(["'])((?:\\.|[^\n\\"'])+)\1|((?:\\.|[^\s,"'()\\])+))\s*\)/g;
+                        //# sourceMappingURL=/sm/ef3916de598f421a779ba0e69af94655b2043095cde2410cc01893452d893338.map
+                        EOF,
                 ],
             ],
             [
                 'es-module-shims' => [
                     'content' => <<<'EOF'
-const je="\n//# sourceURL=",Ue="\n//# sourceMappingURL=",Me=/^(text|application)\/(x-)?javascript(;|$)/,_e=/^(application)\/wasm(;|$)/,Ie=/^(text|application)\/json(;|$)/,Re=/^(text|application)\/css(;|$)/,Te=/url\(\s*(?:(["'])((?:\\.|[^\n\\"'])+)\1|((?:\\.|[^\s,"'()\\])+))\s*\)/g;
-EOF,
+                        const je="\n//# sourceURL=",Ue="\n//# sourceMappingURL=",Me=/^(text|application)\/(x-)?javascript(;|$)/,_e=/^(application)\/wasm(;|$)/,Ie=/^(text|application)\/json(;|$)/,Re=/^(text|application)\/css(;|$)/,Te=/url\(\s*(?:(["'])((?:\\.|[^\n\\"'])+)\1|((?:\\.|[^\s,"'()\\])+))\s*\)/g;
+                        EOF,
                     'dependencies' => [],
                     'extraFiles' => [],
                 ],
@@ -482,16 +479,15 @@ EOF,
             [
                 'url' => '/npm/bootstrap-icons@1.1.1/font/bootstrap-icons.min.css',
                 'body' => <<<EOF
-                @font-face{font-display:block;font-family:bootstrap-icons;src:
-                    url("fonts/bootstrap-icons.woff2?2820a3852bdb9a5832199cc61cec4e65") format("woff2"),
-                    url("fonts/bootstrap-icons.woff?2820a3852bdb9a5832199cc61cec4e65") format("woff")},
-                    url("./fonts/bootstrap-icons.woff-fake-dot-slash") format("woff-fake-dot-slash"),
-                    url("../fonts/bootstrap-icons.woff-fake-dot-dot-slash") format("woff-fake-dot-dot-slash"),
-                    url("data:will-be-ignored") format("woff-fake-data-format"),
-                    url("data:https://example.com/will-be-ignored") format("woff-fake-absolute-url"),
-                    .bi::before,[class*=" bi-"]::before,[class^=bi-]::before{display:inline-block;font-family:bootstrap-icons!important;font-style:normal;font-weight:400!important;font-variant:normal;text-transform:none;
-                EOF
-                ,
+                    @font-face{font-display:block;font-family:bootstrap-icons;src:
+                        url("fonts/bootstrap-icons.woff2?2820a3852bdb9a5832199cc61cec4e65") format("woff2"),
+                        url("fonts/bootstrap-icons.woff?2820a3852bdb9a5832199cc61cec4e65") format("woff")},
+                        url("./fonts/bootstrap-icons.woff-fake-dot-slash") format("woff-fake-dot-slash"),
+                        url("../fonts/bootstrap-icons.woff-fake-dot-dot-slash") format("woff-fake-dot-dot-slash"),
+                        url("data:will-be-ignored") format("woff-fake-data-format"),
+                        url("data:https://example.com/will-be-ignored") format("woff-fake-absolute-url"),
+                        .bi::before,[class*=" bi-"]::before,[class^=bi-]::before{display:inline-block;font-family:bootstrap-icons!important;font-style:normal;font-weight:400!important;font-variant:normal;text-transform:none;
+                    EOF,
             ],
             [
                 'url' => '/npm/bootstrap-icons@1.1.1/font/fonts/bootstrap-icons.woff2',
@@ -584,9 +580,7 @@ EOF,
         ]);
     }
 
-    /**
-     * @dataProvider provideImportRegex
-     */
+    #[DataProvider('provideImportRegex')]
     public function testImportRegex(string $subject, array $expectedPackages)
     {
         preg_match_all(JsDelivrEsmResolver::IMPORT_REGEX, $subject, $matches);
@@ -704,7 +698,7 @@ EOF,
 
     private static function createRemoteEntry(string $importName, string $version, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry
     {
-        $packageSpecifier = $packageSpecifier ?? $importName;
+        $packageSpecifier ??= $importName;
 
         return ImportMapEntry::createRemote($importName, $type, path: 'does not matter', version: $version, packageModuleSpecifier: $packageSpecifier, isEntrypoint: false);
     }

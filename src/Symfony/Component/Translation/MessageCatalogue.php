@@ -217,6 +217,16 @@ class MessageCatalogue implements MessageCatalogueInterface, MetadataAwareInterf
             return $this->metadata;
         }
 
+        if (isset($this->metadata[$domain.self::INTL_DOMAIN_SUFFIX])) {
+            if ('' === $key) {
+                return $this->metadata[$domain.self::INTL_DOMAIN_SUFFIX];
+            }
+
+            if (isset($this->metadata[$domain.self::INTL_DOMAIN_SUFFIX][$key])) {
+                return $this->metadata[$domain.self::INTL_DOMAIN_SUFFIX][$key];
+            }
+        }
+
         if (isset($this->metadata[$domain])) {
             if ('' == $key) {
                 return $this->metadata[$domain];

@@ -49,11 +49,13 @@ class JsonPathUtilsTest extends TestCase
         fclose($resource);
 
         $this->assertSame(<<<JSON
-{"book": [
-    {"category": "reference", "author": "Nigel Rees", "title": "Sayings", "price": 8.95},
-    {"category": "fiction", "author": "Evelyn Waugh", "title": "Sword", "price": 12.99}
-]}
-JSON, $reduced['json']);
+            {"book": [
+                {"category": "reference", "author": "Nigel Rees", "title": "Sayings", "price": 8.95},
+                {"category": "fiction", "author": "Evelyn Waugh", "title": "Sword", "price": 12.99}
+            ]}
+            JSON,
+            $reduced['json']
+        );
         $this->assertEquals([new JsonPathToken(TokenType::Name, 'book')], $reduced['tokens']);
     }
 
@@ -70,11 +72,13 @@ JSON, $reduced['json']);
         fclose($resource);
 
         $this->assertSame(<<<JSON
-{"book": [
-    {"category": "reference", "author": "Nigel Rees", "title": "Sayings", "price": 8.95},
-    {"category": "fiction", "author": "Evelyn Waugh", "title": "Sword", "price": 12.99}
-]}
-JSON, $reduced['json']);
+            {"book": [
+                {"category": "reference", "author": "Nigel Rees", "title": "Sayings", "price": 8.95},
+                {"category": "fiction", "author": "Evelyn Waugh", "title": "Sword", "price": 12.99}
+            ]}
+            JSON,
+            $reduced['json']
+        );
         $this->assertEquals([new JsonPathToken(TokenType::Bracket, '?(@.book.author == "Nigel Rees")')], $reduced['tokens']);
     }
 
@@ -112,11 +116,14 @@ JSON, $reduced['json']);
         fclose($resource);
 
         $this->assertSame(<<<JSON
-[
-    {"category": "reference", "author": "Nigel Rees", "title": "Sayings", "price": 8.95},
-    {"category": "fiction", "author": "Evelyn Waugh", "title": "Sword", "price": 12.99}
-]
-JSON, $reduced['json'], 'reduce to "book", but not further');
+            [
+                {"category": "reference", "author": "Nigel Rees", "title": "Sayings", "price": 8.95},
+                {"category": "fiction", "author": "Evelyn Waugh", "title": "Sword", "price": 12.99}
+            ]
+            JSON,
+            $reduced['json'],
+            'reduce to "book", but not further'
+        );
         $this->assertEquals([
             new JsonPathToken(TokenType::Bracket, '1:2'),
         ], $reduced['tokens']);
@@ -154,11 +161,14 @@ JSON, $reduced['json'], 'reduce to "book", but not further');
         fclose($resource);
 
         $this->assertSame(<<<JSON
-[
-    {"category": "reference", "author": "Nigel Rees", "title": "Sayings", "price": 8.95},
-    {"category": "fiction", "author": "Evelyn Waugh", "title": "Sword", "price": 12.99}
-]
-JSON, $reduced['json'], 'reduce to "book", but not further');
+            [
+                {"category": "reference", "author": "Nigel Rees", "title": "Sayings", "price": 8.95},
+                {"category": "fiction", "author": "Evelyn Waugh", "title": "Sword", "price": 12.99}
+            ]
+            JSON,
+            $reduced['json'],
+            'reduce to "book", but not further'
+        );
         $this->assertEquals([
             new JsonPathToken(TokenType::Bracket, '123'),
             new JsonPathToken(TokenType::Name, 'title'),
@@ -171,11 +181,11 @@ JSON, $reduced['json'], 'reduce to "book", but not further');
     private static function provideJsonResource(): mixed
     {
         $json = <<<'JSON'
-{"store": {"book": [
-    {"category": "reference", "author": "Nigel Rees", "title": "Sayings", "price": 8.95},
-    {"category": "fiction", "author": "Evelyn Waugh", "title": "Sword", "price": 12.99}
-]}}
-JSON;
+            {"store": {"book": [
+                {"category": "reference", "author": "Nigel Rees", "title": "Sayings", "price": 8.95},
+                {"category": "fiction", "author": "Evelyn Waugh", "title": "Sword", "price": 12.99}
+            ]}}
+            JSON;
 
         $resource = fopen('php://memory', 'r+');
         fwrite($resource, $json);

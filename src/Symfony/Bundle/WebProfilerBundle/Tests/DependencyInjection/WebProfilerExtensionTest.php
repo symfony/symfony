@@ -11,7 +11,7 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\DependencyInjection;
 
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\WebProfilerBundle\DependencyInjection\WebProfilerExtension;
 use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -34,7 +34,7 @@ use Twig\Loader\ArrayLoader;
 
 class WebProfilerExtensionTest extends TestCase
 {
-    private MockObject&KernelInterface $kernel;
+    private KernelInterface $kernel;
     private ?ContainerBuilder $container;
 
     public static function assertSaneContainer(Container $container)
@@ -57,7 +57,7 @@ class WebProfilerExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->kernel = $this->createMock(KernelInterface::class);
+        $this->kernel = $this->createStub(KernelInterface::class);
 
         $this->container = new ContainerBuilder();
         $this->container->register('data_collector.dump', DumpDataCollector::class)->setPublic(true);
@@ -88,9 +88,7 @@ class WebProfilerExtensionTest extends TestCase
         $this->container = null;
     }
 
-    /**
-     * @dataProvider getDebugModes
-     */
+    #[DataProvider('getDebugModes')]
     public function testDefaultConfig($debug)
     {
         $this->container->setParameter('kernel.debug', $debug);
@@ -112,9 +110,7 @@ class WebProfilerExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getToolbarConfig
-     */
+    #[DataProvider('getToolbarConfig')]
     public function testToolbarConfig(bool $toolbarEnabled, bool $listenerInjected, bool $listenerEnabled)
     {
         $extension = new WebProfilerExtension();
@@ -146,9 +142,7 @@ class WebProfilerExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getInterceptRedirectsToolbarConfig
-     */
+    #[DataProvider('getInterceptRedirectsToolbarConfig')]
     public function testToolbarConfigUsingInterceptRedirects(
         bool $toolbarEnabled,
         bool $interceptRedirects,

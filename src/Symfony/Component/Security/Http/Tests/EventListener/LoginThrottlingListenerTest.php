@@ -18,13 +18,13 @@ use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\TooManyLoginAttemptsAuthenticationException;
-use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\EventListener\LoginThrottlingListener;
 use Symfony\Component\Security\Http\RateLimiter\DefaultLoginRateLimiter;
+use Symfony\Component\Security\Http\Tests\Fixtures\DummyAuthenticator;
 
 class LoginThrottlingListenerTest extends TestCase
 {
@@ -107,12 +107,12 @@ class LoginThrottlingListenerTest extends TestCase
 
     private function createLoginFailedEvent($passport)
     {
-        return new LoginFailureEvent($this->createMock(AuthenticationException::class), $this->createMock(AuthenticatorInterface::class), $this->requestStack->getCurrentRequest(), null, 'main', $passport);
+        return new LoginFailureEvent(new AuthenticationException(), new DummyAuthenticator(), $this->requestStack->getCurrentRequest(), null, 'main', $passport);
     }
 
     private function createCheckPassportEvent($passport)
     {
-        return new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport);
+        return new CheckPassportEvent(new DummyAuthenticator(), $passport);
     }
 
     private function createRequest($ip = '192.168.1.0')

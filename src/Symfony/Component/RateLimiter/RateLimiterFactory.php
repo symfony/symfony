@@ -63,11 +63,11 @@ final class RateLimiterFactory implements RateLimiterFactoryInterface
             try {
                 $nowPlusInterval = @$now->modify('+'.$interval);
             } catch (\DateMalformedStringException $e) {
-                throw new \LogicException(\sprintf('Cannot parse interval "%s", please use a valid unit as described on https://www.php.net/datetime.formats.relative.', $interval), 0, $e);
+                throw new \LogicException(\sprintf('Cannot parse interval "%s", please use a valid unit as described on https://php.net/datetime.formats#datetime.formats.relative', $interval), 0, $e);
             }
 
             if (!$nowPlusInterval) {
-                throw new \LogicException(\sprintf('Cannot parse interval "%s", please use a valid unit as described on https://www.php.net/datetime.formats.relative.', $interval));
+                throw new \LogicException(\sprintf('Cannot parse interval "%s", please use a valid unit as described on https://php.net/datetime.formats#datetime.formats.relative', $interval));
             }
 
             return $now->diff($nowPlusInterval);
@@ -82,13 +82,13 @@ final class RateLimiterFactory implements RateLimiterFactoryInterface
             ->define('limit')->allowedTypes('int')
             ->define('interval')->allowedTypes('string')->normalize($intervalNormalizer)
             ->define('rate')
-                ->options(function (OptionsResolver $rate) use ($intervalNormalizer) {
+                ->options(static function (OptionsResolver $rate) use ($intervalNormalizer) {
                     $rate
                         ->define('amount')->allowedTypes('int')->default(1)
                         ->define('interval')->allowedTypes('string')->normalize($intervalNormalizer)
                     ;
                 })
-                ->normalize(function (Options $options, $value) {
+                ->normalize(static function (Options $options, $value) {
                     if (!isset($value['interval'])) {
                         return null;
                     }

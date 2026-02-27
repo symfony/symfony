@@ -36,7 +36,7 @@ class MatchingNode extends AbstractNode
     {
         $argumentsSpecificity = array_reduce(
             $this->arguments,
-            fn ($c, $n) => 1 === $n->getSpecificity()->compareTo($c) ? $n->getSpecificity() : $c,
+            static fn ($c, $n) => 1 === $n->getSpecificity()->compareTo($c) ? $n->getSpecificity() : $c,
             new Specificity(0, 0, 0),
         );
 
@@ -46,7 +46,7 @@ class MatchingNode extends AbstractNode
     public function __toString(): string
     {
         $selectorArguments = array_map(
-            fn ($n): string => ltrim((string) $n, '*'),
+            static fn ($n): string => ltrim((string) $n, '*'),
             $this->arguments,
         );
 

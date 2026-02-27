@@ -16,6 +16,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class IsGrantedAttributeMethodsController
 {
+    public int $id = 42;
+
     public function noAttribute()
     {
     }
@@ -75,6 +77,21 @@ class IsGrantedAttributeMethodsController
 
     #[IsGranted(attribute: 'SOME_VOTER', subject: new Expression('request'))]
     public function withRequestAsSubject()
+    {
+    }
+
+    #[IsGranted(attribute: 'SOME_VOTER', subject: new Expression('this.id'))]
+    public function withControllerPropertyAsSubject()
+    {
+    }
+
+    #[IsGranted(attribute: 'ROLE_ADMIN', methods: 'get')]
+    public function adminWithMethodGet(): void
+    {
+    }
+
+    #[IsGranted(attribute: 'ROLE_ADMIN', methods: ['GET', 'POST'])]
+    public function adminWithMethodGetAndPost(): void
     {
     }
 }

@@ -11,16 +11,17 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\StreamOutput;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class ProgressBarTest extends TestCase
 {
     private string|false $colSize;
@@ -423,7 +424,7 @@ class ProgressBarTest extends TestCase
         $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
 
         $bar = new ProgressBar($output, 50, 0);
-        $bar->setFormat('[%bar%] %percent:3s%%' . PHP_EOL . '%message%' . PHP_EOL);
+        $bar->setFormat('[%bar%] %percent:3s%%'.\PHP_EOL.'%message%'.\PHP_EOL);
         $bar->setMessage('');
         $bar->start();
         $bar->display();
@@ -435,8 +436,8 @@ class ProgressBarTest extends TestCase
         rewind($output->getStream());
         $this->assertEquals(escapeshellcmd(
             '[>---------------------------]   0%'.\PHP_EOL.\PHP_EOL.
-            "\x1b[2A\x1b[0J".'[>---------------------------]   2%'.\PHP_EOL. 'Doing something...' . \PHP_EOL .
-            "\x1b[2A\x1b[0J".'[=>--------------------------]   4%'.\PHP_EOL. 'Doing something foo...' . \PHP_EOL),
+            "\x1b[2A\x1b[0J".'[>---------------------------]   2%'.\PHP_EOL.'Doing something...'.\PHP_EOL.
+            "\x1b[2A\x1b[0J".'[=>--------------------------]   4%'.\PHP_EOL.'Doing something foo...'.\PHP_EOL),
             escapeshellcmd(stream_get_contents($output->getStream()))
         );
     }
@@ -448,7 +449,7 @@ class ProgressBarTest extends TestCase
         $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
 
         $bar = new ProgressBar($output, 50, 0);
-        $bar->setFormat('[%bar%] %percent:3s%%' . PHP_EOL . '%message%');
+        $bar->setFormat('[%bar%] %percent:3s%%'.\PHP_EOL.'%message%');
         $bar->setMessage('Start');
         $bar->start();
         $bar->display();
@@ -460,8 +461,8 @@ class ProgressBarTest extends TestCase
         rewind($output->getStream());
         $this->assertEquals(escapeshellcmd(
             '[>---------------------------]   0%'.\PHP_EOL.'Start'.\PHP_EOL.
-            "\x1b[2A\x1b[0J".'[>---------------------------]   2%'.\PHP_EOL .
-            "\x1b[1A\x1b[0J".'[=>--------------------------]   4%'.\PHP_EOL. 'Doing something...' . \PHP_EOL),
+            "\x1b[2A\x1b[0J".'[>---------------------------]   2%'.\PHP_EOL.
+            "\x1b[1A\x1b[0J".'[=>--------------------------]   4%'.\PHP_EOL.'Doing something...'.\PHP_EOL),
             escapeshellcmd(stream_get_contents($output->getStream()))
         );
     }
@@ -473,7 +474,7 @@ class ProgressBarTest extends TestCase
         $output = new ConsoleSectionOutput($stream->getStream(), $sections, $stream->getVerbosity(), $stream->isDecorated(), new OutputFormatter());
 
         $bar = new ProgressBar($output, 50, 0);
-        $bar->setFormat('[%bar%] %percent:3s%%' . PHP_EOL . '<comment>%message%</comment>');
+        $bar->setFormat('[%bar%] %percent:3s%%'.\PHP_EOL.'<comment>%message%</comment>');
         $bar->setMessage('Start');
         $bar->start();
         $bar->display();
@@ -485,8 +486,8 @@ class ProgressBarTest extends TestCase
         rewind($output->getStream());
         $this->assertEquals(escapeshellcmd(
             '[>---------------------------]   0%'.\PHP_EOL."\x1b[33mStart\x1b[39m".\PHP_EOL.
-            "\x1b[2A\x1b[0J".'[>---------------------------]   2%'.\PHP_EOL .
-            "\x1b[1A\x1b[0J".'[=>--------------------------]   4%'.\PHP_EOL. "\x1b[33mDoing something...\x1b[39m" . \PHP_EOL),
+            "\x1b[2A\x1b[0J".'[>---------------------------]   2%'.\PHP_EOL.
+            "\x1b[1A\x1b[0J".'[=>--------------------------]   4%'.\PHP_EOL."\x1b[33mDoing something...\x1b[39m".\PHP_EOL),
             escapeshellcmd(stream_get_contents($output->getStream()))
         );
     }
@@ -949,7 +950,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
 
     public function testAddingPlaceholderFormatter()
     {
-        ProgressBar::setPlaceholderFormatterDefinition('remaining_steps', fn (ProgressBar $bar) => $bar->getMaxSteps() - $bar->getProgress());
+        ProgressBar::setPlaceholderFormatterDefinition('remaining_steps', static fn (ProgressBar $bar) => $bar->getMaxSteps() - $bar->getProgress());
         $bar = new ProgressBar($output = $this->getOutputStream(), 3, 0);
         $bar->setFormat(' %remaining_steps% [%bar%]');
 
@@ -970,7 +971,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 3, 0);
         $bar->setFormat(' %countdown% [%bar%]');
-        $bar->setPlaceholderFormatter('countdown', $function = fn (ProgressBar $bar) => $bar->getMaxSteps() - $bar->getProgress());
+        $bar->setPlaceholderFormatter('countdown', $function = static fn (ProgressBar $bar) => $bar->getMaxSteps() - $bar->getProgress());
 
         $this->assertSame($function, $bar->getPlaceholderFormatter('countdown'));
 
@@ -1014,7 +1015,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         putenv('COLUMNS=156');
 
         $bar = new ProgressBar($output = $this->getOutputStream(), 15, 0);
-        ProgressBar::setPlaceholderFormatterDefinition('memory', function (ProgressBar $bar) {
+        ProgressBar::setPlaceholderFormatterDefinition('memory', static function (ProgressBar $bar) {
             static $i = 0;
             $mem = 100000 * $i;
             $colors = $i++ ? '41;37' : '44;37';
@@ -1117,9 +1118,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $bar->finish();
     }
 
-    /**
-     * @dataProvider provideFormat
-     */
+    #[DataProvider('provideFormat')]
     public function testFormatsWithoutMax($format)
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
@@ -1162,7 +1161,7 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
     {
         $bar = new ProgressBar($output = $this->getOutputStream(), 0, 0);
 
-        $this->assertEquals([1, 2], iterator_to_array($bar->iterate((function () {
+        $this->assertEquals([1, 2], iterator_to_array($bar->iterate((static function () {
             yield 1;
             yield 2;
         })())));
@@ -1372,5 +1371,25 @@ And, as in uffish thought he stood, The Jabberwock, with eyes of flame, Came whi
         $progressBar = new ProgressBar($this->getOutputStream());
 
         $this->assertNull($progressBar->getMessage());
+    }
+
+    public function testRemainingWithoutMaxThrowsLogicException()
+    {
+        $this->expectException(LogicException::class);
+
+        $bar = new ProgressBar($this->getOutputStream());
+        $bar->setFormat('%remaining%');
+        $bar->start();
+        $bar->advance();
+    }
+
+    public function testEstimatedWithoutMaxThrowsLogicException()
+    {
+        $this->expectException(LogicException::class);
+
+        $bar = new ProgressBar($this->getOutputStream());
+        $bar->setFormat('%estimated%');
+        $bar->start();
+        $bar->advance();
     }
 }

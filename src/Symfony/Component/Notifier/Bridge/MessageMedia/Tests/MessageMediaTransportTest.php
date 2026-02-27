@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Notifier\Bridge\MessageMedia\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaOptions;
 use Symfony\Component\Notifier\Bridge\MessageMedia\MessageMediaTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
@@ -21,7 +23,6 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 use Symfony\Component\Notifier\Test\TransportTestCase;
 use Symfony\Component\Notifier\Tests\Transport\DummyMessage;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class MessageMediaTransportTest extends TransportTestCase
 {
@@ -49,19 +50,12 @@ final class MessageMediaTransportTest extends TransportTestCase
     }
 
     /**
-     * @dataProvider exceptionIsThrownWhenHttpSendFailedProvider
-     *
      * @throws TransportExceptionInterface
      */
+    #[DataProvider('exceptionIsThrownWhenHttpSendFailedProvider')]
     public function testExceptionIsThrownWhenHttpSendFailed(int $statusCode, string $content, string $expectedExceptionMessage)
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getStatusCode')
-            ->willReturn($statusCode);
-        $response->method('getContent')
-            ->willReturn($content);
-
-        $client = new MockHttpClient($response);
+        $client = new MockHttpClient(new MockResponse($content, ['http_code' => $statusCode]));
 
         $transport = new MessageMediaTransport('apiKey', 'apiSecret', null, $client);
         $this->expectException(TransportException::class);

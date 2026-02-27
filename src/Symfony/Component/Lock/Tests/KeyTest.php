@@ -31,6 +31,17 @@ class KeyTest extends TestCase
         $this->assertEqualsWithDelta($key->getRemainingLifetime(), $copy->getRemainingLifetime(), 0.001);
     }
 
+    public function testLegacyPayloadCanBeUnserialized()
+    {
+        $serialized = base64_decode('TzoyNjoiU3ltZm9ueVxDb21wb25lbnRcTG9ja1xLZXkiOjM6e3M6MzY6IgBTeW1mb255XENvbXBvbmVudFxMb2NrXEtleQByZXNvdXJjZSI7czo2OiJsZWdhY3kiO3M6NDA6IgBTeW1mb255XENvbXBvbmVudFxMb2NrXEtleQBleHBpcmluZ1RpbWUiO047czozMzoiAFN5bWZvbnlcQ29tcG9uZW50XExvY2tcS2V5AHN0YXRlIjthOjA6e319', true);
+
+        $key = unserialize($serialized, ['allowed_classes' => [Key::class]]);
+
+        $this->assertInstanceOf(Key::class, $key);
+        $this->assertSame('legacy', (string) $key);
+        $this->assertNull($key->getRemainingLifetime());
+    }
+
     public function testUnserialize()
     {
         $key = new Key(__METHOD__);

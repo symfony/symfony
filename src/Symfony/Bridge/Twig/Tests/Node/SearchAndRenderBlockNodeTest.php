@@ -15,8 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode;
 use Twig\Compiler;
 use Twig\Environment;
-use Twig\Extension\CoreExtension;
-use Twig\Loader\LoaderInterface;
+use Twig\Loader\ArrayLoader;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\Ternary\ConditionalTernary;
@@ -34,7 +33,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_widget'), $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(new ArrayLoader()));
 
         $this->assertEquals(
             \sprintf(
@@ -57,7 +56,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_widget'), $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(new ArrayLoader()));
 
         $this->assertEquals(
             \sprintf(
@@ -77,7 +76,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(new ArrayLoader()));
 
         $this->assertEquals(
             \sprintf(
@@ -97,7 +96,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(new ArrayLoader()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -119,7 +118,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(new ArrayLoader()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -140,7 +139,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(new ArrayLoader()));
 
         $this->assertEquals(
             \sprintf(
@@ -164,7 +163,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(new ArrayLoader()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
@@ -193,7 +192,7 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(new ArrayLoader()));
 
         $this->assertEquals(
             \sprintf(
@@ -220,16 +219,15 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(new ArrayLoader()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
         // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             \sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', (%s($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
-                $this->getVariableGetter('form'),
-                method_exists(CoreExtension::class, 'testEmpty') ? 'CoreExtension::testEmpty' : 'twig_test_empty'
+                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', (CoreExtension::testEmpty($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
+                $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
         );
@@ -260,16 +258,15 @@ class SearchAndRenderBlockNodeTest extends TestCase
 
         $node = new SearchAndRenderBlockNode(new TwigFunction('form_label'), $arguments, 0);
 
-        $compiler = new Compiler(new Environment($this->createMock(LoaderInterface::class)));
+        $compiler = new Compiler(new Environment(new ArrayLoader()));
 
         // "label" => null must not be included in the output!
         // Otherwise the default label is overwritten with null.
         // https://github.com/symfony/symfony/issues/5029
         $this->assertEquals(
             \sprintf(
-                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar", "label" => "value in attributes"] + (%s($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
-                $this->getVariableGetter('form'),
-                method_exists(CoreExtension::class, 'testEmpty') ? 'CoreExtension::testEmpty' : 'twig_test_empty'
+                '$this->env->getRuntime(\'Symfony\Component\Form\FormRenderer\')->searchAndRenderBlock(%s, \'label\', ["foo" => "bar", "label" => "value in attributes"] + (CoreExtension::testEmpty($_label_ = ((true) ? (null) : (null))) ? [] : ["label" => $_label_]))',
+                $this->getVariableGetter('form')
             ),
             trim($compiler->compile($node)->getSource())
         );

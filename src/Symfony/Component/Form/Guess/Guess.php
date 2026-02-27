@@ -14,7 +14,7 @@ namespace Symfony\Component\Form\Guess;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 
 /**
- * Base class for guesses made by TypeGuesserInterface implementation.
+ * Base class for guesses made by FormTypeGuesserInterface implementation.
  *
  * Each instance contains a confidence value about the correctness of the guess.
  * Thus an instance with confidence HIGH_CONFIDENCE is more likely to be

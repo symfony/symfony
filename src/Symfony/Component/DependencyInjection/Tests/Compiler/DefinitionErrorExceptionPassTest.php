@@ -64,6 +64,9 @@ class DefinitionErrorExceptionPassTest extends TestCase
         $container->register('foo', 'stdClass')
             ->addArgument(new Reference('bar', ContainerBuilder::RUNTIME_EXCEPTION_ON_INVALID_REFERENCE));
 
+        $container->register('baz', 'stdClass')
+            ->addArgument(new Reference('bar', ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE));
+
         $pass = new DefinitionErrorExceptionPass();
         $pass->process($container);
 

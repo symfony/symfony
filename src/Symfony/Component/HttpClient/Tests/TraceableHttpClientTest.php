@@ -31,22 +31,17 @@ class TraceableHttpClientTest extends TestCase
 
     public function testItTracesRequest()
     {
-        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient = $this->createStub(HttpClientInterface::class);
         $httpClient
-            ->expects($this->any())
             ->method('request')
-            ->with(
-                'GET',
-                '/foo/bar',
-                $this->callback(function ($subject) {
-                    $onprogress = $subject['on_progress'];
-                    unset($subject['on_progress'], $subject['extra']);
-                    $this->assertEquals(['options1' => 'foo'], $subject);
+            ->willReturnCallback(function (string $method, string $url, array $options = []) {
+                $this->assertSame('GET', $method);
+                $this->assertSame('/foo/bar', $url);
+                unset($options['on_progress'], $options['extra']);
+                $this->assertEquals(['options1' => 'foo'], $options);
 
-                    return true;
-                })
-            )
-            ->willReturn(MockResponse::fromRequest('GET', '/foo/bar', ['options1' => 'foo'], new MockResponse('hello')))
+                return MockResponse::fromRequest('GET', '/foo/bar', ['options1' => 'foo'], new MockResponse('hello'));
+            })
         ;
 
         $sut = new TraceableHttpClient($httpClient);
@@ -90,7 +85,7 @@ class TraceableHttpClientTest extends TestCase
     {
         $sut = new TraceableHttpClient(new MockHttpClient());
         $foo = 0;
-        $sut->request('GET', 'http://localhost:8057', ['on_progress' => function (int $dlNow, int $dlSize, array $info) use (&$foo) {
+        $sut->request('GET', 'http://localhost:8057', ['on_progress' => static function (int $dlNow, int $dlSize, array $info) use (&$foo) {
             ++$foo;
         }]);
         $this->assertCount(1, $tracedRequests = $sut->getTracedRequests());
@@ -123,7 +118,7 @@ class TraceableHttpClientTest extends TestCase
     {
         $this->expectException(ClientExceptionInterface::class);
 
-        $sut = new TraceableHttpClient(new MockHttpClient($responseFactory = fn (): MockResponse => new MockResponse('Errored.', ['http_code' => 400])));
+        $sut = new TraceableHttpClient(new MockHttpClient($responseFactory = static fn (): MockResponse => new MockResponse('Errored.', ['http_code' => 400])));
 
         $response = $sut->request('GET', 'https://example.com/foo/bar');
         $response->toArray();

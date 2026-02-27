@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add support for `phpunit.dist.xml` suffix
+
+7.4
+---
+
+ * Add support for mocking the `strtotime()` function
+
 7.3
 ---
 

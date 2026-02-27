@@ -11,33 +11,30 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidTypeException;
 use Symfony\Component\Config\Definition\StringNode;
 
 class StringNodeTest extends TestCase
 {
-    /**
-     * @testWith [""]
-     *           ["valid string"]
-     */
+    #[TestWith([''])]
+    #[TestWith(['valid string'])]
     public function testNormalize(string $value)
     {
         $node = new StringNode('test');
         $this->assertSame($value, $node->normalize($value));
     }
 
-    /**
-     * @testWith [null]
-     *           [false]
-     *           [true]
-     *           [0]
-     *           [1]
-     *           [0.0]
-     *           [0.1]
-     *           [{}]
-     *           [{"foo": "bar"}]
-     */
+    #[TestWith([null])]
+    #[TestWith([false])]
+    #[TestWith([true])]
+    #[TestWith([0])]
+    #[TestWith([1])]
+    #[TestWith([0.0])]
+    #[TestWith([0.1])]
+    #[TestWith([[]])]
+    #[TestWith([['foo' => 'bar']])]
     public function testNormalizeThrowsExceptionOnInvalidValues($value)
     {
         $node = new StringNode('test');

@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Routing\Tests;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,15 +25,10 @@ use Symfony\Component\Routing\Router;
 
 class RouterTest extends TestCase
 {
-    private Router $router;
-    private MockObject&LoaderInterface $loader;
     private string $cacheDir;
 
     protected function setUp(): void
     {
-        $this->loader = $this->createMock(LoaderInterface::class);
-        $this->router = new Router($this->loader, 'routing.yml');
-
         $this->cacheDir = tempnam(sys_get_temp_dir(), 'sf_router_');
         unlink($this->cacheDir);
         mkdir($this->cacheDir);
@@ -50,22 +44,24 @@ class RouterTest extends TestCase
 
     public function testSetOptionsWithSupportedOptions()
     {
-        $this->router->setOptions([
+        $router = $this->getRouter();
+        $router->setOptions([
             'cache_dir' => './cache',
             'debug' => true,
             'resource_type' => 'ResourceType',
         ]);
 
-        $this->assertSame('./cache', $this->router->getOption('cache_dir'));
-        $this->assertTrue($this->router->getOption('debug'));
-        $this->assertSame('ResourceType', $this->router->getOption('resource_type'));
+        $this->assertSame('./cache', $router->getOption('cache_dir'));
+        $this->assertTrue($router->getOption('debug'));
+        $this->assertSame('ResourceType', $router->getOption('resource_type'));
     }
 
     public function testSetOptionsWithUnsupportedOptions()
     {
+        $router = $this->getRouter();
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The Router does not support the following options: "option_foo", "option_bar"');
-        $this->router->setOptions([
+        $router->setOptions([
             'cache_dir' => './cache',
             'option_foo' => true,
             'option_bar' => 'baz',
@@ -75,71 +71,82 @@ class RouterTest extends TestCase
 
     public function testSetOptionWithSupportedOption()
     {
-        $this->router->setOption('cache_dir', './cache');
+        $router = $this->getRouter();
+        $router->setOption('cache_dir', './cache');
 
-        $this->assertSame('./cache', $this->router->getOption('cache_dir'));
+        $this->assertSame('./cache', $router->getOption('cache_dir'));
     }
 
     public function testSetOptionWithUnsupportedOption()
     {
+        $router = $this->getRouter();
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The Router does not support the "option_foo" option');
-        $this->router->setOption('option_foo', true);
+        $router->setOption('option_foo', true);
     }
 
     public function testGetOptionWithUnsupportedOption()
     {
+        $router = $this->getRouter();
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The Router does not support the "option_foo" option');
-        $this->router->getOption('option_foo');
+        $router->getOption('option_foo');
     }
 
     public function testThatRouteCollectionIsLoaded()
     {
-        $this->router->setOption('resource_type', 'ResourceType');
+        $loader = $this->createMock(LoaderInterface::class);
+        $router = $this->getRouter($loader);
+        $router->setOption('resource_type', 'ResourceType');
 
         $routeCollection = new RouteCollection();
 
-        $this->loader->expects($this->once())
+        $loader->expects($this->once())
             ->method('load')->with('routing.yml', 'ResourceType')
             ->willReturn($routeCollection);
 
-        $this->assertSame($routeCollection, $this->router->getRouteCollection());
+        $this->assertSame($routeCollection, $router->getRouteCollection());
     }
 
     public function testMatcherIsCreatedIfCacheIsNotConfigured()
     {
-        $this->router->setOption('cache_dir', null);
+        $loader = $this->createMock(LoaderInterface::class);
+        $router = $this->getRouter($loader);
+        $router->setOption('cache_dir', null);
 
-        $this->loader->expects($this->once())
+        $loader->expects($this->once())
             ->method('load')->with('routing.yml', null)
             ->willReturn(new RouteCollection());
 
-        $this->assertInstanceOf(UrlMatcher::class, $this->router->getMatcher());
+        $this->assertInstanceOf(UrlMatcher::class, $router->getMatcher());
     }
 
     public function testGeneratorIsCreatedIfCacheIsNotConfigured()
     {
-        $this->router->setOption('cache_dir', null);
+        $loader = $this->createMock(LoaderInterface::class);
+        $router = $this->getRouter($loader);
+        $router->setOption('cache_dir', null);
 
-        $this->loader->expects($this->once())
+        $loader->expects($this->once())
             ->method('load')->with('routing.yml', null)
             ->willReturn(new RouteCollection());
 
-        $this->assertInstanceOf(CompiledUrlGenerator::class, $this->router->getGenerator());
+        $this->assertInstanceOf(CompiledUrlGenerator::class, $router->getGenerator());
     }
 
     public function testGeneratorIsCreatedIfCacheIsNotConfiguredNotCompiled()
     {
-        $this->router->setOption('cache_dir', null);
-        $this->router->setOption('generator_class', UrlGenerator::class);
+        $loader = $this->createMock(LoaderInterface::class);
+        $router = $this->getRouter($loader);
+        $router->setOption('cache_dir', null);
+        $router->setOption('generator_class', UrlGenerator::class);
 
-        $this->loader->expects($this->once())
+        $loader->expects($this->once())
             ->method('load')->with('routing.yml', null)
             ->willReturn(new RouteCollection());
 
-        $this->assertInstanceOf(UrlGenerator::class, $this->router->getGenerator());
-        $this->assertNotInstanceOf(CompiledUrlGenerator::class, $this->router->getGenerator());
+        $this->assertInstanceOf(UrlGenerator::class, $router->getGenerator());
+        $this->assertNotInstanceOf(CompiledUrlGenerator::class, $router->getGenerator());
     }
 
     public function testMatchRequestWithUrlMatcherInterface()
@@ -147,10 +154,11 @@ class RouterTest extends TestCase
         $matcher = $this->createMock(UrlMatcherInterface::class);
         $matcher->expects($this->once())->method('match');
 
-        $p = new \ReflectionProperty($this->router, 'matcher');
-        $p->setValue($this->router, $matcher);
+        $router = $this->getRouter();
+        $p = new \ReflectionProperty($router, 'matcher');
+        $p->setValue($router, $matcher);
 
-        $this->router->matchRequest(Request::create('/'));
+        $router->matchRequest(Request::create('/'));
     }
 
     public function testMatchRequestWithRequestMatcherInterface()
@@ -158,19 +166,21 @@ class RouterTest extends TestCase
         $matcher = $this->createMock(RequestMatcherInterface::class);
         $matcher->expects($this->once())->method('matchRequest');
 
-        $p = new \ReflectionProperty($this->router, 'matcher');
-        $p->setValue($this->router, $matcher);
+        $router = $this->getRouter();
+        $p = new \ReflectionProperty($router, 'matcher');
+        $p->setValue($router, $matcher);
 
-        $this->router->matchRequest(Request::create('/'));
+        $router->matchRequest(Request::create('/'));
     }
 
     public function testDefaultLocaleIsPassedToGeneratorClass()
     {
-        $this->loader->expects($this->once())
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader->expects($this->once())
             ->method('load')->with('routing.yml', null)
             ->willReturn(new RouteCollection());
 
-        $router = new Router($this->loader, 'routing.yml', [
+        $router = new Router($loader, 'routing.yml', [
             'cache_dir' => null,
         ], null, null, 'hr');
 
@@ -185,11 +195,12 @@ class RouterTest extends TestCase
 
     public function testDefaultLocaleIsPassedToCompiledGeneratorCacheClass()
     {
-        $this->loader->expects($this->once())
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader->expects($this->once())
             ->method('load')->with('routing.yml', null)
             ->willReturn(new RouteCollection());
 
-        $router = new Router($this->loader, 'routing.yml', [
+        $router = new Router($loader, 'routing.yml', [
             'cache_dir' => $this->cacheDir,
         ], null, null, 'hr');
 
@@ -200,5 +211,10 @@ class RouterTest extends TestCase
         $p = new \ReflectionProperty($generator, 'defaultLocale');
 
         $this->assertSame('hr', $p->getValue($generator));
+    }
+
+    private function getRouter(?LoaderInterface $loader = null): Router
+    {
+        return new Router($loader ?? $this->createStub(LoaderInterface::class), 'routing.yml');
     }
 }

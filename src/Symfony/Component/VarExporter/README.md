@@ -84,10 +84,6 @@ $foo = FooLazyProxy::createLazyProxy(initializer: function (): AbstractFoo {
 // be called only when and if a *method* is called.
 ```
 
-In addition, this component provides traits and methods to aid in implementing
-the ghost and proxy strategies in previous versions of PHP. Those are deprecated
-when using PHP 8.4.
-
 Resources
 ---------
 

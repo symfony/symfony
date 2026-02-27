@@ -34,7 +34,7 @@ return [
         'Egyh' => 'Éigipteach cliarúil',
         'Egyp' => 'Iairiglifí Éigipteacha',
         'Elba' => 'Elbasan',
-        'Ethi' => 'Aetóipic',
+        'Ethi' => 'Aetóipice',
         'Geor' => 'Seoirseach',
         'Glag' => 'Glagalach',
         'Gonm' => 'Masaram Gondi',

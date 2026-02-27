@@ -11,75 +11,74 @@
 
 namespace Symfony\Component\Security\Http\Tests\EventListener;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Security\Http\Authenticator\AuthenticatorInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\EventListener\CsrfProtectionListener;
+use Symfony\Component\Security\Http\Tests\Fixtures\DummyAuthenticator;
 
 class CsrfProtectionListenerTest extends TestCase
 {
-    private MockObject&CsrfTokenManagerInterface $csrfTokenManager;
-    private CsrfProtectionListener $listener;
-
-    protected function setUp(): void
-    {
-        $this->csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
-        $this->listener = new CsrfProtectionListener($this->csrfTokenManager);
-    }
-
     public function testNoCsrfTokenBadge()
     {
-        $this->csrfTokenManager->expects($this->never())->method('isTokenValid');
+        $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfTokenManager->expects($this->never())->method('isTokenValid');
 
         $event = $this->createEvent($this->createPassport(null));
-        $this->listener->checkPassport($event);
+        $listener = new CsrfProtectionListener($csrfTokenManager);
+        $listener->checkPassport($event);
     }
 
     public function testValidCsrfToken()
     {
-        $this->csrfTokenManager->expects($this->any())
+        $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfTokenManager
+            ->expects($this->once())
             ->method('isTokenValid')
             ->with(new CsrfToken('authenticator_token_id', 'abc123'))
             ->willReturn(true);
 
         $badge = new CsrfTokenBadge('authenticator_token_id', 'abc123');
         $event = $this->createEvent($this->createPassport($badge));
-        $this->listener->checkPassport($event);
+        $listener = new CsrfProtectionListener($csrfTokenManager);
+        $listener->checkPassport($event);
 
         $this->assertTrue($badge->isResolved());
     }
 
     public function testInvalidCsrfToken()
     {
-        $this->csrfTokenManager->expects($this->any())
+        $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
+        $csrfTokenManager
+            ->expects($this->once())
             ->method('isTokenValid')
             ->with(new CsrfToken('authenticator_token_id', 'abc123'))
             ->willReturn(false);
 
         $event = $this->createEvent($this->createPassport(new CsrfTokenBadge('authenticator_token_id', 'abc123')));
 
+        $listener = new CsrfProtectionListener($csrfTokenManager);
+
         $this->expectException(InvalidCsrfTokenException::class);
         $this->expectExceptionMessage('Invalid CSRF token.');
 
-        $this->listener->checkPassport($event);
+        $listener->checkPassport($event);
     }
 
     private function createEvent($passport)
     {
-        return new CheckPassportEvent($this->createMock(AuthenticatorInterface::class), $passport);
+        return new CheckPassportEvent(new DummyAuthenticator(), $passport);
     }
 
     private function createPassport(?CsrfTokenBadge $badge)
     {
-        $passport = new SelfValidatingPassport(new UserBadge('wouter', fn ($username) => new InMemoryUser($username, 'pass')));
+        $passport = new SelfValidatingPassport(new UserBadge('wouter', static fn ($username) => new InMemoryUser($username, 'pass')));
         if ($badge) {
             $passport->addBadge($badge);
         }

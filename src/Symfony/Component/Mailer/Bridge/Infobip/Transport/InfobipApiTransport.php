@@ -42,6 +42,7 @@ final class InfobipApiTransport extends AbstractApiTransport
         'X-Infobip-TrackingUrl' => 'trackingUrl',
         'X-Infobip-TrackClicks' => 'trackClicks',
         'X-Infobip-TrackOpens' => 'trackOpens',
+        'X-Infobip-IpPoolId' => 'ipPoolId',
     ];
 
     public function __construct(

@@ -20,9 +20,11 @@ abstract class Existence extends Composite
 {
     public array|Constraint $constraints = [];
 
-    public function getDefaultOption(): ?string
+    public function __construct(array|Constraint $constraints = [], ?array $groups = null, mixed $payload = null)
     {
-        return 'constraints';
+        $this->constraints = $constraints;
+
+        parent::__construct(null, $groups, $payload);
     }
 
     protected function getCompositeOption(): string

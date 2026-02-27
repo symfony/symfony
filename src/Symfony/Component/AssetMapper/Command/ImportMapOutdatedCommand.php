@@ -52,20 +52,20 @@ final class ImportMapOutdatedCommand extends Command
                 default: 'txt',
             )
             ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command will list the latest updates available for the 3rd party packages in <comment>importmap.php</comment>.
-Versions showing in <fg=red>red</> are semver compatible versions and you should upgrading.
-Versions showing in <fg=yellow>yellow</> are major updates that include backward compatibility breaks according to semver.
+                The <info>%command.name%</info> command will list the latest updates available for the 3rd party packages in <comment>importmap.php</comment>.
+                Versions showing in <fg=red>red</> are semver compatible versions and you should upgrading.
+                Versions showing in <fg=yellow>yellow</> are major updates that include backward compatibility breaks according to semver.
 
-   <info>php %command.full_name%</info>
+                   <info>php %command.full_name%</info>
 
-Or specific packages only:
+                Or specific packages only:
 
-   <info>php %command.full_name% <packages></info>
+                   <info>php %command.full_name% <packages></info>
 
-The <info>--format</info> option specifies the format of the command output:
+                The <info>--format</info> option specifies the format of the command output:
 
-  <info>php %command.full_name% --format=json</info>
-EOT
+                  <info>php %command.full_name% --format=json</info>
+                EOT
             );
     }
 
@@ -74,7 +74,7 @@ EOT
         $io = new SymfonyStyle($input, $output);
         $packages = $input->getArgument('packages');
         $packagesUpdateInfos = $this->updateChecker->getAvailableUpdates($packages);
-        $packagesUpdateInfos = array_filter($packagesUpdateInfos, fn ($packageUpdateInfo) => $packageUpdateInfo->hasUpdate());
+        $packagesUpdateInfos = array_filter($packagesUpdateInfos, static fn ($packageUpdateInfo) => $packageUpdateInfo->hasUpdate());
         if (0 === \count($packagesUpdateInfos)) {
             if ('json' === $input->getOption('format')) {
                 $io->writeln('[]');
@@ -85,7 +85,7 @@ EOT
             return Command::SUCCESS;
         }
 
-        $displayData = array_map(fn (string $importName, PackageUpdateInfo $packageUpdateInfo) => [
+        $displayData = array_map(static fn (string $importName, PackageUpdateInfo $packageUpdateInfo) => [
             'name' => $importName,
             'current' => $packageUpdateInfo->currentVersion,
             'latest' => $packageUpdateInfo->latestVersion,

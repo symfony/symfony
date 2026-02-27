@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\ErrorHandler\Tests\ErrorRenderer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\ErrorRenderer\FileLinkFormatter;
 use Symfony\Component\HttpFoundation\Request;
@@ -86,14 +87,10 @@ class FileLinkFormatterTest extends TestCase
         $this->assertInstanceOf(FileLinkFormatter::class, unserialize(serialize(new FileLinkFormatter())));
     }
 
-    /**
-     * @dataProvider providePathMappings
-     */
+    #[DataProvider('providePathMappings')]
     public function testIdeFileLinkFormatWithPathMappingParameters($mappings)
     {
-        $params = array_reduce($mappings, function ($c, $m) {
-            return "$c&".implode('>', $m);
-        }, '');
+        $params = array_reduce($mappings, static fn ($c, $m) => "$c&".implode('>', $m), '');
         $sut = new FileLinkFormatter("vscode://file/%f:%l$params");
         foreach ($mappings as $mapping) {
             $fileGuest = $mapping['guest'].'file.php';

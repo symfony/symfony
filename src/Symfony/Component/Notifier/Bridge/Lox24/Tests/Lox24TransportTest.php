@@ -74,15 +74,15 @@ class Lox24TransportTest extends TransportTestCase
     public function testSupportWithNotSmsMessage()
     {
         $transport = new Lox24Transport('user', 'token', 'testFrom');
-        $message = $this->createMock(MessageInterface::class);
+        $message = $this->createStub(MessageInterface::class);
         $this->assertFalse($transport->supports($message));
     }
 
-    public function testSupportWithNotLOX24Options()
+    public function testSupportWithNotLox24Options()
     {
         $transport = new Lox24Transport('user', 'token', 'testFrom');
         $message = new SmsMessage('test', 'test');
-        $options = $this->createMock(MessageOptionsInterface::class);
+        $options = $this->createStub(MessageOptionsInterface::class);
         $message->options($options);
         $this->assertFalse($transport->supports($message));
     }
@@ -91,7 +91,7 @@ class Lox24TransportTest extends TransportTestCase
     {
         $this->expectException(UnsupportedMessageTypeException::class);
         $transport = new Lox24Transport('user', 'token', 'testFrom');
-        $message = $this->createMock(MessageInterface::class);
+        $message = $this->createStub(MessageInterface::class);
         $transport->send($message);
     }
 

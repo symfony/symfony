@@ -64,7 +64,7 @@ return [
         'Hrkt' => 'alfabet rrokjesor japonez',
         'Hung' => 'hungarishte e vjetër',
         'Ital' => 'italishte e vjetër',
-        'Jamo' => 'jamosisht',
+        'Jamo' => 'xhamosisht',
         'Java' => 'java',
         'Jpan' => 'japonez',
         'Kali' => 'kajali',

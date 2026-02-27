@@ -38,7 +38,7 @@ class AddSessionDomainConstraintPass implements CompilerPassInterface
             $domainRegexp = (empty($sessionOptions['cookie_secure']) ? 'https?://' : 'https://').$domainRegexp;
         }
 
-        $container->findDefinition('security.http_utils')
+        $container->getDefinition('security.http_utils')
             ->addArgument(\sprintf('{^%s$}i', $domainRegexp))
             ->addArgument($secureDomainRegexp);
     }

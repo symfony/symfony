@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Cache\CacheItemPoolInterface;
 use Relay\Cluster as RelayCluster;
 use Relay\Relay;
@@ -19,11 +22,8 @@ use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 use Symfony\Component\Cache\Traits\RelayClusterProxy;
 
-/**
- * @requires extension relay
- *
- * @group integration
- */
+#[RequiresPhpExtension('relay')]
+#[Group('integration')]
 class RelayClusterAdapterTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
@@ -47,9 +47,7 @@ class RelayClusterAdapterTest extends AbstractRedisAdapterTestCase
         return $adapter;
     }
 
-    /**
-     * @dataProvider provideFailedCreateConnection
-     */
+    #[DataProvider('provideFailedCreateConnection')]
     public function testFailedCreateConnection(string $dsn)
     {
         $this->expectException(InvalidArgumentException::class);

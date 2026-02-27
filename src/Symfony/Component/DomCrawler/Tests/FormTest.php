@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DomCrawler\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use Symfony\Component\DomCrawler\Field\FormField;
@@ -67,10 +68,9 @@ class FormTest extends TestCase
     }
 
     /**
-     * @dataProvider constructorThrowsExceptionIfNoRelatedFormProvider
-     *
      * __construct() should throw a \LogicException if the form attribute is invalid.
      */
+    #[DataProvider('constructorThrowsExceptionIfNoRelatedFormProvider')]
     public function testConstructorThrowsExceptionIfNoRelatedForm(\DOMElement $node)
     {
         $this->expectException(\LogicException::class);
@@ -197,16 +197,14 @@ class FormTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideInitializeValues
-     */
+    #[DataProvider('provideInitializeValues')]
     public function testConstructor($message, $form, $values)
     {
         $form = $this->createForm('<form>'.$form.'</form>');
         $this->assertEquals(
             $values,
             array_map(
-                function ($field) {
+                static function ($field) {
                     $class = $field::class;
 
                     return [substr($class, strrpos($class, '\\') + 1), $field->getValue()];
@@ -515,9 +513,7 @@ class FormTest extends TestCase
         $this->assertEquals(['size' => ['error' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => 4, 'size' => 0]]], $form->getPhpFiles(), '->getPhpFiles() int conversion does not collide with file names');
     }
 
-    /**
-     * @dataProvider provideGetUriValues
-     */
+    #[DataProvider('provideGetUriValues')]
     public function testGetUri($message, $form, $values, $uri, $method = null)
     {
         $form = $this->createForm($form, $method);
@@ -886,13 +882,12 @@ class FormTest extends TestCase
         ;
 
         $field
-            ->expects($this->any())
+            ->expects($this->atLeastOnce())
             ->method('getName')
             ->willReturn($name)
         ;
 
         $field
-            ->expects($this->any())
             ->method('getValue')
             ->willReturn($value)
         ;

@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Exception\NoSuchMetadataException;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Factory\LazyLoadingMetadataFactory;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
+use Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\EntityParent;
@@ -110,13 +111,12 @@ class LazyLoadingMetadataFactoryTest extends TestCase
     public function testNonClassNameStringValues()
     {
         $testedValue = 'error@example.com';
-        $loader = $this->createMock(LoaderInterface::class);
         $cache = $this->createMock(CacheItemPoolInterface::class);
         $cache
             ->expects($this->never())
             ->method('getItem');
 
-        $factory = new LazyLoadingMetadataFactory($loader, $cache);
+        $factory = new LazyLoadingMetadataFactory(new StaticMethodLoader(), $cache);
 
         $this->expectException(NoSuchMetadataException::class);
 
@@ -129,7 +129,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
         $factory = new LazyLoadingMetadataFactory(new TestLoader(), $cache);
 
         $metadata = $factory->getMetadataFor(self::PARENT_CLASS);
-        $metadata->addConstraint(new Callback(function () {}));
+        $metadata->addConstraint(new Callback(static function () {}));
 
         $this->assertCount(3, $metadata->getConstraints());
 
@@ -140,7 +140,7 @@ class LazyLoadingMetadataFactoryTest extends TestCase
 
     public function testGroupsFromParent()
     {
-        $reader = new \Symfony\Component\Validator\Mapping\Loader\StaticMethodLoader();
+        $reader = new StaticMethodLoader();
         $factory = new LazyLoadingMetadataFactory($reader);
         $metadata = $factory->getMetadataFor('Symfony\Component\Validator\Tests\Fixtures\EntityStaticCarTurbo');
         $groups = [];

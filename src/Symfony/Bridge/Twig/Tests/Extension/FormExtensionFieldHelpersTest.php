@@ -100,9 +100,7 @@ class FormExtensionFieldHelpersTest extends FormIntegrationTestCase
                     'yes',
                     'no',
                 ],
-                'choice_label' => static function (string $choice) {
-                    return new TranslatableMessage('parametrized.%value%', ['%value%' => $choice], 'forms');
-                },
+                'choice_label' => static fn (string $choice) => new TranslatableMessage('parametrized.%value%', ['%value%' => $choice], 'forms'),
             ])
             ->getForm()
         ;

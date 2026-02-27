@@ -39,17 +39,19 @@ class YamlValidator extends ConstraintValidator
 
         $value = (string) $value;
 
+        $parser = new Parser();
+
         /** @see \Symfony\Component\Yaml\Command\LintCommand::validate() */
-        $prevErrorHandler = set_error_handler(function ($level, $message, $file, $line) use (&$prevErrorHandler) {
+        $prevErrorHandler = set_error_handler(static function ($level, $message, $file, $line) use (&$prevErrorHandler, $parser) {
             if (\E_USER_DEPRECATED === $level) {
-                throw new ParseException($message, $this->getParser()->getRealCurrentLineNb() + 1);
+                throw new ParseException($message, $parser->getRealCurrentLineNb() + 1);
             }
 
             return $prevErrorHandler ? $prevErrorHandler($level, $message, $file, $line) : false;
         });
 
         try {
-            (new Parser())->parse($value, $constraint->flags);
+            $parser->parse($value, $constraint->flags);
         } catch (ParseException $e) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ error }}', $e->getMessage())

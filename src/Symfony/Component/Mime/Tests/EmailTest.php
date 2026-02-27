@@ -477,7 +477,7 @@ class EmailTest extends TestCase
     public function testAttachments()
     {
         // inline part
-        $contents = file_get_contents($name = __DIR__.'/Fixtures/mimetypes/test', 'r');
+        $contents = file_get_contents($name = __DIR__.'/Fixtures/mimetypes/test');
         $att = new DataPart($file = fopen($name, 'r'), 'test');
         $inline = (new DataPart($contents, 'test'))->asInline();
         $e = new Email();
@@ -491,8 +491,8 @@ class EmailTest extends TestCase
         $e = new Email();
         $e->addPart(new DataPart(new File($name)));
         $e->addPart((new DataPart(new File($name)))->asInline());
-        $this->assertEquals([$att->bodyToString(), $inline->bodyToString()], array_map(fn (DataPart $a) => $a->bodyToString(), $e->getAttachments()));
-        $this->assertEquals([$att->getPreparedHeaders(), $inline->getPreparedHeaders()], array_map(fn (DataPart $a) => $a->getPreparedHeaders(), $e->getAttachments()));
+        $this->assertEquals([$att->bodyToString(), $inline->bodyToString()], array_map(static fn (DataPart $a) => $a->bodyToString(), $e->getAttachments()));
+        $this->assertEquals([$att->getPreparedHeaders(), $inline->getPreparedHeaders()], array_map(static fn (DataPart $a) => $a->getPreparedHeaders(), $e->getAttachments()));
     }
 
     public function testSerialize()
@@ -529,44 +529,44 @@ class EmailTest extends TestCase
         $expected = clone $e;
 
         $expectedJson = <<<EOF
-{
-    "text": "Text content",
-    "textCharset": "utf-8",
-    "html": "HTML <b>content</b>",
-    "htmlCharset": "utf-8",
-    "attachments": [
-        {
-            "filename": "test.txt",
-            "mediaType": "application",
-            "body": "Some Text file",
-            "charset": null,
-            "subtype": "octet-stream",
-            "disposition": "attachment",
-            "name": "test.txt",
-            "encoding": "base64",
-            "headers": [],
-            "class": "Symfony\\\Component\\\Mime\\\Part\\\DataPart"
-        }
-    ],
-    "headers": {
-        "to": [
             {
-                "addresses": [
+                "text": "Text content",
+                "textCharset": "utf-8",
+                "html": "HTML <b>content</b>",
+                "htmlCharset": "utf-8",
+                "attachments": [
                     {
-                        "address": "you@example.com",
-                        "name": ""
+                        "filename": "test.txt",
+                        "mediaType": "application",
+                        "body": "Some Text file",
+                        "charset": null,
+                        "subtype": "octet-stream",
+                        "disposition": "attachment",
+                        "name": "test.txt",
+                        "encoding": "base64",
+                        "headers": [],
+                        "class": "Symfony\\\Component\\\Mime\\\Part\\\DataPart"
                     }
                 ],
-                "name": "To",
-                "lineLength": 76,
-                "lang": null,
-                "charset": "utf-8"
+                "headers": {
+                    "to": [
+                        {
+                            "addresses": [
+                                {
+                                    "address": "you@example.com",
+                                    "name": ""
+                                }
+                            ],
+                            "name": "To",
+                            "lineLength": 76,
+                            "lang": null,
+                            "charset": "utf-8"
+                        }
+                    ]
+                },
+                "body": null
             }
-        ]
-    },
-    "body": null
-}
-EOF;
+            EOF;
 
         $extractor = new PhpDocExtractor();
         $propertyNormalizer = new PropertyNormalizer(null, null, $extractor);
@@ -618,7 +618,7 @@ EOF;
         $email->html(null);
         $this->assertNull($email->getHtmlBody());
 
-        $contents = file_get_contents(__DIR__.'/Fixtures/mimetypes/test', 'r');
+        $contents = file_get_contents(__DIR__.'/Fixtures/mimetypes/test');
         $email->html($contents);
         $this->assertSame($contents, $email->getHtmlBody());
     }
@@ -641,7 +641,7 @@ EOF;
         $email->text(null);
         $this->assertNull($email->getTextBody());
 
-        $contents = file_get_contents(__DIR__.'/Fixtures/mimetypes/test', 'r');
+        $contents = file_get_contents(__DIR__.'/Fixtures/mimetypes/test');
         $email->text($contents);
         $this->assertSame($contents, $email->getTextBody());
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\Data\Bundle\Writer;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Intl\Data\Bundle\Writer\JsonBundleWriter;
@@ -27,7 +28,7 @@ class JsonBundleWriterTest extends TestCase
     protected function setUp(): void
     {
         $this->writer = new JsonBundleWriter();
-        $this->directory = sys_get_temp_dir().'/JsonBundleWriterTest/'.mt_rand(1000, 9999);
+        $this->directory = sys_get_temp_dir().'/JsonBundleWriterTest/'.random_int(1000, 9999);
         $this->filesystem = new Filesystem();
 
         $this->filesystem->mkdir($this->directory);
@@ -56,9 +57,7 @@ class JsonBundleWriterTest extends TestCase
         $this->assertFileEquals(__DIR__.'/Fixtures/en.json', $this->directory.'/en.json');
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testWriteResourceBundle()
     {
         $bundle = new \ResourceBundle('rb', __DIR__.'/Fixtures', false);

@@ -38,6 +38,10 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         foreach ($container->getDefinitions() as $id => $definition) {
+            if ($definition->hasErrors()) {
+                continue;
+            }
+
             // synthetic service is public
             if ($definition->isSynthetic() && !$definition->isPublic()) {
                 throw new RuntimeException(\sprintf('A synthetic service ("%s") must be public.', $id));
@@ -66,7 +70,7 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
                 }
             }
 
-            if ($definition->isPublic() && !$definition->isPrivate()) {
+            if ($definition->isPublic()) {
                 $resolvedId = $container->resolveEnvPlaceholders($id, null, $usedEnvs);
                 if (null !== $usedEnvs) {
                     throw new EnvParameterException([$resolvedId], null, 'A service name ("%s") cannot contain dynamic values.');
@@ -75,7 +79,7 @@ class CheckDefinitionValidityPass implements CompilerPassInterface
         }
 
         foreach ($container->getAliases() as $id => $alias) {
-            if ($alias->isPublic() && !$alias->isPrivate()) {
+            if ($alias->isPublic()) {
                 $resolvedId = $container->resolveEnvPlaceholders($id, null, $usedEnvs);
                 if (null !== $usedEnvs) {
                     throw new EnvParameterException([$resolvedId], null, 'An alias name ("%s") cannot contain dynamic values.');

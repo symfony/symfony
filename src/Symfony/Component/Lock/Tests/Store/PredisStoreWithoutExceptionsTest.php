@@ -11,11 +11,12 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\Attributes\Group;
+
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
- *
- * @group integration
  */
+#[Group('integration')]
 class PredisStoreWithoutExceptionsTest extends AbstractRedisStoreTestCase
 {
     public static function setUpBeforeClass(): void

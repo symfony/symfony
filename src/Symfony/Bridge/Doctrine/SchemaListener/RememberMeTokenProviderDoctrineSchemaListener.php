@@ -32,13 +32,18 @@ class RememberMeTokenProviderDoctrineSchemaListener extends AbstractSchemaListen
     public function postGenerateSchema(GenerateSchemaEventArgs $event): void
     {
         $connection = $event->getEntityManager()->getConnection();
+        $schema = $event->getSchema();
 
         foreach ($this->rememberMeHandlers as $rememberMeHandler) {
             if (
                 $rememberMeHandler instanceof PersistentRememberMeHandler
                 && ($tokenProvider = $rememberMeHandler->getTokenProvider()) instanceof DoctrineTokenProvider
             ) {
-                $tokenProvider->configureSchema($event->getSchema(), $connection, $this->getIsSameDatabaseChecker($connection));
+                $isSameDatabaseChecker = $this->getIsSameDatabaseChecker($connection);
+                $this->filterSchemaChanges($schema, $connection, static function () use ($tokenProvider, $schema, $connection, $isSameDatabaseChecker) {
+                    /* @var DoctrineTokenProvider $tokenProvider */
+                    $tokenProvider->configureSchema($schema, $connection, $isSameDatabaseChecker);
+                });
             }
         }
     }

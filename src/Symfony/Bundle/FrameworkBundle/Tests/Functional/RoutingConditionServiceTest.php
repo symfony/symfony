@@ -11,11 +11,11 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 class RoutingConditionServiceTest extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider provideRoutes
-     */
+    #[DataProvider('provideRoutes')]
     public function testCondition(int $code, string $path)
     {
         $client = static::createClient(['test_case' => 'RoutingConditionService']);

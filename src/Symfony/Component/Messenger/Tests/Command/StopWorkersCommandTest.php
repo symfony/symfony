@@ -32,4 +32,24 @@ class StopWorkersCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute([]);
     }
+
+    public function testSuccessMessageGoesToStdout()
+    {
+        $cachePool = $this->createStub(CacheItemPoolInterface::class);
+        $cacheItem = $this->createStub(CacheItemInterface::class);
+        $cacheItem->method('set');
+        $cachePool->method('getItem')->willReturn($cacheItem);
+        $cachePool->method('save');
+
+        $command = new StopWorkersCommand($cachePool);
+
+        $tester = new CommandTester($command);
+        $tester->execute([], ['capture_stderr_separately' => true]);
+
+        $stdout = $tester->getDisplay();
+        $stderr = $tester->getErrorOutput();
+
+        $this->assertStringContainsString('Signal successfully sent', $stdout);
+        $this->assertStringNotContainsString('Signal successfully sent', $stderr);
+    }
 }

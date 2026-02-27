@@ -41,7 +41,7 @@ class LocaleAwareListenerTest extends TestCase
             ->method('setLocale')
             ->with($this->equalTo('fr'));
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->createRequest('fr'), HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $this->createRequest('fr'), HttpKernelInterface::MAIN_REQUEST);
         $this->listener->onKernelRequest($event);
     }
 
@@ -61,7 +61,7 @@ class LocaleAwareListenerTest extends TestCase
             })
         ;
 
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $this->createRequest('fr'), HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $this->createRequest('fr'), HttpKernelInterface::MAIN_REQUEST);
         $this->listener->onKernelRequest($event);
     }
 
@@ -75,7 +75,7 @@ class LocaleAwareListenerTest extends TestCase
         $this->requestStack->push($this->createRequest('fr'));
         $this->requestStack->push($subRequest = $this->createRequest('de'));
 
-        $event = new FinishRequestEvent($this->createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
+        $event = new FinishRequestEvent($this->createStub(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
         $this->listener->onKernelFinishRequest($event);
     }
 
@@ -88,7 +88,7 @@ class LocaleAwareListenerTest extends TestCase
 
         $this->requestStack->push($subRequest = $this->createRequest('de'));
 
-        $event = new FinishRequestEvent($this->createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
+        $event = new FinishRequestEvent($this->createStub(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
         $this->listener->onKernelFinishRequest($event);
     }
 
@@ -111,7 +111,7 @@ class LocaleAwareListenerTest extends TestCase
         $this->requestStack->push($this->createRequest('fr'));
         $this->requestStack->push($subRequest = $this->createRequest('de'));
 
-        $event = new FinishRequestEvent($this->createMock(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
+        $event = new FinishRequestEvent($this->createStub(HttpKernelInterface::class), $subRequest, HttpKernelInterface::SUB_REQUEST);
         $this->listener->onKernelFinishRequest($event);
     }
 

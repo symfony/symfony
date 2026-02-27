@@ -19,8 +19,8 @@ class CallbackTransformerTest extends TestCase
     public function testTransform()
     {
         $transformer = new CallbackTransformer(
-            fn ($value) => $value.' has been transformed',
-            fn ($value) => $value.' has reversely been transformed'
+            static fn ($value) => $value.' has been transformed',
+            static fn ($value) => $value.' has reversely been transformed'
         );
 
         $this->assertEquals('foo has been transformed', $transformer->transform('foo'));

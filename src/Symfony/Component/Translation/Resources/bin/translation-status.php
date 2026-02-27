@@ -15,27 +15,27 @@ if ('cli' !== \PHP_SAPI) {
 
 $usageInstructions = <<<END
 
-  Usage instructions
-  -------------------------------------------------------------------------------
+      Usage instructions
+      -------------------------------------------------------------------------------
 
-  $ cd symfony-code-root-directory/
+      $ cd symfony-code-root-directory/
 
-  # show the translation status of all locales
-  $ php translation-status.php
+      # show the translation status of all locales
+      $ php translation-status.php
 
-  # only show the translation status of incomplete or erroneous locales
-  $ php translation-status.php --incomplete
+      # only show the translation status of incomplete or erroneous locales
+      $ php translation-status.php --incomplete
 
-  # show the translation status of all locales, all their missing translations and mismatches between trans-unit id and source
-  $ php translation-status.php -v
+      # show the translation status of all locales, all their missing translations and mismatches between trans-unit id and source
+      $ php translation-status.php -v
 
-  # show the status of a single locale
-  $ php translation-status.php fr
+      # show the status of a single locale
+      $ php translation-status.php fr
 
-  # show the status of a single locale, missing translations and mismatches between trans-unit id and source
-  $ php translation-status.php fr -v
+      # show the status of a single locale, missing translations and mismatches between trans-unit id and source
+      $ php translation-status.php fr -v
 
-END;
+    END;
 
 $config = [
     // if TRUE, the full list of missing translations is displayed
@@ -87,8 +87,8 @@ foreach ($config['original_files'] as $originalFilePath) {
     $translationFilePaths = findTranslationFiles($originalFilePath, $config['locale_to_analyze']);
     $translationStatus = calculateTranslationStatus($originalFilePath, $translationFilePaths);
 
-    $totalMissingTranslations += array_sum(array_map(fn ($translation) => count($translation['missingKeys']), array_values($translationStatus)));
-    $totalTranslationMismatches += array_sum(array_map(fn ($translation) => count($translation['mismatches']), array_values($translationStatus)));
+    $totalMissingTranslations += array_sum(array_map(static fn ($translation) => count($translation['missingKeys']), array_values($translationStatus)));
+    $totalTranslationMismatches += array_sum(array_map(static fn ($translation) => count($translation['mismatches']), array_values($translationStatus)));
 
     printTranslationStatus($originalFilePath, $translationStatus, $config['verbose_output'], $config['include_completed_languages']);
 }
@@ -145,7 +145,7 @@ function isTranslationCompleted(array $translationStatus): bool
     return $translationStatus['total'] === $translationStatus['translated'] && 0 === count($translationStatus['mismatches']);
 }
 
-function printTranslationStatus($originalFilePath, $translationStatus, $verboseOutput, $includeCompletedLanguages)
+function printTranslationStatus($originalFilePath, $translationStatus, $verboseOutput, $includeCompletedLanguages): void
 {
     printTitle($originalFilePath);
     printTable($translationStatus, $verboseOutput, $includeCompletedLanguages);
@@ -196,13 +196,13 @@ function findTransUnitMismatches(array $baseTranslationKeys, array $translatedKe
     return $mismatches;
 }
 
-function printTitle($title)
+function printTitle($title): void
 {
     echo $title.\PHP_EOL;
     echo str_repeat('=', strlen($title)).\PHP_EOL.\PHP_EOL;
 }
 
-function printTable($translations, $verboseOutput, bool $includeCompletedLanguages)
+function printTable($translations, $verboseOutput, bool $includeCompletedLanguages): void
 {
     if (0 === count($translations)) {
         echo 'No translations found';
@@ -258,17 +258,17 @@ function printTable($translations, $verboseOutput, bool $includeCompletedLanguag
     }
 }
 
-function textColorGreen()
+function textColorGreen(): void
 {
     echo "\033[32m";
 }
 
-function textColorRed()
+function textColorRed(): void
 {
     echo "\033[31m";
 }
 
-function textColorNormal()
+function textColorNormal(): void
 {
     echo "\033[0m";
 }

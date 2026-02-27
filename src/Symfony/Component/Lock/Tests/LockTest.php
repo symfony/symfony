@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Lock\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
@@ -81,11 +83,10 @@ class LockTest extends TestCase
     public function testAcquireBlockingRetryWithPersistingStoreInterface()
     {
         $key = new Key(__METHOD__);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = $this->createStub(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->any())
             ->method('save')
             ->willReturnCallback(static function () {
                 if (1 === random_int(0, 1)) {
@@ -214,6 +215,7 @@ class LockTest extends TestCase
         $lock = new Lock($key, $store, 10);
 
         $store
+            ->expects($this->exactly(2))
             ->method('exists')
             ->with($key)
             ->willReturn(true, false);
@@ -397,13 +399,11 @@ class LockTest extends TestCase
         $this->assertSame([['debug', 'Successfully released the "{resource}" lock.', ['resource' => $key]]], $logger->logs());
     }
 
-    /**
-     * @dataProvider provideExpiredDates
-     */
+    #[DataProvider('provideExpiredDates')]
     public function testExpiration($ttls, $expected)
     {
         $key = new Key(__METHOD__);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = $this->createStub(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         foreach ($ttls as $ttl) {
@@ -416,13 +416,11 @@ class LockTest extends TestCase
         $this->assertSame($expected, $lock->isExpired());
     }
 
-    /**
-     * @dataProvider provideExpiredDates
-     */
+    #[DataProvider('provideExpiredDates')]
     public function testExpirationStoreInterface($ttls, $expected)
     {
         $key = new Key(__METHOD__);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = $this->createStub(PersistingStoreInterface::class);
         $lock = new Lock($key, $store, 10);
 
         foreach ($ttls as $ttl) {
@@ -462,9 +460,7 @@ class LockTest extends TestCase
         $this->assertTrue($lock->acquireRead(false));
     }
 
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testAcquireReadTwiceWithExpiration()
     {
         $key = new Key(__METHOD__);
@@ -506,9 +502,7 @@ class LockTest extends TestCase
         $lock->release();
     }
 
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testAcquireTwiceWithExpiration()
     {
         $key = new Key(__METHOD__);
@@ -569,11 +563,10 @@ class LockTest extends TestCase
     public function testAcquireReadBlockingWithSharedLockStoreInterface()
     {
         $key = new Key(__METHOD__);
-        $store = $this->createMock(SharedLockStoreInterface::class);
+        $store = $this->createStub(SharedLockStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->any())
             ->method('saveRead')
             ->willReturnCallback(static function () {
                 if (1 === random_int(0, 1)) {
@@ -607,11 +600,10 @@ class LockTest extends TestCase
     public function testAcquireReadBlockingWithPersistingStoreInterface()
     {
         $key = new Key(__METHOD__);
-        $store = $this->createMock(PersistingStoreInterface::class);
+        $store = $this->createStub(PersistingStoreInterface::class);
         $lock = new Lock($key, $store);
 
         $store
-            ->expects($this->any())
             ->method('save')
             ->willReturnCallback(static function () {
                 if (1 === random_int(0, 1)) {

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Routing\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Config\Loader\DelegatingLoader;
@@ -66,9 +67,39 @@ class Psr4DirectoryLoaderTest extends TestCase
         $this->assertSame(MyChildController::class.'::someAction', $route->getDefault('_controller'));
     }
 
-    /**
-     * @dataProvider provideNamespacesThatNeedTrimming
-     */
+    public function testExcludeSubNamespace()
+    {
+        $fixturesPath = \dirname(__DIR__).'/Fixtures';
+        $excluded = [
+            rtrim(str_replace('\\', '/', $fixturesPath.'/Psr4Controllers/SubNamespace'), '/') => true,
+        ];
+        $collection = $this->getLoader()->load(
+            ['path' => 'Psr4Controllers', 'namespace' => 'Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers', '_excluded' => $excluded],
+            'attribute'
+        );
+
+        $this->assertNotNull($collection->get('my_route'));
+        $this->assertNull($collection->get('my_other_controller_one'));
+        $this->assertNull($collection->get('my_controller_with_a_trait'));
+        $this->assertNull($collection->get('my_child_controller_from_abstract'));
+    }
+
+    public function testExcludeSingleFile()
+    {
+        $fixturesPath = \dirname(__DIR__).'/Fixtures';
+        $excluded = [
+            rtrim(str_replace('\\', '/', $fixturesPath.'/Psr4Controllers/MyController.php'), '/') => true,
+        ];
+        $collection = $this->getLoader()->load(
+            ['path' => 'Psr4Controllers', 'namespace' => 'Symfony\Component\Routing\Tests\Fixtures\Psr4Controllers', '_excluded' => $excluded],
+            'attribute'
+        );
+
+        $this->assertNull($collection->get('my_route'));
+        $this->assertNotNull($collection->get('my_other_controller_one'));
+    }
+
+    #[DataProvider('provideNamespacesThatNeedTrimming')]
     public function testPsr4NamespaceTrim(string $namespace)
     {
         $route = $this->getLoader()
@@ -91,9 +122,7 @@ class Psr4DirectoryLoaderTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideInvalidPsr4Namespaces
-     */
+    #[DataProvider('provideInvalidPsr4Namespaces')]
     public function testInvalidPsr4Namespace(string $namespace, string $expectedExceptionMessage)
     {
         $this->expectException(InvalidArgumentException::class);

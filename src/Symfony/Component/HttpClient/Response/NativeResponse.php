@@ -70,6 +70,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
         $info['original_url'] = implode('', $info['url']);
         $info['user_data'] = $options['user_data'];
         $info['max_duration'] = $options['max_duration'];
+        $info['max_connect_duration'] = $options['max_connect_duration'];
         ++$multi->responseCount;
 
         $this->initializer = static fn (self $response) => null === $response->remaining;

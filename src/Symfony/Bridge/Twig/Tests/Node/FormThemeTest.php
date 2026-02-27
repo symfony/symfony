@@ -18,7 +18,7 @@ use Symfony\Component\Form\FormRenderer;
 use Symfony\Component\Form\FormRendererEngineInterface;
 use Twig\Compiler;
 use Twig\Environment;
-use Twig\Loader\LoaderInterface;
+use Twig\Loader\ArrayLoader;
 use Twig\Node\Expression\ArrayExpression;
 use Twig\Node\Expression\ConstantExpression;
 use Twig\Node\Expression\Variable\ContextVariable;
@@ -55,15 +55,22 @@ class FormThemeTest extends TestCase
 
         $node = new FormThemeNode($form, $resources, 0);
 
-        $environment = new Environment($this->createMock(LoaderInterface::class));
-        $formRenderer = new FormRenderer($this->createMock(FormRendererEngineInterface::class));
+        $environment = new Environment(new ArrayLoader());
+        $formRenderer = new FormRenderer($this->createStub(FormRendererEngineInterface::class));
         $this->registerTwigRuntimeLoader($environment, $formRenderer);
         $compiler = new Compiler($environment);
 
+        // cope with various versions of Twig
+        $source = '[1 => "tpl1", 0 => "tpl2"]';
+        if ('["tpl1", "tpl2"]' === (new Compiler($environment))->subcompile($node->getNode('resources'))->getSource()) {
+            $source = '["tpl1", "tpl2"]';
+        }
+
         $this->assertEquals(
             \sprintf(
-                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [1 => "tpl1", 0 => "tpl2"], true);',
-                $this->getVariableGetter('form')
+                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, %s, true);',
+                $this->getVariableGetter('form'),
+                $source
             ),
             trim($compiler->compile($node)->getSource())
         );
@@ -72,8 +79,9 @@ class FormThemeTest extends TestCase
 
         $this->assertEquals(
             \sprintf(
-                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, [1 => "tpl1", 0 => "tpl2"], false);',
-                $this->getVariableGetter('form')
+                '$this->env->getRuntime("Symfony\\\\Component\\\\Form\\\\FormRenderer")->setTheme(%s, %s, false);',
+                $this->getVariableGetter('form'),
+                $source
             ),
             trim($compiler->compile($node)->getSource())
         );

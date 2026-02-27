@@ -20,16 +20,16 @@ class CallbackMessageProviderTest extends TestCase
 {
     public function testToString()
     {
-        $context = new MessageContext('test', 'test', $this->createMock(TriggerInterface::class), $this->createMock(\DateTimeImmutable::class));
-        $messageProvider = new CallbackMessageProvider(fn () => []);
+        $context = new MessageContext('test', 'test', $this->createStub(TriggerInterface::class), new \DateTimeImmutable());
+        $messageProvider = new CallbackMessageProvider(static fn () => []);
         $this->assertEquals([], $messageProvider->getMessages($context));
         $this->assertEquals('', $messageProvider->getId());
 
-        $messageProvider = new CallbackMessageProvider(fn () => [new \stdClass()], '');
+        $messageProvider = new CallbackMessageProvider(static fn () => [new \stdClass()], '');
         $this->assertEquals([new \stdClass()], $messageProvider->getMessages($context));
         $this->assertSame('', $messageProvider->getId());
 
-        $messageProvider = new CallbackMessageProvider(fn () => yield new \stdClass(), 'foo', 'bar');
+        $messageProvider = new CallbackMessageProvider(static fn () => yield new \stdClass(), 'foo', 'bar');
         $this->assertInstanceOf(\Generator::class, $messageProvider->getMessages($context));
         $this->assertSame('foo', $messageProvider->getId());
         $this->assertSame('bar', (string) $messageProvider);

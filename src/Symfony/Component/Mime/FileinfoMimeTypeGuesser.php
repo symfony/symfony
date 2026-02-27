@@ -30,7 +30,7 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
     /**
      * @param string|null $magicFile A magic file to use with the finfo instance
      *
-     * @see http://www.php.net/manual/en/function.finfo-open.php
+     * @see https://php.net/finfo-open
      */
     public function __construct(
         private ?string $magicFile = null,
@@ -53,7 +53,7 @@ class FileinfoMimeTypeGuesser implements MimeTypeGuesserInterface
         }
 
         try {
-            $finfo = self::$finfoCache[$this->magicFile] ??= new \finfo(\FILEINFO_MIME_TYPE, $this->magicFile);
+            $finfo = self::$finfoCache[$this->magicFile ?? ''] ??= new \finfo(\FILEINFO_MIME_TYPE, $this->magicFile);
         } catch (\Exception $e) {
             throw new RuntimeException($e->getMessage());
         }

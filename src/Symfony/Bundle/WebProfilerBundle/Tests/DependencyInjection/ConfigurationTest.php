@@ -11,15 +11,14 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\WebProfilerBundle\DependencyInjection\Configuration;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends TestCase
 {
-    /**
-     * @dataProvider getDebugModes
-     */
+    #[DataProvider('getDebugModes')]
     public function testConfigTree(array $options, array $expectedResult)
     {
         $processor = new Processor();
@@ -79,9 +78,7 @@ class ConfigurationTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getInterceptRedirectsConfiguration
-     */
+    #[DataProvider('getInterceptRedirectsConfiguration')]
     public function testConfigTreeUsingInterceptRedirects(bool $interceptRedirects, array $expectedResult)
     {
         $processor = new Processor();

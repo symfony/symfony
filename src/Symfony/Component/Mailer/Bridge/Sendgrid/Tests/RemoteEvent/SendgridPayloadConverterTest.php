@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Sendgrid\Tests\RemoteEvent;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Bridge\Sendgrid\RemoteEvent\SendgridPayloadConverter;
 use Symfony\Component\RemoteEvent\Event\Mailer\MailerDeliveryEvent;
@@ -19,9 +20,7 @@ use Symfony\Component\RemoteEvent\Exception\ParseException;
 
 class SendgridPayloadConverterTest extends TestCase
 {
-    /**
-     * @dataProvider provideDeliveryEvents
-     */
+    #[DataProvider('provideDeliveryEvents')]
     public function testMailDeliveryEvent(string $event, string $expectedEventName)
     {
         $converter = new SendgridPayloadConverter();
@@ -50,9 +49,7 @@ class SendgridPayloadConverterTest extends TestCase
         yield ['deferred', MailerDeliveryEvent::DEFERRED];
     }
 
-    /**
-     * @dataProvider provideEngagementEvents
-     */
+    #[DataProvider('provideEngagementEvents')]
     public function testMailEngagementEvent(string $event, string $expectedEventName)
     {
         $converter = new SendgridPayloadConverter();

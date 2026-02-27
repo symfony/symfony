@@ -84,9 +84,9 @@ class TraceableEventDispatcherTest extends TestCase
         $called1 = false;
         $called2 = false;
         $dispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $dispatcher->addListener('my-event', function () use ($dispatcher, &$called1, &$called2) {
+        $dispatcher->addListener('my-event', static function () use ($dispatcher, &$called1, &$called2) {
             $called1 = true;
-            $dispatcher->addListener('my-event', function () use (&$called2) {
+            $dispatcher->addListener('my-event', static function () use (&$called2) {
                 $called2 = true;
             });
         });
@@ -100,11 +100,11 @@ class TraceableEventDispatcherTest extends TestCase
     public function testListenerCanRemoveItselfWhenExecuted()
     {
         $eventDispatcher = new TraceableEventDispatcher(new EventDispatcher(), new Stopwatch());
-        $listener1 = function () use ($eventDispatcher, &$listener1) {
+        $listener1 = static function () use ($eventDispatcher, &$listener1) {
             $eventDispatcher->removeListener('foo', $listener1);
         };
         $eventDispatcher->addListener('foo', $listener1);
-        $eventDispatcher->addListener('foo', function () {});
+        $eventDispatcher->addListener('foo', static function () {});
         $eventDispatcher->dispatch(new Event(), 'foo');
 
         $this->assertCount(1, $eventDispatcher->getListeners('foo'), 'expected listener1 to be removed');
@@ -113,7 +113,7 @@ class TraceableEventDispatcherTest extends TestCase
     protected function getHttpKernel($dispatcher)
     {
         $controllerResolver = $this->createMock(ControllerResolverInterface::class);
-        $controllerResolver->expects($this->once())->method('getController')->willReturn(fn () => new Response());
+        $controllerResolver->expects($this->once())->method('getController')->willReturn(static fn () => new Response());
         $argumentResolver = $this->createMock(ArgumentResolverInterface::class);
         $argumentResolver->expects($this->once())->method('getArguments')->willReturn([]);
 

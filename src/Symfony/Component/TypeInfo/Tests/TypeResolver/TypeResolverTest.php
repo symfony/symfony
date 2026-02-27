@@ -43,19 +43,19 @@ class TypeResolverTest extends TestCase
 
     public function testUseProperResolver()
     {
-        $stringResolver = $this->createMock(TypeResolverInterface::class);
+        $stringResolver = $this->createStub(TypeResolverInterface::class);
         $stringResolver->method('resolve')->willReturn(Type::template('STRING'));
 
-        $reflectionTypeResolver = $this->createMock(TypeResolverInterface::class);
+        $reflectionTypeResolver = $this->createStub(TypeResolverInterface::class);
         $reflectionTypeResolver->method('resolve')->willReturn(Type::template('REFLECTION_TYPE'));
 
-        $reflectionParameterResolver = $this->createMock(TypeResolverInterface::class);
+        $reflectionParameterResolver = $this->createStub(TypeResolverInterface::class);
         $reflectionParameterResolver->method('resolve')->willReturn(Type::template('REFLECTION_PARAMETER'));
 
-        $reflectionPropertyResolver = $this->createMock(TypeResolverInterface::class);
+        $reflectionPropertyResolver = $this->createStub(TypeResolverInterface::class);
         $reflectionPropertyResolver->method('resolve')->willReturn(Type::template('REFLECTION_PROPERTY'));
 
-        $reflectionReturnTypeResolver = $this->createMock(TypeResolverInterface::class);
+        $reflectionReturnTypeResolver = $this->createStub(TypeResolverInterface::class);
         $reflectionReturnTypeResolver->method('resolve')->willReturn(Type::template('REFLECTION_RETURN_TYPE'));
 
         $resolver = TypeResolver::create([

@@ -114,6 +114,6 @@ class FragmentListenerTest extends TestCase
 
     private function createRequestEvent(Request $request, int $requestType = HttpKernelInterface::MAIN_REQUEST): RequestEvent
     {
-        return new RequestEvent($this->createMock(HttpKernelInterface::class), $request, $requestType);
+        return new RequestEvent($this->createStub(HttpKernelInterface::class), $request, $requestType);
     }
 }

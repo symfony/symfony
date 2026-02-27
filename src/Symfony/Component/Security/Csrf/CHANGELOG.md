@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Extract `SameOriginCsrfListener` from `SameOriginCsrfTokenManager` to handle cookie persistence and clearing
+ * Deprecate `SameOriginCsrfTokenManager::onKernelResponse()`, `SameOriginCsrfTokenManager::clearCookies()` and `SameOriginCsrfTokenManager::persistStrategy()`
+
+7.4
+---
+
+ * Add support for `Sec-Fetch-Site` to `SameOriginCsrfTokenManager`
+
 7.2
 ---
 

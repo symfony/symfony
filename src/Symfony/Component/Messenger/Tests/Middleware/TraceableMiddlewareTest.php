@@ -59,7 +59,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
                 $constraint->evaluate($name);
                 $this->assertSame($expectedCategory, $category);
 
-                return $this->createMock(StopwatchEvent::class);
+                return new StopwatchEvent(1.0);
             })
         ;
         $stopwatch->expects($this->exactly(2))
@@ -72,7 +72,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
 
                 $this->assertSame(array_shift($stopSeries), $name);
 
-                return $this->createMock(StopwatchEvent::class);
+                return new StopwatchEvent(1.0);
             })
         ;
 
@@ -148,13 +148,11 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
 
         $stackMiddleware = new StackMiddleware([
             null,
-            $this->createMock(MiddlewareInterface::class),
-            $this->createMock(MiddlewareInterface::class),
+            $this->createStub(MiddlewareInterface::class),
+            $this->createStub(MiddlewareInterface::class),
         ]);
 
-        $stopwatch = $this->createMock(Stopwatch::class);
-
-        $traceableStack = new TraceableStack($stackMiddleware, $stopwatch, 'command_bus', 'messenger.middleware');
+        $traceableStack = new TraceableStack($stackMiddleware, new Stopwatch(), 'command_bus', 'messenger.middleware');
         $clonedStack = clone $traceableStack;
 
         $traceableStackMiddleware1 = $traceableStack->next();
@@ -179,7 +177,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         // import TraceableStack
         class_exists(TraceableMiddleware::class);
 
-        $middlewareIterable = [null, $this->createMock(MiddlewareInterface::class)];
+        $middlewareIterable = [null, $this->createStub(MiddlewareInterface::class)];
 
         $stackMiddleware = new StackMiddleware($middlewareIterable);
 
@@ -200,7 +198,7 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
                 $constraint->evaluate($name);
                 $this->assertSame($expectedCategory, $category);
 
-                return $this->createMock(StopwatchEvent::class);
+                return new StopwatchEvent(1.0);
             })
         ;
 
@@ -210,11 +208,11 @@ class TraceableMiddlewareTest extends MiddlewareTestCase
         ];
         $stopwatch->expects($this->exactly(2))
             ->method('stop')
-            ->willReturnCallback(function (string $name) use (&$stopSeries) {
+            ->willReturnCallback(static function (string $name) use (&$stopSeries) {
                 $constraint = array_shift($stopSeries);
                 $constraint->evaluate($name);
 
-                return $this->createMock(StopwatchEvent::class);
+                return new StopwatchEvent(1.0);
             })
         ;
 

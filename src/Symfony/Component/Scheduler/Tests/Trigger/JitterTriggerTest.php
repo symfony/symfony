@@ -20,13 +20,13 @@ class JitterTriggerTest extends TestCase
     public function testCanAddJitter()
     {
         $time = new \DateTimeImmutable();
-        $inner = $this->createMock(TriggerInterface::class);
+        $inner = $this->createStub(TriggerInterface::class);
         $inner->method('getNextRunDate')->willReturn($time);
 
         $trigger = new JitterTrigger($inner);
 
         $values = array_map(
-            fn () => (int) $trigger->getNextRunDate($time)?->getTimestamp(),
+            static fn () => (int) $trigger->getNextRunDate($time)?->getTimestamp(),
             array_fill(0, 100, null)
         );
 

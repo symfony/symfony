@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'UserAssignedNames' => [
+        'XK' => 'Kosovo',
+    ],
     'Names' => [
         'AD' => 'Andora',
         'AE' => 'Ujedinjeni Arapski Emirati',
@@ -75,7 +78,7 @@ return [
         'FJ' => 'Fidži',
         'FK' => 'Falklandski Otoci',
         'FM' => 'Mikronezija',
-        'FO' => 'Ovčji Otoci',
+        'FO' => 'Farski Otoci',
         'FR' => 'Francuska',
         'GA' => 'Gabon',
         'GB' => 'Ujedinjeno Kraljevstvo',

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Container;
@@ -68,9 +69,7 @@ class ContainerControllerResolverTest extends ControllerResolverTest
         $this->assertSame($service, $controller);
     }
 
-    /**
-     * @dataProvider getControllers
-     */
+    #[DataProvider('getControllers')]
     public function testInstantiateControllerWhenControllerStartsWithABackslash($controller)
     {
         $service = new ControllerTestService('foo');

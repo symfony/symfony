@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add support for the WhatsApp integration if phone numbers are prefixed with `whatsapp:`
+
 6.2
 ---
 

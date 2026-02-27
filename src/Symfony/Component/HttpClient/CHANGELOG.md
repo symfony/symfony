@@ -1,6 +1,29 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add support for the `max_connect_duration` option
+ * Add option `extra.use_persistent_connections` to `CurlHttpClient` to control the use of persistent connections introduced in PHP 8.5
+ * Add `GuzzleHttpHandler` that allows using Symfony HttpClient as a Guzzle handler
+
+8.0
+---
+
+ * Remove support for passing an instance of `StoreInterface` as `$cache` argument to `CachingHttpClient` constructor, use a `TagAwareCacheInterface` instead
+ * Remove support for amphp/http-client < 5
+ * Remove setLogger() methods on decorators; configure the logger on the wrapped client directly instead
+
+7.4
+---
+
+ * Add RFC 9111–based caching support to `CachingHttpClient`
+ * Add option `auto_upgrade_http_version` to control how the request HTTP version is handled in `HttplugClient` and `Psr18Client`
+ * Add QUERY to the list of retriable HTTP methods
+ * Deprecate using amphp/http-client < 5
+ * Deprecate passing an instance of `StoreInterface` as `$cache` argument to `CachingHttpClient` constructor
+
 7.3
 ---
 

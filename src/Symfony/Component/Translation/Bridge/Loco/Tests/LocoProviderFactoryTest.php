@@ -14,11 +14,11 @@ namespace Symfony\Component\Translation\Bridge\Loco\Tests;
 use Psr\Log\NullLogger;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\Translation\Bridge\Loco\LocoProviderFactory;
-use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Provider\ProviderFactoryInterface;
 use Symfony\Component\Translation\Test\AbstractProviderFactoryTestCase;
 use Symfony\Component\Translation\Test\IncompleteDsnTestTrait;
-use Symfony\Component\Translation\TranslatorBagInterface;
+use Symfony\Component\Translation\TranslatorBag;
 
 class LocoProviderFactoryTest extends AbstractProviderFactoryTestCase
 {
@@ -55,6 +55,6 @@ class LocoProviderFactoryTest extends AbstractProviderFactoryTestCase
 
     public function createFactory(): ProviderFactoryInterface
     {
-        return new LocoProviderFactory(new MockHttpClient(), new NullLogger(), 'en', $this->createMock(LoaderInterface::class), $this->createMock(TranslatorBagInterface::class));
+        return new LocoProviderFactory(new MockHttpClient(), new NullLogger(), 'en', new ArrayLoader(), new TranslatorBag());
     }
 }

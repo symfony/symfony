@@ -24,7 +24,7 @@ final class CliRequest extends Request
         public readonly TraceableCommand $command,
     ) {
         parent::__construct(
-            attributes: ['_controller' => \get_class($command->command), '_virtual_type' => 'command'],
+            attributes: ['_controller' => $command->command::class, '_virtual_type' => 'command'],
             server: $_SERVER,
         );
     }

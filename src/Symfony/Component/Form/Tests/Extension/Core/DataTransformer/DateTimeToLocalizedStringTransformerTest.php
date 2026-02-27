@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhp;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Form\Exception\InvalidArgumentException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\BaseDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToLocalizedStringTransformer;
 use Symfony\Component\Form\Tests\Extension\Core\DataTransformer\Traits\DateTimeEqualsTrait;
-use Symfony\Component\Intl\Intl;
 use Symfony\Component\Intl\Util\IntlTestHelper;
 
 class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTestCase
@@ -35,7 +37,6 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         // Normalize intl. configuration settings.
         if (\extension_loaded('intl')) {
             $this->initialTestCaseUseException = ini_set('intl.use_exceptions', 0);
-            $this->initialTestCaseErrorLevel = ini_set('intl.error_level', 0);
         }
 
         // Since we test against "de_AT", we need the full implementation
@@ -50,11 +51,12 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
     protected function tearDown(): void
     {
-        \Locale::setDefault($this->defaultLocale);
+        if (isset($this->defaultLocale)) {
+            \Locale::setDefault($this->defaultLocale);
+        }
 
         if (\extension_loaded('intl')) {
             ini_set('intl.use_exceptions', $this->initialTestCaseUseException);
-            ini_set('intl.error_level', $this->initialTestCaseErrorLevel);
         }
     }
 
@@ -92,9 +94,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         ];
     }
 
-    /**
-     * @dataProvider dataProvider
-     */
+    #[DataProvider('dataProvider')]
     public function testTransform($dateFormat, $timeFormat, $pattern, $output, $input)
     {
         IntlTestHelper::requireFullIntl($this, '59.1');
@@ -130,7 +130,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC');
 
-        $this->assertMatchesRegularExpression('/^Feb 3, 2010, 4:05\s+AM$/u', $transformer->transform($this->dateTime));
+        $this->assertSame('Feb 3, 2010, 4:05 AM', $transformer->transform($this->dateTime));
     }
 
     public function testTransformEmpty()
@@ -208,9 +208,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         // $transformer->transform(1.5);
     }
 
-    /**
-     * @dataProvider dataProvider
-     */
+    #[DataProvider('dataProvider')]
     public function testReverseTransform($dateFormat, $timeFormat, $pattern, $input, $output)
     {
         $transformer = new DateTimeToLocalizedStringTransformer(
@@ -236,10 +234,6 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
 
     public function testReverseTransformFromDifferentLocale()
     {
-        if (version_compare(Intl::getIcuVersion(), '71.1', '>')) {
-            $this->markTestSkipped('ICU version 71.1 or lower is required.');
-        }
-
         \Locale::setDefault('en_US');
 
         $transformer = new DateTimeToLocalizedStringTransformer('UTC', 'UTC');
@@ -343,9 +337,8 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         $transformer->reverseTransform('20107-03-21 12:34:56');
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
+    #[RequiresPhp('< 8.5')]
     public function testReverseTransformWrapsIntlErrorsWithErrorLevel()
     {
         $errorLevel = ini_set('intl.error_level', \E_WARNING);
@@ -359,9 +352,7 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         }
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
     public function testReverseTransformWrapsIntlErrorsWithExceptions()
     {
         $initialUseExceptions = ini_set('intl.use_exceptions', 1);
@@ -375,9 +366,8 @@ class DateTimeToLocalizedStringTransformerTest extends BaseDateTimeTransformerTe
         }
     }
 
-    /**
-     * @requires extension intl
-     */
+    #[RequiresPhpExtension('intl')]
+    #[RequiresPhp('< 8.5')]
     public function testReverseTransformWrapsIntlErrorsWithExceptionsAndErrorLevel()
     {
         $initialUseExceptions = ini_set('intl.use_exceptions', 1);

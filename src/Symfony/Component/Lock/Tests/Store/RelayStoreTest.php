@@ -11,15 +11,14 @@
 
 namespace Store;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Relay\Relay;
 use Symfony\Component\Lock\Tests\Store\AbstractRedisStoreTestCase;
 use Symfony\Component\Lock\Tests\Store\SharedLockStoreTestTrait;
 
-/**
- * @requires extension relay
- *
- * @group integration
- */
+#[RequiresPhpExtension('relay')]
+#[Group('integration')]
 class RelayStoreTest extends AbstractRedisStoreTestCase
 {
     use SharedLockStoreTestTrait;

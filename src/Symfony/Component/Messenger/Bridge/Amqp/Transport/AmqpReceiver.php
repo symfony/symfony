@@ -60,11 +60,11 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
             try {
                 $this->connection->queue($queueName)->getConnection()->reconnect();
                 $amqpEnvelope = $this->connection->get($queueName);
-            } catch (\AMQPException $exception) {
-                throw new TransportException($exception->getMessage(), 0, $exception);
+            } catch (\AMQPException $e) {
+                throw new TransportException($e->getMessage(), 0, $e);
             }
-        } catch (\AMQPException $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
+        } catch (\AMQPException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
         }
 
         if (null === $amqpEnvelope) {
@@ -72,26 +72,20 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
         }
 
         $body = $amqpEnvelope->getBody();
+        $id = $amqpEnvelope->getMessageId();
+        $stamps = [
+            new AmqpReceivedStamp($amqpEnvelope, $queueName),
+            ...($id ? [new TransportMessageIdStamp($id)] : []),
+        ];
 
         try {
-            $envelope = $this->serializer->decode([
+            yield $this->serializer->decode($data = [
                 'body' => false === $body ? '' : $body, // workaround https://github.com/pdezwart/php-amqp/issues/351
                 'headers' => $amqpEnvelope->getHeaders(),
-            ]);
-        } catch (MessageDecodingFailedException $exception) {
-            // invalid message of some type
-            $this->rejectAmqpEnvelope($amqpEnvelope, $queueName);
-
-            throw $exception;
+            ])->withoutAll(TransportMessageIdStamp::class)->with(...$stamps);
+        } catch (MessageDecodingFailedException $e) {
+            yield MessageDecodingFailedException::wrap($data, $e->getMessage(), $e->getCode(), $e)->with(...$stamps);
         }
-
-        if (null !== $amqpEnvelope->getMessageId()) {
-            $envelope = $envelope
-                ->withoutAll(TransportMessageIdStamp::class)
-                ->with(new TransportMessageIdStamp($amqpEnvelope->getMessageId()));
-        }
-
-        yield $envelope->with(new AmqpReceivedStamp($amqpEnvelope, $queueName));
     }
 
     public function ack(Envelope $envelope): void
@@ -106,11 +100,11 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
 
                 $this->connection->queue($stamp->getQueueName())->getConnection()->reconnect();
                 $this->connection->ack($stamp->getAmqpEnvelope(), $stamp->getQueueName());
-            } catch (\AMQPException $exception) {
-                throw new TransportException($exception->getMessage(), 0, $exception);
+            } catch (\AMQPException $e) {
+                throw new TransportException($e->getMessage(), 0, $e);
             }
-        } catch (\AMQPException $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
+        } catch (\AMQPException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
         }
     }
 
@@ -128,8 +122,8 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
     {
         try {
             return $this->connection->countMessagesInQueues();
-        } catch (\AMQPException $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
+        } catch (\AMQPException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
         }
     }
 
@@ -141,21 +135,16 @@ class AmqpReceiver implements QueueReceiverInterface, MessageCountAwareInterface
             try {
                 $this->connection->queue($queueName)->getConnection()->reconnect();
                 $this->connection->nack($amqpEnvelope, $queueName, \AMQP_NOPARAM);
-            } catch (\AMQPException $exception) {
-                throw new TransportException($exception->getMessage(), 0, $exception);
+            } catch (\AMQPException $e) {
+                throw new TransportException($e->getMessage(), 0, $e);
             }
-        } catch (\AMQPException $exception) {
-            throw new TransportException($exception->getMessage(), 0, $exception);
+        } catch (\AMQPException $e) {
+            throw new TransportException($e->getMessage(), 0, $e);
         }
     }
 
     private function findAmqpStamp(Envelope $envelope): AmqpReceivedStamp
     {
-        $amqpReceivedStamp = $envelope->last(AmqpReceivedStamp::class);
-        if (null === $amqpReceivedStamp) {
-            throw new LogicException('No "AmqpReceivedStamp" stamp found on the Envelope.');
-        }
-
-        return $amqpReceivedStamp;
+        return $envelope->last(AmqpReceivedStamp::class) ?? throw new LogicException('No "AmqpReceivedStamp" stamp found on the Envelope.');
     }
 }

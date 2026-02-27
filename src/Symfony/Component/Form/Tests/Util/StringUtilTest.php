@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Util;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Util\StringUtil;
 
@@ -24,17 +25,13 @@ class StringUtilTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider trimProvider
-     */
+    #[DataProvider('trimProvider')]
     public function testTrim($data, $expectedData)
     {
         $this->assertSame($expectedData, StringUtil::trim($data));
     }
 
-    /**
-     * @dataProvider spaceProvider
-     */
+    #[DataProvider('spaceProvider')]
     public function testTrimUtf8Separators($hex)
     {
         // Convert hexadecimal representation into binary
@@ -87,9 +84,26 @@ class StringUtilTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider fqcnToBlockPrefixProvider
-     */
+    #[DataProvider('normalizeNewlinesProvider')]
+    public function testNormalizeNewlines($data, $expectedData)
+    {
+        $this->assertSame($expectedData, StringUtil::normalizeNewlines($data));
+    }
+
+    public static function normalizeNewlinesProvider(): array
+    {
+        return [
+            ["Line 1\r\nLine 2", "Line 1\nLine 2"],
+            ["Line 1\rLine 2", "Line 1\nLine 2"],
+            ["Line 1\r\nLine 2\rLine 3\nLine 4", "Line 1\nLine 2\nLine 3\nLine 4"],
+            ["Line 1\nLine 2", "Line 1\nLine 2"],
+            ['', ''],
+            ['Single line', 'Single line'],
+            ["Line 1\r\n\r\n\r\nLine 2", "Line 1\n\n\nLine 2"],
+        ];
+    }
+
+    #[DataProvider('fqcnToBlockPrefixProvider')]
     public function testFqcnToBlockPrefix($fqcn, $expectedBlockPrefix)
     {
         $blockPrefix = StringUtil::fqcnToBlockPrefix($fqcn);

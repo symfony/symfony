@@ -11,6 +11,8 @@
 
 namespace Symfony\Bridge\PhpUnit\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,6 +20,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @requires extension ext-dummy
  */
+#[RequiresPhpExtension('ext-dummy')]
 final class OnlyExpectingDeprecationSkippedTest extends TestCase
 {
     /**
@@ -27,6 +30,7 @@ final class OnlyExpectingDeprecationSkippedTest extends TestCase
      *
      * @expectedDeprecation unreachable
      */
+    #[Group('legacy')]
     public function testExpectingOnlyDeprecations()
     {
         $this->fail('should never be ran.');

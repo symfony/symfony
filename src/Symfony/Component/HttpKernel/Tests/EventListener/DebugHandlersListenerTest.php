@@ -61,7 +61,7 @@ class DebugHandlersListenerTest extends TestCase
         $listener = new DebugHandlersListener(null);
         $eHandler = new ErrorHandler();
         $event = new KernelEvent(
-            $this->createMock(HttpKernelInterface::class),
+            $this->createStub(HttpKernelInterface::class),
             Request::create('/'),
             HttpKernelInterface::MAIN_REQUEST
         );
@@ -119,14 +119,14 @@ class DebugHandlersListenerTest extends TestCase
         $this->assertInstanceOf(\Closure::class, $xHandler);
 
         $app->expects($this->once())
-            ->method(method_exists(Application::class, 'renderThrowable') ? 'renderThrowable' : 'renderException');
+            ->method('renderThrowable');
 
         $xHandler(new \Exception());
     }
 
     public function testReplaceExistingExceptionHandler()
     {
-        $userHandler = function () {};
+        $userHandler = static function () {};
         $listener = new DebugHandlersListener($userHandler);
         $eHandler = new ErrorHandler();
         $eHandler->setExceptionHandler('var_dump');

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\AhaSend\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -26,9 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class AhaSendApiTransportTest extends TestCase
 {
-    /**
-     * @dataProvider getTransportData
-     */
+    #[DataProvider('getTransportData')]
     public function testToString(AhaSendApiTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);
@@ -120,7 +119,7 @@ class AhaSendApiTransportTest extends TestCase
 
         $expectedEvent = (new AhaSendDeliveryEvent('someone@gmil.com: Invalid recipient'));
 
-        $dispatcher = $this->createMock(EventDispatcherInterface::class);
+        $dispatcher = $this->createStub(EventDispatcherInterface::class);
         $dispatcher
             ->method('dispatch')
             ->willReturnCallback(function ($event) use ($expectedEvent) {

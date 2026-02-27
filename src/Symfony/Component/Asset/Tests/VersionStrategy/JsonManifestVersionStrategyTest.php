@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Asset\Tests\VersionStrategy;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Asset\Exception\AssetNotFoundException;
 use Symfony\Component\Asset\Exception\RuntimeException;
@@ -20,33 +21,25 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 class JsonManifestVersionStrategyTest extends TestCase
 {
-    /**
-     * @dataProvider provideValidStrategies
-     */
+    #[DataProvider('provideValidStrategies')]
     public function testGetVersion(JsonManifestVersionStrategy $strategy)
     {
         $this->assertSame('main.123abc.js', $strategy->getVersion('main.js'));
     }
 
-    /**
-     * @dataProvider provideValidStrategies
-     */
+    #[DataProvider('provideValidStrategies')]
     public function testApplyVersion(JsonManifestVersionStrategy $strategy)
     {
         $this->assertSame('css/styles.555def.css', $strategy->applyVersion('css/styles.css'));
     }
 
-    /**
-     * @dataProvider provideValidStrategies
-     */
+    #[DataProvider('provideValidStrategies')]
     public function testApplyVersionWhenKeyDoesNotExistInManifest(JsonManifestVersionStrategy $strategy)
     {
         $this->assertSame('css/other.css', $strategy->applyVersion('css/other.css'));
     }
 
-    /**
-     * @dataProvider provideStrictStrategies
-     */
+    #[DataProvider('provideStrictStrategies')]
     public function testStrictExceptionWhenKeyDoesNotExistInManifest(JsonManifestVersionStrategy $strategy, $path, $message)
     {
         $this->expectException(AssetNotFoundException::class);
@@ -55,18 +48,20 @@ class JsonManifestVersionStrategyTest extends TestCase
         $strategy->getVersion($path);
     }
 
-    /**
-     * @dataProvider provideMissingStrategies
-     */
+    #[DataProvider('provideMissingStrictStrategies')]
     public function testMissingManifestFileThrowsException(JsonManifestVersionStrategy $strategy)
     {
         $this->expectException(RuntimeException::class);
         $strategy->getVersion('main.js');
     }
 
-    /**
-     * @dataProvider provideInvalidStrategies
-     */
+    #[DataProvider('provideMissingStrategies')]
+    public function testMissingManifestFileReturnsOriginalPathInNonStrictMode(JsonManifestVersionStrategy $strategy)
+    {
+        $this->assertSame('main.js', $strategy->applyVersion('main.js'));
+    }
+
+    #[DataProvider('provideInvalidStrategies')]
     public function testManifestFileWithBadJSONThrowsException(JsonManifestVersionStrategy $strategy)
     {
         $this->expectException(RuntimeException::class);
@@ -97,9 +92,14 @@ class JsonManifestVersionStrategyTest extends TestCase
         yield from static::provideStrategies('non-existent-file.json');
     }
 
-    public static function provideStrategies(string $manifestPath): \Generator
+    public static function provideMissingStrictStrategies(): \Generator
     {
-        $httpClient = new MockHttpClient(function ($method, $url, $options) {
+        yield from static::provideStrategies('non-existent-file.json', true);
+    }
+
+    public static function provideStrategies(string $manifestPath, bool $strictMode = false): \Generator
+    {
+        $httpClient = new MockHttpClient(static function ($method, $url, $options) {
             $filename = __DIR__.'/../Fixtures/'.basename($url);
 
             if (file_exists($filename)) {
@@ -109,9 +109,9 @@ class JsonManifestVersionStrategyTest extends TestCase
             return new MockResponse('{}', ['http_code' => 404]);
         });
 
-        yield [new JsonManifestVersionStrategy('https://cdn.example.com/'.$manifestPath, $httpClient)];
+        yield [new JsonManifestVersionStrategy('https://cdn.example.com/'.$manifestPath, $httpClient, $strictMode)];
 
-        yield [new JsonManifestVersionStrategy(__DIR__.'/../Fixtures/'.$manifestPath)];
+        yield [new JsonManifestVersionStrategy(__DIR__.'/../Fixtures/'.$manifestPath, null, $strictMode)];
     }
 
     public static function provideStrictStrategies(): \Generator

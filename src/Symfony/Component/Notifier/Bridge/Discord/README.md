@@ -14,6 +14,12 @@ where:
  - `TOKEN` the secure token of the webhook (returned for Incoming Webhooks)
  - `ID` the id of the webhook
 
+To use a custom application bot:
+
+```
+DISCORD_DSN=discord+bot://BOT_TOKEN@default
+```
+
 Adding Interactions to a Message
 --------------------------------
 

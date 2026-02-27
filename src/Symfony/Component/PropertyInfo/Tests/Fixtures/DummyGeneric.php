@@ -38,4 +38,13 @@ class DummyGeneric
      */
     public $nullableInterface;
 
+    /**
+     * @var Clazz<int, Dummy>
+     */
+    public $twoGenerics;
+
+    /**
+     * @var Clazz<int, Dummy, string>
+     */
+    public $threeGenerics;
 }

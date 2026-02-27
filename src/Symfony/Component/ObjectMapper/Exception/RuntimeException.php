@@ -12,8 +12,6 @@
 namespace Symfony\Component\ObjectMapper\Exception;
 
 /**
- * @experimental
- *
  * @author Antoine Bluchet <soyuka@gmail.com>
  */
 class RuntimeException extends \RuntimeException implements ExceptionInterface

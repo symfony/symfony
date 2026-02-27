@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\RequestMatcher;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
 
 class PathRequestMatcherTest extends TestCase
 {
-    /**
-     * @dataProvider getData
-     */
+    #[DataProvider('getData')]
     public function test(string $regexp, bool $expected)
     {
         $matcher = new PathRequestMatcher($regexp);

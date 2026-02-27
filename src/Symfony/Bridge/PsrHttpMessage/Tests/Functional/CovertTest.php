@@ -15,6 +15,7 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\Response as Psr7Response;
 use Nyholm\Psr7\ServerRequest as Psr7Request;
 use Nyholm\Psr7\Stream as Psr7Stream;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -28,7 +29,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Test to convert a request/response back and forth to make sure we do not loose data.
+ * Test to convert a request/response back and forth to make sure we do not lose data.
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
@@ -41,9 +42,7 @@ class CovertTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider requestProvider
-     */
+    #[DataProvider('requestProvider')]
     public function testConvertRequestMultipleTimes(ServerRequestInterface|Request $request, HttpMessageFactoryInterface|HttpFoundationFactoryInterface $firstFactory, HttpMessageFactoryInterface|HttpFoundationFactoryInterface $secondFactory)
     {
         $temporaryRequest = $firstFactory->createRequest($request);
@@ -71,7 +70,7 @@ class CovertTest extends TestCase
             $this->assertEquals($request->getUser(), $finalRequest->getUser());
             $this->assertEquals($request->getUserInfo(), $finalRequest->getUserInfo());
         } elseif ($finalRequest instanceof ServerRequestInterface) {
-            $strToLower = function ($arr) {
+            $strToLower = static function ($arr) {
                 foreach ($arr as $key => $value) {
                     yield strtolower($key) => $value;
                 }
@@ -146,14 +145,10 @@ class CovertTest extends TestCase
 
         return array_merge([
             [$sfRequest, $psr17Factory, $symfonyFactory],
-        ], array_map(function ($psr7Request) use ($symfonyFactory, $psr17Factory) {
-            return [$psr7Request, $symfonyFactory, $psr17Factory];
-        }, $psr7Requests));
+        ], array_map(static fn ($psr7Request) => [$psr7Request, $symfonyFactory, $psr17Factory], $psr7Requests));
     }
 
-    /**
-     * @dataProvider responseProvider
-     */
+    #[DataProvider('responseProvider')]
     public function testConvertResponseMultipleTimes(ResponseInterface|Response $response, HttpMessageFactoryInterface|HttpFoundationFactoryInterface $firstFactory, HttpMessageFactoryInterface|HttpFoundationFactoryInterface $secondFactory)
     {
         $temporaryResponse = $firstFactory->createResponse($response);
@@ -172,7 +167,7 @@ class CovertTest extends TestCase
             $this->assertEquals($response->getStatusCode(), $finalResponse->getStatusCode());
             $this->assertEquals($response->getTtl(), $finalResponse->getTtl());
         } elseif ($finalResponse instanceof ResponseInterface) {
-            $strToLower = function ($arr) {
+            $strToLower = static function ($arr) {
                 foreach ($arr as $key => $value) {
                     yield strtolower($key) => $value;
                 }

@@ -76,22 +76,22 @@ class PoFileDumper extends FileDumper
         }
 
         $intervalRegexp = <<<'EOF'
-/^(?P<interval>
-    ({\s*
-        (\-?\d+(\.\d+)?[\s*,\s*\-?\d+(\.\d+)?]*)
-    \s*})
+            /^(?P<interval>
+                ({\s*
+                    (\-?\d+(\.\d+)?[\s*,\s*\-?\d+(\.\d+)?]*)
+                \s*})
 
-        |
+                    |
 
-    (?P<left_delimiter>[\[\]])
-        \s*
-        (?P<left>-Inf|\-?\d+(\.\d+)?)
-        \s*,\s*
-        (?P<right>\+?Inf|\-?\d+(\.\d+)?)
-        \s*
-    (?P<right_delimiter>[\[\]])
-)\s*(?P<message>.*?)$/xs
-EOF;
+                (?P<left_delimiter>[\[\]])
+                    \s*
+                    (?P<left>-Inf|\-?\d+(\.\d+)?)
+                    \s*,\s*
+                    (?P<right>\+?Inf|\-?\d+(\.\d+)?)
+                    \s*
+                (?P<right_delimiter>[\[\]])
+            )\s*(?P<message>.*?)$/xs
+            EOF;
 
         $standardRules = [];
         foreach ($parts as $part) {

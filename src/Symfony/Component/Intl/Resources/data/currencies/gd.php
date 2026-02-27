@@ -1166,6 +1166,10 @@ return [
             'ZWD',
             'Dolar Sìombabuthach (1980–2008)',
         ],
+        'ZWG' => [
+            'ZWG',
+            'Òr Sìombabuthach',
+        ],
         'ZWL' => [
             'ZWL',
             'Dolar Sìombabuthach (2009)',

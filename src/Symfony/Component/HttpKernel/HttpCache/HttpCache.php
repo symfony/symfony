@@ -210,7 +210,13 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             $this->record($request, 'reload');
             $response = $this->fetch($request, $catch);
         } else {
-            $response = $this->lookup($request, $catch);
+            $response = null;
+            do {
+                try {
+                    $response = $this->lookup($request, $catch);
+                } catch (CacheWasLockedException) {
+                }
+            } while (null === $response);
         }
 
         $this->restoreResponseBody($request, $response);
@@ -476,7 +482,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
          * stale-if-error case even if they have a `s-maxage` Cache-Control directive.
          */
         if (null !== $entry
-            && \in_array($response->getStatusCode(), [500, 502, 503, 504])
+            && \in_array($response->getStatusCode(), [500, 502, 503, 504], true)
             && !$entry->headers->hasCacheControlDirective('no-cache')
             && !$entry->mustRevalidate()
         ) {
@@ -558,23 +564,17 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
             return true;
         }
 
+        $this->record($request, 'waiting');
+
         // wait for the lock to be released
         if ($this->waitForLock($request)) {
-            // replace the current entry with the fresh one
-            $new = $this->lookup($request);
-            $entry->headers = $new->headers;
-            $entry->setContent($new->getContent());
-            $entry->setStatusCode($new->getStatusCode());
-            $entry->setProtocolVersion($new->getProtocolVersion());
-            foreach ($new->headers->getCookies() as $cookie) {
-                $entry->headers->setCookie($cookie);
-            }
-        } else {
-            // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
-            $entry->setStatusCode(503);
-            $entry->setContent('503 Service Unavailable');
-            $entry->headers->set('Retry-After', 10);
+            throw new CacheWasLockedException(); // unwind back to handle(), try again
         }
+
+        // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
+        $entry->setStatusCode(503);
+        $entry->setContent('503 Service Unavailable');
+        $entry->headers->set('Retry-After', 10);
 
         return true;
     }

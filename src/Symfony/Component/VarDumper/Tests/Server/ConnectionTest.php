@@ -56,17 +56,18 @@ class ConnectionTest extends TestCase
 
         $this->assertTrue($process->isSuccessful());
         $this->assertStringMatchesFormat(<<<'DUMP'
-(3) "foo"
-[
-  "timestamp" => %d.%d
-  "foo_provider" => [
-    (3) "foo"
-  ]
-]
-%d
+            (3) "foo"
+            [
+              "timestamp" => %d.%d
+              "foo_provider" => [
+                (3) "foo"
+              ]
+            ]
+            %d
 
-DUMP
-            , $dumped);
+            DUMP,
+            $dumped
+        );
     }
 
     public function testNoServer()

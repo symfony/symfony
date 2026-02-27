@@ -37,6 +37,7 @@ use Symfony\Component\Security\Http\AccessToken\ChainAccessTokenExtractor;
 use Symfony\Component\Security\Http\AccessToken\FormEncodedBodyExtractor;
 use Symfony\Component\Security\Http\AccessToken\HeaderAccessTokenExtractor;
 use Symfony\Component\Security\Http\AccessToken\OAuth2\Oauth2TokenHandler;
+use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenGenerator;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcTokenHandler;
 use Symfony\Component\Security\Http\AccessToken\Oidc\OidcUserInfoTokenHandler;
 use Symfony\Component\Security\Http\AccessToken\QueryAccessTokenExtractor;
@@ -199,6 +200,17 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('http_client'),
                 service('logger')->nullOnInvalid(),
+            ])
+
+        ->set('security.access_token_handler.oidc.generator', OidcTokenGenerator::class)
+            ->abstract()
+            ->args([
+                abstract_arg('signature algorithm'),
+                abstract_arg('signature key'),
+                abstract_arg('audience'),
+                abstract_arg('issuers'),
+                abstract_arg('claim'),
+                service('clock'),
             ])
     ;
 };

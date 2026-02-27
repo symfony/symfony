@@ -11,11 +11,12 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\RequiresMethod;
+use Symfony\Bundle\MercureBundle\MercureBundle;
+
 final class NotificationTest extends AbstractWebTestCase
 {
-    /**
-     * @requires function \Symfony\Bundle\MercureBundle\MercureBundle::build
-     */
+    #[RequiresMethod(MercureBundle::class, 'build')]
     public function testNotifierAssertion()
     {
         $client = $this->createClient(['test_case' => 'Notifier', 'root_config' => 'config.yml', 'debug' => true]);

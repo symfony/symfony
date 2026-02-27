@@ -12,13 +12,12 @@
 namespace Symfony\Component\Cache\Tests;
 
 use Cache\IntegrationTests\SimpleCacheTest;
+use PHPUnit\Framework\Attributes\Group;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Cache\Tests\Fixtures\ExternalAdapter;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class Psr16CacheWithExternalAdapter extends SimpleCacheTest
 {
     protected function setUp(): void

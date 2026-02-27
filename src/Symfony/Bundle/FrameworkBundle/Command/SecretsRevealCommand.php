@@ -38,10 +38,10 @@ final class SecretsRevealCommand extends Command
         $this
             ->addArgument('name', InputArgument::REQUIRED, 'The name of the secret to reveal', null, fn () => array_keys($this->vault->list()))
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command reveals a stored secret.
+                The <info>%command.name%</info> command reveals a stored secret.
 
-    <info>%command.full_name%</info>
-EOF
+                    <info>%command.full_name%</info>
+                EOF
             )
         ;
     }
@@ -60,6 +60,10 @@ EOF
         } else {
             if (!\array_key_exists($name, $secrets)) {
                 $io->error(\sprintf('The secret "%s" does not exist.', $name));
+
+                return self::INVALID;
+            } elseif (null === $secrets[$name]) {
+                $io->error(\sprintf('The secret "%s" could not be decrypted.', $name));
 
                 return self::INVALID;
             }

@@ -41,15 +41,7 @@ final class BuiltinType extends Type
     public function isIdentifiedBy(TypeIdentifier|string ...$identifiers): bool
     {
         foreach ($identifiers as $identifier) {
-            if (\is_string($identifier)) {
-                try {
-                    $identifier = TypeIdentifier::from($identifier);
-                } catch (\ValueError) {
-                    continue;
-                }
-            }
-
-            if ($identifier === $this->typeIdentifier) {
+            if ($identifier === $this->typeIdentifier || $identifier === $this->typeIdentifier->value) {
                 return true;
             }
         }
@@ -59,7 +51,7 @@ final class BuiltinType extends Type
 
     public function isNullable(): bool
     {
-        return \in_array($this->typeIdentifier, [TypeIdentifier::NULL, TypeIdentifier::MIXED]);
+        return \in_array($this->typeIdentifier, [TypeIdentifier::NULL, TypeIdentifier::MIXED], true);
     }
 
     public function accepts(mixed $value): bool

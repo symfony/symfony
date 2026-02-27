@@ -1,7 +1,10 @@
 <?php
 
+/**
+ * @return list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>|null
+ */
 return static function (mixed $stream, \Psr\Container\ContainerInterface $valueTransformers, \Symfony\Component\JsonStreamer\Read\LazyInstantiator $instantiator, array $options): mixed {
-    $providers['array<int,Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>'] = static function ($stream, $offset, $length) use ($options, $valueTransformers, $instantiator, &$providers) {
+    $providers['list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>'] = static function ($stream, $offset, $length) use ($options, $valueTransformers, $instantiator, &$providers) {
         $data = \Symfony\Component\JsonStreamer\Read\Splitter::splitList($stream, $offset, $length);
         $iterable = static function ($stream, $data) use ($options, $valueTransformers, $instantiator, &$providers) {
             foreach ($data as $k => $v) {
@@ -22,15 +25,15 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $valueT
             }
         });
     };
-    $providers['array<int,Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>|null'] = static function ($stream, $offset, $length) use ($options, $valueTransformers, $instantiator, &$providers) {
+    $providers['list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>|null'] = static function ($stream, $offset, $length) use ($options, $valueTransformers, $instantiator, &$providers) {
         $data = \Symfony\Component\JsonStreamer\Read\Decoder::decodeStream($stream, $offset, $length);
         if (\is_array($data) && \array_is_list($data)) {
-            return $providers['array<int,Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>']($data);
+            return $providers['list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>']($stream, $offset, $length);
         }
         if (null === $data) {
             return null;
         }
-        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "array<int,Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>|null".', \get_debug_type($data)));
+        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>|null'));
     };
-    return $providers['array<int,Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>|null']($stream, 0, null);
+    return $providers['list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>|null']($stream, 0, null);
 };

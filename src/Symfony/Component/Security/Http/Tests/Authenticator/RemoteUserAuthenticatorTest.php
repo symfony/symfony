@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
@@ -21,9 +22,7 @@ use Symfony\Component\Security\Http\Authenticator\RemoteUserAuthenticator;
 
 class RemoteUserAuthenticatorTest extends TestCase
 {
-    /**
-     * @dataProvider provideAuthenticators
-     */
+    #[DataProvider('provideAuthenticators')]
     public function testSupport(InMemoryUserProvider $userProvider, RemoteUserAuthenticator $authenticator, $parameterName)
     {
         $request = $this->createRequest([$parameterName => 'TheUsername']);
@@ -50,9 +49,7 @@ class RemoteUserAuthenticatorTest extends TestCase
         $this->assertTrue($authenticator->supports($this->createRequest(['REMOTE_USER' => 'another_username'])));
     }
 
-    /**
-     * @dataProvider provideAuthenticators
-     */
+    #[DataProvider('provideAuthenticators')]
     public function testAuthenticate(InMemoryUserProvider $userProvider, RemoteUserAuthenticator $authenticator, $parameterName)
     {
         $request = $this->createRequest([$parameterName => 'TheUsername']);

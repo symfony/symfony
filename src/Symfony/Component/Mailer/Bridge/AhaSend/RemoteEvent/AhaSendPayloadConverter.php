@@ -21,7 +21,7 @@ final class AhaSendPayloadConverter implements PayloadConverterInterface
 {
     public function convert(array $payload): AbstractMailerEvent
     {
-        if (\in_array($payload['type'], ['message.clicked', 'message.opened'])) {
+        if (\in_array($payload['type'], ['message.clicked', 'message.opened'], true)) {
             $name = match ($payload['type']) {
                 'message.clicked' => MailerEngagementEvent::CLICK,
                 'message.opened' => MailerEngagementEvent::OPEN,

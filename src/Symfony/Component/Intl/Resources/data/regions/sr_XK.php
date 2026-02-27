@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'UserAssignedNames' => [],
     'Names' => [
         'CG' => 'Конго',
         'CV' => 'Кабо Верде',

@@ -23,11 +23,12 @@ class NodeTest extends TestCase
         $node = new Node([new ConstantNode('foo')]);
 
         $this->assertEquals(<<<'EOF'
-Node(
-    ConstantNode(value: 'foo')
-)
-EOF
-            , (string) $node);
+            Node(
+                ConstantNode(value: 'foo')
+            )
+            EOF,
+            (string) $node
+        );
     }
 
     public function testSerialization()
@@ -51,7 +52,7 @@ EOF
         }
 
         $node = new Node($nodes);
-        $node->compile($this->createMock(Compiler::class));
+        $node->compile(new Compiler([]));
     }
 
     public function testEvaluateActuallyEvaluatesAllNodes()

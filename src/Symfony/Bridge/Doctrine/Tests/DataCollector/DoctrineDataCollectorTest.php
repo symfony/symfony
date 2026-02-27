@@ -15,6 +15,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\Persistence\ManagerRegistry;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\DataCollector\DoctrineDataCollector;
 use Symfony\Bridge\Doctrine\Middleware\Debug\DebugDataHolder;
@@ -148,9 +149,7 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertEquals([], $c->getQueries());
     }
 
-    /**
-     * @dataProvider paramProvider
-     */
+    #[DataProvider('paramProvider')]
     public function testCollectQueries($param, $types, $expected)
     {
         $queries = [
@@ -199,9 +198,7 @@ class DoctrineDataCollectorTest extends TestCase
         $this->assertTrue($collectedQueries['default'][1]['runnable']);
     }
 
-    /**
-     * @dataProvider paramProvider
-     */
+    #[DataProvider('paramProvider')]
     public function testSerialization($param, array $types, $expected)
     {
         $queries = [
@@ -241,23 +238,19 @@ class DoctrineDataCollectorTest extends TestCase
 
     private function createCollector(array $queries): DoctrineDataCollector
     {
-        $connection = $this->getMockBuilder(Connection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $connection->expects($this->any())
+        $connection = $this->createStub(Connection::class);
+        $connection
             ->method('getDatabasePlatform')
             ->willReturn(new MySQLPlatform());
 
-        $registry = $this->createMock(ManagerRegistry::class);
+        $registry = $this->createStub(ManagerRegistry::class);
         $registry
-            ->expects($this->any())
             ->method('getConnectionNames')
             ->willReturn(['default' => 'doctrine.dbal.default_connection']);
         $registry
-            ->expects($this->any())
             ->method('getManagerNames')
             ->willReturn(['default' => 'doctrine.orm.default_entity_manager']);
-        $registry->expects($this->any())
+        $registry
             ->method('getConnection')
             ->willReturn($connection);
 

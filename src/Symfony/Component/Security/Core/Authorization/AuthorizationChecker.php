@@ -17,6 +17,10 @@ use Symfony\Component\Security\Core\Authentication\Token\OfflineTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+// Help opcache.preload discover always-needed symbols
+class_exists(AbstractToken::class);
+class_exists(OfflineTokenInterface::class);
+
 /**
  * AuthorizationChecker is the main authorization point of the Security component.
  *

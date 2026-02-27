@@ -11,22 +11,21 @@
 
 namespace Symfony\Component\Config\Tests\Definition;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\BaseNode;
 use Symfony\Component\Config\Definition\NodeInterface;
 
 class BaseNodeTest extends TestCase
 {
-    /**
-     * @dataProvider providePath
-     */
+    #[DataProvider('providePath')]
     public function testGetPathForChildNode(string $expected, array $params)
     {
         $constructorArgs = [];
         $constructorArgs[] = $params[0];
 
         if (isset($params[1])) {
-            $parent = $this->createMock(NodeInterface::class);
+            $parent = $this->createStub(NodeInterface::class);
             $parent->method('getPath')->willReturn($params[1]);
 
             $constructorArgs[] = $parent;

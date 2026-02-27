@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Encoder\ChainDecoder;
 use Symfony\Component\Serializer\Encoder\ContextAwareDecoderInterface;
@@ -24,14 +23,60 @@ class ChainDecoderTest extends TestCase
     private const FORMAT_2 = 'format2';
     private const FORMAT_3 = 'format3';
 
-    private ChainDecoder $chainDecoder;
-    private MockObject&ContextAwareDecoderInterface $decoder1;
-    private MockObject&DecoderInterface $decoder2;
-
-    protected function setUp(): void
+    public function testSupportsDecoding()
     {
-        $this->decoder1 = $this->createMock(ContextAwareDecoderInterface::class);
-        $this->decoder1
+        $decoder1 = $this->createDecoder1();
+        $decoder1
+            ->method('decode')
+            ->willReturn('result1');
+        $decoder2 = $this->createDecoder2();
+        $decoder2
+            ->method('decode')
+            ->willReturn('result2');
+        $chainDecoder = new ChainDecoder([$decoder1, $decoder2]);
+
+        $this->assertTrue($chainDecoder->supportsDecoding(self::FORMAT_1));
+        $this->assertEquals('result1', $chainDecoder->decode('', self::FORMAT_1, []));
+
+        $this->assertTrue($chainDecoder->supportsDecoding(self::FORMAT_2));
+        $this->assertEquals('result2', $chainDecoder->decode('', self::FORMAT_2, []));
+
+        $this->assertFalse($chainDecoder->supportsDecoding(self::FORMAT_3));
+
+        $this->assertTrue($chainDecoder->supportsDecoding(self::FORMAT_3, ['foo' => 'bar']));
+        $this->assertEquals('result1', $chainDecoder->decode('', self::FORMAT_3, ['foo' => 'bar']));
+
+        $this->assertTrue($chainDecoder->supportsDecoding(self::FORMAT_3, ['foo' => 'bar2']));
+        $this->assertEquals('result2', $chainDecoder->decode('', self::FORMAT_3, ['foo' => 'bar2']));
+    }
+
+    public function testDecode()
+    {
+        $decoder1 = $this->createDecoder1(true);
+        $decoder1->expects($this->never())->method('decode');
+        $decoder2 = $this->createDecoder2(true);
+        $decoder2->expects($this->once())->method('decode');
+        $chainDecoder = new ChainDecoder([$decoder1, $decoder2]);
+
+        $chainDecoder->decode('string_to_decode', self::FORMAT_2);
+    }
+
+    public function testDecodeUnsupportedFormat()
+    {
+        $chainDecoder = new ChainDecoder([$this->createDecoder1(), $this->createDecoder2()]);
+        $this->expectException(RuntimeException::class);
+        $chainDecoder->decode('string_to_decode', self::FORMAT_3);
+    }
+
+    private function createDecoder1(bool $mock = false): DecoderInterface
+    {
+        if ($mock) {
+            $decoder = $this->createMock(ContextAwareDecoderInterface::class);
+        } else {
+            $decoder = $this->createStub(ContextAwareDecoderInterface::class);
+        }
+
+        $decoder
             ->method('supportsDecoding')
             ->willReturnMap([
                 [self::FORMAT_1, [], true],
@@ -41,8 +86,18 @@ class ChainDecoderTest extends TestCase
                 [self::FORMAT_3, ['foo' => 'bar2'], false],
             ]);
 
-        $this->decoder2 = $this->createMock(DecoderInterface::class);
-        $this->decoder2
+        return $decoder;
+    }
+
+    private function createDecoder2(bool $mock = false): DecoderInterface
+    {
+        if ($mock) {
+            $decoder = $this->createMock(DecoderInterface::class);
+        } else {
+            $decoder = $this->createStub(DecoderInterface::class);
+        }
+
+        $decoder
             ->method('supportsDecoding')
             ->willReturnMap([
                 [self::FORMAT_1, [], false],
@@ -52,44 +107,6 @@ class ChainDecoderTest extends TestCase
                 [self::FORMAT_3, ['foo' => 'bar2'], true],
             ]);
 
-        $this->chainDecoder = new ChainDecoder([$this->decoder1, $this->decoder2]);
-    }
-
-    public function testSupportsDecoding()
-    {
-        $this->decoder1
-            ->method('decode')
-            ->willReturn('result1');
-        $this->decoder2
-            ->method('decode')
-            ->willReturn('result2');
-
-        $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_1));
-        $this->assertEquals('result1', $this->chainDecoder->decode('', self::FORMAT_1, []));
-
-        $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_2));
-        $this->assertEquals('result2', $this->chainDecoder->decode('', self::FORMAT_2, []));
-
-        $this->assertFalse($this->chainDecoder->supportsDecoding(self::FORMAT_3));
-
-        $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_3, ['foo' => 'bar']));
-        $this->assertEquals('result1', $this->chainDecoder->decode('', self::FORMAT_3, ['foo' => 'bar']));
-
-        $this->assertTrue($this->chainDecoder->supportsDecoding(self::FORMAT_3, ['foo' => 'bar2']));
-        $this->assertEquals('result2', $this->chainDecoder->decode('', self::FORMAT_3, ['foo' => 'bar2']));
-    }
-
-    public function testDecode()
-    {
-        $this->decoder1->expects($this->never())->method('decode');
-        $this->decoder2->expects($this->once())->method('decode');
-
-        $this->chainDecoder->decode('string_to_decode', self::FORMAT_2);
-    }
-
-    public function testDecodeUnsupportedFormat()
-    {
-        $this->expectException(RuntimeException::class);
-        $this->chainDecoder->decode('string_to_decode', self::FORMAT_3);
+        return $decoder;
     }
 }

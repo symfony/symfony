@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\HttpClient\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bridge\PhpUnit\DnsMock;
 use Symfony\Component\HttpClient\NativeHttpClient;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\Test\TestHttpServer;
 
-/**
- * @group dns-sensitive
- */
+#[Group('dns-sensitive')]
 class NativeHttpClientTest extends HttpClientTestCase
 {
     protected function getHttpClient(string $testCase): HttpClientInterface

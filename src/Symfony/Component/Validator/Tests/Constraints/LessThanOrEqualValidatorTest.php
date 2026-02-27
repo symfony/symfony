@@ -84,4 +84,26 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
             ['c', '"c"', 'b', '"b"', 'string'],
         ];
     }
+
+    public static function provideComparisonsToNullValueAtPropertyPath(): array
+    {
+        return [
+            [5, '5', true],
+        ];
+    }
+
+    public function testInvalidComparisonWithExtremeDateDoesNotThrow()
+    {
+        $constraint = new LessThanOrEqual(value: new \DateTimeImmutable('2025-01-01'));
+        $constraint->message = 'Constraint Message';
+
+        $extremeDate = (new \DateTimeImmutable())->setDate(185449, 12, 31)->setTime(23, 0, 0);
+
+        $this->validator->validate($extremeDate, $constraint);
+
+        $violations = $this->context->getViolations();
+        $this->assertCount(1, $violations);
+        $this->assertSame('Constraint Message', $violations[0]->getMessageTemplate());
+        $this->assertSame(LessThanOrEqual::TOO_HIGH_ERROR, $violations[0]->getCode());
+    }
 }

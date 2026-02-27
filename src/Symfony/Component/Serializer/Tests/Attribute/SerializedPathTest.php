@@ -34,6 +34,6 @@ class SerializedPathTest extends TestCase
         $path = '[one][two]';
         $serializedPath = new SerializedPath($path);
         $propertyPath = new PropertyPath($path);
-        $this->assertEquals($propertyPath, $serializedPath->getSerializedPath());
+        $this->assertEquals($propertyPath, $serializedPath->serializedPath);
     }
 }

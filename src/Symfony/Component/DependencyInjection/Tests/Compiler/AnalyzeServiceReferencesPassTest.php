@@ -17,6 +17,7 @@ use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\ExpressionLanguage\Expression;
 
 class AnalyzeServiceReferencesPassTest extends TestCase
 {
@@ -202,6 +203,29 @@ class AnalyzeServiceReferencesPassTest extends TestCase
 
         $this->assertTrue($graph->hasNode('foo'));
         $this->assertCount(1, $graph->getNode('foo')->getInEdges());
+    }
+
+    public function testExpressionReferenceKeepsConstructorFlag()
+    {
+        $container = new ContainerBuilder();
+        $container->register('bar');
+        $container
+            ->register('foo')
+            ->addArgument(new Expression('service("bar")'));
+
+        $graph = $this->process($container);
+
+        $edges = $graph->getNode('bar')->getInEdges();
+        $exprEdge = null;
+        foreach ($edges as $edge) {
+            if ('.internal.reference_in_expression' === $edge->getSourceNode()->getId()) {
+                $exprEdge = $edge;
+                break;
+            }
+        }
+
+        $this->assertNotNull($exprEdge, 'Expression edge should exist.');
+        $this->assertTrue($exprEdge->isReferencedByConstructor());
     }
 
     protected function process(ContainerBuilder $container)

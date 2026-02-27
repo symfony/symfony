@@ -22,11 +22,13 @@ use Symfony\Component\Form\Exception\OutOfBoundsException;
 use Symfony\Component\Form\Exception\RuntimeException;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Validator\Constraints\Form as AssertForm;
 use Symfony\Component\Form\Util\FormUtil;
 use Symfony\Component\Form\Util\InheritDataAwareIterator;
 use Symfony\Component\Form\Util\OrderedHashMap;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
+use Symfony\Component\Validator\Constraints\Traverse;
 
 /**
  * Form represents a form.
@@ -68,6 +70,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  *
  * @implements \IteratorAggregate<string, FormInterface>
  */
+#[AssertForm]
+#[Traverse(false)]
 class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterface
 {
     private ?FormInterface $parent = null;
@@ -301,7 +305,7 @@ class Form implements \IteratorAggregate, FormInterface, ClearableErrorsInterfac
             if (null !== $dataClass && !$viewData instanceof $dataClass) {
                 $actualType = get_debug_type($viewData);
 
-                throw new LogicException('The form\'s view data is expected to be a "'.$dataClass.'", but it is a "'.$actualType.'". You can avoid this error by setting the "data_class" option to null or by adding a view transformer that transforms "'.$actualType.'" to an instance of "'.$dataClass.'".');
+                throw new LogicException(\sprintf('The form\'s view data is expected to be a "%s", but it is a "%s". You can avoid this error by setting the "data_class" option to null or by adding a view transformer that transforms "%2$s" to an instance of "%1$s".', $dataClass, $actualType));
             }
         }
 

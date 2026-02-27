@@ -14,6 +14,7 @@ namespace Symfony\Contracts\Translation\Test;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Contracts\Translation\TranslatorTrait;
 
@@ -26,7 +27,7 @@ use Symfony\Contracts\Translation\TranslatorTrait;
  *
  * As mentioned by chx http://drupal.org/node/1273968 we can cover all by testing number from 0 to 199
  *
- * The goal to cover all languages is to far fetched so this test case is smaller.
+ * The goal to cover all languages is too far fetched so this test case is smaller.
  *
  * @author Clemens Tolboom clemens@build2be.nl
  */
@@ -124,10 +125,12 @@ class TranslatorTest extends TestCase
 
     public static function getTransTests()
     {
-        return [
-            ['Symfony is great!', 'Symfony is great!', []],
-            ['Symfony is awesome!', 'Symfony is %what%!', ['%what%' => 'awesome']],
-        ];
+        yield ['Symfony is great!', 'Symfony is great!', []];
+        yield ['Symfony is awesome!', 'Symfony is %what%!', ['%what%' => 'awesome']];
+
+        if (class_exists(TranslatableMessage::class)) {
+            yield ['He said "Symfony is awesome!".', 'He said "%what%".', ['%what%' => new TranslatableMessage('Symfony is %what%!', ['%what%' => 'awesome'])]];
+        }
     }
 
     public static function getTransChoiceTests()
@@ -346,7 +349,7 @@ class TranslatorTest extends TestCase
      * This both depends on a complete list trying to add above as understanding
      * the plural rules of the current failing languages.
      *
-     * @return array with nplural together with langcodes
+     * @return array With nplural together with langcodes
      */
     public static function failingLangcodes(): array
     {

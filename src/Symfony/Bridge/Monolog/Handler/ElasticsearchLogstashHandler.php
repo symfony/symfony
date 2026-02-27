@@ -61,7 +61,7 @@ final class ElasticsearchLogstashHandler extends AbstractHandler
         bool $bubble = true,
         private string $elasticsearchVersion = '1.0.0',
     ) {
-        if (!interface_exists(HttpClientInterface::class)) {
+        if (!$client && !class_exists(HttpClient::class)) {
             throw new \LogicException(\sprintf('The "%s" handler needs an HTTP client. Try running "composer require symfony/http-client".', __CLASS__));
         }
 
@@ -133,17 +133,17 @@ final class ElasticsearchLogstashHandler extends AbstractHandler
             ],
         ]);
 
-        $this->responses->attach($response);
+        $this->responses[$response] = null;
 
         $this->wait(false);
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -164,10 +164,10 @@ final class ElasticsearchLogstashHandler extends AbstractHandler
                     continue;
                 }
                 if ($chunk->isLast()) {
-                    $this->responses->detach($response);
+                    unset($this->responses[$response]);
                 }
             } catch (ExceptionInterface $e) {
-                $this->responses->detach($response);
+                unset($this->responses[$response]);
                 error_log(\sprintf("Could not push logs to Elasticsearch:\n%s", (string) $e));
             }
         }

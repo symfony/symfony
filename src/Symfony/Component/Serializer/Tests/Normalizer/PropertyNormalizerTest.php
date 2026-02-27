@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
 use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -30,10 +31,12 @@ use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummyChild;
+use Symfony\Component\Serializer\Tests\Fixtures\ChildClassDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Php74Dummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertyCircularReferenceDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\PropertySiblingHolder;
+use Symfony\Component\Serializer\Tests\Fixtures\SpecialBookDummy;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CacheableObjectAttributesTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CallbacksTestTrait;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\CircularReferenceTestTrait;
@@ -71,7 +74,7 @@ class PropertyNormalizerTest extends TestCase
 
     private function createNormalizer(array $defaultContext = []): void
     {
-        $this->serializer = $this->createMock(SerializerInterface::class);
+        $this->serializer = $this->createStub(SerializerInterface::class);
         $this->normalizer = new PropertyNormalizer(null, null, null, null, null, $defaultContext);
         $this->normalizer->setSerializer($this->serializer);
     }
@@ -174,6 +177,33 @@ class PropertyNormalizerTest extends TestCase
         );
         $this->assertEquals('foo', $obj->foo);
         $this->assertEquals('bar', $obj->getBar());
+    }
+
+    public function testDenormalizeWithReadOnlyClass()
+    {
+        /** @var ChildClassDummy $object */
+        $object = $this->normalizer->denormalize(
+            ['parentProp' => 'parentProp', 'childProp' => 'childProp'],
+            ChildClassDummy::class,
+            'any'
+        );
+
+        $this->assertSame('parentProp', $object->getParentProp());
+        $this->assertSame('childProp', $object->childProp);
+    }
+
+    public function testDenormalizeWithAsymmetricPropertyVisibility()
+    {
+        /** @var SpecialBookDummy $object */
+        $object = $this->normalizer->denormalize(
+            ['title' => 'life', 'author' => 'Santiago San Martin', 'pubYear' => 2000],
+            SpecialBookDummy::class,
+            'any'
+        );
+
+        $this->assertSame('life', $object->title);
+        $this->assertSame('Santiago San Martin', $object->author);
+        $this->assertSame(2000, $object->getPubYear());
     }
 
     public function testNormalizeWithParentClass()
@@ -425,7 +455,7 @@ class PropertyNormalizerTest extends TestCase
 
     public function testUnableToNormalizeObjectAttribute()
     {
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = $this->createStub(SerializerInterface::class);
         $this->normalizer->setSerializer($serializer);
 
         $obj = new PropertyDummy();
@@ -549,6 +579,23 @@ class PropertyNormalizerTest extends TestCase
                 PropertyDummyInterface::class
             )
         );
+    }
+
+    public function testDiscriminatorWithAllowExtraAttributesFalse()
+    {
+        // Discriminator type property should be allowed with allow_extra_attributes=false
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $discriminator = new ClassDiscriminatorFromClassMetadata($classMetadataFactory);
+        $normalizer = new PropertyNormalizer($classMetadataFactory, null, null, $discriminator);
+
+        $obj = $normalizer->denormalize(
+            ['type' => 'one'],
+            PropertyDummyInterface::class,
+            null,
+            [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false]
+        );
+
+        $this->assertInstanceOf(PropertyDiscriminatedDummyOne::class, $obj);
     }
 }
 

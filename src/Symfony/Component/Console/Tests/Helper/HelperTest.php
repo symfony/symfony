@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\Helper;
@@ -61,17 +62,13 @@ class HelperTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider formatTimeProvider
-     */
+    #[DataProvider('formatTimeProvider')]
     public function testFormatTime(int|float $secs, string $expectedFormat, int $precision)
     {
         $this->assertEquals($expectedFormat, Helper::formatTime($secs, $precision));
     }
 
-    /**
-     * @dataProvider decoratedTextProvider
-     */
+    #[DataProvider('decoratedTextProvider')]
     public function testRemoveDecoration(string $decoratedText, string $undecoratedText)
     {
         $this->assertEquals($undecoratedText, Helper::removeDecoration(new OutputFormatter(), $decoratedText));

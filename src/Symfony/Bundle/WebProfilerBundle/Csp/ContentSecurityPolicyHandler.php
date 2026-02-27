@@ -179,7 +179,7 @@ class ContentSecurityPolicyHandler
      */
     private function generateCspHeader(array $directives): string
     {
-        return array_reduce(array_keys($directives), fn ($res, $name) => ('' !== $res ? $res.'; ' : '').\sprintf('%s %s', $name, implode(' ', $directives[$name])), '');
+        return array_reduce(array_keys($directives), static fn ($res, $name) => ('' !== $res ? $res.'; ' : '').\sprintf('%s %s', $name, implode(' ', $directives[$name])), '');
     }
 
     /**

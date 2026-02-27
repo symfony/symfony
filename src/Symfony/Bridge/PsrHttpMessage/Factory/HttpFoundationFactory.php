@@ -96,7 +96,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
      */
     private function createUploadedFile(UploadedFileInterface $psrUploadedFile): UploadedFile
     {
-        return new UploadedFile($psrUploadedFile, function () { return $this->getTemporaryPath(); });
+        return new UploadedFile($psrUploadedFile, fn () => $this->getTemporaryPath());
     }
 
     /**

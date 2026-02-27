@@ -17,30 +17,10 @@ namespace Symfony\Component\Routing\Attribute;
 class DeprecatedAlias
 {
     public function __construct(
-        private string $aliasName,
-        private string $package,
-        private string $version,
-        private string $message = '',
+        public readonly string $aliasName,
+        public readonly string $package,
+        public readonly string $version,
+        public readonly string $message = '',
     ) {
-    }
-
-    public function getMessage(): string
-    {
-        return $this->message;
-    }
-
-    public function getAliasName(): string
-    {
-        return $this->aliasName;
-    }
-
-    public function getPackage(): string
-    {
-        return $this->package;
-    }
-
-    public function getVersion(): string
-    {
-        return $this->version;
     }
 }

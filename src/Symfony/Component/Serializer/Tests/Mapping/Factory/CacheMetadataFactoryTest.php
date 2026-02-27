@@ -16,7 +16,9 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Mapping\Factory\CacheClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\Tests\Fixtures\Dummy;
 
 /**
@@ -58,8 +60,7 @@ class CacheMetadataFactoryTest extends TestCase
 
     public function testInvalidClassThrowsException()
     {
-        $decorated = $this->createMock(ClassMetadataFactoryInterface::class);
-        $factory = new CacheClassMetadataFactory($decorated, new ArrayAdapter());
+        $factory = new CacheClassMetadataFactory(new ClassMetadataFactory(new AttributeLoader()), new ArrayAdapter());
 
         $this->expectException(InvalidArgumentException::class);
 

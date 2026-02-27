@@ -118,10 +118,10 @@ class ResolveBindingsPass extends AbstractRecursivePass
         foreach ($bindings as $key => $binding) {
             [$bindingValue, $bindingId, $used, $bindingType, $file] = $binding->getValues();
             if ($used) {
-                $this->usedBindings[$bindingId] = true;
-                unset($this->unusedBindings[$bindingId]);
-            } elseif (!isset($this->usedBindings[$bindingId])) {
-                $this->unusedBindings[$bindingId] = [$key, $this->currentId, $bindingType, $file];
+                $this->usedBindings[$bindingId ?? ''] = true;
+                unset($this->unusedBindings[$bindingId ?? '']);
+            } elseif (!isset($this->usedBindings[$bindingId ?? ''])) {
+                $this->unusedBindings[$bindingId ?? ''] = [$key, $this->currentId, $bindingType, $file];
             }
 
             if (preg_match('/^(?:(?:array|bool|float|int|string|iterable|([^ $]++)) )\$/', $key, $m)) {
@@ -201,13 +201,17 @@ class ResolveBindingsPass extends AbstractRecursivePass
                 if ($typeHint && (
                     \array_key_exists($k = preg_replace('/(^|[(|&])\\\\/', '\1', $typeHint).' $'.$name, $bindings)
                     || \array_key_exists($k = preg_replace('/(^|[(|&])\\\\/', '\1', $typeHint).' $'.$parsedName, $bindings)
+                    || ($name !== $parameter->name && \array_key_exists($k = preg_replace('/(^|[(|&])\\\\/', '\1', $typeHint).' $'.$parameter->name, $bindings))
                 )) {
                     $arguments[$key] = $this->getBindingValue($bindings[$k]);
 
                     continue;
                 }
 
-                if (\array_key_exists($k = '$'.$name, $bindings) || \array_key_exists($k = '$'.$parsedName, $bindings)) {
+                if (\array_key_exists($k = '$'.$name, $bindings)
+                    || \array_key_exists($k = '$'.$parsedName, $bindings)
+                    || ($name !== $parameter->name && \array_key_exists($k = '$'.$parameter->name, $bindings))
+                ) {
                     $arguments[$key] = $this->getBindingValue($bindings[$k]);
 
                     continue;
@@ -219,7 +223,7 @@ class ResolveBindingsPass extends AbstractRecursivePass
                     continue;
                 }
 
-                if (isset($bindingNames[$name]) || isset($bindingNames[$parsedName]) || isset($bindingNames[$parameter->name])) {
+                if (null !== $binding = $bindingNames[$name] ?? $bindingNames[$parsedName] ?? $bindingNames[$parameter->name] ?? null) {
                     $bindingKey = array_search($binding, $bindings, true);
                     $argumentType = substr($bindingKey, 0, strpos($bindingKey, ' '));
                     $this->errorMessages[] = \sprintf('Did you forget to add the type "%s" to argument "$%s" of method "%s::%s()"?', $argumentType, $parameter->name, $reflectionMethod->class, $reflectionMethod->name);
@@ -260,8 +264,8 @@ class ResolveBindingsPass extends AbstractRecursivePass
     {
         [$bindingValue, $bindingId] = $binding->getValues();
 
-        $this->usedBindings[$bindingId] = true;
-        unset($this->unusedBindings[$bindingId]);
+        $this->usedBindings[$bindingId ?? ''] = true;
+        unset($this->unusedBindings[$bindingId ?? '']);
 
         return $bindingValue;
     }

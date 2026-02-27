@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -60,9 +61,7 @@ class ValidatorTypeGuesserTest extends TestCase
         $this->guesser = new ValidatorTypeGuesser($this->metadataFactory);
     }
 
-    /**
-     * @dataProvider guessTypeProvider
-     */
+    #[DataProvider('guessTypeProvider')]
     public function testGuessType(Constraint $constraint, TypeGuess $guess)
     {
         $this->metadata->addPropertyConstraint(self::TEST_PROPERTY, $constraint);
@@ -101,9 +100,7 @@ class ValidatorTypeGuesserTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider guessRequiredProvider
-     */
+    #[DataProvider('guessRequiredProvider')]
     public function testGuessRequired($constraint, $guess)
     {
         // add distracting constraint
@@ -185,9 +182,7 @@ class ValidatorTypeGuesserTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider maxLengthTypeProvider
-     */
+    #[DataProvider('maxLengthTypeProvider')]
     public function testGuessMaxLengthForConstraintWithType($type)
     {
         $constraint = new Type($type);

@@ -14,8 +14,10 @@ namespace Symfony\Component\Messenger\Middleware;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Event\MessageSentToTransportsEvent;
 use Symfony\Component\Messenger\Event\SendMessageToTransportsEvent;
 use Symfony\Component\Messenger\Exception\NoSenderForMessageException;
+use Symfony\Component\Messenger\Stamp\FlushBatchHandlersStamp;
 use Symfony\Component\Messenger\Stamp\ReceivedStamp;
 use Symfony\Component\Messenger\Stamp\SentStamp;
 use Symfony\Component\Messenger\Transport\Sender\SendersLocatorInterface;
@@ -45,21 +47,26 @@ class SendMessageMiddleware implements MiddlewareInterface
 
         if ($envelope->all(ReceivedStamp::class)) {
             // it's a received message, do not send it back
-            $this->logger?->info('Received message {class}', $context);
+            if (!$envelope->all(FlushBatchHandlersStamp::class)) {
+                $this->logger?->info('Received message {class}', $context);
+            }
         } else {
-            $shouldDispatchEvent = true;
             $senders = $this->sendersLocator->getSenders($envelope);
             $senders = \is_array($senders) ? $senders : iterator_to_array($senders);
-            foreach ($senders as $alias => $sender) {
-                if (null !== $this->eventDispatcher && $shouldDispatchEvent) {
-                    $event = new SendMessageToTransportsEvent($envelope, $senders);
-                    $this->eventDispatcher->dispatch($event);
-                    $envelope = $event->getEnvelope();
-                    $shouldDispatchEvent = false;
-                }
 
+            if (null !== $this->eventDispatcher && $senders) {
+                $event = new SendMessageToTransportsEvent($envelope, $senders);
+                $this->eventDispatcher->dispatch($event);
+                $envelope = $event->getEnvelope();
+            }
+
+            foreach ($senders as $alias => $sender) {
                 $this->logger?->info('Sending message {class} with {alias} sender using {sender}', $context + ['alias' => $alias, 'sender' => $sender::class]);
                 $envelope = $sender->send($envelope->with(new SentStamp($sender::class, \is_string($alias) ? $alias : null)));
+            }
+
+            if (null !== $this->eventDispatcher && $senders) {
+                $this->eventDispatcher->dispatch(new MessageSentToTransportsEvent($envelope, $senders));
             }
 
             if (!$this->allowNoSenders && !$sender) {

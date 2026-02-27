@@ -11,12 +11,14 @@
 
 namespace Symfony\Component\Messenger\Bridge\Amqp\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Amqp\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceivedStamp;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpReceiver;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\Connection;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Serialization\Serializer;
@@ -27,9 +29,7 @@ use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 
-/**
- * @requires extension amqp
- */
+#[RequiresPhpExtension('amqp')]
 class AmqpReceiverTest extends TestCase
 {
     public function testItReturnsTheDecodedMessageToTheHandler()
@@ -41,7 +41,7 @@ class AmqpReceiverTest extends TestCase
         $amqpEnvelope = $this->createAMQPEnvelope();
         $connection = $this->createMock(Connection::class);
         $connection->method('getQueueNames')->willReturn(['queueName']);
-        $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
+        $connection->expects($this->once())->method('get')->with('queueName')->willReturn($amqpEnvelope);
 
         $receiver = new AmqpReceiver($connection, $serializer);
         $actualEnvelopes = iterator_to_array($receiver->get());
@@ -52,12 +52,11 @@ class AmqpReceiverTest extends TestCase
     public function testItThrowsATransportExceptionIfItCannotAcknowledgeMessage()
     {
         $this->expectException(TransportException::class);
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = $this->createStub(SerializerInterface::class);
         $amqpEnvelope = $this->createAMQPEnvelope();
         $connection = $this->createMock(Connection::class);
         $connection->method('getQueueNames')->willReturn(['queueName']);
-        $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
-        $connection->method('ack')->with($amqpEnvelope, 'queueName')->willThrowException(new \AMQPException());
+        $connection->expects($this->once())->method('ack')->with($amqpEnvelope, 'queueName')->willThrowException(new \AMQPException());
 
         $receiver = new AmqpReceiver($connection, $serializer);
         $receiver->ack(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope, 'queueName')]));
@@ -66,12 +65,11 @@ class AmqpReceiverTest extends TestCase
     public function testItThrowsATransportExceptionIfItCannotRejectMessage()
     {
         $this->expectException(TransportException::class);
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = $this->createStub(SerializerInterface::class);
         $amqpEnvelope = $this->createAMQPEnvelope();
         $connection = $this->createMock(Connection::class);
         $connection->method('getQueueNames')->willReturn(['queueName']);
-        $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
-        $connection->method('nack')->with($amqpEnvelope, 'queueName', \AMQP_NOPARAM)->willThrowException(new \AMQPException());
+        $connection->expects($this->once())->method('nack')->with($amqpEnvelope, 'queueName', \AMQP_NOPARAM)->willThrowException(new \AMQPException());
 
         $receiver = new AmqpReceiver($connection, $serializer);
         $receiver->reject(new Envelope(new \stdClass(), [new AmqpReceivedStamp($amqpEnvelope, 'queueName')]));
@@ -88,7 +86,7 @@ class AmqpReceiverTest extends TestCase
 
         $connection = $this->createMock(Connection::class);
         $connection->method('getQueueNames')->willReturn(['queueName']);
-        $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
+        $connection->expects($this->once())->method('get')->with('queueName')->willReturn($amqpEnvelope);
 
         $receiver = new AmqpReceiver($connection, $serializer);
         $actualEnvelopes = iterator_to_array($receiver->get());
@@ -121,7 +119,7 @@ class AmqpReceiverTest extends TestCase
 
         $connection = $this->createMock(Connection::class);
         $connection->method('getQueueNames')->willReturn(['queueName']);
-        $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
+        $connection->expects($this->once())->method('get')->with('queueName')->willReturn($amqpEnvelope);
 
         $receiver = new AmqpReceiver($connection, $serializer);
         $actualEnvelopes = iterator_to_array($receiver->get());
@@ -143,9 +141,26 @@ class AmqpReceiverTest extends TestCase
         $this->assertNull($transportMessageIdStamp);
     }
 
+    public function testItReturnsSerializedEnvelopeWhenDecodingFails()
+    {
+        $serializer = $this->createStub(SerializerInterface::class);
+        $serializer->method('decode')->willThrowException(new MessageDecodingFailedException());
+
+        $amqpEnvelope = $this->createAMQPEnvelope();
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getQueueNames')->willReturn(['queueName']);
+        $connection->method('get')->with('queueName')->willReturn($amqpEnvelope);
+
+        $receiver = new AmqpReceiver($connection, $serializer);
+        $envelopes = iterator_to_array($receiver->get());
+
+        $this->assertCount(1, $envelopes);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelopes[0]->getMessage());
+    }
+
     private function createAMQPEnvelope(?string $messageId = null): \AMQPEnvelope
     {
-        $envelope = $this->createMock(\AMQPEnvelope::class);
+        $envelope = $this->createStub(\AMQPEnvelope::class);
         $envelope->method('getBody')->willReturn('{"message": "Hi"}');
         $envelope->method('getHeaders')->willReturn([
             'type' => DummyMessage::class,

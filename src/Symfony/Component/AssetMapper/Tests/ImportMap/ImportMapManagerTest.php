@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
@@ -28,10 +29,10 @@ use Symfony\Component\Filesystem\Filesystem;
 
 class ImportMapManagerTest extends TestCase
 {
-    private AssetMapperInterface&MockObject $assetMapper;
-    private PackageResolverInterface&MockObject $packageResolver;
+    private AssetMapperInterface $assetMapper;
+    private PackageResolverInterface $packageResolver;
     private ImportMapConfigReader&MockObject $configReader;
-    private RemotePackageDownloader&MockObject $remotePackageDownloader;
+    private RemotePackageDownloader $remotePackageDownloader;
 
     private Filesystem $filesystem;
     private static string $writableRoot = __DIR__.'/../Fixtures/importmap_manager';
@@ -49,18 +50,17 @@ class ImportMapManagerTest extends TestCase
         $this->filesystem->remove(self::$writableRoot);
     }
 
-    /**
-     * @dataProvider getRequirePackageTests
-     */
+    #[DataProvider('getRequirePackageTests')]
     public function testRequire(array $packages, int $expectedProviderPackageArgumentCount, array $resolvedPackages, array $expectedImportMap)
     {
+        $this->packageResolver = $this->createMock(PackageResolverInterface::class);
         $manager = $this->createImportMapManager();
         // physical file we point to in one test
         $this->writeFile('assets/some_file.js', 'some file contents');
 
-        $this->assetMapper->expects($this->any())
+        $this->assetMapper
             ->method('getAssetFromSourcePath')
-            ->willReturnCallback(function (string $sourcePath) {
+            ->willReturnCallback(static function (string $sourcePath) {
                 if (str_ends_with($sourcePath, 'some_file.js')) {
                     // physical file we point to in one test
                     return new MappedAsset('some_file.js', $sourcePath);
@@ -70,18 +70,18 @@ class ImportMapManagerTest extends TestCase
             })
         ;
 
-        $this->configReader->expects($this->any())
+        $this->configReader
             ->method('convertPathToFilesystemPath')
-            ->willReturnCallback(function ($path) {
+            ->willReturnCallback(static function ($path) {
                 if (str_ends_with($path, 'some_file.js')) {
                     return '/path/to/assets/some_file.js';
                 }
 
                 throw new \Exception(\sprintf('Unexpected path "%s"', $path));
             });
-        $this->configReader->expects($this->any())
+        $this->configReader
             ->method('convertFilesystemPathToPath')
-            ->willReturnCallback(function ($path) {
+            ->willReturnCallback(static function ($path) {
                 return match ($path) {
                     '/path/to/assets/some_file.js' => './assets/some_file.js',
                     default => throw new \Exception(\sprintf('Unexpected path "%s"', $path)),
@@ -125,9 +125,7 @@ class ImportMapManagerTest extends TestCase
 
         $this->packageResolver->expects($this->exactly(0 === $expectedProviderPackageArgumentCount ? 0 : 1))
             ->method('resolvePackages')
-            ->with($this->callback(function (array $packages) use ($expectedProviderPackageArgumentCount) {
-                return \count($packages) === $expectedProviderPackageArgumentCount;
-            }))
+            ->with($this->callback(static fn (array $packages) => \count($packages) === $expectedProviderPackageArgumentCount))
             ->willReturn($resolvedPackages)
         ;
 
@@ -237,6 +235,7 @@ class ImportMapManagerTest extends TestCase
 
     public function testUpdateAll()
     {
+        $this->packageResolver = $this->createMock(PackageResolverInterface::class);
         $manager = $this->createImportMapManager();
         $this->mockImportMap([
             self::createRemoteEntry('lodash', version: '1.2.3', path: '/vendor/lodash.js'),
@@ -282,6 +281,8 @@ class ImportMapManagerTest extends TestCase
 
     public function testUpdateWithSpecificPackages()
     {
+        $this->packageResolver = $this->createMock(PackageResolverInterface::class);
+        $this->remotePackageDownloader = $this->createMock(RemotePackageDownloader::class);
         $manager = $this->createImportMapManager();
         $this->mockImportMap([
             self::createRemoteEntry('lodash', version: '1.2.3'),
@@ -314,21 +315,19 @@ class ImportMapManagerTest extends TestCase
         $manager->update(['cowsay']);
     }
 
-    /**
-     * @dataProvider getPackageNameTests
-     */
+    #[DataProvider('getPackageNameTests')]
     public function testParsePackageName(string $packageName, array $expectedReturn)
     {
         $parsed = ImportMapManager::parsePackageName($packageName);
         $this->assertIsArray($parsed);
 
         // remove integer keys - they're noise
-        $parsed = array_filter($parsed, fn ($key) => !\is_int($key), \ARRAY_FILTER_USE_KEY);
+        $parsed = array_filter($parsed, static fn ($key) => !\is_int($key), \ARRAY_FILTER_USE_KEY);
         $this->assertEquals($expectedReturn, $parsed);
 
         $parsedWithAlias = ImportMapManager::parsePackageName($packageName.'=some_alias');
         $this->assertIsArray($parsedWithAlias);
-        $parsedWithAlias = array_filter($parsedWithAlias, fn ($key) => !\is_int($key), \ARRAY_FILTER_USE_KEY);
+        $parsedWithAlias = array_filter($parsedWithAlias, static fn ($key) => !\is_int($key), \ARRAY_FILTER_USE_KEY);
         $expectedReturnWithAlias = $expectedReturn + ['alias' => 'some_alias'];
         $this->assertEquals($expectedReturnWithAlias, $parsedWithAlias, 'Asserting with alias');
     }
@@ -366,17 +365,46 @@ class ImportMapManagerTest extends TestCase
         ];
     }
 
+    public function testUpdatePreservesEntrypointStatus()
+    {
+        $this->packageResolver = $this->createMock(PackageResolverInterface::class);
+        $manager = $this->createImportMapManager();
+
+        $this->mockImportMap([
+            self::createRemoteEntry('my_entrypoint', version: '1.0.0', isEntrypoint: true),
+            self::createRemoteEntry('standard_lib', version: '2.0.0', isEntrypoint: false),
+        ]);
+
+        $this->packageResolver->expects($this->once())
+            ->method('resolvePackages')
+            ->willReturn([
+                self::resolvedPackage('my_entrypoint', '1.0.1', isEntrypoint: true),
+                self::resolvedPackage('standard_lib', '2.1.0'),
+            ]);
+
+        $this->configReader->expects($this->once())
+            ->method('writeEntries')
+            ->with($this->callback(function (ImportMapEntries $entries) {
+                $this->assertTrue($entries->get('my_entrypoint')->isEntrypoint, 'Entrypoint status lost!');
+                $this->assertFalse($entries->get('standard_lib')->isEntrypoint);
+
+                return true;
+            }));
+
+        $manager->update();
+    }
+
     private function createImportMapManager(): ImportMapManager
     {
-        $this->assetMapper = $this->createMock(AssetMapperInterface::class);
+        $this->assetMapper = $this->createStub(AssetMapperInterface::class);
         $this->configReader = $this->createMock(ImportMapConfigReader::class);
-        $this->packageResolver = $this->createMock(PackageResolverInterface::class);
-        $this->remotePackageDownloader = $this->createMock(RemotePackageDownloader::class);
+        $this->packageResolver ??= $this->createStub(PackageResolverInterface::class);
+        $this->remotePackageDownloader ??= $this->createStub(RemotePackageDownloader::class);
 
         // mock this to behave like normal
-        $this->configReader->expects($this->any())
+        $this->configReader
             ->method('createRemoteEntry')
-            ->willReturnCallback(function (string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint) {
+            ->willReturnCallback(static function (string $importName, ImportMapType $type, string $version, string $packageModuleSpecifier, bool $isEntrypoint) {
                 $path = '/path/to/vendor/'.$packageModuleSpecifier.'.js';
 
                 return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageModuleSpecifier, $isEntrypoint);
@@ -390,10 +418,10 @@ class ImportMapManagerTest extends TestCase
         );
     }
 
-    private static function resolvedPackage(string $packageName, string $version, ImportMapType $type = ImportMapType::JS)
+    private static function resolvedPackage(string $packageName, string $version, ImportMapType $type = ImportMapType::JS, bool $isEntrypoint = false)
     {
         return new ResolvedImportMapPackage(
-            new PackageRequireOptions($packageName),
+            new PackageRequireOptions($packageName, entrypoint: $isEntrypoint),
             $version,
             $type,
         );
@@ -401,7 +429,7 @@ class ImportMapManagerTest extends TestCase
 
     private function mockImportMap(array $importMapEntries): void
     {
-        $this->configReader->expects($this->any())
+        $this->configReader
             ->method('getEntries')
             ->willReturn(new ImportMapEntries($importMapEntries))
         ;
@@ -417,11 +445,11 @@ class ImportMapManagerTest extends TestCase
         return ImportMapEntry::createLocal($importName, $type, path: $path, isEntrypoint: $isEntrypoint);
     }
 
-    private static function createRemoteEntry(string $importName, string $version, ?string $path = null, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry
+    private static function createRemoteEntry(string $importName, string $version, ?string $path = null, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null, bool $isEntrypoint = false): ImportMapEntry
     {
-        $packageSpecifier = $packageSpecifier ?? $importName;
-        $path = $path ?? '/vendor/any-path.js';
+        $packageSpecifier ??= $importName;
+        $path ??= '/vendor/any-path.js';
 
-        return ImportMapEntry::createRemote($importName, $type, path: $path, version: $version, packageModuleSpecifier: $packageSpecifier, isEntrypoint: false);
+        return ImportMapEntry::createRemote($importName, $type, path: $path, version: $version, packageModuleSpecifier: $packageSpecifier, isEntrypoint: $isEntrypoint);
     }
 }

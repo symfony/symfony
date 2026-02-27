@@ -18,6 +18,11 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\ParameterType;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\DBAL\Platforms\OraclePlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
+use Doctrine\DBAL\Platforms\SQLServerPlatform;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Schema\Name\Identifier;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
@@ -32,6 +37,8 @@ use Symfony\Component\Cache\PruneableInterface;
 class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 {
     private const MAX_KEY_LENGTH = 255;
+
+    private static int $savepointCounter = 0;
 
     private MarshallerInterface $marshaller;
     private Connection $conn;
@@ -236,6 +243,26 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             return $failed;
         }
 
+        if ($this->conn->isTransactionActive() && $this->conn->getDatabasePlatform()->supportsSavepoints()) {
+            $savepoint = 'cache_save_'.++self::$savepointCounter;
+            try {
+                $this->conn->createSavepoint($savepoint);
+                $failed = $this->doSaveInner($values, $lifetime, $failed);
+                $this->conn->releaseSavepoint($savepoint);
+
+                return $failed;
+            } catch (\Throwable $e) {
+                $this->conn->rollbackSavepoint($savepoint);
+
+                throw $e;
+            }
+        }
+
+        return $this->doSaveInner($values, $lifetime, $failed);
+    }
+
+    private function doSaveInner(array $values, int $lifetime, array $failed): array|bool
+    {
         $platformName = $this->getPlatformName();
         $insertSql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (?, ?, ?, ?)";
 
@@ -359,19 +386,12 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 
         $platform = $this->conn->getDatabasePlatform();
 
-        if (interface_exists(DBALException::class)) {
-            // DBAL 4+
-            $sqlitePlatformClass = 'Doctrine\DBAL\Platforms\SQLitePlatform';
-        } else {
-            $sqlitePlatformClass = 'Doctrine\DBAL\Platforms\SqlitePlatform';
-        }
-
         return $this->platformName = match (true) {
-            $platform instanceof \Doctrine\DBAL\Platforms\AbstractMySQLPlatform => 'mysql',
-            $platform instanceof $sqlitePlatformClass => 'sqlite',
-            $platform instanceof \Doctrine\DBAL\Platforms\PostgreSQLPlatform => 'pgsql',
-            $platform instanceof \Doctrine\DBAL\Platforms\OraclePlatform => 'oci',
-            $platform instanceof \Doctrine\DBAL\Platforms\SQLServerPlatform => 'sqlsrv',
+            $platform instanceof AbstractMySQLPlatform => 'mysql',
+            $platform instanceof SQLitePlatform => 'sqlite',
+            $platform instanceof PostgreSQLPlatform => 'pgsql',
+            $platform instanceof OraclePlatform => 'oci',
+            $platform instanceof SQLServerPlatform => 'sqlsrv',
             default => $platform::class,
         };
     }
@@ -389,10 +409,6 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         $table->addColumn($this->lifetimeCol, 'integer', ['unsigned' => true, 'notnull' => false]);
         $table->addColumn($this->timeCol, 'integer', ['unsigned' => true]);
 
-        if (class_exists(PrimaryKeyConstraint::class)) {
-            $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted($this->idCol))], true));
-        } else {
-            $table->setPrimaryKey([$this->idCol]);
-        }
+        $table->addPrimaryKeyConstraint(new PrimaryKeyConstraint(null, [new UnqualifiedName(Identifier::unquoted($this->idCol))], true));
     }
 }

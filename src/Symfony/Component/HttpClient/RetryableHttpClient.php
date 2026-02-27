@@ -201,6 +201,8 @@ class RetryableHttpClient implements HttpClientInterface, ResetInterface
         if ($baseUris) {
             $baseUri = 1 < \count($baseUris) ? array_shift($baseUris) : current($baseUris);
             $options['base_uri'] = \is_array($baseUri) ? $baseUri[array_rand($baseUri)] : $baseUri;
+        } elseif (\is_array($options['base_uri'] ?? null)) {
+            unset($options['base_uri']);
         }
 
         return $options;

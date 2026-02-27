@@ -54,14 +54,8 @@ class UserBadge implements BadgeInterface
         private ?array $attributes = null,
         ?\Closure $identifierNormalizer = null,
     ) {
-        if ('' === $userIdentifier) {
-            trigger_deprecation('symfony/security-http', '7.2', 'Using an empty string as user identifier is deprecated and will throw an exception in Symfony 8.0.');
-            // throw new BadCredentialsException('Empty user identifier.');
-        }
+        $this->validateUserIdentifier($userIdentifier);
 
-        if (\strlen($userIdentifier) > self::MAX_USERNAME_LENGTH) {
-            throw new BadCredentialsException('Username too long.');
-        }
         if ($identifierNormalizer) {
             $this->identifierNormalizer = static fn () => $identifierNormalizer($userIdentifier);
         }
@@ -74,6 +68,8 @@ class UserBadge implements BadgeInterface
         if (isset($this->identifierNormalizer)) {
             $this->userIdentifier = ($this->identifierNormalizer)();
             $this->identifierNormalizer = null;
+
+            $this->validateUserIdentifier($this->userIdentifier);
         }
 
         return $this->userIdentifier;
@@ -131,5 +127,16 @@ class UserBadge implements BadgeInterface
     public function isResolved(): bool
     {
         return true;
+    }
+
+    private function validateUserIdentifier(string $userIdentifier): void
+    {
+        if ('' === $userIdentifier) {
+            throw new BadCredentialsException('Empty user identifier.');
+        }
+
+        if (\strlen($userIdentifier) > self::MAX_USERNAME_LENGTH) {
+            throw new BadCredentialsException('Username too long.');
+        }
     }
 }

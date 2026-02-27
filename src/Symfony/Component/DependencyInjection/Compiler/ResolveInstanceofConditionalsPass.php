@@ -112,8 +112,8 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
                 $definition = substr_replace($definition, '53', 2, 2);
                 $definition = substr_replace($definition, 'Child', 44, 0);
             }
-            $definition = unserialize($definition);
             /** @var ChildDefinition $definition */
+            $definition = unserialize($definition);
             $definition->setParent($parent);
 
             if (null !== $shared && !isset($definition->getChanges()['shared'])) {
@@ -160,7 +160,7 @@ class ResolveInstanceofConditionalsPass implements CompilerPassInterface
     private function mergeConditionals(array $autoconfiguredInstanceof, array $instanceofConditionals, ContainerBuilder $container): array
     {
         // make each value an array of ChildDefinition
-        $conditionals = array_map(fn ($childDef) => [$childDef], $autoconfiguredInstanceof);
+        $conditionals = array_map(static fn ($childDef) => [$childDef], $autoconfiguredInstanceof);
 
         foreach ($instanceofConditionals as $interface => $instanceofDef) {
             // make sure the interface/class exists (but don't validate automaticInstanceofConditionals)

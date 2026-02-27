@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Ldap\Tests\Security;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Ldap\Adapter\CollectionInterface;
 use Symfony\Component\Ldap\Adapter\QueryInterface;
@@ -24,9 +25,7 @@ use Symfony\Component\Ldap\Security\RoleFetcherInterface;
 use Symfony\Component\Security\Core\Exception\InvalidArgumentException;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 
-/**
- * @requires extension ldap
- */
+#[RequiresPhpExtension('ldap')]
 class LdapUserProviderTest extends TestCase
 {
     public function testLoadUserByIdentifierFailsIfCantConnectToLdap()
@@ -383,7 +382,7 @@ class LdapUserProviderTest extends TestCase
 
     public function testRefreshUserShouldReturnUserWithSameProperties()
     {
-        $ldap = $this->createMock(LdapInterface::class);
+        $ldap = $this->createStub(LdapInterface::class);
         $provider = new LdapUserProvider($ldap, 'ou=MyBusiness,dc=symfony,dc=com', null, null, [], 'sAMAccountName', '({uid_key}={user_identifier})', 'userpassword', ['email']);
 
         $user = new LdapUser(new Entry('foo'), 'foo', 'bar', ['ROLE_DUMMY'], ['email' => 'foo@symfony.com']);
@@ -395,13 +394,14 @@ class LdapUserProviderTest extends TestCase
     {
         // Given
         $result = $this->createMock(CollectionInterface::class);
-        $query = $this->createMock(QueryInterface::class);
+        $query = $this->createStub(QueryInterface::class);
         $query
             ->method('execute')
             ->willReturn($result)
         ;
-        $ldap = $this->createMock(LdapInterface::class);
+        $ldap = $this->createStub(LdapInterface::class);
         $result
+            ->expects($this->once())
             ->method('offsetGet')
             ->with(0)
             ->willReturn(new Entry('foo', ['sAMAccountName' => ['foo']]))
@@ -418,7 +418,7 @@ class LdapUserProviderTest extends TestCase
             ->method('query')
             ->willReturn($query)
         ;
-        $roleFetcher = $this->createMock(RoleFetcherInterface::class);
+        $roleFetcher = $this->createStub(RoleFetcherInterface::class);
         $roleFetcher
             ->method('fetchRoles')
             ->willReturn(['ROLE_FOO', 'ROLE_BAR'])

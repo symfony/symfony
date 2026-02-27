@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,15 +22,13 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class DisallowRobotsIndexingListenerTest extends TestCase
 {
-    /**
-     * @dataProvider provideResponses
-     */
+    #[DataProvider('provideResponses')]
     public function testInvoke(?string $expected, array $responseArgs)
     {
         $response = new Response(...$responseArgs);
         $listener = new DisallowRobotsIndexingListener();
 
-        $event = new ResponseEvent($this->createMock(HttpKernelInterface::class), new Request(), KernelInterface::MAIN_REQUEST, $response);
+        $event = new ResponseEvent($this->createStub(HttpKernelInterface::class), new Request(), KernelInterface::MAIN_REQUEST, $response);
 
         $listener->onResponse($event);
 

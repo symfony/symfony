@@ -24,15 +24,25 @@ final class SlackActionsBlock extends AbstractSlackBlock
     /**
      * @return $this
      */
-    public function button(string $text, string $url, ?string $style = null): static
+    public function button(string $text, ?string $url = null, ?string $style = null, ?string $value = null, ?array $confirm = null): static
     {
         if (25 === \count($this->options['elements'] ?? [])) {
             throw new \LogicException('Maximum number of buttons should not exceed 25.');
         }
 
-        $element = new SlackButtonBlockElement($text, $url, $style);
+        $element = new SlackButtonBlockElement($text, $url, $style, $value, $confirm);
 
         $this->options['elements'][] = $element->toArray();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function id(string $id): static
+    {
+        $this->options['block_id'] = $id;
 
         return $this;
     }

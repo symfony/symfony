@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Allow setting `queues` to `false` to skip binding the default `messages` queue
+
 7.3
 ---
 

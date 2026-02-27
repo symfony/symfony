@@ -113,16 +113,11 @@ class OrderedHashMap implements \ArrayAccess, \IteratorAggregate, \Countable
 
     public function offsetSet(mixed $key, mixed $value): void
     {
-        if (null === $key || !isset($this->elements[$key])) {
-            if (null === $key) {
-                $key = [] === $this->orderedKeys
-                    // If the array is empty, use 0 as key
-                    ? 0
-                    // Imitate PHP behavior of generating a key that equals
-                    // the highest existing integer key + 1
-                    : 1 + (int) max($this->orderedKeys);
-            }
-
+        if (null === $key) {
+            $this->elements[] = $value;
+            $key = array_key_last($this->elements);
+            $this->orderedKeys[] = (string) $key;
+        } elseif (!\array_key_exists($key, $this->elements)) {
             $this->orderedKeys[] = (string) $key;
         }
 

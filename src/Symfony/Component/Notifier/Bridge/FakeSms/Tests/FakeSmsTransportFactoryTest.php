@@ -12,7 +12,10 @@
 namespace Symfony\Component\Notifier\Bridge\FakeSms\Tests;
 
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
+use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Notifier\Bridge\FakeSms\FakeSmsTransportFactory;
 use Symfony\Component\Notifier\Exception\LogicException;
 use Symfony\Component\Notifier\Test\AbstractTransportFactoryTestCase;
@@ -61,7 +64,7 @@ final class FakeSmsTransportFactoryTest extends AbstractTransportFactoryTestCase
 
     public function createFactory(): FakeSmsTransportFactory
     {
-        return new FakeSmsTransportFactory($this->createMock(MailerInterface::class), $this->createMock(LoggerInterface::class));
+        return new FakeSmsTransportFactory(new Mailer(new NullTransport()), new NullLogger());
     }
 
     public static function createProvider(): iterable

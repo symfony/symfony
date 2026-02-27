@@ -123,12 +123,12 @@ abstract class PropertyAccessorCollectionTestCase extends PropertyAccessorArrayA
 
     public function testSetValueCallsAdderAndRemoverForNestedCollections()
     {
-        $car = $this->createMock(__CLASS__.'_CompositeCar');
+        $car = $this->createStub(__CLASS__.'_CompositeCar');
         $structure = $this->createMock(__CLASS__.'_CarStructure');
         $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth']);
         $axesAfter = $this->getContainer([0 => 'first', 1 => 'second', 2 => 'third']);
 
-        $car->expects($this->any())
+        $car
             ->method('getStructure')
             ->willReturn($structure);
 
@@ -156,11 +156,11 @@ abstract class PropertyAccessorCollectionTestCase extends PropertyAccessorArrayA
 
     public function testSetValueFailsIfNoAdderNorRemoverFound()
     {
-        $car = $this->createMock(__CLASS__.'_CarNoAdderAndRemover');
+        $car = $this->createStub(__CLASS__.'_CarNoAdderAndRemover');
         $axesBefore = $this->getContainer([1 => 'second', 3 => 'fourth']);
         $axesAfter = $this->getContainer([0 => 'first', 1 => 'second', 2 => 'third']);
 
-        $car->expects($this->any())
+        $car
             ->method('getAxes')
             ->willReturn($axesBefore);
 

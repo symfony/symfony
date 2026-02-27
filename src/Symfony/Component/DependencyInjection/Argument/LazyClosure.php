@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Argument;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
 use Symfony\Component\DependencyInjection\Reference;
@@ -40,22 +39,22 @@ class LazyClosure
         }
 
         if (isset($this->initializer)) {
-            $this->service = ($this->initializer)();
+            if (\is_string($service = ($this->initializer)())) {
+                $service = (new \ReflectionClass($service))->newInstanceWithoutConstructor();
+            }
+            $this->service = $service;
             unset($this->initializer);
         }
 
         return $this->service;
     }
 
-    public static function getCode(string $initializer, array $callable, Definition $definition, ContainerBuilder $container, ?string $id): string
+    public static function getCode(string $initializer, array $callable, string $class, ContainerBuilder $container, ?string $id): string
     {
         $method = $callable[1];
-        $asClosure = 'Closure' === ($definition->getClass() ?: 'Closure');
 
-        if ($asClosure) {
+        if ($asClosure = 'Closure' === $class) {
             $class = ($callable[0] instanceof Reference ? $container->findDefinition($callable[0]) : $callable[0])->getClass();
-        } else {
-            $class = $definition->getClass();
         }
 
         $r = $container->getReflectionClass($class);

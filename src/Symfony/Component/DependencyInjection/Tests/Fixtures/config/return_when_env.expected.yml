@@ -1,0 +1,16 @@
+parameters:
+    .container.known_envs: [prod]
+    foo_param: bar_value
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    Symfony\Component\DependencyInjection\Tests\Fixtures\Bar:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
+        public: true
+    my_service:
+        class: Symfony\Component\DependencyInjection\Tests\Fixtures\Bar
+        public: true
+        arguments: [bar_value]

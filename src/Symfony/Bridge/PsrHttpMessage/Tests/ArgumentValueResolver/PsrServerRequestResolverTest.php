@@ -27,8 +27,8 @@ final class PsrServerRequestResolverTest extends TestCase
 {
     public function testServerRequest()
     {
-        $symfonyRequest = $this->createMock(Request::class);
-        $psrRequest = $this->createMock(ServerRequestInterface::class);
+        $symfonyRequest = new Request();
+        $psrRequest = $this->createStub(ServerRequestInterface::class);
 
         $resolver = $this->bootstrapResolver($symfonyRequest, $psrRequest);
 
@@ -37,8 +37,8 @@ final class PsrServerRequestResolverTest extends TestCase
 
     public function testRequest()
     {
-        $symfonyRequest = $this->createMock(Request::class);
-        $psrRequest = $this->createMock(ServerRequestInterface::class);
+        $symfonyRequest = new Request();
+        $psrRequest = $this->createStub(ServerRequestInterface::class);
 
         $resolver = $this->bootstrapResolver($symfonyRequest, $psrRequest);
 
@@ -47,8 +47,8 @@ final class PsrServerRequestResolverTest extends TestCase
 
     public function testMessage()
     {
-        $symfonyRequest = $this->createMock(Request::class);
-        $psrRequest = $this->createMock(ServerRequestInterface::class);
+        $symfonyRequest = new Request();
+        $psrRequest = $this->createStub(ServerRequestInterface::class);
 
         $resolver = $this->bootstrapResolver($symfonyRequest, $psrRequest);
 

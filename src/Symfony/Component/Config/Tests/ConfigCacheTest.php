@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\FileResource;
@@ -39,9 +40,7 @@ class ConfigCacheTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider debugModes
-     */
+    #[DataProvider('debugModes')]
     public function testCacheIsNotValidIfNothingHasBeenCached(bool $debug)
     {
         unlink($this->cacheFile); // remove tempnam() side effect
@@ -61,9 +60,7 @@ class ConfigCacheTest extends TestCase
         $this->assertTrue($cache->isFresh());
     }
 
-    /**
-     * @dataProvider debugModes
-     */
+    #[DataProvider('debugModes')]
     public function testIsFreshWhenNoResourceProvided(bool $debug)
     {
         $cache = new ConfigCache($this->cacheFile, $debug);

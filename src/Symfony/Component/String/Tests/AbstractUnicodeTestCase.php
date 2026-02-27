@@ -11,20 +11,30 @@
 
 namespace Symfony\Component\String\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\String\Exception\InvalidArgumentException;
 
 abstract class AbstractUnicodeTestCase extends AbstractAsciiTestCase
 {
     public static function provideWidth(): array
     {
-        return array_merge(
-            parent::provideWidth(),
-            [
-                [14, '<<<END
+        $unicodeWidthTests = [
+            [1, '⚠'],
+            [2, '⚠️'],
+            [14, '<<<END
 This is a
 multiline text
 END'],
-            ]
+        ];
+
+        if (\PCRE_VERSION_MAJOR > 10 || \PCRE_VERSION_MAJOR === 10 && \PCRE_VERSION_MINOR >= 40) {
+            $unicodeWidthTests[] = [2, '1️⃣'];
+        }
+
+        return array_merge(
+            parent::provideWidth(),
+            $unicodeWidthTests
         );
     }
 
@@ -44,17 +54,14 @@ END'],
 
     public function testAsciiClosureRule()
     {
-        $rule = fn ($c) => str_replace('ö', 'OE', $c);
+        $rule = static fn ($c) => str_replace('ö', 'OE', $c);
 
         $s = static::createFromString('Dieser Wert sollte größer oder gleich');
         $this->assertSame('Dieser Wert sollte grOEsser oder gleich', (string) $s->ascii([$rule]));
     }
 
-    /**
-     * @dataProvider provideLocaleLower
-     *
-     * @requires extension intl
-     */
+    #[DataProvider('provideLocaleLower')]
+    #[RequiresPhpExtension('intl')]
     public function testLocaleLower(string $locale, string $expected, string $origin)
     {
         $instance = static::createFromString($origin)->localeLower($locale);
@@ -64,11 +71,8 @@ END'],
         $this->assertSame($expected, (string) $instance);
     }
 
-    /**
-     * @dataProvider provideLocaleUpper
-     *
-     * @requires extension intl
-     */
+    #[DataProvider('provideLocaleUpper')]
+    #[RequiresPhpExtension('intl')]
     public function testLocaleUpper(string $locale, string $expected, string $origin)
     {
         $instance = static::createFromString($origin)->localeUpper($locale);
@@ -78,11 +82,8 @@ END'],
         $this->assertSame($expected, (string) $instance);
     }
 
-    /**
-     * @dataProvider provideLocaleTitle
-     *
-     * @requires extension intl
-     */
+    #[DataProvider('provideLocaleTitle')]
+    #[RequiresPhpExtension('intl')]
     public function testLocaleTitle(string $locale, string $expected, string $origin)
     {
         $instance = static::createFromString($origin)->localeTitle($locale);
@@ -117,9 +118,7 @@ END'],
         );
     }
 
-    /**
-     * @dataProvider provideCodePointsAt
-     */
+    #[DataProvider('provideCodePointsAt')]
     public function testCodePointsAt(array $expected, string $string, int $offset, ?int $form = null)
     {
         if (2 !== grapheme_strlen('च्छे') && 'नमस्ते' === $string) {
@@ -751,7 +750,7 @@ END'],
             [
                 ['äuß⭐erst', 'tsre⭐ßuä'],
                 ['漢字ーユニコードéèΣσς', 'ςσΣèéドーコニユー字漢'],
-                ['नमस्ते', 'तेस्मन'],
+                // ['नमस्ते', 'तेस्मन'], this case requires a version of intl that supports Unicode 15.1
             ]
         );
     }

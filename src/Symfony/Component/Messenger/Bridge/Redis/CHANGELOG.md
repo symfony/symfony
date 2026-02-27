@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add option `cluster` to force cluster mode
+ * Implement the `ListableReceiverInterface` to enable listing and finding messages in Redis streams
+
+7.4
+---
+
+ * Bump ext-redis to 6.1 and ext-relay to 0.12 minimum
+
 7.3
 ---
 

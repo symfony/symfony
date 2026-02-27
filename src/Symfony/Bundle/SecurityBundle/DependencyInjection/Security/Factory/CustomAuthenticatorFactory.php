@@ -37,24 +37,24 @@ class CustomAuthenticatorFactory implements AuthenticatorFactoryInterface
      */
     public function addConfiguration(NodeDefinition $builder): void
     {
-        $builder
-            ->info('An array of service ids for all of your "authenticators".')
-            ->requiresAtLeastOneElement()
-            ->prototype('scalar')->end();
-
         // get the parent array node builder ("firewalls") from inside the children builder
         $factoryRootNode = $builder->end()->end();
         $factoryRootNode
             ->fixXmlConfig('custom_authenticator')
             ->validate()
-                ->ifTrue(fn ($v) => isset($v['custom_authenticators']) && empty($v['custom_authenticators']))
-                ->then(function ($v) {
+                ->ifTrue(static fn ($v) => isset($v['custom_authenticators']) && !$v['custom_authenticators'])
+                ->then(static function ($v) {
                     unset($v['custom_authenticators']);
 
                     return $v;
                 })
             ->end()
         ;
+
+        $builder
+            ->info('An array of service ids for all of your "authenticators".')
+            ->requiresAtLeastOneElement()
+            ->prototype('scalar')->end();
     }
 
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): array

@@ -65,7 +65,25 @@ class HttpUtils
      */
     public function createRequest(Request $request, string $path): Request
     {
-        $newRequest = Request::create($this->generateUri($request, $path), 'get', [], $request->cookies->all(), [], $request->server->all());
+        if ($trustedProxies = Request::getTrustedProxies()) {
+            Request::setTrustedProxies([], Request::getTrustedHeaderSet());
+        }
+
+        $context = $this->urlGenerator?->getContext();
+        if ($baseUrl = $context?->getBaseUrl()) {
+            $context->setBaseUrl('');
+        }
+
+        try {
+            $newRequest = Request::create($this->generateUri($request, $path), 'get', [], $request->cookies->all(), [], $request->server->all());
+        } finally {
+            if ($trustedProxies) {
+                Request::setTrustedProxies($trustedProxies, Request::getTrustedHeaderSet());
+            }
+            if ($baseUrl) {
+                $context->setBaseUrl($baseUrl);
+            }
+        }
 
         static $setSession;
 
@@ -82,8 +100,8 @@ class HttpUtils
             $newRequest->attributes->set(SecurityRequestAttributes::LAST_USERNAME, $request->attributes->get(SecurityRequestAttributes::LAST_USERNAME));
         }
 
-        if ($request->get('_format')) {
-            $newRequest->attributes->set('_format', $request->get('_format'));
+        if ($request->attributes->has('_format')) {
+            $newRequest->attributes->set('_format', $request->attributes->get('_format'));
         }
         if ($request->getDefaultLocale() !== $request->getLocale()) {
             $newRequest->setLocale($request->getLocale());

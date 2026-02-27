@@ -92,7 +92,7 @@ final class WrappedTemplatedEmail
 
     public function getReturnPath(): string
     {
-        return $this->message->getReturnPath();
+        return $this->message->getReturnPath()?->toString() ?? '';
     }
 
     /**

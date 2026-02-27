@@ -30,8 +30,6 @@ use Symfony\Component\Validator\GroupSequenceProviderInterface;
  * @see GroupSequence
  * @see GroupSequenceProviderInterface
  * @see TraversalStrategy
- *
- * @method string|null getGroupProvider()
  */
 interface ClassMetadataInterface extends MetadataInterface
 {
@@ -65,6 +63,8 @@ interface ClassMetadataInterface extends MetadataInterface
      * of this class is validated.
      */
     public function isGroupSequenceProvider(): bool;
+
+    public function getGroupProvider(): ?string;
 
     /**
      * Check if there's any metadata attached to the given named property.

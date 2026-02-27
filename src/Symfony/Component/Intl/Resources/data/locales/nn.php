@@ -9,6 +9,5 @@ return [
         'ne' => 'nepalsk',
         'sc' => 'sardinsk',
         'st' => 'sørsotho',
-        'tn' => 'tswana',
     ],
 ];

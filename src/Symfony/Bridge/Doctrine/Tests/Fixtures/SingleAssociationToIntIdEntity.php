@@ -22,7 +22,7 @@ class SingleAssociationToIntIdEntity
 {
     public function __construct(
         #[Id, OneToOne(cascade: ['ALL'])]
-        #[JoinColumn(nullable: false)]
+        #[JoinColumn()]
         protected SingleIntIdNoToStringEntity $entity,
 
         #[Column(nullable: true)]

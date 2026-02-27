@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Profiler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\Profiler\FileProfilerStorage;
 use Symfony\Component\HttpKernel\Profiler\Profile;
@@ -328,6 +329,45 @@ class FileProfilerStorageTest extends TestCase
         $this->assertContains((int) $tokens[1]['status_code'], [200, 404]);
     }
 
+    public function testHasErrors()
+    {
+        $profile = new Profile('token_with_errors');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://foo.bar/error');
+        $profile->setMethod('GET');
+        $profile->setStatusCode(500);
+        $profile->setHasErrors(true);
+        $this->storage->write($profile);
+
+        $profile = new Profile('token_without_errors');
+        $profile->setIp('127.0.0.1');
+        $profile->setUrl('http://foo.bar/success');
+        $profile->setMethod('GET');
+        $profile->setStatusCode(200);
+        $profile->setHasErrors(false);
+        $this->storage->write($profile);
+
+        $loadedProfile = $this->storage->read('token_with_errors');
+        $this->assertTrue($loadedProfile->hasErrors(), '->read() restores hasErrors=true on the Profile object');
+
+        $loadedProfile = $this->storage->read('token_without_errors');
+        $this->assertFalse($loadedProfile->hasErrors(), '->read() restores hasErrors=false on the Profile object');
+    }
+
+    public function testHasErrorsBackwardCompatibility()
+    {
+        // Test backward compatibility with old CSV lines that don't have has_errors field
+        $file = $this->tmpDir.'/index.csv';
+        $time = time();
+
+        // Write an old-format CSV line (8 fields, no has_errors)
+        file_put_contents($file, "old_token,127.0.0.1,GET,http://foo.bar/old,{$time},,200,request\n");
+
+        $tokens = $this->storage->find('', '', 10, '');
+        $this->assertCount(1, $tokens);
+        $this->assertFalse($tokens[0]['has_errors'], '->find() returns has_errors=false for old CSV lines without the field');
+    }
+
     public function testMultiRowIndexFile()
     {
         $iteration = 3;
@@ -351,9 +391,7 @@ class FileProfilerStorageTest extends TestCase
         $this->assertFalse(fgetcsv($handle, null, ',', '"', '\\'));
     }
 
-    /**
-     * @dataProvider provideExpiredProfiles
-     */
+    #[DataProvider('provideExpiredProfiles')]
     public function testRemoveExpiredProfiles(string $index, string $expectedOffset)
     {
         $file = $this->tmpDir.'/index.csv';
@@ -371,17 +409,17 @@ class FileProfilerStorageTest extends TestCase
 
         yield 'One unexpired profile' => [
             <<<CSV
-            token0,127.0.0.0,,http://foo.bar/0,{$oneHourAgo->getTimestamp()},,
+                token0,127.0.0.0,,http://foo.bar/0,{$oneHourAgo->getTimestamp()},,
 
-            CSV,
+                CSV,
             '0',
         ];
 
         yield 'One unexpired profile with virtual type' => [
             <<<CSV
-            token0,127.0.0.0,,http://foo.bar/0,{$oneHourAgo->getTimestamp()},,virtual
+                token0,127.0.0.0,,http://foo.bar/0,{$oneHourAgo->getTimestamp()},,virtual
 
-            CSV,
+                CSV,
             '0',
         ];
 
@@ -389,17 +427,17 @@ class FileProfilerStorageTest extends TestCase
 
         yield 'One expired profile' => [
             <<<CSV
-            token0,127.0.0.0,,http://foo.bar/0,{$threeDaysAgo->getTimestamp()},,
+                token0,127.0.0.0,,http://foo.bar/0,{$threeDaysAgo->getTimestamp()},,
 
-            CSV,
+                CSV,
             '48',
         ];
 
         yield 'One expired profile with virtual type' => [
             <<<CSV
-            token0,127.0.0.0,,http://foo.bar/0,{$threeDaysAgo->getTimestamp()},,virtual
+                token0,127.0.0.0,,http://foo.bar/0,{$threeDaysAgo->getTimestamp()},,virtual
 
-            CSV,
+                CSV,
             '55',
         ];
 
@@ -409,21 +447,21 @@ class FileProfilerStorageTest extends TestCase
 
         yield 'Multiple expired profiles' => [
             <<<CSV
-            token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,
-            token1,127.0.0.1,,http://foo.bar/1,{$threeDaysAgo->getTimestamp()},,
-            token2,127.0.0.2,,http://foo.bar/2,{$oneHourAgo->getTimestamp()},,
+                token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,
+                token1,127.0.0.1,,http://foo.bar/1,{$threeDaysAgo->getTimestamp()},,
+                token2,127.0.0.2,,http://foo.bar/2,{$oneHourAgo->getTimestamp()},,
 
-            CSV,
+                CSV,
             '96',
         ];
 
         yield 'Multiple expired profiles with virtual type' => [
             <<<CSV
-            token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,virtual
-            token1,127.0.0.1,,http://foo.bar/1,{$threeDaysAgo->getTimestamp()},,virtual
-            token2,127.0.0.2,,http://foo.bar/2,{$oneHourAgo->getTimestamp()},,virtual
+                token0,127.0.0.0,,http://foo.bar/0,{$fourDaysAgo->getTimestamp()},,virtual
+                token1,127.0.0.1,,http://foo.bar/1,{$threeDaysAgo->getTimestamp()},,virtual
+                token2,127.0.0.2,,http://foo.bar/2,{$oneHourAgo->getTimestamp()},,virtual
 
-            CSV,
+                CSV,
             '110',
         ];
     }

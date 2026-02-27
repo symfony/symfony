@@ -211,9 +211,9 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             }
 
             return $this->pool->clear($prefix);
-        } else {
-            $this->deferred = [];
         }
+
+        $this->deferred = [];
 
         return $this->pool->clear();
     }
@@ -309,12 +309,12 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
         $this->tags instanceof ResettableInterface && $this->tags->reset();
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -378,7 +378,7 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
             (self::$saveTags)($this->tags, $newTags);
         }
 
-        while ($now > ($this->knownTagVersions[$tag = array_key_first($this->knownTagVersions)][0] ?? \INF)) {
+        while ($now > ($this->knownTagVersions[$tag = array_key_first($this->knownTagVersions) ?? ''][0] ?? \INF)) {
             unset($this->knownTagVersions[$tag]);
         }
 

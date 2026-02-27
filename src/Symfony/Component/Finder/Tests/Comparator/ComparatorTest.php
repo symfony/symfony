@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Tests\Comparator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Finder\Comparator\Comparator;
 
@@ -24,9 +25,7 @@ class ComparatorTest extends TestCase
         new Comparator('some target', 'foo');
     }
 
-    /**
-     * @dataProvider provideMatches
-     */
+    #[DataProvider('provideMatches')]
     public function testTestSucceeds(string $operator, string $target, string $testedValue)
     {
         $c = new Comparator($target, $operator);
@@ -53,9 +52,7 @@ class ComparatorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideNonMatches
-     */
+    #[DataProvider('provideNonMatches')]
     public function testTestFails(string $operator, string $target, string $testedValue)
     {
         $c = new Comparator($target, $operator);

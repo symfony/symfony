@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Completion;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -19,9 +20,7 @@ use Symfony\Component\Console\Input\InputOption;
 
 class CompletionInputTest extends TestCase
 {
-    /**
-     * @dataProvider provideBindData
-     */
+    #[DataProvider('provideBindData')]
     public function testBind(CompletionInput $input, string $expectedType, ?string $expectedName, string $expectedValue)
     {
         $definition = new InputDefinition([
@@ -74,9 +73,7 @@ class CompletionInputTest extends TestCase
         yield 'end' => [CompletionInput::fromTokens(['bin/console', 'symfony', 'sensiolabs'], 3), CompletionInput::TYPE_NONE, null, ''];
     }
 
-    /**
-     * @dataProvider provideBindWithLastArrayArgumentData
-     */
+    #[DataProvider('provideBindWithLastArrayArgumentData')]
     public function testBindWithLastArrayArgument(CompletionInput $input, ?string $expectedValue)
     {
         $definition = new InputDefinition([
@@ -111,9 +108,7 @@ class CompletionInputTest extends TestCase
         $this->assertEquals('', $input->getCompletionValue(), 'Unexpected value');
     }
 
-    /**
-     * @dataProvider provideFromStringData
-     */
+    #[DataProvider('provideFromStringData')]
     public function testFromString($inputStr, array $expectedTokens)
     {
         $input = CompletionInput::fromString($inputStr, 1);

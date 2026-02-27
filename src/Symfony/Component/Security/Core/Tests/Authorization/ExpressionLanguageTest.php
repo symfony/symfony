@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\Tests\Authorization;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\Token\RememberMeToken;
@@ -25,9 +26,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
 
 class ExpressionLanguageTest extends TestCase
 {
-    /**
-     * @dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testIsAuthenticated($token, $expression, $result)
     {
         $expressionLanguage = new ExpressionLanguage();

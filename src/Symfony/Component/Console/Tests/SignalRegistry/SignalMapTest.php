@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Console\Tests\SignalRegistry;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\SignalRegistry\SignalMap;
 
 class SignalMapTest extends TestCase
 {
-    /**
-     * @requires extension pcntl
-     */
+    #[RequiresPhpExtension('pcntl')]
     public function testSignalExists()
     {
         $this->assertSame('SIGINT', SignalMap::getSignalName(\SIGINT));

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\HttpKernel\Tests\HttpCache;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpCache\ResponseCacheStrategy;
@@ -340,15 +342,12 @@ class ResponseCacheStrategyTest extends TestCase
         $this->assertFalse($mainResponse->isValidateable());
     }
 
-    /**
-     * @group time-sensitive
-     *
-     * @dataProvider cacheControlMergingProvider
-     */
+    #[DataProvider('cacheControlMergingProvider')]
+    #[Group('time-sensitive')]
     public function testCacheControlMerging(array $expects, array $main, array $surrogates)
     {
         $cacheStrategy = new ResponseCacheStrategy();
-        $buildResponse = function ($config) {
+        $buildResponse = static function ($config) {
             $response = new Response();
 
             foreach ($config as $key => $value) {

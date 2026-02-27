@@ -20,7 +20,7 @@ class AccessMapTest extends TestCase
 {
     public function testReturnsFirstMatchedPattern()
     {
-        $request = $this->createMock(Request::class);
+        $request = new Request();
         $requestMatcher1 = $this->getRequestMatcher($request, false);
         $requestMatcher2 = $this->getRequestMatcher($request, true);
 
@@ -33,7 +33,7 @@ class AccessMapTest extends TestCase
 
     public function testReturnsEmptyPatternIfNoneMatched()
     {
-        $request = $this->createMock(Request::class);
+        $request = new Request();
         $requestMatcher = $this->getRequestMatcher($request, false);
 
         $map = new AccessMap();

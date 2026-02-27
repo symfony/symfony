@@ -44,11 +44,11 @@ class CacheWarmupCommand extends Command
                 new InputOption('no-optional-warmers', '', InputOption::VALUE_NONE, 'Skip optional cache warmers (faster)'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command warms up the cache.
+                The <info>%command.name%</info> command warms up the cache.
 
-Before running this command, the cache must be empty.
+                Before running this command, the cache must be empty.
 
-EOF
+                EOF
             )
         ;
     }
@@ -69,9 +69,10 @@ EOF
             $kernel->warmUp($cacheDir);
         }
 
-        $preload = $this->cacheWarmer->warmUp($cacheDir);
-
         $buildDir = $kernel->getContainer()->getParameter('kernel.build_dir');
+
+        $preload = $this->cacheWarmer->warmUp($cacheDir, $buildDir);
+
         if ($preload && $cacheDir === $buildDir && file_exists($preloadFile = $buildDir.'/'.$kernel->getContainer()->getParameter('kernel.container_class').'.preload.php')) {
             Preloader::append($preloadFile, $preload);
         }

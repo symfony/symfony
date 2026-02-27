@@ -85,7 +85,6 @@ class ApplicationDescription
         foreach ($this->sortCommands($all) as $namespace => $commands) {
             $names = [];
 
-            /** @var Command $command */
             foreach ($commands as $name => $command) {
                 if (!$command->getName() || (!$this->showHidden && $command->isHidden())) {
                     continue;
@@ -104,6 +103,9 @@ class ApplicationDescription
         }
     }
 
+    /**
+     * @return array<string, array<string, Command>>
+     */
     private function sortCommands(array $commands): array
     {
         $namespacedCommands = [];

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\IdentityMarshaller;
 
@@ -28,9 +29,7 @@ class IdentityMarshallerTest extends TestCase
         $this->assertSame($values, $marshaller->marshall($values, $failed));
     }
 
-    /**
-     * @dataProvider invalidMarshallDataProvider
-     */
+    #[DataProvider('invalidMarshallDataProvider')]
     public function testMarshallInvalidData($values)
     {
         $marshaller = new IdentityMarshaller();

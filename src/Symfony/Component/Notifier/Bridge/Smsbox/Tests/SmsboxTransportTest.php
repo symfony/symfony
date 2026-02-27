@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Notifier\Bridge\Smsbox\Tests;
 
+use Symfony\Component\Clock\Test\ClockSensitiveTrait;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Day;
 use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Encoding;
 use Symfony\Component\Notifier\Bridge\Smsbox\Enum\Mode;
@@ -28,6 +30,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 final class SmsboxTransportTest extends TransportTestCase
 {
+    use ClockSensitiveTrait;
+
     public static function createTransport(?HttpClientInterface $client = null): SmsboxTransport
     {
         return new SmsboxTransport('apikey', Mode::Standard, Strategy::Marketing, null, $client ?? new MockHttpClient());
@@ -52,21 +56,13 @@ final class SmsboxTransportTest extends TransportTestCase
     public function testBasicQuerySucceded()
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
 
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn('OK 12345678');
-
-        $client = new MockHttpClient(function (string $method, string $url, $request) use ($response): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, $request): ResponseInterface {
             $this->assertSame('POST', $method);
             $this->assertSame('https://api.smsbox.pro/1.1/api.php', $url);
             $this->assertSame('dest=%2B33612345678&msg=Hello%21&id=1&usage=symfony&mode=Standard&strategy=4', $request['body']);
 
-            return $response;
+            return new MockResponse('OK 12345678');
         });
 
         $transport = $this->createTransport($client);
@@ -81,21 +77,13 @@ final class SmsboxTransportTest extends TransportTestCase
         $this->expectExceptionMessage('Unable to send the SMS: "ERROR 02" (400).');
 
         $message = new SmsMessage('+33612345678', 'Hello!');
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
 
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn('ERROR 02');
-
-        $client = new MockHttpClient(function (string $method, string $url, $request) use ($response): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, $request): ResponseInterface {
             $this->assertSame('POST', $method);
             $this->assertSame('https://api.smsbox.pro/1.1/api.php', $url);
             $this->assertSame('dest=%2B33612345678&msg=Hello%21&id=1&usage=symfony&mode=Standard&strategy=4', $request['body']);
 
-            return $response;
+            return new MockResponse('ERROR 02');
         });
 
         $transport = $this->createTransport($client);
@@ -105,21 +93,13 @@ final class SmsboxTransportTest extends TransportTestCase
     public function testQuerySuccededWithOptions()
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
 
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn('OK 12345678');
-
-        $client = new MockHttpClient(function (string $method, string $url, $request) use ($response): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, $request): ResponseInterface {
             $this->assertSame('POST', $method);
             $this->assertSame('https://api.smsbox.pro/1.1/api.php', $url);
             $this->assertSame('max_parts=5&coding=unicode&callback=1&dest=%2B33612345678&msg=Hello%21&id=1&usage=symfony&mode=Standard&strategy=4&day_min=1&day_max=3', $request['body']);
 
-            return $response;
+            return new MockResponse('OK 12345678');
         });
 
         $transport = $this->createTransport($client);
@@ -137,22 +117,16 @@ final class SmsboxTransportTest extends TransportTestCase
 
     public function testQueryDateTime()
     {
+        self::mockTime('2023-12-26');
+
         $message = new SmsMessage('+33612345678', 'Hello!');
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
 
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn('OK 12345678');
-
-        $client = new MockHttpClient(function (string $method, string $url, $request) use ($response): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, $request): ResponseInterface {
             $this->assertSame('POST', $method);
             $this->assertSame('https://api.smsbox.pro/1.1/api.php', $url);
             $this->assertSame('dest=%2B33612345678&msg=Hello%21&id=1&usage=symfony&mode=Standard&strategy=4&date=05%2F12%2F2025&heure=19%3A00', $request['body']);
 
-            return $response;
+            return new MockResponse('OK 12345678');
         });
 
         $dateTime = \DateTimeImmutable::createFromFormat('d/m/Y H:i', '05/12/2025 18:00', new \DateTimeZone('UTC'));
@@ -171,21 +145,13 @@ final class SmsboxTransportTest extends TransportTestCase
     public function testQueryVariable()
     {
         $message = new SmsMessage('0612345678', 'Hello %1% %2%');
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
 
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn('OK 12345678');
-
-        $client = new MockHttpClient(function (string $method, string $url, $request) use ($response): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, $request): ResponseInterface {
             $this->assertSame('POST', $method);
             $this->assertSame('https://api.smsbox.pro/1.1/api.php', $url);
             $this->assertSame('dest=0612345678%3Btye%25d44%25%25d44%25t%3Be%25d59%25%25d44%25fe&msg=Hello+%251%25+%252%25&id=1&usage=symfony&mode=Standard&strategy=4&personnalise=1', $request['body']);
 
-            return $response;
+            return new MockResponse('OK 12345678');
         });
 
         $transport = $this->createTransport($client);
@@ -201,10 +167,7 @@ final class SmsboxTransportTest extends TransportTestCase
 
     public function testSmsboxOptionsInvalidDateTimeAndDate()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $client = new MockHttpClient(function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => new MockResponse());
 
         $dateTime = new \DateTimeImmutable('+1 day');
 
@@ -227,10 +190,7 @@ final class SmsboxTransportTest extends TransportTestCase
 
     public function testSmsboxInvalidPhoneNumber()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $client = new MockHttpClient(function () use ($response): ResponseInterface {
-            return $response;
-        });
+        $client = new MockHttpClient(static fn (): ResponseInterface => new MockResponse());
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid phone number');

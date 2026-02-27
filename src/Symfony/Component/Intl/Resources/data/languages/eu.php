@@ -31,6 +31,7 @@ return [
         'ay' => 'aimara',
         'az' => 'azerbaijanera',
         'ba' => 'baxkirera',
+        'bal' => 'balutxera',
         'ban' => 'baliera',
         'bas' => 'basaa',
         'be' => 'bielorrusiera',

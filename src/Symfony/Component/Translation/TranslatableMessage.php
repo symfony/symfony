@@ -26,11 +26,6 @@ class TranslatableMessage implements TranslatableInterface
     ) {
     }
 
-    public function __toString(): string
-    {
-        return $this->getMessage();
-    }
-
     public function getMessage(): string
     {
         return $this->message;
@@ -48,9 +43,13 @@ class TranslatableMessage implements TranslatableInterface
 
     public function trans(TranslatorInterface $translator, ?string $locale = null): string
     {
-        return $translator->trans($this->getMessage(), array_map(
-            static fn ($parameter) => $parameter instanceof TranslatableInterface ? $parameter->trans($translator, $locale) : $parameter,
-            $this->getParameters()
-        ), $this->getDomain(), $locale);
+        $parameters = $this->getParameters();
+        foreach ($parameters as $k => $v) {
+            if ($v instanceof TranslatableInterface) {
+                $parameters[$k] = $v->trans($translator, $locale);
+            }
+        }
+
+        return $translator->trans($this->getMessage(), $parameters, $this->getDomain(), $locale);
     }
 }

@@ -11,14 +11,13 @@
 
 namespace Session\Storage\Handler;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Relay\Relay;
 use Symfony\Component\HttpFoundation\Tests\Session\Storage\Handler\AbstractRedisSessionHandlerTestCase;
 
-/**
- * @requires extension relay
- *
- * @group integration
- */
+#[RequiresPhpExtension('relay')]
+#[Group('integration')]
 class RelaySessionHandlerTest extends AbstractRedisSessionHandlerTestCase
 {
     protected function createRedisClient(string $host): Relay

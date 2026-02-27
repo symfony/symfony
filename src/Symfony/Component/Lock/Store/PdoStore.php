@@ -98,7 +98,7 @@ class PdoStore implements PersistingStoreInterface
             $stmt = $conn->prepare($sql);
         }
 
-        $stmt->bindValue(':id', $this->getHashedKey($key));
+        $stmt->bindValue(':id', $this->getKeyName($key));
         $stmt->bindValue(':token', $this->getUniqueToken($key));
 
         try {
@@ -134,7 +134,7 @@ class PdoStore implements PersistingStoreInterface
         $stmt = $this->getConnection()->prepare($sql);
 
         $uniqueToken = $this->getUniqueToken($key);
-        $stmt->bindValue(':id', $this->getHashedKey($key));
+        $stmt->bindValue(':id', $this->getKeyName($key));
         $stmt->bindValue(':token1', $uniqueToken);
         $stmt->bindValue(':token2', $uniqueToken);
         $result = $stmt->execute();
@@ -152,7 +152,7 @@ class PdoStore implements PersistingStoreInterface
         $sql = "DELETE FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token";
         $stmt = $this->getConnection()->prepare($sql);
 
-        $stmt->bindValue(':id', $this->getHashedKey($key));
+        $stmt->bindValue(':id', $this->getKeyName($key));
         $stmt->bindValue(':token', $this->getUniqueToken($key));
         $stmt->execute();
     }
@@ -162,7 +162,7 @@ class PdoStore implements PersistingStoreInterface
         $sql = "SELECT 1 FROM $this->table WHERE $this->idCol = :id AND $this->tokenCol = :token AND $this->expirationCol > {$this->getCurrentTimestampStatement()}";
         $stmt = $this->getConnection()->prepare($sql);
 
-        $stmt->bindValue(':id', $this->getHashedKey($key));
+        $stmt->bindValue(':id', $this->getKeyName($key));
         $stmt->bindValue(':token', $this->getUniqueToken($key));
         $result = $stmt->execute();
 
@@ -188,7 +188,7 @@ class PdoStore implements PersistingStoreInterface
     public function createTable(): void
     {
         $sql = match ($driver = $this->getDriver()) {
-            'mysql' => "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(44) NOT NULL, $this->expirationCol INTEGER UNSIGNED NOT NULL) COLLATE utf8mb4_bin, ENGINE = InnoDB",
+            'mysql' => "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(44) NOT NULL, $this->expirationCol INTEGER UNSIGNED NOT NULL) ENGINE = InnoDB",
             'sqlite' => "CREATE TABLE $this->table ($this->idCol TEXT NOT NULL PRIMARY KEY, $this->tokenCol TEXT NOT NULL, $this->expirationCol INTEGER)",
             'pgsql' => "CREATE TABLE $this->table ($this->idCol VARCHAR(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR(64) NOT NULL, $this->expirationCol INTEGER)",
             'oci' => "CREATE TABLE $this->table ($this->idCol VARCHAR2(64) NOT NULL PRIMARY KEY, $this->tokenCol VARCHAR2(64) NOT NULL, $this->expirationCol INTEGER)",
@@ -220,12 +220,12 @@ class PdoStore implements PersistingStoreInterface
     private function getCurrentTimestampStatement(): string
     {
         return match ($this->getDriver()) {
-            'mysql' => 'UNIX_TIMESTAMP()',
-            'sqlite' => 'strftime(\'%s\',\'now\')',
-            'pgsql' => 'CAST(EXTRACT(epoch FROM NOW()) AS INT)',
-            'oci' => '(SYSDATE - TO_DATE(\'19700101\',\'yyyymmdd\'))*86400 - TO_NUMBER(SUBSTR(TZ_OFFSET(sessiontimezone), 1, 3))*3600',
-            'sqlsrv' => 'DATEDIFF(s, \'1970-01-01\', GETUTCDATE())',
-            default => (string) time(),
+            'mysql' => 'UNIX_TIMESTAMP(NOW(6))',
+            'sqlite' => "(julianday('now') - 2440587.5) * 86400.0",
+            'pgsql' => 'CAST(EXTRACT(epoch FROM NOW()) AS DOUBLE PRECISION)',
+            'oci' => "(CAST(systimestamp AT TIME ZONE 'UTC' AS DATE) - DATE '1970-01-01') * 86400 + TO_NUMBER(TO_CHAR(systimestamp AT TIME ZONE 'UTC', 'SSSSS.FF'))",
+            'sqlsrv' => "CAST(DATEDIFF_BIG(ms, '1970-01-01', SYSUTCDATETIME()) AS FLOAT) / 1000.0",
+            default => (new \DateTimeImmutable())->format('U.u'),
         };
     }
 

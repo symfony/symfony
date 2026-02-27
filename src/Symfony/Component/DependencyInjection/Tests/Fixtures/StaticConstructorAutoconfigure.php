@@ -12,7 +12,6 @@
 namespace Symfony\Component\DependencyInjection\Tests\Fixtures;
 
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
-use Symfony\Component\DependencyInjection\Attribute\Factory;
 
 #[Autoconfigure(bind: ['$foo' => 'foo'], constructor: 'create')]
 class StaticConstructorAutoconfigure

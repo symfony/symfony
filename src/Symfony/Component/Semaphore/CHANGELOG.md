@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `LockStore` to use the Lock component as a semaphore store backend
+ * Add `SemaphoreKeyNormalizer`
+
+7.4
+---
+
+ * RedisStore uses `EVALSHA` over `EVAL` when evaluating LUA scripts
+
 7.3
 ---
 

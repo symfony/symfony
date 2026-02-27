@@ -11,8 +11,10 @@
 
 namespace Symfony\Component\Config\Tests\Resource;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\ReflectionClassResource;
+use Symfony\Component\Config\Tests\Fixtures\FakeVendor\Base;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
 
@@ -60,9 +62,7 @@ class ReflectionClassResourceTest extends TestCase
         $this->assertFalse($res->isFresh($now), '->isFresh() returns false if the resource does not exist');
     }
 
-    /**
-     * @dataProvider provideHashedSignature
-     */
+    #[DataProvider('provideHashedSignature')]
     public function testHashedSignature(bool $changeExpected, int $changedLine, ?string $changedCode, int $resourceClassNameSuffix, ?\Closure $setContext = null)
     {
         if ($setContext) {
@@ -70,43 +70,48 @@ class ReflectionClassResourceTest extends TestCase
         }
 
         $code = <<<'EOPHP'
-/* 0*/
-/* 1*/  class %s extends ErrorException
-/* 2*/  {
-/* 3*/      const FOO = 123;
-/* 4*/
-/* 5*/      public $pub = [];
-/* 6*/
-/* 7*/      protected $prot;
-/* 8*/
-/* 9*/      private $priv;
-/*10*/
-/*11*/      public function pub($arg = null) {}
-/*12*/
-/*13*/      protected function prot($a = []) {}
-/*14*/
-/*15*/      private function priv() {}
-/*16*/
-/*17*/      public function ccc($bar = A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC) {}
-/*18*/  }
-EOPHP;
+            /* 0*/
+            /* 1*/  class %s extends %s
+            /* 2*/  {
+            /* 3*/      const FOO = 123;
+            /* 4*/
+            /* 5*/      public $pub = [];
+            /* 6*/
+            /* 7*/      protected $prot;
+            /* 8*/
+            /* 9*/      private $priv;
+            /*10*/
+            /*11*/      public function pub($arg = null) {}
+            /*12*/
+            /*13*/      protected function prot($a = []) {}
+            /*14*/
+            /*15*/      private function priv() {}
+            /*16*/
+            /*17*/      public function ccc($bar = A_CONSTANT_THAT_FOR_SURE_WILL_NEVER_BE_DEFINED_CCCCCC) {}
+            /*18*/  }
+            EOPHP;
 
-        static $expectedSignature, $generateSignature;
+        static $expectedSignature, $signatureGenerator;
 
         if (null === $expectedSignature) {
-            eval(\sprintf($code, $class = 'Foo'.(string) $resourceClassNameSuffix));
+            eval(\sprintf($code, $class = 'Foo'.(string) $resourceClassNameSuffix, Base::class));
+
             $r = new \ReflectionClass(ReflectionClassResource::class);
             $generateSignature = $r->getMethod('generateSignature');
-            $generateSignature = $generateSignature->getClosure($r->newInstanceWithoutConstructor());
-            $expectedSignature = implode("\n", iterator_to_array($generateSignature(new \ReflectionClass($class))));
+
+            $res = new ReflectionClassResource(new \ReflectionClass($class), [\dirname(__DIR__).'/Fixtures/FakeVendor']);
+            $signatureGenerator = $generateSignature->getClosure($res);
+            $expectedSignature = implode("\n", iterator_to_array($signatureGenerator(new \ReflectionClass($class))));
+
+            $signatureGenerator = $generateSignature->getClosure(unserialize(serialize($res)));
         }
 
         $code = explode("\n", $code);
         if (null !== $changedCode) {
             $code[$changedLine] = $changedCode;
         }
-        eval(\sprintf(implode("\n", $code), $class = 'Bar'.(string) $resourceClassNameSuffix));
-        $signature = implode("\n", iterator_to_array($generateSignature(new \ReflectionClass($class))));
+        eval(\sprintf(implode("\n", $code), $class = 'Bar'.(string) $resourceClassNameSuffix, Base::class));
+        $signature = implode("\n", iterator_to_array($signatureGenerator(new \ReflectionClass($class))));
 
         if ($changeExpected) {
             $this->assertNotSame($expectedSignature, $signature);
@@ -195,6 +200,30 @@ EOPHP;
         TestServiceWithStaticProperty::$initializedObject = new TestServiceWithStaticProperty();
         $this->assertTrue($res->isFresh(0));
     }
+
+    public function testEnum()
+    {
+        $res = new ReflectionClassResource($enum = new \ReflectionClass(SomeEnum::class));
+        $r = new \ReflectionClass(ReflectionClassResource::class);
+        $generateSignature = $r->getMethod('generateSignature')->getClosure($res);
+        $actual = implode("\n", iterator_to_array($generateSignature($enum)));
+        $this->assertStringContainsString('UnitEnum', $actual);
+        $this->assertStringContainsString('TestAttribute', $actual);
+        $this->assertStringContainsString('Beta', $actual);
+    }
+
+    public function testBackedEnum()
+    {
+        $res = new ReflectionClassResource($enum = new \ReflectionClass(SomeBackedEnum::class));
+        $r = new \ReflectionClass(ReflectionClassResource::class);
+        $generateSignature = $r->getMethod('generateSignature')->getClosure($res);
+        $actual = implode("\n", iterator_to_array($generateSignature($enum)));
+        $this->assertStringContainsString('UnitEnum', $actual);
+        $this->assertStringContainsString('BackedEnum', $actual);
+        $this->assertStringContainsString('TestAttribute', $actual);
+        $this->assertStringContainsString('Beta', $actual);
+        $this->assertStringContainsString('beta', $actual);
+    }
 }
 
 interface DummyInterface
@@ -224,4 +253,20 @@ class TestServiceSubscriber implements ServiceSubscriberInterface
 class TestServiceWithStaticProperty
 {
     public static object $initializedObject;
+}
+
+enum SomeEnum
+{
+    case Alpha;
+
+    #[TestAttribute]
+    case Beta;
+}
+
+enum SomeBackedEnum: string
+{
+    case Alpha = 'alpha';
+
+    #[TestAttribute]
+    case Beta = 'beta';
 }

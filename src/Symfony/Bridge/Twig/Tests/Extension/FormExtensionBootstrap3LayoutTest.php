@@ -16,7 +16,7 @@ use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Bridge\Twig\Form\TwigRendererEngine;
 use Symfony\Bridge\Twig\Tests\Extension\Fixtures\StubTranslator;
 use Symfony\Component\Form\FormRenderer;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManager;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
@@ -60,7 +60,7 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTestCase
             'bootstrap_3_layout.html.twig',
             'custom_widgets.html.twig',
         ], $environment);
-        $this->renderer = new FormRenderer($rendererEngine, $this->createMock(CsrfTokenManagerInterface::class));
+        $this->renderer = new FormRenderer($rendererEngine, new CsrfTokenManager());
         $this->registerTwigRuntimeLoader($environment, $this->renderer);
 
         $view = $this->factory
@@ -69,11 +69,12 @@ class FormExtensionBootstrap3LayoutTest extends AbstractBootstrap3LayoutTestCase
         ;
 
         $this->assertSame(<<<'HTML'
-<div class="input-group">
-                            <span class="input-group-addon">&euro; </span>
-            <input type="text" id="name" name="name" required="required" class="form-control" />        </div>
-HTML
-            , trim($this->renderWidget($view)));
+            <div class="input-group">
+                                        <span class="input-group-addon">&euro; </span>
+                        <input type="text" id="name" name="name" required="required" inputmode="decimal" class="form-control" />        </div>
+            HTML,
+            trim($this->renderWidget($view))
+        );
     }
 
     protected function getTemplatePaths(): array

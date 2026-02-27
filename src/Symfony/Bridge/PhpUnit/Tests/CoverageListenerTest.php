@@ -11,11 +11,10 @@
 
 namespace Symfony\Bridge\PhpUnit\Tests;
 
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @requires PHPUnit < 10
- */
+#[RequiresPhpunit('<10')]
 class CoverageListenerTest extends TestCase
 {
     public function test()
@@ -34,7 +33,7 @@ class CoverageListenerTest extends TestCase
         exec("$php $phpunit -c $dir/phpunit-with-listener.xml.dist $dir/tests/ --coverage-text --colors=never 2> /dev/null", $output);
         $output = implode("\n", $output);
 
-        if (false === strpos($output, 'FooCov')) {
+        if (!str_contains($output, 'FooCov')) {
             $this->addToAssertionCount(1);
         } else {
             $this->assertMatchesRegularExpression('/FooCov\n\s*Methods:\s+0.00%[^\n]+Lines:\s+0.00%/', $output);

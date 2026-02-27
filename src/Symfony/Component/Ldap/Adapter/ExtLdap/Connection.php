@@ -40,12 +40,12 @@ class Connection extends AbstractConnection
     private bool $bound = false;
     private ?LDAPConnection $connection = null;
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -170,7 +170,7 @@ class Connection extends AbstractConnection
         $resolver->setAllowedTypes('debug', 'bool');
         $resolver->setDefault('referrals', false);
         $resolver->setAllowedTypes('referrals', 'bool');
-        $resolver->setOptions('options', function (OptionsResolver $options, Options $parent) {
+        $resolver->setOptions('options', static function (OptionsResolver $options, Options $parent) {
             $options->setDefined(array_map('strtolower', array_keys((new \ReflectionClass(ConnectionOptions::class))->getConstants())));
 
             if (true === $parent['debug']) {

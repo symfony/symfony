@@ -46,18 +46,18 @@ class HarFileResponseFactoryTest extends TestCase
         $factory = new HarFileResponseFactory("{$this->fixtureDir}/graphql.github.io_archive.har");
         $client = new MockHttpClient($factory, 'https://swapi-graphql.netlify.app');
         $query = <<<'GRAPHQL'
-{
-  allFilms(first: 5) {
-    edges {
-      node {
-        title
-        director
-      }
-    }
-    totalCount
-  }
-}
-GRAPHQL;
+            {
+              allFilms(first: 5) {
+                edges {
+                  node {
+                    title
+                    director
+                  }
+                }
+                totalCount
+              }
+            }
+            GRAPHQL;
 
         $response = $client->request('POST', '/graphql', [
             'json' => ['query' => $query],

@@ -22,7 +22,7 @@ class ClosureLoaderTest extends TestCase
     {
         $loader = new ClosureLoader();
 
-        $closure = function () {};
+        $closure = static function () {};
 
         $this->assertTrue($loader->supports($closure), '->supports() returns true if the resource is loadable');
         $this->assertFalse($loader->supports('foo.foo'), '->supports() returns true if the resource is loadable');

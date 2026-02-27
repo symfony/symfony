@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotBlankValidator;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
@@ -22,9 +23,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
         return new NotBlankValidator();
     }
 
-    /**
-     * @dataProvider getValidValues
-     */
+    #[DataProvider('getValidValues')]
     public function testValidValues($value)
     {
         $this->validator->validate($value, new NotBlank());
@@ -117,9 +116,7 @@ class NotBlankValidatorTest extends ConstraintValidatorTestCase
             ->assertRaised();
     }
 
-    /**
-     * @dataProvider getWhitespaces
-     */
+    #[DataProvider('getWhitespaces')]
     public function testNormalizedStringIsInvalid($value)
     {
         $constraint = new NotBlank(

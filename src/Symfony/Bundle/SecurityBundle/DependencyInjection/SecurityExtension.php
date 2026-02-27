@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
@@ -43,12 +44,12 @@ use Symfony\Component\HttpFoundation\RequestMatcher\IpsRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\MethodRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\PathRequestMatcher;
 use Symfony\Component\HttpFoundation\RequestMatcher\PortRequestMatcher;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\PasswordHasher\Hasher\NativePasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\PlaintextPasswordHasher;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Routing\Loader\ContainerLoader;
 use Symfony\Component\Security\Core\Authorization\Strategy\AffirmativeStrategy;
 use Symfony\Component\Security\Core\Authorization\Strategy\ConsensusStrategy;
@@ -59,7 +60,6 @@ use Symfony\Component\Security\Core\User\ChainUserChecker;
 use Symfony\Component\Security\Core\User\ChainUserProvider;
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Http\Authentication\ExposeSecurityLevel;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Debug\TraceableAuthenticatorManagerListener;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
@@ -155,7 +155,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 ));
         }
 
-        $container->setParameter('security.authentication.hide_user_not_found', ExposeSecurityLevel::All !== $config['expose_security_errors']);
         $container->setParameter('.security.authentication.expose_security_errors', $config['expose_security_errors']);
 
         if (class_exists(Application::class)) {
@@ -181,6 +180,10 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             $loader->load('console.php');
 
             $container->getDefinition('security.command.user_password_hash')->replaceArgument(1, array_keys($config['password_hashers']));
+        }
+
+        if ($container->hasDefinition('security.role_hierarchy')) {
+            $loader->load('security_role_hierarchy_dump_command.php');
         }
 
         $container->registerForAutoconfiguration(VoterInterface::class)
@@ -321,7 +324,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $authenticators[$name] = ServiceLocatorTagPass::register($container, $firewallAuthenticatorRefs);
             }
             $contextId = 'security.firewall.map.context.'.$name;
-            $isLazy = !$firewall['stateless'] && (!empty($firewall['anonymous']['lazy']) || $firewall['lazy']);
+            $isLazy = !$firewall['stateless'] && $firewall['lazy'];
             $context = new ChildDefinition($isLazy ? 'security.firewall.lazy_context' : 'security.firewall.context');
             $context = $container->setDefinition($contextId, $context);
             $context
@@ -503,7 +506,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $configuredEntryPoint = $defaultEntryPoint;
 
         // authenticator manager
-        $authenticators = array_map(fn ($id) => new Reference($id), $firewallAuthenticationProviders, []);
+        $authenticators = array_map(static fn ($id) => new Reference($id), $firewallAuthenticationProviders, []);
         $container
             ->setDefinition($managerId = 'security.authenticator.manager.'.$id, new ChildDefinition('security.authenticator.manager'))
             ->replaceArgument(0, $authenticators)
@@ -683,7 +686,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             return $this->createMissingUserProvider($container, $id, $factoryKey);
         }
 
-        if ('remember_me' === $factoryKey || 'anonymous' === $factoryKey) {
+        if ('remember_me' === $factoryKey) {
             return 'security.user_providers';
         }
 
@@ -706,6 +709,17 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $hasherMap = [];
         foreach ($hashers as $class => $hasher) {
             $hasherMap[$class] = $this->createHasher($hasher);
+            // The key is not a class, so we register an alias for argument to
+            // ease getting the hasher
+            if (!class_exists($class) && !interface_exists($class, false)) {
+                $id = 'security.password_hasher.'.$class;
+                $container
+                    ->register($id, PasswordHasherInterface::class)
+                    ->setFactory([new Reference('security.password_hasher_factory'), 'getPasswordHasher'])
+                    ->setArgument(0, $class)
+                ;
+                $container->registerAliasForArgument($id, PasswordHasherInterface::class, $class);
+            }
         }
 
         $container
@@ -1023,16 +1037,6 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         $this->userProviderFactories[] = $factory;
     }
 
-    public function getXsdValidationBasePath(): string|false
-    {
-        return __DIR__.'/../Resources/config/schema';
-    }
-
-    public function getNamespace(): string
-    {
-        return 'http://symfony.com/schema/dic/security';
-    }
-
     public function getConfiguration(array $config, ContainerBuilder $container): ?ConfigurationInterface
     {
         // first assemble the factories
@@ -1041,7 +1045,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
 
     private function isValidIps(string|array $ips): bool
     {
-        $ipsList = array_reduce((array) $ips, fn ($ips, $ip) => array_merge($ips, preg_split('/\s*,\s*/', $ip)), []);
+        $ipsList = array_reduce((array) $ips, static fn ($ips, $ip) => array_merge($ips, preg_split('/\s*,\s*/', $ip)), []);
 
         if (!$ipsList) {
             return false;
@@ -1093,7 +1097,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
                 $factories[] = array_merge($factory, [$i]);
             }
 
-            usort($factories, fn ($a, $b) => $b[0] <=> $a[0] ?: $a[2] <=> $b[2]);
+            usort($factories, static fn ($a, $b) => $b[0] <=> $a[0] ?: $a[2] <=> $b[2]);
 
             $this->sortedFactories = array_column($factories, 1);
         }

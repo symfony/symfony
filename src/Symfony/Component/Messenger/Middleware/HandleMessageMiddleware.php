@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Middleware;
 
+use Psr\Clock\ClockInterface;
 use Psr\Log\LoggerAwareTrait;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
@@ -35,6 +36,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
     public function __construct(
         private HandlersLocatorInterface $handlersLocator,
         private bool $allowNoHandlers = false,
+        private ?ClockInterface $clock = null,
     ) {
     }
 
@@ -62,7 +64,6 @@ class HandleMessageMiddleware implements MiddlewareInterface
                 $handler = $handlerDescriptor->getHandler();
                 $batchHandler = $handlerDescriptor->getBatchHandler();
 
-                /** @var AckStamp $ackStamp */
                 if ($batchHandler && $ackStamp = $envelope->last(AckStamp::class)) {
                     $ack = new Acknowledger(get_debug_type($batchHandler), static function (?\Throwable $e = null, $result = null) use ($envelope, $ackStamp, $handlerDescriptor) {
                         if (null !== $e) {
@@ -72,7 +73,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
                         }
 
                         $ackStamp->ack($envelope, $e);
-                    });
+                    }, $this->clock);
 
                     $result = $this->callHandler($handler, $message, $ack, $envelope->last(HandlerArgumentsStamp::class));
 
@@ -99,9 +100,7 @@ class HandleMessageMiddleware implements MiddlewareInterface
             }
         }
 
-        /** @var FlushBatchHandlersStamp $flushStamp */
         if ($flushStamp = $envelope->last(FlushBatchHandlersStamp::class)) {
-            /** @var NoAutoAckStamp $stamp */
             foreach ($envelope->all(NoAutoAckStamp::class) as $stamp) {
                 try {
                     $handler = $stamp->getHandlerDescriptor()->getBatchHandler();
@@ -129,7 +128,6 @@ class HandleMessageMiddleware implements MiddlewareInterface
 
     private function messageHasAlreadyBeenHandled(Envelope $envelope, HandlerDescriptor $handlerDescriptor): bool
     {
-        /** @var HandledStamp $stamp */
         foreach ($envelope->all(HandledStamp::class) as $stamp) {
             if ($stamp->getHandlerName() === $handlerDescriptor->getName()) {
                 return true;

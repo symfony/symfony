@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarExporter\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarExporter\Exception\ClassNotFoundException;
 use Symfony\Component\VarExporter\Exception\NotInstantiableTypeException;
@@ -25,9 +26,7 @@ class InstantiatorTest extends TestCase
         Instantiator::instantiate('SomeNotExistingClass');
     }
 
-    /**
-     * @dataProvider provideFailingInstantiation
-     */
+    #[DataProvider('provideFailingInstantiation')]
     public function testFailingInstantiation(string $class)
     {
         $this->expectException(NotInstantiableTypeException::class);

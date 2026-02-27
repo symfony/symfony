@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\RequestMatcher;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,9 +19,7 @@ use Symfony\Component\HttpFoundation\RequestMatcher\ExpressionRequestMatcher;
 
 class ExpressionRequestMatcherTest extends TestCase
 {
-    /**
-     * @dataProvider provideExpressions
-     */
+    #[DataProvider('provideExpressions')]
     public function testMatchesWhenParentMatchesIsTrue($expression, $expected)
     {
         $request = Request::create('/foo');

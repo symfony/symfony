@@ -183,11 +183,8 @@ class IpUtils
      * @param int<0, 4>  $v4Bytes
      * @param int<0, 16> $v6Bytes
      */
-    public static function anonymize(string $ip/* , int $v4Bytes = 1, int $v6Bytes = 8 */): string
+    public static function anonymize(string $ip, int $v4Bytes = 1, int $v6Bytes = 8): string
     {
-        $v4Bytes = 1 < \func_num_args() ? func_get_arg(1) : 1;
-        $v6Bytes = 2 < \func_num_args() ? func_get_arg(2) : 8;
-
         if ($v4Bytes < 0 || $v6Bytes < 0) {
             throw new \InvalidArgumentException('Cannot anonymize less than 0 bytes.');
         }
@@ -196,7 +193,7 @@ class IpUtils
             throw new \InvalidArgumentException('Cannot anonymize more than 4 bytes for IPv4 and 16 bytes for IPv6.');
         }
 
-        /**
+        /*
          * If the IP contains a % symbol, then it is a local-link address with scoping according to RFC 4007
          * In that case, we only care about the part before the % symbol, as the following functions, can only work with
          * the IP address itself. As the scope can leak information (containing interface name), we do not want to
@@ -212,7 +209,7 @@ class IpUtils
             $ip = substr($ip, 1, -1);
         }
 
-        $mappedIpV4MaskGenerator = function (string $mask, int $bytesToAnonymize) {
+        $mappedIpV4MaskGenerator = static function (string $mask, int $bytesToAnonymize) {
             $mask .= str_repeat('ff', 4 - $bytesToAnonymize);
             $mask .= str_repeat('00', $bytesToAnonymize);
 

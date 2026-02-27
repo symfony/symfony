@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'UserAssignedNames' => [
+        'XK' => 'Kòsófò',
+    ],
     'Names' => [
         'AD' => 'Ààndórà',
         'AE' => 'Ẹmirate ti Awọn Arabu',
@@ -44,7 +47,7 @@ return [
         'CD' => 'Kóńgò – Kinshasa',
         'CF' => 'Àrin gùngun Áfíríkà',
         'CG' => 'Kóńgò – Brazaville',
-        'CH' => 'switiṣilandi',
+        'CH' => 'Súwísìlanìdì',
         'CI' => 'Kóútè forà',
         'CK' => 'Etíokun Kùúkù',
         'CL' => 'Ṣílè',
@@ -207,7 +210,7 @@ return [
         'SL' => 'Siria looni',
         'SM' => 'Sani Marino',
         'SN' => 'Sẹnẹga',
-        'SO' => 'Somalia',
+        'SO' => 'Sòmálíà',
         'SR' => 'Surinami',
         'SS' => 'Gúúsù Sudan',
         'ST' => 'Sao tomi ati piriiṣipi',

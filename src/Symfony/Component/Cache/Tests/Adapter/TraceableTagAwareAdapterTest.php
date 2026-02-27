@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\Adapter\TraceableTagAwareAdapter;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class TraceableTagAwareAdapterTest extends TraceableAdapterTest
 {
     public function testInvalidateTags()

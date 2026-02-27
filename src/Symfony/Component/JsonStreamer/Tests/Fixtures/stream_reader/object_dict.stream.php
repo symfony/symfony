@@ -1,7 +1,10 @@
 <?php
 
+/**
+ * @return array<string, Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>
+ */
 return static function (mixed $stream, \Psr\Container\ContainerInterface $valueTransformers, \Symfony\Component\JsonStreamer\Read\LazyInstantiator $instantiator, array $options): mixed {
-    $providers['array<string,Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>'] = static function ($stream, $offset, $length) use ($options, $valueTransformers, $instantiator, &$providers) {
+    $providers['array<string, Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>'] = static function ($stream, $offset, $length) use ($options, $valueTransformers, $instantiator, &$providers) {
         $data = \Symfony\Component\JsonStreamer\Read\Splitter::splitDict($stream, $offset, $length);
         $iterable = static function ($stream, $data) use ($options, $valueTransformers, $instantiator, &$providers) {
             foreach ($data as $k => $v) {
@@ -22,5 +25,5 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $valueT
             }
         });
     };
-    return $providers['array<string,Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>']($stream, 0, null);
+    return $providers['array<string, Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>']($stream, 0, null);
 };

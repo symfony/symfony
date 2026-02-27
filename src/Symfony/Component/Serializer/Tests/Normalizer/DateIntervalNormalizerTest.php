@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
@@ -56,17 +57,13 @@ class DateIntervalNormalizerTest extends TestCase
         $this->assertEquals('P0Y0M0DT0H0M0S', $this->normalizer->normalize(new \DateInterval('PT0S')));
     }
 
-    /**
-     * @dataProvider dataProviderISO
-     */
+    #[DataProvider('dataProviderISO')]
     public function testNormalizeUsingFormatPassedInContext($format, $output, $input)
     {
         $this->assertEquals($output, $this->normalizer->normalize($this->getInterval($input), null, [DateIntervalNormalizer::FORMAT_KEY => $format]));
     }
 
-    /**
-     * @dataProvider dataProviderISO
-     */
+    #[DataProvider('dataProviderISO')]
     public function testNormalizeUsingFormatPassedInConstructor($format, $output, $input)
     {
         $normalizer = new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);
@@ -91,17 +88,13 @@ class DateIntervalNormalizerTest extends TestCase
         $this->assertDateIntervalEquals(new \DateInterval('P00Y00M00DT00H00M00S'), $this->normalizer->denormalize('P00Y00M00DT00H00M00S', \DateInterval::class));
     }
 
-    /**
-     * @dataProvider dataProviderISO
-     */
+    #[DataProvider('dataProviderISO')]
     public function testDenormalizeUsingFormatPassedInContext($format, $input, $output)
     {
         $this->assertDateIntervalEquals($this->getInterval($output), $this->normalizer->denormalize($input, \DateInterval::class, null, [DateIntervalNormalizer::FORMAT_KEY => $format]));
     }
 
-    /**
-     * @dataProvider dataProviderISO
-     */
+    #[DataProvider('dataProviderISO')]
     public function testDenormalizeUsingFormatPassedInConstructor($format, $input, $output)
     {
         $normalizer = new DateIntervalNormalizer([DateIntervalNormalizer::FORMAT_KEY => $format]);

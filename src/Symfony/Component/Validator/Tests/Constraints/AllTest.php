@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\Valid;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
+use Symfony\Component\Validator\Exception\MissingOptionsException;
 
 /**
  * @author Bernhard Schussek <bschussek@gmail.com>
@@ -35,5 +36,21 @@ class AllTest extends TestCase
         new All([
             new Valid(),
         ]);
+    }
+
+    public function testMissingConstraints()
+    {
+        $this->expectException(MissingOptionsException::class);
+        $this->expectExceptionMessage(\sprintf('The options "constraints" must be set for constraint "%s".', All::class));
+
+        new All(null);
+    }
+
+    public function testMissingConstraintsDoctrineStyle()
+    {
+        $this->expectException(MissingOptionsException::class);
+        $this->expectExceptionMessage(\sprintf('The options "constraints" must be set for constraint "%s".', All::class));
+
+        new All([]);
     }
 }

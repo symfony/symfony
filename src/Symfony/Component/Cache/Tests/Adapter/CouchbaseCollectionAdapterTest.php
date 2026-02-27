@@ -11,18 +11,18 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\CouchbaseCollectionAdapter;
 
 /**
- * @requires extension couchbase <4.0.0
- * @requires extension couchbase >=3.0.5
- *
- * @group integration
- *
  * @author Antonio Jose Cerezo Aranda <aj.cerezo@gmail.com>
  */
+#[RequiresPhpExtension('couchbase', '<4.0.0')]
+#[RequiresPhpExtension('couchbase', '>=3.0.5')]
+#[Group('integration')]
 class CouchbaseCollectionAdapterTest extends AdapterTestCase
 {
     protected $skippedTests = [

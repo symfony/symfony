@@ -35,22 +35,22 @@ final class MailerTestCommand extends Command
     {
         $this
             ->addArgument('to', InputArgument::REQUIRED, 'The recipient of the message')
-            ->addOption('from', null, InputOption::VALUE_OPTIONAL, 'The sender of the message', 'from@example.org')
-            ->addOption('subject', null, InputOption::VALUE_OPTIONAL, 'The subject of the message', 'Testing transport')
-            ->addOption('body', null, InputOption::VALUE_OPTIONAL, 'The body of the message', 'Testing body')
-            ->addOption('transport', null, InputOption::VALUE_OPTIONAL, 'The transport to be used')
+            ->addOption('from', null, InputOption::VALUE_REQUIRED, 'The sender of the message', 'from@example.org')
+            ->addOption('subject', null, InputOption::VALUE_REQUIRED, 'The subject of the message', 'Testing transport')
+            ->addOption('body', null, InputOption::VALUE_REQUIRED, 'The body of the message', 'Testing body')
+            ->addOption('transport', null, InputOption::VALUE_REQUIRED, 'The transport to be used')
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> command tests a Mailer transport by sending a simple email message:
+                The <info>%command.name%</info> command tests a Mailer transport by sending a simple email message:
 
-<info>php %command.full_name% to@example.com</info>
+                <info>php %command.full_name% to@example.com</info>
 
-You can also specify a specific transport:
+                You can also specify a specific transport:
 
-    <info>php %command.full_name% to@example.com --transport=transport_name</info>
+                    <info>php %command.full_name% to@example.com --transport=transport_name</info>
 
-Note that this command bypasses the Messenger bus if configured.
+                Note that this command bypasses the Messenger bus if configured.
 
-EOF
+                EOF
             );
     }
 

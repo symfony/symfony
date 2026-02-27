@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Exception;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Exception\InvalidParameterTypeException;
 
 final class InvalidParameterTypeExceptionTest extends TestCase
 {
-    /**
-     * @dataProvider provideReflectionParameters
-     */
+    #[DataProvider('provideReflectionParameters')]
     public function testExceptionMessage(\ReflectionParameter $parameter, string $expectedMessage)
     {
         $exception = new InvalidParameterTypeException('my_service', 'int', $parameter);

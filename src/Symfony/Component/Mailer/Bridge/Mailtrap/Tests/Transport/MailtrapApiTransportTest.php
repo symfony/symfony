@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Mailtrap\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\JsonMockResponse;
@@ -26,9 +27,7 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class MailtrapApiTransportTest extends TestCase
 {
-    /**
-     * @dataProvider getTransportData
-     */
+    #[DataProvider('getTransportData')]
     public function testToString(MailtrapApiTransport $transport, string $expected)
     {
         $this->assertSame($expected, (string) $transport);
@@ -49,6 +48,22 @@ class MailtrapApiTransportTest extends TestCase
                 (new MailtrapApiTransport('KEY'))->setHost('example.com')->setPort(99),
                 'mailtrap+api://example.com:99',
             ],
+            [
+                new MailtrapApiTransport('KEY', null, null, null, 123456),
+                'mailtrap+sandbox://sandbox.api.mailtrap.io/?inboxId=123456',
+            ],
+            [
+                (new MailtrapApiTransport('KEY', null, null, null, 123456))->setHost('example.com'),
+                'mailtrap+sandbox://example.com/?inboxId=123456',
+            ],
+            [
+                (new MailtrapApiTransport('KEY', null, null, null, 123456))->setHost('example.com')->setPort(99),
+                'mailtrap+sandbox://example.com:99/?inboxId=123456',
+            ],
+            [
+                new MailtrapApiTransport('KEY', null, null, null, 123456),
+                'mailtrap+sandbox://sandbox.api.mailtrap.io/?inboxId=123456',
+            ],
         ];
     }
 
@@ -66,7 +81,7 @@ class MailtrapApiTransportTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $payload['headers']);
     }
 
-    public function testSend()
+    public function testSendToLiveApi()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
             $this->assertSame('POST', $method);
@@ -84,6 +99,34 @@ class MailtrapApiTransportTest extends TestCase
         });
 
         $transport = new MailtrapApiTransport('KEY', $client);
+
+        $mail = new Email();
+        $mail->subject('Hello!')
+            ->to(new Address('kevin@symfony.com', 'Kevin'))
+            ->from(new Address('fabpot@symfony.com', 'Fabien'))
+            ->text('Hello There!');
+
+        $transport->send($mail);
+    }
+
+    public function testSendToSandboxApi()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $this->assertSame('POST', $method);
+            $this->assertSame('https://sandbox.api.mailtrap.io/api/send/123456', $url);
+
+            $body = json_decode($options['body'], true);
+            $this->assertSame(['email' => 'fabpot@symfony.com', 'name' => 'Fabien'], $body['from']);
+            $this->assertSame([['email' => 'kevin@symfony.com', 'name' => 'Kevin']], $body['to']);
+            $this->assertSame('Hello!', $body['subject']);
+            $this->assertSame('Hello There!', $body['text']);
+
+            return new JsonMockResponse([], [
+                'http_code' => 200,
+            ]);
+        });
+
+        $transport = new MailtrapApiTransport('KEY', $client, null, null, 123456);
 
         $mail = new Email();
         $mail->subject('Hello!')

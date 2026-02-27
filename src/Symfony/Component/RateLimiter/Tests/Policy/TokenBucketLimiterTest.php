@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\RateLimiter\Tests\Policy;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Exception\MaxWaitDurationExceededException;
@@ -21,9 +22,7 @@ use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 use Symfony\Component\RateLimiter\Tests\Resources\DummyWindow;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class TokenBucketLimiterTest extends TestCase
 {
     private InMemoryStorage $storage;
@@ -105,6 +104,35 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertSame(10, $rateLimit->getLimit());
     }
 
+    public function testConsumeLastToken()
+    {
+        $rate = Rate::perSecond(1);
+        $limiter = $this->createLimiter(10, $rate);
+
+        $rateLimit = $limiter->consume(10);
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEqualsWithDelta(time(), $rateLimit->getRetryAfter()->getTimestamp(), 10);
+    }
+
+    public function testConsumeZeroTokens()
+    {
+        $rate = Rate::perSecond(1);
+        $limiter = $this->createLimiter(10, $rate);
+
+        $rateLimit = $limiter->consume(0);
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(time(), $rateLimit->getRetryAfter()->getTimestamp());
+
+        $limiter->reset();
+        $limiter->consume(10);
+
+        $rateLimit = $limiter->consume(0);
+        $this->assertTrue($rateLimit->isAccepted());
+        // no tokens available, retryAfter should point to when the next token regenerates
+        $this->assertEqualsWithDelta(time() + 1, $rateLimit->getRetryAfter()->getTimestamp(), 1);
+    }
+
     public function testWaitIntervalOnConsumeOverLimit()
     {
         $limiter = $this->createLimiter();
@@ -168,6 +196,19 @@ class TokenBucketLimiterTest extends TestCase
             \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 1)),
             $rateLimit->getRetryAfter()
         );
+    }
+
+    public function testNegativeConsume()
+    {
+        $limiter = $this->createLimiter();
+
+        $limiter->consume(10);
+
+        for ($i = 1; $i <= 3; ++$i) {
+            $rateLimit = $limiter->consume(-1);
+            $this->assertEquals($i, $rateLimit->getRemainingTokens());
+            $this->assertTrue($rateLimit->isAccepted());
+        }
     }
 
     public function testBucketRefilledWithStrictFrequency()

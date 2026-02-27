@@ -28,8 +28,11 @@ class MailchimpRequestParserTest extends AbstractRequestParserTestCase
     {
         $decodedPayload = json_decode($payload, true, 512, \JSON_THROW_ON_ERROR);
         $mandrillSignature = $decodedPayload['X-Mandrill-Signature'] ?? '';
-        unset($decodedPayload['X-Mandrill-Signature']);
-        $request = parent::createRequest(json_encode($decodedPayload, \JSON_THROW_ON_ERROR));
+        $formData = ['mandrill_events' => json_encode($decodedPayload['mandrill_events'], \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE)];
+
+        $request = Request::create('/', 'POST', $formData, [], [], [
+            'Content-Type' => 'application/x-www-form-urlencoded',
+        ]);
         $request->headers->set('X-Mandrill-Signature', $mandrillSignature);
 
         return $request;
@@ -38,5 +41,18 @@ class MailchimpRequestParserTest extends AbstractRequestParserTestCase
     protected function getSecret(): string
     {
         return 'key-0p6mqbf74lb20gzq9f4dhpn9rg3zyk26';
+    }
+
+    public function testEmptyWebhookCheck()
+    {
+        $request = Request::create('/', 'POST', ['mandrill_events' => '[]'], [], [], [
+            'Content-Type' => 'application/x-www-form-urlencoded',
+        ]);
+        // Mailchimp signs empty-check requests with the literal secret 'test-webhook'
+        $request->headers->set('X-Mandrill-Signature', 'QANhYzyeonX51wyzKImgnLZ27CE=');
+
+        $parser = $this->createRequestParser();
+
+        $this->assertNull($parser->parse($request, $this->getSecret()));
     }
 }

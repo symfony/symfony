@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Intl\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresFunction;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Locale;
 
@@ -39,9 +41,7 @@ class LocaleTest extends TestCase
         return $tests;
     }
 
-    /**
-     * @dataProvider provideGetFallbackTests
-     */
+    #[DataProvider('provideGetFallbackTests')]
     public function testGetFallback($expected, $locale)
     {
         $this->assertSame($expected, Locale::getFallback($locale));
@@ -71,9 +71,7 @@ class LocaleTest extends TestCase
         Locale::setDefaultFallback($prev);
     }
 
-    /**
-     * @requires function locale_parse
-     */
+    #[RequiresFunction('locale_parse')]
     public function testLongLocaleFallback()
     {
         $locale = 'LC_TYPE=fr_FR.UTF-8;LC_NUMERIC=C;LC_TIME=fr_FR.UTF-8;LC_COLLATE=fr_FR.UTF-8;'.

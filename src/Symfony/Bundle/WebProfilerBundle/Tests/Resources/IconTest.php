@@ -11,13 +11,12 @@
 
 namespace Symfony\Bundle\WebProfilerBundle\Tests\Resources;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class IconTest extends TestCase
 {
-    /**
-     * @dataProvider provideIconFilePaths
-     */
+    #[DataProvider('provideIconFilePaths')]
     public function testIconFileContents($iconFilePath)
     {
         $iconFilePath = realpath($iconFilePath);
@@ -34,6 +33,6 @@ class IconTest extends TestCase
 
     public static function provideIconFilePaths(): array
     {
-        return array_map(fn ($filePath) => (array) $filePath, glob(__DIR__.'/../../Resources/views/Icon/*.svg'));
+        return array_map(static fn ($filePath) => (array) $filePath, glob(__DIR__.'/../../Resources/views/Icon/*.svg'));
     }
 }

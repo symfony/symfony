@@ -32,7 +32,8 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
  */
 final class MailtrapApiTransport extends AbstractApiTransport
 {
-    private const HOST = 'send.api.mailtrap.io';
+    private const LIVE_API_HOST = 'send.api.mailtrap.io';
+    private const SANDBOX_API_HOST = 'sandbox.api.mailtrap.io';
     private const HEADERS_TO_BYPASS = ['from', 'to', 'cc', 'bcc', 'subject', 'content-type', 'sender'];
 
     public function __construct(
@@ -40,18 +41,23 @@ final class MailtrapApiTransport extends AbstractApiTransport
         ?HttpClientInterface $client = null,
         ?EventDispatcherInterface $dispatcher = null,
         ?LoggerInterface $logger = null,
+        private ?int $inboxId = null,
     ) {
         parent::__construct($client, $dispatcher, $logger);
     }
 
     public function __toString(): string
     {
+        if (null !== $this->inboxId) {
+            return \sprintf('mailtrap+sandbox://%s/?inboxId=%d', $this->getEndpoint(), $this->inboxId);
+        }
+
         return \sprintf('mailtrap+api://%s', $this->getEndpoint());
     }
 
     protected function doSendApi(SentMessage $sentMessage, Email $email, Envelope $envelope): ResponseInterface
     {
-        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/send', [
+        $response = $this->client->request('POST', 'https://'.$this->getEndpoint().'/api/send'.(null !== $this->inboxId ? '/'.$this->inboxId : ''), [
             'json' => $this->getPayload($email, $envelope),
             'auth_bearer' => $this->token,
         ]);
@@ -143,8 +149,16 @@ final class MailtrapApiTransport extends AbstractApiTransport
         return array_filter(['email' => $address->getEncodedAddress(), 'name' => $address->getName()]);
     }
 
-    private function getEndpoint(): ?string
+    private function getEndpoint(): string
     {
-        return ($this->host ?: self::HOST).($this->port ? ':'.$this->port : '');
+        if ($this->host) {
+            $host = $this->host;
+        } elseif (null !== $this->inboxId) {
+            $host = self::SANDBOX_API_HOST;
+        } else {
+            $host = self::LIVE_API_HOST;
+        }
+
+        return $host.($this->port ? ':'.$this->port : '');
     }
 }

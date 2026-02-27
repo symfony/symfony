@@ -72,7 +72,7 @@ final class GenericType extends Type implements WrappingTypeInterface
         $glue = '';
         foreach ($this->variableTypes as $t) {
             $variableTypesString .= $glue.$t;
-            $glue = ',';
+            $glue = ', ';
         }
 
         return $typeString.'<'.$variableTypesString.'>';

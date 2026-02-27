@@ -50,11 +50,11 @@ final class AssetMapperCompileCommand extends Command
     {
         $this
             ->setHelp(<<<'EOT'
-The <info>%command.name%</info> command compiles and dumps all the assets in
-the asset mapper into the final public directory (usually <comment>public/assets</comment>).
+                The <info>%command.name%</info> command compiles and dumps all the assets in
+                the asset mapper into the final public directory (usually <comment>public/assets</comment>).
 
-This command is meant to be run during deployment.
-EOT
+                This command is meant to be run during deployment.
+                EOT
             );
     }
 
@@ -84,7 +84,7 @@ EOT
         foreach ($entrypointFiles as $entrypointName => $path) {
             $this->compiledConfigReader->saveConfig($path, $this->importMapGenerator->findEagerEntrypointImports($entrypointName));
         }
-        $styledEntrypointNames = array_map(fn (string $entrypointName) => \sprintf('<info>%s</>', $entrypointName), array_keys($entrypointFiles));
+        $styledEntrypointNames = array_map(static fn (string $entrypointName) => \sprintf('<info>%s</>', $entrypointName), array_keys($entrypointFiles));
         $io->comment(\sprintf('Entrypoint metadata written for <comment>%d</> entrypoints (%s).', \count($entrypointFiles), implode(', ', $styledEntrypointNames)));
 
         if ($this->isDebug) {

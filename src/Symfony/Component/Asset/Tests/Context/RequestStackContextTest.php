@@ -29,7 +29,7 @@ class RequestStackContextTest extends TestCase
     {
         $testBasePath = 'test-path';
 
-        $request = $this->createMock(Request::class);
+        $request = $this->createStub(Request::class);
         $request->method('getBasePath')
             ->willReturn($testBasePath);
         $requestStack = new RequestStack();
@@ -49,7 +49,7 @@ class RequestStackContextTest extends TestCase
 
     public function testIsSecureTrue()
     {
-        $request = $this->createMock(Request::class);
+        $request = $this->createStub(Request::class);
         $request->method('isSecure')
             ->willReturn(true);
         $requestStack = new RequestStack();

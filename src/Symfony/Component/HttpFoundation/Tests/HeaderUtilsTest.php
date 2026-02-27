@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\HttpFoundation\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 
 class HeaderUtilsTest extends TestCase
 {
-    /**
-     * @dataProvider provideHeaderToSplit
-     */
+    #[DataProvider('provideHeaderToSplit')]
     public function testSplit(array $expected, string $header, string $separator)
     {
         $this->assertSame($expected, HeaderUtils::split($header, $separator));
@@ -105,9 +104,7 @@ class HeaderUtilsTest extends TestCase
         HeaderUtils::makeDisposition('invalid', 'foo.html');
     }
 
-    /**
-     * @dataProvider provideMakeDisposition
-     */
+    #[DataProvider('provideMakeDisposition')]
     public function testMakeDisposition($disposition, $filename, $filenameFallback, $expected)
     {
         $this->assertEquals($expected, HeaderUtils::makeDisposition($disposition, $filename, $filenameFallback));
@@ -125,9 +122,7 @@ class HeaderUtilsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideMakeDispositionFail
-     */
+    #[DataProvider('provideMakeDispositionFail')]
     public function testMakeDispositionFail($disposition, $filename)
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -146,9 +141,7 @@ class HeaderUtilsTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideParseQuery
-     */
+    #[DataProvider('provideParseQuery')]
     public function testParseQuery(string $query, ?string $expected = null)
     {
         $this->assertSame($expected ?? $query, http_build_query(HeaderUtils::parseQuery($query), '', '&'));

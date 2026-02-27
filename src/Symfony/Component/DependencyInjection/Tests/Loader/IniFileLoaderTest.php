@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -34,9 +35,7 @@ class IniFileLoaderTest extends TestCase
         $this->assertEquals(['foo' => 'bar', 'bar' => '%foo%'], $this->container->getParameterBag()->all(), '->load() takes a single file name as its first argument');
     }
 
-    /**
-     * @dataProvider getTypeConversions
-     */
+    #[DataProvider('getTypeConversions')]
     public function testTypeConversions($key, $value, $supported)
     {
         $this->loader->load('types.ini');
@@ -45,9 +44,9 @@ class IniFileLoaderTest extends TestCase
     }
 
     /**
-     * @dataProvider getTypeConversions
-     * This test illustrates where our conversions differs from INI_SCANNER_TYPED introduced in PHP 5.6.1
+     * This test illustrates where our conversions differs from INI_SCANNER_TYPED introduced in PHP 5.6.1.
      */
+    #[DataProvider('getTypeConversions')]
     public function testTypeConversionsWithNativePhp($key, $value, $supported)
     {
         if (!$supported) {
@@ -82,7 +81,7 @@ class IniFileLoaderTest extends TestCase
             ['zero', 0, true],
             ['0b0110_byte_string', bindec('0b0110'), false], // not supported by INI_SCANNER_TYPED
             ['11112222333344445555_great_number', '1111,2222,3333,4444,5555', true],
-            ['0777_number_starting_with_0', 0777, false], // not supported by INI_SCANNER_TYPED
+            ['0777_number_starting_with_0', 0o777, false], // not supported by INI_SCANNER_TYPED
             ['255_hexadecimal', 0xFF, false], // not supported by INI_SCANNER_TYPED
             ['100.0_exponential', 1e2, false], // not supported by INI_SCANNER_TYPED
             ['-120.0_exponential', -1.2E2, false], // not supported by INI_SCANNER_TYPED

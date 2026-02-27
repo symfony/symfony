@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\RateLimiter\Tests\Policy;
 
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\RateLimiter\Policy\SlidingWindowLimiter;
 use Symfony\Component\RateLimiter\RateLimit;
 use Symfony\Component\RateLimiter\Storage\InMemoryStorage;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class SlidingWindowLimiterTest extends TestCase
 {
     private InMemoryStorage $storage;
@@ -70,6 +69,20 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertTrue($limiter->consume()->isAccepted());
     }
 
+    public function testConsumeLastToken()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(9);
+
+        $rateLimit = $limiter->consume(1);
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(
+            \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 12)),
+            $rateLimit->getRetryAfter()
+        );
+    }
+
     public function testReserve()
     {
         $limiter = $this->createLimiter();
@@ -108,6 +121,19 @@ class SlidingWindowLimiterTest extends TestCase
             \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 12)),
             $rateLimit->getRetryAfter()
         );
+    }
+
+    public function testNegativeConsume()
+    {
+        $limiter = $this->createLimiter();
+
+        $limiter->consume(10);
+
+        for ($i = 1; $i <= 3; ++$i) {
+            $rateLimit = $limiter->consume(-1);
+            $this->assertEquals($i, $rateLimit->getRemainingTokens());
+            $this->assertTrue($rateLimit->isAccepted());
+        }
     }
 
     private function createLimiter(): SlidingWindowLimiter

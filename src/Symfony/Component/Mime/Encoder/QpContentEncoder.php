@@ -46,9 +46,9 @@ final class QpContentEncoder implements ContentEncoderInterface
         // transform =0D=0A to CRLF
         $string = str_replace(["\t=0D=0A", ' =0D=0A', '=0D=0A'], ["=09\r\n", "=20\r\n", "\r\n"], $string);
 
-        return match (\ord(substr($string, -1))) {
-            0x09 => substr_replace($string, '=09', -1),
-            0x20 => substr_replace($string, '=20', -1),
+        return match ($string[-1] ?? '') {
+            "\x09" => substr_replace($string, '=09', -1),
+            "\x20" => substr_replace($string, '=20', -1),
             default => $string,
         };
     }

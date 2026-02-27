@@ -13,18 +13,17 @@ namespace Symfony\Bridge\Doctrine\Tests\Middleware\IdleConnection;
 
 use Doctrine\DBAL\Driver as DriverInterface;
 use Doctrine\DBAL\Driver\Connection as ConnectionInterface;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Middleware\IdleConnection\Driver;
 
 class DriverTest extends TestCase
 {
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testConnect()
     {
         $driverMock = $this->createMock(DriverInterface::class);
-        $connectionMock = $this->createMock(ConnectionInterface::class);
+        $connectionMock = $this->createStub(ConnectionInterface::class);
 
         $driverMock->expects($this->once())
             ->method('connect')

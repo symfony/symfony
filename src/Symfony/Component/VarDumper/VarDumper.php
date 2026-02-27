@@ -76,18 +76,20 @@ class VarDumper
             case 'server' === $format:
             case $format && 'tcp' === parse_url($format, \PHP_URL_SCHEME):
                 $host = 'server' === $format ? $_SERVER['VAR_DUMPER_SERVER'] ?? '127.0.0.1:9912' : $format;
-                $dumper = \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? new CliDumper() : new HtmlDumper();
+                $accept = $_SERVER['HTTP_ACCEPT'] ?? (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? 'txt' : 'html');
+                $dumper = str_contains($accept, 'html') || str_contains($accept, '*/*') ? new HtmlDumper() : new CliDumper();
                 $dumper = new ServerDumper($host, $dumper, self::getDefaultContextProviders());
                 break;
             default:
-                $dumper = \in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? new CliDumper() : new HtmlDumper();
+                $accept = $_SERVER['HTTP_ACCEPT'] ?? (\in_array(\PHP_SAPI, ['cli', 'phpdbg', 'embed'], true) ? 'txt' : 'html');
+                $dumper = str_contains($accept, 'html') || str_contains($accept, '*/*') ? new HtmlDumper() : new CliDumper();
         }
 
         if (!$dumper instanceof ServerDumper) {
             $dumper = new ContextualizedDumper($dumper, [new SourceContextProvider()]);
         }
 
-        self::$handler = function ($var, ?string $label = null) use ($cloner, $dumper) {
+        self::$handler = static function ($var, ?string $label = null) use ($cloner, $dumper) {
             $var = $cloner->cloneVar($var);
 
             if (null !== $label) {

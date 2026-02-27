@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Caster\Caster;
 use Symfony\Component\VarDumper\Caster\DateCaster;
@@ -37,41 +38,35 @@ class DateCasterTest extends TestCase
         date_default_timezone_set($this->previousTimezone);
     }
 
-    /**
-     * @dataProvider provideDateTimes
-     */
-    public function testDumpDateTime($time, $timezone, $xDate, $xTimestamp)
+    #[DataProvider('provideDateTimes')]
+    public function testDumpDateTime($time, $timezone, $xDate, $xTimestamp, $xInfos)
     {
         $date = new \DateTime($time, new \DateTimeZone($timezone));
 
         $xDump = <<<EODUMP
-DateTime @$xTimestamp {
-  date: $xDate
-}
-EODUMP;
+            DateTime @$xTimestamp {
+              date: $xDate
+            }
+            EODUMP;
 
         $this->assertDumpEquals($xDump, $date);
     }
 
-    /**
-     * @dataProvider provideDateTimes
-     */
-    public function testDumpDateTimeImmutable($time, $timezone, $xDate, $xTimestamp)
+    #[DataProvider('provideDateTimes')]
+    public function testDumpDateTimeImmutable($time, $timezone, $xDate, $xTimestamp, $xInfos)
     {
         $date = new \DateTimeImmutable($time, new \DateTimeZone($timezone));
 
         $xDump = <<<EODUMP
-DateTimeImmutable @$xTimestamp {
-  date: $xDate
-}
-EODUMP;
+            DateTimeImmutable @$xTimestamp {
+              date: $xDate
+            }
+            EODUMP;
 
         $this->assertDumpEquals($xDump, $date);
     }
 
-    /**
-     * @dataProvider provideDateTimes
-     */
+    #[DataProvider('provideDateTimes')]
     public function testCastDateTime($time, $timezone, $xDate, $xTimestamp, $xInfos)
     {
         $stub = new Stub();
@@ -79,25 +74,25 @@ EODUMP;
         $cast = DateCaster::castDateTime($date, Caster::castObject($date, \DateTimeImmutable::class), $stub, false, 0);
 
         $xDump = <<<EODUMP
-array:1 [
-  "\\x00~\\x00date" => $xDate
-]
-EODUMP;
+            array:1 [
+              "\\x00~\\x00date" => $xDate
+            ]
+            EODUMP;
 
         $this->assertDumpEquals($xDump, $cast);
 
         $xDump = <<<EODUMP
-Symfony\Component\VarDumper\Caster\ConstStub {
-  +type: 1
-  +class: "$xDate"
-  +value: "%A$xInfos%A"
-  +cut: 0
-  +handle: 0
-  +refCount: 0
-  +position: 0
-  +attr: []
-}
-EODUMP;
+            Symfony\Component\VarDumper\Caster\ConstStub {
+              +type: 1
+              +class: "$xDate"
+              +value: "%A$xInfos%A"
+              +cut: 0
+              +handle: 0
+              +refCount: 0
+              +position: 0
+              +attr: []
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($xDump, $cast["\0~\0date"]);
     }
@@ -118,9 +113,7 @@ EODUMP;
         ];
     }
 
-    /**
-     * @dataProvider provideNoTimezoneDateTimes
-     */
+    #[DataProvider('provideNoTimezoneDateTimes')]
     public function testCastDateTimeNoTimezone($time, $xDate, $xInfos)
     {
         date_default_timezone_set('UTC');
@@ -130,25 +123,25 @@ EODUMP;
         $cast = DateCaster::castDateTime($date, Caster::castObject($date, \DateTime::class), $stub, false, 0);
 
         $xDump = <<<EODUMP
-array:1 [
-  "\\x00~\\x00date" => $xDate
-]
-EODUMP;
+            array:1 [
+              "\\x00~\\x00date" => $xDate
+            ]
+            EODUMP;
 
         $this->assertDumpEquals($xDump, $cast);
 
         $xDump = <<<EODUMP
-Symfony\Component\VarDumper\Caster\ConstStub {
-  +type: 1
-  +class: "$xDate"
-  +value: "%A$xInfos%A"
-  +cut: 0
-  +handle: 0
-  +refCount: 0
-  +position: 0
-  +attr: []
-}
-EODUMP;
+            Symfony\Component\VarDumper\Caster\ConstStub {
+              +type: 1
+              +class: "$xDate"
+              +value: "%A$xInfos%A"
+              +cut: 0
+              +handle: 0
+              +refCount: 0
+              +position: 0
+              +attr: []
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($xDump, $cast["\0~\0date"]);
     }
@@ -176,65 +169,59 @@ EODUMP;
         $xDate = '2020-02-13 00:00:00.123456 Europe/Paris (+01:00)';
         $xInfo = 'Thursday, February 13, 2020%Afrom now';
         $xDump = <<<EODUMP
-array:2 [
-  "\\x00Symfony\Component\VarDumper\Tests\Fixtures\DateTimeChild\\x00addedProperty" => "foo"
-  "\\x00~\\x00date" => $xDate
-]
-EODUMP;
+            array:2 [
+              "\\x00Symfony\Component\VarDumper\Tests\Fixtures\DateTimeChild\\x00addedProperty" => "foo"
+              "\\x00~\\x00date" => $xDate
+            ]
+            EODUMP;
 
         $this->assertDumpEquals($xDump, $dateCast);
 
         $xDump = <<<EODUMP
-Symfony\Component\VarDumper\Caster\ConstStub {
-  +type: 1
-  +class: "$xDate"
-  +value: "%A$xInfo%A"
-  +cut: 0
-  +handle: 0
-  +refCount: 0
-  +position: 0
-  +attr: []
-}
-EODUMP;
+            Symfony\Component\VarDumper\Caster\ConstStub {
+              +type: 1
+              +class: "$xDate"
+              +value: "%A$xInfo%A"
+              +cut: 0
+              +handle: 0
+              +refCount: 0
+              +position: 0
+              +attr: []
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($xDump, $dateCast["\0~\0date"]);
     }
 
-    /**
-     * @dataProvider provideIntervals
-     */
-    public function testDumpInterval($intervalSpec, $ms, $invert, $expected)
+    #[DataProvider('provideIntervals')]
+    public function testDumpInterval($intervalSpec, $ms, $invert, $expected, $xSeconds)
     {
         $interval = $this->createInterval($intervalSpec, $ms, $invert);
 
         $xDump = <<<EODUMP
-DateInterval {
-  interval: $expected
-%A}
-EODUMP;
+            DateInterval {
+              interval: $expected
+            %A}
+            EODUMP;
 
         $this->assertDumpMatchesFormat($xDump, $interval);
     }
 
-    /**
-     * @dataProvider provideIntervals
-     */
-    public function testDumpIntervalExcludingVerbosity($intervalSpec, $ms, $invert, $expected)
+    #[DataProvider('provideIntervals')]
+    public function testDumpIntervalExcludingVerbosity($intervalSpec, $ms, $invert, $expected, $xSeconds)
     {
         $interval = $this->createInterval($intervalSpec, $ms, $invert);
 
         $xDump = <<<EODUMP
-DateInterval {
-  interval: $expected
-}
-EODUMP;
+            DateInterval {
+              interval: $expected
+            }
+            EODUMP;
 
         $this->assertDumpEquals($xDump, $interval, Caster::EXCLUDE_VERBOSE);
     }
 
-    /**
-     * @dataProvider provideIntervals
-     */
+    #[DataProvider('provideIntervals')]
     public function testCastInterval($intervalSpec, $ms, $invert, $xInterval, $xSeconds)
     {
         $interval = $this->createInterval($intervalSpec, $ms, $invert);
@@ -243,10 +230,10 @@ EODUMP;
         $cast = DateCaster::castInterval($interval, ['foo' => 'bar'], $stub, false, Caster::EXCLUDE_VERBOSE);
 
         $xDump = <<<EODUMP
-array:1 [
-  "\\x00~\\x00interval" => $xInterval
-]
-EODUMP;
+            array:1 [
+              "\\x00~\\x00interval" => $xInterval
+            ]
+            EODUMP;
 
         $this->assertDumpEquals($xDump, $cast);
 
@@ -255,17 +242,17 @@ EODUMP;
         }
 
         $xDump = <<<EODUMP
-Symfony\Component\VarDumper\Caster\ConstStub {
-  +type: 1
-  +class: "$xInterval"
-  +value: "$xSeconds"
-  +cut: 0
-  +handle: 0
-  +refCount: 0
-  +position: 0
-  +attr: []
-}
-EODUMP;
+            Symfony\Component\VarDumper\Caster\ConstStub {
+              +type: 1
+              +class: "$xInterval"
+              +value: "$xSeconds"
+              +cut: 0
+              +handle: 0
+              +refCount: 0
+              +position: 0
+              +attr: []
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($xDump, $cast["\0~\0interval"]);
     }
@@ -303,41 +290,35 @@ EODUMP;
         ];
     }
 
-    /**
-     * @dataProvider provideTimeZones
-     */
-    public function testDumpTimeZone($timezone, $expected)
+    #[DataProvider('provideTimeZones')]
+    public function testDumpTimeZone($timezone, $expected, $xRegion)
     {
         $timezone = new \DateTimeZone($timezone);
 
         $xDump = <<<EODUMP
-DateTimeZone {
-  timezone: $expected
-%A}
-EODUMP;
+            DateTimeZone {
+              timezone: $expected
+            %A}
+            EODUMP;
 
         $this->assertDumpMatchesFormat($xDump, $timezone);
     }
 
-    /**
-     * @dataProvider provideTimeZones
-     */
-    public function testDumpTimeZoneExcludingVerbosity($timezone, $expected)
+    #[DataProvider('provideTimeZones')]
+    public function testDumpTimeZoneExcludingVerbosity($timezone, $expected, $xRegion)
     {
         $timezone = new \DateTimeZone($timezone);
 
         $xDump = <<<EODUMP
-DateTimeZone {
-  timezone: $expected
-}
-EODUMP;
+            DateTimeZone {
+              timezone: $expected
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($xDump, $timezone, Caster::EXCLUDE_VERBOSE);
     }
 
-    /**
-     * @dataProvider provideTimeZones
-     */
+    #[DataProvider('provideTimeZones')]
     public function testCastTimeZone($timezone, $xTimezone, $xRegion)
     {
         $timezone = new \DateTimeZone($timezone);
@@ -346,25 +327,25 @@ EODUMP;
         $cast = DateCaster::castTimeZone($timezone, ['foo' => 'bar'], $stub, false, Caster::EXCLUDE_VERBOSE);
 
         $xDump = <<<EODUMP
-array:1 [
-  "\\x00~\\x00timezone" => $xTimezone
-]
-EODUMP;
+            array:1 [
+              "\\x00~\\x00timezone" => $xTimezone
+            ]
+            EODUMP;
 
         $this->assertDumpMatchesFormat($xDump, $cast);
 
         $xDump = <<<EODUMP
-Symfony\Component\VarDumper\Caster\ConstStub {
-  +type: 1
-  +class: "$xTimezone"
-  +value: "$xRegion"
-  +cut: 0
-  +handle: 0
-  +refCount: 0
-  +position: 0
-  +attr: []
-}
-EODUMP;
+            Symfony\Component\VarDumper\Caster\ConstStub {
+              +type: 1
+              +class: "$xTimezone"
+              +value: "$xRegion"
+              +cut: 0
+              +handle: 0
+              +refCount: 0
+              +position: 0
+              +attr: []
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($xDump, $cast["\0~\0timezone"]);
     }
@@ -396,25 +377,21 @@ EODUMP;
         ];
     }
 
-    /**
-     * @dataProvider providePeriods
-     */
-    public function testDumpPeriod($start, $interval, $end, $options, $expected)
+    #[DataProvider('providePeriods')]
+    public function testDumpPeriod($start, $interval, $end, $options, $expected, $xDates)
     {
         $p = new \DatePeriod(new \DateTimeImmutable($start), new \DateInterval($interval), \is_int($end) ? $end : new \DateTime($end), $options);
 
         $xDump = <<<EODUMP
-DatePeriod {
-  period: $expected
-%A}
-EODUMP;
+            DatePeriod {
+              period: $expected
+            %A}
+            EODUMP;
 
         $this->assertDumpMatchesFormat($xDump, $p);
     }
 
-    /**
-     * @dataProvider providePeriods
-     */
+    #[DataProvider('providePeriods')]
     public function testCastPeriod($start, $interval, $end, $options, $xPeriod, $xDates)
     {
         $p = new \DatePeriod(new \DateTimeImmutable($start, new \DateTimeZone('UTC')), new \DateInterval($interval), \is_int($end) ? $end : new \DateTimeImmutable($end, new \DateTimeZone('UTC')), $options);
@@ -423,25 +400,25 @@ EODUMP;
         $cast = DateCaster::castPeriod($p, [], $stub, false, 0);
 
         $xDump = <<<EODUMP
-array:1 [
-  "\\x00~\\x00period" => $xPeriod
-]
-EODUMP;
+            array:1 [
+              "\\x00~\\x00period" => $xPeriod
+            ]
+            EODUMP;
 
         $this->assertDumpEquals($xDump, $cast);
 
         $xDump = <<<EODUMP
-Symfony\Component\VarDumper\Caster\ConstStub {
-  +type: 1
-  +class: "$xPeriod"
-  +value: "%A$xDates%A"
-  +cut: 0
-  +handle: 0
-  +refCount: 0
-  +position: 0
-  +attr: []
-}
-EODUMP;
+            Symfony\Component\VarDumper\Caster\ConstStub {
+              +type: 1
+              +class: "$xPeriod"
+              +value: "%A$xDates%A"
+              +cut: 0
+              +handle: 0
+              +refCount: 0
+              +position: 0
+              +attr: []
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($xDump, $cast["\0~\0period"]);
     }

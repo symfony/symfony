@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -83,7 +84,27 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertSame(CustomDefinition::class, $locator('bar')::class);
         $this->assertSame(CustomDefinition::class, $locator('baz')::class);
         $this->assertSame(CustomDefinition::class, $locator('some.service')::class);
-        $this->assertSame(CustomDefinition::class, \get_class($locator('inlines.service')));
+        $this->assertSame(CustomDefinition::class, $locator('inlines.service')::class);
+    }
+
+    public function testServiceListIsOrdered()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('bar', CustomDefinition::class);
+        $container->register('baz', CustomDefinition::class);
+
+        $container->register('foo', ServiceLocator::class)
+            ->setArguments([[
+                new Reference('baz'),
+                new Reference('bar'),
+            ]])
+            ->addTag('container.service_locator')
+        ;
+
+        (new ServiceLocatorTagPass())->process($container);
+
+        $this->assertSame(['bar', 'baz'], array_keys($container->getDefinition('foo')->getArgument(0)));
     }
 
     public function testServiceWithKeyOverwritesPreviousInheritedKey()
@@ -157,7 +178,7 @@ class ServiceLocatorTagPassTest extends TestCase
         $container->register('baz', TestDefinition2::class)->addTag('test_tag');
 
         $container->register('foo', ServiceLocator::class)
-            ->setArguments([new TaggedIteratorArgument('test_tag', null, null, true)])
+            ->setArguments([new TaggedIteratorArgument('test_tag', null, true)])
             ->addTag('container.service_locator')
         ;
 
@@ -170,13 +191,34 @@ class ServiceLocatorTagPassTest extends TestCase
         $this->assertSame(TestDefinition2::class, $locator('baz')::class);
     }
 
+    public function testTaggedServicesKeysAreKept()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('bar', TestDefinition1::class)->addTag('test_tag', ['index' => 0]);
+        $container->register('baz', TestDefinition2::class)->addTag('test_tag', ['index' => 1]);
+
+        $container->register('foo', ServiceLocator::class)
+            ->setArguments([new TaggedIteratorArgument('test_tag', 'index', true)])
+            ->addTag('container.service_locator')
+        ;
+
+        (new ServiceLocatorTagPass())->process($container);
+
+        /** @var ServiceLocator $locator */
+        $locator = $container->get('foo');
+
+        $this->assertSame(TestDefinition1::class, $locator(0)::class);
+        $this->assertSame(TestDefinition2::class, $locator(1)::class);
+    }
+
     public function testIndexedByServiceIdWithDecoration()
     {
         $container = new ContainerBuilder();
 
         $locator = new Definition(Locator::class);
         $locator->setPublic(true);
-        $locator->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('test_tag', null, null, true)));
+        $locator->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('test_tag', null, true)));
 
         $container->setDefinition(Locator::class, $locator);
 
@@ -201,6 +243,24 @@ class ServiceLocatorTagPassTest extends TestCase
         static::assertInstanceOf(DecoratedService::class, $locator->get(Service::class));
     }
 
+    public function testServicesKeysAreKept()
+    {
+        $container = new ContainerBuilder();
+        $container->register('service-1');
+        $container->register('service-2');
+        $container->register('service-3');
+
+        $locator = ServiceLocatorTagPass::register($container, [
+            new Reference('service-1'),
+            'service-2' => new Reference('service-2'),
+            'foo' => new Reference('service-3'),
+        ]);
+        $locator = $container->getDefinition($locator);
+        $factories = $locator->getArguments()[0];
+
+        static::assertSame([0, 'service-2', 'foo'], array_keys($factories));
+    }
+
     public function testDefinitionOrderIsTheSame()
     {
         $container = new ContainerBuilder();
@@ -208,13 +268,44 @@ class ServiceLocatorTagPassTest extends TestCase
         $container->register('service-2');
 
         $locator = ServiceLocatorTagPass::register($container, [
-            new Reference('service-2'),
-            new Reference('service-1'),
+            'service-2' => new Reference('service-2'),
+            'service-1' => new Reference('service-1'),
         ]);
         $locator = $container->getDefinition($locator);
         $factories = $locator->getArguments()[0];
 
         static::assertSame(['service-2', 'service-1'], array_keys($factories));
+    }
+
+    public function testIndexedByAsTaggedItemWithDecoration()
+    {
+        $container = new ContainerBuilder();
+
+        $locator = new Definition(Locator::class);
+        $locator->setPublic(true);
+        $locator->addArgument(new ServiceLocatorArgument(new TaggedIteratorArgument('test_tag', 'key', true)));
+
+        $container->setDefinition(Locator::class, $locator);
+
+        $service = new Definition(AsTaggedItemService::class);
+        $service->setPublic(true);
+        $service->setAutoconfigured(true);
+        $service->addTag('test_tag');
+
+        $container->setDefinition(AsTaggedItemService::class, $service);
+
+        $decorated = new Definition(AsTaggedItemServiceDecorator::class);
+        $decorated->setPublic(true);
+        $decorated->setDecoratedService(AsTaggedItemService::class);
+
+        $container->setDefinition(AsTaggedItemServiceDecorator::class, $decorated);
+
+        $container->compile();
+
+        /** @var ServiceLocator $locator */
+        $locator = $container->get(Locator::class)->locator;
+        static::assertTrue($locator->has('custom_key'));
+        static::assertInstanceOf(AsTaggedItemServiceDecorator::class, $locator->get('custom_key'));
     }
 
     public function testBindingsAreProcessed()
@@ -245,5 +336,14 @@ class Service
 }
 
 class DecoratedService
+{
+}
+
+#[AsTaggedItem(index: 'custom_key')]
+class AsTaggedItemService
+{
+}
+
+class AsTaggedItemServiceDecorator
 {
 }

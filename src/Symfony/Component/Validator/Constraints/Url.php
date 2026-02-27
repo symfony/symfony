@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Validator\Constraints;
 
-use Symfony\Component\Validator\Attribute\HasNamedArguments;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 
@@ -35,22 +34,20 @@ class Url extends Constraint
     public string $tldMessage = 'This URL is missing a top-level domain.';
     public array $protocols = ['http', 'https'];
     public bool $relativeProtocol = false;
-    public bool $requireTld = false;
+    public bool $requireTld = true;
     /** @var callable|null */
     public $normalizer;
 
     /**
-     * @param array<string,mixed>|null $options
-     * @param string[]|null            $protocols        The protocols considered to be valid for the URL (e.g. http, https, ftp, etc.) (defaults to ['http', 'https']
-     * @param bool|null                $relativeProtocol Whether to accept URL without the protocol (i.e. //example.com) (defaults to false)
-     * @param string[]|null            $groups
-     * @param bool|null                $requireTld       Whether to require the URL to include a top-level domain (defaults to false)
+     * @param string[]|string|null $protocols        The protocols considered to be valid for the URL (e.g. http, https, ftp, etc.) (defaults to ['http', 'https']; use '*' to allow any protocol)
+     * @param bool|null            $relativeProtocol Whether to accept URL without the protocol (i.e. //example.com) (defaults to false)
+     * @param string[]|null        $groups
+     * @param bool|null            $requireTld       Whether to require the URL to include a top-level domain (defaults to false)
      */
-    #[HasNamedArguments]
     public function __construct(
         ?array $options = null,
         ?string $message = null,
-        ?array $protocols = null,
+        array|string|null $protocols = null,
         ?bool $relativeProtocol = null,
         ?callable $normalizer = null,
         ?array $groups = null,
@@ -58,20 +55,20 @@ class Url extends Constraint
         ?bool $requireTld = null,
         ?string $tldMessage = null,
     ) {
-        if (\is_array($options)) {
-            trigger_deprecation('symfony/validator', '7.3', 'Passing an array of options to configure the "%s" constraint is deprecated, use named arguments instead.', static::class);
+        if (null !== $options) {
+            throw new InvalidArgumentException(\sprintf('Passing an array of options to configure the "%s" constraint is no longer supported.', static::class));
         }
 
-        parent::__construct($options, $groups, $payload);
+        parent::__construct(null, $groups, $payload);
 
-        if (null === ($options['requireTld'] ?? $requireTld)) {
-            trigger_deprecation('symfony/validator', '7.1', 'Not passing a value for the "requireTld" option to the Url constraint is deprecated. Its default value will change to "true".');
+        if (\is_string($protocols)) {
+            $protocols = (array) $protocols;
         }
 
         $this->message = $message ?? $this->message;
         $this->protocols = $protocols ?? $this->protocols;
         $this->relativeProtocol = $relativeProtocol ?? $this->relativeProtocol;
-        $this->normalizer = $normalizer ?? $this->normalizer;
+        $this->normalizer = $normalizer;
         $this->requireTld = $requireTld ?? $this->requireTld;
         $this->tldMessage = $tldMessage ?? $this->tldMessage;
 

@@ -41,7 +41,7 @@ final class ArrayShapeType extends CollectionType
         $valueTypes = [];
 
         foreach ($shape as $k => $v) {
-            $keyTypes[] = self::fromValue($k);
+            $keyTypes[] = \is_int($k) ? Type::int() : Type::string();
             $valueTypes[] = $v['type'];
         }
 
@@ -90,7 +90,7 @@ final class ArrayShapeType extends CollectionType
 
     public function getExtraValueType(): ?Type
     {
-        return $this->extraKeyType;
+        return $this->extraValueType;
     }
 
     public function accepts(mixed $value): bool

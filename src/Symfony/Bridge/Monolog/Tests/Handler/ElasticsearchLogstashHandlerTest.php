@@ -27,11 +27,11 @@ class ElasticsearchLogstashHandlerTest extends TestCase
         $callCount = 0;
         $responseFactory = function ($method, $url, $options) use (&$callCount) {
             $body = <<<EOBODY
-{"index":{"_index":"log","_type":"_doc"}}
-{"@timestamp":"2020-01-01T00:00:00.000000+01:00","@version":1,"host":"my hostname","message":"My info message","type":"application","channel":"app","level":"INFO","monolog_level":200}
+                {"index":{"_index":"log","_type":"_doc"}}
+                {"@timestamp":"2020-01-01T00:00:00.000000+01:00","@version":1,"host":"my hostname","message":"My info message","type":"application","channel":"app","level":"INFO","monolog_level":200}
 
 
-EOBODY;
+                EOBODY;
 
             // Monolog 1X
             if (\defined(LogstashFormatter::class.'::V1')) {
@@ -63,11 +63,11 @@ EOBODY;
         $callCount = 0;
         $responseFactory = function ($method, $url, $options) use (&$callCount) {
             $body = <<<EOBODY
-{"index":{"_index":"log"}}
-{"@timestamp":"2020-01-01T00:00:00.000000+01:00","@version":1,"host":"my hostname","message":"My info message","type":"application","channel":"app","level":"INFO","monolog_level":200}
+                {"index":{"_index":"log"}}
+                {"@timestamp":"2020-01-01T00:00:00.000000+01:00","@version":1,"host":"my hostname","message":"My info message","type":"application","channel":"app","level":"INFO","monolog_level":200}
 
 
-EOBODY;
+                EOBODY;
 
             // Monolog 1X
             if (\defined(LogstashFormatter::class.'::V1')) {
@@ -99,14 +99,14 @@ EOBODY;
         $callCount = 0;
         $responseFactory = function ($method, $url, $options) use (&$callCount) {
             $body = <<<EOBODY
-{"index":{"_index":"log","_type":"_doc"}}
-{"@timestamp":"2020-01-01T00:00:00.000000+01:00","@version":1,"host":"my hostname","message":"My info message","type":"application","channel":"app","level":"INFO","monolog_level":200}
+                {"index":{"_index":"log","_type":"_doc"}}
+                {"@timestamp":"2020-01-01T00:00:00.000000+01:00","@version":1,"host":"my hostname","message":"My info message","type":"application","channel":"app","level":"INFO","monolog_level":200}
 
-{"index":{"_index":"log","_type":"_doc"}}
-{"@timestamp":"2020-01-01T00:00:01.000000+01:00","@version":1,"host":"my hostname","message":"My second message","type":"application","channel":"php","level":"WARNING","monolog_level":300}
+                {"index":{"_index":"log","_type":"_doc"}}
+                {"@timestamp":"2020-01-01T00:00:01.000000+01:00","@version":1,"host":"my hostname","message":"My second message","type":"application","channel":"php","level":"WARNING","monolog_level":300}
 
 
-EOBODY;
+                EOBODY;
 
             // Monolog 1X
             if (\defined(LogstashFormatter::class.'::V1')) {

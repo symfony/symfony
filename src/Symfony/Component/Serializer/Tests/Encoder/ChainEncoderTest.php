@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Serializer\Tests\Encoder;
 
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Serializer\Debug\TraceableEncoder;
 use Symfony\Component\Serializer\Encoder\ChainEncoder;
@@ -26,79 +25,59 @@ class ChainEncoderTest extends TestCase
     private const FORMAT_2 = 'format2';
     private const FORMAT_3 = 'format3';
 
-    private ChainEncoder $chainEncoder;
-    private MockObject&ContextAwareEncoderInterface $encoder1;
-    private MockObject&EncoderInterface $encoder2;
-
-    protected function setUp(): void
-    {
-        $this->encoder1 = $this->createMock(ContextAwareEncoderInterface::class);
-        $this->encoder1
-            ->method('supportsEncoding')
-            ->willReturnMap([
-                [self::FORMAT_1, [], true],
-                [self::FORMAT_2, [], false],
-                [self::FORMAT_3, [], false],
-                [self::FORMAT_3, ['foo' => 'bar'], true],
-                [self::FORMAT_3, ['foo' => 'bar2'], false],
-            ]);
-
-        $this->encoder2 = $this->createMock(EncoderInterface::class);
-        $this->encoder2
-            ->method('supportsEncoding')
-            ->willReturnMap([
-                [self::FORMAT_1, [], false],
-                [self::FORMAT_2, [], true],
-                [self::FORMAT_3, [], false],
-                [self::FORMAT_3, ['foo' => 'bar'], false],
-                [self::FORMAT_3, ['foo' => 'bar2'], true],
-            ]);
-
-        $this->chainEncoder = new ChainEncoder([$this->encoder1, $this->encoder2]);
-    }
-
     public function testSupportsEncoding()
     {
-        $this->encoder1
+        $encoder1 = $this->createEncoder1();
+        $encoder1
             ->method('encode')
             ->willReturn('result1');
-        $this->encoder2
+        $encoder2 = $this->createEncoder2();
+        $encoder2
             ->method('encode')
             ->willReturn('result2');
 
-        $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_1));
-        $this->assertEquals('result1', $this->chainEncoder->encode('', self::FORMAT_1, []));
+        $chainEncoder = new ChainEncoder([$encoder1, $encoder2]);
 
-        $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_2));
-        $this->assertEquals('result2', $this->chainEncoder->encode('', self::FORMAT_2, []));
+        $this->assertTrue($chainEncoder->supportsEncoding(self::FORMAT_1));
+        $this->assertEquals('result1', $chainEncoder->encode('', self::FORMAT_1, []));
 
-        $this->assertFalse($this->chainEncoder->supportsEncoding(self::FORMAT_3));
+        $this->assertTrue($chainEncoder->supportsEncoding(self::FORMAT_2));
+        $this->assertEquals('result2', $chainEncoder->encode('', self::FORMAT_2, []));
 
-        $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_3, ['foo' => 'bar']));
-        $this->assertEquals('result1', $this->chainEncoder->encode('', self::FORMAT_3, ['foo' => 'bar']));
+        $this->assertFalse($chainEncoder->supportsEncoding(self::FORMAT_3));
 
-        $this->assertTrue($this->chainEncoder->supportsEncoding(self::FORMAT_3, ['foo' => 'bar2']));
-        $this->assertEquals('result2', $this->chainEncoder->encode('', self::FORMAT_3, ['foo' => 'bar2']));
+        $this->assertTrue($chainEncoder->supportsEncoding(self::FORMAT_3, ['foo' => 'bar']));
+        $this->assertEquals('result1', $chainEncoder->encode('', self::FORMAT_3, ['foo' => 'bar']));
+
+        $this->assertTrue($chainEncoder->supportsEncoding(self::FORMAT_3, ['foo' => 'bar2']));
+        $this->assertEquals('result2', $chainEncoder->encode('', self::FORMAT_3, ['foo' => 'bar2']));
     }
 
     public function testEncode()
     {
-        $this->encoder1->expects($this->never())->method('encode');
-        $this->encoder2->expects($this->once())->method('encode')->willReturn('foo:123');
+        $encoder1 = $this->createEncoder1(true);
+        $encoder1->expects($this->never())->method('encode');
+        $encoder2 = $this->createEncoder2(true);
+        $encoder2->expects($this->once())->method('encode')->willReturn('foo:123');
 
-        $this->assertSame('foo:123', $this->chainEncoder->encode(['foo' => 123], self::FORMAT_2));
+        $chainEncoder = new ChainEncoder([$encoder1, $encoder2]);
+
+        $this->assertSame('foo:123', $chainEncoder->encode(['foo' => 123], self::FORMAT_2));
     }
 
     public function testEncodeUnsupportedFormat()
     {
+        $chainEncoder = new ChainEncoder([$this->createEncoder1(), $this->createEncoder2()]);
         $this->expectException(RuntimeException::class);
-        $this->chainEncoder->encode(['foo' => 123], self::FORMAT_3);
+        $chainEncoder->encode(['foo' => 123], self::FORMAT_3);
     }
 
     public function testNeedsNormalizationBasic()
     {
-        $this->assertTrue($this->chainEncoder->needsNormalization(self::FORMAT_1));
-        $this->assertTrue($this->chainEncoder->needsNormalization(self::FORMAT_2));
+        $chainEncoder = new ChainEncoder([$this->createEncoder1(), $this->createEncoder2()]);
+
+        $this->assertTrue($chainEncoder->needsNormalization(self::FORMAT_1));
+        $this->assertTrue($chainEncoder->needsNormalization(self::FORMAT_2));
     }
 
     public function testNeedsNormalizationNormalizationAware()
@@ -111,17 +90,59 @@ class ChainEncoderTest extends TestCase
 
     public function testNeedsNormalizationTraceableEncoder()
     {
-        $traceableEncoder = $this->createMock(TraceableEncoder::class);
+        $traceableEncoder = $this->createStub(TraceableEncoder::class);
         $traceableEncoder->method('needsNormalization')->willReturn(true);
         $traceableEncoder->method('supportsEncoding')->willReturn(true);
 
         $this->assertTrue((new ChainEncoder([$traceableEncoder]))->needsNormalization('format'));
 
-        $traceableEncoder = $this->createMock(TraceableEncoder::class);
+        $traceableEncoder = $this->createStub(TraceableEncoder::class);
         $traceableEncoder->method('needsNormalization')->willReturn(false);
         $traceableEncoder->method('supportsEncoding')->willReturn(true);
 
         $this->assertFalse((new ChainEncoder([$traceableEncoder]))->needsNormalization('format'));
+    }
+
+    private function createEncoder1(bool $mock = false): EncoderInterface
+    {
+        if ($mock) {
+            $encoder = $this->createMock(ContextAwareEncoderInterface::class);
+        } else {
+            $encoder = $this->createStub(ContextAwareEncoderInterface::class);
+        }
+
+        $encoder
+            ->method('supportsEncoding')
+            ->willReturnMap([
+                [self::FORMAT_1, [], true],
+                [self::FORMAT_2, [], false],
+                [self::FORMAT_3, [], false],
+                [self::FORMAT_3, ['foo' => 'bar'], true],
+                [self::FORMAT_3, ['foo' => 'bar2'], false],
+            ]);
+
+        return $encoder;
+    }
+
+    private function createEncoder2(bool $mock = false): EncoderInterface
+    {
+        if ($mock) {
+            $encoder = $this->createMock(EncoderInterface::class);
+        } else {
+            $encoder = $this->createStub(EncoderInterface::class);
+        }
+
+        $encoder
+            ->method('supportsEncoding')
+            ->willReturnMap([
+                [self::FORMAT_1, [], false],
+                [self::FORMAT_2, [], true],
+                [self::FORMAT_3, [], false],
+                [self::FORMAT_3, ['foo' => 'bar'], false],
+                [self::FORMAT_3, ['foo' => 'bar2'], true],
+            ]);
+
+        return $encoder;
     }
 }
 

@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 require __DIR__.'/autoload.php';
 
-return fn (array $context) => new class($context['APP_ENV'], $context['SOME_VAR']) implements HttpKernelInterface {
+return static fn (array $context) => new class($context['APP_ENV'], $context['SOME_VAR']) implements HttpKernelInterface {
     private string $env;
     private string $var;
 

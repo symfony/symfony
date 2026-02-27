@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\VarDumper\Tests\Caster;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
-/**
- * @requires extension sockets
- */
+#[RequiresPhpExtension('sockets')]
 class AddressInfoCasterTest extends TestCase
 {
     use VarDumperTestTrait;
@@ -24,11 +23,11 @@ class AddressInfoCasterTest extends TestCase
     public function testCaster()
     {
         $xDump = <<<EODUMP
-AddressInfo {
-  ai_flags: 0
-  ai_family: AF_INET%A
-}
-EODUMP;
+            AddressInfo {
+              ai_flags: 0
+              ai_family: AF_INET%A
+            }
+            EODUMP;
 
         $this->assertDumpMatchesFormat($xDump, socket_addrinfo_lookup('localhost')[0]);
     }

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\CssSelector\Parser;
 
+use Symfony\Component\CssSelector\Exception\InternalErrorException;
 use Symfony\Component\CssSelector\Exception\SyntaxErrorException;
 use Symfony\Component\CssSelector\Node;
 use Symfony\Component\CssSelector\Parser\Tokenizer\Tokenizer;
@@ -57,9 +58,9 @@ class Parser implements ParserInterface
             }
         }
 
-        $joined = trim(implode('', array_map(fn (Token $token) => $token->getValue(), $tokens)));
+        $joined = trim(implode('', array_map(static fn (Token $token) => $token->getValue(), $tokens)));
 
-        $int = function ($string) {
+        $int = static function ($string) {
             if (!is_numeric($string)) {
                 throw SyntaxErrorException::stringAsFunctionArgument();
             }
@@ -145,9 +146,45 @@ class Parser implements ParserInterface
     }
 
     /**
+     * @throws SyntaxErrorException
+     * @throws InternalErrorException
+     */
+    private function parseRelativeSelector(TokenStream $stream): array
+    {
+        $stream->skipWhitespace();
+        $subSelector = '';
+        $next = $stream->getNext();
+
+        if ($next->isDelimiter(['+', '>', '~'])) {
+            $combinator = $next->getValue();
+            $stream->skipWhitespace();
+            $next = $stream->getNext();
+        } else {
+            $combinator = ' ';
+        }
+
+        while (true) {
+            if ($next->isString() || $next->isIdentifier() || $next->isNumber() || $next->isDelimiter(['.', '*'])) {
+                $subSelector .= $next->getValue();
+            } elseif ($next->isHash()) {
+                $subSelector .= '#'.$next->getValue();
+            } elseif ($next->isDelimiter([')'])) {
+                $result = $this->parse($subSelector);
+
+                return [$combinator, $result[0]];
+            } else {
+                throw SyntaxErrorException::unexpectedToken('an argument', $next);
+            }
+
+            $next = $stream->getNext();
+        }
+    }
+
+    /**
      * Parses next simple node (hash, class, pseudo, negation).
      *
      * @throws SyntaxErrorException
+     * @throws InternalErrorException
      */
     private function parseSimpleSelector(TokenStream $stream, bool $insideNegation = false, bool $isArgument = false): array
     {
@@ -190,7 +227,7 @@ class Parser implements ParserInterface
                 }
 
                 $identifier = $stream->getNextIdentifier();
-                if (\in_array(strtolower($identifier), ['first-line', 'first-letter', 'before', 'after'])) {
+                if (\in_array(strtolower($identifier), ['first-line', 'first-letter', 'before', 'after'], true)) {
                     // Special case: CSS 2.1 pseudo-elements can have a single ':'.
                     // Any new pseudo-element must have two.
                     $pseudoElement = $identifier;
@@ -253,6 +290,9 @@ class Parser implements ParserInterface
                     }
 
                     $result = new Node\SpecificityAdjustmentNode($result, $selectors);
+                } elseif ('has' === strtolower($identifier)) {
+                    [$combinator, $arguments] = $this->parseRelativeSelector($stream);
+                    $result = new Node\RelationNode($result, $combinator, $arguments);
                 } else {
                     $arguments = [];
                     $next = null;

@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Resources;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\Util\XliffUtils;
 
 class TranslationFilesTest extends TestCase
 {
-    /**
-     * @dataProvider provideTranslationFiles
-     */
+    #[DataProvider('provideTranslationFiles')]
     public function testTranslationFileIsValid($filePath)
     {
         $document = new \DOMDocument();
@@ -29,9 +28,7 @@ class TranslationFilesTest extends TestCase
         $this->assertCount(0, $errors, \sprintf('"%s" is invalid:%s', $filePath, \PHP_EOL.implode(\PHP_EOL, array_column($errors, 'message'))));
     }
 
-    /**
-     * @dataProvider provideTranslationFiles
-     */
+    #[DataProvider('provideTranslationFiles')]
     public function testTranslationFileIsValidWithoutEntityLoader($filePath)
     {
         $document = new \DOMDocument();
@@ -45,7 +42,7 @@ class TranslationFilesTest extends TestCase
     public static function provideTranslationFiles()
     {
         return array_map(
-            fn ($filePath) => (array) $filePath,
+            static fn ($filePath) => (array) $filePath,
             glob(\dirname(__DIR__, 2).'/Resources/translations/*.xlf')
         );
     }

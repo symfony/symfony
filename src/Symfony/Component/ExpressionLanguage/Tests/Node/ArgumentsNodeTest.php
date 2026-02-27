@@ -12,6 +12,7 @@
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
 use Symfony\Component\ExpressionLanguage\Node\ArgumentsNode;
+use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 
 class ArgumentsNodeTest extends ArrayNodeTest
 {
@@ -29,7 +30,7 @@ class ArgumentsNodeTest extends ArrayNodeTest
         ];
     }
 
-    protected static function createArrayNode(): \Symfony\Component\ExpressionLanguage\Node\ArrayNode
+    protected static function createArrayNode(): ArrayNode
     {
         return new ArgumentsNode();
     }

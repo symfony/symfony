@@ -61,6 +61,7 @@ return [
         'Mong' => 'mongolek',
         'Mymr' => 'myanmar',
         'Narb' => 'henarabek an Norzh',
+        'Nkoo' => 'nkoek',
         'Ogam' => 'ogam',
         'Orya' => 'oriya',
         'Phnx' => 'fenikianek',

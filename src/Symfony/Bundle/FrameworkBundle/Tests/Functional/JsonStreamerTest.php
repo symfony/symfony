@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Tests\Functional\app\JsonStreamer\Dto\Dummy;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\JsonStreamer\StreamerDumper;
 use Symfony\Component\JsonStreamer\StreamReaderInterface;
 use Symfony\Component\JsonStreamer\StreamWriterInterface;
 use Symfony\Component\TypeInfo\Type;
@@ -62,6 +63,13 @@ class JsonStreamerTest extends AbstractWebTestCase
         static::getContainer()->get('json_streamer.cache_warmer.streamer.alias')->warmUp(static::getContainer()->getParameter('kernel.cache_dir'));
 
         $this->assertFileExists($streamWritersDir);
-        $this->assertCount(2, glob($streamWritersDir.'/*'));
+
+        if (!class_exists(StreamerDumper::class)) {
+            $this->assertCount(2, glob($streamWritersDir.'/*'));
+        } else {
+            $this->assertCount(2, glob($streamWritersDir.'/*.php'));
+            $this->assertCount(2, glob($streamWritersDir.'/*.php.meta'));
+            $this->assertCount(2, glob($streamWritersDir.'/*.php.meta.json'));
+        }
     }
 }

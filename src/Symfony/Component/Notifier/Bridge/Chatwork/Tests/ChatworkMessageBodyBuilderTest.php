@@ -52,10 +52,10 @@ class ChatworkMessageBodyBuilderTest extends TestCase
         ;
 
         $expectedBody = <<<EOT
-[To:abc]
-[To:def]
-test body
-EOT;
+            [To:abc]
+            [To:def]
+            test body
+            EOT;
         $expected = [
             'body' => $expectedBody,
             'self_unread' => true,

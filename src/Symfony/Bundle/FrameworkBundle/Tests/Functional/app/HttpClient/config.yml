@@ -3,7 +3,6 @@ imports:
     - { resource: services.yml }
 
 framework:
-    http_method_override: false
     profiler: ~
     http_client:
         mock_response_factory: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Tests\MockClientCallback

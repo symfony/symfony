@@ -75,6 +75,13 @@ class ExpressionSyntaxValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
+    public function testExpressionWithNullAllowedVariables()
+    {
+        $this->validator->validate('a + 1', new ExpressionSyntax());
+
+        $this->assertNoViolation();
+    }
+
     public function testExpressionIsNotValid()
     {
         $this->validator->validate('a + 1', new ExpressionSyntax(

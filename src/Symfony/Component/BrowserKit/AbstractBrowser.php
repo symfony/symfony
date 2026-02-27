@@ -19,6 +19,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Link;
 use Symfony\Component\Process\PhpProcess;
+use Symfony\Component\Process\Process;
 
 /**
  * Simulates a browser.
@@ -45,7 +46,7 @@ abstract class AbstractBrowser
     /** @psalm-var TResponse */
     protected object $response;
     protected Crawler $crawler;
-    protected bool $useHtml5Parser = true;
+    protected string|false $wrapContentPattern = false;
     protected bool $insulated = false;
     protected ?string $redirect;
     protected bool $followRedirects = true;
@@ -114,7 +115,7 @@ abstract class AbstractBrowser
      */
     public function insulate(bool $insulated = true): void
     {
-        if ($insulated && !class_exists(\Symfony\Component\Process\Process::class)) {
+        if ($insulated && !class_exists(Process::class)) {
             throw new LogicException('Unable to isolate requests as the Symfony Process Component is not installed. Try running "composer require symfony/process".');
         }
 
@@ -201,15 +202,13 @@ abstract class AbstractBrowser
     }
 
     /**
-     * Sets whether parsing should be done using "masterminds/html5".
+     * Sets the content wrapper format.
      *
-     * @return $this
+     * @example <table>%s</table>
      */
-    public function useHtml5Parser(bool $useHtml5Parser): static
+    public function wrapContent(false|string $pattern): void
     {
-        $this->useHtml5Parser = $useHtml5Parser;
-
-        return $this;
+        $this->wrapContentPattern = $pattern;
     }
 
     /**
@@ -396,7 +395,11 @@ abstract class AbstractBrowser
             return $this->crawler = $this->followRedirect();
         }
 
-        $this->crawler = $this->createCrawlerFromContent($this->internalRequest->getUri(), $this->internalResponse->getContent(), $this->internalResponse->getHeader('Content-Type') ?? '');
+        $responseContent = $this->internalResponse->getContent();
+        if ($this->wrapContentPattern) {
+            $responseContent = \sprintf($this->wrapContentPattern, $responseContent);
+        }
+        $this->crawler = $this->createCrawlerFromContent($this->internalRequest->getUri(), $responseContent, $this->internalResponse->getHeader('Content-Type') ?? '');
 
         // Check for meta refresh redirect
         if ($this->followMetaRefresh && null !== $redirect = $this->getMetaRefreshUrl()) {
@@ -413,13 +416,11 @@ abstract class AbstractBrowser
      *
      * @psalm-param TRequest $request
      *
-     * @return object
-     *
      * @psalm-return TResponse
      *
      * @throws \RuntimeException When processing returns exit code
      */
-    protected function doRequestInProcess(object $request)
+    protected function doRequestInProcess(object $request): object
     {
         $deprecationsFile = tempnam(sys_get_temp_dir(), 'deprec');
         putenv('SYMFONY_DEPRECATIONS_SERIALIZE='.$deprecationsFile);
@@ -452,24 +453,20 @@ abstract class AbstractBrowser
      *
      * @psalm-param TRequest $request
      *
-     * @return object
-     *
      * @psalm-return TResponse
      */
-    abstract protected function doRequest(object $request);
+    abstract protected function doRequest(object $request): object;
 
     /**
      * Returns the script to execute when the request must be insulated.
      *
-     * @psalm-param TRequest $request
-     *
      * @param object $request An origin request instance
      *
-     * @return string
+     * @psalm-param TRequest $request
      *
      * @throws LogicException When this abstract class is not implemented
      */
-    protected function getScript(object $request)
+    protected function getScript(object $request): string
     {
         throw new LogicException('To insulate requests, you need to override the getScript() method.');
     }
@@ -477,11 +474,9 @@ abstract class AbstractBrowser
     /**
      * Filters the BrowserKit request to the origin one.
      *
-     * @return object
-     *
      * @psalm-return TRequest
      */
-    protected function filterRequest(Request $request)
+    protected function filterRequest(Request $request): object
     {
         return $request;
     }
@@ -490,10 +485,8 @@ abstract class AbstractBrowser
      * Filters the origin response to the BrowserKit one.
      *
      * @psalm-param TResponse $response
-     *
-     * @return Response
      */
-    protected function filterResponse(object $response)
+    protected function filterResponse(object $response): Response
     {
         return $response;
     }
@@ -509,7 +502,7 @@ abstract class AbstractBrowser
             return null;
         }
 
-        $crawler = new Crawler(null, $uri, null, $this->useHtml5Parser);
+        $crawler = new Crawler(null, $uri, null);
         $crawler->addContent($content, $type);
 
         return $crawler;
@@ -567,7 +560,7 @@ abstract class AbstractBrowser
 
         $request = $this->internalRequest;
 
-        if (\in_array($this->internalResponse->getStatusCode(), [301, 302, 303])) {
+        if (\in_array($this->internalResponse->getStatusCode(), [301, 302, 303], true)) {
             $method = 'GET';
             $files = [];
             $content = null;
@@ -661,7 +654,7 @@ abstract class AbstractBrowser
             $uri = $path.$uri;
         }
 
-        return preg_replace('#^(.*?//[^/]+)\/.*$#', '$1', $currentUri).$uri;
+        return preg_replace('#^(.*?//[^/?]+)[/?].*$#', '$1', $currentUri).$uri;
     }
 
     /**
@@ -695,3 +688,5 @@ abstract class AbstractBrowser
         return $host;
     }
 }
+
+// @php-cs-fixer-ignore error_suppression This file is explicitly expected to not silence each of trigger_error calls

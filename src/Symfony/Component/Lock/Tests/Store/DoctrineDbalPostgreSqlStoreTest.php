@@ -17,19 +17,21 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Tools\DsnParser;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\LockConflictedException;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\DoctrineDbalPostgreSqlStore;
+use Symfony\Component\Lock\Test\AbstractStoreTestCase;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
- *
- * @requires extension pdo_pgsql
- *
- * @group integration
  */
+#[RequiresPhpExtension('pdo_pgsql')]
+#[Group('integration')]
 class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
 {
     use BlockingStoreTestTrait;
@@ -51,11 +53,8 @@ class DoctrineDbalPostgreSqlStoreTest extends AbstractStoreTestCase
         return new DoctrineDbalPostgreSqlStore($conn);
     }
 
-    /**
-     * @requires extension pdo_sqlite
-     *
-     * @dataProvider getInvalidDrivers
-     */
+    #[RequiresPhpExtension('pdo_sqlite')]
+    #[DataProvider('getInvalidDrivers')]
     public function testInvalidDriver($connOrDsn)
     {
         $this->expectException(InvalidArgumentException::class);

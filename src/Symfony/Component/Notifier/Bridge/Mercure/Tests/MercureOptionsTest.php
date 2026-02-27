@@ -18,28 +18,28 @@ final class MercureOptionsTest extends TestCase
 {
     public function testConstructWithDefaults()
     {
-        $this->assertSame((new MercureOptions())->toArray(), [
+        $this->assertSame([
             'topics' => null,
             'private' => false,
             'id' => null,
             'type' => null,
             'retry' => null,
             'content' => null,
-        ]);
+        ], (new MercureOptions())->toArray());
     }
 
     public function testConstructWithParameters()
     {
         $options = (new MercureOptions('/topic/1', true, 'id', 'type', 1, ['tag' => '1234', 'body' => 'TEST']));
 
-        $this->assertSame($options->toArray(), [
+        $this->assertSame([
             'topics' => ['/topic/1'],
             'private' => true,
             'id' => 'id',
             'type' => 'type',
             'retry' => 1,
             'content' => ['tag' => '1234', 'body' => 'TEST'],
-        ]);
+        ], $options->toArray());
     }
 
     public function testConstructWithWrongTopicsThrows()

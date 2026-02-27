@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\DataTransformer;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\TransformationFailedException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\StringToFloatTransformer;
@@ -28,9 +29,7 @@ class StringToFloatTransformerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideTransformations
-     */
+    #[DataProvider('provideTransformations')]
     public function testTransform($from, $to)
     {
         $transformer = new StringToFloatTransformer();
@@ -68,9 +67,7 @@ class StringToFloatTransformerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideReverseTransformations
-     */
+    #[DataProvider('provideReverseTransformations')]
     public function testReverseTransform($from, $to, ?int $scale = null)
     {
         $transformer = new StringToFloatTransformer($scale);

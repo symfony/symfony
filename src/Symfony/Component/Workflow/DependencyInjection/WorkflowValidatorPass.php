@@ -14,7 +14,6 @@ namespace Symfony\Component\Workflow\DependencyInjection;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\LogicException;
 
 /**
  * @author Grégoire Pineau <lyrixx@lyrixx.info>

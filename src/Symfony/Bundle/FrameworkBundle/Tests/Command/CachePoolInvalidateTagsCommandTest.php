@@ -132,7 +132,7 @@ class CachePoolInvalidateTagsCommandTest extends TestCase
     private function createCommand(array $services): CachePoolInvalidateTagsCommand
     {
         return new CachePoolInvalidateTagsCommand(
-            new ServiceLocator(array_map(fn ($service) => fn () => $service, $services))
+            new ServiceLocator(array_map(static fn ($service) => static fn () => $service, $services))
         );
     }
 }

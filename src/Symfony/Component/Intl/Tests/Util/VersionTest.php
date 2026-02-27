@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Intl\Tests\Util;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Intl\Util\Version;
 
@@ -45,9 +46,7 @@ class VersionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider normalizeProvider
-     */
+    #[DataProvider('normalizeProvider')]
     public function testNormalize($precision, $version, $result)
     {
         $this->assertSame($result, Version::normalize($version, $precision));
@@ -78,9 +77,7 @@ class VersionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider compareProvider
-     */
+    #[DataProvider('compareProvider')]
     public function testCompare($precision, $version1, $operator, $version2, $result)
     {
         $this->assertSame($result, Version::compare($version1, $version2, $operator, $precision));

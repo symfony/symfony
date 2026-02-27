@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -19,6 +20,7 @@ use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Output\BashCompletionOutput;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -33,7 +35,9 @@ class CompleteCommandTest extends TestCase
         $this->command = new CompleteCommand();
 
         $this->application = new Application();
-        $this->application->add(new CompleteCommandTest_HelloCommand());
+        $this->application->addCommand(new CompleteCommandTest_HelloCommand());
+        $this->application->getDefinition()
+            ->addOption(new InputOption('global-option', null, InputOption::VALUE_REQUIRED, suggestedValues: ['foo', 'bar', 'baz']));
 
         $this->command->setApplication($this->application);
         $this->tester = new CommandTester($this->command);
@@ -65,9 +69,7 @@ class CompleteCommandTest extends TestCase
         $this->execute(['--shell' => 'bash', '--current' => '1', '--input' => ['bin/console']]);
     }
 
-    /**
-     * @dataProvider provideInputAndCurrentOptionValues
-     */
+    #[DataProvider('provideInputAndCurrentOptionValues')]
     public function testInputAndCurrentOptionValidation(array $input, ?string $exceptionMessage)
     {
         if ($exceptionMessage) {
@@ -91,9 +93,7 @@ class CompleteCommandTest extends TestCase
         yield [['--current' => '2', '--input' => ['bin/console', 'cache:clear']], null];
     }
 
-    /**
-     * @dataProvider provideCompleteCommandNameInputs
-     */
+    #[DataProvider('provideCompleteCommandNameInputs')]
     public function testCompleteCommandName(array $input, array $suggestions)
     {
         $this->execute(['--current' => '1', '--input' => $input]);
@@ -102,15 +102,15 @@ class CompleteCommandTest extends TestCase
 
     public static function provideCompleteCommandNameInputs()
     {
-        yield 'empty' => [['bin/console'], ['help', 'list', 'completion', 'hello', 'ahoy']];
-        yield 'partial' => [['bin/console', 'he'], ['help', 'list', 'completion', 'hello', 'ahoy']];
-        yield 'complete-shortcut-name' => [['bin/console', 'hell'], ['hello', 'ahoy']];
-        yield 'complete-aliases' => [['bin/console', 'ah'], ['hello', 'ahoy']];
+        yield 'empty' => [['bin/console'], ['help', 'list', 'completion', 'hello', 'ahoy', 'h', 'ahah']];
+        yield 'partial' => [['bin/console', 'he'], ['help', 'list', 'completion', 'hello', 'ahoy', 'h', 'ahah']];
+        yield 'complete-shortcut-name' => [['bin/console', 'hell'], ['hello']];
+        yield 'complete-aliases' => [['bin/console', 'ah'], ['ahoy']];
+        yield 'short-alias-completes-to-name' => [['bin/console', 'h'], ['hello']];
+        yield 'ambiguous-of-same-command-completes-to-first-match' => [['bin/console', 'ah'], ['ahoy']];
     }
 
-    /**
-     * @dataProvider provideCompleteCommandInputDefinitionInputs
-     */
+    #[DataProvider('provideCompleteCommandInputDefinitionInputs')]
     public function testCompleteCommandInputDefinition(array $input, array $suggestions)
     {
         $this->execute(['--current' => '2', '--input' => $input]);
@@ -119,10 +119,13 @@ class CompleteCommandTest extends TestCase
 
     public static function provideCompleteCommandInputDefinitionInputs()
     {
-        yield 'definition' => [['bin/console', 'hello', '-'], ['--help', '--silent', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
+        yield 'definition' => [['bin/console', 'hello', '-'], ['--help', '--silent', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction', '--global-option']];
         yield 'custom' => [['bin/console', 'hello'], ['Fabien', 'Robin', 'Wouter']];
-        yield 'definition-aliased' => [['bin/console', 'ahoy', '-'], ['--help', '--silent', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction']];
+        yield 'definition-aliased' => [['bin/console', 'ahoy', '-'], ['--help', '--silent', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction', '--global-option']];
         yield 'custom-aliased' => [['bin/console', 'ahoy'], ['Fabien', 'Robin', 'Wouter']];
+        yield 'custom-aliased-input' => [['bin/console', 'ahoy', 'Fa'], ['Fabien', 'Robin', 'Wouter']];
+        yield 'global-option-values' => [['bin/console', '--global-option'], ['foo', 'bar', 'baz']];
+        yield 'global-option-with-command-values' => [['bin/console', 'ahoy', '--global-option'], ['foo', 'bar', 'baz']];
     }
 
     private function execute(array $input)
@@ -137,7 +140,7 @@ class CompleteCommandTest_HelloCommand extends Command
     public function configure(): void
     {
         $this->setName('hello')
-             ->setAliases(['ahoy'])
+             ->setAliases(['ahoy', 'h', 'ahah'])
              ->setDescription('Hello test command')
              ->addArgument('name', InputArgument::REQUIRED)
         ;
@@ -147,6 +150,10 @@ class CompleteCommandTest_HelloCommand extends Command
     {
         if ($input->mustSuggestArgumentValuesFor('name')) {
             $suggestions->suggestValues(['Fabien', 'Robin', 'Wouter']);
+
+            return;
         }
+
+        parent::complete($input, $suggestions);
     }
 }

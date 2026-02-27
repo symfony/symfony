@@ -15,7 +15,9 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 
 class SourceOnly
 {
-    public function __construct(#[Map(source: 'name')] public string $mappedName)
-    {
+    public function __construct(
+        #[Map(source: 'name')] public string $mappedName,
+        #[Map(if: false)] public ?string $mappedDescription = null
+    ) {
     }
 }

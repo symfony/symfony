@@ -14,4 +14,4 @@ use Symfony\Component\HttpFoundation\Response;
 
 require __DIR__.'/autoload.php';
 
-return fn (Request $request, array $context) => new Response('OK Request '.$context['SOME_VAR']);
+return static fn (Request $request, array $context) => new Response('OK Request '.$context['SOME_VAR']);

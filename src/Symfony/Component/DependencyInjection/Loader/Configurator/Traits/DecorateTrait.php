@@ -31,4 +31,28 @@ trait DecorateTrait
 
         return $this;
     }
+
+    /**
+     * Sets the tag that this definition is decorating.
+     *
+     * When decorating a tag, this definition acts as a template to create decorator services
+     * for each service that has the specified tag.
+     *
+     * @return $this
+     */
+    final public function decorateTag(string $tag, int $priority = 0, int $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE): static
+    {
+        $tagAttributes = [
+            'decorates_tag' => $tag,
+            'priority' => $priority,
+        ];
+
+        if (ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE !== $invalidBehavior) {
+            $tagAttributes['on_invalid'] = $invalidBehavior;
+        }
+
+        $this->definition->addResourceTag('container.tag_decorator', $tagAttributes);
+
+        return $this;
+    }
 }

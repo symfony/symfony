@@ -54,41 +54,21 @@ class EmailTest extends TestCase
         $this->assertEquals('trim', $email->normalizer);
     }
 
-    /**
-     * @group legacy
-     */
-    public function testInvalidNormalizerThrowsException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("string" given).');
-        new Email(['normalizer' => 'Unknown Callable']);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testInvalidNormalizerObjectThrowsException()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The "normalizer" option must be a valid callable ("stdClass" given).');
-        new Email(['normalizer' => new \stdClass()]);
-    }
-
     public function testAttribute()
     {
         $metadata = new ClassMetadata(EmailDummy::class);
         (new AttributeLoader())->loadClassMetadata($metadata);
 
-        [$aConstraint] = $metadata->properties['a']->constraints;
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertNull($aConstraint->mode);
         self::assertNull($aConstraint->normalizer);
 
-        [$bConstraint] = $metadata->properties['b']->constraints;
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(Email::VALIDATION_MODE_HTML5, $bConstraint->mode);
         self::assertSame('trim', $bConstraint->normalizer);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertSame(['my_group'], $cConstraint->groups);
         self::assertSame('some attached data', $cConstraint->payload);
     }

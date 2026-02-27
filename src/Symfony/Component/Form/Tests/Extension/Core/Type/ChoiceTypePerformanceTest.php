@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Form\Test\FormPerformanceTestCase;
 
 /**
@@ -21,16 +22,15 @@ class ChoiceTypePerformanceTest extends FormPerformanceTestCase
     /**
      * This test case is realistic in collection forms where each
      * row contains the same choice field.
-     *
-     * @group benchmark
      */
+    #[Group('benchmark')]
     public function testSameChoiceFieldCreatedMultipleTimes()
     {
         $this->setMaxRunningTime(1);
         $choices = range(1, 300);
 
         for ($i = 0; $i < 100; ++$i) {
-            $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', mt_rand(1, 400), [
+            $this->factory->create('Symfony\Component\Form\Extension\Core\Type\ChoiceType', random_int(1, 400), [
                 'choices' => $choices,
             ]);
         }

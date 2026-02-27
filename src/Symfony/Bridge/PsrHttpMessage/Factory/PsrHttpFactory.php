@@ -161,14 +161,17 @@ class PsrHttpFactory implements HttpMessageFactoryInterface
         } else {
             $stream = $this->streamFactory->createStreamFromFile('php://temp', 'wb+');
             if ($symfonyResponse instanceof StreamedResponse || $symfonyResponse instanceof BinaryFileResponse) {
-                ob_start(function ($buffer) use ($stream) {
+                ob_start(static function ($buffer) use ($stream) {
                     $stream->write($buffer);
 
                     return '';
                 }, 1);
 
-                $symfonyResponse->sendContent();
-                ob_end_clean();
+                try {
+                    $symfonyResponse->sendContent();
+                } finally {
+                    ob_end_clean();
+                }
             } else {
                 $stream->write($symfonyResponse->getContent());
             }

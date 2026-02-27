@@ -11,14 +11,13 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Http\Firewall\SwitchUserListener;
 
 class SwitchUserTest extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider getTestParameters
-     */
+    #[DataProvider('getTestParameters')]
     public function testSwitchUser($originalUser, $targetUser, $expectedUser, $expectedStatus)
     {
         $client = $this->createAuthenticatedClient($originalUser, ['root_config' => 'switchuser.yml']);

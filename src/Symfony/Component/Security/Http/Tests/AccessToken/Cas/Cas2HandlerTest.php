@@ -25,13 +25,13 @@ final class Cas2HandlerTest extends TestCase
     public function testWithValidTicket()
     {
         $response = new MockResponse(<<<BODY
-            <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
-                <cas:authenticationSuccess>
-                    <cas:user>lobster</cas:user>
-                    <cas:proxyGrantingTicket>PGTIOU-84678-8a9d</cas:proxyGrantingTicket>
-                </cas:authenticationSuccess>
-            </cas:serviceResponse>
-        BODY
+                <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
+                    <cas:authenticationSuccess>
+                        <cas:user>lobster</cas:user>
+                        <cas:proxyGrantingTicket>PGTIOU-84678-8a9d</cas:proxyGrantingTicket>
+                    </cas:authenticationSuccess>
+                </cas:serviceResponse>
+            BODY
         );
 
         $httpClient = new MockHttpClient([$response]);
@@ -49,12 +49,12 @@ final class Cas2HandlerTest extends TestCase
         $this->expectExceptionMessage('CAS Authentication Failure: Ticket ST-1856339 not recognized');
 
         $response = new MockResponse(<<<BODY
-            <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
-                <cas:authenticationFailure code="INVALID_TICKET">
-                    Ticket ST-1856339 not recognized
-                </cas:authenticationFailure>
-            </cas:serviceResponse>
-        BODY
+                <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
+                    <cas:authenticationFailure code="INVALID_TICKET">
+                        Ticket ST-1856339 not recognized
+                    </cas:authenticationFailure>
+                </cas:serviceResponse>
+            BODY
         );
 
         $httpClient = new MockHttpClient([$response]);
@@ -71,9 +71,9 @@ final class Cas2HandlerTest extends TestCase
         $this->expectExceptionMessage('Invalid CAS response.');
 
         $response = new MockResponse(<<<BODY
-            <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
-            </cas:serviceResponse>
-        BODY
+                <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
+                </cas:serviceResponse>
+            BODY
         );
 
         $httpClient = new MockHttpClient([$response]);
@@ -103,13 +103,13 @@ final class Cas2HandlerTest extends TestCase
         $this->expectExceptionMessage('Invalid CAS response.');
 
         $response = new MockResponse(<<<BODY
-            <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
-                <cas:authenticationSuccess>
-                    <cas:user>lobster</cas:user>
-                    <cas:proxyGrantingTicket>PGTIOU-84678-8a9d</cas:proxyGrantingTicket>
-                </cas:authenticationSuccess>
-            </cas:serviceResponse>
-        BODY
+                <cas:serviceResponse xmlns:cas='http://www.yale.edu/tp/cas'>
+                    <cas:authenticationSuccess>
+                        <cas:user>lobster</cas:user>
+                        <cas:proxyGrantingTicket>PGTIOU-84678-8a9d</cas:proxyGrantingTicket>
+                    </cas:authenticationSuccess>
+                </cas:serviceResponse>
+            BODY
         );
 
         $httpClient = new MockHttpClient([$response]);

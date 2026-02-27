@@ -57,9 +57,6 @@ class DoctrineDummy
     #[Column(type: 'dateinterval')]
     private $dateInterval;
 
-    #[Column(type: 'json_array')]
-    private $jsonArray;
-
     #[Column(type: 'simple_array')]
     private $simpleArray;
 

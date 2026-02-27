@@ -89,8 +89,8 @@ class YamlReferenceDumper
                 $children = $this->getPrototypeChildren($node);
             }
 
-            if (!$children && !($node->hasDefaultValue() && \count($defaultArray = $node->getDefaultValue()))) {
-                $default = '[]';
+            if (!$children && !($node->hasDefaultValue() && $defaultArray = $node->getDefaultValue())) {
+                $default = $node->hasDefaultValue() && null === $defaultArray ? '~' : '[]';
             }
         } elseif ($node instanceof EnumNode) {
             $comments[] = 'One of '.$node->getPermissibleValues('; ');
@@ -120,8 +120,7 @@ class YamlReferenceDumper
 
         // deprecated?
         if ($node instanceof BaseNode && $node->isDeprecated()) {
-            $deprecation = $node->getDeprecation($node->getName(), $parentNode ? $parentNode->getPath() : $node->getPath());
-            $comments[] = \sprintf('Deprecated (%s)', ($deprecation['package'] || $deprecation['version'] ? "Since {$deprecation['package']} {$deprecation['version']}: " : '').$deprecation['message']);
+            $comments[] = \sprintf('Deprecated (%s)', $node->getDeprecationMessage($parentNode));
         }
 
         // example
@@ -240,6 +239,6 @@ class YamlReferenceDumper
         }
         $keyNode->setInfo($info);
 
-        return [$key => $keyNode];
+        return [$key ?? '' => $keyNode];
     }
 }

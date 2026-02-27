@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'UserAssignedNames' => [
+        'XK' => 'Kòssovo',
+    ],
     'Names' => [
         'AD' => 'Andorra',
         'AE' => 'Emirados Àrabos Unidos',
@@ -188,7 +191,7 @@ return [
         'PT' => 'Portogallu',
         'PW' => 'Palau',
         'PY' => 'Paraguày',
-        'QA' => 'Catar',
+        'QA' => 'Catàr',
         'RE' => 'Riunione',
         'RO' => 'Romania',
         'RS' => 'Sèrbia',

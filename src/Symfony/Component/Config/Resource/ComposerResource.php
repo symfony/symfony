@@ -47,6 +47,13 @@ class ComposerResource implements SelfCheckingResourceInterface
         return array_values(self::$runtimeVendors) === array_values($this->vendors);
     }
 
+    public function __serialize(): array
+    {
+        return [
+            'vendors' => $this->vendors,
+        ];
+    }
+
     private static function refresh(): void
     {
         self::$runtimeVendors = [];

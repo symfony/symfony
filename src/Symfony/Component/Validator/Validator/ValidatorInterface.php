@@ -30,7 +30,7 @@ interface ValidatorInterface extends MetadataFactoryInterface
      * If no constraint is passed, the constraint
      * {@link \Symfony\Component\Validator\Constraints\Valid} is assumed.
      *
-     * @param Constraint|Constraint[]                               $constraints The constraint(s) to validate against
+     * @param Constraint|Constraint[]|null                          $constraints The constraint(s) to validate against
      * @param string|GroupSequence|array<string|GroupSequence>|null $groups      The validation groups to validate. If none is given, "Default" is assumed
      *
      * @return ConstraintViolationListInterface A list of constraint violations

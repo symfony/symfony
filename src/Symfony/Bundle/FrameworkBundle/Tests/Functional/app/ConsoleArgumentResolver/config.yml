@@ -1,0 +1,37 @@
+imports:
+    - { resource: ../config/default.yml }
+
+framework:
+    translator: { fallbacks: [en] }
+
+services:
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\CustomTypeValueResolver:
+        tags:
+            - { name: console.argument_value_resolver, priority: 150 }
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\CustomOptionValueResolver:
+        tags:
+            - { name: console.argument_value_resolver, priority: 150 }
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\TestService: ~
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\CustomTypeCommand:
+        autowire: true
+        autoconfigure: true
+
+    test_service:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\TestService
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\AdvancedCommand:
+        autowire: true
+        autoconfigure: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\AutoTaggedValueResolver:
+        autoconfigure: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\TargetedCustomValueResolver:
+        autoconfigure: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\ResolverTestCommand:
+        autowire: true
+        autoconfigure: true

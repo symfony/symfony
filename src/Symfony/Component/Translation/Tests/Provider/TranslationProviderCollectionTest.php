@@ -12,7 +12,7 @@
 namespace Symfony\Component\Translation\Tests\Provider;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Translation\Provider\ProviderInterface;
+use Symfony\Component\Translation\Provider\NullProvider;
 use Symfony\Component\Translation\Provider\TranslationProviderCollection;
 
 class TranslationProviderCollectionTest extends TestCase
@@ -25,10 +25,10 @@ class TranslationProviderCollectionTest extends TestCase
     public function testKeysWithGenerator()
     {
         $this->assertSame(['foo', 'baz'], (new TranslationProviderCollection(
-            (function () {
-                yield 'foo' => $this->createMock(ProviderInterface::class);
+            (static function () {
+                yield 'foo' => new NullProvider();
 
-                yield 'baz' => $this->createMock(ProviderInterface::class);
+                yield 'baz' => new NullProvider();
             })()
         ))->keys());
     }
@@ -45,11 +45,11 @@ class TranslationProviderCollectionTest extends TestCase
 
     public function testGet()
     {
-        $provider = $this->createMock(ProviderInterface::class);
+        $provider = new NullProvider();
 
         $this->assertSame($provider, (new TranslationProviderCollection([
             'foo' => $provider,
-            'baz' => $this->createMock(ProviderInterface::class),
+            'baz' => new NullProvider(),
         ]))->get('foo'));
     }
 
@@ -64,8 +64,8 @@ class TranslationProviderCollectionTest extends TestCase
     private function createProviderCollection(): TranslationProviderCollection
     {
         return new TranslationProviderCollection([
-            'foo' => $this->createMock(ProviderInterface::class),
-            'baz' => $this->createMock(ProviderInterface::class),
+            'foo' => new NullProvider(),
+            'baz' => new NullProvider(),
         ]);
     }
 }

@@ -41,7 +41,7 @@ class TestHttpServer
         }
 
         $finder = new PhpExecutableFinder();
-        $process = new Process(array_merge([$finder->find(false)], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', $ip.':'.$port]));
+        $process = new Process(array_merge([$finder->find(false) ?: throw new \Exception('PHP executable not found.')], $finder->findArguments(), ['-dopcache.enable=0', '-dvariables_order=EGPCS', '-S', $ip.':'.$port]));
         $process->setWorkingDirectory($workingDirectory);
         $process->start();
         self::$process[$port] = $process;

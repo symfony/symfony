@@ -37,7 +37,7 @@ class DoctrineReceiverTest extends TestCase
         $serializer = $this->createSerializer();
 
         $doctrineEnvelope = $this->createDoctrineEnvelope();
-        $connection = $this->createMock(Connection::class);
+        $connection = $this->createStub(Connection::class);
         $connection->method('get')->willReturn($doctrineEnvelope);
 
         $receiver = new DoctrineReceiver($connection, $serializer);
@@ -58,25 +58,26 @@ class DoctrineReceiverTest extends TestCase
         $this->assertSame(1, $transportMessageIdStamp->getId());
     }
 
-    public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException()
+    public function testItReturnsSerializedEnvelopeWhenDecodingFails()
     {
-        $this->expectException(MessageDecodingFailedException::class);
-        $serializer = $this->createMock(PhpSerializer::class);
+        $serializer = $this->createStub(PhpSerializer::class);
         $serializer->method('decode')->willThrowException(new MessageDecodingFailedException());
 
         $doctrineEnvelop = $this->createDoctrineEnvelope();
-        $connection = $this->createMock(Connection::class);
+        $connection = $this->createStub(Connection::class);
         $connection->method('get')->willReturn($doctrineEnvelop);
-        $connection->expects($this->once())->method('reject');
 
         $receiver = new DoctrineReceiver($connection, $serializer);
-        $receiver->get();
+        $envelopes = $receiver->get();
+
+        $this->assertCount(1, $envelopes);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelopes[0]->getMessage());
     }
 
     public function testOccursRetryableExceptionFromConnection()
     {
         $serializer = $this->createSerializer();
-        $connection = $this->createMock(Connection::class);
+        $connection = $this->createStub(Connection::class);
         $connection->method('get')->willThrowException(new DeadlockException(Exception::new(new \PDOException('Deadlock', 40001)), null));
 
         $receiver = new DoctrineReceiver($connection, $serializer);
@@ -98,7 +99,7 @@ class DoctrineReceiverTest extends TestCase
         $serializer = $this->createSerializer();
 
         $doctrineEnvelope = $this->createRetriedDoctrineEnvelope();
-        $connection = $this->createMock(Connection::class);
+        $connection = $this->createStub(Connection::class);
         $connection->method('get')->willReturn($doctrineEnvelope);
 
         $receiver = new DoctrineReceiver($connection, $serializer);
@@ -117,7 +118,7 @@ class DoctrineReceiverTest extends TestCase
         $doctrineEnvelope1 = $this->createDoctrineEnvelope();
         $doctrineEnvelope2 = $this->createDoctrineEnvelope();
         $connection = $this->createMock(Connection::class);
-        $connection->method('findAll')->with(50)->willReturn([$doctrineEnvelope1, $doctrineEnvelope2]);
+        $connection->expects($this->once())->method('findAll')->with(50)->willReturn([$doctrineEnvelope1, $doctrineEnvelope2]);
 
         $receiver = new DoctrineReceiver($connection, $serializer);
         $actualEnvelopes = iterator_to_array($receiver->all(50));
@@ -132,7 +133,7 @@ class DoctrineReceiverTest extends TestCase
         $doctrineEnvelope1 = $this->createRetriedDoctrineEnvelope();
         $doctrineEnvelope2 = $this->createRetriedDoctrineEnvelope();
         $connection = $this->createMock(Connection::class);
-        $connection->method('findAll')->willReturn([$doctrineEnvelope1, $doctrineEnvelope2]);
+        $connection->expects($this->once())->method('findAll')->willReturn([$doctrineEnvelope1, $doctrineEnvelope2]);
 
         $receiver = new DoctrineReceiver($connection, $serializer);
         $actualEnvelopes = $receiver->all();
@@ -149,7 +150,7 @@ class DoctrineReceiverTest extends TestCase
 
         $doctrineEnvelope = $this->createDoctrineEnvelope();
         $connection = $this->createMock(Connection::class);
-        $connection->method('find')->with(10)->willReturn($doctrineEnvelope);
+        $connection->expects($this->once())->method('find')->with(10)->willReturn($doctrineEnvelope);
 
         $receiver = new DoctrineReceiver($connection, $serializer);
         $actualEnvelope = $receiver->find(10);
@@ -162,7 +163,7 @@ class DoctrineReceiverTest extends TestCase
 
         $doctrineEnvelope = $this->createRetriedDoctrineEnvelope();
         $connection = $this->createMock(Connection::class);
-        $connection->method('find')->with(3)->willReturn($doctrineEnvelope);
+        $connection->expects($this->once())->method('find')->with(3)->willReturn($doctrineEnvelope);
 
         $receiver = new DoctrineReceiver($connection, $serializer);
         $actualEnvelope = $receiver->find(3);
@@ -196,13 +197,8 @@ class DoctrineReceiverTest extends TestCase
         $envelope = new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]);
         $receiver = new DoctrineReceiver($connection, $serializer);
 
-        $driverException = class_exists(Exception::class) ? Exception::new(new \PDOException('Deadlock', 40001)) : new PDOException(new \PDOException('Deadlock', 40001));
-        if (!class_exists(Version::class)) {
-            // This is doctrine/dbal 3.x
-            $deadlockException = new DeadlockException($driverException, null);
-        } else {
-            $deadlockException = new DeadlockException('Deadlock', $driverException);
-        }
+        $driverException = Exception::new(new \PDOException('Deadlock', 40001));
+        $deadlockException = new DeadlockException($driverException, null);
 
         $connection
             ->expects($this->exactly(2))
@@ -224,13 +220,8 @@ class DoctrineReceiverTest extends TestCase
         $envelope = new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]);
         $receiver = new DoctrineReceiver($connection, $serializer);
 
-        $driverException = class_exists(Exception::class) ? Exception::new(new \PDOException('Deadlock', 40001)) : new PDOException(new \PDOException('Deadlock', 40001));
-        if (!class_exists(Version::class)) {
-            // This is doctrine/dbal 3.x
-            $deadlockException = new DeadlockException($driverException, null);
-        } else {
-            $deadlockException = new DeadlockException('Deadlock', $driverException);
-        }
+        $driverException = Exception::new(new \PDOException('Deadlock', 40001));
+        $deadlockException = new DeadlockException($driverException, null);
 
         $connection
             ->expects($this->exactly(4))
@@ -287,13 +278,8 @@ class DoctrineReceiverTest extends TestCase
         $envelope = new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]);
         $receiver = new DoctrineReceiver($connection, $serializer);
 
-        $driverException = class_exists(Exception::class) ? Exception::new(new \PDOException('Deadlock', 40001)) : new PDOException(new \PDOException('Deadlock', 40001));
-        if (!class_exists(Version::class)) {
-            // This is doctrine/dbal 3.x
-            $deadlockException = new DeadlockException($driverException, null);
-        } else {
-            $deadlockException = new DeadlockException('Deadlock', $driverException);
-        }
+        $driverException = Exception::new(new \PDOException('Deadlock', 40001));
+        $deadlockException = new DeadlockException($driverException, null);
 
         $connection
             ->expects($this->exactly(2))
@@ -315,13 +301,8 @@ class DoctrineReceiverTest extends TestCase
         $envelope = new Envelope(new \stdClass(), [new DoctrineReceivedStamp('1')]);
         $receiver = new DoctrineReceiver($connection, $serializer);
 
-        $driverException = class_exists(Exception::class) ? Exception::new(new \PDOException('Deadlock', 40001)) : new PDOException(new \PDOException('Deadlock', 40001));
-        if (!class_exists(Version::class)) {
-            // This is doctrine/dbal 3.x
-            $deadlockException = new DeadlockException($driverException, null);
-        } else {
-            $deadlockException = new DeadlockException('Deadlock', $driverException);
-        }
+        $driverException = Exception::new(new \PDOException('Deadlock', 40001));
+        $deadlockException = new DeadlockException($driverException, null);
 
         $connection
             ->expects($this->exactly(4))

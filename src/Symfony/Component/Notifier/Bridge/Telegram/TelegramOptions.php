@@ -51,6 +51,16 @@ final class TelegramOptions implements MessageOptionsInterface
     /**
      * @return $this
      */
+    public function messageThreadId(int $threadId): static
+    {
+        $this->options['message_thread_id'] = $threadId;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function parseMode(string $mode): static
     {
         $this->options['parse_mode'] = $mode;

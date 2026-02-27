@@ -11,13 +11,15 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Helper\ProgressIndicator;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Output\StreamOutput;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class ProgressIndicatorTest extends TestCase
 {
     public function testDefaultIndicator()
@@ -176,9 +178,7 @@ class ProgressIndicatorTest extends TestCase
         $bar->finish('Finished');
     }
 
-    /**
-     * @dataProvider provideFormat
-     */
+    #[DataProvider('provideFormat')]
     public function testFormats($format)
     {
         $bar = new ProgressIndicator($output = $this->getOutputStream(), $format);
@@ -201,6 +201,58 @@ class ProgressIndicatorTest extends TestCase
             ['very_verbose'],
             ['debug'],
         ];
+    }
+
+    public function testWithConsoleSectionOutput()
+    {
+        $sections = [];
+        $stream = fopen('php://memory', 'r+', false);
+        $output = new ConsoleSectionOutput($stream, $sections, StreamOutput::VERBOSITY_NORMAL, true, new OutputFormatter());
+
+        $bar = new ProgressIndicator($output, null, 100, ['-', '\\', '|', '/']);
+        $bar->start('Starting...');
+        usleep(101000);
+        $bar->advance();
+        $bar->finish('Done...');
+
+        rewind($stream);
+        $content = stream_get_contents($stream);
+
+        // Must not use raw ANSI line-clear sequences — those corrupt ConsoleSectionOutput's internal line tracking
+        $this->assertStringNotContainsString("\x0D\x1B[2K", $content);
+
+        // finish() must not add an extra trailing newline — ConsoleSectionOutput::overwrite() already ends with writeln()
+        $this->assertStringEndsWith(' ✔ Done...'.\PHP_EOL, $content);
+    }
+
+    public function testMultipleSectionsWithProgressIndicators()
+    {
+        $sections = [];
+        $stream = fopen('php://memory', 'r+', false);
+        $formatter = new OutputFormatter();
+        $section1 = new ConsoleSectionOutput($stream, $sections, StreamOutput::VERBOSITY_NORMAL, true, $formatter);
+        $section2 = new ConsoleSectionOutput($stream, $sections, StreamOutput::VERBOSITY_NORMAL, true, $formatter);
+
+        $bar1 = new ProgressIndicator($section1, null, 100, ['-', '\\', '|', '/']);
+        $bar2 = new ProgressIndicator($section2, null, 100, ['-', '\\', '|', '/']);
+
+        $bar1->start('Project 1...');
+        $bar2->start('Project 2...');
+        usleep(101000);
+        $bar1->advance();
+        $bar2->advance();
+        $bar1->finish('Project 1 Done.');
+        $bar2->finish('Project 2 Done.');
+
+        rewind($stream);
+        $content = stream_get_contents($stream);
+
+        // Must not use raw ANSI line-clear sequences
+        $this->assertStringNotContainsString("\x0D\x1B[2K", $content);
+
+        // Both finished messages must appear in the output
+        $this->assertStringContainsString('Project 1 Done.', $content);
+        $this->assertStringContainsString('Project 2 Done.', $content);
     }
 
     protected function getOutputStream($decorated = true, $verbosity = StreamOutput::VERBOSITY_NORMAL)

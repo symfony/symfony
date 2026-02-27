@@ -20,7 +20,7 @@ trait ConfiguratorTrait
      *
      * @return $this
      */
-    final public function configurator(string|array|ReferenceConfigurator $configurator): static
+    final public function configurator(string|array|\Closure|ReferenceConfigurator $configurator): static
     {
         $this->definition->setConfigurator(static::processValue($configurator, true));
 

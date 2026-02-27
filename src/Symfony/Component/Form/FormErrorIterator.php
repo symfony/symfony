@@ -76,7 +76,7 @@ class FormErrorIterator implements \RecursiveIterator, \SeekableIterator, \Array
             if ($error instanceof FormError) {
                 $string .= 'ERROR: '.$error->getMessage()."\n";
             } else {
-                /* @var self $error */
+                /** @var self $error */
                 $string .= $error->getForm()->getName().":\n";
                 $string .= self::indent((string) $error);
             }

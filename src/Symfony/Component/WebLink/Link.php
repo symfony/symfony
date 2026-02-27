@@ -98,6 +98,12 @@ class Link implements EvolvableLinkInterface
     public const REL_PREDECESSOR_VERSION = 'predecessor-version';
     public const REL_PREFETCH = 'prefetch';
     public const REL_PRELOAD = 'preload';
+
+    /**
+     * This feature is deprecated and superseded by the Speculation Rules API.
+     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/rel/prerender
+     */
     public const REL_PRERENDER = 'prerender';
     public const REL_PREV = 'prev';
     public const REL_PREVIEW = 'preview';
@@ -141,13 +147,24 @@ class Link implements EvolvableLinkInterface
     // Extra relations
     public const REL_MERCURE = 'mercure';
 
+    // `as` attributes (for `REL_PRELOAD`), according to https://html.spec.whatwg.org/multipage/semantics.html#attr-link-as
+    public const AS_FETCH = 'fetch';
+    public const AS_FONT = 'font';
+    public const AS_IMAGE = 'image';
+    public const AS_SCRIPT = 'script';
+    public const AS_STYLE = 'style';
+    public const AS_TRACK = 'track';
+
+    // `as` attributes for `REL_MODULEPRELOAD` only, according to https://html.spec.whatwg.org/multipage/semantics.html#module-preload-destination
+    public const AS_JSON = 'json';
+
     /**
      * @var string[]
      */
     private array $rel = [];
 
     /**
-     * @var array<string, string|bool|string[]>
+     * @var array<string, scalar|\Stringable|list<scalar|\Stringable>>
      */
     private array $attributes = [];
 
@@ -175,6 +192,11 @@ class Link implements EvolvableLinkInterface
         return array_values($this->rel);
     }
 
+    /**
+     * Returns a list of attributes that describe the target URI.
+     *
+     * @return array<string, scalar|\Stringable|list<scalar|\Stringable>>
+     */
     public function getAttributes(): array
     {
         return $this->attributes;
@@ -204,6 +226,14 @@ class Link implements EvolvableLinkInterface
         return $that;
     }
 
+    /**
+     * Returns an instance with the specified attribute added.
+     *
+     * If the specified attribute is already present, it will be overwritten
+     * with the new value.
+     *
+     * @param scalar|\Stringable|list<scalar|\Stringable> $value
+     */
     public function withAttribute(string $attribute, string|\Stringable|int|float|bool|array $value): static
     {
         $that = clone $this;

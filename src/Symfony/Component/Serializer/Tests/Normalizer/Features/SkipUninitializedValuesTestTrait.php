@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 
@@ -21,9 +22,7 @@ trait SkipUninitializedValuesTestTrait
 {
     abstract protected function getNormalizerForSkipUninitializedValues(): AbstractObjectNormalizer;
 
-    /**
-     * @dataProvider skipUninitializedValuesFlagProvider
-     */
+    #[DataProvider('skipUninitializedValuesFlagProvider')]
     public function testSkipUninitializedValues(array $context)
     {
         $object = new TypedPropertiesObjectWithGetters();

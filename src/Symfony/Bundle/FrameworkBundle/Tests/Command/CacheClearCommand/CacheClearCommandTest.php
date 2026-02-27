@@ -121,7 +121,7 @@ class CacheClearCommandTest extends TestCase
         // BUT without "kernel.build_dir" parameter (like an old dumped container)
         $kernel->boot();
         $container = $kernel->getContainer();
-        \Closure::bind(function (Container $class) {
+        \Closure::bind(static function (Container $class) {
             unset($class->loadedDynamicParameters['kernel.build_dir']);
             unset($class->parameters['kernel.build_dir']);
         }, null, $container::class)($container);

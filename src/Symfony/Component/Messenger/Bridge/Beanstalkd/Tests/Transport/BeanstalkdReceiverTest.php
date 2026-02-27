@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Transport;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdPriorityStamp;
@@ -41,7 +42,7 @@ final class BeanstalkdReceiverTest extends TestCase
         $connection->expects($this->once())->method('getTube')->willReturn($tube);
 
         $receiver = new BeanstalkdReceiver($connection, $serializer);
-        $actualEnvelopes = $receiver->get();
+        $actualEnvelopes = iterator_to_array($receiver->get());
         $this->assertCount(1, $actualEnvelopes);
         /** @var Envelope $actualEnvelope */
         $actualEnvelope = $actualEnvelopes[0];
@@ -68,15 +69,12 @@ final class BeanstalkdReceiverTest extends TestCase
         $connection->expects($this->once())->method('get')->willReturn(null);
 
         $receiver = new BeanstalkdReceiver($connection, $serializer);
-        $actualEnvelopes = $receiver->get();
-        $this->assertIsArray($actualEnvelopes);
+        $actualEnvelopes = iterator_to_array($receiver->get());
         $this->assertCount(0, $actualEnvelopes);
     }
 
-    public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException()
+    public function testItReturnsSerializedEnvelopeWhenDecodingFails()
     {
-        $this->expectException(MessageDecodingFailedException::class);
-
         $serializer = $this->createMock(PhpSerializer::class);
         $serializer->expects($this->once())->method('decode')->willThrowException(new MessageDecodingFailedException());
 
@@ -84,15 +82,16 @@ final class BeanstalkdReceiverTest extends TestCase
         $connection = $this->createMock(Connection::class);
         $connection->expects($this->once())->method('get')->willReturn($beanstalkdEnvelope);
         $connection->expects($this->once())->method('getMessagePriority')->with($beanstalkdEnvelope['id'])->willReturn(2);
-        $connection->expects($this->once())->method('reject')->with($beanstalkdEnvelope['id'], 2);
+        $connection->expects($this->once())->method('getTube')->willReturn('tube');
 
         $receiver = new BeanstalkdReceiver($connection, $serializer);
-        $receiver->get();
+        $envelopes = iterator_to_array($receiver->get());
+
+        $this->assertCount(1, $envelopes);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelopes[0]->getMessage());
     }
 
-    /**
-     * @dataProvider provideRejectCases
-     */
+    #[DataProvider('provideRejectCases')]
     public function testReject(array $stamps, ?int $priority, bool $forceDelete)
     {
         $serializer = $this->createSerializer();

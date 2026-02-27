@@ -11,7 +11,10 @@
 
 namespace Symfony\Component\Messenger\Tests\Command;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerTrait;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
@@ -19,11 +22,11 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
+use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Stamp\BusNameStamp;
@@ -34,7 +37,7 @@ class ConsumeMessagesCommandTest extends TestCase
 {
     public function testConfigurationWithDefaultReceiver()
     {
-        $command = new ConsumeMessagesCommand($this->createMock(RoutableMessageBus::class), $this->createMock(ServiceLocator::class), $this->createMock(EventDispatcherInterface::class), null, ['amqp']);
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus(new Container()), new ServiceLocator([]), new EventDispatcher(), null, ['amqp']);
         $inputArgument = $command->getDefinition()->getArgument('receivers');
         $this->assertFalse($inputArgument->isRequired());
         $this->assertSame(['amqp'], $inputArgument->getDefault());
@@ -59,7 +62,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
 
         $application = new Application();
-        $application->add($command);
+        $application->addCommand($command);
         $tester = new CommandTester($application->get('messenger:consume'));
         $tester->execute([
             'receivers' => ['dummy-receiver'],
@@ -89,7 +92,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
 
         $application = new Application();
-        $application->add($command);
+        $application->addCommand($command);
         $tester = new CommandTester($application->get('messenger:consume'));
         $tester->execute([
             'receivers' => ['dummy-receiver'],
@@ -107,9 +110,7 @@ class ConsumeMessagesCommandTest extends TestCase
         yield [false];
     }
 
-    /**
-     * @dataProvider provideRunWithResetServicesOption
-     */
+    #[DataProvider('provideRunWithResetServicesOption')]
     public function testRunWithResetServicesOption(bool $shouldReset)
     {
         $envelope = new Envelope(new \stdClass());
@@ -132,7 +133,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $command = new ConsumeMessagesCommand($bus, $receiverLocator, new EventDispatcher(), null, [], new ResetServicesListener($servicesResetter));
 
         $application = new Application();
-        $application->add($command);
+        $application->addCommand($command);
         $tester = new CommandTester($application->get('messenger:consume'));
         $tester->execute(array_merge([
             'receivers' => ['dummy-receiver'],
@@ -145,9 +146,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
-    /**
-     * @dataProvider getInvalidOptions
-     */
+    #[DataProvider('getInvalidOptions')]
     public function testRunWithInvalidOption(string $option, string $value, string $expectedMessage)
     {
         $receiverLocator = new Container();
@@ -156,7 +155,7 @@ class ConsumeMessagesCommandTest extends TestCase
         $command = new ConsumeMessagesCommand(new RoutableMessageBus(new Container()), $receiverLocator, new EventDispatcher());
 
         $application = new Application();
-        $application->add($command);
+        $application->addCommand($command);
         $tester = new CommandTester($application->get('messenger:consume'));
 
         $this->expectException(InvalidOptionException::class);
@@ -180,21 +179,19 @@ class ConsumeMessagesCommandTest extends TestCase
     {
         $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
 
-        $receiver = $this->createMock(ReceiverInterface::class);
+        $receiver = $this->createStub(ReceiverInterface::class);
         $receiver->method('get')->willReturn([$envelope]);
 
         $receiverLocator = new Container();
         $receiverLocator->set('dummy-receiver', $receiver);
 
-        $bus = $this->createMock(MessageBusInterface::class);
-
         $busLocator = new Container();
-        $busLocator->set('dummy-bus', $bus);
+        $busLocator->set('dummy-bus', new MessageBus());
 
         $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
 
         $application = new Application();
-        $application->add($command);
+        $application->addCommand($command);
         $tester = new CommandTester($application->get('messenger:consume'));
         $tester->execute([
             'receivers' => ['dummy-receiver'],
@@ -205,14 +202,56 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
     }
 
+    public function testRunWithMemoryLimit()
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver = $this->createStub(ReceiverInterface::class);
+        $receiver->method('get')->willReturn([$envelope]);
+
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver', $receiver);
+
+        $bus = $this->createStub(MessageBusInterface::class);
+
+        $busLocator = new Container();
+        $busLocator->set('dummy-bus', $bus);
+
+        $logger = new class implements LoggerInterface {
+            use LoggerTrait;
+
+            public array $logs = [];
+
+            public function log(...$args): void
+            {
+                $this->logs[] = $args;
+            }
+        };
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher(), $logger);
+
+        $application = new Application();
+        $application->addCommand($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--memory-limit' => '1.5M',
+        ]);
+
+        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertStringContainsString('[OK] Consuming messages from transport "dummy-receiver"', $tester->getDisplay());
+        $this->assertStringContainsString('The worker will automatically exit once it has exceeded 1.5M of memory', $tester->getDisplay());
+
+        $this->assertSame(1572864, $logger->logs[1][2]['limit']);
+    }
+
     public function testRunWithAllOption()
     {
         $envelope1 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
         $envelope2 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
 
-        $receiver1 = $this->createMock(ReceiverInterface::class);
+        $receiver1 = $this->createStub(ReceiverInterface::class);
         $receiver1->method('get')->willReturn([$envelope1]);
-        $receiver2 = $this->createMock(ReceiverInterface::class);
+        $receiver2 = $this->createStub(ReceiverInterface::class);
         $receiver2->method('get')->willReturn([$envelope2]);
 
         $receiverLocator = new Container();
@@ -232,7 +271,7 @@ class ConsumeMessagesCommandTest extends TestCase
         );
 
         $application = new Application();
-        $application->add($command);
+        $application->addCommand($command);
         $tester = new CommandTester($application->get('messenger:consume'));
         $tester->execute([
             '--all' => true,
@@ -243,13 +282,10 @@ class ConsumeMessagesCommandTest extends TestCase
         $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver1, dummy-receiver2"', $tester->getDisplay());
     }
 
-    /**
-     * @dataProvider provideCompletionSuggestions
-     */
+    #[DataProvider('provideCompletionSuggestions')]
     public function testComplete(array $input, array $expectedSuggestions)
     {
-        $bus = $this->createMock(RoutableMessageBus::class);
-        $command = new ConsumeMessagesCommand($bus, new Container(), new EventDispatcher(), null, ['async', 'async_high', 'failed'], null, ['messenger.bus.default']);
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus(new Container()), new Container(), new EventDispatcher(), null, ['async', 'async_high', 'failed'], null, ['messenger.bus.default']);
         $tester = new CommandCompletionTester($command);
         $suggestions = $tester->complete($input);
         $this->assertSame($expectedSuggestions, $suggestions);
@@ -261,5 +297,279 @@ class ConsumeMessagesCommandTest extends TestCase
         yield 'receiver (value)' => [['async'], ['async', 'async_high', 'failed']];
         yield 'receiver (no repeat)' => [['async', ''], ['async_high', 'failed']];
         yield 'option --bus' => [['--bus', ''], ['messenger.bus.default']];
+    }
+
+    public function testSuccessMessageGoesToStdout()
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver = $this->createMock(ReceiverInterface::class);
+        $receiver->expects($this->once())->method('get')->willReturn([$envelope]);
+
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver', $receiver);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch');
+
+        $busLocator = new Container();
+        $busLocator->set('dummy-bus', $bus);
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
+
+        $application = new Application();
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            $application->add($command);
+        }
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--limit' => 1,
+        ], ['capture_stderr_separately' => true]);
+
+        $stdout = $tester->getDisplay();
+        $stderr = $tester->getErrorOutput();
+
+        $this->assertStringContainsString('Consuming messages from transport', $stdout);
+        $this->assertStringNotContainsString('Consuming messages from transport', $stderr);
+    }
+
+    public function testCommentsGoToStderr()
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver = $this->createMock(ReceiverInterface::class);
+        $receiver->expects($this->once())->method('get')->willReturn([$envelope]);
+
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver', $receiver);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        $bus->expects($this->once())->method('dispatch');
+
+        $busLocator = new Container();
+        $busLocator->set('dummy-bus', $bus);
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher());
+
+        $application = new Application();
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            $application->add($command);
+        }
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--limit' => 1,
+        ], ['capture_stderr_separately' => true]);
+
+        $stdout = $tester->getDisplay();
+        $stderr = $tester->getErrorOutput();
+
+        $this->assertStringNotContainsString('Quit the worker with CONTROL-C', $stdout);
+        $this->assertStringContainsString('Quit the worker with CONTROL-C', $stderr);
+    }
+
+    public function testRunWithExcludeReceiversOption()
+    {
+        $envelope1 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+        $envelope2 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+        $envelope3 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver1 = $this->createStub(ReceiverInterface::class);
+        $receiver1->method('get')->willReturn([$envelope1]);
+        $receiver2 = $this->createStub(ReceiverInterface::class);
+        $receiver2->method('get')->willReturn([$envelope2]);
+        $receiver3 = $this->createStub(ReceiverInterface::class);
+        $receiver3->method('get')->willReturn([$envelope3]);
+
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver1', $receiver1);
+        $receiverLocator->set('dummy-receiver2', $receiver2);
+        $receiverLocator->set('dummy-receiver3', $receiver3);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        // Only 2 messages should be dispatched (receiver1 and receiver3, receiver2 is excluded)
+        $bus->expects($this->exactly(2))->method('dispatch');
+
+        $busLocator = new Container();
+        $busLocator->set('dummy-bus', $bus);
+
+        $command = new ConsumeMessagesCommand(
+            new RoutableMessageBus($busLocator),
+            $receiverLocator, new EventDispatcher(),
+            receiverNames: ['dummy-receiver1', 'dummy-receiver2', 'dummy-receiver3']
+        );
+
+        $application = new Application();
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            $application->add($command);
+        }
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            '--all' => true,
+            '--exclude-receivers' => ['dummy-receiver2'],
+            '--limit' => 2,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver1, dummy-receiver3"', $tester->getDisplay());
+    }
+
+    public function testRunWithExcludeReceiversMultipleQueues()
+    {
+        $envelope1 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+        $envelope2 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+        $envelope3 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+        $envelope4 = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver1 = $this->createStub(ReceiverInterface::class);
+        $receiver1->method('get')->willReturn([$envelope1]);
+        $receiver2 = $this->createStub(ReceiverInterface::class);
+        $receiver2->method('get')->willReturn([$envelope2]);
+        $receiver3 = $this->createStub(ReceiverInterface::class);
+        $receiver3->method('get')->willReturn([$envelope3]);
+        $receiver4 = $this->createStub(ReceiverInterface::class);
+        $receiver4->method('get')->willReturn([$envelope4]);
+
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver1', $receiver1);
+        $receiverLocator->set('dummy-receiver2', $receiver2);
+        $receiverLocator->set('dummy-receiver3', $receiver3);
+        $receiverLocator->set('dummy-receiver4', $receiver4);
+
+        $bus = $this->createMock(MessageBusInterface::class);
+        // Only 2 messages should be dispatched (receiver1 and receiver4, receiver2 and receiver3 are excluded)
+        $bus->expects($this->exactly(2))->method('dispatch');
+
+        $busLocator = new Container();
+        $busLocator->set('dummy-bus', $bus);
+
+        $command = new ConsumeMessagesCommand(
+            new RoutableMessageBus($busLocator),
+            $receiverLocator, new EventDispatcher(),
+            receiverNames: ['dummy-receiver1', 'dummy-receiver2', 'dummy-receiver3', 'dummy-receiver4']
+        );
+
+        $application = new Application();
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            $application->add($command);
+        }
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            '--all' => true,
+            '--exclude-receivers' => ['dummy-receiver2', 'dummy-receiver3'],
+            '--limit' => 2,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString('[OK] Consuming messages from transports "dummy-receiver1, dummy-receiver4"', $tester->getDisplay());
+    }
+
+    public function testExcludeReceiverssWithoutAllOptionThrowsException()
+    {
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver', new \stdClass());
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus(new Container()), $receiverLocator, new EventDispatcher());
+
+        $application = new Application();
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            $application->add($command);
+        }
+        $tester = new CommandTester($application->get('messenger:consume'));
+
+        $this->expectException(InvalidOptionException::class);
+        $this->expectExceptionMessage('The "--exclude-receivers" option can only be used with the "--all" option.');
+        $tester->execute([
+            'receivers' => ['dummy-receiver'],
+            '--exclude-receivers' => ['dummy-receiver'],
+        ]);
+    }
+
+    public function testExcludeReceiversWithAllQueuesExcludedThrowsException()
+    {
+        $receiverLocator = new Container();
+        $receiverLocator->set('dummy-receiver1', new \stdClass());
+        $receiverLocator->set('dummy-receiver2', new \stdClass());
+
+        $command = new ConsumeMessagesCommand(
+            new RoutableMessageBus(new Container()),
+            $receiverLocator,
+            new EventDispatcher(),
+            receiverNames: ['dummy-receiver1', 'dummy-receiver2']
+        );
+
+        $application = new Application();
+        if (method_exists($application, 'addCommand')) {
+            $application->addCommand($command);
+        } else {
+            $application->add($command);
+        }
+        $tester = new CommandTester($application->get('messenger:consume'));
+
+        $this->expectException(\Symfony\Component\Console\Exception\RuntimeException::class);
+        $this->expectExceptionMessage('All transports/receivers have been excluded, please specify at least one to consume from.');
+        $tester->execute([
+            '--all' => true,
+            '--exclude-receivers' => ['dummy-receiver1', 'dummy-receiver2'],
+        ]);
+    }
+
+    #[DataProvider('provideReceiversForCaseInsensitiveMatching')]
+    public function testCaseInsensitiveReceiverMatching(array $receiverNames, array $receivers, array $expectedReceivers)
+    {
+        $envelope = new Envelope(new \stdClass(), [new BusNameStamp('dummy-bus')]);
+
+        $receiver = $this->createStub(ReceiverInterface::class);
+        $receiver->method('get')->willReturn([$envelope]);
+
+        $receiverLocator = new Container();
+        foreach ($receiverNames as $receiverName) {
+            $receiverLocator->set($receiverName, $receiver);
+        }
+
+        $bus = $this->createStub(MessageBusInterface::class);
+
+        $busLocator = new Container();
+        $busLocator->set('dummy-bus', $bus);
+
+        $command = new ConsumeMessagesCommand(new RoutableMessageBus($busLocator), $receiverLocator, new EventDispatcher(), receiverNames: $receiverNames);
+
+        $application = new Application();
+        $application->addCommand($command);
+        $tester = new CommandTester($application->get('messenger:consume'));
+        $tester->execute([
+            'receivers' => $receivers,
+            '--limit' => 1,
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $this->assertStringContainsString(
+            \sprintf(
+                '[OK] Consuming messages from %s "%s"',
+                1 === \count($expectedReceivers) ? 'transport' : 'transports',
+                implode(', ', $expectedReceivers)
+            ),
+            $tester->getDisplay()
+        );
+    }
+
+    public static function provideReceiversForCaseInsensitiveMatching(): \Traversable
+    {
+        yield [['one', 'one_second', 'second', 'pone'], ['one.*'], ['one', 'one_second']];
+        yield [['one', 'one_second', 'second'], ['one'], ['one']];
+        yield [['one', 'one_second', 'second', 'SECOND'], ['(?i)second'], ['second', 'SECOND']];
+        yield [['one', 'one_second', 'second', 'SECOND', 'ssecond'], ['one', 'one.*', 'second.*'], ['one', 'one_second', 'second']];
+        yield [['pone'], ['.*one'], ['pone']];
     }
 }

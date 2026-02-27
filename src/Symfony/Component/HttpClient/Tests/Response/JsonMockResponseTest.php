@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpClient\Tests\Response;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -75,9 +76,7 @@ final class JsonMockResponseTest extends TestCase
         ], $response->toArray());
     }
 
-    /**
-     * @dataProvider responseHeadersProvider
-     */
+    #[DataProvider('responseHeadersProvider')]
     public function testResponseHeaders(string $expectedContentType, array $responseHeaders)
     {
         $client = new MockHttpClient(new JsonMockResponse([

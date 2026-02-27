@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+7.4
+---
+
+ * Add support for adding more default casters to `AbstractCloner::addDefaultCasters()`
+ * Select HtmlDumper only if `Accept` header contains "html"
+
 7.3
 ---
 

@@ -34,5 +34,9 @@ return [
             'ZMW',
             'kwacha zambiano',
         ],
+        'ZWG' => [
+            'ZWG',
+            'oro de Zimbabue',
+        ],
     ],
 ];

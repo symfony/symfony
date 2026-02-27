@@ -11,9 +11,10 @@
 
 namespace Symfony\Component\Console\Tests\Helper;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\Dumper;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\VarDumper\Test\VarDumperTestTrait;
 
 class DumperTest extends TestCase
@@ -32,15 +33,10 @@ class DumperTest extends TestCase
         putenv('DUMP_COMMA_SEPARATOR');
     }
 
-    /**
-     * @dataProvider provideVariables
-     */
+    #[DataProvider('provideVariables')]
     public function testInvoke($variable)
     {
-        $output = $this->createMock(OutputInterface::class);
-        $output->method('isDecorated')->willReturn(false);
-
-        $dumper = new Dumper($output);
+        $dumper = new Dumper(new NullOutput());
 
         $this->assertDumpMatchesFormat($dumper($variable), $variable);
     }

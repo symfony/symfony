@@ -11,11 +11,10 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 class PredisRedisClusterAdapterTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void

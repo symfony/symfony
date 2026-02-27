@@ -28,7 +28,7 @@ class BundlePathsTest extends AbstractWebTestCase
         $fs = new Filesystem();
         $fs->remove($projectDir);
         $fs->mkdir($projectDir.'/public');
-        $command = (new Application($kernel))->add(new AssetsInstallCommand($fs, $projectDir));
+        $command = (new Application($kernel))->addCommand(new AssetsInstallCommand($fs, $projectDir));
         $exitCode = (new CommandTester($command))->execute(['target' => $projectDir.'/public']);
 
         $this->assertSame(0, $exitCode);

@@ -990,6 +990,10 @@ return [
             'EC$',
             'Şərqi Karib Dolları',
         ],
+        'XCG' => [
+            'Cg.',
+            'Karib gilderi',
+        ],
         'XFO' => [
             'XFO',
             'Fransız Gızıl Frankı',
@@ -1053,6 +1057,10 @@ return [
         'ZWD' => [
             'ZWD',
             'Zimbabve Dolları (1980–2008)',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'Zimbabve Qızılı',
         ],
         'ZWL' => [
             'ZWL',

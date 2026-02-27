@@ -30,6 +30,7 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
     public function __construct(
         private ContainerInterface $failureSenders,
         private ?LoggerInterface $logger = null,
+        private array $failureTransportsByName = [],
     ) {
     }
 
@@ -48,7 +49,10 @@ class SendFailedMessageToFailureTransportListener implements EventSubscriberInte
         $envelope = $event->getEnvelope();
 
         // avoid re-sending to the failed sender
-        if (null !== $envelope->last(SentToFailureTransportStamp::class)) {
+        if (!$this->failureTransportsByName && $envelope->last(SentToFailureTransportStamp::class)) {
+            return;
+        }
+        if (($this->failureTransportsByName[$event->getReceiverName()] ?? null) === $event->getReceiverName()) {
             return;
         }
 

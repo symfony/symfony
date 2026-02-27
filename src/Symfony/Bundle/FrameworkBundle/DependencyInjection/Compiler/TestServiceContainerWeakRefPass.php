@@ -31,7 +31,10 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
         $definitions = $container->getDefinitions();
 
         foreach ($definitions as $id => $definition) {
-            if ($id && '.' !== $id[0] && (!$definition->isPublic() || $definition->isPrivate() || $definition->hasTag('container.private')) && !$definition->hasErrors() && !$definition->isAbstract()) {
+            if ($inner = $definition->getTag('container.decorator')[0]['inner'] ?? null) {
+                $privateServices[$inner] = new Reference($inner, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE);
+            }
+            if ($id && '.' !== $id[0] && ($definition->isPrivate() || $definition->hasTag('container.private')) && !$definition->hasErrors() && !$definition->isAbstract()) {
                 $privateServices[$id] = new Reference($id, ContainerBuilder::IGNORE_ON_UNINITIALIZED_REFERENCE);
             }
         }
@@ -39,7 +42,7 @@ class TestServiceContainerWeakRefPass implements CompilerPassInterface
         $aliases = $container->getAliases();
 
         foreach ($aliases as $id => $alias) {
-            if ($id && '.' !== $id[0] && (!$alias->isPublic() || $alias->isPrivate())) {
+            if ($id && '.' !== $id[0] && $alias->isPrivate()) {
                 while (isset($aliases[$target = (string) $alias])) {
                     $alias = $aliases[$target];
                 }

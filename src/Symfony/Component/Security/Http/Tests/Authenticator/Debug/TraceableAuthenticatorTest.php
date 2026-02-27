@@ -23,7 +23,7 @@ class TraceableAuthenticatorTest extends TestCase
     public function testGetInfo()
     {
         $request = new Request();
-        $passport = new SelfValidatingPassport(new UserBadge('robin', function () {}));
+        $passport = new SelfValidatingPassport(new UserBadge('robin', static function () {}));
 
         $authenticator = $this->createMock(AuthenticatorInterface::class);
         $authenticator->expects($this->once())

@@ -14,6 +14,7 @@ namespace Symfony\Component\TypeInfo\Tests\TypeContext;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\TypeInfo\Exception\LogicException;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AbstractDummy;
+use Symfony\Component\TypeInfo\Tests\Fixtures\AnotherNamespace\DummyInDifferentNs;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyExtendingStdClass;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithUses;
@@ -47,6 +48,14 @@ class TypeContextTest extends TestCase
     {
         $this->assertSame(Dummy::class, (new TypeContextFactory())->createFromClassName(Dummy::class)->getCalledClass());
         $this->assertSame(Dummy::class, (new TypeContextFactory())->createFromClassName(Dummy::class, AbstractDummy::class)->getCalledClass());
+    }
+
+    public function testGetCalledClassInDifferentNamespace()
+    {
+        $this->assertSame(
+            DummyInDifferentNs::class,
+            (new TypeContextFactory())->createFromClassName(DummyInDifferentNs::class, AbstractDummy::class)->getCalledClass()
+        );
     }
 
     public function testGetParentClass()

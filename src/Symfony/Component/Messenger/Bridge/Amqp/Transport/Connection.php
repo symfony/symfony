@@ -31,6 +31,7 @@ class Connection
         'x-max-length-bytes',
         'x-max-priority',
         'x-message-ttl',
+        'x-delivery-limit',
     ];
 
     /**
@@ -78,6 +79,7 @@ class Connection
         'default_publish_routing_key',
         'flags',
         'arguments',
+        'bindings',
     ];
 
     private AmqpFactory $amqpFactory;
@@ -93,6 +95,7 @@ class Connection
 
     private \AMQPExchange $amqpDelayExchange;
     private int $lastActivityTime = 0;
+    private int $inFlightMessages = 0;
 
     public function __construct(
         #[\SensitiveParameter] private array $connectionOptions,
@@ -133,12 +136,16 @@ class Connection
      *     * binding_arguments: Arguments to be used while binding the queue.
      *     * flags: Queue flags (Default: AMQP_DURABLE)
      *     * arguments: Extra arguments
+     *   * queues: Set to false (or "queues=false" in the DSN query) to skip binding the default "messages" queue when no queues are defined
      *   * exchange:
      *     * name: Name of the exchange. An empty string (name: '') can be used to use the default exchange
      *     * type: Type of exchange (Default: fanout)
      *     * default_publish_routing_key: Routing key to use when publishing, if none is specified on the message
      *     * flags: Exchange flags (Default: AMQP_DURABLE)
      *     * arguments: Extra arguments
+     *     * bindings[name]: An array of the source exchanges to bind this exchange to, keyed by the name. Binding direction: source exchange -> this exchange
+     *       * binding_keys: The binding/routing keys to be used for the binding
+     *       * binding_arguments: Additional binding arguments
      *   * delay:
      *     * queue_name_pattern: Pattern to use to create the queues (Default: "delay_%exchange_name%_%routing_key%_%delay%")
      *     * exchange_name: Name of the exchange to be used for the delayed/retried messages (Default: "delays")
@@ -165,7 +172,7 @@ class Connection
     {
         if (false === $params = parse_url($dsn)) {
             // this is a valid URI that parse_url cannot handle when you want to pass all parameters as options
-            if (!\in_array($dsn, ['amqp://', 'amqps://'])) {
+            if (!\in_array($dsn, ['amqp://', 'amqps://'], true)) {
                 throw new InvalidArgumentException('The given AMQP DSN is invalid.');
             }
 
@@ -197,18 +204,19 @@ class Connection
             $amqpOptions['password'] = rawurldecode($params['pass']);
         }
 
-        if (!isset($amqpOptions['queues'])) {
-            $amqpOptions['queues'][$exchangeName] = [];
+        if (!\is_array($queuesOptions = $amqpOptions['queues'] ?? true)) {
+            $queuesOptions = filter_var($queuesOptions, \FILTER_VALIDATE_BOOL) ? [$exchangeName => []] : [];
+        } else {
+            $queuesOptions = $amqpOptions['queues'];
         }
 
         $exchangeOptions = $amqpOptions['exchange'];
-        $queuesOptions = $amqpOptions['queues'];
         unset($amqpOptions['queues'], $amqpOptions['exchange']);
         if (isset($amqpOptions['auto_setup'])) {
             $amqpOptions['auto_setup'] = filter_var($amqpOptions['auto_setup'], \FILTER_VALIDATE_BOOL);
         }
 
-        $queuesOptions = array_map(function ($queueOptions) {
+        $queuesOptions = array_map(static function ($queueOptions) {
             if (!\is_array($queueOptions)) {
                 $queueOptions = [];
             }
@@ -288,7 +296,7 @@ class Connection
         }
 
         $this->withConnectionExceptionRetry(function () use ($body, $headers, $delayInMs, $amqpStamp) {
-            if (0 !== $delayInMs) {
+            if (0 < $delayInMs) {
                 $this->publishWithDelay($body, $headers, $delayInMs, $amqpStamp);
 
                 return;
@@ -430,20 +438,35 @@ class Connection
         }
 
         if (false !== $message = $this->queue($queueName)->get()) {
+            ++$this->inFlightMessages;
+            $this->lastActivityTime = time();
+
             return $message;
         }
+
+        $this->lastActivityTime = time();
 
         return null;
     }
 
     public function ack(\AMQPEnvelope $message, string $queueName): bool
     {
-        return $this->queue($queueName)->ack($message->getDeliveryTag()) ?? true;
+        try {
+            return $this->queue($queueName)->ack($message->getDeliveryTag()) ?? true;
+        } finally {
+            $this->lastActivityTime = time();
+            $this->inFlightMessages = max(0, $this->inFlightMessages - 1);
+        }
     }
 
     public function nack(\AMQPEnvelope $message, string $queueName, int $flags = \AMQP_NOPARAM): bool
     {
-        return $this->queue($queueName)->nack($message->getDeliveryTag(), $flags) ?? true;
+        try {
+            return $this->queue($queueName)->nack($message->getDeliveryTag(), $flags) ?? true;
+        } finally {
+            $this->lastActivityTime = time();
+            $this->inFlightMessages = max(0, $this->inFlightMessages - 1);
+        }
     }
 
     public function setup(): void
@@ -457,6 +480,15 @@ class Connection
         $exchange = $this->exchange();
         if ('' !== $this->exchangeOptions['name']) {
             $exchange->declareExchange();
+        }
+
+        foreach ($this->exchangeOptions['bindings'] ?? [] as $exchangeName => $exchangeConfig) {
+            if (!\is_array($exchangeConfig['binding_keys'] ?? false) || !$exchangeConfig['binding_keys']) {
+                throw new InvalidArgumentException(\sprintf('The "binding_keys" option must be set to a non-empty array for exchange "%s".', $exchangeName));
+            }
+            foreach ($exchangeConfig['binding_keys'] as $bindingKey) {
+                $this->exchange()->bind($exchangeName, $bindingKey, $exchangeConfig['binding_arguments'] ?? []);
+            }
         }
 
         foreach ($this->queuesOptions as $queueName => $queueConfig) {
@@ -506,7 +538,7 @@ class Connection
             }
 
             $this->lastActivityTime = time();
-        } elseif (0 < ($this->connectionOptions['heartbeat'] ?? 0) && time() > $this->lastActivityTime + 2 * $this->connectionOptions['heartbeat']) {
+        } elseif (0 < ($this->connectionOptions['heartbeat'] ?? 0) && time() > $this->lastActivityTime + 2 * $this->connectionOptions['heartbeat'] && 0 === $this->inFlightMessages) {
             $disconnectMethod = 'true' === ($this->connectionOptions['persistent'] ?? 'false') ? 'pdisconnect' : 'disconnect';
             $this->amqpChannel->getConnection()->{$disconnectMethod}();
         }
@@ -563,6 +595,7 @@ class Connection
     {
         unset($this->amqpChannel, $this->amqpExchange, $this->amqpDelayExchange);
         $this->amqpQueues = [];
+        $this->inFlightMessages = 0;
     }
 
     private function getDefaultPublishRoutingKey(): ?string

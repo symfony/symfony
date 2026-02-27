@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use Symfony\Component\Console\ArgumentResolver\TraceableArgumentResolver as TraceableConsoleArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\NotTaggedControllerValueResolver;
 use Symfony\Component\HttpKernel\Controller\TraceableArgumentResolver;
 use Symfony\Component\HttpKernel\Controller\TraceableControllerResolver;
@@ -47,5 +48,12 @@ return static function (ContainerConfigurator $container) {
         ->set('argument_resolver.not_tagged_controller', NotTaggedControllerValueResolver::class)
             ->args([abstract_arg('Controller argument, set in FrameworkExtension')])
             ->tag('controller.argument_value_resolver', ['priority' => -200])
+
+        ->set('debug.console.argument_resolver', TraceableConsoleArgumentResolver::class)
+            ->decorate('console.argument_resolver')
+            ->args([
+                service('debug.console.argument_resolver.inner'),
+                service('debug.stopwatch'),
+            ])
     ;
 };

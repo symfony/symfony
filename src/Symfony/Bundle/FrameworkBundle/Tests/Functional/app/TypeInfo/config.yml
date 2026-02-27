@@ -2,8 +2,9 @@ imports:
     - { resource: ../config/default.yml }
 
 framework:
-    http_method_override: false
-    type_info: true
+    type_info:
+        aliases:
+            CustomAlias: int
 
 services:
     type_info.resolver.alias:

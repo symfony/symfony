@@ -23,7 +23,7 @@ return function (Application $app, Command $command, RuntimeInterface $runtime) 
     $command->setName('my_command');
 
     [$cmd, $args] = $runtime->getResolver(require __DIR__.'/command.php')->resolve();
-    $app->add($cmd(...$args));
+    $app->addCommand($cmd(...$args));
 
     return $app;
 };

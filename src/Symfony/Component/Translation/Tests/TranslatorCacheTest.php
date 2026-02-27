@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Translation\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\SelfCheckingResourceInterface;
@@ -46,17 +47,15 @@ class TranslatorCacheTest extends TestCase
                 continue;
             }
             if ($path->isDir()) {
-                rmdir($path->__toString());
+                @rmdir($path->__toString());
             } else {
-                unlink($path->__toString());
+                @unlink($path->__toString());
             }
         }
         rmdir($this->tmpDir);
     }
 
-    /**
-     * @dataProvider runForDebugAndProduction
-     */
+    #[DataProvider('runForDebugAndProduction')]
     public function testThatACacheIsUsed($debug)
     {
         if (!class_exists(\MessageFormatter::class)) {
@@ -125,9 +124,7 @@ class TranslatorCacheTest extends TestCase
         $translator->trans($msgid);
     }
 
-    /**
-     * @dataProvider runForDebugAndProduction
-     */
+    #[DataProvider('runForDebugAndProduction')]
     public function testDifferentTranslatorsForSameLocaleDoNotOverwriteEachOthersCache($debug)
     {
         /*
@@ -252,7 +249,7 @@ class TranslatorCacheTest extends TestCase
 
     public function testRefreshCacheWhenResourcesAreNoLongerFresh()
     {
-        $resource = $this->createMock(SelfCheckingResourceInterface::class);
+        $resource = $this->createStub(SelfCheckingResourceInterface::class);
         $loader = $this->createMock(LoaderInterface::class);
         $resource->method('isFresh')->willReturn(false);
         $loader

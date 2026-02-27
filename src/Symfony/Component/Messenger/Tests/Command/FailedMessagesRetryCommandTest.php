@@ -18,10 +18,12 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Messenger\Command\FailedMessagesRetryCommand;
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\MessageBus;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Receiver\ListableReceiverInterface;
+use Symfony\Component\Messenger\Transport\Receiver\MessageCountAwareInterface;
 
 class FailedMessagesRetryCommandTest extends TestCase
 {
@@ -51,13 +53,10 @@ class FailedMessagesRetryCommandTest extends TestCase
         $bus->expects($this->exactly(2))->method('dispatch')->willReturn(new Envelope(new \stdClass()));
 
         $failureTransportName = 'failure_receiver';
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
 
         $command = new FailedMessagesRetryCommand(
             $failureTransportName,
-            $serviceLocator,
+            new ServiceLocator([$failureTransportName => static fn () => $receiver]),
             $bus,
             $dispatcher
         );
@@ -71,26 +70,21 @@ class FailedMessagesRetryCommandTest extends TestCase
 
     public function testBasicRunWithServiceLocatorMultipleFailedTransportsDefined()
     {
-        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver = $this->createStub(ListableReceiverInterface::class);
         $receiver->method('all')->willReturn([]);
 
         $dispatcher = new EventDispatcher();
-        $bus = $this->createMock(MessageBusInterface::class);
 
         $failureTransportName = 'failure_receiver';
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
-        $serviceLocator->method('getProvidedServices')->willReturn([
-            'failure_receiver' => [],
-            'failure_receiver_2' => [],
-            'failure_receiver_3' => [],
-        ]);
 
         $command = new FailedMessagesRetryCommand(
             $failureTransportName,
-            $serviceLocator,
-            $bus,
+            new ServiceLocator([
+                $failureTransportName => static fn () => $receiver,
+                'failure_receiver_2' => static fn () => $receiver,
+                'failure_receiver_3' => static fn () => $receiver,
+            ]),
+            new MessageBus(),
             $dispatcher
         );
         $tester = new CommandTester($command);
@@ -98,8 +92,8 @@ class FailedMessagesRetryCommandTest extends TestCase
         $tester->execute(['--force' => true]);
 
         $expectedLadingMessage = <<<EOF
-> Available failure transports are: failure_receiver, failure_receiver_2, failure_receiver_3
-EOF;
+            > Available failure transports are: failure_receiver, failure_receiver_2, failure_receiver_3
+            EOF;
         $this->assertStringContainsString($expectedLadingMessage, $tester->getDisplay());
     }
 
@@ -129,13 +123,10 @@ EOF;
         $bus->expects($this->exactly(2))->method('dispatch')->willReturn(new Envelope(new \stdClass()));
 
         $failureTransportName = 'failure_receiver';
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->method('has')->with($failureTransportName)->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
 
         $command = new FailedMessagesRetryCommand(
             $failureTransportName,
-            $serviceLocator,
+            new ServiceLocator([$failureTransportName => static fn () => $receiver]),
             $bus,
             $dispatcher
         );
@@ -150,18 +141,15 @@ EOF;
     {
         $globalFailureReceiverName = 'failure_receiver';
 
-        $receiver = $this->createMock(ListableReceiverInterface::class);
-
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('getProvidedServices')->willReturn([
-            'global_receiver' => $receiver,
-            $globalFailureReceiverName => $receiver,
-        ]);
+        $receiver = $this->createStub(ListableReceiverInterface::class);
 
         $command = new FailedMessagesRetryCommand(
             $globalFailureReceiverName,
-            $serviceLocator,
-            $this->createMock(MessageBusInterface::class),
+            new ServiceLocator([
+                'global_receiver' => static fn () => $receiver,
+                $globalFailureReceiverName => static fn () => $receiver,
+            ]),
+            new MessageBus(),
             new EventDispatcher()
         );
         $tester = new CommandCompletionTester($command);
@@ -180,14 +168,10 @@ EOF;
             Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('78c2da843723')]),
         ]);
 
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('has')->with($globalFailureReceiverName)->willReturn(true);
-        $serviceLocator->expects($this->any())->method('get')->with($globalFailureReceiverName)->willReturn($receiver);
-
         $command = new FailedMessagesRetryCommand(
             $globalFailureReceiverName,
-            $serviceLocator,
-            $this->createMock(MessageBusInterface::class),
+            new ServiceLocator([$globalFailureReceiverName => static fn () => $receiver]),
+            new MessageBus(),
             new EventDispatcher()
         );
         $tester = new CommandCompletionTester($command);
@@ -208,14 +192,10 @@ EOF;
             Envelope::wrap(new \stdClass(), [new TransportMessageIdStamp('78c2da843723')]),
         ]);
 
-        $serviceLocator = $this->createMock(ServiceLocator::class);
-        $serviceLocator->expects($this->once())->method('has')->with($anotherFailureReceiverName)->willReturn(true);
-        $serviceLocator->expects($this->any())->method('get')->with($anotherFailureReceiverName)->willReturn($receiver);
-
         $command = new FailedMessagesRetryCommand(
             $globalFailureReceiverName,
-            $serviceLocator,
-            $this->createMock(MessageBusInterface::class),
+            new ServiceLocator([$anotherFailureReceiverName => static fn () => $receiver]),
+            new MessageBus(),
             new EventDispatcher()
         );
         $tester = new CommandCompletionTester($command);
@@ -225,19 +205,113 @@ EOF;
         $this->assertSame(['2ab50dfa1fbf', '78c2da843723'], $suggestions);
     }
 
+    public function testSuccessMessageGoesToStdout()
+    {
+        $envelope = new Envelope(new \stdClass(), [new TransportMessageIdStamp('some_id')]);
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('find')->with('some_id')->willReturn($envelope);
+
+        $command = new FailedMessagesRetryCommand(
+            'failure_receiver',
+            new ServiceLocator(['failure_receiver' => static fn () => $receiver]),
+            new MessageBus(),
+            new EventDispatcher()
+        );
+
+        $tester = new CommandTester($command);
+        $tester->setInputs(['retry']);
+        $tester->execute(['id' => ['some_id']], ['capture_stderr_separately' => true]);
+
+        $stdout = $tester->getDisplay();
+        $stderr = $tester->getErrorOutput();
+
+        $this->assertStringContainsString('All done!', $stdout);
+        $this->assertStringNotContainsString('All done!', $stderr);
+    }
+
+    public function testCommentsGoToStderr()
+    {
+        $envelope = new Envelope(new \stdClass(), [new TransportMessageIdStamp('some_id')]);
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('find')->with('some_id')->willReturn($envelope);
+
+        $command = new FailedMessagesRetryCommand(
+            'failure_receiver',
+            new ServiceLocator(['failure_receiver' => static fn () => $receiver]),
+            new MessageBus(),
+            new EventDispatcher()
+        );
+
+        $tester = new CommandTester($command);
+        $tester->setInputs(['retry']);
+        $tester->execute(['id' => ['some_id']], ['capture_stderr_separately' => true]);
+
+        $stdout = $tester->getDisplay();
+        $stderr = $tester->getErrorOutput();
+
+        $this->assertStringContainsString('Quit this command with CONTROL-C', $stderr);
+        $this->assertStringNotContainsString('Quit this command with CONTROL-C', $stdout);
+    }
+
+    public function testPendingMessageCountGoesToStdout()
+    {
+        $receiver = new class implements ListableReceiverInterface, MessageCountAwareInterface {
+            public function get(): iterable
+            {
+                return [];
+            }
+
+            public function ack(Envelope $envelope): void
+            {
+            }
+
+            public function reject(Envelope $envelope): void
+            {
+            }
+
+            public function find(mixed $id): ?Envelope
+            {
+                return null;
+            }
+
+            public function all(?int $limit = null): iterable
+            {
+                return [];
+            }
+
+            public function getMessageCount(): int
+            {
+                return 5;
+            }
+        };
+
+        $command = new FailedMessagesRetryCommand(
+            'failure_receiver',
+            new ServiceLocator(['failure_receiver' => static fn () => $receiver]),
+            new MessageBus(),
+            new EventDispatcher()
+        );
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--force' => true], ['capture_stderr_separately' => true]);
+
+        $stdout = $tester->getDisplay();
+        $stderr = $tester->getErrorOutput();
+
+        $this->assertStringContainsString('There are', $stdout);
+        $this->assertStringContainsString('5', $stdout);
+        $this->assertStringContainsString('messages pending', $stdout);
+        $this->assertStringNotContainsString('messages pending', $stderr);
+    }
+
     public function testSkipRunWithServiceLocator()
     {
         $failureTransportName = 'failure_receiver';
         $originalTransportName = 'original_receiver';
 
-        $serviceLocator = $this->createMock(ServiceLocator::class);
         $receiver = $this->createMock(ListableReceiverInterface::class);
 
         $dispatcher = new EventDispatcher();
-        $bus = $this->createMock(MessageBusInterface::class);
-
-        $serviceLocator->method('has')->willReturn(true);
-        $serviceLocator->method('get')->with($failureTransportName)->willReturn($receiver);
 
         $receiver->expects($this->once())->method('find')
             ->willReturn(Envelope::wrap(new \stdClass(), [
@@ -249,8 +323,8 @@ EOF;
 
         $command = new FailedMessagesRetryCommand(
             $failureTransportName,
-            $serviceLocator,
-            $bus,
+            new ServiceLocator([$failureTransportName => static fn () => $receiver]),
+            new MessageBus(),
             $dispatcher
         );
 

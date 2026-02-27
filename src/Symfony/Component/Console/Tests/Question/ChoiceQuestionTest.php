@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Console\Tests\Question;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
 class ChoiceQuestionTest extends TestCase
 {
-    /**
-     * @dataProvider selectUseCases
-     */
+    #[DataProvider('selectUseCases')]
     public function testSelectUseCases($multiSelect, $answers, $expected, $message, $default = null)
     {
         $question = new ChoiceQuestion('A question', [
@@ -104,9 +103,7 @@ class ChoiceQuestionTest extends TestCase
         $this->assertSame(['First response ', ' Second response'], $question->getValidator()('First response , Second response'));
     }
 
-    /**
-     * @dataProvider selectAssociativeChoicesProvider
-     */
+    #[DataProvider('selectAssociativeChoicesProvider')]
     public function testSelectAssociativeChoices($providedAnswer, $expectedValue)
     {
         $question = new ChoiceQuestion('A question', [

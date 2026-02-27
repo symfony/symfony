@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\BarMessage;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyCommand;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummySchedule;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyTask;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\FooMessage;
@@ -86,6 +87,29 @@ class SchedulerTest extends AbstractWebTestCase
         $this->assertSame([['4']], $calls['method4']);
         $this->assertSame([['9'], ['9b'], ['named' => '9']], $calls['method5']);
         $this->assertSame([['5', 6], ['7', 8]], $calls['attributesOnMethod']);
+    }
+
+    public function testAutoconfiguredSchedulerCommand()
+    {
+        $container = self::getContainer();
+        $container->set('clock', $clock = new MockClock('2023-10-26T08:59:59Z'));
+
+        $this->assertTrue($container->get('receivers')->has('scheduler_dummy_command'));
+        $this->assertInstanceOf(SchedulerTransport::class, $cron = $container->get('receivers')->get('scheduler_dummy_command'));
+        $bus = $container->get(MessageBusInterface::class);
+
+        $getCalls = static function (float $sleep) use ($clock, $cron, $bus) {
+            DummyCommand::$calls = [];
+            $clock->sleep($sleep);
+            foreach ($cron->get() as $message) {
+                $bus->dispatch($message->with(new ReceivedStamp('scheduler_dummy_command')));
+            }
+
+            return DummyCommand::$calls;
+        };
+
+        $this->assertSame([], $getCalls(0));
+        $this->assertSame(['execute' => [0 => null, 1 => 'test']], $getCalls(1));
     }
 
     public function testSchedulerWithCustomTransport()

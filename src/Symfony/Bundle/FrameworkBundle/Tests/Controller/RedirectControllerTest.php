@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\RedirectController;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -60,9 +61,7 @@ class RedirectControllerTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testRoute($permanent, $keepRequestMethod, $keepQueryParams, $ignoreAttributes, $expectedCode, $expectedAttributes)
     {
         $request = new Request();
@@ -255,9 +254,7 @@ class RedirectControllerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider urlRedirectProvider
-     */
+    #[DataProvider('urlRedirectProvider')]
     public function testUrlRedirect($scheme, $httpPort, $httpsPort, $requestScheme, $requestPort, $expectedPort)
     {
         $host = 'www.example.com';
@@ -287,9 +284,7 @@ class RedirectControllerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider pathQueryParamsProvider
-     */
+    #[DataProvider('pathQueryParamsProvider')]
     public function testPathQueryParams($expectedUrl, $path, $queryString)
     {
         $scheme = 'http';

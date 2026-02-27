@@ -1078,6 +1078,10 @@ return [
             'EC$',
             'Doğu Karayip doları',
         ],
+        'XCG' => [
+            'Cg.',
+            'Karayip guldeni',
+        ],
         'XEU' => [
             'XEU',
             'Avrupa Para Birimi',
@@ -1153,6 +1157,10 @@ return [
         'ZWD' => [
             'ZWD',
             'Zimbabve Doları',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'Zimbabve altını',
         ],
         'ZWL' => [
             'ZWL',

@@ -40,9 +40,9 @@ abstract class AbstractConnection implements ConnectionInterface
             'options' => [],
         ]);
 
-        $resolver->setDefault('port', fn (Options $options) => 'ssl' === $options['encryption'] ? 636 : 389);
+        $resolver->setDefault('port', static fn (Options $options) => 'ssl' === $options['encryption'] ? 636 : 389);
 
-        $resolver->setDefault('connection_string', fn (Options $options) => \sprintf('ldap%s://%s:%s', 'ssl' === $options['encryption'] ? 's' : '', $options['host'], $options['port']));
+        $resolver->setDefault('connection_string', static fn (Options $options) => \sprintf('ldap%s://%s:%s', 'ssl' === $options['encryption'] ? 's' : '', $options['host'], $options['port']));
 
         $resolver->setAllowedTypes('host', 'string');
         $resolver->setAllowedTypes('port', 'numeric');

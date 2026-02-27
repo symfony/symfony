@@ -658,6 +658,10 @@ return [
             'EC$',
             'Dolyar ng Silangang Caribbean',
         ],
+        'XCG' => [
+            'Cg.',
+            'Caribbean guilder',
+        ],
         'XOF' => [
             'F CFA',
             'CFA Franc ng Kanlurang Africa',
@@ -681,6 +685,10 @@ return [
         'ZMW' => [
             'ZMW',
             'Zambian Kwacha',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'Zimbabwean Gold',
         ],
     ],
 ];

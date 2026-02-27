@@ -66,6 +66,7 @@ class PassConfig
             new AutowireRequiredPropertiesPass(),
             new ResolveBindingsPass(),
             new ServiceLocatorTagPass(),
+            new TagDecoratorPass(),
             new DecoratorServicePass(),
             new CheckDefinitionValidityPass(),
             new AutowirePass(false),
@@ -99,7 +100,8 @@ class PassConfig
                 new AliasDeprecatedPublicServicesPass(),
             ],
             // Let build parameters be available as late as possible
-            -2048 => [new RemoveBuildParametersPass()],
+            // Don't remove array parameters since ResolveParameterPlaceHoldersPass doesn't resolve them
+            -2048 => [new RemoveBuildParametersPass(true)],
         ];
     }
 

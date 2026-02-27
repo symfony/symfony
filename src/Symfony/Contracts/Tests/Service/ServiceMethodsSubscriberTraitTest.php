@@ -11,6 +11,7 @@
 
 namespace Symfony\Contracts\Tests\Service;
 
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -18,6 +19,10 @@ use Symfony\Contracts\Service\Attribute\SubscribedService;
 use Symfony\Contracts\Service\ServiceLocatorTrait;
 use Symfony\Contracts\Service\ServiceMethodsSubscriberTrait;
 use Symfony\Contracts\Service\ServiceSubscriberInterface;
+use Symfony\Contracts\Tests\Service\Fixtures\HookedPropertyService;
+use Symfony\Contracts\Tests\Service\Fixtures\MyDependency;
+use Symfony\Contracts\Tests\Service\Fixtures\NonHookedPropertyService;
+use Symfony\Contracts\Tests\Service\Fixtures\WriteOnlyPropertyService;
 
 class ServiceMethodsSubscriberTraitTest extends TestCase
 {
@@ -31,6 +36,42 @@ class ServiceMethodsSubscriberTraitTest extends TestCase
         ];
 
         $this->assertEquals($expected, ChildTestService::getSubscribedServices());
+    }
+
+    #[RequiresPhp('>= 8.4')]
+    public function testHookedProperties()
+    {
+        $this->assertSame([
+            HookedPropertyService::class.'::$myDependency::get' => MyDependency::class,
+            HookedPropertyService::class.'::$myNullableDependency::get' => '?'.MyDependency::class,
+            HookedPropertyService::class.'::$myTentativeDependency::get' => '?'.MyDependency::class,
+            HookedPropertyService::class.'::$myCachedDependency::get' => MyDependency::class,
+            'my_key' => MyDependency::class,
+        ], HookedPropertyService::getSubscribedServices());
+
+        $container = new class([HookedPropertyService::class.'::$myDependency::get' => static fn () => new MyDependency()]) implements ContainerInterface {
+            use ServiceLocatorTrait;
+        };
+
+        $service = new HookedPropertyService();
+        $service->setContainer($container);
+
+        $this->assertInstanceOf(MyDependency::class, $service->myDependency);
+    }
+
+    public function testPropertyHookRequired()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot use "Symfony\Contracts\Service\Attribute\SubscribedService" on property "Symfony\Contracts\Tests\Service\Fixtures\NonHookedPropertyService::$myDependency" (can only be used on properties with a get hook).');
+        NonHookedPropertyService::getSubscribedServices();
+    }
+
+    #[RequiresPhp('>= 8.4')]
+    public function testPropertyWithGetHookRequired()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot use "Symfony\Contracts\Service\Attribute\SubscribedService" on property "Symfony\Contracts\Tests\Service\Fixtures\WriteOnlyPropertyService::$myDependency" (can only be used on properties with a get hook).');
+        WriteOnlyPropertyService::getSubscribedServices();
     }
 
     public function testSetContainerIsCalledOnParent()

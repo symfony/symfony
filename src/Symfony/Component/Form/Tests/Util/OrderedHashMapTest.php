@@ -524,4 +524,36 @@ class OrderedHashMapTest extends TestCase
 
         $this->assertCount(2, $map);
     }
+
+    public function testAppendDoesNotOverwriteExistingNumericKeysWhenStringKeysExist()
+    {
+        $map = new OrderedHashMap();
+        $map[0] = 'zero';
+        $map[1] = 'one';
+        $map['foo'] = 'bar';
+        $map[] = 'new';
+
+        $this->assertSame('one', $map[1]);
+        $this->assertSame('new', $map[2]);
+    }
+
+    public function testUpdateNullValueDoesNotChangeElementPosition()
+    {
+        $map = new OrderedHashMap();
+        $map['first'] = null;
+        $map['second'] = 2;
+        $map['first'] = null;
+
+        $this->assertSame(['first' => null, 'second' => 2], iterator_to_array($map));
+    }
+
+    public function testUpdateFromNullValueDoesNotChangeElementPosition()
+    {
+        $map = new OrderedHashMap();
+        $map['first'] = null;
+        $map['second'] = 2;
+        $map['first'] = 1;
+
+        $this->assertSame(['first' => 1, 'second' => 2], iterator_to_array($map));
+    }
 }

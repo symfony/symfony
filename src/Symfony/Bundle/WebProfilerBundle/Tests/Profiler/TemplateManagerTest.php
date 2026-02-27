@@ -13,6 +13,9 @@ namespace Symfony\Bundle\WebProfilerBundle\Tests\Profiler;
 
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 use Symfony\Bundle\WebProfilerBundle\Tests\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\DataCollector\DataCollector;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
@@ -30,7 +33,7 @@ class TemplateManagerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->profiler = $this->createMock(Profiler::class);
+        $this->profiler = $this->createStub(Profiler::class);
         $twigEnvironment = $this->mockTwigEnvironment();
         $templates = [
             'data_collector.foo' => ['foo', '@Foo/Collector/foo.html.twig'],
@@ -52,12 +55,14 @@ class TemplateManagerTest extends TestCase
      */
     public function testGetNameValidTemplate()
     {
-        $this->profiler->expects($this->any())
+        $this->profiler
             ->method('has')
-            ->withAnyParameters()
             ->willReturnCallback($this->profilerHasCallback(...));
 
-        $this->assertEquals('@Foo/Collector/foo.html.twig', $this->templateManager->getName(new ProfileDummy(), 'foo'));
+        $profile = new Profile('token');
+        $profile->addCollector(new DummyCollector('foo'));
+        $profile->addCollector(new DummyCollector('bar'));
+        $this->assertEquals('@Foo/Collector/foo.html.twig', $this->templateManager->getName($profile, 'foo'));
     }
 
     public function profilerHasCallback($panel)
@@ -80,33 +85,29 @@ class TemplateManagerTest extends TestCase
 
     protected function mockTwigEnvironment()
     {
-        $this->twigEnvironment = $this->createMock(Environment::class);
-
-        $loader = $this->createMock(LoaderInterface::class);
+        $loader = $this->createStub(LoaderInterface::class);
         $loader
-            ->expects($this->any())
             ->method('exists')
             ->willReturn(true);
 
-        $this->twigEnvironment->expects($this->any())->method('getLoader')->willReturn($loader);
+        $this->twigEnvironment = new Environment($loader);
 
         return $this->twigEnvironment;
     }
 }
 
-class ProfileDummy extends Profile
+class DummyCollector extends DataCollector
 {
-    public function __construct()
+    public function __construct(private string $name)
     {
-        parent::__construct('token');
     }
 
-    public function hasCollector(string $name): bool
+    public function getName(): string
     {
-        return match ($name) {
-            'foo',
-            'bar' => true,
-            default => false,
-        };
+        return $this->name;
+    }
+
+    public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
+    {
     }
 }

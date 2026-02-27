@@ -11,15 +11,16 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\PersistingStoreInterface;
 use Symfony\Component\Lock\Store\SemaphoreStore;
+use Symfony\Component\Lock\Test\AbstractStoreTestCase;
 
 /**
  * @author Jérémy Derussé <jeremy@derusse.com>
- *
- * @requires extension sysvsem
  */
+#[RequiresPhpExtension('sysvsem')]
 class SemaphoreStoreTest extends AbstractStoreTestCase
 {
     use BlockingStoreTestTrait;
@@ -41,6 +42,24 @@ class SemaphoreStoreTest extends AbstractStoreTestCase
 
         $store->delete($key);
         $this->assertEquals($initialCount, $this->getOpenedSemaphores(), 'All semaphores should be removed');
+    }
+
+    public function testProjectIdSeparatesLocks()
+    {
+        $keyName = __METHOD__;
+        $storeA = new SemaphoreStore('project-a');
+        $storeB = new SemaphoreStore('project-b');
+
+        $keyA = new Key($keyName);
+        $keyB = new Key($keyName);
+
+        $storeA->save($keyA);
+        $storeB->save($keyB);
+
+        $storeA->delete($keyA);
+        $storeB->delete($keyB);
+
+        $this->addToAssertionCount(1);
     }
 
     private function getOpenedSemaphores()

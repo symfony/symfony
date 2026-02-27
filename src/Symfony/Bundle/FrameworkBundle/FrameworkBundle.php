@@ -11,10 +11,13 @@
 
 namespace Symfony\Bundle\FrameworkBundle;
 
+use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddDebugLogProcessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConsoleArgumentValueResolverPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ErrorLoggerCompilerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\TestServiceContainerRealRefPass;
@@ -35,6 +38,8 @@ use Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
+use Symfony\Component\Console\DependencyInjection\RegisterCommandArgumentLocatorsPass;
+use Symfony\Component\Console\DependencyInjection\RemoveEmptyCommandArgumentLocatorsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\RegisterReverseContainerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -47,6 +52,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\DependencyInjection\ControllerArgumentValueResolverPass;
+use Symfony\Component\HttpKernel\DependencyInjection\ControllerAttributesListenerPass;
 use Symfony\Component\HttpKernel\DependencyInjection\FragmentRendererPass;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
@@ -57,12 +63,15 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\JsonStreamer\DependencyInjection\StreamablePass;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Mime\DependencyInjection\AddMimeTypeGuesserPass;
+use Symfony\Component\ObjectMapper\DependencyInjection\ReverseMappingPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoConstructorPass;
 use Symfony\Component\PropertyInfo\DependencyInjection\PropertyInfoPass;
 use Symfony\Component\Routing\DependencyInjection\AddExpressionLanguageProvidersPass;
+use Symfony\Component\Routing\DependencyInjection\RoutingControllerPass;
 use Symfony\Component\Routing\DependencyInjection\RoutingResolverPass;
 use Symfony\Component\Runtime\SymfonyRuntime;
 use Symfony\Component\Scheduler\DependencyInjection\AddScheduleMessengerPass;
+use Symfony\Component\Serializer\DependencyInjection\AttributeMetadataPass as SerializerAttributeMetadataPass;
 use Symfony\Component\Serializer\DependencyInjection\SerializerPass;
 use Symfony\Component\Translation\DependencyInjection\DataCollectorTranslatorPass;
 use Symfony\Component\Translation\DependencyInjection\LoggingTranslatorPass;
@@ -73,6 +82,7 @@ use Symfony\Component\Translation\DependencyInjection\TranslatorPathsPass;
 use Symfony\Component\Validator\DependencyInjection\AddAutoMappingConfigurationPass;
 use Symfony\Component\Validator\DependencyInjection\AddConstraintValidatorsPass;
 use Symfony\Component\Validator\DependencyInjection\AddValidatorInitializersPass;
+use Symfony\Component\Validator\DependencyInjection\AttributeMetadataPass;
 use Symfony\Component\VarExporter\Internal\Hydrator;
 use Symfony\Component\VarExporter\Internal\Registry;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowDebugPass;
@@ -102,8 +112,7 @@ class FrameworkBundle extends Bundle
         $_ENV['DOCTRINE_DEPRECATIONS'] = $_SERVER['DOCTRINE_DEPRECATIONS'] ??= 'trigger';
 
         if (class_exists(SymfonyRuntime::class)) {
-            $handler = set_error_handler('var_dump');
-            restore_error_handler();
+            $handler = get_error_handler();
         } else {
             $handler = [ErrorHandler::register(null, false)];
         }
@@ -114,6 +123,10 @@ class FrameworkBundle extends Bundle
 
         if ($this->container->getParameter('kernel.http_method_override')) {
             Request::enableHttpMethodParameterOverride();
+        }
+
+        if ($this->container->hasParameter('kernel.allowed_http_method_override')) {
+            Request::setAllowedHttpMethodOverride($this->container->getParameter('kernel.allowed_http_method_override'));
         }
 
         if ($this->container->hasParameter('kernel.trust_x_sendfile_type_header') && $this->container->getParameter('kernel.trust_x_sendfile_type_header')) {
@@ -141,18 +154,24 @@ class FrameworkBundle extends Bundle
             ]);
         }
 
-        $container->addCompilerPass(new AssetsContextPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION);
+        $container->addCompilerPass(new AssetsContextPass());
         $container->addCompilerPass(new LoggerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());
         $container->addCompilerPass(new RemoveEmptyControllerArgumentLocatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $this->addCompilerPassIfExists($container, RegisterCommandArgumentLocatorsPass::class);
+        $this->addCompilerPassIfExists($container, RemoveEmptyCommandArgumentLocatorsPass::class, PassConfig::TYPE_BEFORE_REMOVING);
+        $this->addCompilerPassIfExists($container, ConsoleArgumentValueResolverPass::class);
         $container->addCompilerPass(new RoutingResolverPass());
+        $this->addCompilerPassIfExists($container, RoutingControllerPass::class);
         $this->addCompilerPassIfExists($container, DataCollectorTranslatorPass::class);
         $container->addCompilerPass(new ProfilerPass());
         // must be registered before removing private services as some might be listeners/subscribers
         // but as late as possible to get resolved parameters
         $container->addCompilerPass($registerListenersPass, PassConfig::TYPE_BEFORE_REMOVING);
+        $this->addCompilerPassIfExists($container, ControllerAttributesListenerPass::class, PassConfig::TYPE_BEFORE_REMOVING);
         $this->addCompilerPassIfExists($container, AddConstraintValidatorsPass::class);
         $this->addCompilerPassIfExists($container, AddValidatorInitializersPass::class);
+        $this->addCompilerPassIfExists($container, AttributeMetadataPass::class);
         $this->addCompilerPassIfExists($container, AddConsoleCommandPass::class, PassConfig::TYPE_BEFORE_REMOVING);
         // must be registered before the AddConsoleCommandPass
         $container->addCompilerPass(new TranslationLintCommandPass(), PassConfig::TYPE_BEFORE_REMOVING, 10);
@@ -166,6 +185,7 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, TranslationDumperPass::class);
         $container->addCompilerPass(new FragmentRendererPass());
         $this->addCompilerPassIfExists($container, SerializerPass::class);
+        $this->addCompilerPassIfExists($container, SerializerAttributeMetadataPass::class);
         $this->addCompilerPassIfExists($container, PropertyInfoPass::class);
         $this->addCompilerPassIfExists($container, PropertyInfoConstructorPass::class);
         $container->addCompilerPass(new ControllerArgumentValueResolverPass());
@@ -192,14 +212,26 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new VirtualRequestStackPass());
         $container->addCompilerPass(new TranslationUpdateCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
         $this->addCompilerPassIfExists($container, StreamablePass::class);
+        $this->addCompilerPassIfExists($container, ReverseMappingPass::class);
 
         if ($container->getParameter('kernel.debug')) {
+            if ($container->hasParameter('.kernel.config_dir') && $container->hasParameter('.kernel.bundles_definition')) {
+                $container->addCompilerPass(new PhpConfigReferenceDumpPass($container->getParameter('.kernel.config_dir').'/reference.php', $container->getParameter('.kernel.bundles_definition')));
+            }
             $container->addCompilerPass(new AddDebugLogProcessorPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 2);
             $container->addCompilerPass(new UnusedTagsPass(), PassConfig::TYPE_AFTER_REMOVING);
             $container->addCompilerPass(new ContainerBuilderDebugDumpPass(), PassConfig::TYPE_BEFORE_REMOVING, -255);
             $container->addCompilerPass(new CacheCollectorPass(), PassConfig::TYPE_BEFORE_REMOVING);
             $this->addCompilerPassIfExists($container, WorkflowDebugPass::class);
         }
+    }
+
+    /**
+     * @internal
+     */
+    public static function considerProfilerEnabled(): bool
+    {
+        return !($GLOBALS['app'] ?? null) instanceof Application || empty($_GET) && \in_array('--profile', $_SERVER['argv'] ?? [], true);
     }
 
     private function addCompilerPassIfExists(ContainerBuilder $container, string $class, string $type = PassConfig::TYPE_BEFORE_OPTIMIZATION, int $priority = 0): void

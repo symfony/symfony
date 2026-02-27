@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Attribute;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
@@ -19,9 +20,7 @@ use Symfony\Component\ExpressionLanguage\Expression;
 
 class AutowireTest extends TestCase
 {
-    /**
-     * @dataProvider provideMultipleParameters
-     */
+    #[DataProvider('provideMultipleParameters')]
     public function testCanOnlySetOneParameter(array $parameters)
     {
         $this->expectException(LogicException::class);
@@ -81,5 +80,23 @@ class AutowireTest extends TestCase
         yield [['env' => 'ENV', 'param' => 'param']];
 
         yield [['value' => 'some-value', 'expression' => 'expr']];
+    }
+
+    #[DataProvider('provideMutuallyExclusiveOptions')]
+    public function testConstructThrowsOnMutuallyExclusiveOptions(array $parameters)
+    {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('#[Autowire] attribute must declare exactly one of $service, $expression, $env, $param or $value.');
+
+        new Autowire(...$parameters);
+    }
+
+    public static function provideMutuallyExclusiveOptions(): iterable
+    {
+        yield [[]];
+        yield [['value' => 'some-value', 'service' => 'id']];
+        yield [['value' => 'some-value', 'service' => 'id', 'expression' => 'expr']];
+        yield [['value' => 'some-value', 'service' => 'id', 'expression' => 'expr', 'env' => 'ENV']];
+        yield [['value' => 'some-value', 'service' => 'id', 'expression' => 'expr', 'env' => 'ENV', 'param' => 'param']];
     }
 }

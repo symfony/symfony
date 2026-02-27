@@ -108,7 +108,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
                 $callback = $wrap;
                 $beta = \INF === $beta ? \INF : 0;
             }
-            if ($adapter instanceof CacheInterface) {
+            if ($adapter instanceof CacheInterface && $i !== $this->adapterCount) {
                 $value = $adapter->get($key, $callback, $beta, $metadata);
             } else {
                 $value = $this->doGet($adapter, $key, $callback, $beta, $metadata);

@@ -24,7 +24,9 @@ use Symfony\Component\Routing\Loader\Configurator\RoutingConfigurator;
 
 class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
 {
-    use MicroKernelTrait;
+    use MicroKernelTrait {
+        getKernelParameters as public;
+    }
 
     private string $cacheDir;
 
@@ -55,12 +57,17 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
         return $this->cacheDir;
     }
 
-    public function __sleep(): array
+    public function getConfigDir(): string
+    {
+        return $this->getCacheDir().'/config';
+    }
+
+    public function __serialize(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -75,12 +82,7 @@ class ConcreteMicroKernel extends Kernel implements EventSubscriberInterface
     {
         $c->register('logger', NullLogger::class);
         $c->loadFromExtension('framework', [
-            'annotations' => false,
-            'http_method_override' => false,
-            'handle_all_throwables' => true,
-            'php_errors' => ['log' => true],
             'secret' => '$ecret',
-            'router' => ['utf8' => true],
         ]);
 
         $c->setParameter('halloween', 'Have a great day!');

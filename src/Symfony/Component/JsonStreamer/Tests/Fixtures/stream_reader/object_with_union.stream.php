@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @return Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties
+ */
 return static function (mixed $stream, \Psr\Container\ContainerInterface $valueTransformers, \Symfony\Component\JsonStreamer\Read\LazyInstantiator $instantiator, array $options): mixed {
     $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties'] = static function ($stream, $offset, $length) use ($options, $valueTransformers, $instantiator, &$providers) {
         $data = \Symfony\Component\JsonStreamer\Read\Splitter::splitDict($stream, $offset, $length);
@@ -18,7 +21,7 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $valueT
     $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null|string'] = static function ($stream, $offset, $length) use ($options, $valueTransformers, $instantiator, &$providers) {
         $data = \Symfony\Component\JsonStreamer\Read\Decoder::decodeStream($stream, $offset, $length);
         if (\is_int($data)) {
-            return $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum']($data);
+            return $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum']($stream, $offset, $length);
         }
         if (null === $data) {
             return null;
@@ -26,7 +29,7 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $valueT
         if (\is_string($data)) {
             return $data;
         }
-        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null|string".', \get_debug_type($data)));
+        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null|string'));
     };
     return $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithUnionProperties']($stream, 0, null);
 };

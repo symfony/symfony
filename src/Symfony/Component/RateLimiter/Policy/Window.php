@@ -77,7 +77,9 @@ final class Window implements LimiterStateInterface
             return 0;
         }
 
-        return (int) ceil($this->timer + $this->intervalInSeconds - $now);
+        $inWindow = (int) ceil(($this->hitCount + $tokens) / $this->maxSize) - 1;
+
+        return (int) ceil($this->timer + ($this->intervalInSeconds * $inWindow) - $now);
     }
 
     public function __serialize(): array

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Retry;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Retry\MultiplierRetryStrategy;
@@ -49,9 +50,7 @@ class MultiplierRetryStrategyTest extends TestCase
         $this->assertTrue($strategy->isRetryable($envelope));
     }
 
-    /**
-     * @dataProvider getWaitTimeTests
-     */
+    #[DataProvider('getWaitTimeTests')]
     public function testGetWaitTime(int $delay, float $multiplier, int $maxDelay, int $previousRetries, int $expectedDelay)
     {
         $strategy = new MultiplierRetryStrategy(10, $delay, $multiplier, $maxDelay, 0);
@@ -98,9 +97,7 @@ class MultiplierRetryStrategyTest extends TestCase
         yield [1000, 1.5555, 5000, 2, 2420];
     }
 
-    /**
-     * @dataProvider getJitterTest
-     */
+    #[DataProvider('getJitterTest')]
     public function testJitter(float $jitter, int $maxMin, int $maxMax)
     {
         $strategy = new MultiplierRetryStrategy(3, 1000, 1, 0, $jitter);

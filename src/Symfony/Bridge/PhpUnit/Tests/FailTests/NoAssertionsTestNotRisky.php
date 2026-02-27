@@ -11,15 +11,15 @@
 
 namespace Symfony\Bridge\PhpUnit\Tests\FailTests;
 
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
 /**
  * This class is deliberately suffixed with *TestRisky.php so that it is ignored
  * by PHPUnit. This test is designed to fail. See ../expectnotrisky.phpt.
- *
- * @requires PHPUnit < 10
  */
+#[RequiresPhpunit('<10')]
 final class NoAssertionsTestNotRisky extends TestCase
 {
     use ExpectDeprecationTrait;

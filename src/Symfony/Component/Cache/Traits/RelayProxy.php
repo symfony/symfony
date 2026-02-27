@@ -11,13 +11,7 @@
 
 namespace Symfony\Component\Cache\Traits;
 
-use Symfony\Component\Cache\Traits\Relay\CopyTrait;
-use Symfony\Component\Cache\Traits\Relay\GeosearchTrait;
-use Symfony\Component\Cache\Traits\Relay\GetrangeTrait;
-use Symfony\Component\Cache\Traits\Relay\HsetTrait;
-use Symfony\Component\Cache\Traits\Relay\MoveTrait;
-use Symfony\Component\Cache\Traits\Relay\NullableReturnTrait;
-use Symfony\Component\Cache\Traits\Relay\PfcountTrait;
+use Symfony\Component\Cache\Traits\Relay\Relay20Trait;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -31,151 +25,14 @@ class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectState::class);
  */
 class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInterface
 {
-    use CopyTrait;
-    use GeosearchTrait;
-    use GetrangeTrait;
-    use HsetTrait;
-    use MoveTrait;
-    use NullableReturnTrait;
-    use PfcountTrait;
     use RedisProxyTrait {
         resetLazyObject as reset;
     }
-    use RelayProxyTrait;
+    use Relay20Trait;
 
     public function __construct($host = null, $port = 6379, $connect_timeout = 0.0, $command_timeout = 0.0, #[\SensitiveParameter] $context = [], $database = 0)
     {
         $this->initializeLazyObject()->__construct(...\func_get_args());
-    }
-
-    public function connect($host, $port = 6379, $timeout = 0.0, $persistent_id = null, $retry_interval = 0, $read_timeout = 0.0, #[\SensitiveParameter] $context = [], $database = 0): bool
-    {
-        return $this->initializeLazyObject()->connect(...\func_get_args());
-    }
-
-    public function pconnect($host, $port = 6379, $timeout = 0.0, $persistent_id = null, $retry_interval = 0, $read_timeout = 0.0, #[\SensitiveParameter] $context = [], $database = 0): bool
-    {
-        return $this->initializeLazyObject()->pconnect(...\func_get_args());
-    }
-
-    public function close(): bool
-    {
-        return $this->initializeLazyObject()->close(...\func_get_args());
-    }
-
-    public function pclose(): bool
-    {
-        return $this->initializeLazyObject()->pclose(...\func_get_args());
-    }
-
-    public function listen($callback): bool
-    {
-        return $this->initializeLazyObject()->listen(...\func_get_args());
-    }
-
-    public function onFlushed($callback): bool
-    {
-        return $this->initializeLazyObject()->onFlushed(...\func_get_args());
-    }
-
-    public function onInvalidated($callback, $pattern = null): bool
-    {
-        return $this->initializeLazyObject()->onInvalidated(...\func_get_args());
-    }
-
-    public function dispatchEvents(): false|int
-    {
-        return $this->initializeLazyObject()->dispatchEvents(...\func_get_args());
-    }
-
-    public function getOption($option): mixed
-    {
-        return $this->initializeLazyObject()->getOption(...\func_get_args());
-    }
-
-    public function option($option, $value = null): mixed
-    {
-        return $this->initializeLazyObject()->option(...\func_get_args());
-    }
-
-    public function setOption($option, $value): bool
-    {
-        return $this->initializeLazyObject()->setOption(...\func_get_args());
-    }
-
-    public function addIgnorePatterns(...$pattern): int
-    {
-        return $this->initializeLazyObject()->addIgnorePatterns(...\func_get_args());
-    }
-
-    public function addAllowPatterns(...$pattern): int
-    {
-        return $this->initializeLazyObject()->addAllowPatterns(...\func_get_args());
-    }
-
-    public function getTimeout(): false|float
-    {
-        return $this->initializeLazyObject()->getTimeout(...\func_get_args());
-    }
-
-    public function timeout(): false|float
-    {
-        return $this->initializeLazyObject()->timeout(...\func_get_args());
-    }
-
-    public function getReadTimeout(): false|float
-    {
-        return $this->initializeLazyObject()->getReadTimeout(...\func_get_args());
-    }
-
-    public function readTimeout(): false|float
-    {
-        return $this->initializeLazyObject()->readTimeout(...\func_get_args());
-    }
-
-    public function getBytes(): array
-    {
-        return $this->initializeLazyObject()->getBytes(...\func_get_args());
-    }
-
-    public function bytes(): array
-    {
-        return $this->initializeLazyObject()->bytes(...\func_get_args());
-    }
-
-    public function getHost(): false|string
-    {
-        return $this->initializeLazyObject()->getHost(...\func_get_args());
-    }
-
-    public function isConnected(): bool
-    {
-        return $this->initializeLazyObject()->isConnected(...\func_get_args());
-    }
-
-    public function getPort(): false|int
-    {
-        return $this->initializeLazyObject()->getPort(...\func_get_args());
-    }
-
-    public function getAuth(): mixed
-    {
-        return $this->initializeLazyObject()->getAuth(...\func_get_args());
-    }
-
-    public function getDbNum(): mixed
-    {
-        return $this->initializeLazyObject()->getDbNum(...\func_get_args());
-    }
-
-    public function _serialize($value): mixed
-    {
-        return $this->initializeLazyObject()->_serialize(...\func_get_args());
-    }
-
-    public function _unserialize($value): mixed
-    {
-        return $this->initializeLazyObject()->_unserialize(...\func_get_args());
     }
 
     public function _compress($value): string
@@ -183,9 +40,9 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->_compress(...\func_get_args());
     }
 
-    public function _uncompress($value): string
+    public function _getKeys()
     {
-        return $this->initializeLazyObject()->_uncompress(...\func_get_args());
+        return $this->initializeLazyObject()->_getKeys(...\func_get_args());
     }
 
     public function _pack($value): string
@@ -193,49 +50,49 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->_pack(...\func_get_args());
     }
 
-    public function _unpack($value): mixed
-    {
-        return $this->initializeLazyObject()->_unpack(...\func_get_args());
-    }
-
     public function _prefix($value): string
     {
         return $this->initializeLazyObject()->_prefix(...\func_get_args());
     }
 
-    public function getLastError(): ?string
+    public function _serialize($value): mixed
     {
-        return $this->initializeLazyObject()->getLastError(...\func_get_args());
+        return $this->initializeLazyObject()->_serialize(...\func_get_args());
     }
 
-    public function clearLastError(): bool
+    public function _uncompress($value): string
     {
-        return $this->initializeLazyObject()->clearLastError(...\func_get_args());
+        return $this->initializeLazyObject()->_uncompress(...\func_get_args());
     }
 
-    public function endpointId(): false|string
+    public function _unpack($value): mixed
     {
-        return $this->initializeLazyObject()->endpointId(...\func_get_args());
+        return $this->initializeLazyObject()->_unpack(...\func_get_args());
     }
 
-    public function getPersistentID(): false|string
+    public function _unserialize($value): mixed
     {
-        return $this->initializeLazyObject()->getPersistentID(...\func_get_args());
+        return $this->initializeLazyObject()->_unserialize(...\func_get_args());
     }
 
-    public function socketId(): false|string
+    public function acl($cmd, ...$args): mixed
     {
-        return $this->initializeLazyObject()->socketId(...\func_get_args());
+        return $this->initializeLazyObject()->acl(...\func_get_args());
     }
 
-    public function rawCommand($cmd, ...$args): mixed
+    public function addAllowPatterns(...$pattern): int
     {
-        return $this->initializeLazyObject()->rawCommand(...\func_get_args());
+        return $this->initializeLazyObject()->addAllowPatterns(...\func_get_args());
     }
 
-    public function select($db): \Relay\Relay|bool
+    public function addIgnorePatterns(...$pattern): int
     {
-        return $this->initializeLazyObject()->select(...\func_get_args());
+        return $this->initializeLazyObject()->addIgnorePatterns(...\func_get_args());
+    }
+
+    public function append($key, $value): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->append(...\func_get_args());
     }
 
     public function auth(#[\SensitiveParameter] $auth): bool
@@ -243,34 +100,154 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->auth(...\func_get_args());
     }
 
-    public function info(...$sections): \Relay\Relay|array|false
+    public function bgrewriteaof(): \Relay\Relay|bool
     {
-        return $this->initializeLazyObject()->info(...\func_get_args());
+        return $this->initializeLazyObject()->bgrewriteaof(...\func_get_args());
     }
 
-    public function flushdb($sync = null): \Relay\Relay|bool
+    public function bgsave($arg = null): \Relay\Relay|bool
     {
-        return $this->initializeLazyObject()->flushdb(...\func_get_args());
+        return $this->initializeLazyObject()->bgsave(...\func_get_args());
     }
 
-    public function flushall($sync = null): \Relay\Relay|bool
+    public function bitcount($key, $start = 0, $end = -1, $by_bit = false): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->flushall(...\func_get_args());
+        return $this->initializeLazyObject()->bitcount(...\func_get_args());
     }
 
-    public function fcall($name, $keys = [], $argv = [], $handler = null): mixed
+    public function bitfield($key, ...$args): \Relay\Relay|array|false
     {
-        return $this->initializeLazyObject()->fcall(...\func_get_args());
+        return $this->initializeLazyObject()->bitfield(...\func_get_args());
     }
 
-    public function fcall_ro($name, $keys = [], $argv = [], $handler = null): mixed
+    public function bitop($operation, $dstkey, $srckey, ...$other_keys): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->fcall_ro(...\func_get_args());
+        return $this->initializeLazyObject()->bitop(...\func_get_args());
     }
 
-    public function function($op, ...$args): mixed
+    public function bitpos($key, $bit, $start = null, $end = null, $bybit = false): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->function(...\func_get_args());
+        return $this->initializeLazyObject()->bitpos(...\func_get_args());
+    }
+
+    public function blmove($srckey, $dstkey, $srcpos, $dstpos, $timeout): mixed
+    {
+        return $this->initializeLazyObject()->blmove(...\func_get_args());
+    }
+
+    public function blmpop($timeout, $keys, $from, $count = 1): \Relay\Relay|array|false|null
+    {
+        return $this->initializeLazyObject()->blmpop(...\func_get_args());
+    }
+
+    public function blpop($key, $timeout_or_key, ...$extra_args): \Relay\Relay|array|false|null
+    {
+        return $this->initializeLazyObject()->blpop(...\func_get_args());
+    }
+
+    public function brpop($key, $timeout_or_key, ...$extra_args): \Relay\Relay|array|false|null
+    {
+        return $this->initializeLazyObject()->brpop(...\func_get_args());
+    }
+
+    public function brpoplpush($source, $dest, $timeout): mixed
+    {
+        return $this->initializeLazyObject()->brpoplpush(...\func_get_args());
+    }
+
+    public function bytes(): array
+    {
+        return $this->initializeLazyObject()->bytes(...\func_get_args());
+    }
+
+    public function bzmpop($timeout, $keys, $from, $count = 1): \Relay\Relay|array|false|null
+    {
+        return $this->initializeLazyObject()->bzmpop(...\func_get_args());
+    }
+
+    public function bzpopmax($key, $timeout_or_key, ...$extra_args): \Relay\Relay|array|false|null
+    {
+        return $this->initializeLazyObject()->bzpopmax(...\func_get_args());
+    }
+
+    public function bzpopmin($key, $timeout_or_key, ...$extra_args): \Relay\Relay|array|false|null
+    {
+        return $this->initializeLazyObject()->bzpopmin(...\func_get_args());
+    }
+
+    public function clearBytes(): void
+    {
+        $this->initializeLazyObject()->clearBytes(...\func_get_args());
+    }
+
+    public function clearLastError(): bool
+    {
+        return $this->initializeLazyObject()->clearLastError(...\func_get_args());
+    }
+
+    public function client($operation, ...$args): mixed
+    {
+        return $this->initializeLazyObject()->client(...\func_get_args());
+    }
+
+    public function close(): bool
+    {
+        return $this->initializeLazyObject()->close(...\func_get_args());
+    }
+
+    public function cmsIncrBy($key, $field, $value, ...$fields_and_falues): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->cmsIncrBy(...\func_get_args());
+    }
+
+    public function cmsInfo($key): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->cmsInfo(...\func_get_args());
+    }
+
+    public function cmsInitByDim($key, $width, $depth): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->cmsInitByDim(...\func_get_args());
+    }
+
+    public function cmsInitByProb($key, $error, $probability): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->cmsInitByProb(...\func_get_args());
+    }
+
+    public function cmsMerge($dstkey, $keys, $weights = []): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->cmsMerge(...\func_get_args());
+    }
+
+    public function cmsQuery($key, ...$fields): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->cmsQuery(...\func_get_args());
+    }
+
+    public function command(...$args): \Relay\Relay|array|false|int
+    {
+        return $this->initializeLazyObject()->command(...\func_get_args());
+    }
+
+    public function commandlog($subcmd, ...$args): \Relay\Relay|array|bool|int
+    {
+        return $this->initializeLazyObject()->commandlog(...\func_get_args());
+    }
+
+    public function config($operation, $key = null, $value = null): \Relay\Relay|array|bool
+    {
+        return $this->initializeLazyObject()->config(...\func_get_args());
+    }
+
+    public function connect($host, $port = 6379, $timeout = 0.0, $persistent_id = null, $retry_interval = 0, $read_timeout = 0.0, #[\SensitiveParameter] $context = [], $database = 0): bool
+    {
+        return $this->initializeLazyObject()->connect(...\func_get_args());
+    }
+
+    public function copy($src, $dst, $options = null): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->copy(...\func_get_args());
     }
 
     public function dbsize(): \Relay\Relay|false|int
@@ -278,24 +255,39 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->dbsize(...\func_get_args());
     }
 
-    public function replicaof($host = null, $port = 0): \Relay\Relay|bool
+    public function decr($key, $by = 1): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->replicaof(...\func_get_args());
+        return $this->initializeLazyObject()->decr(...\func_get_args());
     }
 
-    public function waitaof($numlocal, $numremote, $timeout): \Relay\Relay|array|false
+    public function decrby($key, $value): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->waitaof(...\func_get_args());
+        return $this->initializeLazyObject()->decrby(...\func_get_args());
     }
 
-    public function restore($key, $ttl, $value, $options = null): \Relay\Relay|bool
+    public function del(...$keys): \Relay\Relay|bool|int
     {
-        return $this->initializeLazyObject()->restore(...\func_get_args());
+        return $this->initializeLazyObject()->del(...\func_get_args());
     }
 
-    public function migrate($host, $port, $key, $dstdb, $timeout, $copy = false, $replace = false, #[\SensitiveParameter] $credentials = null): \Relay\Relay|bool
+    public function delifeq($key, $value): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->migrate(...\func_get_args());
+        return $this->initializeLazyObject()->delifeq(...\func_get_args());
+    }
+
+    public function discard(): bool
+    {
+        return $this->initializeLazyObject()->discard(...\func_get_args());
+    }
+
+    public function dispatchEvents(): false|int
+    {
+        return $this->initializeLazyObject()->dispatchEvents(...\func_get_args());
+    }
+
+    public function dump($key): \Relay\Relay|false|null|string
+    {
+        return $this->initializeLazyObject()->dump(...\func_get_args());
     }
 
     public function echo($arg): \Relay\Relay|bool|string
@@ -303,69 +295,9 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->echo(...\func_get_args());
     }
 
-    public function ping($arg = null): \Relay\Relay|bool|string
+    public function endpointId(): false|string
     {
-        return $this->initializeLazyObject()->ping(...\func_get_args());
-    }
-
-    public function idleTime(): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->idleTime(...\func_get_args());
-    }
-
-    public function randomkey(): \Relay\Relay|bool|null|string
-    {
-        return $this->initializeLazyObject()->randomkey(...\func_get_args());
-    }
-
-    public function time(): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->time(...\func_get_args());
-    }
-
-    public function bgrewriteaof(): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->bgrewriteaof(...\func_get_args());
-    }
-
-    public function lastsave(): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->lastsave(...\func_get_args());
-    }
-
-    public function lcs($key1, $key2, $options = null): mixed
-    {
-        return $this->initializeLazyObject()->lcs(...\func_get_args());
-    }
-
-    public function bgsave($schedule = false): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->bgsave(...\func_get_args());
-    }
-
-    public function save(): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->save(...\func_get_args());
-    }
-
-    public function role(): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->role(...\func_get_args());
-    }
-
-    public function ttl($key): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->ttl(...\func_get_args());
-    }
-
-    public function pttl($key): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->pttl(...\func_get_args());
-    }
-
-    public function exists(...$keys): \Relay\Relay|bool|int
-    {
-        return $this->initializeLazyObject()->exists(...\func_get_args());
+        return $this->initializeLazyObject()->endpointId(...\func_get_args());
     }
 
     public function eval($script, $args = [], $num_keys = 0): mixed
@@ -388,9 +320,159 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->evalsha_ro(...\func_get_args());
     }
 
-    public function client($operation, ...$args): mixed
+    public function exec(): \Relay\Relay|array|bool
     {
-        return $this->initializeLazyObject()->client(...\func_get_args());
+        return $this->initializeLazyObject()->exec(...\func_get_args());
+    }
+
+    public function exists(...$keys): \Relay\Relay|bool|int
+    {
+        return $this->initializeLazyObject()->exists(...\func_get_args());
+    }
+
+    public function expire($key, $seconds, $mode = null): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->expire(...\func_get_args());
+    }
+
+    public function expireat($key, $timestamp): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->expireat(...\func_get_args());
+    }
+
+    public function expiretime($key): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->expiretime(...\func_get_args());
+    }
+
+    public function fcall($name, $keys = [], $argv = [], $handler = null): mixed
+    {
+        return $this->initializeLazyObject()->fcall(...\func_get_args());
+    }
+
+    public function fcall_ro($name, $keys = [], $argv = [], $handler = null): mixed
+    {
+        return $this->initializeLazyObject()->fcall_ro(...\func_get_args());
+    }
+
+    public function flushall($sync = null): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->flushall(...\func_get_args());
+    }
+
+    public function flushdb($sync = null): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->flushdb(...\func_get_args());
+    }
+
+    public function ftAggregate($index, $query, $options = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->ftAggregate(...\func_get_args());
+    }
+
+    public function ftAliasAdd($index, $alias): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->ftAliasAdd(...\func_get_args());
+    }
+
+    public function ftAliasDel($alias): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->ftAliasDel(...\func_get_args());
+    }
+
+    public function ftAliasUpdate($index, $alias): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->ftAliasUpdate(...\func_get_args());
+    }
+
+    public function ftAlter($index, $schema, $skipinitialscan = false): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->ftAlter(...\func_get_args());
+    }
+
+    public function ftConfig($operation, $option, $value = null): \Relay\Relay|array|bool
+    {
+        return $this->initializeLazyObject()->ftConfig(...\func_get_args());
+    }
+
+    public function ftCreate($index, $schema, $options = null): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->ftCreate(...\func_get_args());
+    }
+
+    public function ftCursor($operation, $index, $cursor, $options = null): \Relay\Relay|array|bool
+    {
+        return $this->initializeLazyObject()->ftCursor(...\func_get_args());
+    }
+
+    public function ftDictAdd($dict, $term, ...$other_terms): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->ftDictAdd(...\func_get_args());
+    }
+
+    public function ftDictDel($dict, $term, ...$other_terms): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->ftDictDel(...\func_get_args());
+    }
+
+    public function ftDictDump($dict): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->ftDictDump(...\func_get_args());
+    }
+
+    public function ftDropIndex($index, $dd = false): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->ftDropIndex(...\func_get_args());
+    }
+
+    public function ftExplain($index, $query, $dialect = 0): \Relay\Relay|false|string
+    {
+        return $this->initializeLazyObject()->ftExplain(...\func_get_args());
+    }
+
+    public function ftExplainCli($index, $query, $dialect = 0): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->ftExplainCli(...\func_get_args());
+    }
+
+    public function ftInfo($index): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->ftInfo(...\func_get_args());
+    }
+
+    public function ftProfile($index, $command, $query, $limited = false): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->ftProfile(...\func_get_args());
+    }
+
+    public function ftSearch($index, $query, $options = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->ftSearch(...\func_get_args());
+    }
+
+    public function ftSpellCheck($index, $query, $options = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->ftSpellCheck(...\func_get_args());
+    }
+
+    public function ftSynDump($index): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->ftSynDump(...\func_get_args());
+    }
+
+    public function ftSynUpdate($index, $synonym, $term_or_terms, $skipinitialscan = false): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->ftSynUpdate(...\func_get_args());
+    }
+
+    public function ftTagVals($index, $tag): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->ftTagVals(...\func_get_args());
+    }
+
+    public function function($op, ...$args): mixed
+    {
+        return $this->initializeLazyObject()->function(...\func_get_args());
     }
 
     public function geoadd($key, $lng, $lat, $member, ...$other_triples_and_options): \Relay\Relay|false|int
@@ -398,14 +480,29 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->geoadd(...\func_get_args());
     }
 
+    public function geodist($key, $src, $dst, $unit = null): \Relay\Relay|false|float|null
+    {
+        return $this->initializeLazyObject()->geodist(...\func_get_args());
+    }
+
     public function geohash($key, $member, ...$other_members): \Relay\Relay|array|false
     {
         return $this->initializeLazyObject()->geohash(...\func_get_args());
     }
 
+    public function geopos($key, ...$members): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->geopos(...\func_get_args());
+    }
+
     public function georadius($key, $lng, $lat, $radius, $unit, $options = []): mixed
     {
         return $this->initializeLazyObject()->georadius(...\func_get_args());
+    }
+
+    public function georadius_ro($key, $lng, $lat, $radius, $unit, $options = []): mixed
+    {
+        return $this->initializeLazyObject()->georadius_ro(...\func_get_args());
     }
 
     public function georadiusbymember($key, $member, $radius, $unit, $options = []): mixed
@@ -418,9 +515,9 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->georadiusbymember_ro(...\func_get_args());
     }
 
-    public function georadius_ro($key, $lng, $lat, $radius, $unit, $options = []): mixed
+    public function geosearch($key, $position, $shape, $unit, $options = []): \Relay\Relay|array|false
     {
-        return $this->initializeLazyObject()->georadius_ro(...\func_get_args());
+        return $this->initializeLazyObject()->geosearch(...\func_get_args());
     }
 
     public function geosearchstore($dst, $src, $position, $shape, $unit, $options = []): \Relay\Relay|false|int
@@ -433,14 +530,64 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->get(...\func_get_args());
     }
 
-    public function getset($key, $value): mixed
+    public function getAuth(): mixed
     {
-        return $this->initializeLazyObject()->getset(...\func_get_args());
+        return $this->initializeLazyObject()->getAuth(...\func_get_args());
     }
 
-    public function setrange($key, $start, $value): \Relay\Relay|false|int
+    public function getBytes(): array
     {
-        return $this->initializeLazyObject()->setrange(...\func_get_args());
+        return $this->initializeLazyObject()->getBytes(...\func_get_args());
+    }
+
+    public function getDbNum(): mixed
+    {
+        return $this->initializeLazyObject()->getDbNum(...\func_get_args());
+    }
+
+    public function getHost(): false|string
+    {
+        return $this->initializeLazyObject()->getHost(...\func_get_args());
+    }
+
+    public function getLastError(): ?string
+    {
+        return $this->initializeLazyObject()->getLastError(...\func_get_args());
+    }
+
+    public function getMode($masked = false): int
+    {
+        return $this->initializeLazyObject()->getMode(...\func_get_args());
+    }
+
+    public function getOption($option): mixed
+    {
+        return $this->initializeLazyObject()->getOption(...\func_get_args());
+    }
+
+    public function getPersistentID(): false|string
+    {
+        return $this->initializeLazyObject()->getPersistentID(...\func_get_args());
+    }
+
+    public function getPort(): false|int
+    {
+        return $this->initializeLazyObject()->getPort(...\func_get_args());
+    }
+
+    public function getReadTimeout(): false|float
+    {
+        return $this->initializeLazyObject()->getReadTimeout(...\func_get_args());
+    }
+
+    public function getTimeout(): false|float
+    {
+        return $this->initializeLazyObject()->getTimeout(...\func_get_args());
+    }
+
+    public function getWithMeta($key): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->getWithMeta(...\func_get_args());
     }
 
     public function getbit($key, $pos): \Relay\Relay|false|int
@@ -448,54 +595,9 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->getbit(...\func_get_args());
     }
 
-    public function bitcount($key, $start = 0, $end = -1, $by_bit = false): \Relay\Relay|false|int
+    public function getdel($key): mixed
     {
-        return $this->initializeLazyObject()->bitcount(...\func_get_args());
-    }
-
-    public function bitfield($key, ...$args): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->bitfield(...\func_get_args());
-    }
-
-    public function config($operation, $key = null, $value = null): \Relay\Relay|array|bool
-    {
-        return $this->initializeLazyObject()->config(...\func_get_args());
-    }
-
-    public function command(...$args): \Relay\Relay|array|false|int
-    {
-        return $this->initializeLazyObject()->command(...\func_get_args());
-    }
-
-    public function bitop($operation, $dstkey, $srckey, ...$other_keys): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->bitop(...\func_get_args());
-    }
-
-    public function bitpos($key, $bit, $start = null, $end = null, $bybit = false): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->bitpos(...\func_get_args());
-    }
-
-    public function setbit($key, $pos, $val): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->setbit(...\func_get_args());
-    }
-
-    public function acl($cmd, ...$args): mixed
-    {
-        return $this->initializeLazyObject()->acl(...\func_get_args());
-    }
-
-    public function append($key, $value): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->append(...\func_get_args());
-    }
-
-    public function set($key, $value, $options = null): mixed
-    {
-        return $this->initializeLazyObject()->set(...\func_get_args());
+        return $this->initializeLazyObject()->getdel(...\func_get_args());
     }
 
     public function getex($key, $options = null): mixed
@@ -503,54 +605,409 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->getex(...\func_get_args());
     }
 
-    public function getdel($key): mixed
+    public function getrange($key, $start, $end): mixed
     {
-        return $this->initializeLazyObject()->getdel(...\func_get_args());
+        return $this->initializeLazyObject()->getrange(...\func_get_args());
     }
 
-    public function setex($key, $seconds, $value): \Relay\Relay|bool
+    public function getset($key, $value): mixed
     {
-        return $this->initializeLazyObject()->setex(...\func_get_args());
+        return $this->initializeLazyObject()->getset(...\func_get_args());
     }
 
-    public function pfadd($key, $elements): \Relay\Relay|false|int
+    public function hdel($key, $mem, ...$mems): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->pfadd(...\func_get_args());
+        return $this->initializeLazyObject()->hdel(...\func_get_args());
     }
 
-    public function pfmerge($dst, $srckeys): \Relay\Relay|bool
+    public function hexists($hash, $member): \Relay\Relay|bool
     {
-        return $this->initializeLazyObject()->pfmerge(...\func_get_args());
+        return $this->initializeLazyObject()->hexists(...\func_get_args());
     }
 
-    public function psetex($key, $milliseconds, $value): \Relay\Relay|bool
+    public function hexpire($hash, $ttl, $fields, $mode = null): \Relay\Relay|array|false
     {
-        return $this->initializeLazyObject()->psetex(...\func_get_args());
+        return $this->initializeLazyObject()->hexpire(...\func_get_args());
     }
 
-    public function publish($channel, $message): \Relay\Relay|false|int
+    public function hexpireat($hash, $ttl, $fields, $mode = null): \Relay\Relay|array|false
     {
-        return $this->initializeLazyObject()->publish(...\func_get_args());
+        return $this->initializeLazyObject()->hexpireat(...\func_get_args());
     }
 
-    public function pubsub($operation, ...$args): mixed
+    public function hexpiretime($hash, $fields): \Relay\Relay|array|false
     {
-        return $this->initializeLazyObject()->pubsub(...\func_get_args());
+        return $this->initializeLazyObject()->hexpiretime(...\func_get_args());
     }
 
-    public function spublish($channel, $message): \Relay\Relay|false|int
+    public function hget($hash, $member): mixed
     {
-        return $this->initializeLazyObject()->spublish(...\func_get_args());
+        return $this->initializeLazyObject()->hget(...\func_get_args());
     }
 
-    public function setnx($key, $value): \Relay\Relay|bool
+    public function hgetWithMeta($hash, $member): \Relay\Relay|array|false
     {
-        return $this->initializeLazyObject()->setnx(...\func_get_args());
+        return $this->initializeLazyObject()->getWithMeta(...\func_get_args());
+    }
+
+    public function hgetall($hash): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->hgetall(...\func_get_args());
+    }
+
+    public function hgetdel($key, $fields): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->hgetdel(...\func_get_args());
+    }
+
+    public function hgetex($hash, $fields, $expiry = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->hgetex(...\func_get_args());
+    }
+
+    public function hincrby($key, $mem, $value): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->hincrby(...\func_get_args());
+    }
+
+    public function hincrbyfloat($key, $mem, $value): \Relay\Relay|bool|float
+    {
+        return $this->initializeLazyObject()->hincrbyfloat(...\func_get_args());
+    }
+
+    public function hkeys($hash): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->hkeys(...\func_get_args());
+    }
+
+    public function hlen($key): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->hlen(...\func_get_args());
+    }
+
+    public function hmget($hash, $members): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->hmget(...\func_get_args());
+    }
+
+    public function hmset($hash, $members): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->hmset(...\func_get_args());
+    }
+
+    public function hpersist($hash, $fields): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->hpersist(...\func_get_args());
+    }
+
+    public function hpexpire($hash, $ttl, $fields, $mode = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->hpexpire(...\func_get_args());
+    }
+
+    public function hpexpireat($hash, $ttl, $fields, $mode = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->hpexpireat(...\func_get_args());
+    }
+
+    public function hpexpiretime($hash, $fields): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->hpexpiretime(...\func_get_args());
+    }
+
+    public function hpttl($hash, $fields): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->hpttl(...\func_get_args());
+    }
+
+    public function hrandfield($hash, $options = null): \Relay\Relay|array|false|null|string
+    {
+        return $this->initializeLazyObject()->hrandfield(...\func_get_args());
+    }
+
+    public function hscan($key, &$iterator, $match = null, $count = 0): array|false
+    {
+        return $this->initializeLazyObject()->hscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
+    }
+
+    public function hset($key, ...$keys_and_vals): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->hset(...\func_get_args());
+    }
+
+    public function hsetex($key, $fields, $expiry = null): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->hsetex(...\func_get_args());
+    }
+
+    public function hsetnx($hash, $member, $value): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->hsetnx(...\func_get_args());
+    }
+
+    public function hstrlen($hash, $member): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->hstrlen(...\func_get_args());
+    }
+
+    public function httl($hash, $fields): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->httl(...\func_get_args());
+    }
+
+    public function hvals($hash): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->hvals(...\func_get_args());
+    }
+
+    public function idleTime(): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->idleTime(...\func_get_args());
+    }
+
+    public function incr($key, $by = 1): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->incr(...\func_get_args());
+    }
+
+    public function incrby($key, $value): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->incrby(...\func_get_args());
+    }
+
+    public function incrbyfloat($key, $value): \Relay\Relay|false|float
+    {
+        return $this->initializeLazyObject()->incrbyfloat(...\func_get_args());
+    }
+
+    public function info(...$sections): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->info(...\func_get_args());
+    }
+
+    public function isConnected(): bool
+    {
+        return $this->initializeLazyObject()->isConnected(...\func_get_args());
+    }
+
+    public function isTracked($key): bool
+    {
+        return $this->initializeLazyObject()->isTracked(...\func_get_args());
+    }
+
+    public function jsonArrAppend($key, $value_or_array, $path = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonArrAppend(...\func_get_args());
+    }
+
+    public function jsonArrIndex($key, $path, $value, $start = 0, $stop = -1): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonArrIndex(...\func_get_args());
+    }
+
+    public function jsonArrInsert($key, $path, $index, $value, ...$other_values): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonArrInsert(...\func_get_args());
+    }
+
+    public function jsonArrLen($key, $path = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonArrLen(...\func_get_args());
+    }
+
+    public function jsonArrPop($key, $path = null, $index = -1): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonArrPop(...\func_get_args());
+    }
+
+    public function jsonArrTrim($key, $path, $start, $stop): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonArrTrim(...\func_get_args());
+    }
+
+    public function jsonClear($key, $path = null): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->jsonClear(...\func_get_args());
+    }
+
+    public function jsonDebug($command, $key, $path = null): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->jsonDebug(...\func_get_args());
+    }
+
+    public function jsonDel($key, $path = null): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->jsonDel(...\func_get_args());
+    }
+
+    public function jsonForget($key, $path = null): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->jsonForget(...\func_get_args());
+    }
+
+    public function jsonGet($key, $options = [], ...$paths): mixed
+    {
+        return $this->initializeLazyObject()->jsonGet(...\func_get_args());
+    }
+
+    public function jsonMerge($key, $path, $value): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->jsonMerge(...\func_get_args());
+    }
+
+    public function jsonMget($key_or_array, $path): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonMget(...\func_get_args());
+    }
+
+    public function jsonMset($key, $path, $value, ...$other_triples): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->jsonMset(...\func_get_args());
+    }
+
+    public function jsonNumIncrBy($key, $path, $value): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonNumIncrBy(...\func_get_args());
+    }
+
+    public function jsonNumMultBy($key, $path, $value): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonNumMultBy(...\func_get_args());
+    }
+
+    public function jsonObjKeys($key, $path = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonObjKeys(...\func_get_args());
+    }
+
+    public function jsonObjLen($key, $path = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonObjLen(...\func_get_args());
+    }
+
+    public function jsonResp($key, $path = null): \Relay\Relay|array|false|int|string
+    {
+        return $this->initializeLazyObject()->jsonResp(...\func_get_args());
+    }
+
+    public function jsonSet($key, $path, $value, $condition = null): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->jsonSet(...\func_get_args());
+    }
+
+    public function jsonStrAppend($key, $value, $path = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonStrAppend(...\func_get_args());
+    }
+
+    public function jsonStrLen($key, $path = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonStrLen(...\func_get_args());
+    }
+
+    public function jsonToggle($key, $path): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonToggle(...\func_get_args());
+    }
+
+    public function jsonType($key, $path = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->jsonType(...\func_get_args());
+    }
+
+    public function keys($pattern): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->keys(...\func_get_args());
+    }
+
+    public function lastsave(): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->lastsave(...\func_get_args());
+    }
+
+    public function lcs($key1, $key2, $options = null): mixed
+    {
+        return $this->initializeLazyObject()->lcs(...\func_get_args());
+    }
+
+    public function lindex($key, $index): mixed
+    {
+        return $this->initializeLazyObject()->lindex(...\func_get_args());
+    }
+
+    public function linsert($key, $op, $pivot, $element): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->linsert(...\func_get_args());
+    }
+
+    public function listen($callback): bool
+    {
+        return $this->initializeLazyObject()->listen(...\func_get_args());
+    }
+
+    public function llen($key): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->llen(...\func_get_args());
+    }
+
+    public function lmove($srckey, $dstkey, $srcpos, $dstpos): mixed
+    {
+        return $this->initializeLazyObject()->lmove(...\func_get_args());
+    }
+
+    public function lmpop($keys, $from, $count = 1): \Relay\Relay|array|false|null
+    {
+        return $this->initializeLazyObject()->lmpop(...\func_get_args());
+    }
+
+    public function lpop($key, $count = 1): mixed
+    {
+        return $this->initializeLazyObject()->lpop(...\func_get_args());
+    }
+
+    public function lpos($key, $value, $options = null): \Relay\Relay|array|false|int|null
+    {
+        return $this->initializeLazyObject()->lpos(...\func_get_args());
+    }
+
+    public function lpush($key, $mem, ...$mems): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->lpush(...\func_get_args());
+    }
+
+    public function lpushx($key, $mem, ...$mems): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->lpushx(...\func_get_args());
+    }
+
+    public function lrange($key, $start, $stop): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->lrange(...\func_get_args());
+    }
+
+    public function lrem($key, $mem, $count = 0): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->lrem(...\func_get_args());
+    }
+
+    public function lset($key, $index, $mem): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->lset(...\func_get_args());
+    }
+
+    public function ltrim($key, $start, $end): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->ltrim(...\func_get_args());
     }
 
     public function mget($keys): \Relay\Relay|array|false
     {
         return $this->initializeLazyObject()->mget(...\func_get_args());
+    }
+
+    public function migrate($host, $port, $key, $dstdb, $timeout, $copy = false, $replace = false, #[\SensitiveParameter] $credentials = null): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->migrate(...\func_get_args());
     }
 
     public function move($key, $db): \Relay\Relay|false|int
@@ -568,44 +1025,49 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->msetnx(...\func_get_args());
     }
 
-    public function rename($key, $newkey): \Relay\Relay|bool
+    public function multi($mode = 0): \Relay\Relay|bool
     {
-        return $this->initializeLazyObject()->rename(...\func_get_args());
+        return $this->initializeLazyObject()->multi(...\func_get_args());
     }
 
-    public function renamenx($key, $newkey): \Relay\Relay|bool
+    public function object($op, $key): mixed
     {
-        return $this->initializeLazyObject()->renamenx(...\func_get_args());
+        return $this->initializeLazyObject()->object(...\func_get_args());
     }
 
-    public function del(...$keys): \Relay\Relay|bool|int
+    public function onFlushed($callback): bool
     {
-        return $this->initializeLazyObject()->del(...\func_get_args());
+        return $this->initializeLazyObject()->onFlushed(...\func_get_args());
     }
 
-    public function unlink(...$keys): \Relay\Relay|false|int
+    public function onInvalidated($callback, $pattern = null): bool
     {
-        return $this->initializeLazyObject()->unlink(...\func_get_args());
+        return $this->initializeLazyObject()->onInvalidated(...\func_get_args());
     }
 
-    public function expire($key, $seconds, $mode = null): \Relay\Relay|bool
+    public function option($option, $value = null): mixed
     {
-        return $this->initializeLazyObject()->expire(...\func_get_args());
+        return $this->initializeLazyObject()->option(...\func_get_args());
+    }
+
+    public function pclose(): bool
+    {
+        return $this->initializeLazyObject()->pclose(...\func_get_args());
+    }
+
+    public function pconnect($host, $port = 6379, $timeout = 0.0, $persistent_id = null, $retry_interval = 0, $read_timeout = 0.0, #[\SensitiveParameter] $context = [], $database = 0): bool
+    {
+        return $this->initializeLazyObject()->pconnect(...\func_get_args());
+    }
+
+    public function persist($key): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->persist(...\func_get_args());
     }
 
     public function pexpire($key, $milliseconds): \Relay\Relay|bool
     {
         return $this->initializeLazyObject()->pexpire(...\func_get_args());
-    }
-
-    public function expireat($key, $timestamp): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->expireat(...\func_get_args());
-    }
-
-    public function expiretime($key): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->expiretime(...\func_get_args());
     }
 
     public function pexpireat($key, $timestamp_ms): \Relay\Relay|bool
@@ -618,54 +1080,99 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->pexpiretime(...\func_get_args());
     }
 
-    public function persist($key): \Relay\Relay|bool
+    public function pfadd($key, $elements): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->persist(...\func_get_args());
+        return $this->initializeLazyObject()->pfadd(...\func_get_args());
     }
 
-    public function type($key): \Relay\Relay|bool|int|string
+    public function pfcount($key_or_keys): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->type(...\func_get_args());
+        return $this->initializeLazyObject()->pfcount(...\func_get_args());
     }
 
-    public function lrange($key, $start, $stop): \Relay\Relay|array|false
+    public function pfmerge($dst, $srckeys): \Relay\Relay|bool
     {
-        return $this->initializeLazyObject()->lrange(...\func_get_args());
+        return $this->initializeLazyObject()->pfmerge(...\func_get_args());
     }
 
-    public function lpush($key, $mem, ...$mems): \Relay\Relay|false|int
+    public function ping($arg = null): \Relay\Relay|bool|string
     {
-        return $this->initializeLazyObject()->lpush(...\func_get_args());
+        return $this->initializeLazyObject()->ping(...\func_get_args());
     }
 
-    public function rpush($key, $mem, ...$mems): \Relay\Relay|false|int
+    public function pipeline(): \Relay\Relay|bool
     {
-        return $this->initializeLazyObject()->rpush(...\func_get_args());
+        return $this->initializeLazyObject()->pipeline(...\func_get_args());
     }
 
-    public function lpushx($key, $mem, ...$mems): \Relay\Relay|false|int
+    public function psetex($key, $milliseconds, $value): \Relay\Relay|bool
     {
-        return $this->initializeLazyObject()->lpushx(...\func_get_args());
+        return $this->initializeLazyObject()->psetex(...\func_get_args());
     }
 
-    public function rpushx($key, $mem, ...$mems): \Relay\Relay|false|int
+    public function psubscribe($patterns, $callback): bool
     {
-        return $this->initializeLazyObject()->rpushx(...\func_get_args());
+        return $this->initializeLazyObject()->psubscribe(...\func_get_args());
     }
 
-    public function lset($key, $index, $mem): \Relay\Relay|bool
+    public function pttl($key): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->lset(...\func_get_args());
+        return $this->initializeLazyObject()->pttl(...\func_get_args());
     }
 
-    public function lpop($key, $count = 1): mixed
+    public function publish($channel, $message): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->lpop(...\func_get_args());
+        return $this->initializeLazyObject()->publish(...\func_get_args());
     }
 
-    public function lpos($key, $value, $options = null): \Relay\Relay|array|false|int|null
+    public function pubsub($operation, ...$args): mixed
     {
-        return $this->initializeLazyObject()->lpos(...\func_get_args());
+        return $this->initializeLazyObject()->pubsub(...\func_get_args());
+    }
+
+    public function punsubscribe($patterns = []): bool
+    {
+        return $this->initializeLazyObject()->punsubscribe(...\func_get_args());
+    }
+
+    public function randomkey(): \Relay\Relay|bool|null|string
+    {
+        return $this->initializeLazyObject()->randomkey(...\func_get_args());
+    }
+
+    public function rawCommand($cmd, ...$args): mixed
+    {
+        return $this->initializeLazyObject()->rawCommand(...\func_get_args());
+    }
+
+    public function readTimeout(): false|float
+    {
+        return $this->initializeLazyObject()->readTimeout(...\func_get_args());
+    }
+
+    public function rename($key, $newkey): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->rename(...\func_get_args());
+    }
+
+    public function renamenx($key, $newkey): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->renamenx(...\func_get_args());
+    }
+
+    public function replicaof($host = null, $port = 0): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->replicaof(...\func_get_args());
+    }
+
+    public function restore($key, $ttl, $value, $options = null): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->restore(...\func_get_args());
+    }
+
+    public function role(): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->role(...\func_get_args());
     }
 
     public function rpop($key, $count = 1): mixed
@@ -678,164 +1185,39 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->rpoplpush(...\func_get_args());
     }
 
-    public function brpoplpush($source, $dest, $timeout): mixed
+    public function rpush($key, $mem, ...$mems): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->brpoplpush(...\func_get_args());
+        return $this->initializeLazyObject()->rpush(...\func_get_args());
     }
 
-    public function blpop($key, $timeout_or_key, ...$extra_args): \Relay\Relay|array|false|null
+    public function rpushx($key, $mem, ...$mems): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->blpop(...\func_get_args());
+        return $this->initializeLazyObject()->rpushx(...\func_get_args());
     }
 
-    public function blmpop($timeout, $keys, $from, $count = 1): \Relay\Relay|array|false|null
+    public function sadd($set, $member, ...$members): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->blmpop(...\func_get_args());
+        return $this->initializeLazyObject()->sadd(...\func_get_args());
     }
 
-    public function bzmpop($timeout, $keys, $from, $count = 1): \Relay\Relay|array|false|null
+    public function save(): \Relay\Relay|bool
     {
-        return $this->initializeLazyObject()->bzmpop(...\func_get_args());
+        return $this->initializeLazyObject()->save(...\func_get_args());
     }
 
-    public function lmpop($keys, $from, $count = 1): \Relay\Relay|array|false|null
+    public function scan(&$iterator, $match = null, $count = 0, $type = null): array|false
     {
-        return $this->initializeLazyObject()->lmpop(...\func_get_args());
+        return $this->initializeLazyObject()->scan($iterator, ...\array_slice(\func_get_args(), 1));
     }
 
-    public function zmpop($keys, $from, $count = 1): \Relay\Relay|array|false|null
+    public function scard($key): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->zmpop(...\func_get_args());
+        return $this->initializeLazyObject()->scard(...\func_get_args());
     }
 
-    public function brpop($key, $timeout_or_key, ...$extra_args): \Relay\Relay|array|false|null
+    public function script($command, ...$args): mixed
     {
-        return $this->initializeLazyObject()->brpop(...\func_get_args());
-    }
-
-    public function bzpopmax($key, $timeout_or_key, ...$extra_args): \Relay\Relay|array|false|null
-    {
-        return $this->initializeLazyObject()->bzpopmax(...\func_get_args());
-    }
-
-    public function bzpopmin($key, $timeout_or_key, ...$extra_args): \Relay\Relay|array|false|null
-    {
-        return $this->initializeLazyObject()->bzpopmin(...\func_get_args());
-    }
-
-    public function object($op, $key): mixed
-    {
-        return $this->initializeLazyObject()->object(...\func_get_args());
-    }
-
-    public function geopos($key, ...$members): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->geopos(...\func_get_args());
-    }
-
-    public function lrem($key, $mem, $count = 0): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->lrem(...\func_get_args());
-    }
-
-    public function lindex($key, $index): mixed
-    {
-        return $this->initializeLazyObject()->lindex(...\func_get_args());
-    }
-
-    public function linsert($key, $op, $pivot, $element): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->linsert(...\func_get_args());
-    }
-
-    public function ltrim($key, $start, $end): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->ltrim(...\func_get_args());
-    }
-
-    public function hget($hash, $member): mixed
-    {
-        return $this->initializeLazyObject()->hget(...\func_get_args());
-    }
-
-    public function hstrlen($hash, $member): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->hstrlen(...\func_get_args());
-    }
-
-    public function hgetall($hash): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->hgetall(...\func_get_args());
-    }
-
-    public function hkeys($hash): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->hkeys(...\func_get_args());
-    }
-
-    public function hvals($hash): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->hvals(...\func_get_args());
-    }
-
-    public function hmget($hash, $members): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->hmget(...\func_get_args());
-    }
-
-    public function hmset($hash, $members): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->hmset(...\func_get_args());
-    }
-
-    public function hexists($hash, $member): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->hexists(...\func_get_args());
-    }
-
-    public function hsetnx($hash, $member, $value): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->hsetnx(...\func_get_args());
-    }
-
-    public function hdel($key, $mem, ...$mems): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->hdel(...\func_get_args());
-    }
-
-    public function hincrby($key, $mem, $value): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->hincrby(...\func_get_args());
-    }
-
-    public function hincrbyfloat($key, $mem, $value): \Relay\Relay|bool|float
-    {
-        return $this->initializeLazyObject()->hincrbyfloat(...\func_get_args());
-    }
-
-    public function incr($key, $by = 1): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->incr(...\func_get_args());
-    }
-
-    public function decr($key, $by = 1): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->decr(...\func_get_args());
-    }
-
-    public function incrby($key, $value): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->incrby(...\func_get_args());
-    }
-
-    public function decrby($key, $value): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->decrby(...\func_get_args());
-    }
-
-    public function incrbyfloat($key, $value): \Relay\Relay|false|float
-    {
-        return $this->initializeLazyObject()->incrbyfloat(...\func_get_args());
+        return $this->initializeLazyObject()->script(...\func_get_args());
     }
 
     public function sdiff($key, ...$other_keys): \Relay\Relay|array|false
@@ -846,6 +1228,51 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     public function sdiffstore($key, ...$other_keys): \Relay\Relay|false|int
     {
         return $this->initializeLazyObject()->sdiffstore(...\func_get_args());
+    }
+
+    public function select($db): \Relay\Relay|bool|string
+    {
+        return $this->initializeLazyObject()->select(...\func_get_args());
+    }
+
+    public function serverName(): false|string
+    {
+        return $this->initializeLazyObject()->serverName(...\func_get_args());
+    }
+
+    public function serverVersion(): false|string
+    {
+        return $this->initializeLazyObject()->serverVersion(...\func_get_args());
+    }
+
+    public function set($key, $value, $options = null): mixed
+    {
+        return $this->initializeLazyObject()->set(...\func_get_args());
+    }
+
+    public function setOption($option, $value): bool
+    {
+        return $this->initializeLazyObject()->setOption(...\func_get_args());
+    }
+
+    public function setbit($key, $pos, $val): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->setbit(...\func_get_args());
+    }
+
+    public function setex($key, $seconds, $value): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->setex(...\func_get_args());
+    }
+
+    public function setnx($key, $value): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->setnx(...\func_get_args());
+    }
+
+    public function setrange($key, $start, $value): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->setrange(...\func_get_args());
     }
 
     public function sinter($key, ...$other_keys): \Relay\Relay|array|false
@@ -863,119 +1290,9 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->sinterstore(...\func_get_args());
     }
 
-    public function sunion($key, ...$other_keys): \Relay\Relay|array|false
+    public function sismember($set, $member): \Relay\Relay|bool
     {
-        return $this->initializeLazyObject()->sunion(...\func_get_args());
-    }
-
-    public function sunionstore($key, ...$other_keys): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->sunionstore(...\func_get_args());
-    }
-
-    public function subscribe($channels, $callback): bool
-    {
-        return $this->initializeLazyObject()->subscribe(...\func_get_args());
-    }
-
-    public function unsubscribe($channels = []): bool
-    {
-        return $this->initializeLazyObject()->unsubscribe(...\func_get_args());
-    }
-
-    public function psubscribe($patterns, $callback): bool
-    {
-        return $this->initializeLazyObject()->psubscribe(...\func_get_args());
-    }
-
-    public function punsubscribe($patterns = []): bool
-    {
-        return $this->initializeLazyObject()->punsubscribe(...\func_get_args());
-    }
-
-    public function ssubscribe($channels, $callback): bool
-    {
-        return $this->initializeLazyObject()->ssubscribe(...\func_get_args());
-    }
-
-    public function sunsubscribe($channels = []): bool
-    {
-        return $this->initializeLazyObject()->sunsubscribe(...\func_get_args());
-    }
-
-    public function touch($key_or_array, ...$more_keys): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->touch(...\func_get_args());
-    }
-
-    public function pipeline(): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->pipeline(...\func_get_args());
-    }
-
-    public function multi($mode = 0): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->multi(...\func_get_args());
-    }
-
-    public function exec(): \Relay\Relay|array|bool
-    {
-        return $this->initializeLazyObject()->exec(...\func_get_args());
-    }
-
-    public function wait($replicas, $timeout): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->wait(...\func_get_args());
-    }
-
-    public function watch($key, ...$other_keys): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->watch(...\func_get_args());
-    }
-
-    public function unwatch(): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->unwatch(...\func_get_args());
-    }
-
-    public function discard(): bool
-    {
-        return $this->initializeLazyObject()->discard(...\func_get_args());
-    }
-
-    public function getMode($masked = false): int
-    {
-        return $this->initializeLazyObject()->getMode(...\func_get_args());
-    }
-
-    public function clearBytes(): void
-    {
-        $this->initializeLazyObject()->clearBytes(...\func_get_args());
-    }
-
-    public function scan(&$iterator, $match = null, $count = 0, $type = null): array|false
-    {
-        return $this->initializeLazyObject()->scan($iterator, ...\array_slice(\func_get_args(), 1));
-    }
-
-    public function hscan($key, &$iterator, $match = null, $count = 0): array|false
-    {
-        return $this->initializeLazyObject()->hscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
-    }
-
-    public function sscan($key, &$iterator, $match = null, $count = 0): array|false
-    {
-        return $this->initializeLazyObject()->sscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
-    }
-
-    public function zscan($key, &$iterator, $match = null, $count = 0): array|false
-    {
-        return $this->initializeLazyObject()->zscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
-    }
-
-    public function keys($pattern): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->keys(...\func_get_args());
+        return $this->initializeLazyObject()->sismember(...\func_get_args());
     }
 
     public function slowlog($operation, ...$extra_args): \Relay\Relay|array|bool|int
@@ -988,24 +1305,19 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->smembers(...\func_get_args());
     }
 
-    public function sismember($set, $member): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->sismember(...\func_get_args());
-    }
-
     public function smismember($set, ...$members): \Relay\Relay|array|false
     {
         return $this->initializeLazyObject()->smismember(...\func_get_args());
     }
 
-    public function srem($set, $member, ...$members): \Relay\Relay|false|int
+    public function smove($srcset, $dstset, $member): \Relay\Relay|bool
     {
-        return $this->initializeLazyObject()->srem(...\func_get_args());
+        return $this->initializeLazyObject()->smove(...\func_get_args());
     }
 
-    public function sadd($set, $member, ...$members): \Relay\Relay|false|int
+    public function socketId(): false|string
     {
-        return $this->initializeLazyObject()->sadd(...\func_get_args());
+        return $this->initializeLazyObject()->socketId(...\func_get_args());
     }
 
     public function sort($key, $options = []): \Relay\Relay|array|false|int
@@ -1018,14 +1330,14 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->sort_ro(...\func_get_args());
     }
 
-    public function smove($srcset, $dstset, $member): \Relay\Relay|bool
-    {
-        return $this->initializeLazyObject()->smove(...\func_get_args());
-    }
-
     public function spop($set, $count = 1): mixed
     {
         return $this->initializeLazyObject()->spop(...\func_get_args());
+    }
+
+    public function spublish($channel, $message): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->spublish(...\func_get_args());
     }
 
     public function srandmember($set, $count = 1): mixed
@@ -1033,14 +1345,19 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->srandmember(...\func_get_args());
     }
 
-    public function scard($key): \Relay\Relay|false|int
+    public function srem($set, $member, ...$members): \Relay\Relay|false|int
     {
-        return $this->initializeLazyObject()->scard(...\func_get_args());
+        return $this->initializeLazyObject()->srem(...\func_get_args());
     }
 
-    public function script($command, ...$args): mixed
+    public function sscan($key, &$iterator, $match = null, $count = 0): array|false
     {
-        return $this->initializeLazyObject()->script(...\func_get_args());
+        return $this->initializeLazyObject()->sscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
+    }
+
+    public function ssubscribe($channels, $callback): bool
+    {
+        return $this->initializeLazyObject()->ssubscribe(...\func_get_args());
     }
 
     public function strlen($key): \Relay\Relay|false|int
@@ -1048,14 +1365,149 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->strlen(...\func_get_args());
     }
 
-    public function hlen($key): \Relay\Relay|false|int
+    public function subscribe($channels, $callback): bool
     {
-        return $this->initializeLazyObject()->hlen(...\func_get_args());
+        return $this->initializeLazyObject()->subscribe(...\func_get_args());
     }
 
-    public function llen($key): \Relay\Relay|false|int
+    public function sunion($key, ...$other_keys): \Relay\Relay|array|false
     {
-        return $this->initializeLazyObject()->llen(...\func_get_args());
+        return $this->initializeLazyObject()->sunion(...\func_get_args());
+    }
+
+    public function sunionstore($key, ...$other_keys): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->sunionstore(...\func_get_args());
+    }
+
+    public function sunsubscribe($channels = []): bool
+    {
+        return $this->initializeLazyObject()->sunsubscribe(...\func_get_args());
+    }
+
+    public function swapdb($index1, $index2): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->swapdb(...\func_get_args());
+    }
+
+    public function time(): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->time(...\func_get_args());
+    }
+
+    public function timeout(): false|float
+    {
+        return $this->initializeLazyObject()->timeout(...\func_get_args());
+    }
+
+    public function touch($key_or_array, ...$more_keys): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->touch(...\func_get_args());
+    }
+
+    public function ttl($key): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->ttl(...\func_get_args());
+    }
+
+    public function type($key): \Relay\Relay|bool|int|string
+    {
+        return $this->initializeLazyObject()->type(...\func_get_args());
+    }
+
+    public function unlink(...$keys): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->unlink(...\func_get_args());
+    }
+
+    public function unsubscribe($channels = []): bool
+    {
+        return $this->initializeLazyObject()->unsubscribe(...\func_get_args());
+    }
+
+    public function unwatch(): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->unwatch(...\func_get_args());
+    }
+
+    public function vadd($key, $values, $element, $options = null): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->vadd(...\func_get_args());
+    }
+
+    public function vcard($key): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->vcard(...\func_get_args());
+    }
+
+    public function vdim($key): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->vdim(...\func_get_args());
+    }
+
+    public function vemb($key, $element, $raw = false): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->vemb(...\func_get_args());
+    }
+
+    public function vgetattr($key, $element, $raw = false): \Relay\Relay|array|false|string
+    {
+        return $this->initializeLazyObject()->vgetattr(...\func_get_args());
+    }
+
+    public function vinfo($key): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->vinfo(...\func_get_args());
+    }
+
+    public function vismember($key, $element): \Relay\Relay|bool
+    {
+        return $this->initializeLazyObject()->vismember(...\func_get_args());
+    }
+
+    public function vlinks($key, $element, $withscores): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->vlinks(...\func_get_args());
+    }
+
+    public function vrandmember($key, $count = 0): \Relay\Relay|array|false|string
+    {
+        return $this->initializeLazyObject()->vrandmember(...\func_get_args());
+    }
+
+    public function vrange($key, $min, $max, $count = -1): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->vrange(...\func_get_args());
+    }
+
+    public function vrem($key, $element): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->vrem(...\func_get_args());
+    }
+
+    public function vsetattr($key, $element, $attributes): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->vsetattr(...\func_get_args());
+    }
+
+    public function vsim($key, $member, $options = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->vsim(...\func_get_args());
+    }
+
+    public function wait($replicas, $timeout): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->wait(...\func_get_args());
+    }
+
+    public function waitaof($numlocal, $numremote, $timeout): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->waitaof(...\func_get_args());
+    }
+
+    public function watch($key, ...$other_keys): \Relay\Relay|bool|string
+    {
+        return $this->initializeLazyObject()->watch(...\func_get_args());
     }
 
     public function xack($key, $group, $ids): \Relay\Relay|false|int
@@ -1063,9 +1515,14 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->xack(...\func_get_args());
     }
 
-    public function xclaim($key, $group, $consumer, $min_idle, $ids, $options): \Relay\Relay|array|bool
+    public function xackdel($key, $group, $ids, $mode = null): \Relay\Relay|array|false
     {
-        return $this->initializeLazyObject()->xclaim(...\func_get_args());
+        return $this->initializeLazyObject()->xackdel(...\func_get_args());
+    }
+
+    public function xadd($key, $id, $values, $maxlen = 0, $approx = false, $nomkstream = false): \Relay\Relay|false|null|string
+    {
+        return $this->initializeLazyObject()->xadd(...\func_get_args());
     }
 
     public function xautoclaim($key, $group, $consumer, $min_idle, $start, $count = -1, $justid = false): \Relay\Relay|array|bool
@@ -1073,14 +1530,9 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->xautoclaim(...\func_get_args());
     }
 
-    public function xlen($key): \Relay\Relay|false|int
+    public function xclaim($key, $group, $consumer, $min_idle, $ids, $options): \Relay\Relay|array|bool
     {
-        return $this->initializeLazyObject()->xlen(...\func_get_args());
-    }
-
-    public function xgroup($operation, $key = null, $group = null, $id_or_consumer = null, $mkstream = false, $entries_read = -2): mixed
-    {
-        return $this->initializeLazyObject()->xgroup(...\func_get_args());
+        return $this->initializeLazyObject()->xclaim(...\func_get_args());
     }
 
     public function xdel($key, $ids): \Relay\Relay|false|int
@@ -1088,9 +1540,24 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->xdel(...\func_get_args());
     }
 
+    public function xdelex($key, $ids, $mode = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->xdelex(...\func_get_args());
+    }
+
+    public function xgroup($operation, $key = null, $group = null, $id_or_consumer = null, $mkstream = false, $entries_read = -2): mixed
+    {
+        return $this->initializeLazyObject()->xgroup(...\func_get_args());
+    }
+
     public function xinfo($operation, $arg1 = null, $arg2 = null, $count = -1): mixed
     {
         return $this->initializeLazyObject()->xinfo(...\func_get_args());
+    }
+
+    public function xlen($key): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->xlen(...\func_get_args());
     }
 
     public function xpending($key, $group, $start = null, $end = null, $count = -1, $consumer = null, $idle = 0): \Relay\Relay|array|false
@@ -1103,11 +1570,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->xrange(...\func_get_args());
     }
 
-    public function xrevrange($key, $end, $start, $count = -1): \Relay\Relay|array|bool
-    {
-        return $this->initializeLazyObject()->xrevrange(...\func_get_args());
-    }
-
     public function xread($streams, $count = -1, $block = -1): \Relay\Relay|array|bool|null
     {
         return $this->initializeLazyObject()->xread(...\func_get_args());
@@ -1118,6 +1580,11 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->xreadgroup(...\func_get_args());
     }
 
+    public function xrevrange($key, $end, $start, $count = -1): \Relay\Relay|array|bool
+    {
+        return $this->initializeLazyObject()->xrevrange(...\func_get_args());
+    }
+
     public function xtrim($key, $threshold, $approx = false, $minid = false, $limit = -1): \Relay\Relay|false|int
     {
         return $this->initializeLazyObject()->xtrim(...\func_get_args());
@@ -1126,66 +1593,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     public function zadd($key, ...$args): mixed
     {
         return $this->initializeLazyObject()->zadd(...\func_get_args());
-    }
-
-    public function zrandmember($key, $options = null): mixed
-    {
-        return $this->initializeLazyObject()->zrandmember(...\func_get_args());
-    }
-
-    public function zrange($key, $start, $end, $options = null): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->zrange(...\func_get_args());
-    }
-
-    public function zrevrange($key, $start, $end, $options = null): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->zrevrange(...\func_get_args());
-    }
-
-    public function zrangebyscore($key, $start, $end, $options = null): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->zrangebyscore(...\func_get_args());
-    }
-
-    public function zrevrangebyscore($key, $start, $end, $options = null): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->zrevrangebyscore(...\func_get_args());
-    }
-
-    public function zrangestore($dst, $src, $start, $end, $options = null): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->zrangestore(...\func_get_args());
-    }
-
-    public function zrangebylex($key, $min, $max, $offset = -1, $count = -1): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->zrangebylex(...\func_get_args());
-    }
-
-    public function zrevrangebylex($key, $max, $min, $offset = -1, $count = -1): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->zrevrangebylex(...\func_get_args());
-    }
-
-    public function zrem($key, ...$args): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->zrem(...\func_get_args());
-    }
-
-    public function zremrangebylex($key, $min, $max): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->zremrangebylex(...\func_get_args());
-    }
-
-    public function zremrangebyrank($key, $start, $end): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->zremrangebyrank(...\func_get_args());
-    }
-
-    public function zremrangebyscore($key, $min, $max): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->zremrangebyscore(...\func_get_args());
     }
 
     public function zcard($key): \Relay\Relay|false|int
@@ -1213,16 +1620,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->zincrby(...\func_get_args());
     }
 
-    public function zlexcount($key, $min, $max): \Relay\Relay|false|int
-    {
-        return $this->initializeLazyObject()->zlexcount(...\func_get_args());
-    }
-
-    public function zmscore($key, ...$mems): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->zmscore(...\func_get_args());
-    }
-
     public function zinter($keys, $weights = null, $options = null): \Relay\Relay|array|false
     {
         return $this->initializeLazyObject()->zinter(...\func_get_args());
@@ -1238,6 +1635,111 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->zinterstore(...\func_get_args());
     }
 
+    public function zlexcount($key, $min, $max): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->zlexcount(...\func_get_args());
+    }
+
+    public function zmpop($keys, $from, $count = 1): \Relay\Relay|array|false|null
+    {
+        return $this->initializeLazyObject()->zmpop(...\func_get_args());
+    }
+
+    public function zmscore($key, ...$mems): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->zmscore(...\func_get_args());
+    }
+
+    public function zpopmax($key, $count = 1): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->zpopmax(...\func_get_args());
+    }
+
+    public function zpopmin($key, $count = 1): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->zpopmin(...\func_get_args());
+    }
+
+    public function zrandmember($key, $options = null): mixed
+    {
+        return $this->initializeLazyObject()->zrandmember(...\func_get_args());
+    }
+
+    public function zrange($key, $start, $end, $options = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->zrange(...\func_get_args());
+    }
+
+    public function zrangebylex($key, $min, $max, $offset = -1, $count = -1): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->zrangebylex(...\func_get_args());
+    }
+
+    public function zrangebyscore($key, $start, $end, $options = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->zrangebyscore(...\func_get_args());
+    }
+
+    public function zrangestore($dst, $src, $start, $end, $options = null): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->zrangestore(...\func_get_args());
+    }
+
+    public function zrank($key, $rank, $withscore = false): \Relay\Relay|array|false|int|null
+    {
+        return $this->initializeLazyObject()->zrank(...\func_get_args());
+    }
+
+    public function zrem($key, ...$args): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->zrem(...\func_get_args());
+    }
+
+    public function zremrangebylex($key, $min, $max): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->zremrangebylex(...\func_get_args());
+    }
+
+    public function zremrangebyrank($key, $start, $end): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->zremrangebyrank(...\func_get_args());
+    }
+
+    public function zremrangebyscore($key, $min, $max): \Relay\Relay|false|int
+    {
+        return $this->initializeLazyObject()->zremrangebyscore(...\func_get_args());
+    }
+
+    public function zrevrange($key, $start, $end, $options = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->zrevrange(...\func_get_args());
+    }
+
+    public function zrevrangebylex($key, $max, $min, $offset = -1, $count = -1): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->zrevrangebylex(...\func_get_args());
+    }
+
+    public function zrevrangebyscore($key, $start, $end, $options = null): \Relay\Relay|array|false
+    {
+        return $this->initializeLazyObject()->zrevrangebyscore(...\func_get_args());
+    }
+
+    public function zrevrank($key, $rank, $withscore = false): \Relay\Relay|array|false|int|null
+    {
+        return $this->initializeLazyObject()->zrevrank(...\func_get_args());
+    }
+
+    public function zscan($key, &$iterator, $match = null, $count = 0): array|false
+    {
+        return $this->initializeLazyObject()->zscan($key, $iterator, ...\array_slice(\func_get_args(), 2));
+    }
+
+    public function zscore($key, $member): \Relay\Relay|false|float|null
+    {
+        return $this->initializeLazyObject()->zscore(...\func_get_args());
+    }
+
     public function zunion($keys, $weights = null, $options = null): \Relay\Relay|array|false
     {
         return $this->initializeLazyObject()->zunion(...\func_get_args());
@@ -1246,20 +1748,5 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     public function zunionstore($dst, $keys, $weights = null, $options = null): \Relay\Relay|false|int
     {
         return $this->initializeLazyObject()->zunionstore(...\func_get_args());
-    }
-
-    public function zpopmin($key, $count = 1): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->zpopmin(...\func_get_args());
-    }
-
-    public function zpopmax($key, $count = 1): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->zpopmax(...\func_get_args());
-    }
-
-    public function _getKeys()
-    {
-        return $this->initializeLazyObject()->_getKeys(...\func_get_args());
     }
 }

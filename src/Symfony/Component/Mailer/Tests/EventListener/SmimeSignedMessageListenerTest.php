@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Mailer\Envelope;
 use Symfony\Component\Mailer\Event\MessageEvent;
@@ -25,9 +26,7 @@ use Symfony\Component\Mime\Part\TextPart;
 
 class SmimeSignedMessageListenerTest extends TestCase
 {
-    /**
-     * @requires extension openssl
-     */
+    #[RequiresPhpExtension('openssl')]
     public function testSmimeMessageSigningProcess()
     {
         $signer = new SMimeSigner(\dirname(__DIR__).'/Fixtures/sign.crt', \dirname(__DIR__).'/Fixtures/sign.key');

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Style;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\RuntimeException;
@@ -47,9 +48,7 @@ class SymfonyStyleTest extends TestCase
         putenv($this->colSize ? 'COLUMNS='.$this->colSize : 'COLUMNS');
     }
 
-    /**
-     * @dataProvider inputCommandToOutputFilesProvider
-     */
+    #[DataProvider('inputCommandToOutputFilesProvider')]
     public function testOutputs($inputCommandFilepath, $outputFilepath)
     {
         $code = require $inputCommandFilepath;
@@ -58,9 +57,7 @@ class SymfonyStyleTest extends TestCase
         $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
     }
 
-    /**
-     * @dataProvider inputInteractiveCommandToOutputFilesProvider
-     */
+    #[DataProvider('inputInteractiveCommandToOutputFilesProvider')]
     public function testInteractiveOutputs($inputCommandFilepath, $outputFilepath)
     {
         $code = require $inputCommandFilepath;
@@ -98,9 +95,62 @@ class SymfonyStyleTest extends TestCase
         $this->assertStringEqualsFile($outputFilepath, $this->tester->getDisplay(true));
     }
 
+    public function testProgressIterateWithCustomFormat()
+    {
+        $code = static function (InputInterface $input, OutputInterface $output): int {
+            $io = new SymfonyStyle($input, $output);
+
+            foreach ($io->progressIterate(range(1, 3), null, ' %current%/%max% [%bar%] %memory:6s%') as $step) {
+                // noop
+            }
+
+            return Command::SUCCESS;
+        };
+
+        $this->command->setCode($code);
+        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
+
+        $this->assertMatchesRegularExpression('/\d+(\.\d+)? (GiB|MiB|KiB|B)/', $this->tester->getDisplay(true));
+    }
+
+    public function testProgressStartWithCustomFormat()
+    {
+        $code = static function (InputInterface $input, OutputInterface $output): int {
+            $io = new SymfonyStyle($input, $output);
+            $io->progressStart(3, ' %current%/%max% [%bar%] %memory:6s%');
+            $io->progressAdvance(3);
+            $io->progressFinish();
+
+            return Command::SUCCESS;
+        };
+
+        $this->command->setCode($code);
+        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
+
+        $this->assertMatchesRegularExpression('/\d+(\.\d+)? (GiB|MiB|KiB|B)/', $this->tester->getDisplay(true));
+    }
+
+    public function testBlockWithWindowsLineEndings()
+    {
+        $code = static function (InputInterface $input, OutputInterface $output) {
+            $io = new SymfonyStyle($input, $output);
+            $io->block("First line.\r\nSecond line.", 'INFO', 'fg=white;bg=blue', ' ', true);
+
+            return Command::SUCCESS;
+        };
+
+        $this->command->setCode($code);
+        $this->tester->execute([], ['interactive' => false, 'decorated' => false]);
+
+        $display = $this->tester->getDisplay(true);
+        $this->assertStringNotContainsString("\r", $display);
+        $this->assertStringContainsString('First line.', $display);
+        $this->assertStringContainsString('Second line.', $display);
+    }
+
     public function testGetErrorStyle()
     {
-        $input = $this->createMock(InputInterface::class);
+        $input = $this->createStub(InputInterface::class);
 
         $errorOutput = $this->createMock(OutputInterface::class);
         $errorOutput
@@ -125,7 +175,7 @@ class SymfonyStyleTest extends TestCase
 
     public function testCreateTableWithConsoleOutput()
     {
-        $input = $this->createMock(InputInterface::class);
+        $input = $this->createStub(InputInterface::class);
         $output = $this->createMock(ConsoleOutputInterface::class);
         $output
             ->method('getFormatter')
@@ -133,7 +183,7 @@ class SymfonyStyleTest extends TestCase
         $output
             ->expects($this->once())
             ->method('section')
-            ->willReturn($this->createMock(ConsoleSectionOutput::class));
+            ->willReturn($this->createStub(ConsoleSectionOutput::class));
 
         $style = new SymfonyStyle($input, $output);
 
@@ -142,8 +192,8 @@ class SymfonyStyleTest extends TestCase
 
     public function testCreateTableWithoutConsoleOutput()
     {
-        $input = $this->createMock(InputInterface::class);
-        $output = $this->createMock(OutputInterface::class);
+        $input = $this->createStub(InputInterface::class);
+        $output = $this->createStub(OutputInterface::class);
         $output
             ->method('getFormatter')
             ->willReturn(new OutputFormatter());
@@ -158,12 +208,12 @@ class SymfonyStyleTest extends TestCase
 
     public function testCreateTree()
     {
-        $output = $this->createMock(OutputInterface::class);
+        $output = $this->createStub(OutputInterface::class);
         $output
             ->method('getFormatter')
             ->willReturn(new OutputFormatter());
 
-        $style = new SymfonyStyle($this->createMock(InputInterface::class), $output);
+        $style = new SymfonyStyle($this->createStub(InputInterface::class), $output);
 
         $tree = $style->createTree([]);
         $this->assertInstanceOf(TreeHelper::class, $tree);
@@ -171,7 +221,7 @@ class SymfonyStyleTest extends TestCase
 
     public function testTree()
     {
-        $input = $this->createMock(InputInterface::class);
+        $input = $this->createStub(InputInterface::class);
         $output = new BufferedOutput();
         $style = new SymfonyStyle($input, $output);
 
@@ -179,20 +229,22 @@ class SymfonyStyleTest extends TestCase
         $tree->render();
 
         $this->assertSame(<<<TREE
-root
-├── A
-├── B
-│   ├── B1
-│   │   ├── B11
-│   │   └── B12
-│   └── B2
-└── C
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            root
+            ├── A
+            ├── B
+            │   ├── B1
+            │   │   ├── B11
+            │   │   └── B12
+            │   └── B2
+            └── C
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testCreateTreeWithArray()
     {
-        $input = $this->createMock(InputInterface::class);
+        $input = $this->createStub(InputInterface::class);
         $output = new BufferedOutput();
         $style = new SymfonyStyle($input, $output);
 
@@ -200,20 +252,22 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
         $tree->render();
 
         $this->assertSame($tree = <<<TREE
-root
-├── A
-├── B
-│   ├── B1
-│   │   ├── B11
-│   │   └── B12
-│   └── B2
-└── C
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            root
+            ├── A
+            ├── B
+            │   ├── B1
+            │   │   ├── B11
+            │   │   └── B12
+            │   └── B2
+            └── C
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testCreateTreeWithIterable()
     {
-        $input = $this->createMock(InputInterface::class);
+        $input = $this->createStub(InputInterface::class);
         $output = new BufferedOutput();
         $style = new SymfonyStyle($input, $output);
 
@@ -221,20 +275,22 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
         $tree->render();
 
         $this->assertSame(<<<TREE
-root
-├── A
-├── B
-│   ├── B1
-│   │   ├── B11
-│   │   └── B12
-│   └── B2
-└── C
-TREE, self::normalizeLineBreaks(trim($output->fetch())));
+            root
+            ├── A
+            ├── B
+            │   ├── B1
+            │   │   ├── B11
+            │   │   └── B12
+            │   └── B2
+            └── C
+            TREE,
+            self::normalizeLineBreaks(trim($output->fetch()))
+        );
     }
 
     public function testCreateTreeWithConsoleOutput()
     {
-        $input = $this->createMock(InputInterface::class);
+        $input = $this->createStub(InputInterface::class);
         $output = $this->createMock(ConsoleOutputInterface::class);
         $output
             ->method('getFormatter')
@@ -242,7 +298,7 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
         $output
             ->expects($this->once())
             ->method('section')
-            ->willReturn($this->createMock(ConsoleSectionOutput::class));
+            ->willReturn($this->createStub(ConsoleSectionOutput::class));
 
         $style = new SymfonyStyle($input, $output);
 
@@ -251,12 +307,12 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
 
     public function testGetErrorStyleUsesTheCurrentOutputIfNoErrorOutputIsAvailable()
     {
-        $output = $this->createMock(OutputInterface::class);
+        $output = $this->createStub(OutputInterface::class);
         $output
             ->method('getFormatter')
             ->willReturn(new OutputFormatter());
 
-        $style = new SymfonyStyle($this->createMock(InputInterface::class), $output);
+        $style = new SymfonyStyle($this->createStub(InputInterface::class), $output);
 
         $this->assertInstanceOf(SymfonyStyle::class, $style->getErrorStyle());
     }
@@ -281,7 +337,7 @@ TREE, self::normalizeLineBreaks(trim($output->fetch())));
         $inputStream = fopen('php://memory', 'r+');
         fwrite($inputStream, $answer.\PHP_EOL);
         rewind($inputStream);
-        $input = $this->createMock(Input::class);
+        $input = $this->createStub(Input::class);
         $sections = [];
         $output = new ConsoleSectionOutput(fopen('php://memory', 'r+', false), $sections, StreamOutput::VERBOSITY_NORMAL, true, new OutputFormatter());
         $input

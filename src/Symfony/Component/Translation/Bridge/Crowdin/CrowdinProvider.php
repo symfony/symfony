@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Translation\Dumper\XliffFileDumper;
 use Symfony\Component\Translation\Exception\ProviderException;
 use Symfony\Component\Translation\Loader\LoaderInterface;
+use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Provider\ProviderInterface;
 use Symfony\Component\Translation\TranslatorBag;
 use Symfony\Component\Translation\TranslatorBagInterface;
@@ -32,12 +33,12 @@ use Symfony\Contracts\HttpClient\ResponseInterface;
 final class CrowdinProvider implements ProviderInterface
 {
     public function __construct(
-        private HttpClientInterface $client,
-        private LoaderInterface $loader,
-        private LoggerInterface $logger,
-        private XliffFileDumper $xliffFileDumper,
-        private string $defaultLocale,
-        private string $endpoint,
+        private readonly HttpClientInterface $client,
+        private readonly LoaderInterface $loader,
+        private readonly LoggerInterface $logger,
+        private readonly XliffFileDumper $xliffFileDumper,
+        private readonly string $defaultLocale,
+        private readonly string $endpoint,
     ) {
     }
 
@@ -69,6 +70,25 @@ final class CrowdinProvider implements ProviderInterface
                     if (!$fileId) {
                         $file = $this->addFile($domain, $content);
                     } else {
+                        $sourceFileInfo = $this->downloadSourceFile($fileId);
+                        $sourceFile = $this->client->request('GET', $sourceFileInfo->toArray()['data']['url']);
+
+                        $providerCatalogue = $this->loader->load(
+                            $sourceFile->getContent(),
+                            $this->defaultLocale,
+                            $domain
+                        );
+                        $allMessages = array_merge(
+                            $providerCatalogue->all($domain),
+                            $catalogue->all($domain)
+                        );
+
+                        $content = $this->xliffFileDumper->formatCatalogue(
+                            new MessageCatalogue($this->defaultLocale, [$domain => $allMessages]),
+                            $domain,
+                            ['default_locale' => $this->defaultLocale],
+                        );
+
                         $file = $this->updateFile($fileId, $domain, $content);
                     }
 
@@ -124,7 +144,7 @@ final class CrowdinProvider implements ProviderInterface
             }
         }
 
-        /* @var ResponseInterface $response */
+        /** @var ResponseInterface $response */
         $downloads = [];
         foreach ($responses as [$response, $locale, $domain]) {
             if (204 === $response->getStatusCode()) {
@@ -167,8 +187,6 @@ final class CrowdinProvider implements ProviderInterface
     public function delete(TranslatorBagInterface $translatorBag): void
     {
         $fileList = $this->getFileList();
-        $responses = [];
-
         $defaultCatalogue = $translatorBag->getCatalogue($this->defaultLocale);
 
         foreach ($defaultCatalogue->all() as $domain => $messages) {
@@ -178,28 +196,28 @@ final class CrowdinProvider implements ProviderInterface
                 continue;
             }
 
-            $stringsMap = $this->mapStrings($fileId);
+            $sourceFileInfo = $this->downloadSourceFile($fileId);
+            $sourceFile = $this->client->request('GET', $sourceFileInfo->toArray()['data']['url']);
 
-            foreach ($messages as $id => $message) {
-                if (!\array_key_exists($id, $stringsMap)) {
-                    continue;
+            $providerCatalogue = $this->loader->load($sourceFile->getContent(), $this->defaultLocale, $domain);
+            $existingMessages = array_diff($providerCatalogue->all($domain), $messages);
+
+            $content = $this->xliffFileDumper->formatCatalogue(
+                new MessageCatalogue($this->defaultLocale, [$domain => $existingMessages]),
+                $domain,
+                ['default_locale' => $this->defaultLocale],
+            );
+
+            try {
+                $file = $this->updateFile($fileId, $domain, $content);
+
+                if (null === $file) {
+                    $this->logger->warning(
+                        \sprintf('Unable to update file "%d" and domain "%s".', $fileId, $domain)
+                    );
                 }
-
-                $responses[] = $this->deleteString($stringsMap[$id]);
-            }
-        }
-
-        foreach ($responses as $response) {
-            if (404 === $response->getStatusCode()) {
-                continue;
-            }
-
-            if (204 !== $statusCode = $response->getStatusCode()) {
-                $this->logger->warning(\sprintf('Unable to delete string: "%s".', $response->getContent(false)));
-
-                if (500 <= $statusCode) {
-                    throw new ProviderException('Unable to delete string.', $response);
-                }
+            } catch (ProviderException $e) {
+                throw new ProviderException(\sprintf('Unable to update file "%d" and domain "%s": "%s".', $fileId, $domain, $e->getMessage()), $e->getResponse(), previous: $e);
             }
         }
     }
@@ -207,26 +225,6 @@ final class CrowdinProvider implements ProviderInterface
     private function getFileIdByDomain(array $filesMap, string $domain): ?int
     {
         return $filesMap[\sprintf('%s.%s', $domain, 'xlf')] ?? null;
-    }
-
-    private function mapStrings(int $fileId): array
-    {
-        $result = [];
-
-        $limit = 500;
-        $offset = 0;
-
-        do {
-            $strings = $this->listStrings($fileId, $limit, $offset);
-
-            foreach ($strings as $string) {
-                $result[$string['data']['text']] = $string['data']['id'];
-            }
-
-            $offset += $limit;
-        } while (\count($strings) > 0);
-
-        return $result;
     }
 
     private function addFile(string $domain, string $content): ?array
@@ -321,36 +319,6 @@ final class CrowdinProvider implements ProviderInterface
          * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.files.download.get (Crowdin Enterprise API)
          */
         return $this->client->request('GET', \sprintf('files/%d/download', $fileId));
-    }
-
-    private function listStrings(int $fileId, int $limit, int $offset): array
-    {
-        /**
-         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.strings.getMany (Crowdin API)
-         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.strings.getMany (Crowdin Enterprise API)
-         */
-        $response = $this->client->request('GET', 'strings', [
-            'query' => [
-                'fileId' => $fileId,
-                'limit' => $limit,
-                'offset' => $offset,
-            ],
-        ]);
-
-        if (200 !== $response->getStatusCode()) {
-            throw new ProviderException(\sprintf('Unable to list strings for file "%d".', $fileId), $response);
-        }
-
-        return $response->toArray()['data'];
-    }
-
-    private function deleteString(int $stringId): ResponseInterface
-    {
-        /*
-         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.strings.delete (Crowdin API)
-         * @see https://developer.crowdin.com/enterprise/api/v2#operation/api.projects.strings.delete (Crowdin Enterprise API)
-         */
-        return $this->client->request('DELETE', 'strings/'.$stringId);
     }
 
     private function addStorage(string $domain, string $content): int

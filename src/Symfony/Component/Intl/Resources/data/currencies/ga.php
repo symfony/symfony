@@ -1010,6 +1010,10 @@ return [
             'EC$',
             'Dollar na Cairibe Thoir',
         ],
+        'XCG' => [
+            'Cg.',
+            'gildear Chairib',
+        ],
         'XEU' => [
             'XEU',
             'Aonad Airgeadra Eorpach',
@@ -1081,6 +1085,10 @@ return [
         'ZWD' => [
             'ZWD',
             'Dollar Siombábach (1980–2008)',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'ór na Siombáibe',
         ],
         'ZWL' => [
             'ZWL',

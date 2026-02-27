@@ -138,14 +138,21 @@ class AddSessionDomainConstraintPassTest extends TestCase
         $container->setParameter('request_listener.https_port', 443);
 
         $config = [
+            'framework' => [
+                'csrf_protection' => false,
+                'router' => ['resource' => 'dummy'],
+            ],
+        ];
+
+        $ext = new FrameworkExtension();
+        $ext->load($config, $container);
+
+        $config = [
             'security' => [
                 'providers' => ['some_provider' => ['id' => 'foo']],
                 'firewalls' => ['some_firewall' => ['security' => false]],
             ],
         ];
-
-        $ext = new FrameworkExtension();
-        $ext->load(['framework' => ['annotations' => false, 'http_method_override' => false, 'handle_all_throwables' => true, 'php_errors' => ['log' => true], 'csrf_protection' => false, 'router' => ['resource' => 'dummy', 'utf8' => true]]], $container);
 
         $ext = new SecurityExtension();
         $ext->load($config, $container);

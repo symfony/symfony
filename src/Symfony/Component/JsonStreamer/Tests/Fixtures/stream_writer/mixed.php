@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @param mixed $data
+ */
 return static function (mixed $data, \Psr\Container\ContainerInterface $valueTransformers, array $options): \Traversable {
     try {
         yield \json_encode($data, \JSON_THROW_ON_ERROR, 512);

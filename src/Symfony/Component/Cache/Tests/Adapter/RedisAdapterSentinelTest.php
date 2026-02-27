@@ -11,13 +11,12 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Cache\Adapter\AbstractAdapter;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 class RedisAdapterSentinelTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void

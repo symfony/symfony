@@ -72,7 +72,12 @@ class Application extends BaseApplication
             $this->renderRegistrationErrors($input, $output);
         }
 
-        $this->setDispatcher($this->kernel->getContainer()->get('event_dispatcher'));
+        $container = $this->kernel->getContainer();
+        $this->setDispatcher($container->get('event_dispatcher'));
+
+        if ($container->has('console.argument_resolver')) {
+            $this->setArgumentResolver($container->get('console.argument_resolver'));
+        }
 
         return parent::doRun($input, $output);
     }
@@ -159,11 +164,11 @@ class Application extends BaseApplication
         return parent::getLongVersion().\sprintf(' (env: <comment>%s</>, debug: <comment>%s</>)', $this->kernel->getEnvironment(), $this->kernel->isDebug() ? 'true' : 'false');
     }
 
-    public function add(Command $command): ?Command
+    public function addCommand(callable|Command $command): ?Command
     {
         $this->registerCommands();
 
-        return parent::add($command);
+        return parent::addCommand($command);
     }
 
     protected function registerCommands(): void
@@ -197,7 +202,7 @@ class Application extends BaseApplication
             foreach ($container->getParameter('console.command.ids') as $id) {
                 if (!isset($lazyCommandIds[$id])) {
                     try {
-                        $this->add($container->get($id));
+                        $this->addCommand($container->get($id));
                     } catch (\Throwable $e) {
                         $this->registrationErrors[] = $e;
                     }

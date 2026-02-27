@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Twig\Extension\DumpExtension;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
@@ -18,13 +19,10 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 use Symfony\Component\VarDumper\VarDumper;
 use Twig\Environment;
 use Twig\Loader\ArrayLoader;
-use Twig\Loader\LoaderInterface;
 
 class DumpExtensionTest extends TestCase
 {
-    /**
-     * @dataProvider getDumpTags
-     */
+    #[DataProvider('getDumpTags')]
     public function testDumpTag($template, $debug, $expectedOutput, $expectedDumped)
     {
         $extension = new DumpExtension(new VarCloner());
@@ -37,7 +35,7 @@ class DumpExtensionTest extends TestCase
 
         $dumped = null;
         $exception = null;
-        $prevDumper = VarDumper::setHandler(function ($var) use (&$dumped) { $dumped = $var; });
+        $prevDumper = VarDumper::setHandler(static function ($var) use (&$dumped) { $dumped = $var; });
 
         try {
             $this->assertEquals($expectedOutput, $twig->render('template'));
@@ -62,13 +60,11 @@ class DumpExtensionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider getDumpArgs
-     */
+    #[DataProvider('getDumpArgs')]
     public function testDump($context, $args, $expectedOutput, $debug = true)
     {
         $extension = new DumpExtension(new VarCloner());
-        $twig = new Environment($this->createMock(LoaderInterface::class), [
+        $twig = new Environment(new ArrayLoader(), [
             'debug' => $debug,
             'cache' => false,
             'optimizations' => 0,
@@ -113,7 +109,7 @@ class DumpExtensionTest extends TestCase
     public function testCustomDumper()
     {
         $output = '';
-        $lineDumper = function ($line) use (&$output) {
+        $lineDumper = static function ($line) use (&$output) {
             $output .= $line;
         };
 
@@ -125,7 +121,7 @@ class DumpExtensionTest extends TestCase
             '</pre><script>Sfdump("%s")</script>'
         );
         $extension = new DumpExtension(new VarCloner(), $dumper);
-        $twig = new Environment($this->createMock(LoaderInterface::class), [
+        $twig = new Environment(new ArrayLoader(), [
             'debug' => true,
             'cache' => false,
             'optimizations' => 0,

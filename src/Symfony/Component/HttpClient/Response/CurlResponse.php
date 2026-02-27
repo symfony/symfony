@@ -71,6 +71,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
         $this->info['http_method'] = $method;
         $this->info['user_data'] = $options['user_data'] ?? null;
         $this->info['max_duration'] = $options['max_duration'] ?? null;
+        $this->info['max_connect_duration'] = $options['max_connect_duration'] ?? null;
         $this->info['start_time'] ??= microtime(true);
         $this->info['original_url'] = $originalUrl ?? $this->info['url'] ?? curl_getinfo($ch, \CURLINFO_EFFECTIVE_URL);
         $info = &$this->info;
@@ -79,7 +80,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
 
         if (!$info['response_headers']) {
             // Used to keep track of what we're waiting for
-            curl_setopt($ch, \CURLOPT_PRIVATE, \in_array($method, ['GET', 'HEAD', 'OPTIONS', 'TRACE'], true) && 1.0 < (float) ($options['http_version'] ?? 1.1) ? 'H2' : 'H0'); // H = headers + retry counter
+            curl_setopt($ch, \CURLOPT_PRIVATE, \in_array($method, ['GET', 'HEAD', 'OPTIONS', 'TRACE', 'QUERY'], true) && 1.0 < (float) ($options['http_version'] ?? 1.1) ? 'H2' : 'H0'); // H = headers + retry counter
         }
 
         curl_setopt($ch, \CURLOPT_HEADERFUNCTION, static function ($ch, string $data) use (&$info, &$headers, $options, $multi, $id, &$location, $resolveRedirect, $logger): int {
@@ -321,6 +322,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
 
                 if (\CURLE_RECV_ERROR === $result && 'H' === $waitFor[0] && 400 <= ($responses[(int) $ch]->info['http_code'] ?? 0)) {
                     $multi->handlesActivity[$id][] = new FirstChunk();
+                    curl_setopt($ch, \CURLOPT_PRIVATE, 'C'.$waitFor[1]);
                 }
 
                 $multi->handlesActivity[$id][] = null;
@@ -408,7 +410,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
                 $info['peer_certificate_chain'] = array_map('openssl_x509_read', array_column($certinfo, 'Cert'));
             }
 
-            if (300 <= $info['http_code'] && $info['http_code'] < 400) {
+            if (300 <= $info['http_code'] && $info['http_code'] < 400 && null !== $options) {
                 if (curl_getinfo($ch, \CURLINFO_REDIRECT_COUNT) === $options['max_redirects']) {
                     curl_setopt($ch, \CURLOPT_FOLLOWLOCATION, false);
                 } elseif (303 === $info['http_code'] || ('POST' === $info['http_method'] && \in_array($info['http_code'], [301, 302], true))) {
@@ -430,7 +432,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
 
         $info['redirect_url'] = null;
 
-        if (300 <= $statusCode && $statusCode < 400 && null !== $location) {
+        if (300 <= $statusCode && $statusCode < 400 && null !== $location && null !== $options) {
             if ($noContent = 303 === $statusCode || ('POST' === $info['http_method'] && \in_array($statusCode, [301, 302], true))) {
                 $info['http_method'] = 'HEAD' === $info['http_method'] ? 'HEAD' : 'GET';
                 curl_setopt($ch, \CURLOPT_CUSTOMREQUEST, $info['http_method']);
@@ -445,7 +447,7 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
 
         if (401 === $statusCode && isset($options['auth_ntlm']) && 0 === strncasecmp($headers['www-authenticate'][0] ?? '', 'NTLM ', 5)) {
             // Continue with NTLM auth
-        } elseif ($statusCode < 300 || 400 <= $statusCode || null === $location || curl_getinfo($ch, \CURLINFO_REDIRECT_COUNT) === $options['max_redirects']) {
+        } elseif ($statusCode < 300 || 400 <= $statusCode || null === $location || null === $options || curl_getinfo($ch, \CURLINFO_REDIRECT_COUNT) === $options['max_redirects']) {
             // Headers and redirects completed, time to get the response's content
             $multi->handlesActivity[$id][] = new FirstChunk();
 

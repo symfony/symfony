@@ -58,7 +58,7 @@ final class TreeNode implements \Countable, \IteratorAggregate
     public function addChild(self|string|callable $node): self
     {
         if (\is_string($node)) {
-            $node = new self($node, $this);
+            $node = new self($node);
         }
 
         $this->children[] = $node;

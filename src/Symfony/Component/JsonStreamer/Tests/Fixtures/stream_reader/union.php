@@ -1,7 +1,10 @@
 <?php
 
+/**
+ * @return Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes|int|list<Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum>
+ */
 return static function (string|\Stringable $string, \Psr\Container\ContainerInterface $valueTransformers, \Symfony\Component\JsonStreamer\Read\Instantiator $instantiator, array $options): mixed {
-    $providers['array<int,Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum>'] = static function ($data) use ($options, $valueTransformers, $instantiator, &$providers) {
+    $providers['list<Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum>'] = static function ($data) use ($options, $valueTransformers, $instantiator, &$providers) {
         $iterable = static function ($data) use ($options, $valueTransformers, $instantiator, &$providers) {
             foreach ($data as $k => $v) {
                 yield $k => $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum']($v);
@@ -17,9 +20,9 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
             return '_symfony_missing_value' !== $v;
         }));
     };
-    $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes|array<int,Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum>|int'] = static function ($data) use ($options, $valueTransformers, $instantiator, &$providers) {
+    $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes|int|list<Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum>'] = static function ($data) use ($options, $valueTransformers, $instantiator, &$providers) {
         if (\is_array($data) && \array_is_list($data)) {
-            return $providers['array<int,Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum>']($data);
+            return $providers['list<Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum>']($data);
         }
         if (\is_array($data)) {
             return $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes']($data);
@@ -27,7 +30,7 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
         if (\is_int($data)) {
             return $data;
         }
-        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes|array<int,Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum>|int".', \get_debug_type($data)));
+        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes|int|list<Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum>'));
     };
-    return $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes|array<int,Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum>|int'](\Symfony\Component\JsonStreamer\Read\Decoder::decodeString((string) $string));
+    return $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes|int|list<Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum>'](\Symfony\Component\JsonStreamer\Read\Decoder::decodeString((string) $string));
 };

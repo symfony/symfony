@@ -40,16 +40,16 @@ class ImportMapConfigReader
         }
 
         $configPath = $this->importMapConfigPath;
-        $importMapConfig = is_file($this->importMapConfigPath) ? (static fn () => include $configPath)() : [];
+        $importMapConfig = is_file($configPath) ? \Closure::bind(static fn () => include func_get_arg(0), null, null)($configPath) : [];
 
         $entries = new ImportMapEntries();
-        foreach ($importMapConfig ?? [] as $importName => $data) {
+        foreach ($importMapConfig as $importName => $data) {
             $validKeys = ['path', 'version', 'type', 'entrypoint', 'package_specifier'];
             if ($invalidKeys = array_diff(array_keys($data), $validKeys)) {
                 throw new \InvalidArgumentException(\sprintf('The following keys are not valid for the importmap entry "%s": "%s". Valid keys are: "%s".', $importName, implode('", "', $invalidKeys), implode('", "', $validKeys)));
             }
 
-            $type = isset($data['type']) ? ImportMapType::tryFrom($data['type']) : ImportMapType::JS;
+            $type = ImportMapType::tryFrom($data['type'] ?? 'js') ?? ImportMapType::JS;
             $isEntrypoint = $data['entrypoint'] ?? false;
 
             if (isset($data['path'])) {
@@ -105,22 +105,33 @@ class ImportMapConfigReader
 
         $map = class_exists(VarExporter::class) ? VarExporter::export($importMapConfig) : var_export($importMapConfig, true);
         $this->filesystem->dumpFile($this->importMapConfigPath, <<<EOF
-        <?php
+            <?php
 
-        /**
-         * Returns the importmap for this application.
-         *
-         * - "path" is a path inside the asset mapper system. Use the
-         *     "debug:asset-map" command to see the full list of paths.
-         *
-         * - "entrypoint" (JavaScript only) set to true for any module that will
-         *     be used as an "entrypoint" (and passed to the importmap() Twig function).
-         *
-         * The "importmap:require" command can be used to add new entries to this file.
-         */
-        return $map;
+            /**
+             * Returns the importmap for this application.
+             *
+             * - "path" is a path inside the asset mapper system. Use the
+             *     "debug:asset-map" command to see the full list of paths.
+             *
+             * - "entrypoint" (JavaScript only) set to true for any module that will
+             *     be used as an "entrypoint" (and passed to the importmap() Twig function).
+             *
+             * The "importmap:require" command can be used to add new entries to this file.
+             *
+             * @return array<string, array{    // Import name as key, description of the imported file as value
+             *     path: string,               // Logical, relative or absolute path to the file
+             *     type?: 'js'|'css'|'json',   // Type of the file, defaults to 'js'
+             *     entrypoint?: bool,          // Whether the file is an entrypoint, for 'js' only
+             * }|array{
+             *     version: string,            // Version of the remote package
+             *     package_specifier?: string, // Remote "package-name/path" specifier, defaults to the import name
+             *     type?: 'js'|'css'|'json',
+             *     entrypoint?: bool,
+             * }>
+             */
+            return $map;
 
-        EOF);
+            EOF);
     }
 
     public function findRootImportMapEntry(string $moduleName): ?ImportMapEntry
@@ -173,24 +184,5 @@ class ImportMapConfigReader
     private function getRootDirectory(): string
     {
         return \dirname($this->importMapConfigPath);
-    }
-
-    /**
-     * @deprecated since Symfony 7.1, use ImportMapEntry::splitPackageNameAndFilePath() instead
-     */
-    public static function splitPackageNameAndFilePath(string $packageName): array
-    {
-        trigger_deprecation('symfony/asset-mapper', '7.1', 'The method "%s()" is deprecated and will be removed in 8.0. Use ImportMapEntry::splitPackageNameAndFilePath() instead.', __METHOD__);
-
-        $filePath = '';
-        $i = strpos($packageName, '/');
-
-        if ($i && (!str_starts_with($packageName, '@') || $i = strpos($packageName, '/', $i + 1))) {
-            // @vendor/package/filepath or package/filepath
-            $filePath = substr($packageName, $i);
-            $packageName = substr($packageName, 0, $i);
-        }
-
-        return [$packageName, $filePath];
     }
 }

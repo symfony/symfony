@@ -11,11 +11,12 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+
 class LocalizedRoutesAsPathTest extends AbstractWebTestCase
 {
-    /**
-     * @dataProvider getLocales
-     */
+    #[DataProvider('getLocales')]
     public function testLoginLogoutProcedure(string $locale)
     {
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes.yml']);
@@ -34,11 +35,8 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
         $this->assertEquals('Homepage', $client->followRedirect()->text());
     }
 
-    /**
-     * @group issue-32995
-     *
-     * @dataProvider getLocales
-     */
+    #[Group('issue-32995')]
+    #[DataProvider('getLocales')]
     public function testLoginFailureWithLocalizedFailurePath(string $locale)
     {
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'localized_form_failure_handler.yml']);
@@ -52,9 +50,7 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
         $this->assertRedirect($client->getResponse(), '/'.$locale.'/login');
     }
 
-    /**
-     * @dataProvider getLocales
-     */
+    #[DataProvider('getLocales')]
     public function testAccessRestrictedResource(string $locale)
     {
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes.yml']);
@@ -63,9 +59,7 @@ class LocalizedRoutesAsPathTest extends AbstractWebTestCase
         $this->assertRedirect($client->getResponse(), '/'.$locale.'/login');
     }
 
-    /**
-     * @dataProvider getLocales
-     */
+    #[DataProvider('getLocales')]
     public function testAccessRestrictedResourceWithForward(string $locale)
     {
         $client = $this->createClient(['test_case' => 'StandardFormLogin', 'root_config' => 'localized_routes_with_forward.yml']);

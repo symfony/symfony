@@ -12,6 +12,7 @@
 namespace Symfony\Component\Notifier\Bridge\Esendex\Tests;
 
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexOptions;
 use Symfony\Component\Notifier\Bridge\Esendex\EsendexTransport;
 use Symfony\Component\Notifier\Exception\TransportException;
@@ -48,12 +49,7 @@ final class EsendexTransportTest extends TransportTestCase
 
     public function testSendWithErrorResponseThrowsTransportException()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(500);
-
-        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
+        $client = new MockHttpClient(new MockResponse('', ['http_code' => 500]));
 
         $transport = self::createTransport($client);
 
@@ -65,15 +61,7 @@ final class EsendexTransportTest extends TransportTestCase
 
     public function testSendWithErrorResponseContainingDetailsThrowsTransportException()
     {
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(500);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['errors' => [['code' => 'accountreference_invalid', 'description' => 'Invalid Account Reference EX0000000']]]));
-
-        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
+        $client = new MockHttpClient(new MockResponse(json_encode(['errors' => [['code' => 'accountreference_invalid', 'description' => 'Invalid Account Reference EX0000000']]]), ['http_code' => 500]));
 
         $transport = self::createTransport($client);
 
@@ -86,15 +74,7 @@ final class EsendexTransportTest extends TransportTestCase
     public function testSendWithSuccessfulResponseDispatchesMessageEvent()
     {
         $messageId = bin2hex(random_bytes(7));
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['batch' => ['messageheaders' => [['id' => $messageId]]]]));
-
-        $client = new MockHttpClient(static fn (): ResponseInterface => $response);
+        $client = new MockHttpClient(new MockResponse(json_encode(['batch' => ['messageheaders' => [['id' => $messageId]]]])));
 
         $transport = self::createTransport($client);
 
@@ -105,20 +85,11 @@ final class EsendexTransportTest extends TransportTestCase
 
     public function testSentMessageContainsAnArrayOfMessages()
     {
-        $messageId = bin2hex(random_bytes(7));
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(200);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode(['batch' => ['messageheaders' => [['id' => $messageId]]]]));
-
         $requestOptions = [];
-        $client = new MockHttpClient(static function ($method, $url, $options) use (&$requestOptions, $response): ResponseInterface {
+        $client = new MockHttpClient(static function ($method, $url, $options) use (&$requestOptions): ResponseInterface {
             $requestOptions = $options;
 
-            return $response;
+            return new MockResponse(json_encode(['batch' => ['messageheaders' => [['id' => bin2hex(random_bytes(7))]]]]));
         });
 
         $transport = self::createTransport($client);

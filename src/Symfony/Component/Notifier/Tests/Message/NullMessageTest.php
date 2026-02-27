@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Tests\Message;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Notifier\Message\MessageInterface;
 use Symfony\Component\Notifier\Message\NullMessage;
@@ -20,9 +21,7 @@ use Symfony\Component\Notifier\Message\NullMessage;
  */
 class NullMessageTest extends TestCase
 {
-    /**
-     * @dataProvider messageDataProvider
-     */
+    #[DataProvider('messageDataProvider')]
     public function testCanBeConstructed(MessageInterface $message)
     {
         $nullMessage = new NullMessage($message);

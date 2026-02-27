@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Serializer\Tests\Normalizer\Features;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Serializer\Exception\CircularReferenceException;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -32,9 +33,7 @@ trait CircularReferenceTestTrait
         ];
     }
 
-    /**
-     * @dataProvider provideUnableToNormalizeCircularReference
-     */
+    #[DataProvider('provideUnableToNormalizeCircularReference')]
     public function testUnableToNormalizeCircularReference(array $defaultContext, array $context, int $expectedLimit)
     {
         $normalizer = $this->getNormalizerForCircularReference($defaultContext);

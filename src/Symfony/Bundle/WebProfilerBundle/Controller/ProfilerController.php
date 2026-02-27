@@ -72,7 +72,7 @@ class ProfilerController
         $page = $request->query->get('page', 'home');
         $profileType = $request->query->get('type', 'request');
 
-        if ('latest' === $token && $latest = current($this->profiler->find(null, null, 1, null, null, null, null, fn ($profile) => $profileType === $profile['virtual_type']))) {
+        if ('latest' === $token && $latest = current($this->profiler->find(null, null, 1, null, null, null, null, static fn ($profile) => $profileType === $profile['virtual_type']))) {
             $token = $latest['token'];
         }
 
@@ -243,7 +243,7 @@ class ProfilerController
             'request' => $request,
             'token' => $token,
             'profile' => $profile,
-            'tokens' => $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode, fn ($profile) => $profileType === $profile['virtual_type']),
+            'tokens' => $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode, static fn ($profile) => $profileType === $profile['virtual_type']),
             'ip' => $ip,
             'method' => $method,
             'status_code' => $statusCode,
@@ -293,7 +293,7 @@ class ProfilerController
             return new RedirectResponse($this->generator->generate('_profiler', ['token' => $token]), 302, ['Content-Type' => 'text/html']);
         }
 
-        $tokens = $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode, fn ($profile) => $profileType === $profile['virtual_type']);
+        $tokens = $this->profiler->find($ip, $url, $limit, $method, $start, $end, $statusCode, static fn ($profile) => $profileType === $profile['virtual_type']);
 
         return new RedirectResponse($this->generator->generate('_profiler_search_results', [
             'token' => $tokens ? $tokens[0]['token'] : 'empty',

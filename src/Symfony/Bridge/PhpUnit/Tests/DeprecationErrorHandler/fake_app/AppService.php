@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace App\Services;
 
 use acme\lib\SomeService;
@@ -20,9 +29,9 @@ final class AppService
     {
         $args = [__FUNCTION__, __FUNCTION__];
         if ($useContracts) {
-            trigger_deprecation('App', '3.0', sprintf('%s is deprecated, use %s_new instead.', ...$args));
+            trigger_deprecation('App', '3.0', \sprintf('%s is deprecated, use %s_new instead.', ...$args));
         } else {
-            @trigger_error(sprintf('Since App 3.0: %s is deprecated, use %s_new instead.', ...$args), \E_USER_DEPRECATED);
+            @trigger_error(\sprintf('Since App 3.0: %s is deprecated, use %s_new instead.', ...$args), \E_USER_DEPRECATED);
         }
     }
 

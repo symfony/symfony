@@ -283,8 +283,8 @@ class Workflow implements WorkflowInterface
 
     private function buildTransitionBlockerListForTransition(object $subject, Marking $marking, Transition $transition): TransitionBlockerList
     {
-        foreach ($transition->getFroms() as $place) {
-            if (!$marking->has($place)) {
+        foreach ($transition->getFroms(true) as $arc) {
+            if ($marking->getTokenCount($arc->place) < $arc->weight) {
                 return new TransitionBlockerList([
                     TransitionBlocker::createBlockedByMarking($marking),
                 ]);
@@ -321,7 +321,7 @@ class Workflow implements WorkflowInterface
 
     private function leave(object $subject, Transition $transition, Marking $marking, array $context = []): void
     {
-        $places = $transition->getFroms();
+        $arcs = $transition->getFroms(true);
 
         if ($this->shouldDispatchEvent(WorkflowEvents::LEAVE, $context)) {
             $event = new LeaveEvent($subject, $marking, $transition, $this, $context);
@@ -329,13 +329,13 @@ class Workflow implements WorkflowInterface
             $this->dispatcher->dispatch($event, WorkflowEvents::LEAVE);
             $this->dispatcher->dispatch($event, \sprintf('workflow.%s.leave', $this->name));
 
-            foreach ($places as $place) {
-                $this->dispatcher->dispatch($event, \sprintf('workflow.%s.leave.%s', $this->name, $place));
+            foreach ($arcs as $arc) {
+                $this->dispatcher->dispatch($event, \sprintf('workflow.%s.leave.%s', $this->name, $arc->place));
             }
         }
 
-        foreach ($places as $place) {
-            $marking->unmark($place);
+        foreach ($arcs as $arc) {
+            $marking->unmark($arc->place, $arc->weight);
         }
     }
 
@@ -356,7 +356,7 @@ class Workflow implements WorkflowInterface
 
     private function enter(object $subject, Transition $transition, Marking $marking, array $context): void
     {
-        $places = $transition->getTos();
+        $arcs = $transition->getTos(true);
 
         if ($this->shouldDispatchEvent(WorkflowEvents::ENTER, $context)) {
             $event = new EnterEvent($subject, $marking, $transition, $this, $context);
@@ -364,13 +364,13 @@ class Workflow implements WorkflowInterface
             $this->dispatcher->dispatch($event, WorkflowEvents::ENTER);
             $this->dispatcher->dispatch($event, \sprintf('workflow.%s.enter', $this->name));
 
-            foreach ($places as $place) {
-                $this->dispatcher->dispatch($event, \sprintf('workflow.%s.enter.%s', $this->name, $place));
+            foreach ($arcs as $arc) {
+                $this->dispatcher->dispatch($event, \sprintf('workflow.%s.enter.%s', $this->name, $arc->place));
             }
         }
 
-        foreach ($places as $place) {
-            $marking->mark($place);
+        foreach ($arcs as $arc) {
+            $marking->mark($arc->place, $arc->weight);
         }
     }
 
@@ -387,7 +387,7 @@ class Workflow implements WorkflowInterface
 
         $placeNames = [];
         if ($transition) {
-            $placeNames = $transition->getTos();
+            $placeNames = array_column($transition->getTos(true), 'place');
         } elseif ($this->definition->getInitialPlaces()) {
             $placeNames = $this->definition->getInitialPlaces();
         }

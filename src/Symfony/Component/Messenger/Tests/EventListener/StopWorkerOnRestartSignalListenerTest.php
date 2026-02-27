@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -18,14 +20,10 @@ use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Component\Messenger\Worker;
 
-/**
- * @group time-sensitive
- */
+#[Group('time-sensitive')]
 class StopWorkerOnRestartSignalListenerTest extends TestCase
 {
-    /**
-     * @dataProvider restartTimeProvider
-     */
+    #[DataProvider('restartTimeProvider')]
     public function testWorkerStopsWhenMemoryLimitExceeded(?int $lastRestartTimeOffset, bool $shouldStop)
     {
         $cachePool = $this->createMock(CacheItemPoolInterface::class);

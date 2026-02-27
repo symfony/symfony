@@ -38,7 +38,7 @@ final class CrawlerAnySelectorTextSame extends Constraint
             return false;
         }
 
-        $nodes = $other->each(fn (Crawler $node) => trim($node->text(null, true)));
+        $nodes = $other->each(static fn (Crawler $node) => trim($node->text(null, true)));
 
         return \in_array($this->expectedText, $nodes, true);
     }

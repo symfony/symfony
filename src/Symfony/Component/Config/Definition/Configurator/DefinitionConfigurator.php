@@ -12,15 +12,27 @@
 namespace Symfony\Component\Config\Definition\Configurator;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\BooleanNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\EnumNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\FloatNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\IntegerNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
+use Symfony\Component\Config\Definition\Builder\ScalarNodeDefinition;
+use Symfony\Component\Config\Definition\Builder\StringNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\Builder\VariableNodeDefinition;
 use Symfony\Component\Config\Definition\Loader\DefinitionFileLoader;
 
 /**
+ * @template T of 'array'|'variable'|'scalar'|'string'|'boolean'|'integer'|'float'|'enum' = 'array'
+ *
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
 class DefinitionConfigurator
 {
+    /**
+     * @param TreeBuilder<T> $treeBuilder
+     */
     public function __construct(
         private TreeBuilder $treeBuilder,
         private DefinitionFileLoader $loader,
@@ -35,7 +47,20 @@ class DefinitionConfigurator
         $this->loader->import($resource, $type, $ignoreErrors, $this->file);
     }
 
-    public function rootNode(): NodeDefinition|ArrayNodeDefinition
+    /**
+     * @return (
+     *    T is 'array' ? ArrayNodeDefinition<TreeBuilder<T>>
+     *    : (T is 'variable' ? VariableNodeDefinition<TreeBuilder<T>>
+     *    : (T is 'scalar' ? ScalarNodeDefinition<TreeBuilder<T>>
+     *    : (T is 'string' ? StringNodeDefinition<TreeBuilder<T>>
+     *    : (T is 'boolean' ? BooleanNodeDefinition<TreeBuilder<T>>
+     *    : (T is 'integer' ? IntegerNodeDefinition<TreeBuilder<T>>
+     *    : (T is 'float' ? FloatNodeDefinition<TreeBuilder<T>>
+     *    : (T is 'enum' ? EnumNodeDefinition<TreeBuilder<T>>
+     *    : NodeDefinition<TreeBuilder<T>>)))))))
+     * )
+     */
+    public function rootNode(): NodeDefinition
     {
         return $this->treeBuilder->getRootNode();
     }

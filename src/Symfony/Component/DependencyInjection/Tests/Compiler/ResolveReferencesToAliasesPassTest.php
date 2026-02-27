@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\DependencyInjection\Tests\Compiler;
 
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Compiler\ResolveReferencesToAliasesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -22,8 +22,6 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class ResolveReferencesToAliasesPassTest extends TestCase
 {
-    use ExpectUserDeprecationMessageTrait;
-
     public function testProcess()
     {
         $container = new ContainerBuilder();
@@ -86,10 +84,9 @@ class ResolveReferencesToAliasesPassTest extends TestCase
     }
 
     /**
-     * The test should be kept in the group as it always expects a deprecation.
-     *
-     * @group legacy
+     * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
+    #[IgnoreDeprecations]
     public function testDeprecationNoticeWhenReferencedByAlias()
     {
         $this->expectUserDeprecationMessage('Since foobar 1.2.3.4: The "deprecated_foo_alias" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "alias" alias.');
@@ -108,10 +105,9 @@ class ResolveReferencesToAliasesPassTest extends TestCase
     }
 
     /**
-     * The test should be kept in the group as it always expects a deprecation.
-     *
-     * @group legacy
+     * The test must be marked as ignoring deprecations as it always expects a deprecation.
      */
+    #[IgnoreDeprecations]
     public function testDeprecationNoticeWhenReferencedByDefinition()
     {
         $this->expectUserDeprecationMessage('Since foobar 1.2.3.4: The "foo_aliased" service alias is deprecated. You should stop using it, as it will be removed in the future. It is being referenced by the "definition" service.');
@@ -167,6 +163,30 @@ class ResolveReferencesToAliasesPassTest extends TestCase
 
         $this->process($container);
         $this->addToAssertionCount(1);
+    }
+
+    public function testDeprecationIsPreservedWhenResolvingAliasChain()
+    {
+        $container = new ContainerBuilder();
+
+        // Create a chain: deprecated_alias -> intermediate_alias -> service
+        $container->register('service', 'stdClass');
+
+        $container->setAlias('intermediate_alias', 'service');
+
+        $deprecatedAlias = new Alias('intermediate_alias');
+        $deprecatedAlias->setPublic(true);
+        $deprecatedAlias->setDeprecated('my/package', '1.0', 'The "%alias_id%" alias is deprecated.');
+        $container->setAlias('deprecated_alias', $deprecatedAlias);
+
+        $this->process($container);
+
+        // After resolving, deprecated_alias should point directly to service
+        // but should still be deprecated
+        $resolvedAlias = $container->getAlias('deprecated_alias');
+        $this->assertSame('service', (string) $resolvedAlias);
+        $this->assertTrue($resolvedAlias->isDeprecated(), 'Deprecation should be preserved when resolving alias chain');
+        $this->assertSame('my/package', $resolvedAlias->getDeprecation('deprecated_alias')['package']);
     }
 
     protected function process(ContainerBuilder $container)

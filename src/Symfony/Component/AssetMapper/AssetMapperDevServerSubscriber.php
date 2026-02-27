@@ -100,8 +100,15 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
     ];
 
     private readonly string $publicPrefix;
+
+    /**
+     * @var array<string, string>
+     */
     private array $extensionsMap;
 
+    /**
+     * @param array<string, string> $extensionsMap
+     */
     public function __construct(
         private readonly AssetMapperInterface $assetMapper,
         string $publicPrefix = '/assets/',
@@ -146,7 +153,7 @@ final class AssetMapperDevServerSubscriber implements EventSubscriberInterface
         if ($mediaType = $this->getMediaType($asset->publicPath)) {
             $response->headers->set('Content-Type', $mediaType);
         }
-        $response->headers->set('X-Assets-Dev', true);
+        $response->headers->set('X-Assets-Dev', '1');
 
         $event->setResponse($response);
         $event->stopPropagation();

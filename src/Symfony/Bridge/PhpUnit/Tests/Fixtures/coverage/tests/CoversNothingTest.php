@@ -9,11 +9,13 @@
  * file that was distributed with this source code.
  */
 
+use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
 
 /**
  * @coversNothing
  */
+#[CoversNothing]
 class CoversNothingTest extends TestCase
 {
     public function test()

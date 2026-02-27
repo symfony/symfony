@@ -20,7 +20,7 @@ class AbstractDecoratedTriggerTest extends TestCase
 {
     public function testCanGetInnerTrigger()
     {
-        $trigger = new JitterTrigger($inner = $this->createMock(TriggerInterface::class));
+        $trigger = new JitterTrigger($inner = $this->createStub(TriggerInterface::class));
 
         $this->assertSame($inner, $trigger->inner());
         $this->assertSame([$trigger], iterator_to_array($trigger->decorators()));
@@ -29,7 +29,7 @@ class AbstractDecoratedTriggerTest extends TestCase
     public function testCanGetNestedInnerTrigger()
     {
         $trigger = new ExcludeTimeTrigger(
-            $jitter = new JitterTrigger($inner = $this->createMock(TriggerInterface::class)),
+            $jitter = new JitterTrigger($inner = $this->createStub(TriggerInterface::class)),
             new \DateTimeImmutable(),
             new \DateTimeImmutable(),
         );

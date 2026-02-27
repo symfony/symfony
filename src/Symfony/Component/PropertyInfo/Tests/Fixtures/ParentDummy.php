@@ -71,6 +71,14 @@ class ParentDummy
     public $rootDummyItem;
 
     /**
+     * @param RootDummyItem|null $rootDummyItem
+     */
+    public function __construct(?RootDummyItem $rootDummyItem = null)
+    {
+        $this->rootDummyItem = $rootDummyItem;
+    }
+
+    /**
      * @return bool|null
      */
     public function isC()

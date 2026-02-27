@@ -11,11 +11,12 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class RememberMeCookieTest extends AbstractWebTestCase
 {
-    /** @dataProvider getSessionRememberMeSecureCookieFlagAutoHttpsMap */
+    #[DataProvider('getSessionRememberMeSecureCookieFlagAutoHttpsMap')]
     public function testSessionRememberMeSecureCookieFlagAuto($https, $expectedSecureFlag)
     {
         $client = $this->createClient(['test_case' => 'RememberMeCookie', 'root_config' => 'config.yml']);

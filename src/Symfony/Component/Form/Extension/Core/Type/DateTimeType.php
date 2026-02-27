@@ -11,10 +11,12 @@
 
 namespace Symfony\Component\Form\Extension\Core\Type;
 
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Exception\LogicException;
 use Symfony\Component\Form\Extension\Core\DataTransformer\ArrayToPartsTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DataTransformerChain;
+use Symfony\Component\Form\Extension\Core\DataTransformer\DatePointToDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeImmutableToDateTimeTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToArrayTransformer;
 use Symfony\Component\Form\Extension\Core\DataTransformer\DateTimeToHtml5LocalDateTimeTransformer;
@@ -178,7 +180,12 @@ class DateTimeType extends AbstractType
             ;
         }
 
-        if ('datetime_immutable' === $options['input']) {
+        if ('date_point' === $options['input']) {
+            if (!class_exists(DatePoint::class)) {
+                throw new LogicException(\sprintf('The "symfony/clock" component is required to use "%s" with option "input=date_point". Try running "composer require symfony/clock".', self::class));
+            }
+            $builder->addModelTransformer(new DatePointToDateTimeTransformer());
+        } elseif ('datetime_immutable' === $options['input']) {
             $builder->addModelTransformer(new DateTimeImmutableToDateTimeTransformer());
         } elseif ('string' === $options['input']) {
             $builder->addModelTransformer(new ReversedTransformer(
@@ -194,7 +201,7 @@ class DateTimeType extends AbstractType
             ));
         }
 
-        if (\in_array($options['input'], ['datetime', 'datetime_immutable'], true) && null !== $options['model_timezone']) {
+        if (\in_array($options['input'], ['datetime', 'datetime_immutable', 'date_point'], true) && null !== $options['model_timezone']) {
             $builder->addEventListener(FormEvents::POST_SET_DATA, static function (FormEvent $event) use ($options): void {
                 $date = $event->getData();
 
@@ -283,6 +290,7 @@ class DateTimeType extends AbstractType
         $resolver->setAllowedValues('input', [
             'datetime',
             'datetime_immutable',
+            'date_point',
             'string',
             'timestamp',
             'array',

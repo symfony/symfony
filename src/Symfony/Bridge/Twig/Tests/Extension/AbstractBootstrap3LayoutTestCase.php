@@ -1013,7 +1013,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'],
-            'choice_label' => function ($choice, $label, $value) {
+            'choice_label' => static function ($choice, $label, $value) {
                 if ('&b' === $choice) {
                     return false;
                 }
@@ -1063,7 +1063,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', '&a', [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
-            'choice_label' => fn () => false,
+            'choice_label' => static fn () => false,
             'multiple' => false,
             'expanded' => true,
         ]);
@@ -1376,7 +1376,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b', 'Choice&C' => '&c'],
-            'choice_label' => function ($choice, $label, $value) {
+            'choice_label' => static function ($choice, $label, $value) {
                 if ('&b' === $choice) {
                     return false;
                 }
@@ -1426,7 +1426,7 @@ abstract class AbstractBootstrap3LayoutTestCase extends AbstractLayoutTestCase
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\ChoiceType', ['&a'], [
             'choices' => ['Choice&A' => '&a', 'Choice&B' => '&b'],
-            'choice_label' => fn () => false,
+            'choice_label' => static fn () => false,
             'multiple' => true,
             'expanded' => true,
         ]);

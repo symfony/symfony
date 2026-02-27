@@ -57,9 +57,8 @@ abstract class RealIteratorTestCase extends IteratorTestCase
 
         if (is_dir(self::$tmpDir)) {
             self::tearDownAfterClass();
-        } else {
-            mkdir(self::$tmpDir);
         }
+        mkdir(self::$tmpDir);
 
         foreach (self::$files as $file) {
             if (\DIRECTORY_SEPARATOR === $file[\strlen($file) - 1]) {
@@ -72,8 +71,9 @@ abstract class RealIteratorTestCase extends IteratorTestCase
         file_put_contents(self::toAbsolute('test.php'), str_repeat(' ', 800));
         file_put_contents(self::toAbsolute('test.py'), str_repeat(' ', 2000));
 
-        touch(self::toAbsolute('foo/bar.tmp'), strtotime('2005-10-15'));
-        touch(self::toAbsolute('test.php'), strtotime('2005-10-15'));
+        $oneYearAgo = strtotime('-1 year');
+        touch(self::toAbsolute('foo/bar.tmp'), $oneYearAgo);
+        touch(self::toAbsolute('test.php'), $oneYearAgo);
 
         if (FinderTest::class === static::class) {
             $fs = new Filesystem();
@@ -98,27 +98,7 @@ abstract class RealIteratorTestCase extends IteratorTestCase
 
     public static function tearDownAfterClass(): void
     {
-        try {
-            $paths = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator(self::$tmpDir, \RecursiveDirectoryIterator::SKIP_DOTS),
-                \RecursiveIteratorIterator::CHILD_FIRST
-            );
-        } catch (\UnexpectedValueException $exception) {
-            // open_basedir restriction in effect
-            return;
-        }
-
-        foreach ($paths as $path) {
-            if ($path->isDir()) {
-                if ($path->isLink()) {
-                    @unlink($path);
-                } else {
-                    @rmdir($path);
-                }
-            } else {
-                @unlink($path);
-            }
-        }
+        (new Filesystem())->remove(self::$tmpDir);
     }
 
     protected static function toAbsolute($files = null)

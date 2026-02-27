@@ -48,7 +48,7 @@ class IdReader
             $singleId = $this->associationIdReader->isSingleId();
             $this->intId = $this->associationIdReader->isIntId();
         } else {
-            $this->intId = $singleId && \in_array($idType, ['integer', 'smallint', 'bigint']);
+            $this->intId = $singleId && \in_array($idType, ['integer', 'smallint', 'bigint'], true);
             $this->associationIdReader = null;
         }
 

@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Validator\Constraints;
 
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationMapperInterface;
 use Symfony\Component\Form\Test\FormPerformanceTestCase;
 use Symfony\Component\Validator\Validation;
 
@@ -20,18 +22,17 @@ use Symfony\Component\Validator\Validation;
  */
 class FormValidatorPerformanceTest extends FormPerformanceTestCase
 {
-    protected function getExtensions(): array
+    protected function getExtensions(?ViolationMapperInterface $violationMapper = null): array
     {
         return [
-            new ValidatorExtension(Validation::createValidator(), false),
+            new ValidatorExtension(Validation::createValidator(), $violationMapper),
         ];
     }
 
     /**
      * findClickedButton() used to have an exponential number of calls.
-     *
-     * @group benchmark
      */
+    #[Group('benchmark')]
     public function testValidationPerformance()
     {
         $this->setMaxRunningTime(1);

@@ -2,9 +2,11 @@ imports:
     - { resource: ../config/default.yml }
 
 framework:
-    http_method_override: false
     type_info: ~
-    json_streamer: ~
+    json_streamer:
+        default_options:
+            include_null_properties: true
+            custom_key: custom_value
 
 services:
     _defaults:

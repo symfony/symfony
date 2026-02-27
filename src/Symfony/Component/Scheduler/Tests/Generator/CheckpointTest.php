@@ -48,7 +48,7 @@ class CheckpointTest extends TestCase
         $this->assertTrue($checkpoint->acquire($now));
         $this->assertEquals($now, $checkpoint->time());
         $this->assertEquals(-1, $checkpoint->index());
-        $this->assertEquals([$now, -1, $now], $cache->get('cache', fn () => []));
+        $this->assertEquals([$now, -1, $now], $cache->get('cache', static fn () => []));
     }
 
     public function testWithStateLoadStateOnAcquiring()
@@ -56,12 +56,12 @@ class CheckpointTest extends TestCase
         $checkpoint = new Checkpoint('cache', new NoLock(), $cache = new ArrayAdapter());
         $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
 
-        $cache->get('cache', fn () => [$now, 0], \INF);
+        $cache->get('cache', static fn () => [$now, 0], \INF);
 
         $this->assertTrue($checkpoint->acquire($startedAt = $now->modify('1 min')));
         $this->assertEquals($now, $checkpoint->time());
         $this->assertEquals(0, $checkpoint->index());
-        $this->assertEquals([$now, 0, $startedAt], $cache->get('cache', fn () => []));
+        $this->assertEquals([$now, 0, $startedAt], $cache->get('cache', static fn () => []));
     }
 
     public function testWithLockInitStateOnFirstAcquiring()
@@ -113,7 +113,7 @@ class CheckpointTest extends TestCase
         $this->assertSame($now, $checkpoint->time());
         $this->assertSame(3, $checkpoint->index());
         $this->assertSame($startedAt, $checkpoint->from());
-        $this->assertEquals([$now, 3, $startedAt], $cache->get('cache', fn () => []));
+        $this->assertEquals([$now, 3, $startedAt], $cache->get('cache', static fn () => []));
     }
 
     public function testWithLockSave()
@@ -141,7 +141,7 @@ class CheckpointTest extends TestCase
 
         $this->assertSame($now, $checkpoint->time());
         $this->assertSame(3, $checkpoint->index());
-        $this->assertEquals([$now, 3, $startTime], $cache->get('dummy', fn () => []));
+        $this->assertEquals([$now, 3, $startTime], $cache->get('dummy', static fn () => []));
     }
 
     public function testWithCacheFullCycle()
@@ -150,7 +150,7 @@ class CheckpointTest extends TestCase
         $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
 
         // init
-        $cache->get('cache', fn () => [$now->modify('-1 min'), 3], \INF);
+        $cache->get('cache', static fn () => [$now->modify('-1 min'), 3], \INF);
 
         // action
         $acquired = $checkpoint->acquire($now);
@@ -165,7 +165,7 @@ class CheckpointTest extends TestCase
         $this->assertSame(3, $lastIndex);
         $this->assertEquals($now, $checkpoint->time());
         $this->assertSame(0, $checkpoint->index());
-        $this->assertEquals([$now, 0, $now], $cache->get('cache', fn () => []));
+        $this->assertEquals([$now, 0, $now], $cache->get('cache', static fn () => []));
     }
 
     public function testWithLockResetStateAfterLockedAcquiring()

@@ -35,7 +35,7 @@ class ApplicationTest extends TestCase
 {
     public function testBundleInterfaceImplementation()
     {
-        $bundle = $this->createMock(BundleInterface::class);
+        $bundle = $this->createStub(BundleInterface::class);
 
         $kernel = $this->getKernel([$bundle], true);
 
@@ -119,7 +119,7 @@ class ApplicationTest extends TestCase
 
         $application = new Application($kernel);
         $newCommand = new Command('example');
-        $application->add($newCommand);
+        $application->addCommand($newCommand);
 
         $this->assertSame($newCommand, $application->get('example'));
     }
@@ -131,11 +131,11 @@ class ApplicationTest extends TestCase
         $container->register(ThrowingCommand::class, ThrowingCommand::class);
         $container->setParameter('console.command.ids', [ThrowingCommand::class => ThrowingCommand::class]);
 
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = $this->createStub(KernelInterface::class);
         $kernel
             ->method('getBundles')
             ->willReturn([$this->createBundleMock(
-                [(new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output): int {
+                [(new Command('fine'))->setCode(static function (InputInterface $input, OutputInterface $output): int {
                     $output->write('fine');
 
                     return 0;
@@ -163,11 +163,11 @@ class ApplicationTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('event_dispatcher', EventDispatcher::class);
 
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = $this->createStub(KernelInterface::class);
         $kernel
             ->method('getBundles')
             ->willReturn([$this->createBundleMock(
-                [(new Command(null))->setCode(function (InputInterface $input, OutputInterface $output): int {
+                [(new Command(null))->setCode(static function (InputInterface $input, OutputInterface $output): int {
                     $output->write('fine');
 
                     return 0;
@@ -201,7 +201,7 @@ class ApplicationTest extends TestCase
         $kernel
             ->method('getBundles')
             ->willReturn([$this->createBundleMock(
-                [(new Command('fine'))->setCode(function (InputInterface $input, OutputInterface $output): int {
+                [(new Command('fine'))->setCode(static function (InputInterface $input, OutputInterface $output): int {
                     $output->write('fine');
 
                     return 0;
@@ -271,12 +271,10 @@ class ApplicationTest extends TestCase
         $kernel = $this->createMock(KernelInterface::class);
         $kernel->expects($this->once())->method('boot');
         $kernel
-            ->expects($this->any())
             ->method('getBundles')
             ->willReturn($bundles)
         ;
         $kernel
-            ->expects($this->any())
             ->method('getContainer')
             ->willReturn($container)
         ;
@@ -290,7 +288,7 @@ class ApplicationTest extends TestCase
         $bundle
             ->expects($this->once())
             ->method('registerCommands')
-            ->willReturnCallback(function (Application $application) use ($commands) {
+            ->willReturnCallback(static function (Application $application) use ($commands) {
                 $application->addCommands($commands);
             })
         ;

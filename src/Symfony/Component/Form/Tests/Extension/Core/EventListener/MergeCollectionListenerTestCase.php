@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\EventListener\MergeCollectionListener;
@@ -56,9 +57,7 @@ abstract class MergeCollectionListenerTestCase extends TestCase
 
     abstract protected function getData(array $data);
 
-    /**
-     * @dataProvider getBooleanMatrix1
-     */
+    #[DataProvider('getBooleanMatrix1')]
     public function testAddExtraEntriesIfAllowAdd($allowDelete)
     {
         $originalData = $this->getData([1 => 'second']);
@@ -80,9 +79,7 @@ abstract class MergeCollectionListenerTestCase extends TestCase
         $this->assertEquals($newData, $event->getData());
     }
 
-    /**
-     * @dataProvider getBooleanMatrix1
-     */
+    #[DataProvider('getBooleanMatrix1')]
     public function testAddExtraEntriesIfAllowAddDontOverwriteExistingIndices($allowDelete)
     {
         $originalData = $this->getData([1 => 'first']);
@@ -104,9 +101,7 @@ abstract class MergeCollectionListenerTestCase extends TestCase
         $this->assertEquals($this->getData([1 => 'first', 2 => 'second']), $event->getData());
     }
 
-    /**
-     * @dataProvider getBooleanMatrix1
-     */
+    #[DataProvider('getBooleanMatrix1')]
     public function testDoNothingIfNotAllowAdd($allowDelete)
     {
         $originalDataArray = [1 => 'second'];
@@ -129,9 +124,7 @@ abstract class MergeCollectionListenerTestCase extends TestCase
         $this->assertEquals($this->getData($originalDataArray), $event->getData());
     }
 
-    /**
-     * @dataProvider getBooleanMatrix1
-     */
+    #[DataProvider('getBooleanMatrix1')]
     public function testRemoveMissingEntriesIfAllowDelete($allowAdd)
     {
         $originalData = $this->getData([0 => 'first', 1 => 'second', 2 => 'third']);
@@ -153,9 +146,7 @@ abstract class MergeCollectionListenerTestCase extends TestCase
         $this->assertEquals($newData, $event->getData());
     }
 
-    /**
-     * @dataProvider getBooleanMatrix1
-     */
+    #[DataProvider('getBooleanMatrix1')]
     public function testDoNothingIfNotAllowDelete($allowAdd)
     {
         $originalDataArray = [0 => 'first', 1 => 'second', 2 => 'third'];
@@ -178,9 +169,7 @@ abstract class MergeCollectionListenerTestCase extends TestCase
         $this->assertEquals($this->getData($originalDataArray), $event->getData());
     }
 
-    /**
-     * @dataProvider getBooleanMatrix2
-     */
+    #[DataProvider('getBooleanMatrix2')]
     public function testRequireArrayOrTraversable($allowAdd, $allowDelete)
     {
         $this->expectException(UnexpectedTypeException::class);
@@ -205,9 +194,7 @@ abstract class MergeCollectionListenerTestCase extends TestCase
         $this->assertSame($originalData, $event->getData());
     }
 
-    /**
-     * @dataProvider getBooleanMatrix1
-     */
+    #[DataProvider('getBooleanMatrix1')]
     public function testDealWithNullOriginalDataIfAllowAdd($allowDelete)
     {
         $originalData = null;
@@ -223,9 +210,7 @@ abstract class MergeCollectionListenerTestCase extends TestCase
         $this->assertSame($newData, $event->getData());
     }
 
-    /**
-     * @dataProvider getBooleanMatrix1
-     */
+    #[DataProvider('getBooleanMatrix1')]
     public function testDontDealWithNullOriginalDataIfNotAllowAdd($allowDelete)
     {
         $originalData = null;

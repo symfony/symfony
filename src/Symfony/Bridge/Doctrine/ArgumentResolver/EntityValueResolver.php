@@ -11,9 +11,6 @@
 
 namespace Symfony\Bridge\Doctrine\ArgumentResolver;
 
-use Doctrine\DBAL\Types\ConversionException;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -32,6 +29,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 final class EntityValueResolver implements ValueResolverInterface
 {
+    use EntityValueResolverTrait;
+
     public function __construct(
         private ManagerRegistry $registry,
         private ?ExpressionLanguage $expressionLanguage = null,
@@ -56,30 +55,27 @@ final class EntityValueResolver implements ValueResolverInterface
 
         $options->class = $this->typeAliases[$options->class] ?? $options->class;
 
-        if (!$manager = $this->getManager($options->objectManager, $options->class)) {
+        if (!$manager = $this->getManager($this->registry, $options->objectManager, $options->class)) {
             return [];
         }
 
         $message = '';
         if (null !== $options->expr) {
-            if (null === $object = $this->findViaExpression($manager, $request, $options)) {
+            $variables = array_merge($request->attributes->all(), ['request' => $request]);
+            if (null === $object = $this->findViaExpression($this->expressionLanguage, $manager, $options, $variables)) {
                 $message = \sprintf(' The expression "%s" returned null.', $options->expr);
             }
         // find by identifier?
-        } elseif (false === $object = $this->find($manager, $request, $options, $argument)) {
+        } elseif (false === $object = $this->findById($manager, $options, $this->getIdentifier($request, $options, $argument))) {
             // find by criteria
             if (!$criteria = $this->getCriteria($request, $options, $manager, $argument)) {
                 if (!class_exists(NearMissValueResolverException::class)) {
                     return [];
                 }
 
-                throw new NearMissValueResolverException(sprintf('Cannot find mapping for "%s": declare one using either the #[MapEntity] attribute or mapped route parameters.', $options->class));
+                throw new NearMissValueResolverException(\sprintf('Cannot find mapping for "%s": declare one using either the #[MapEntity] attribute or mapped route parameters.', $options->class));
             }
-            try {
-                $object = $manager->getRepository($options->class)->findOneBy($criteria);
-            } catch (NoResultException|ConversionException) {
-                $object = null;
-            }
+            $object = $this->findOneByCriteria($manager, $options, $criteria);
         }
 
         if (null === $object && !$argument->isNullable()) {
@@ -87,49 +83,6 @@ final class EntityValueResolver implements ValueResolverInterface
         }
 
         return [$object];
-    }
-
-    private function getManager(?string $name, string $class): ?ObjectManager
-    {
-        if (null === $name) {
-            return $this->registry->getManagerForClass($class);
-        }
-
-        try {
-            $manager = $this->registry->getManager($name);
-        } catch (\InvalidArgumentException) {
-            return null;
-        }
-
-        return $manager->getMetadataFactory()->isTransient($class) ? null : $manager;
-    }
-
-    private function find(ObjectManager $manager, Request $request, MapEntity $options, ArgumentMetadata $argument): false|object|null
-    {
-        if ($options->mapping || $options->exclude) {
-            return false;
-        }
-
-        $id = $this->getIdentifier($request, $options, $argument);
-        if (false === $id || null === $id) {
-            return $id;
-        }
-        if (\is_array($id) && \in_array(null, $id, true)) {
-            return null;
-        }
-
-        if ($options->evictCache && $manager instanceof EntityManagerInterface) {
-            $cacheProvider = $manager->getCache();
-            if ($cacheProvider && $cacheProvider->containsEntity($options->class, $id)) {
-                $cacheProvider->evictEntity($options->class, $id);
-            }
-        }
-
-        try {
-            return $manager->getRepository($options->class)->find($id);
-        } catch (NoResultException|ConversionException) {
-            return null;
-        }
     }
 
     private function getIdentifier(Request $request, MapEntity $options, ArgumentMetadata $argument): mixed
@@ -189,57 +142,12 @@ final class EntityValueResolver implements ValueResolverInterface
             }
 
             return $criteria;
-        } elseif (null === $mapping) {
-            trigger_deprecation('symfony/doctrine-bridge', '7.1', 'Relying on auto-mapping for Doctrine entities is deprecated for argument $%s of "%s": declare the mapping using either the #[MapEntity] attribute or mapped route parameters.', $argument->getName(), method_exists($argument, 'getControllerName') ? $argument->getControllerName() : 'n/a');
-            $mapping = $request->attributes->keys();
-        }
-
-        if ($mapping && array_is_list($mapping)) {
-            $mapping = array_combine($mapping, $mapping);
-        }
-
-        foreach ($options->exclude as $exclude) {
-            unset($mapping[$exclude]);
         }
 
         if (!$mapping) {
             return [];
         }
 
-        $criteria = [];
-        $metadata = null === $options->mapping ? $manager->getClassMetadata($options->class) : false;
-
-        foreach ($mapping as $attribute => $field) {
-            if ($metadata && !$metadata->hasField($field) && (!$metadata->hasAssociation($field) || !$metadata->isSingleValuedAssociation($field))) {
-                continue;
-            }
-
-            $criteria[$field] = $request->attributes->get($attribute);
-        }
-
-        if ($options->stripNull) {
-            $criteria = array_filter($criteria, static fn ($value) => null !== $value);
-        }
-
-        return $criteria;
-    }
-
-    private function findViaExpression(ObjectManager $manager, Request $request, MapEntity $options): object|iterable|null
-    {
-        if (!$this->expressionLanguage) {
-            throw new \LogicException(\sprintf('You cannot use the "%s" if the ExpressionLanguage component is not available. Try running "composer require symfony/expression-language".', __CLASS__));
-        }
-
-        $repository = $manager->getRepository($options->class);
-        $variables = array_merge($request->attributes->all(), [
-            'repository' => $repository,
-            'request' => $request,
-        ]);
-
-        try {
-            return $this->expressionLanguage->evaluate($options->expr, $variables);
-        } catch (NoResultException|ConversionException) {
-            return null;
-        }
+        return $this->buildCriteriaFromMapping($manager, $options, $mapping, $request->attributes->all());
     }
 }

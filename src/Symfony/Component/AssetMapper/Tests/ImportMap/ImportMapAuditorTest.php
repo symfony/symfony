@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\Exception\RuntimeException;
 use Symfony\Component\AssetMapper\ImportMap\ImportMapAuditor;
@@ -33,7 +34,7 @@ class ImportMapAuditorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->importMapConfigReader = $this->createMock(ImportMapConfigReader::class);
+        $this->importMapConfigReader = $this->createStub(ImportMapConfigReader::class);
         $this->httpClient = new MockHttpClient();
         $this->importMapAuditor = new ImportMapAuditor($this->importMapConfigReader, $this->httpClient);
     }
@@ -89,9 +90,7 @@ class ImportMapAuditorTest extends TestCase
         ], $audit);
     }
 
-    /**
-     * @dataProvider provideAuditWithVersionRange
-     */
+    #[DataProvider('provideAuditWithVersionRange')]
     public function testAuditWithVersionRange(bool $expectMatch, string $version, ?string $versionRange)
     {
         $this->httpClient->setResponseFactory(new JsonMockResponse([

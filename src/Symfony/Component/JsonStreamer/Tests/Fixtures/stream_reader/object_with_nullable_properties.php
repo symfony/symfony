@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @return Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties
+ */
 return static function (string|\Stringable $string, \Psr\Container\ContainerInterface $valueTransformers, \Symfony\Component\JsonStreamer\Read\Instantiator $instantiator, array $options): mixed {
     $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties'] = static function ($data) use ($options, $valueTransformers, $instantiator, &$providers) {
         return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties::class, \array_filter(['name' => $data['name'] ?? '_symfony_missing_value', 'enum' => \array_key_exists('enum', $data) ? $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null']($data['enum']) : '_symfony_missing_value'], static function ($v) {
@@ -16,7 +19,7 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
         if (null === $data) {
             return null;
         }
-        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null".', \get_debug_type($data)));
+        throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value for "%s".', \get_debug_type($data), 'Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null'));
     };
     return $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties'](\Symfony\Component\JsonStreamer\Read\Decoder::decodeString((string) $string));
 };

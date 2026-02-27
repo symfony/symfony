@@ -9,35 +9,42 @@
  * file that was distributed with this source code.
  */
 
-namespace Middleware\IdleConnection;
+namespace Symfony\Bridge\Doctrine\Tests\Middleware\IdleConnection;
 
 use Doctrine\DBAL\Connection as ConnectionInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Doctrine\Middleware\IdleConnection\Listener;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
+use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ListenerTest extends TestCase
 {
     public function testOnKernelRequest()
     {
-        $containerMock = $this->createMock(ContainerInterface::class);
         $connectionExpiries = new \ArrayObject(['connectionone' => time() - 30, 'connectiontwo' => time() + 40]);
 
-        $connectionOneMock = $this->getMockBuilder(ConnectionInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $connectionOneMock = $this->createStub(ConnectionInterface::class);
 
-        $containerMock->expects($this->exactly(1))
-            ->method('get')
-            ->with('doctrine.dbal.connectionone_connection')
-            ->willReturn($connectionOneMock);
+        $container = new Container();
+        $container->set('doctrine.dbal.connectionone_connection', $connectionOneMock);
 
-        $listener = new Listener($connectionExpiries, $containerMock);
+        $listener = new Listener($connectionExpiries, $container);
 
-        $listener->onKernelRequest($this->createMock(RequestEvent::class));
+        $listener->onKernelRequest(new RequestEvent($this->createStub(HttpKernelInterface::class), new Request(), HttpKernelInterface::MAIN_REQUEST));
 
         $this->assertArrayNotHasKey('connectionone', (array) $connectionExpiries);
         $this->assertArrayHasKey('connectiontwo', (array) $connectionExpiries);
+    }
+
+    public function testOnKernelRequestShouldSkipSubrequests()
+    {
+        self::expectNotToPerformAssertions();
+        $arrayObj = $this->createStub(\ArrayObject::class);
+        $arrayObj->method('getIterator')->willThrowException(new \Exception('Invalid behavior'));
+        $listener = new Listener($arrayObj, new Container());
+
+        $listener->onKernelRequest(new RequestEvent($this->createStub(HttpKernelInterface::class), new Request(), HttpKernelInterface::SUB_REQUEST));
     }
 }

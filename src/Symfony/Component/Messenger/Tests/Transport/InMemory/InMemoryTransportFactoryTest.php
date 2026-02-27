@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Tests\Transport\InMemory;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
@@ -31,9 +32,7 @@ class InMemoryTransportFactoryTest extends TestCase
         $this->factory = new InMemoryTransportFactory();
     }
 
-    /**
-     * @dataProvider provideDSN
-     */
+    #[DataProvider('provideDSN')]
     public function testSupports(string $dsn, bool $expected = true)
     {
         $this->assertSame($expected, $this->factory->supports($dsn, []), 'InMemoryTransportFactory::supports returned unexpected result.');
@@ -42,7 +41,7 @@ class InMemoryTransportFactoryTest extends TestCase
     public function testCreateTransport()
     {
         /** @var SerializerInterface $serializer */
-        $serializer = $this->createMock(SerializerInterface::class);
+        $serializer = $this->createStub(SerializerInterface::class);
 
         $this->assertInstanceOf(InMemoryTransport::class, $this->factory->createTransport('in-memory://', [], $serializer));
     }
@@ -78,7 +77,7 @@ class InMemoryTransportFactoryTest extends TestCase
 
     public function testResetCreatedTransports()
     {
-        $transport = $this->factory->createTransport('in-memory://', [], $this->createMock(SerializerInterface::class));
+        $transport = $this->factory->createTransport('in-memory://', [], $this->createStub(SerializerInterface::class));
         $transport->send(Envelope::wrap(new DummyMessage('Hello.')));
 
         $this->assertCount(1, $transport->get());

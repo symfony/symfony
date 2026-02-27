@@ -61,10 +61,12 @@ class AssetMapperCompileCommandTest extends TestCase
 
         $this->assertFileExists($targetBuildDir.'/subdir/file5-9P3Dc3X.js');
         $this->assertSame(<<<EOF
-        import '../file4.js';
-        console.log('file5.js');
+            import '../file4.js';
+            console.log('file5.js');
 
-        EOF, $this->filesystem->readFile($targetBuildDir.'/subdir/file5-9P3Dc3X.js'));
+            EOF,
+            $this->filesystem->readFile($targetBuildDir.'/subdir/file5-9P3Dc3X.js')
+        );
 
         $finder = new Finder();
         $finder->in($targetBuildDir)->files();

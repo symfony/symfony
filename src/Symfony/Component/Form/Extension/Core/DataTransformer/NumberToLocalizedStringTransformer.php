@@ -38,17 +38,9 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         $this->roundingMode = $roundingMode ?? \NumberFormatter::ROUND_HALFUP;
     }
 
-    /**
-     * Transforms a number type into localized number.
-     *
-     * @param int|float|null $value Number value
-     *
-     * @throws TransformationFailedException if the given value is not numeric
-     *                                       or if the value cannot be transformed
-     */
     public function transform(mixed $value): string
     {
-        if (null === $value) {
+        if (null === $value || '' === $value) {
             return '';
         }
 
@@ -67,14 +59,6 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
         return str_replace(["\xc2\xa0", "\xe2\x80\xaf"], ' ', $value);
     }
 
-    /**
-     * Transforms a localized number into an integer or float.
-     *
-     * @param string $value The localized value
-     *
-     * @throws TransformationFailedException if the given value is not a string
-     *                                       or if the value cannot be transformed
-     */
     public function reverseTransform(mixed $value): int|float|null
     {
         if (null !== $value && !\is_string($value)) {
@@ -173,7 +157,7 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      */
     protected function castParsedValue(int|float $value): int|float
     {
-        if (\is_int($value) && $value === (int) $float = (float) $value) {
+        if (\is_int($value) && (($float = (float) $value) < \PHP_INT_MAX) && $value === (int) $float) {
             return $float;
         }
 
@@ -185,6 +169,10 @@ class NumberToLocalizedStringTransformer implements DataTransformerInterface
      */
     private function round(int|float $number): int|float
     {
+        if (\is_int($number)) {
+            return $number;
+        }
+
         if (null !== $this->scale) {
             // shift number to maintain the correct scale during rounding
             $roundingCoef = 10 ** $this->scale;

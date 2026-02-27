@@ -21,3 +21,11 @@ map_request_to_attribute_with_default_value:
 map_request_to_non_nullable_attribute_without_default_value:
     path: /map-request-to-non-nullable-attribute-without-default-value.{_format}
     controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithMapRequestToNonNullableAttributeWithoutDefaultValueController
+
+serialize_controller_result:
+    path: /serialize-controller-result
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithSerializeAttributeController
+
+serialize_controller_result_with_format:
+    path: /serialize-controller-result.{_format}
+    controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\WithSerializeAttributeController

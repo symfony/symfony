@@ -13,6 +13,7 @@ namespace Symfony\Component\TypeInfo\Tests\Fixtures;
 
 use Symfony\Component\TypeInfo\Type;
 use \DateTimeInterface;
+
 use \DateTimeImmutable as DateTime;
 
 final class DummyWithUses

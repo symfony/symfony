@@ -24,7 +24,7 @@ class LazyChoiceListTest extends TestCase
     {
         $choices = ['RESULT'];
         $calls = 0;
-        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), function ($choice) use ($choices, &$calls) {
+        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), static function ($choice) use ($choices, &$calls) {
             ++$calls;
 
             return array_search($choice, $choices);
@@ -38,7 +38,7 @@ class LazyChoiceListTest extends TestCase
     public function testGetValuesLoadsLoadedListOnFirstCall()
     {
         $calls = 0;
-        $list = new LazyChoiceList(new ArrayChoiceLoader(['RESULT']), function ($choice) use (&$calls) {
+        $list = new LazyChoiceList(new ArrayChoiceLoader(['RESULT']), static function ($choice) use (&$calls) {
             ++$calls;
 
             return $choice;
@@ -52,7 +52,7 @@ class LazyChoiceListTest extends TestCase
     public function testGetStructuredValuesLoadsLoadedListOnFirstCall()
     {
         $calls = 0;
-        $list = new LazyChoiceList(new ArrayChoiceLoader(['RESULT']), function ($choice) use (&$calls) {
+        $list = new LazyChoiceList(new ArrayChoiceLoader(['RESULT']), static function ($choice) use (&$calls) {
             ++$calls;
 
             return $choice;
@@ -71,7 +71,7 @@ class LazyChoiceListTest extends TestCase
             'b' => 'bar',
             'c' => 'baz',
         ];
-        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), function ($choice) use (&$calls) {
+        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), static function ($choice) use (&$calls) {
             ++$calls;
 
             return $choice;
@@ -90,7 +90,7 @@ class LazyChoiceListTest extends TestCase
             'b' => 'bar',
             'c' => 'baz',
         ];
-        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), function ($choice) use ($choices, &$calls) {
+        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), static function ($choice) use ($choices, &$calls) {
             ++$calls;
 
             return array_search($choice, $choices);
@@ -108,7 +108,7 @@ class LazyChoiceListTest extends TestCase
             'b' => 'bar',
             'c' => 'baz',
         ];
-        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), fn ($choice) => array_search($choice, $choices));
+        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), static fn ($choice) => array_search($choice, $choices));
 
         // load choice list
         $list->getChoices();
@@ -124,7 +124,7 @@ class LazyChoiceListTest extends TestCase
             'b' => 'bar',
             'c' => 'baz',
         ];
-        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), fn ($choice) => array_search($choice, $choices));
+        $list = new LazyChoiceList(new ArrayChoiceLoader($choices), static fn ($choice) => array_search($choice, $choices));
 
         // load choice list
         $list->getChoices();

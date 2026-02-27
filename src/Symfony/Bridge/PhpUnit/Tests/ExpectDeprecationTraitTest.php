@@ -11,12 +11,13 @@
 
 namespace Symfony\Bridge\PhpUnit\Tests;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpunit;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
-/**
- * @requires PHPUnit < 10
- */
+#[RequiresPhpunit('<10')]
 final class ExpectDeprecationTraitTest extends TestCase
 {
     use ExpectDeprecationTrait;
@@ -26,6 +27,7 @@ final class ExpectDeprecationTraitTest extends TestCase
      *
      * @group legacy
      */
+    #[Group('legacy')]
     public function testOne()
     {
         $this->expectDeprecation('foo');
@@ -39,6 +41,8 @@ final class ExpectDeprecationTraitTest extends TestCase
      *
      * @runInSeparateProcess
      */
+    #[Group('legacy')]
+    #[RunInSeparateProcess]
     public function testOneInIsolation()
     {
         $this->expectDeprecation('foo');
@@ -50,6 +54,7 @@ final class ExpectDeprecationTraitTest extends TestCase
      *
      * @group legacy
      */
+    #[Group('legacy')]
     public function testMany()
     {
         $this->expectDeprecation('foo');
@@ -65,6 +70,7 @@ final class ExpectDeprecationTraitTest extends TestCase
      *
      * @expectedDeprecation foo
      */
+    #[Group('legacy')]
     public function testOneWithAnnotation()
     {
         $this->expectDeprecation('bar');
@@ -80,6 +86,7 @@ final class ExpectDeprecationTraitTest extends TestCase
      * @expectedDeprecation foo
      * @expectedDeprecation bar
      */
+    #[Group('legacy')]
     public function testManyWithAnnotation()
     {
         $this->expectDeprecation('ccc');

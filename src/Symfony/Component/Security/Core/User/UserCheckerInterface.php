@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Core\User;
 
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AccountStatusException;
 
 /**
@@ -35,5 +36,5 @@ interface UserCheckerInterface
      *
      * @throws AccountStatusException
      */
-    public function checkPostAuth(UserInterface $user /* , TokenInterface $token */): void;
+    public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void;
 }

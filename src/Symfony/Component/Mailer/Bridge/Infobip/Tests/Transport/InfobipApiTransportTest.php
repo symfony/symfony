@@ -252,7 +252,8 @@ class InfobipApiTransportTest extends TestCase
             ->addTextHeader('X-Infobip-Track', 'false')
             ->addTextHeader('X-Infobip-TrackingUrl', 'https://bar.foo')
             ->addTextHeader('X-Infobip-TrackClicks', 'true')
-            ->addTextHeader('X-Infobip-TrackOpens', 'true');
+            ->addTextHeader('X-Infobip-TrackOpens', 'true')
+            ->addTextHeader('X-Infobip-IpPoolId', 'pool-123');
 
         $this->transport->send($email);
 
@@ -308,6 +309,12 @@ class InfobipApiTransportTest extends TestCase
             Content-Disposition: form-data; name="trackOpens"
 
             true
+            --%s
+            Content-Type: text/plain; charset=utf-8
+            Content-Transfer-Encoding: 8bit
+            Content-Disposition: form-data; name="ipPoolId"
+
+            pool-123
             --%s--
             TXT,
             $options['body']
@@ -328,17 +335,17 @@ class InfobipApiTransportTest extends TestCase
         $this->assertInstanceOf(SentMessage::class, $sentMessage);
         $this->assertStringMatchesFormat(
             <<<'TXT'
-            Subject: Subject of the email
-            From: from@example.com
-            To: to@example.com
-            Message-ID: <%x@example.com>
-            MIME-Version: %f
-            Date: %s
-            Content-Type: text/plain; charset=utf-8
-            Content-Transfer-Encoding: quoted-printable
+                Subject: Subject of the email
+                From: from@example.com
+                To: to@example.com
+                Message-ID: <%x@example.com>
+                MIME-Version: %f
+                Date: %s
+                Content-Type: text/plain; charset=utf-8
+                Content-Transfer-Encoding: quoted-printable
 
-            Some text
-            TXT,
+                Some text
+                TXT,
             $sentMessage->toString()
         );
     }
@@ -362,28 +369,28 @@ class InfobipApiTransportTest extends TestCase
         $this->assertInstanceOf(SentMessage::class, $sentMessage);
         $this->assertStringMatchesFormat(
             <<<'TXT'
-            Subject: Subject of the email
-            From: From <from@example.com>
-            To: to1@example.com, to2@example.com
-            Cc: cc@example.com
-            Date: Thu, 28 Apr 2022 14:00:00 +0000
-            Reply-To: replyTo@example.com
-            Message-ID: <%x@example.com>
-            MIME-Version: 1.0
-            Content-Type: multipart/alternative; boundary=%s
+                Subject: Subject of the email
+                From: From <from@example.com>
+                To: to1@example.com, to2@example.com
+                Cc: cc@example.com
+                Date: Thu, 28 Apr 2022 14:00:00 +0000
+                Reply-To: replyTo@example.com
+                Message-ID: <%x@example.com>
+                MIME-Version: 1.0
+                Content-Type: multipart/alternative; boundary=%s
 
-            --%s
-            Content-Type: text/plain; charset=utf-8
-            Content-Transfer-Encoding: quoted-printable
+                --%s
+                Content-Type: text/plain; charset=utf-8
+                Content-Transfer-Encoding: quoted-printable
 
-            Some text
-            --%s
-            Content-Type: text/html; charset=utf-8
-            Content-Transfer-Encoding: quoted-printable
+                Some text
+                --%s
+                Content-Type: text/html; charset=utf-8
+                Content-Transfer-Encoding: quoted-printable
 
-            <html><p>Hello!</p></html>
-            --%s--
-            TXT,
+                <html><p>Hello!</p></html>
+                --%s--
+                TXT,
             $sentMessage->toString()
         );
         $this->assertInstanceOf(Email::class, $sentMessage->getOriginalMessage());
@@ -403,29 +410,29 @@ class InfobipApiTransportTest extends TestCase
         $this->assertInstanceOf(SentMessage::class, $sentMessage);
         $this->assertStringMatchesFormat(
             <<<'TXT'
-            %a
-            Content-Type: multipart/mixed; boundary=%s
+                %a
+                Content-Type: multipart/mixed; boundary=%s
 
-            --%s
-            Content-Type: text/plain; charset=utf-8
-            Content-Transfer-Encoding: quoted-printable
+                --%s
+                Content-Type: text/plain; charset=utf-8
+                Content-Transfer-Encoding: quoted-printable
 
-            foobar
-            --%s
-            Content-Type: text/plain; name=attachment.txt
-            Content-Transfer-Encoding: base64
-            Content-Disposition: attachment; name=attachment.txt;
-             filename=attachment.txt
+                foobar
+                --%s
+                Content-Type: text/plain; name=attachment.txt
+                Content-Transfer-Encoding: base64
+                Content-Disposition: attachment; name=attachment.txt;
+                 filename=attachment.txt
 
-            c29tZSBhdHRhY2htZW50
-            --%s
-            Content-Type: text/plain; name=inline.txt
-            Content-Transfer-Encoding: base64
-            Content-Disposition: inline; name=inline.txt; filename=inline.txt
+                c29tZSBhdHRhY2htZW50
+                --%s
+                Content-Type: text/plain; name=inline.txt
+                Content-Transfer-Encoding: base64
+                Content-Disposition: inline; name=inline.txt; filename=inline.txt
 
-            c29tZSBpbmxpbmUgYXR0YWNobWVudA==
-            --%s--
-            TXT,
+                c29tZSBpbmxpbmUgYXR0YWNobWVudA==
+                --%s--
+                TXT,
             $sentMessage->toString()
         );
     }
@@ -441,24 +448,26 @@ class InfobipApiTransportTest extends TestCase
             ->addTextHeader('X-Infobip-Track', 'false')
             ->addTextHeader('X-Infobip-TrackingUrl', 'https://bar.foo')
             ->addTextHeader('X-Infobip-TrackClicks', 'true')
-            ->addTextHeader('X-Infobip-TrackOpens', 'true');
+            ->addTextHeader('X-Infobip-TrackOpens', 'true')
+            ->addTextHeader('X-Infobip-IpPoolId', 'pool-123');
 
         $sentMessage = $this->transport->send($email);
 
         $this->assertInstanceOf(SentMessage::class, $sentMessage);
         $this->assertStringMatchesFormat(
             <<<'TXT'
-            %a
-            X-Infobip-IntermediateReport: true
-            X-Infobip-NotifyUrl: https://foo.bar
-            X-Infobip-NotifyContentType: application/json
-            X-Infobip-MessageId: RANDOM-CUSTOM-ID
-            X-Infobip-Track: false
-            X-Infobip-TrackingUrl: https://bar.foo
-            X-Infobip-TrackClicks: true
-            X-Infobip-TrackOpens: true
-            %a
-            TXT,
+                %a
+                X-Infobip-IntermediateReport: true
+                X-Infobip-NotifyUrl: https://foo.bar
+                X-Infobip-NotifyContentType: application/json
+                X-Infobip-MessageId: RANDOM-CUSTOM-ID
+                X-Infobip-Track: false
+                X-Infobip-TrackingUrl: https://bar.foo
+                X-Infobip-TrackClicks: true
+                X-Infobip-TrackOpens: true
+                X-Infobip-IpPoolId: pool-123
+                %a
+                TXT,
             $sentMessage->toString()
         );
     }

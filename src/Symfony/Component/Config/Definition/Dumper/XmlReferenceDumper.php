@@ -53,7 +53,7 @@ class XmlReferenceDumper
 
         // xml remapping
         if ($node->getParent()) {
-            $remapping = array_filter($node->getParent()->getXmlRemappings(), fn (array $mapping) => $rootName === $mapping[1]);
+            $remapping = array_filter($node->getParent()->getXmlRemappings(), static fn (array $mapping) => $rootName === $mapping[1]);
 
             if (\count($remapping)) {
                 [$singular] = current($remapping);
@@ -144,8 +144,7 @@ class XmlReferenceDumper
                 }
 
                 if ($child instanceof BaseNode && $child->isDeprecated()) {
-                    $deprecation = $child->getDeprecation($child->getName(), $node->getPath());
-                    $comments[] = \sprintf('Deprecated (%s)', ($deprecation['package'] || $deprecation['version'] ? "Since {$deprecation['package']} {$deprecation['version']}: " : '').$deprecation['message']);
+                    $comments[] = \sprintf('Deprecated (%s)', $child->getDeprecationMessage($node));
                 }
 
                 if ($child instanceof EnumNode) {

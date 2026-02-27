@@ -41,7 +41,7 @@ class InputBagTest extends TestCase
         $bag = new InputBag(['foo' => 'bar']);
 
         $this->expectException(BadRequestException::class);
-        $this->expectExceptionMessage('Input value "foo" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
+        $this->expectExceptionMessage('Input value "foo" cannot be converted to "int".');
 
         $bag->getInt('foo');
     }
@@ -51,7 +51,7 @@ class InputBagTest extends TestCase
         $bag = new InputBag(['foo' => 'bar']);
 
         $this->expectException(BadRequestException::class);
-        $this->expectExceptionMessage('Input value "foo" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
+        $this->expectExceptionMessage('Input value "foo" cannot be converted to "bool".');
 
         $bag->getBoolean('foo');
     }

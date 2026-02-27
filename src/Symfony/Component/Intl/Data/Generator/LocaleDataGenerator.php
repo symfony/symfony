@@ -16,6 +16,7 @@ use Symfony\Component\Intl\Data\Bundle\Compiler\BundleCompilerInterface;
 use Symfony\Component\Intl\Data\Bundle\Reader\BundleEntryReaderInterface;
 use Symfony\Component\Intl\Data\Util\LocaleScanner;
 use Symfony\Component\Intl\Exception\MissingResourceException;
+use Symfony\Component\VarExporter\VarExporter;
 
 /**
  * The rule for compiling the locale bundle.
@@ -56,10 +57,8 @@ class LocaleDataGenerator extends AbstractDataGenerator
     protected function preGenerate(): void
     {
         // Write parents locale file for the Translation component
-        file_put_contents(
-            __DIR__.'/../../../Translation/Resources/data/parents.json',
-            json_encode($this->localeParents, \JSON_PRETTY_PRINT).\PHP_EOL
-        );
+        file_put_contents(__DIR__.'/../../../Translation/Resources/data/parents.json', json_encode($this->localeParents, \JSON_PRETTY_PRINT)."\n");
+        file_put_contents(__DIR__.'/../../../Translation/Resources/data/parents.php', "<?php\n\nreturn ".VarExporter::export($this->localeParents).";\n");
     }
 
     protected function generateDataForLocale(BundleEntryReaderInterface $reader, string $tempDir, string $displayLocale): ?array

@@ -64,12 +64,12 @@ class FlexStyleMicroKernel extends Kernel
         return \dirname((new \ReflectionObject($this))->getFileName(), 2);
     }
 
-    public function __sleep(): array
+    public function __serialize(): array
     {
         throw new \BadMethodCallException('Cannot serialize '.__CLASS__);
     }
 
-    public function __wakeup(): void
+    public function __unserialize(array $data): void
     {
         throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
     }
@@ -100,12 +100,6 @@ class FlexStyleMicroKernel extends Kernel
                 ->factory([$this, 'createHalloween'])
                 ->arg('$halloween', '%halloween%');
 
-        $c->extension('framework', [
-            'annotations' => false,
-            'http_method_override' => false,
-            'handle_all_throwables' => true,
-            'php_errors' => ['log' => true],
-            'router' => ['utf8' => true],
-        ]);
+        $c->extension('framework', []);
     }
 }

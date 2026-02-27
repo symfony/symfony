@@ -31,7 +31,7 @@ final class AutowiringFailedExceptionTest extends TestCase
         $counter = 0;
         $exception = new AutowiringFailedException(
             'App\DummyService',
-            function () use (&$counter) {
+            static function () use (&$counter) {
                 ++$counter;
 
                 throw new \Exception('boo');

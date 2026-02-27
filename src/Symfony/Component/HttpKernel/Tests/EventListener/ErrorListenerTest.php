@@ -11,9 +11,11 @@
 
 namespace Symfony\Component\HttpKernel\Tests\EventListener;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,9 +35,8 @@ use Symfony\Component\HttpKernel\Tests\Logger;
 
 /**
  * @author Robert Schönthal <seroscho@googlemail.com>
- *
- * @group time-sensitive
  */
+#[Group('time-sensitive')]
 class ErrorListenerTest extends TestCase
 {
     public function testConstruct()
@@ -50,9 +51,7 @@ class ErrorListenerTest extends TestCase
         $this->assertSame('foo', $_controller->getValue($l));
     }
 
-    /**
-     * @dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testHandleWithoutLogger($event, $event2)
     {
         $initialErrorLog = ini_set('error_log', file_exists('/dev/null') ? '/dev/null' : 'nul');
@@ -77,9 +76,7 @@ class ErrorListenerTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider provider
-     */
+    #[DataProvider('provider')]
     public function testHandleWithLogger($event, $event2)
     {
         $logger = new TestLogger();
@@ -234,9 +231,7 @@ class ErrorListenerTest extends TestCase
         $this->assertCount(1, $logger->getLogsForLevel('info'));
     }
 
-    /**
-     * @dataProvider exceptionWithAttributeProvider
-     */
+    #[DataProvider('exceptionWithAttributeProvider')]
     public function testHandleHttpAttribute(\Throwable $exception, int $expectedStatusCode, array $expectedHeaders)
     {
         $request = new Request();
@@ -282,10 +277,10 @@ class ErrorListenerTest extends TestCase
 
     public function testSubRequestFormat()
     {
-        $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class));
+        $listener = new ErrorListener('foo', new NullLogger());
 
         $kernel = $this->createMock(HttpKernelInterface::class);
-        $kernel->expects($this->once())->method('handle')->willReturnCallback(fn (Request $request) => new Response($request->getRequestFormat()));
+        $kernel->expects($this->once())->method('handle')->willReturnCallback(static fn (Request $request) => new Response($request->getRequestFormat()));
 
         $request = Request::create('/');
         $request->setRequestFormat('xml');
@@ -301,9 +296,9 @@ class ErrorListenerTest extends TestCase
     {
         $dispatcher = new EventDispatcher();
         $kernel = $this->createMock(HttpKernelInterface::class);
-        $kernel->expects($this->once())->method('handle')->willReturnCallback(fn (Request $request) => new Response($request->getRequestFormat()));
+        $kernel->expects($this->once())->method('handle')->willReturnCallback(static fn (Request $request) => new Response($request->getRequestFormat()));
 
-        $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class), true);
+        $listener = new ErrorListener('foo', new NullLogger(), true);
 
         $dispatcher->addSubscriber($listener);
 
@@ -322,7 +317,7 @@ class ErrorListenerTest extends TestCase
 
     public function testTerminating()
     {
-        $listener = new ErrorListener('foo', $this->createMock(LoggerInterface::class));
+        $listener = new ErrorListener('foo', new NullLogger());
 
         $kernel = $this->createMock(HttpKernelInterface::class);
         $kernel->expects($this->never())->method('handle');
@@ -333,14 +328,12 @@ class ErrorListenerTest extends TestCase
         $listener->onKernelException($event);
     }
 
-    /**
-     * @dataProvider controllerProvider
-     */
+    #[DataProvider('controllerProvider')]
     public function testOnControllerArguments(callable $controller)
     {
-        $listener = new ErrorListener($controller, $this->createMock(LoggerInterface::class), true);
+        $listener = new ErrorListener($controller, new NullLogger(), true);
 
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = $this->createStub(HttpKernelInterface::class);
         $kernel->method('handle')->willReturnCallback(function (Request $request) use ($listener, $controller, $kernel) {
             $this->assertSame($controller, $request->attributes->get('_controller'));
             $arguments = (new ArgumentResolver())->getArguments($request, $controller);
@@ -358,15 +351,15 @@ class ErrorListenerTest extends TestCase
 
     public static function controllerProvider()
     {
-        yield [fn (FlattenException $exception) => new Response('OK: '.$exception->getMessage())];
+        yield [static fn (FlattenException $exception) => new Response('OK: '.$exception->getMessage())];
 
-        yield [function ($exception) {
+        yield [static function ($exception) {
             static::assertInstanceOf(FlattenException::class, $exception);
 
             return new Response('OK: '.$exception->getMessage());
         }];
 
-        yield [fn (\Throwable $exception) => new Response('OK: '.$exception->getMessage())];
+        yield [static fn (\Throwable $exception) => new Response('OK: '.$exception->getMessage())];
     }
 
     public static function exceptionWithAttributeProvider()

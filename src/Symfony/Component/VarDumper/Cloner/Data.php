@@ -293,7 +293,7 @@ class Data implements \ArrayAccess, \Countable, \IteratorAggregate, \Stringable
         if (!$item instanceof Stub) {
             $cursor->attr = [];
             $type = \gettype($item);
-            if ($item && 'array' === $type) {
+            if ('array' === $type && $item) {
                 $item = $this->getStub($item);
             }
         } elseif (Stub::TYPE_REF === $item->type) {

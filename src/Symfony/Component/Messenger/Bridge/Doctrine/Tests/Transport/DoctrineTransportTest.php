@@ -35,7 +35,7 @@ class DoctrineTransportTest extends TestCase
     {
         $transport = $this->getTransport(
             $serializer = $this->createMock(SerializerInterface::class),
-            $connection = $this->createMock(Connection::class)
+            $connection = $this->createStub(Connection::class)
         );
 
         $decodedMessage = new DummyMessage('Decoded.');
@@ -46,7 +46,7 @@ class DoctrineTransportTest extends TestCase
             'headers' => ['my' => 'header'],
         ];
 
-        $serializer->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
+        $serializer->expects($this->once())->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
         $connection->method('get')->willReturn($doctrineEnvelope);
 
         $envelopes = $transport->get();
@@ -61,13 +61,14 @@ class DoctrineTransportTest extends TestCase
         );
 
         $schema = new Schema();
-        $dbalConnection = $this->createMock(DbalConnection::class);
+        $dbalConnection = $this->createStub(DbalConnection::class);
 
+        $isSameDatabaseChecker = static fn () => true;
         $connection->expects($this->once())
             ->method('configureSchema')
-            ->with($schema, $dbalConnection, static fn () => true);
+            ->with($schema, $dbalConnection, $isSameDatabaseChecker);
 
-        $transport->configureSchema($schema, $dbalConnection, static fn () => true);
+        $transport->configureSchema($schema, $dbalConnection, $isSameDatabaseChecker);
     }
 
     public function testKeepalive()
@@ -88,8 +89,8 @@ class DoctrineTransportTest extends TestCase
 
     private function getTransport(?SerializerInterface $serializer = null, ?Connection $connection = null): DoctrineTransport
     {
-        $serializer ??= $this->createMock(SerializerInterface::class);
-        $connection ??= $this->createMock(Connection::class);
+        $serializer ??= $this->createStub(SerializerInterface::class);
+        $connection ??= $this->createStub(Connection::class);
 
         return new DoctrineTransport($connection, $serializer);
     }

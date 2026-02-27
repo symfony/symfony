@@ -13,15 +13,15 @@ namespace Symfony\Component\Ldap\Security;
 
 use Symfony\Component\Ldap\Entry;
 
-final readonly class MemberOfRoles implements RoleFetcherInterface
+final class MemberOfRoles implements RoleFetcherInterface
 {
     /**
      * @param array<string, string> $mapping
      */
     public function __construct(
-        private array $mapping,
-        private string $attributeName = 'ismemberof',
-        private string $groupNameRegex = '/^CN=(?P<group>[^,]+),ou.*$/i',
+        private readonly array $mapping,
+        private readonly string $attributeName = 'ismemberof',
+        private readonly string $groupNameRegex = '/^CN=(?P<group>[^,]+),ou.*$/i',
     ) {
     }
 

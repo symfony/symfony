@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -34,9 +35,7 @@ class ContainerTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $sc->getParameterBag()->all(), '__construct() takes an array of parameters as its first argument');
     }
 
-    /**
-     * @dataProvider dataForTestCamelize
-     */
+    #[DataProvider('dataForTestCamelize')]
     public function testCamelize($id, $expected)
     {
         $this->assertEquals($expected, Container::camelize($id), \sprintf('Container::camelize("%s")', $id));
@@ -58,9 +57,7 @@ class ContainerTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dataForTestUnderscore
-     */
+    #[DataProvider('dataForTestUnderscore')]
     public function testUnderscore($id, $expected)
     {
         $this->assertEquals($expected, Container::underscore($id), \sprintf('Container::underscore("%s")', $id));
@@ -428,9 +425,7 @@ class ContainerTest extends TestCase
         $container = new Container();
         $container->setParameter('env(FOO)', null);
         $container->set('container.env_var_processors_locator', new ServiceLocator([
-            'string' => static function () use ($container): EnvVarProcessor {
-                return new EnvVarProcessor($container);
-            },
+            'string' => static fn (): EnvVarProcessor => new EnvVarProcessor($container),
         ]));
         $container->compile();
 

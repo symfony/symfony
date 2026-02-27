@@ -34,6 +34,22 @@ class Reference
      */
     public function getInvalidBehavior(): int
     {
-        return $this->invalidBehavior;
+        return $this->invalidBehavior ??= ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+    }
+
+    public function __serialize(): array
+    {
+        $data = [];
+        foreach ((array) $this as $k => $v) {
+            if (false !== $i = strrpos($k, "\0")) {
+                $k = substr($k, 1 + $i);
+            }
+            if ('invalidBehavior' === $k && ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE === $v) {
+                continue;
+            }
+            $data[$k] = $v;
+        }
+
+        return $data;
     }
 }

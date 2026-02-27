@@ -18,22 +18,31 @@ use Symfony\Component\Validator\Mapping\Loader\AttributeLoader;
 
 class NotIdenticalToTest extends TestCase
 {
+    public function testArrayValueDoesNotTriggerDeprecation()
+    {
+        $constraint = new NotIdenticalTo(value: []);
+        self::assertSame([], $constraint->value);
+
+        $constraint = new NotIdenticalTo(value: [1, 2, 3]);
+        self::assertSame([1, 2, 3], $constraint->value);
+    }
+
     public function testAttributes()
     {
         $metadata = new ClassMetadata(NotIdenticalToDummy::class);
         $loader = new AttributeLoader();
         self::assertTrue($loader->loadClassMetadata($metadata));
 
-        [$aConstraint] = $metadata->properties['a']->getConstraints();
+        [$aConstraint] = $metadata->getPropertyMetadata('a')[0]->getConstraints();
         self::assertSame(2, $aConstraint->value);
         self::assertNull($aConstraint->propertyPath);
 
-        [$bConstraint] = $metadata->properties['b']->getConstraints();
+        [$bConstraint] = $metadata->getPropertyMetadata('b')[0]->getConstraints();
         self::assertSame(4711, $bConstraint->value);
         self::assertSame('myMessage', $bConstraint->message);
         self::assertSame(['Default', 'NotIdenticalToDummy'], $bConstraint->groups);
 
-        [$cConstraint] = $metadata->properties['c']->getConstraints();
+        [$cConstraint] = $metadata->getPropertyMetadata('c')[0]->getConstraints();
         self::assertNull($cConstraint->value);
         self::assertSame('b', $cConstraint->propertyPath);
         self::assertSame('myMessage', $cConstraint->message);

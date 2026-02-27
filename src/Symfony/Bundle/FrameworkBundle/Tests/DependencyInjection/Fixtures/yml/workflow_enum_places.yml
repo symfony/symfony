@@ -1,0 +1,13 @@
+framework:
+    workflows:
+        enum:
+            supports:
+                - Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\FrameworkExtensionTestCase
+            places: !php/enum Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Workflow\Places
+            transitions:
+                one:
+                    from: !php/enum Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Workflow\Places::A
+                    to: !php/enum Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Workflow\Places::B
+                two:
+                    from: !php/enum Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Workflow\Places::B
+                    to: !php/enum Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Workflow\Places::C

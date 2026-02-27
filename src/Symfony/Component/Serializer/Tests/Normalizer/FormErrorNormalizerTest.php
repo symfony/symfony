@@ -26,7 +26,7 @@ class FormErrorNormalizerTest extends TestCase
     {
         $this->normalizer = new FormErrorNormalizer();
 
-        $this->form = $this->createMock(FormInterface::class);
+        $this->form = $this->createStub(FormInterface::class);
         $this->form->method('isSubmitted')->willReturn(true);
         $this->form->method('all')->willReturn([]);
 
@@ -45,7 +45,7 @@ class FormErrorNormalizerTest extends TestCase
 
     public function testSupportsNormalizationWithNotSubmittedForm()
     {
-        $form = $this->createMock(FormInterface::class);
+        $form = $this->createStub(FormInterface::class);
         $this->assertFalse($this->normalizer->supportsNormalization($form));
     }
 
@@ -77,7 +77,7 @@ class FormErrorNormalizerTest extends TestCase
 
     public function testNormalizeWithChildren()
     {
-        $exptected = [
+        $expected = [
             'code' => null,
             'title' => 'Validation Failed',
             'type' => 'https://symfony.com/errors/form',
@@ -117,7 +117,7 @@ class FormErrorNormalizerTest extends TestCase
             ],
         ];
 
-        $form = clone $form1 = clone $form2 = clone $form3 = $this->createMock(FormInterface::class);
+        $form = clone $form1 = clone $form2 = clone $form3 = $this->createStub(FormInterface::class);
 
         $form1->method('getErrors')
             ->willReturn(new FormErrorIterator($form1, [
@@ -142,7 +142,7 @@ class FormErrorNormalizerTest extends TestCase
 
         $form2->method('all')->willReturn([$form3]);
 
-        $form = $this->createMock(FormInterface::class);
+        $form = $this->createStub(FormInterface::class);
         $form->method('isSubmitted')->willReturn(true);
         $form->method('all')->willReturn([$form1, $form2]);
         $form->method('getErrors')
@@ -151,6 +151,6 @@ class FormErrorNormalizerTest extends TestCase
             ])
             );
 
-        $this->assertEquals($exptected, $this->normalizer->normalize($form));
+        $this->assertEquals($expected, $this->normalizer->normalize($form));
     }
 }

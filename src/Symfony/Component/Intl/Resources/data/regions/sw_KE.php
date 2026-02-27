@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'UserAssignedNames' => [],
     'Names' => [
         'AF' => 'Afghanistani',
         'AG' => 'Antigua na Babuda',
@@ -13,7 +14,6 @@ return [
         'BT' => 'Bhutani',
         'BY' => 'Belarusi',
         'CC' => 'Visiwa vya Kokos (Keeling)',
-        'CD' => 'Kongo - Kinshasa',
         'CV' => 'Kepuvede',
         'CW' => 'Kurakao',
         'EC' => 'Ekwado',

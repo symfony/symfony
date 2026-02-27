@@ -37,14 +37,25 @@ use Symfony\Bundle\FrameworkBundle\Command\SecretsRevealCommand;
 use Symfony\Bundle\FrameworkBundle\Command\SecretsSetCommand;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Command\TranslationExtractCommand;
-use Symfony\Bundle\FrameworkBundle\Command\WorkflowDumpCommand;
 use Symfony\Bundle\FrameworkBundle\Command\YamlLintCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
+use Symfony\Component\Console\ArgumentResolver\ArgumentResolver;
+use Symfony\Component\Console\ArgumentResolver\ValueResolver\BackedEnumValueResolver;
+use Symfony\Component\Console\ArgumentResolver\ValueResolver\BuiltinTypeValueResolver;
+use Symfony\Component\Console\ArgumentResolver\ValueResolver\DateTimeValueResolver;
+use Symfony\Component\Console\ArgumentResolver\ValueResolver\DefaultValueResolver;
+use Symfony\Component\Console\ArgumentResolver\ValueResolver\InputFileValueResolver;
+use Symfony\Component\Console\ArgumentResolver\ValueResolver\MapInputValueResolver;
+use Symfony\Component\Console\ArgumentResolver\ValueResolver\ServiceValueResolver;
+use Symfony\Component\Console\ArgumentResolver\ValueResolver\UidValueResolver;
+use Symfony\Component\Console\ArgumentResolver\ValueResolver\VariadicValueResolver;
 use Symfony\Component\Console\EventListener\ErrorListener;
+use Symfony\Component\Console\EventListener\ValidateQuestionInputListener;
 use Symfony\Component\Console\Messenger\RunCommandMessageHandler;
 use Symfony\Component\Dotenv\Command\DebugCommand as DotenvDebugCommand;
 use Symfony\Component\ErrorHandler\Command\ErrorDumpCommand;
+use Symfony\Component\Form\Command\DebugCommand;
 use Symfony\Component\Messenger\Command\ConsumeMessagesCommand;
 use Symfony\Component\Messenger\Command\DebugCommand as MessengerDebugCommand;
 use Symfony\Component\Messenger\Command\FailedMessagesRemoveCommand;
@@ -60,6 +71,7 @@ use Symfony\Component\Translation\Command\TranslationPullCommand;
 use Symfony\Component\Translation\Command\TranslationPushCommand;
 use Symfony\Component\Translation\Command\XliffLintCommand;
 use Symfony\Component\Validator\Command\DebugCommand as ValidatorDebugCommand;
+use Symfony\Component\Workflow\Command\WorkflowDumpCommand;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookupInterface;
 
 return static function (ContainerConfigurator $container) {
@@ -72,6 +84,12 @@ return static function (ContainerConfigurator $container) {
             ->tag('monolog.logger', ['channel' => 'console'])
 
         ->set('console.suggest_missing_package_subscriber', SuggestMissingPackageSubscriber::class)
+            ->tag('kernel.event_subscriber')
+
+        ->set('.console.validate_question_input_listener', ValidateQuestionInputListener::class)
+            ->args([
+                service('validator'),
+            ])
             ->tag('kernel.event_subscriber')
 
         ->set('console.command.about', AboutCommand::class)
@@ -128,6 +146,9 @@ return static function (ContainerConfigurator $container) {
             ->tag('console.command')
 
         ->set('console.command.config_debug', ConfigDebugCommand::class)
+            ->args([
+                service('container.env_var_processors_locator'),
+            ])
             ->tag('console.command')
 
         ->set('console.command.config_dump_reference', ConfigDumpReferenceCommand::class)
@@ -200,7 +221,7 @@ return static function (ContainerConfigurator $container) {
                 service('messenger.routable_message_bus'),
                 service('event_dispatcher'),
                 service('logger')->nullOnInvalid(),
-                service('messenger.transport.native_php_serializer')->nullOnInvalid(),
+                service('.messenger.transport.native_php_serializer')->nullOnInvalid(),
                 null,
             ])
             ->tag('console.command')
@@ -210,7 +231,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('Default failure receiver name'),
                 abstract_arg('Receivers'),
-                service('messenger.transport.native_php_serializer')->nullOnInvalid(),
+                service('.messenger.transport.native_php_serializer')->nullOnInvalid(),
             ])
             ->tag('console.command')
 
@@ -218,7 +239,7 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 abstract_arg('Default failure receiver name'),
                 abstract_arg('Receivers'),
-                service('messenger.transport.native_php_serializer')->nullOnInvalid(),
+                service('.messenger.transport.native_php_serializer')->nullOnInvalid(),
             ])
             ->tag('console.command')
 
@@ -327,7 +348,7 @@ return static function (ContainerConfigurator $container) {
             ])
             ->tag('console.command')
 
-        ->set('console.command.form_debug', \Symfony\Component\Form\Command\DebugCommand::class)
+        ->set('console.command.form_debug', DebugCommand::class)
             ->args([
                 service('form.registry'),
                 [], // All form types namespaces are stored here by FormPass
@@ -406,6 +427,51 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('console.messenger.application'),
             ])
-            ->tag('messenger.message_handler')
+            ->tag('messenger.message_handler', ['sign' => true])
+
+        ->set('console.argument_resolver', ArgumentResolver::class)
+            ->public()
+            ->args([
+                abstract_arg('argument value resolvers'),
+                abstract_arg('named argument value resolvers'),
+            ])
+
+        ->set('console.argument_resolver.backed_enum', BackedEnumValueResolver::class)
+            ->tag('console.argument_value_resolver', ['priority' => 100, 'name' => BackedEnumValueResolver::class])
+
+        ->set('console.argument_resolver.uid', UidValueResolver::class)
+            ->tag('console.argument_value_resolver', ['priority' => 100, 'name' => UidValueResolver::class])
+
+        ->set('console.argument_resolver.input_file', InputFileValueResolver::class)
+            ->tag('console.argument_value_resolver', ['priority' => 100, 'name' => InputFileValueResolver::class])
+
+        ->set('console.argument_resolver.builtin_type', BuiltinTypeValueResolver::class)
+            ->tag('console.argument_value_resolver', ['priority' => 100, 'name' => BuiltinTypeValueResolver::class])
+
+        ->set('console.argument_resolver.datetime', DateTimeValueResolver::class)
+            ->args([
+                service('clock')->nullOnInvalid(),
+            ])
+            ->tag('console.argument_value_resolver', ['priority' => 100, 'name' => DateTimeValueResolver::class])
+
+        ->set('console.argument_resolver.map_input', MapInputValueResolver::class)
+            ->args([
+                service('console.argument_resolver.builtin_type'),
+                service('console.argument_resolver.backed_enum'),
+                service('console.argument_resolver.datetime'),
+            ])
+            ->tag('console.argument_value_resolver', ['priority' => 100, 'name' => MapInputValueResolver::class])
+
+        ->set('console.argument_resolver.service', ServiceValueResolver::class)
+            ->args([
+                abstract_arg('service locator, set in RegisterCommandArgumentLocatorsPass'),
+            ])
+            ->tag('console.argument_value_resolver', ['priority' => -50, 'name' => ServiceValueResolver::class])
+
+        ->set('console.argument_resolver.default', DefaultValueResolver::class)
+            ->tag('console.argument_value_resolver', ['priority' => -100, 'name' => DefaultValueResolver::class])
+
+        ->set('console.argument_resolver.variadic', VariadicValueResolver::class)
+            ->tag('console.argument_value_resolver', ['priority' => -150, 'name' => VariadicValueResolver::class])
     ;
 };

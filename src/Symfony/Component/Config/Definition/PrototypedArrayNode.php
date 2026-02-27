@@ -29,10 +29,12 @@ class PrototypedArrayNode extends ArrayNode
     protected int $minNumberOfElements = 0;
     protected array $defaultValue = [];
     protected ?array $defaultChildren = null;
+
     /**
      * @var NodeInterface[] An array of the prototypes of the simplified value children
      */
     private array $valuePrototypes = [];
+    private bool $defaultToNull = false;
 
     /**
      * Sets the minimum number of elements that a prototype based node must
@@ -87,6 +89,13 @@ class PrototypedArrayNode extends ArrayNode
     public function setDefaultValue(array $value): void
     {
         $this->defaultValue = $value;
+        $this->defaultToNull = false;
+    }
+
+    public function setNullAsDefault(): void
+    {
+        $this->defaultValue = [];
+        $this->defaultToNull = true;
     }
 
     public function hasDefaultValue(): bool
@@ -106,14 +115,19 @@ class PrototypedArrayNode extends ArrayNode
         } else {
             $this->defaultChildren = \is_int($children) && $children > 0 ? range(1, $children) : (array) $children;
         }
+        $this->defaultToNull = false;
     }
 
     /**
-     * The default value could be either explicited or derived from the prototype
+     * The default value could be either explicit or derived from the prototype
      * default value.
      */
     public function getDefaultValue(): mixed
     {
+        if ($this->defaultToNull) {
+            return null;
+        }
+
         if (null !== $this->defaultChildren) {
             $default = $this->prototype->hasDefaultValue() ? $this->prototype->getDefaultValue() : [];
             $defaults = [];
@@ -255,6 +269,11 @@ class PrototypedArrayNode extends ArrayNode
             return $rightSide;
         }
 
+        // Track if this is initial population (leftSide is empty) - allowNewKeys
+        // should only be enforced when merging additional configs, not when
+        // initially populating from the first config
+        $isInitialPopulation = [] === $leftSide;
+
         $isList = array_is_list($rightSide);
         foreach ($rightSide as $k => $v) {
             // prototype, and key is irrelevant there are no named keys, append the element
@@ -265,14 +284,19 @@ class PrototypedArrayNode extends ArrayNode
 
             // no conflict
             if (!\array_key_exists($k, $leftSide)) {
-                if (!$this->allowNewKeys) {
+                if (!$this->allowNewKeys && !$isInitialPopulation) {
                     $ex = new InvalidConfigurationException(\sprintf('You are not allowed to define new elements for path "%s". Please define all elements for this path in one config file.', $this->getPath()));
                     $ex->setPath($this->getPath());
 
                     throw $ex;
                 }
 
-                $leftSide[$k] = $v;
+                if (\is_array($v) && ($prototype = $this->getPrototypeForChild($k)) instanceof ArrayNode) {
+                    // Ensure prototype's merge is called to handle auto_enable recursively
+                    $leftSide[$k] = $prototype->merge([], $v);
+                } else {
+                    $leftSide[$k] = $v;
+                }
                 continue;
             }
 

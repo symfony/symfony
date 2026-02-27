@@ -106,7 +106,7 @@
  
    &lt;info&gt;%%PHP_SELF%% help list&lt;/info&gt;
  
- You can also output the help in other formats by using the &lt;comment&gt;--format&lt;/comment&gt; option:
+ You can also output the help in other formats by using the &lt;info&gt;--format&lt;/info&gt; option:
  
    &lt;info&gt;%%PHP_SELF%% help --format=xml list&lt;/info&gt;
  
@@ -168,7 +168,7 @@
  
    &lt;info&gt;%%PHP_SELF%% list test&lt;/info&gt;
  
- You can also output the information in other formats by using the &lt;comment&gt;--format&lt;/comment&gt; option:
+ You can also output the information in other formats by using the &lt;info&gt;--format&lt;/info&gt; option:
  
    &lt;info&gt;%%PHP_SELF%% list --format=xml&lt;/info&gt;
  

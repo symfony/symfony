@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\AssetMapper\Tests\ImportMap;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\AssetMapper\ImportMap\PackageUpdateInfo;
 
 class PackageUpdateInfoTest extends TestCase
 {
-    /**
-     * @dataProvider provideValidConstructorArguments
-     */
+    #[DataProvider('provideValidConstructorArguments')]
     public function testConstructor($importName, $currentVersion, $latestVersion, $updateType)
     {
         $packageUpdateInfo = new PackageUpdateInfo(
@@ -44,9 +43,7 @@ class PackageUpdateInfoTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideHasUpdateArguments
-     */
+    #[DataProvider('provideHasUpdateArguments')]
     public function testHasUpdate($updateType, $expectUpdate)
     {
         $packageUpdateInfo = new PackageUpdateInfo(

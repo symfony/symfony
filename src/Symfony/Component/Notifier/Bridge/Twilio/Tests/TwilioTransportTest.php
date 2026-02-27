@@ -11,7 +11,9 @@
 
 namespace Symfony\Component\Notifier\Bridge\Twilio\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
+use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Twilio\TwilioTransport;
 use Symfony\Component\Notifier\Exception\InvalidArgumentException;
 use Symfony\Component\Notifier\Message\ChatMessage;
@@ -44,9 +46,7 @@ final class TwilioTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    /**
-     * @dataProvider invalidFromProvider
-     */
+    #[DataProvider('invalidFromProvider')]
     public function testInvalidArgumentExceptionIsThrownIfFromIsInvalid(string $from)
     {
         $transport = self::createTransport(null, $from);
@@ -57,9 +57,7 @@ final class TwilioTransportTest extends TransportTestCase
         $transport->send(new SmsMessage('+33612345678', 'Hello!'));
     }
 
-    /**
-     * @dataProvider invalidFromProvider
-     */
+    #[DataProvider('invalidFromProvider')]
     public function testInvalidArgumentExceptionIsThrownIfSmsMessageFromIsInvalid(string $from)
     {
         $transport = $this->createTransport();
@@ -81,30 +79,20 @@ final class TwilioTransportTest extends TransportTestCase
         yield 'phone number to short' => ['+1'];
     }
 
-    /**
-     * @dataProvider validFromProvider
-     */
+    #[DataProvider('validFromProvider')]
     public function testNoInvalidArgumentExceptionIsThrownIfFromIsValid(string $from)
     {
         $message = new SmsMessage('+33612345678', 'Hello!');
 
-        $response = $this->createMock(ResponseInterface::class);
-        $response->expects($this->exactly(2))
-            ->method('getStatusCode')
-            ->willReturn(201);
-        $response->expects($this->once())
-            ->method('getContent')
-            ->willReturn(json_encode([
-                'sid' => '123',
-                'message' => 'foo',
-                'more_info' => 'bar',
-            ]));
-
-        $client = new MockHttpClient(function (string $method, string $url, array $options = []) use ($response): ResponseInterface {
+        $client = new MockHttpClient(function (string $method, string $url, array $options = []): ResponseInterface {
             $this->assertSame('POST', $method);
             $this->assertSame('https://api.twilio.com/2010-04-01/Accounts/accountSid/Messages.json', $url);
 
-            return $response;
+            return new MockResponse(json_encode([
+                'sid' => '123',
+                'message' => 'foo',
+                'more_info' => 'bar',
+            ]), ['http_code' => 201]);
         });
 
         $transport = self::createTransport($client, $from);
@@ -146,5 +134,21 @@ final class TwilioTransportTest extends TransportTestCase
         yield ['+1123456789123'];
         yield ['+11234567891234'];
         yield ['+112345678912345'];
+
+        // whatsapp
+        yield ['whatsapp:+11'];
+        yield ['whatsapp:+112'];
+        yield ['whatsapp:+1123'];
+        yield ['whatsapp:+11234'];
+        yield ['whatsapp:+112345'];
+        yield ['whatsapp:+1123456'];
+        yield ['whatsapp:+11234567'];
+        yield ['whatsapp:+112345678'];
+        yield ['whatsapp:+1123456789'];
+        yield ['whatsapp:+11234567891'];
+        yield ['whatsapp:+112345678912'];
+        yield ['whatsapp:+1123456789123'];
+        yield ['whatsapp:+11234567891234'];
+        yield ['whatsapp:+112345678912345'];
     }
 }

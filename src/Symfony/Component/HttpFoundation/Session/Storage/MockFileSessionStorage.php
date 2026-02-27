@@ -34,7 +34,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
     {
         $savePath ??= sys_get_temp_dir();
 
-        if (!is_dir($savePath) && !@mkdir($savePath, 0777, true) && !is_dir($savePath)) {
+        if (!is_dir($savePath) && !@mkdir($savePath, 0o777, true) && !is_dir($savePath)) {
             throw new \RuntimeException(\sprintf('Session Storage was not able to create directory "%s".', $savePath));
         }
 
@@ -103,7 +103,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
             $this->data = $data;
         }
 
-        // this is needed when the session object is re-used across multiple requests
+        // this is needed when the session object is reused across multiple requests
         // in functional tests.
         $this->started = false;
     }

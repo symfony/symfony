@@ -55,6 +55,26 @@ class DefaultsConfigurator extends AbstractServiceConfigurator
     }
 
     /**
+     * Adds a resource tag for this definition.
+     *
+     * @return $this
+     *
+     * @throws InvalidArgumentException when an invalid tag name or attribute is provided
+     */
+    final public function resourceTag(string $name, array $attributes = []): static
+    {
+        if ('' === $name) {
+            throw new InvalidArgumentException('The resource tag name in "_defaults" must be a non-empty string.');
+        }
+
+        $this->validateAttributes($name, $attributes);
+
+        $this->definition->addResourceTag($name, $attributes);
+
+        return $this;
+    }
+
+    /**
      * Defines an instanceof-conditional to be applied to following service definitions.
      */
     final public function instanceof(string $fqcn): InstanceofConfigurator

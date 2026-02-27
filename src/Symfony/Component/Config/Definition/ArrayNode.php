@@ -127,6 +127,14 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
     }
 
     /**
+     * Whether deep merging should occur.
+     */
+    public function shouldPerformDeepMerging(): bool
+    {
+        return $this->performDeepMerging;
+    }
+
+    /**
      * Whether extra keys should just be ignored without an exception.
      *
      * @param bool $boolean To allow extra keys
@@ -343,6 +351,13 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
             return $rightSide;
         }
 
+        if ($this->getAttribute('auto_enable')
+            && \is_array($leftSide) && \is_array($rightSide)
+            && !\array_key_exists('enabled', $leftSide) && !\array_key_exists('enabled', $rightSide)
+        ) {
+            $rightSide['enabled'] = true;
+        }
+
         foreach ($rightSide as $k => $v) {
             // no conflict
             if (!\array_key_exists($k, $leftSide)) {
@@ -353,7 +368,12 @@ class ArrayNode extends BaseNode implements PrototypeNodeInterface
                     throw $ex;
                 }
 
-                $leftSide[$k] = $v;
+                if (\is_array($v) && ($this->children[$k] ?? null) instanceof self) {
+                    // Ensure child's merge is called to handle auto_enable recursively
+                    $leftSide[$k] = $this->children[$k]->merge([], $v);
+                } else {
+                    $leftSide[$k] = $v;
+                }
                 continue;
             }
 

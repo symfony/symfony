@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\ExpressionLanguage\Tests\Node;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Component\ExpressionLanguage\Compiler;
 use Symfony\Component\ExpressionLanguage\Node\ArrayNode;
 use Symfony\Component\ExpressionLanguage\Node\BinaryNode;
@@ -265,10 +266,8 @@ class BinaryNodeTest extends AbstractNodeTestCase
         $node->evaluate([], []);
     }
 
-    /**
-     * @testWith [1]
-     *           ["true"]
-     */
+    #[TestWith([1])]
+    #[TestWith(['true'])]
     public function testInOperatorStrictness(mixed $value)
     {
         $array = new ArrayNode();

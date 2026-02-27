@@ -92,4 +92,24 @@ class GlobTest extends TestCase
 
         $this->assertSame(['one/.dot', 'one/a', 'one/b', 'one/b/c.neon', 'one/b/d.neon'], $match);
     }
+
+    public function testGlobToRegexDoubleStarMatchesRootFiles()
+    {
+        $regex = Glob::toRegex('**/*.txt');
+
+        $this->assertSame(1, preg_match($regex, 'file.txt'));
+        $this->assertSame(1, preg_match($regex, 'foo/file.txt'));
+        $this->assertSame(1, preg_match($regex, 'foo/bar/baz.txt'));
+        $this->assertSame(1, preg_match($regex, '/foo/bar.txt'));
+        $this->assertSame(0, preg_match($regex, './foo/bar.txt'));
+        $this->assertSame(0, preg_match($regex, 'foo/.bar/bar.txt'));
+        $this->assertSame(0, preg_match($regex, '.file.txt'));
+        $this->assertSame(0, preg_match($regex, 'foo/bar/baz.php'));
+
+        $regex = Glob::toRegex('**/*.txt', false);
+
+        $this->assertSame(1, preg_match($regex, './foo/bar.txt'));
+        $this->assertSame(1, preg_match($regex, 'foo/.bar/bar.txt'));
+        $this->assertSame(1, preg_match($regex, '.file.txt'));
+    }
 }

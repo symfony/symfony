@@ -43,7 +43,7 @@ class Store implements StoreInterface
         protected string $root,
         private array $options = [],
     ) {
-        if (!is_dir($this->root) && !@mkdir($this->root, 0777, true) && !is_dir($this->root)) {
+        if (!is_dir($this->root) && !@mkdir($this->root, 0o777, true) && !is_dir($this->root)) {
             throw new \RuntimeException(\sprintf('Unable to create the store directory (%s).', $this->root));
         }
         $this->keyCache = new \SplObjectStorage();
@@ -75,7 +75,7 @@ class Store implements StoreInterface
 
         if (!isset($this->locks[$key])) {
             $path = $this->getPath($key);
-            if (!is_dir(\dirname($path)) && false === @mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
+            if (!is_dir(\dirname($path)) && false === @mkdir(\dirname($path), 0o777, true) && !is_dir(\dirname($path))) {
                 return $path;
             }
             $h = fopen($path, 'c');
@@ -206,13 +206,9 @@ class Store implements StoreInterface
 
         // read existing cache entries, remove non-varying, and add this one to the list
         $entries = [];
-        $vary = $response->headers->get('vary');
+        $vary = implode(', ', $response->headers->all('vary'));
         foreach ($this->getMetadata($key) as $entry) {
-            if (!isset($entry[1]['vary'][0])) {
-                $entry[1]['vary'] = [''];
-            }
-
-            if ($entry[1]['vary'][0] != $vary || !$this->requestsMatch($vary ?? '', $entry[0], $storedEnv)) {
+            if (!$this->requestsMatch($vary ?? '', $entry[0], $storedEnv)) {
                 $entries[] = $entry;
             }
         }
@@ -278,7 +274,7 @@ class Store implements StoreInterface
      */
     private function requestsMatch(?string $vary, array $env1, array $env2): bool
     {
-        if (!$vary) {
+        if ('' === ($vary ?? '')) {
             return true;
         }
 
@@ -379,7 +375,7 @@ class Store implements StoreInterface
                 return false;
             }
         } else {
-            if (!is_dir(\dirname($path)) && false === @mkdir(\dirname($path), 0777, true) && !is_dir(\dirname($path))) {
+            if (!is_dir(\dirname($path)) && false === @mkdir(\dirname($path), 0o777, true) && !is_dir(\dirname($path))) {
                 return false;
             }
 
@@ -405,7 +401,7 @@ class Store implements StoreInterface
             }
         }
 
-        @chmod($path, 0666 & ~umask());
+        @chmod($path, 0o666 & ~umask());
 
         return true;
     }
@@ -427,7 +423,15 @@ class Store implements StoreInterface
      */
     protected function generateCacheKey(Request $request): string
     {
-        return 'md'.hash('sha256', $request->getUri());
+        $key = $request->getUri();
+
+        if ('QUERY' === $request->getMethod()) {
+            // add null byte to separate the URI from the body and avoid boundary collisions
+            // which could lead to cache poisoning
+            $key .= "\0".$request->getContent();
+        }
+
+        return 'md'.hash('sha256', $key);
     }
 
     /**

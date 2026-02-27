@@ -185,17 +185,48 @@ abstract class AbstractDumper implements DataDumperInterface, DumperInterface
             return $s;
         }
 
-        if (!\function_exists('iconv')) {
-            throw new \RuntimeException('Unable to convert a non-UTF-8 string to UTF-8: required function iconv() does not exist. You should install ext-iconv or symfony/polyfill-iconv.');
+        if (\function_exists('iconv')) {
+            if (false !== $c = @iconv($this->charset, 'UTF-8', $s)) {
+                return $c;
+            }
+            if ('CP1252' !== $this->charset && false !== $c = @iconv('CP1252', 'UTF-8', $s)) {
+                return $c;
+            }
         }
 
-        if (false !== $c = @iconv($this->charset, 'UTF-8', $s)) {
-            return $c;
-        }
-        if ('CP1252' !== $this->charset && false !== $c = @iconv('CP1252', 'UTF-8', $s)) {
-            return $c;
+        $s .= $s;
+        $len = \strlen($s);
+        $mapCp1252 = false;
+
+        for ($i = $len >> 1, $j = 0; $i < $len; ++$i, ++$j) {
+            if ($s[$i] < "\x80") {
+                $s[$j] = $s[$i];
+            } elseif ($s[$i] < "\xC0") {
+                $s[$j] = "\xC2";
+                $s[++$j] = $s[$i];
+                if ($s[$i] < "\xA0") {
+                    $mapCp1252 = true;
+                }
+            } else {
+                $s[$j] = "\xC3";
+                $s[++$j] = \chr(\ord($s[$i]) - 64);
+            }
         }
 
-        return iconv('CP850', 'UTF-8', $s);
+        $s = substr($s, 0, $j);
+
+        if (!$mapCp1252) {
+            return $s;
+        }
+
+        return strtr($s, [
+            "\xC2\x80" => '€', "\xC2\x82" => '‚', "\xC2\x83" => 'ƒ', "\xC2\x84" => '„',
+            "\xC2\x85" => '…', "\xC2\x86" => '†', "\xC2\x87" => '‡', "\xC2\x88" => 'ˆ',
+            "\xC2\x89" => '‰', "\xC2\x8A" => 'Š', "\xC2\x8B" => '‹', "\xC2\x8C" => 'Œ',
+            "\xC2\x8D" => 'Ž', "\xC2\x91" => '‘', "\xC2\x92" => '’', "\xC2\x93" => '“',
+            "\xC2\x94" => '”', "\xC2\x95" => '•', "\xC2\x96" => '–', "\xC2\x97" => '—',
+            "\xC2\x98" => '˜', "\xC2\x99" => '™', "\xC2\x9A" => 'š', "\xC2\x9B" => '›',
+            "\xC2\x9C" => 'œ', "\xC2\x9E" => 'ž',
+        ]);
     }
 }

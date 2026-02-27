@@ -11,16 +11,15 @@
 
 namespace Symfony\Component\String\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
 class SluggerTest extends TestCase
 {
-    /**
-     * @requires extension intl
-     *
-     * @dataProvider provideSlug
-     */
+    #[RequiresPhpExtension('intl')]
+    #[DataProvider('provideSlug')]
     public function testSlug(string $string, string $locale, string $expectedSlug)
     {
         $slugger = new AsciiSlugger($locale);

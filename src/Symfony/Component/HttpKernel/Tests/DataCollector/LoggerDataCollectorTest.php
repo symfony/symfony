@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\DataCollector;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,7 +34,7 @@ class LoggerDataCollectorTest extends TestCase
 
         $c = new LoggerDataCollector($logger, __DIR__.'/');
         $c->lateCollect();
-        $compilerLogs = $c->getCompilerLogs()->getValue('message');
+        $compilerLogs = $c->getCompilerLogs()->getValue(true);
 
         $this->assertSame([
             ['message' => 'Removed service "Psr\Container\ContainerInterface"; reason: private alias.'],
@@ -54,10 +55,10 @@ class LoggerDataCollectorTest extends TestCase
         file_put_contents($path, serialize([[
             'type' => 16384,
             'message' => 'The "Symfony\Bundle\FrameworkBundle\Controller\Controller" class is deprecated since Symfony 4.2, use Symfony\Bundle\FrameworkBundle\Controller\AbstractController instead.',
-            'file' => '/home/hamza/projet/contrib/sf/vendor/symfony/framework-bundle/Controller/Controller.php',
+            'file' => '/home/hamza/project/contrib/sf/vendor/symfony/framework-bundle/Controller/Controller.php',
             'line' => 17,
             'trace' => [[
-                'file' => '/home/hamza/projet/contrib/sf/src/Controller/DefaultController.php',
+                'file' => '/home/hamza/project/contrib/sf/src/Controller/DefaultController.php',
                 'line' => 9,
                 'function' => 'spl_autoload_call',
             ]],
@@ -132,9 +133,7 @@ class LoggerDataCollectorTest extends TestCase
         $c->lateCollect();
     }
 
-    /**
-     * @dataProvider getCollectTestData
-     */
+    #[DataProvider('getCollectTestData')]
     public function testCollect($nb, $logs, $expectedLogs, $expectedDeprecationCount, $expectedScreamCount, $expectedPriorities = null)
     {
         $logger = $this
@@ -150,7 +149,7 @@ class LoggerDataCollectorTest extends TestCase
         $this->assertEquals('logger', $c->getName());
         $this->assertEquals($nb, $c->countErrors());
 
-        $logs = array_map(function ($v) {
+        $logs = array_map(static function ($v) {
             if (isset($v['context']['exception'])) {
                 $e = &$v['context']['exception'];
                 $e = isset($e["\0*\0message"]) ? [$e["\0*\0message"], $e["\0*\0severity"]] : [$e["\0Symfony\Component\ErrorHandler\Exception\SilencedErrorContext\0severity"]];
@@ -184,10 +183,6 @@ class LoggerDataCollectorTest extends TestCase
             0,
             0,
         ];
-
-        if (!class_exists(SilencedErrorContext::class)) {
-            return;
-        }
 
         yield 'logs with some deprecations' => [
             1,

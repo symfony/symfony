@@ -11,19 +11,32 @@
 
 namespace Symfony\Component\Console\Tests\Command;
 
+use PHPUnit\Framework\Assert;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\ArgumentResolver\ArgumentResolver;
+use Symfony\Component\Console\ArgumentResolver\ValueResolver\ValueResolverInterface;
 use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\Option;
+use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Completion\Suggestion;
+use Symfony\Component\Console\Cursor;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Console\Tests\Fixtures\InvokableTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithCustomValidatorTestCommand;
+use Symfony\Component\Console\Tests\Fixtures\InvokableWithInputFileAndConstraintsTestCommand;
 
 class InvokableCommandTest extends TestCase
 {
@@ -35,8 +48,15 @@ class InvokableCommandTest extends TestCase
             #[Argument] ?string $firstName,
             #[Argument] string $lastName = '',
             #[Argument(description: 'Short argument description')] string $bio = '',
+            // In this test case, we declare the callback in static context, even when the method is NOT static.
+            // PHP doesn't allow using `$this` here, and the callback is later modified on-the-fly
+            // to be called on the instance instead, and this test case validates if this mechanism works.
+            //
+            // @see \Symfony\Component\Console\Attribute\Argument
             #[Argument(suggestedValues: [self::class, 'getSuggestedRoles'])] array $roles = ['ROLE_USER'],
         ): int {
+            \assert(null !== $this); // so PHP CS Fixer knows this callback is actually coupled with `$this` and `static_lambda` rule shall not be applied
+
             return 0;
         });
 
@@ -81,6 +101,8 @@ class InvokableCommandTest extends TestCase
             #[Option(suggestedValues: [self::class, 'getSuggestedRoles'])] array $roles = ['ROLE_USER'],
             #[Option] string|bool $opt = false,
         ): int {
+            \assert(null !== $this); // so PHP CS Fixer knows this callback is actually coupled with `$this` and `static_lambda` rule shall not be applied
+
             return 0;
         });
 
@@ -132,32 +154,93 @@ class InvokableCommandTest extends TestCase
         self::assertFalse($optInputOption->getDefault());
     }
 
-    public function testInvalidArgumentType()
+    public function testEnumArgument()
     {
         $command = new Command('foo');
-        $command->setCode(function (#[Argument] object $any) {});
+        $command->setCode(static function (
+            #[Argument] StringEnum $enum,
+            #[Argument] StringEnum $enumWithDefault = StringEnum::Image,
+            #[Argument] ?StringEnum $nullableEnum = null,
+        ): int {
+            Assert::assertSame(StringEnum::Image, $enum);
+            Assert::assertSame(StringEnum::Image, $enumWithDefault);
+            Assert::assertNull($nullableEnum);
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The type "object" of parameter "$any" is not supported as a command argument. Only "string", "bool", "int", "float", "array" types are allowed.');
+            return 0;
+        });
 
-        $command->getDefinition();
+        $enumInputArgument = $command->getDefinition()->getArgument('enum');
+        self::assertTrue($enumInputArgument->isRequired());
+        self::assertNull($enumInputArgument->getDefault());
+        self::assertTrue($enumInputArgument->hasCompletion());
+
+        $enumWithDefaultInputArgument = $command->getDefinition()->getArgument('enum-with-default');
+        self::assertFalse($enumWithDefaultInputArgument->isRequired());
+        self::assertSame('image', $enumWithDefaultInputArgument->getDefault());
+        self::assertTrue($enumWithDefaultInputArgument->hasCompletion());
+
+        $nullableEnumInputArgument = $command->getDefinition()->getArgument('nullable-enum');
+        self::assertFalse($nullableEnumInputArgument->isRequired());
+        self::assertNull($nullableEnumInputArgument->getDefault());
+        self::assertTrue($nullableEnumInputArgument->hasCompletion());
+
+        $enumInputArgument->complete(CompletionInput::fromTokens([], 0), $suggestions = new CompletionSuggestions());
+        self::assertEquals([new Suggestion('image'), new Suggestion('video')], $suggestions->getValueSuggestions());
+
+        $command->run(new ArrayInput(['enum' => 'image']), new NullOutput());
+
+        self::expectException(InvalidArgumentException::class);
+        self::expectExceptionMessage('The value "incorrect" is not valid for the "enum" argument. Supported values are "image", "video".');
+
+        $command->run(new ArrayInput(['enum' => 'incorrect']), new NullOutput());
     }
 
-    public function testInvalidOptionType()
+    public function testEnumOption()
     {
         $command = new Command('foo');
-        $command->setCode(function (#[Option] ?object $any = null) {});
+        $command->setCode(static function (
+            #[Option] StringEnum $enum = StringEnum::Video,
+            #[Option] StringEnum $enumWithDefault = StringEnum::Image,
+            #[Option] ?StringEnum $nullableEnum = null,
+        ): int {
+            Assert::assertSame(StringEnum::Image, $enum);
+            Assert::assertSame(StringEnum::Image, $enumWithDefault);
+            Assert::assertNull($nullableEnum);
 
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The type "object" of parameter "$any" is not supported as a command option. Only "string", "bool", "int", "float", "array" types are allowed.');
+            return 0;
+        });
 
-        $command->getDefinition();
+        $enumInputOption = $command->getDefinition()->getOption('enum');
+        self::assertTrue($enumInputOption->isValueRequired());
+        self::assertSame('video', $enumInputOption->getDefault());
+        self::assertTrue($enumInputOption->hasCompletion());
+
+        $enumWithDefaultInputOption = $command->getDefinition()->getOption('enum-with-default');
+        self::assertTrue($enumWithDefaultInputOption->isValueRequired());
+        self::assertSame('image', $enumWithDefaultInputOption->getDefault());
+        self::assertTrue($enumWithDefaultInputOption->hasCompletion());
+
+        $nullableEnumInputOption = $command->getDefinition()->getOption('nullable-enum');
+        self::assertTrue($nullableEnumInputOption->isValueRequired());
+        self::assertNull($nullableEnumInputOption->getDefault());
+        self::assertTrue($nullableEnumInputOption->hasCompletion());
+
+        $enumInputOption->complete(CompletionInput::fromTokens([], 0), $suggestions = new CompletionSuggestions());
+        self::assertEquals([new Suggestion('image'), new Suggestion('video')], $suggestions->getValueSuggestions());
+
+        $command->run(new ArrayInput(['--enum' => 'image']), new NullOutput());
+
+        self::expectException(InvalidOptionException::class);
+        self::expectExceptionMessage('The value "incorrect" is not valid for the "enum" option. Supported values are "image", "video".');
+
+        $command->run(new ArrayInput(['--enum' => 'incorrect']), new NullOutput());
     }
 
     public function testExecuteHasPriorityOverInvokeMethod()
     {
         $command = new class extends Command {
             public string $called;
+
             protected function execute(InputInterface $input, OutputInterface $output): int
             {
                 $this->called = __FUNCTION__;
@@ -181,6 +264,7 @@ class InvokableCommandTest extends TestCase
     {
         $command = new class extends Command {
             public string $called;
+
             public function __invoke(): int
             {
                 $this->called = __FUNCTION__;
@@ -197,7 +281,9 @@ class InvokableCommandTest extends TestCase
     {
         $command = new Command('foo');
         $command->setCode(new class {
-            public function __invoke() {}
+            public function __invoke()
+            {
+            }
         });
 
         $this->expectException(\TypeError::class);
@@ -206,9 +292,15 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput([]), new NullOutput());
     }
 
-    /**
-     * @dataProvider provideInputArguments
-     */
+    public function testGetCode()
+    {
+        $invokableTestCommand = new InvokableTestCommand();
+        $command = new Command(null, $invokableTestCommand);
+
+        $this->assertSame($invokableTestCommand, $command->getCode());
+    }
+
+    #[DataProvider('provideInputArguments')]
     public function testInputArguments(array $parameters, array $expected)
     {
         $command = new Command('foo');
@@ -236,9 +328,7 @@ class InvokableCommandTest extends TestCase
         yield 'required & without-value' => [['a' => 'x', 'b' => null, 'c' => null, 'd' => null], ['x', null, '', []]];
     }
 
-    /**
-     * @dataProvider provideBinaryInputOptions
-     */
+    #[DataProvider('provideBinaryInputOptions')]
     public function testBinaryInputOptions(array $parameters, array $expected)
     {
         $command = new Command('foo');
@@ -264,9 +354,7 @@ class InvokableCommandTest extends TestCase
         yield 'negative' => [['--no-a' => null, '--no-c' => null], [false, false, false]];
     }
 
-    /**
-     * @dataProvider provideNonBinaryInputOptions
-     */
+    #[DataProvider('provideNonBinaryInputOptions')]
     public function testNonBinaryInputOptions(array $parameters, array $expected)
     {
         $command = new Command('foo');
@@ -319,16 +407,13 @@ class InvokableCommandTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideInvalidOptionDefinitions
-     */
-    public function testInvalidOptionDefinition(callable $code, string $expectedMessage)
+    #[DataProvider('provideInvalidOptionDefinitions')]
+    public function testInvalidOptionDefinition(callable $code)
     {
         $command = new Command('foo');
         $command->setCode($code);
 
         $this->expectException(LogicException::class);
-        $this->expectExceptionMessage($expectedMessage);
 
         $command->getDefinition();
     }
@@ -336,47 +421,38 @@ class InvokableCommandTest extends TestCase
     public static function provideInvalidOptionDefinitions(): \Generator
     {
         yield 'no-default' => [
-            function (#[Option] string $a) {},
-            'The option parameter "$a" must declare a default value.',
+            static function (#[Option] string $a) {},
         ];
         yield 'nullable-bool-default-true' => [
-            function (#[Option] ?bool $a = true) {},
-            'The option parameter "$a" must not be nullable when it has a default boolean value.',
+            static function (#[Option] ?bool $a = true) {},
         ];
         yield 'nullable-bool-default-false' => [
-            function (#[Option] ?bool $a = false) {},
-            'The option parameter "$a" must not be nullable when it has a default boolean value.',
+            static function (#[Option] ?bool $a = false) {},
         ];
         yield 'invalid-union-type' => [
-            function (#[Option] array|bool $a = false) {},
-            'The union type for parameter "$a" is not supported as a command option. Only "bool|string", "bool|int", "bool|float" types are allowed.',
+            static function (#[Option] array|bool $a = false) {},
         ];
         yield 'union-type-cannot-allow-null' => [
-            function (#[Option] string|bool|null $a = null) {},
-            'The union type for parameter "$a" is not supported as a command option. Only "bool|string", "bool|int", "bool|float" types are allowed.',
+            static function (#[Option] string|bool|null $a = null) {},
         ];
         yield 'union-type-default-true' => [
-            function (#[Option] string|bool $a = true) {},
-            'The option parameter "$a" must have a default value of false.',
+            static function (#[Option] string|bool $a = true) {},
         ];
         yield 'union-type-default-string' => [
-            function (#[Option] string|bool $a = 'foo') {},
-            'The option parameter "$a" must have a default value of false.',
+            static function (#[Option] string|bool $a = 'foo') {},
         ];
         yield 'nullable-string-not-null-default' => [
-            function (#[Option] ?string $a = 'foo') {},
-            'The option parameter "$a" must either be not-nullable or have a default of null.',
+            static function (#[Option] ?string $a = 'foo') {},
         ];
         yield 'nullable-array-not-null-default' => [
-            function (#[Option] ?array $a = []) {},
-            'The option parameter "$a" must either be not-nullable or have a default of null.',
+            static function (#[Option] ?array $a = []) {},
         ];
     }
 
     public function testInvalidRequiredValueOptionEvenWithDefault()
     {
         $command = new Command('foo');
-        $command->setCode(function (#[Option] string $a = 'a') {});
+        $command->setCode(static function (#[Option] string $a = 'a') {});
 
         $this->expectException(InvalidOptionException::class);
         $this->expectExceptionMessage('The "--a" option requires a value.');
@@ -384,8 +460,166 @@ class InvokableCommandTest extends TestCase
         $command->run(new ArrayInput(['--a' => null]), new NullOutput());
     }
 
+    public function testHelpersInjection()
+    {
+        $command = new Command('foo');
+        $command->setApplication(new Application());
+        $command->setCode(function (
+            InputInterface $input,
+            OutputInterface $output,
+            Cursor $cursor,
+            SymfonyStyle $io,
+            Application $application,
+            Command $command,
+        ): int {
+            $this->addToAssertionCount(1);
+
+            return 0;
+        });
+
+        $command->run(new ArrayInput([]), new NullOutput());
+    }
+
+    public function testDefaultArgumentResolversWithoutApplication()
+    {
+        $command = new Command('foo');
+        $command->setCode(static function (
+            \DateTime $date,
+            #[Argument] string $name = 'default',
+        ): int {
+            Assert::assertInstanceOf(\DateTime::class, $date);
+            Assert::assertSame('test', $name);
+
+            return 0;
+        });
+
+        $tester = new CommandTester($command);
+        $tester->execute(['name' => 'test']);
+
+        $tester->assertCommandIsSuccessful();
+    }
+
+    public function testCustomArgumentResolverViaApplication()
+    {
+        $customArgumentResolver = new ArgumentResolver([
+            new CustomTypeValueResolver(),
+            ...ArgumentResolver::getDefaultArgumentValueResolvers(),
+        ]);
+
+        $application = new Application();
+        $application->setArgumentResolver($customArgumentResolver);
+
+        $command = new Command('foo');
+        $command->setCode(static function (
+            CustomType $custom,
+            #[Argument] string $name = 'default',
+        ): int {
+            Assert::assertInstanceOf(CustomType::class, $custom);
+            Assert::assertSame('resolved:from-app-test', $custom->value);
+            Assert::assertSame('app-test', $name);
+
+            return 0;
+        });
+
+        $application->addCommand($command);
+
+        $tester = new CommandTester($command);
+        $tester->execute(['name' => 'app-test']);
+
+        $tester->assertCommandIsSuccessful();
+    }
+
+    public function testCommandInjection()
+    {
+        $application = new Application();
+
+        $command = new Command('test-cmd');
+        $command->setCode(static function (
+            Command $cmd,
+            #[Argument] string $arg = 'default',
+        ): int {
+            Assert::assertInstanceOf(Command::class, $cmd);
+            Assert::assertSame('test-cmd', $cmd->getName());
+            Assert::assertSame('value', $arg);
+
+            return 0;
+        });
+
+        $application->addCommand($command);
+
+        $tester = new CommandTester($command);
+        $tester->execute(['arg' => 'value']);
+
+        $tester->assertCommandIsSuccessful();
+    }
+
     public function getSuggestedRoles(CompletionInput $input): array
     {
         return ['ROLE_ADMIN', 'ROLE_USER'];
+    }
+
+    public function testAskWithInputFileAndConstraints()
+    {
+        if (!\extension_loaded('fileinfo')) {
+            $this->markTestSkipped('The "fileinfo" extension is required for this test.');
+        }
+
+        $pngData = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==');
+        $tempFile = sys_get_temp_dir().'/test_image_'.uniqid().'.png';
+        file_put_contents($tempFile, $pngData);
+
+        try {
+            $tester = new CommandTester(new InvokableWithInputFileAndConstraintsTestCommand());
+            $tester->setInputs([$tempFile]);
+            $tester->execute([], ['interactive' => true]);
+            $tester->assertCommandIsSuccessful();
+
+            self::assertStringContainsString('Provide an image file:', $tester->getDisplay());
+            self::assertStringContainsString('Filename:', $tester->getDisplay());
+            self::assertStringContainsString('Valid: yes', $tester->getDisplay());
+        } finally {
+            @unlink($tempFile);
+        }
+    }
+
+    public function testAskWithCustomValidatorIsNotOverwritten()
+    {
+        $tester = new CommandTester(new InvokableWithCustomValidatorTestCommand());
+        $tester->setInputs(['invalid', 'valid']);
+        $tester->execute([], ['interactive' => true]);
+        $tester->assertCommandIsSuccessful();
+
+        self::assertStringContainsString('Enter a value:', $tester->getDisplay());
+        self::assertStringContainsString('Value must be "valid"', $tester->getDisplay());
+        self::assertStringContainsString('Value: valid', $tester->getDisplay());
+    }
+}
+
+enum StringEnum: string
+{
+    case Image = 'image';
+    case Video = 'video';
+}
+
+class CustomType
+{
+    public function __construct(public string $value)
+    {
+    }
+}
+
+class CustomTypeValueResolver implements ValueResolverInterface
+{
+    public function resolve(string $argumentName, InputInterface $input, ReflectionMember $member): iterable
+    {
+        $type = $member->getType();
+
+        if (!$type instanceof \ReflectionNamedType || CustomType::class !== $type->getName()) {
+            return [];
+        }
+
+        $name = $input->hasArgument('name') ? $input->getArgument('name') : 'default';
+
+        yield new CustomType('resolved:from-'.$name);
     }
 }

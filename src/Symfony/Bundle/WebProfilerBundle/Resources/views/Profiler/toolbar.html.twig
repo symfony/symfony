@@ -9,7 +9,7 @@
                 name: name,
                 profiler_markup_version: profiler_markup_version,
                 csp_script_nonce: csp_script_nonce,
-                csp_style_nonce: csp_style_nonce
+                csp_style_nonce: csp_style_nonce,
               } %}
                 {{ block('toolbar', template) }}
             {% endwith %}
@@ -32,8 +32,8 @@
         </div>
     {% endif %}
 
-    <button class="sf-toolbar-toggle-button" type="button" id="sfToolbarToggleButton-{{ token }}" title="Close Toolbar" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}">
-        <i class="sf-toolbar-icon-opened">{{ source('@WebProfiler/Icon/close.svg') }}</i>
-        <i class="sf-toolbar-icon-closed">{{ source('@WebProfiler/Icon/symfony.svg') }}</i>
+    <button class="sf-toolbar-toggle-button" type="button" id="sfToolbarToggleButton-{{ token }}" accesskey="D" aria-expanded="true" aria-controls="sfToolbarMainContent-{{ token }}">
+        <i class="sf-toolbar-icon-opened" title="Close Toolbar">{{ source('@WebProfiler/Icon/close.svg') }}</i>
+        <i class="sf-toolbar-icon-closed" title="Open Toolbar">{{ source('@WebProfiler/Icon/symfony.svg') }}</i>
     </button>
 </div>

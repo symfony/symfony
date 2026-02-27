@@ -12,7 +12,7 @@
 namespace Symfony\Component\Lock\Tests;
 
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Lock\Key;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\PersistingStoreInterface;
@@ -25,21 +25,20 @@ class LockFactoryTest extends TestCase
     public function testCreateLock()
     {
         $store = $this->createMock(PersistingStoreInterface::class);
-        $store->expects($this->any())->method('exists')->willReturn(false);
+        $store->method('exists')->willReturn(false);
 
         $keys = [];
         $store
             ->expects($this->exactly(2))
             ->method('save')
-            ->with($this->callback(function ($key) use (&$keys) {
+            ->with($this->callback(static function ($key) use (&$keys) {
                 $keys[] = $key;
 
                 return true;
             }));
 
-        $logger = $this->createMock(LoggerInterface::class);
         $factory = new LockFactory($store);
-        $factory->setLogger($logger);
+        $factory->setLogger(new NullLogger());
 
         $lock1 = $factory->createLock('foo');
         $lock2 = $factory->createLock('foo');
@@ -54,21 +53,20 @@ class LockFactoryTest extends TestCase
     public function testCreateLockFromKey()
     {
         $store = $this->createMock(PersistingStoreInterface::class);
-        $store->expects($this->any())->method('exists')->willReturn(false);
+        $store->method('exists')->willReturn(false);
 
         $keys = [];
         $store
             ->expects($this->exactly(2))
             ->method('save')
-            ->with($this->callback(function ($key) use (&$keys) {
+            ->with($this->callback(static function ($key) use (&$keys) {
                 $keys[] = $key;
 
                 return true;
             }));
 
-        $logger = $this->createMock(LoggerInterface::class);
         $factory = new LockFactory($store);
-        $factory->setLogger($logger);
+        $factory->setLogger(new NullLogger());
 
         $key = new Key('foo');
         $lock1 = $factory->createLockFromKey($key);

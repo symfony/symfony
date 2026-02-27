@@ -11,20 +11,20 @@
 
 namespace Symfony\Component\Lock\Tests\Store;
 
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Lock\Store\ZookeeperStore;
 
 /**
  * @author Alexandre Daubois <alex.daubois@gmail.com>
- *
- * @requires extension zookeeper
  */
+#[RequiresPhpExtension('zookeeper')]
 class ZookeeperStoreFactoryTest extends TestCase
 {
     public function testCreateZooKeeperStore()
     {
-        $store = StoreFactory::createStore($this->createMock(\Zookeeper::class));
+        $store = StoreFactory::createStore($this->createStub(\Zookeeper::class));
 
         $this->assertInstanceOf(ZookeeperStore::class, $store);
     }

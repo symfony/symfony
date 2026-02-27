@@ -27,9 +27,6 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
     ) {
     }
 
-    /**
-     * @throws TransformationFailedException if the given value is not an array
-     */
     public function transform(mixed $array): array
     {
         if (null === $array) {
@@ -43,11 +40,6 @@ class ChoicesToValuesTransformer implements DataTransformerInterface
         return $this->choiceList->getValuesForChoices($array);
     }
 
-    /**
-     * @throws TransformationFailedException if the given value is not an array
-     *                                       or if no matching choice could be
-     *                                       found for some given value
-     */
     public function reverseTransform(mixed $array): array
     {
         if (null === $array) {

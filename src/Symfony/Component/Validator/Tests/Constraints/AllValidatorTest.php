@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\All;
 use Symfony\Component\Validator\Constraints\AllValidator;
 use Symfony\Component\Validator\Constraints\NotNull;
@@ -38,9 +39,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('foo.barbar', new All(new Range(min: 4)));
     }
 
-    /**
-     * @dataProvider getValidArguments
-     */
+    #[DataProvider('getValidArguments')]
     public function testWalkSingleConstraint($array)
     {
         $constraint = new Range(min: 4);
@@ -56,9 +55,7 @@ class AllValidatorTest extends ConstraintValidatorTestCase
         $this->assertNoViolation();
     }
 
-    /**
-     * @dataProvider getValidArguments
-     */
+    #[DataProvider('getValidArguments')]
     public function testWalkMultipleConstraints($array)
     {
         $constraint1 = new Range(min: 4);

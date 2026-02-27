@@ -42,7 +42,6 @@ final class ClosureVoter implements CacheableVoterInterface
 
     public function vote(TokenInterface $token, mixed $subject, array $attributes, ?Vote $vote = null): int
     {
-        $vote ??= new Vote();
         $context = new IsGrantedContext($token, $token->getUser(), $this->authorizationChecker);
         $failingClosures = [];
         $result = VoterInterface::ACCESS_ABSTAIN;
@@ -54,7 +53,7 @@ final class ClosureVoter implements CacheableVoterInterface
             $name = (new \ReflectionFunction($attribute))->name;
             $result = VoterInterface::ACCESS_DENIED;
             if ($attribute($context, $subject)) {
-                $vote->reasons[] = \sprintf('Closure %s returned true.', $name);
+                $vote?->addReason(\sprintf('Closure %s returned true.', $name));
 
                 return VoterInterface::ACCESS_GRANTED;
             }
@@ -63,7 +62,7 @@ final class ClosureVoter implements CacheableVoterInterface
         }
 
         if ($failingClosures) {
-            $vote->reasons[] = \sprintf('Closure%s %s returned false.', 1 < \count($failingClosures) ? 's' : '', implode(', ', $failingClosures));
+            $vote?->addReason(\sprintf('Closure%s %s returned false.', 1 < \count($failingClosures) ? 's' : '', implode(', ', $failingClosures)));
         }
 
         return $result;

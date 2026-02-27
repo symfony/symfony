@@ -24,8 +24,8 @@ use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
 {
     private MockObject&Connection $connection;
-    private MockObject&EntityManagerInterface $entityManager;
-    private MockObject&ManagerRegistry $managerRegistry;
+    private EntityManagerInterface $entityManager;
+    private ManagerRegistry $managerRegistry;
     private DoctrineCloseConnectionMiddleware $middleware;
     private string $entityManagerName = 'default';
 
@@ -33,10 +33,10 @@ class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
     {
         $this->connection = $this->createMock(Connection::class);
 
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->entityManager = $this->createStub(EntityManagerInterface::class);
         $this->entityManager->method('getConnection')->willReturn($this->connection);
 
-        $this->managerRegistry = $this->createMock(ManagerRegistry::class);
+        $this->managerRegistry = $this->createStub(ManagerRegistry::class);
         $this->managerRegistry->method('getManager')->willReturn($this->entityManager);
 
         $this->middleware = new DoctrineCloseConnectionMiddleware(
@@ -59,8 +59,10 @@ class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
 
     public function testInvalidEntityManagerThrowsException()
     {
+        $this->connection->expects($this->never())->method('getDatabasePlatform');
         $managerRegistry = $this->createMock(ManagerRegistry::class);
         $managerRegistry
+            ->expects($this->once())
             ->method('getManager')
             ->with('unknown_manager')
             ->willThrowException(new \InvalidArgumentException());

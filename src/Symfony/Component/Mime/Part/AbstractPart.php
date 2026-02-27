@@ -62,4 +62,14 @@ abstract class AbstractPart
     abstract public function getMediaType(): string;
 
     abstract public function getMediaSubtype(): string;
+
+    public function __serialize(): array
+    {
+        return ['headers' => $this->headers];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->headers = $data['headers'];
+    }
 }

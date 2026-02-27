@@ -100,10 +100,10 @@ final class TreeHelper implements \RecursiveIterator
         $visited = new \SplObjectStorage();
         foreach ($treeIterator as $node) {
             $currentNode = $node instanceof TreeNode ? $node : $treeIterator->getInnerIterator()->current();
-            if ($visited->contains($currentNode)) {
+            if (isset($visited[$currentNode])) {
                 throw new \LogicException(\sprintf('Cycle detected at node: "%s".', $currentNode->getValue()));
             }
-            $visited->attach($currentNode);
+            $visited[$currentNode] = true;
 
             $this->output->writeln($node);
         }

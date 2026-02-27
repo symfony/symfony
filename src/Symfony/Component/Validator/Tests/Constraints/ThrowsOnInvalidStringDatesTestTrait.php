@@ -11,14 +11,13 @@
 
 namespace Symfony\Component\Validator\Tests\Constraints;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Validator\Constraints\AbstractComparison;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 
 trait ThrowsOnInvalidStringDatesTestTrait
 {
-    /**
-     * @dataProvider throwsOnInvalidStringDatesProvider
-     */
+    #[DataProvider('throwsOnInvalidStringDatesProvider')]
     public function testThrowsOnInvalidStringDates(AbstractComparison $constraint, $expectedMessage, $value)
     {
         $this->expectException(ConstraintDefinitionException::class);

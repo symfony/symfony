@@ -12,12 +12,9 @@
 namespace Symfony\Component\Form\Tests\Extension\Validator\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
-use Symfony\Component\Form\Test\Traits\ValidatorExtensionTrait;
 
 class ColorTypeValidatorExtensionTest extends BaseValidatorExtensionTestCase
 {
-    use ValidatorExtensionTrait;
-
     protected function createForm(array $options = [])
     {
         return $this->factory->create(ColorType::class, null, $options);

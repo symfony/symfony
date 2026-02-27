@@ -1,0 +1,44 @@
+name: Twig CS Fixer
+
+on:
+  push:
+    paths:
+      - '**.twig'
+  pull_request:
+    paths:
+      - '**.twig'
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+    cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  twig-cs-fixer:
+    name: Twig CS Fixer
+    runs-on: ubuntu-24.04
+
+    env:
+      php-version: '8.4'
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.php-version }}
+          ini-values: "memory_limit=-1"
+          coverage: none
+
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          COMPOSER_HOME="$(composer config home)"
+          ([ -d "$COMPOSER_HOME" ] || mkdir "$COMPOSER_HOME") && cp .github/composer-config.json "$COMPOSER_HOME/config.json"
+          export COMPOSER_ROOT_VERSION=$(grep ' VERSION = ' src/Symfony/Component/HttpKernel/Kernel.php | grep -P -o '[0-9]+\.[0-9]+').x-dev
+          composer require --dev vincentlanglet/twig-cs-fixer:^3.9.0
+
+      - name: Run Twig CS Fixer Lint
+        run: vendor/bin/twig-cs-fixer lint --config=.twig-cs-fixer.dist.php --report=github

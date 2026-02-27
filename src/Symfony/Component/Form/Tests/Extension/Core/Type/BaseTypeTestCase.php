@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Extension\Core\Type;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Test\TypeTestCase;
 
 /**
@@ -19,6 +20,13 @@ use Symfony\Component\Form\Test\TypeTestCase;
 abstract class BaseTypeTestCase extends TypeTestCase
 {
     public const TESTED_TYPE = '';
+
+    protected function setUp(): void
+    {
+        $this->dispatcher = new EventDispatcher();
+
+        parent::setUp();
+    }
 
     public function testPassDisabledAsOption()
     {

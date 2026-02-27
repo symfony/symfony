@@ -57,13 +57,6 @@ interface TokenInterface extends \Stringable
      */
     public function setUser(UserInterface $user): void;
 
-    /**
-     * Removes sensitive information from the token.
-     *
-     * @deprecated since Symfony 7.3; erase credentials using the "__serialize()" method instead
-     */
-    public function eraseCredentials(): void;
-
     public function getAttributes(): array;
 
     /**

@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\Iterator\VcsIgnoredFilterIterator;
 
@@ -31,9 +32,8 @@ class VcsIgnoredFilterIteratorTest extends IteratorTestCase
 
     /**
      * @param array<string, string> $gitIgnoreFiles
-     *
-     * @dataProvider getAcceptData
      */
+    #[DataProvider('getAcceptData')]
     public function testAccept(array $gitIgnoreFiles, array $otherFileNames, array $expectedResult, string $baseDir = '')
     {
         $otherFileNames = $this->toAbsolute($otherFileNames);

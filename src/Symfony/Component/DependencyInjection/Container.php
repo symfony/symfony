@@ -35,7 +35,7 @@ class_exists(ArgumentServiceLocator::class);
  *
  * It gives access to object instances (services).
  * Services and parameters are simple key/pair stores.
- * The container can have four possible behaviors when a service
+ * The container can have five possible behaviors when a service
  * does not exist (or is not initialized for the last case):
  *
  *  * EXCEPTION_ON_INVALID_REFERENCE: Throws an exception at compilation time (the default)

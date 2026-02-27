@@ -37,7 +37,7 @@ _sf_{{ COMMAND_NAME }}() {
 
     local completecmd=("$sf_cmd" "_complete" "--no-interaction" "-sbash" "-c$cword" "-a{{ VERSION }}")
     for w in ${words[@]}; do
-        w=$(printf -- '%b' "$w")
+        w="${w//\\\\/\\}"
         # remove quotes from typed values
         quote="${w:0:1}"
         if [ "$quote" == \' ]; then

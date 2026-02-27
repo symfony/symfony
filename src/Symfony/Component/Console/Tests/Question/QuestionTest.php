@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Console\Tests\Question;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Question\Question;
 
@@ -44,9 +45,7 @@ class QuestionTest extends TestCase
         self::assertNull($this->question->getDefault());
     }
 
-    /**
-     * @dataProvider providerTrueFalse
-     */
+    #[DataProvider('providerTrueFalse')]
     public function testIsSetHidden(bool $hidden)
     {
         $this->question->setHidden($hidden);
@@ -61,7 +60,7 @@ class QuestionTest extends TestCase
     public function testSetHiddenWithAutocompleterCallback()
     {
         $this->question->setAutocompleterCallback(
-            fn (string $input): array => []
+            static fn (string $input): array => []
         );
 
         $this->expectException(\LogicException::class);
@@ -75,7 +74,7 @@ class QuestionTest extends TestCase
     public function testSetHiddenWithNoAutocompleterCallback()
     {
         $this->question->setAutocompleterCallback(
-            fn (string $input): array => []
+            static fn (string $input): array => []
         );
         $this->question->setAutocompleterCallback(null);
 
@@ -89,9 +88,7 @@ class QuestionTest extends TestCase
         $this->assertNull($exception);
     }
 
-    /**
-     * @dataProvider providerTrueFalse
-     */
+    #[DataProvider('providerTrueFalse')]
     public function testIsSetHiddenFallback(bool $hidden)
     {
         $this->question->setHiddenFallback($hidden);
@@ -122,9 +119,7 @@ class QuestionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerGetSetAutocompleterValues
-     */
+    #[DataProvider('providerGetSetAutocompleterValues')]
     public function testGetSetAutocompleterValues($values, $expectValues)
     {
         $this->question->setAutocompleterValues($values);
@@ -143,9 +138,7 @@ class QuestionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider providerSetAutocompleterValuesInvalid
-     */
+    #[DataProvider('providerSetAutocompleterValuesInvalid')]
     public function testSetAutocompleterValuesInvalid($values)
     {
         self::expectException(\TypeError::class);
@@ -186,7 +179,7 @@ class QuestionTest extends TestCase
 
     public function testGetSetAutocompleterCallback()
     {
-        $callback = fn (string $input): array => [];
+        $callback = static fn (string $input): array => [];
 
         $this->question->setAutocompleterCallback($callback);
         self::assertSame($callback, $this->question->getAutocompleterCallback());
@@ -207,7 +200,7 @@ class QuestionTest extends TestCase
         );
 
         $this->question->setAutocompleterCallback(
-            fn (string $input): array => []
+            static fn (string $input): array => []
         );
     }
 
@@ -219,7 +212,7 @@ class QuestionTest extends TestCase
         $exception = null;
         try {
             $this->question->setAutocompleterCallback(
-                fn (string $input): array => []
+                static fn (string $input): array => []
             );
         } catch (\Exception $exception) {
             // Do nothing
@@ -231,14 +224,12 @@ class QuestionTest extends TestCase
     public static function providerGetSetValidator()
     {
         return [
-            [fn ($input) => $input],
+            [static fn ($input) => $input],
             [null],
         ];
     }
 
-    /**
-     * @dataProvider providerGetSetValidator
-     */
+    #[DataProvider('providerGetSetValidator')]
     public function testGetSetValidator($callback)
     {
         $this->question->setValidator($callback);
@@ -255,9 +246,7 @@ class QuestionTest extends TestCase
         return [[1], [5], [null]];
     }
 
-    /**
-     * @dataProvider providerGetSetMaxAttempts
-     */
+    #[DataProvider('providerGetSetMaxAttempts')]
     public function testGetSetMaxAttempts($attempts)
     {
         $this->question->setMaxAttempts($attempts);
@@ -269,9 +258,7 @@ class QuestionTest extends TestCase
         return [[0], [-1]];
     }
 
-    /**
-     * @dataProvider providerSetMaxAttemptsInvalid
-     */
+    #[DataProvider('providerSetMaxAttemptsInvalid')]
     public function testSetMaxAttemptsInvalid($attempts)
     {
         self::expectException(\InvalidArgumentException::class);
@@ -287,7 +274,7 @@ class QuestionTest extends TestCase
 
     public function testGetSetNormalizer()
     {
-        $normalizer = fn ($input) => $input;
+        $normalizer = static fn ($input) => $input;
         $this->question->setNormalizer($normalizer);
         self::assertSame($normalizer, $this->question->getNormalizer());
     }
@@ -297,9 +284,7 @@ class QuestionTest extends TestCase
         self::assertNull($this->question->getNormalizer());
     }
 
-    /**
-     * @dataProvider providerTrueFalse
-     */
+    #[DataProvider('providerTrueFalse')]
     public function testSetMultiline(bool $multiline)
     {
         self::assertSame($this->question, $this->question->setMultiline($multiline));

@@ -14,6 +14,8 @@ namespace Symfony\Component\Security\Core\Role;
 /**
  * RoleHierarchyInterface is the interface for a role hierarchy.
  *
+ * @method array<string, string> getParentRoleNames(string[] $roles)
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  */
 interface RoleHierarchyInterface
@@ -21,7 +23,7 @@ interface RoleHierarchyInterface
     /**
      * @param string[] $roles
      *
-     * @return string[]
+     * @return array<string, string>
      */
     public function getReachableRoleNames(array $roles): array;
 }

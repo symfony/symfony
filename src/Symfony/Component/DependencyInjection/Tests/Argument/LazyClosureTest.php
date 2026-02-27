@@ -20,7 +20,7 @@ class LazyClosureTest extends TestCase
 {
     public function testMagicGetThrows()
     {
-        $closure = new LazyClosure(fn () => null);
+        $closure = new LazyClosure(static fn () => null);
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Cannot read property "foo" from a lazy closure.');
@@ -33,7 +33,7 @@ class LazyClosureTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot create adapter for service "foo" because "Symfony\Component\DependencyInjection\Tests\Argument\LazyClosureTest" is not an interface.');
 
-        LazyClosure::getCode('foo', [new \stdClass(), 'bar'], new Definition(self::class), new ContainerBuilder(), 'foo');
+        LazyClosure::getCode('foo', [new \stdClass(), 'bar'], self::class, new ContainerBuilder(), 'foo');
     }
 
     public function testThrowsOnNonFunctionalInterface()
@@ -41,7 +41,7 @@ class LazyClosureTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot create adapter for service "foo" because interface "Symfony\Component\DependencyInjection\Tests\Argument\NonFunctionalInterface" doesn\'t have exactly one method.');
 
-        LazyClosure::getCode('foo', [new \stdClass(), 'bar'], new Definition(NonFunctionalInterface::class), new ContainerBuilder(), 'foo');
+        LazyClosure::getCode('foo', [new \stdClass(), 'bar'], NonFunctionalInterface::class, new ContainerBuilder(), 'foo');
     }
 
     public function testThrowsOnUnknownMethodInInterface()
@@ -49,7 +49,7 @@ class LazyClosureTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Cannot create lazy closure for service "bar" because its corresponding callable is invalid.');
 
-        LazyClosure::getCode('bar', [new Definition(FunctionalInterface::class), 'bar'], new Definition(\Closure::class), new ContainerBuilder(), 'bar');
+        LazyClosure::getCode('bar', [new Definition(FunctionalInterface::class), 'bar'], \Closure::class, new ContainerBuilder(), 'bar');
     }
 }
 

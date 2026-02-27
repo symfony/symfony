@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\HttpKernel\Tests\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,12 +23,10 @@ use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 class ErrorControllerTest extends TestCase
 {
-    /**
-     * @dataProvider getInvokeControllerDataProvider
-     */
+    #[DataProvider('getInvokeControllerDataProvider')]
     public function testInvokeController(Request $request, \Exception $exception, int $statusCode, string $content)
     {
-        $kernel = $this->createMock(HttpKernelInterface::class);
+        $kernel = $this->createStub(HttpKernelInterface::class);
         $errorRenderer = new HtmlErrorRenderer();
         $controller = new ErrorController($kernel, null, $errorRenderer);
         $response = $controller($exception);

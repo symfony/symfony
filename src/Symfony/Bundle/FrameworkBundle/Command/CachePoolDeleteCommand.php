@@ -47,10 +47,10 @@ final class CachePoolDeleteCommand extends Command
                 new InputArgument('key', InputArgument::REQUIRED, 'The cache key to delete from the pool'),
             ])
             ->setHelp(<<<'EOF'
-The <info>%command.name%</info> deletes an item from a given cache pool.
+                The <info>%command.name%</info> deletes an item from a given cache pool.
 
-    %command.full_name% <pool> <key>
-EOF
+                    %command.full_name% <pool> <key>
+                EOF
             )
         ;
     }

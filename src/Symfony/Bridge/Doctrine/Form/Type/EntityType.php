@@ -27,7 +27,7 @@ class EntityType extends DoctrineType
 
         // Invoke the query builder closure so that we can cache choice lists
         // for equal query builders
-        $queryBuilderNormalizer = function (Options $options, $queryBuilder) {
+        $queryBuilderNormalizer = static function (Options $options, $queryBuilder) {
             if (\is_callable($queryBuilder)) {
                 $queryBuilder = $queryBuilder($options['em']->getRepository($options['class']));
 

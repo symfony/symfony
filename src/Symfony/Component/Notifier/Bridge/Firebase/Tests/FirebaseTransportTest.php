@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Notifier\Bridge\Firebase\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 use Symfony\Component\Notifier\Bridge\Firebase\FirebaseOptions;
@@ -49,9 +50,7 @@ final class FirebaseTransportTest extends TransportTestCase
         yield [new DummyMessage()];
     }
 
-    /**
-     * @dataProvider sendWithErrorThrowsExceptionProvider
-     */
+    #[DataProvider('sendWithErrorThrowsExceptionProvider')]
     public function testSendWithErrorThrowsTransportException(ResponseInterface $response)
     {
         $this->expectException(TransportException::class);

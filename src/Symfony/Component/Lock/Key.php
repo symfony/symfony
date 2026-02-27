@@ -18,7 +18,7 @@ use Symfony\Component\Lock\Exception\UnserializableKeyException;
  *
  * @author Jérémy Derussé <jeremy@derusse.com>
  */
-final class Key
+final class Key implements \Stringable
 {
     private ?float $expiringTime = null;
     private array $state = [];
@@ -89,12 +89,23 @@ final class Key
         return null !== $this->expiringTime && $this->expiringTime <= microtime(true);
     }
 
-    public function __sleep(): array
+    public function __unserialize(array $data): void
+    {
+        $this->resource = $data['resource'] ?? $data["\0".self::class."\0resource"];
+        $this->expiringTime = $data['expiringTime'] ?? $data["\0".self::class."\0expiringTime"] ?? null;
+        $this->state = $data['state'] ?? $data["\0".self::class."\0state"] ?? [];
+    }
+
+    public function __serialize(): array
     {
         if (!$this->serializable) {
-            throw new UnserializableKeyException('The key cannot be serialized.');
+            throw new UnserializableKeyException('The current lock store doesn\'t support serialization of Key objects.');
         }
 
-        return ['resource', 'expiringTime', 'state'];
+        return [
+            'resource' => $this->resource,
+            'expiringTime' => $this->expiringTime,
+            'state' => $this->state,
+        ];
     }
 }

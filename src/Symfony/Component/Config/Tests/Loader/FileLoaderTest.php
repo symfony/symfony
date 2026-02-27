@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests\Loader;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Exception\FileLoaderImportCircularReferenceException;
 use Symfony\Component\Config\FileLocator;
@@ -22,10 +23,8 @@ class FileLoaderTest extends TestCase
 {
     public function testImportWithFileLocatorDelegation()
     {
-        $locatorMock = $this->createMock(FileLocatorInterface::class);
-
-        $locatorMockForAdditionalLoader = $this->createMock(FileLocatorInterface::class);
-        $locatorMockForAdditionalLoader->expects($this->any())
+        $locatorMockForAdditionalLoader = $this->createStub(FileLocatorInterface::class);
+        $locatorMockForAdditionalLoader
             ->method('locate')
             ->willReturn(
                 ['path/to/file1'],
@@ -35,7 +34,7 @@ class FileLoaderTest extends TestCase
                 ['path/to/file1', 'path/to/file2']
             );
 
-        $fileLoader = new TestFileLoader($locatorMock);
+        $fileLoader = new TestFileLoader(new FileLocator());
         $fileLoader->setSupports(false);
         $fileLoader->setCurrentDir('.');
 
@@ -92,16 +91,14 @@ class FileLoaderTest extends TestCase
 
     public function testImportWithGlobLikeResourceWhichContainsMultipleLines()
     {
-        $locatorMock = $this->createMock(FileLocatorInterface::class);
-        $loader = new TestFileLoader($locatorMock);
+        $loader = new TestFileLoader(new FileLocator());
 
         $this->assertSame("foo\nfoobar[foo]", $loader->import("foo\nfoobar[foo]"));
     }
 
     public function testImportWithGlobLikeResourceWhichContainsSlashesAndMultipleLines()
     {
-        $locatorMock = $this->createMock(FileLocatorInterface::class);
-        $loader = new TestFileLoader($locatorMock);
+        $loader = new TestFileLoader(new FileLocator());
 
         $this->assertSame("foo\nfoo/bar[foo]", $loader->import("foo\nfoo/bar[foo]"));
     }
@@ -122,23 +119,40 @@ class FileLoaderTest extends TestCase
         $this->assertSame(__FILE__, strtr($loader->import('FileLoaderTest.*'), '/', \DIRECTORY_SEPARATOR));
     }
 
-    public function testImportWithExclude()
+    #[DataProvider('importWithExcludeProvider')]
+    public function testImportWithExclude(string $include, string $exclude, int $expectedCount)
     {
         $loader = new TestFileLoader(new FileLocator(__DIR__.'/../Fixtures'));
-        $loadedFiles = $loader->import('Include/*', null, false, null, __DIR__.'/../Fixtures/Include/{ExcludeFile.txt}');
-        $this->assertCount(2, $loadedFiles);
+        $loadedFiles = $loader->import($include, null, false, null, $exclude);
+        $this->assertCount($expectedCount, $loadedFiles);
         $this->assertNotContains('ExcludeFile.txt', $loadedFiles);
     }
 
-    /**
-     * @dataProvider excludeTrailingSlashConsistencyProvider
-     */
+    #[DataProvider('excludeTrailingSlashConsistencyProvider')]
     public function testExcludeTrailingSlashConsistency(string $exclude)
     {
         $loader = new TestFileLoader(new FileLocator(__DIR__.'/../Fixtures'));
         $loadedFiles = $loader->import('ExcludeTrailingSlash/*', null, false, null, $exclude);
         $this->assertCount(2, $loadedFiles);
         $this->assertNotContains('baz.txt', $loadedFiles);
+    }
+
+    public static function importWithExcludeProvider(): iterable
+    {
+        yield ['Include/*', __DIR__.'/../Fixtures/Include/{ExcludeFile.txt}', 2];
+        yield ['Include/', __DIR__.'/../Fixtures/Include/{ExcludeFile.txt}', 4];
+        yield ['Include', __DIR__.'/../Fixtures/Include/{ExcludeFile.txt}', 4];
+        yield ['Include/**/*', __DIR__.'/../Fixtures/Include/{ExcludeFile.txt}', 4];
+        yield ['Include/*', __DIR__.'/../Fixtures/Include/{Exclude*.txt}', 2];
+        yield ['Include/', __DIR__.'/../Fixtures/Include/{Exclude*.txt}', 4];
+        yield ['Include', __DIR__.'/../Fixtures/Include/{Exclude*.txt}', 4];
+        yield ['Include/**/*', __DIR__.'/../Fixtures/Include/{Exclude*.txt}', 4];
+        yield ['Include/', __DIR__.'/../Fixtures/Include/**/{ExcludeFile.txt}', 3];
+        yield ['Include', __DIR__.'/../Fixtures/Include/**/{ExcludeFile.txt}', 3];
+        yield ['Include/**/*', __DIR__.'/../Fixtures/Include/**/{ExcludeFile.txt}', 3];
+        yield ['Include/', __DIR__.'/../Fixtures/Include/**/{Exclude*.txt}', 3];
+        yield ['Include', __DIR__.'/../Fixtures/Include/**/{Exclude*.txt}', 3];
+        yield ['Include/**/*', __DIR__.'/../Fixtures/Include/**/{Exclude*.txt}', 3];
     }
 
     public static function excludeTrailingSlashConsistencyProvider(): iterable

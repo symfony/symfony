@@ -11,12 +11,15 @@
 
 namespace Symfony\Bundle\SecurityBundle\Tests\DataCollector;
 
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 use Symfony\Bundle\SecurityBundle\Debug\TraceableFirewallListener;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,7 +35,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchy;
 use Symfony\Component\Security\Core\User\InMemoryUser;
-use Symfony\Component\Security\Http\FirewallMapInterface;
+use Symfony\Component\Security\Http\Firewall\AbstractListener;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Component\VarDumper\Caster\ClassStub;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -41,7 +44,7 @@ class SecurityDataCollectorTest extends TestCase
 {
     public function testCollectWhenSecurityIsDisabled()
     {
-        $collector = new SecurityDataCollector(null, null, null, null, null, null, true);
+        $collector = new SecurityDataCollector(null, null, null, null, null, null);
         $collector->collect(new Request(), new Response());
 
         $this->assertSame('security', $collector->getName());
@@ -61,7 +64,7 @@ class SecurityDataCollectorTest extends TestCase
     public function testCollectWhenAuthenticationTokenIsNull()
     {
         $tokenStorage = new TokenStorage();
-        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null, true);
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null);
         $collector->collect(new Request(), new Response());
 
         $this->assertTrue($collector->isEnabled());
@@ -77,13 +80,13 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertNull($collector->getFirewall());
     }
 
-    /** @dataProvider provideRoles */
+    #[DataProvider('provideRoles')]
     public function testCollectAuthenticationTokenAndRoles(array $roles, array $normalizedRoles, array $inheritedRoles)
     {
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('hhamon', 'P4$$w0rD', $roles), 'provider', $roles));
 
-        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null, true);
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null);
         $collector->collect(new Request(), new Response());
         $collector->lateCollect();
 
@@ -106,7 +109,7 @@ class SecurityDataCollectorTest extends TestCase
         $tokenStorage = new TokenStorage();
         $tokenStorage->setToken(new SwitchUserToken(new InMemoryUser('hhamon', 'P4$$w0rD', ['ROLE_USER']), 'provider', ['ROLE_USER'], $adminToken));
 
-        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null, true);
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, null, null);
         $collector->collect(new Request(), new Response());
         $collector->lateCollect();
 
@@ -136,7 +139,7 @@ class SecurityDataCollectorTest extends TestCase
             ->with($request)
             ->willReturn($firewallConfig);
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()), true);
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
         $collector->collect($request, new Response());
         $collector->lateCollect();
         $collected = $collector->getFirewall();
@@ -160,51 +163,53 @@ class SecurityDataCollectorTest extends TestCase
         $response = new Response();
 
         // Don't inject any firewall map
-        $collector = new SecurityDataCollector(null, null, null, null, null, null, true);
+        $collector = new SecurityDataCollector(null, null, null, null, null, null);
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
 
         // Inject an instance that is not context aware
-        $firewallMap = $this
-            ->getMockBuilder(FirewallMapInterface::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $firewallMap = new FirewallMap(new Container(), []);
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()), true);
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
 
         // Null config
-        $firewallMap = $this
-            ->getMockBuilder(FirewallMap::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $firewallMap = new FirewallMap(new Container(), []);
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()), true);
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator()));
         $collector->collect($request, $response);
         $this->assertNull($collector->getFirewall());
     }
 
-    /**
-     * @group time-sensitive
-     */
+    #[Group('time-sensitive')]
     public function testGetListeners()
     {
         $request = new Request();
-        $event = new RequestEvent($this->createMock(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
         $event->setResponse($response = new Response());
-        $listener = function ($e) use ($event, &$listenerCalled) {
-            $listenerCalled += $e === $event;
+        $listener = new class extends AbstractListener {
+            public int $callCount = 0;
+
+            public function supports(Request $request): ?bool
+            {
+                return true;
+            }
+
+            public function authenticate(RequestEvent $event): void
+            {
+                ++$this->callCount;
+            }
         };
         $firewallMap = $this
             ->getMockBuilder(FirewallMap::class)
             ->disableOriginalConstructor()
             ->getMock();
         $firewallMap
-            ->expects($this->any())
             ->method('getFirewallConfig')
-            ->with($request)
-            ->willReturn(null);
+            ->willReturnMap([
+                [$request, null],
+            ]);
         $firewallMap
             ->expects($this->once())
             ->method('getListeners')
@@ -214,12 +219,12 @@ class SecurityDataCollectorTest extends TestCase
         $firewall = new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator());
         $firewall->onKernelRequest($event);
 
-        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, $firewall, true);
+        $collector = new SecurityDataCollector(null, null, null, null, $firewallMap, $firewall);
         $collector->collect($request, $response);
 
-        $this->assertNotEmpty($collected = $collector->getListeners()[0]);
+        $this->assertCount(1, $collector->getListeners());
         $collector->lateCollect();
-        $this->assertSame(1, $listenerCalled);
+        $this->assertSame(1, $listener->callCount);
     }
 
     public function testCollectCollectsDecisionLogWhenStrategyIsAffirmative()
@@ -236,7 +241,7 @@ class SecurityDataCollectorTest extends TestCase
 
         $strategy = MainConfiguration::STRATEGY_AFFIRMATIVE;
 
-        $accessDecisionManager = $this->createMock(TraceableAccessDecisionManager::class);
+        $accessDecisionManager = $this->createStub(TraceableAccessDecisionManager::class);
 
         $accessDecisionManager
             ->method('getStrategy')
@@ -261,7 +266,7 @@ class SecurityDataCollectorTest extends TestCase
                 ],
             ]]);
 
-        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null, true);
+        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null);
 
         $dataCollector->collect(new Request(), new Response());
 
@@ -279,9 +284,7 @@ class SecurityDataCollectorTest extends TestCase
 
         $this->assertEquals($actualDecisionLog, $expectedDecisionLog, 'Wrong value returned by getAccessDecisionLog');
 
-        $actualVoterClasses = array_map(static function (ClassStub $classStub): string {
-            return (string) $classStub;
-        }, $dataCollector->getVoters());
+        $actualVoterClasses = array_map(static fn (ClassStub $classStub): string => (string) $classStub, $dataCollector->getVoters());
 
         $expectedVoterClasses = [
             $voter1::class,
@@ -311,7 +314,7 @@ class SecurityDataCollectorTest extends TestCase
 
         $strategy = MainConfiguration::STRATEGY_UNANIMOUS;
 
-        $accessDecisionManager = $this->createMock(TraceableAccessDecisionManager::class);
+        $accessDecisionManager = $this->createStub(TraceableAccessDecisionManager::class);
 
         $accessDecisionManager
             ->method('getStrategy')
@@ -349,7 +352,7 @@ class SecurityDataCollectorTest extends TestCase
                 ],
             ]);
 
-        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null, true);
+        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null);
 
         $dataCollector->collect(new Request(), new Response());
 
@@ -380,9 +383,7 @@ class SecurityDataCollectorTest extends TestCase
 
         $this->assertEquals($actualDecisionLog, $expectedDecisionLog, 'Wrong value returned by getAccessDecisionLog');
 
-        $actualVoterClasses = array_map(static function (ClassStub $classStub): string {
-            return (string) $classStub;
-        }, $dataCollector->getVoters());
+        $actualVoterClasses = array_map(static fn (ClassStub $classStub): string => (string) $classStub, $dataCollector->getVoters());
 
         $expectedVoterClasses = [
             $voter1::class,
@@ -402,7 +403,7 @@ class SecurityDataCollectorTest extends TestCase
     {
         $strategy = MainConfiguration::STRATEGY_AFFIRMATIVE;
 
-        $accessDecisionManager = $this->createMock(TraceableAccessDecisionManager::class);
+        $accessDecisionManager = $this->createStub(TraceableAccessDecisionManager::class);
 
         $accessDecisionManager
             ->method('getStrategy')
@@ -421,7 +422,7 @@ class SecurityDataCollectorTest extends TestCase
                 'voterDetails' => [],
             ]]);
 
-        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null, true);
+        $dataCollector = new SecurityDataCollector(null, null, null, $accessDecisionManager, null, null);
 
         $dataCollector->collect(new Request(), new Response());
 

@@ -146,6 +146,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
         $response->info['http_code'] = 0;
         $response->info['user_data'] = $options['user_data'] ?? null;
         $response->info['max_duration'] = $options['max_duration'] ?? null;
+        $response->info['max_connect_duration'] = $options['max_connect_duration'] ?? null;
         $response->info['url'] = $url;
         $response->info['original_url'] = $url;
 
@@ -282,6 +283,7 @@ class MockResponse implements ResponseInterface, StreamableInterface
             'start_time' => $response->info['start_time'],
             'user_data' => $response->info['user_data'],
             'max_duration' => $response->info['max_duration'],
+            'max_connect_duration' => $response->info['max_connect_duration'],
             'http_code' => $response->info['http_code'],
         ] + $info + $response->info;
 

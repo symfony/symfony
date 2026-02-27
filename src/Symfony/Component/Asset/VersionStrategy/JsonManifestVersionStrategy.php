@@ -73,17 +73,23 @@ class JsonManifestVersionStrategy implements VersionStrategyInterface
                 } catch (DecodingExceptionInterface $e) {
                     throw new RuntimeException(\sprintf('Error parsing JSON from asset manifest URL "%s".', $this->manifestPath), 0, $e);
                 } catch (ClientExceptionInterface $e) {
-                    throw new RuntimeException(\sprintf('Error loading JSON from asset manifest URL "%s".', $this->manifestPath), 0, $e);
+                    if ($this->strictMode) {
+                        throw new RuntimeException(\sprintf('Error loading JSON from asset manifest URL "%s".', $this->manifestPath), 0, $e);
+                    }
+                    $this->manifestData = [];
                 }
             } else {
                 if (!is_file($this->manifestPath)) {
-                    throw new RuntimeException(\sprintf('Asset manifest file "%s" does not exist. Did you forget to build the assets with npm or yarn?', $this->manifestPath));
-                }
-
-                try {
-                    $this->manifestData = json_decode(file_get_contents($this->manifestPath), true, flags: \JSON_THROW_ON_ERROR);
-                } catch (\JsonException $e) {
-                    throw new RuntimeException(\sprintf('Error parsing JSON from asset manifest file "%s": ', $this->manifestPath).$e->getMessage(), previous: $e);
+                    if ($this->strictMode) {
+                        throw new RuntimeException(\sprintf('Asset manifest file "%s" does not exist. Did you forget to build the assets with npm or yarn?', $this->manifestPath));
+                    }
+                    $this->manifestData = [];
+                } else {
+                    try {
+                        $this->manifestData = json_decode(file_get_contents($this->manifestPath), true, flags: \JSON_THROW_ON_ERROR);
+                    } catch (\JsonException $e) {
+                        throw new RuntimeException(\sprintf('Error parsing JSON from asset manifest file "%s": ', $this->manifestPath).$e->getMessage(), previous: $e);
+                    }
                 }
             }
         }

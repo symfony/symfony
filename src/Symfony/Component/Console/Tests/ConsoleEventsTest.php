@@ -58,7 +58,7 @@ class ConsoleEventsTest extends TestCase
             ->setPublic(true)
             ->addMethodCall('setAutoExit', [false])
             ->addMethodCall('setDispatcher', [new Reference('event_dispatcher')])
-            ->addMethodCall('add', [new Reference('failing_command')])
+            ->addMethodCall('addCommand', [new Reference('failing_command')])
         ;
 
         $container->compile();

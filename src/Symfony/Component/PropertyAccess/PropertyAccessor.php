@@ -109,11 +109,6 @@ class PropertyAccessor implements PropertyAccessorInterface
         return $propertyValues[\count($propertyValues) - 1][self::VALUE];
     }
 
-    /**
-     * @template T of object|array
-     * @param T $objectOrArray
-     * @param-out ($objectOrArray is array ? array : T) $objectOrArray
-     */
     public function setValue(object|array &$objectOrArray, string|PropertyPathInterface $propertyPath, mixed $value): void
     {
         if (\is_object($objectOrArray) && (false === strpbrk((string) $propertyPath, '.[') || $objectOrArray instanceof \stdClass && property_exists($objectOrArray, $propertyPath))) {

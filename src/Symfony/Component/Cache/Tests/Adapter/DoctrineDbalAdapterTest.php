@@ -17,17 +17,17 @@ use Doctrine\DBAL\Driver\AbstractMySQLDriver;
 use Doctrine\DBAL\Driver\Middleware;
 use Doctrine\DBAL\Driver\Middleware\AbstractDriverMiddleware;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Schema\Schema;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\DoctrineDbalAdapter;
 
-/**
- * @requires extension pdo_sqlite
- *
- * @group time-sensitive
- */
+#[RequiresPhpExtension('pdo_sqlite')]
+#[Group('time-sensitive')]
 class DoctrineDbalAdapterTest extends AdapterTestCase
 {
     protected static string $dbFile;
@@ -54,11 +54,8 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         }
 
         $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => self::$dbFile], $this->getDbalConfig());
-        if (!interface_exists(Middleware::class)) {
-            $this->markTestSkipped('doctrine/dbal v2 does not support custom drivers using middleware');
-        }
 
-        $middleware = $this->createMock(Middleware::class);
+        $middleware = $this->createStub(Middleware::class);
         $middleware
             ->method('wrap')
             ->willReturn(new class($connection->getDriver()) extends AbstractDriverMiddleware {});
@@ -86,7 +83,7 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         $schema = new Schema();
 
         $adapter = new DoctrineDbalAdapter($connection);
-        $adapter->configureSchema($schema, $connection, fn () => true);
+        $adapter->configureSchema($schema, $connection, static fn () => true);
         $this->assertTrue($schema->hasTable('cache_items'));
     }
 
@@ -96,11 +93,11 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
             @unlink(self::$dbFile);
         }
 
-        $otherConnection = $this->createConnectionMock();
+        $otherConnection = $this->createConnection();
         $schema = new Schema();
 
         $adapter = $this->createCachePool();
-        $adapter->configureSchema($schema, $otherConnection, fn () => false);
+        $adapter->configureSchema($schema, $otherConnection, static fn () => false);
         $this->assertFalse($schema->hasTable('cache_items'));
     }
 
@@ -115,14 +112,12 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         $schema->createTable('cache_items');
 
         $adapter = new DoctrineDbalAdapter($connection);
-        $adapter->configureSchema($schema, $connection, fn () => true);
+        $adapter->configureSchema($schema, $connection, static fn () => true);
         $table = $schema->getTable('cache_items');
         $this->assertSame([], $table->getColumns(), 'The table was not overwritten');
     }
 
-    /**
-     * @dataProvider provideDsnWithSQLite
-     */
+    #[DataProvider('provideDsnWithSQLite')]
     public function testDsnWithSQLite(string $dsn, ?string $file = null)
     {
         try {
@@ -146,11 +141,8 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         yield 'SQLite in memory' => ['sqlite://localhost/:memory:'];
     }
 
-    /**
-     * @requires extension pdo_pgsql
-     *
-     * @group integration
-     */
+    #[RequiresPhpExtension('pdo_pgsql')]
+    #[Group('integration')]
     public function testDsnWithPostgreSQL()
     {
         if (!$host = getenv('POSTGRES_HOST')) {
@@ -169,6 +161,49 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         }
     }
 
+    public function testSaveWithinActiveTransactionUsesSavepoint()
+    {
+        $dbFile = tempnam(sys_get_temp_dir(), 'sf_sqlite_savepoint');
+        try {
+            $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'path' => $dbFile], $this->getDbalConfig());
+            $adapter = new DoctrineDbalAdapter($connection);
+            $adapter->createTable();
+
+            $connection->beginTransaction();
+            $item = $adapter->getItem('savepoint_key');
+            $item->set('savepoint_value');
+            $adapter->save($item);
+
+            $this->assertTrue($connection->isTransactionActive(), 'Outer transaction must still be active after cache save');
+            $connection->commit();
+
+            $this->assertSame('savepoint_value', $adapter->getItem('savepoint_key')->get());
+        } finally {
+            @unlink($dbFile);
+        }
+    }
+
+    public function testSavepointIsRolledBackOnFailure()
+    {
+        $platform = $this->createStub(AbstractPlatform::class);
+        $platform->method('supportsSavepoints')->willReturn(true);
+
+        $conn = $this->createMock(Connection::class);
+        $conn->method('isTransactionActive')->willReturn(true);
+        $conn->method('getDatabasePlatform')->willReturn($platform);
+        $conn->expects($this->once())->method('createSavepoint')->with($this->stringStartsWith('cache_save_'));
+        $conn->expects($this->once())->method('rollbackSavepoint')->with($this->stringStartsWith('cache_save_'));
+        $conn->expects($this->never())->method('releaseSavepoint');
+        $conn->method('prepare')->willThrowException(new \RuntimeException('DB error'));
+
+        $adapter = new DoctrineDbalAdapter($conn);
+
+        $doSave = new \ReflectionMethod($adapter, 'doSave');
+
+        $this->expectException(\RuntimeException::class);
+        $doSave->invoke($adapter, ['key' => 'value'], 0);
+    }
+
     protected function isPruned(DoctrineDbalAdapter $cache, string $name): bool
     {
         $o = new \ReflectionObject($cache);
@@ -181,11 +216,11 @@ class DoctrineDbalAdapterTest extends AdapterTestCase
         return 1 !== (int) $result->fetchOne();
     }
 
-    private function createConnectionMock(): Connection&MockObject
+    private function createConnection(): Connection
     {
-        $connection = $this->createMock(Connection::class);
-        $driver = $this->createMock(AbstractMySQLDriver::class);
-        $connection->expects($this->any())
+        $connection = $this->createStub(Connection::class);
+        $driver = $this->createStub(AbstractMySQLDriver::class);
+        $connection
             ->method('getDriver')
             ->willReturn($driver);
 

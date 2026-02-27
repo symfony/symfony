@@ -21,10 +21,8 @@ use Symfony\Component\Translation\Translator as BaseTranslator;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
- *
- * @final since Symfony 7.1
  */
-class Translator extends BaseTranslator implements WarmableInterface
+final class Translator extends BaseTranslator implements WarmableInterface
 {
     protected array $options = [
         'cache_dir' => null,

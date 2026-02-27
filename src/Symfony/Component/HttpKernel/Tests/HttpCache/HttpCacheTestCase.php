@@ -30,7 +30,7 @@ abstract class HttpCacheTestCase extends TestCase
     protected $responses;
     protected $catch;
     protected $esi;
-    protected Store $store;
+    protected ?Store $store = null;
 
     protected function setUp(): void
     {
@@ -115,7 +115,9 @@ abstract class HttpCacheTestCase extends TestCase
 
         $this->kernel->reset();
 
-        $this->store = new Store(sys_get_temp_dir().'/http_cache');
+        if (!$this->store) {
+            $this->store = $this->createStore();
+        }
 
         if (!isset($this->cacheConfig['debug'])) {
             $this->cacheConfig['debug'] = true;
@@ -169,7 +171,7 @@ abstract class HttpCacheTestCase extends TestCase
 
         $fp = opendir($directory);
         while (false !== $file = readdir($fp)) {
-            if (!\in_array($file, ['.', '..'])) {
+            if (!\in_array($file, ['.', '..'], true)) {
                 if (is_link($directory.'/'.$file)) {
                     unlink($directory.'/'.$file);
                 } elseif (is_dir($directory.'/'.$file)) {
@@ -182,5 +184,10 @@ abstract class HttpCacheTestCase extends TestCase
         }
 
         closedir($fp);
+    }
+
+    protected function createStore(): Store
+    {
+        return new Store(sys_get_temp_dir().'/http_cache');
     }
 }

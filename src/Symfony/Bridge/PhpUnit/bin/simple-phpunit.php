@@ -21,7 +21,7 @@ error_reporting(-1);
 global $argv, $argc;
 $argv = $_SERVER['argv'] ?? [];
 $argc = $_SERVER['argc'] ?? 0;
-$getEnvVar = function ($name, $default = false) use ($argv) {
+$getEnvVar = static function ($name, $default = false) use ($argv) {
     if (false !== $value = getenv($name)) {
         return $value;
     }
@@ -29,19 +29,19 @@ $getEnvVar = function ($name, $default = false) use ($argv) {
     static $phpunitConfig = null;
     if (null === $phpunitConfig) {
         $phpunitConfigFilename = null;
-        $getPhpUnitConfig = function ($probableConfig) use (&$getPhpUnitConfig) {
+        $getPhpUnitConfig = static function ($probableConfig) use (&$getPhpUnitConfig) {
             if (!$probableConfig) {
                 return null;
             }
+
             if (is_dir($probableConfig)) {
-                return $getPhpUnitConfig($probableConfig.\DIRECTORY_SEPARATOR.'phpunit.xml');
+                return $getPhpUnitConfig($probableConfig.\DIRECTORY_SEPARATOR.'phpunit');
             }
 
-            if (file_exists($probableConfig)) {
-                return $probableConfig;
-            }
-            if (file_exists($probableConfig.'.dist')) {
-                return $probableConfig.'.dist';
+            foreach (['.xml', '.xml.dist', '.dist.xml'] as $suffix) {
+                if (file_exists($candidate = $probableConfig.$suffix)) {
+                    return $candidate;
+                }
             }
 
             return null;
@@ -57,7 +57,7 @@ $getEnvVar = function ($name, $default = false) use ($argv) {
                 break;
             }
             // short option
-            if (0 === strpos($cliArgument, '-c')) {
+            if (str_starts_with($cliArgument, '-c')) {
                 if ('-c' === $cliArgument && array_key_exists($cliArgumentIndex + 1, $argv)) {
                     $phpunitConfigFilename = $getPhpUnitConfig($argv[$cliArgumentIndex + 1]);
                 } else {
@@ -67,7 +67,7 @@ $getEnvVar = function ($name, $default = false) use ($argv) {
             }
         }
 
-        $phpunitConfigFilename = $phpunitConfigFilename ?: $getPhpUnitConfig('phpunit.xml');
+        $phpunitConfigFilename = $phpunitConfigFilename ?: $getPhpUnitConfig('phpunit');
 
         if ($phpunitConfigFilename) {
             $phpunitConfig = new DOMDocument();
@@ -89,7 +89,7 @@ $getEnvVar = function ($name, $default = false) use ($argv) {
     return $default;
 };
 
-$passthruOrFail = function ($command) {
+$passthruOrFail = static function ($command) {
     passthru($command, $status);
 
     if ($status) {
@@ -97,11 +97,7 @@ $passthruOrFail = function ($command) {
     }
 };
 
-if (\PHP_VERSION_ID >= 80000) {
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '9.6') ?: '9.6';
-} else {
-    $PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '8.5') ?: '8.5';
-}
+$PHPUNIT_VERSION = $getEnvVar('SYMFONY_PHPUNIT_VERSION', '9.6') ?: '9.6';
 
 $MAX_PHPUNIT_VERSION = $getEnvVar('SYMFONY_MAX_PHPUNIT_VERSION', false);
 
@@ -138,6 +134,7 @@ $defaultEnvs = [
     'COMPOSER' => 'composer.json',
     'COMPOSER_VENDOR_DIR' => 'vendor',
     'COMPOSER_BIN_DIR' => 'bin',
+    'COMPOSER_NO_INTERACTION' => '1',
     'SYMFONY_SIMPLE_PHPUNIT_BIN_DIR' => __DIR__,
 ];
 
@@ -168,7 +165,7 @@ $COMPOSER = ($COMPOSER = getenv('COMPOSER_BINARY'))
 $prevCacheDir = getenv('COMPOSER_CACHE_DIR');
 if ($prevCacheDir) {
     if (false === $absoluteCacheDir = realpath($prevCacheDir)) {
-        @mkdir($prevCacheDir, 0777, true);
+        @mkdir($prevCacheDir, 0o777, true);
         $absoluteCacheDir = realpath($prevCacheDir);
     }
     if ($absoluteCacheDir) {
@@ -177,14 +174,14 @@ if ($prevCacheDir) {
         $prevCacheDir = false;
     }
 }
-$SYMFONY_PHPUNIT_REMOVE = $getEnvVar('SYMFONY_PHPUNIT_REMOVE', 'phpspec/prophecy'.($PHPUNIT_VERSION < 6.0 ? ' symfony/yaml' : ''));
+$SYMFONY_PHPUNIT_REMOVE = $getEnvVar('SYMFONY_PHPUNIT_REMOVE', 'phpspec/prophecy');
 $SYMFONY_PHPUNIT_REQUIRE = $getEnvVar('SYMFONY_PHPUNIT_REQUIRE', '');
 $configurationHash = md5(implode(\PHP_EOL, [md5_file(__FILE__), $SYMFONY_PHPUNIT_REMOVE, $SYMFONY_PHPUNIT_REQUIRE, (int) $PHPUNIT_REMOVE_RETURN_TYPEHINT]));
 $PHPUNIT_VERSION_DIR = sprintf('phpunit-%s-%d', $PHPUNIT_VERSION, $PHPUNIT_REMOVE_RETURN_TYPEHINT);
 if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationHash !== @file_get_contents("$PHPUNIT_DIR/.$PHPUNIT_VERSION_DIR.md5")) {
     // Build a standalone phpunit without symfony/yaml nor prophecy by default
 
-    @mkdir($PHPUNIT_DIR, 0777, true);
+    @mkdir($PHPUNIT_DIR, 0o777, true);
     chdir($PHPUNIT_DIR);
     if (file_exists("$PHPUNIT_VERSION_DIR")) {
         passthru(sprintf('\\' === \DIRECTORY_SEPARATOR ? 'rmdir /S /Q %s 2> NUL' : 'rm -rf %s', escapeshellarg("$PHPUNIT_VERSION_DIR.old")));
@@ -193,7 +190,7 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     }
 
     $info = [];
-    foreach (explode("\n", `$COMPOSER info --no-ansi -a -n phpunit/phpunit "$PHPUNIT_VERSION.*"`) as $line) {
+    foreach (explode("\n", shell_exec("$COMPOSER info --no-ansi -a -n phpunit/phpunit \"$PHPUNIT_VERSION.*\"")) as $line) {
         $line = rtrim($line);
 
         if (!$info && preg_match('/^versions +: /', $line)) {
@@ -221,9 +218,7 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         'requires' => ['php' => '*'],
     ];
 
-    $stableVersions = array_filter($info['versions'], function ($v) {
-        return !preg_match('/-dev$|^dev-/', $v);
-    });
+    $stableVersions = array_filter($info['versions'], static fn ($v) => !preg_match('/-dev$|^dev-/', $v));
 
     if (!$stableVersions) {
         $passthruOrFail("$COMPOSER create-project --ignore-platform-reqs --no-install --prefer-dist --no-scripts --no-plugins --no-progress -s dev phpunit/phpunit $PHPUNIT_VERSION_DIR \"$PHPUNIT_VERSION.*\"");
@@ -234,13 +229,10 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     @copy("$PHPUNIT_VERSION_DIR/phpunit.xsd", 'phpunit.xsd');
     chdir("$PHPUNIT_VERSION_DIR");
     if ($SYMFONY_PHPUNIT_REMOVE) {
-        $passthruOrFail("$COMPOSER remove --no-update --no-interaction ".$SYMFONY_PHPUNIT_REMOVE);
+        $passthruOrFail("$COMPOSER remove --no-update ".$SYMFONY_PHPUNIT_REMOVE);
     }
     if ($SYMFONY_PHPUNIT_REQUIRE) {
-        $passthruOrFail("$COMPOSER require --no-update --no-interaction ".$SYMFONY_PHPUNIT_REQUIRE);
-    }
-    if (5.1 <= $PHPUNIT_VERSION && $PHPUNIT_VERSION < 5.4) {
-        $passthruOrFail("$COMPOSER require --no-update phpunit/phpunit-mock-objects \"~3.1.0\"");
+        $passthruOrFail("$COMPOSER require --no-update ".$SYMFONY_PHPUNIT_REQUIRE);
     }
 
     if (preg_match('{\^((\d++\.)\d++)[\d\.]*$}', $info['requires']['php'], $phpVersion) && version_compare($phpVersion[2].'99', \PHP_VERSION, '<')) {
@@ -266,9 +258,8 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
     }
     $prevRoot = getenv('COMPOSER_ROOT_VERSION');
     putenv("COMPOSER_ROOT_VERSION=$PHPUNIT_VERSION.99");
-    $q = '\\' === \DIRECTORY_SEPARATOR && \PHP_VERSION_ID < 80000 ? '"' : '';
     // --no-suggest is not in the list to keep compat with composer 1.0, which is shipped with Ubuntu 16.04LTS
-    $exit = proc_close(proc_open("$q$COMPOSER update --no-dev --prefer-dist --no-progress $q", [], $p, getcwd()));
+    $exit = proc_close(proc_open("$COMPOSER update --no-dev --prefer-dist --no-progress", [], $p, getcwd()));
     putenv('COMPOSER_ROOT_VERSION'.(false !== $prevRoot ? '='.$prevRoot : ''));
     if ($prevCacheDir) {
         putenv("COMPOSER_CACHE_DIR=$prevCacheDir");
@@ -283,7 +274,6 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         if ($PHPUNIT_REMOVE_RETURN_TYPEHINT) {
             $alteredCode = preg_replace('/^    ((?:protected|public)(?: static)? function \w+\(\)): void/m', '    $1', $alteredCode);
         }
-        $alteredCode = preg_replace('/abstract class TestCase[^\{]+\{/', '$0 '.\PHP_EOL."    use \Symfony\Bridge\PhpUnit\Legacy\PolyfillTestCaseTrait;", $alteredCode, 1);
         file_put_contents($alteredFile, $alteredCode);
 
         // Mutate Assert code
@@ -292,30 +282,30 @@ if (!file_exists("$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/phpunit") || $configurationH
         file_put_contents($alteredFile, $alteredCode);
 
         file_put_contents('phpunit', <<<'EOPHP'
-<?php
+            <?php
 
-define('PHPUNIT_COMPOSER_INSTALL', __DIR__.'/vendor/autoload.php');
-require PHPUNIT_COMPOSER_INSTALL;
+            define('PHPUNIT_COMPOSER_INSTALL', __DIR__.'/vendor/autoload.php');
+            require PHPUNIT_COMPOSER_INSTALL;
 
-if (!class_exists(\SymfonyExcludeListPhpunit::class, false)) {
-    class SymfonyExcludeListPhpunit {}
-}
-if (method_exists(\PHPUnit\Util\ExcludeList::class, 'addDirectory')) {
-    (new PHPUnit\Util\Excludelist())->getExcludedDirectories();
-    PHPUnit\Util\ExcludeList::addDirectory(\dirname((new \ReflectionClass(\SymfonyExcludeListPhpunit::class))->getFileName()));
-    class_exists(\SymfonyExcludeListSimplePhpunit::class, false) && PHPUnit\Util\ExcludeList::addDirectory(\dirname((new \ReflectionClass(\SymfonyExcludeListSimplePhpunit::class))->getFileName()));
-} elseif (method_exists(\PHPUnit\Util\Blacklist::class, 'addDirectory')) {
-    (new PHPUnit\Util\BlackList())->getBlacklistedDirectories();
-    PHPUnit\Util\Blacklist::addDirectory(\dirname((new \ReflectionClass(\SymfonyExcludeListPhpunit::class))->getFileName()));
-    class_exists(\SymfonyExcludeListSimplePhpunit::class, false) && PHPUnit\Util\Blacklist::addDirectory(\dirname((new \ReflectionClass(\SymfonyExcludeListSimplePhpunit::class))->getFileName()));
-} else {
-    PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyExcludeListPhpunit'] = 1;
-    PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyExcludeListSimplePhpunit'] = 1;
-}
+            if (!class_exists(\SymfonyExcludeListPhpunit::class, false)) {
+                class SymfonyExcludeListPhpunit {}
+            }
+            if (method_exists(\PHPUnit\Util\ExcludeList::class, 'addDirectory')) {
+                (new PHPUnit\Util\Excludelist())->getExcludedDirectories();
+                PHPUnit\Util\ExcludeList::addDirectory(\dirname((new \ReflectionClass(\SymfonyExcludeListPhpunit::class))->getFileName()));
+                class_exists(\SymfonyExcludeListSimplePhpunit::class, false) && PHPUnit\Util\ExcludeList::addDirectory(\dirname((new \ReflectionClass(\SymfonyExcludeListSimplePhpunit::class))->getFileName()));
+            } elseif (method_exists(\PHPUnit\Util\Blacklist::class, 'addDirectory')) {
+                (new PHPUnit\Util\BlackList())->getBlacklistedDirectories();
+                PHPUnit\Util\Blacklist::addDirectory(\dirname((new \ReflectionClass(\SymfonyExcludeListPhpunit::class))->getFileName()));
+                class_exists(\SymfonyExcludeListSimplePhpunit::class, false) && PHPUnit\Util\Blacklist::addDirectory(\dirname((new \ReflectionClass(\SymfonyExcludeListSimplePhpunit::class))->getFileName()));
+            } else {
+                PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyExcludeListPhpunit'] = 1;
+                PHPUnit\Util\Blacklist::$blacklistedClassNames['SymfonyExcludeListSimplePhpunit'] = 1;
+            }
 
-Symfony\Bridge\PhpUnit\TextUI\Command::main();
+            Symfony\Bridge\PhpUnit\TextUI\Command::main();
 
-EOPHP
+            EOPHP
         );
     }
 
@@ -339,16 +329,7 @@ if ('\\' === \DIRECTORY_SEPARATOR) {
 }
 chdir($oldPwd);
 
-if ($PHPUNIT_VERSION < 8.0) {
-    $argv = array_filter($argv, function ($v) use (&$argc) {
-        if ('--do-not-cache-result' !== $v) {
-            return true;
-        }
-        --$argc;
-
-        return false;
-    });
-} elseif (filter_var(getenv('SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE'), \FILTER_VALIDATE_BOOLEAN)) {
+if (filter_var(getenv('SYMFONY_PHPUNIT_DISABLE_RESULT_CACHE'), \FILTER_VALIDATE_BOOLEAN)) {
     $argv[] = '--do-not-cache-result';
     ++$argc;
 }
@@ -384,6 +365,10 @@ if ('\\' === \DIRECTORY_SEPARATOR) {
     $cmd = 'cmd /v:on /d /c "('.$cmd.')%2$s"';
 } else {
     $cmd .= '%2$s';
+}
+
+if (version_compare($PHPUNIT_VERSION, '11.0', '>=')) {
+    $GLOBALS['_composer_autoload_path'] = "$PHPUNIT_DIR/$PHPUNIT_VERSION_DIR/vendor/autoload.php";
 }
 
 if ($components) {

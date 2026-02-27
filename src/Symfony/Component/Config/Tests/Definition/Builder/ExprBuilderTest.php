@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests\Definition\Builder;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ExprBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
@@ -37,25 +38,25 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs('new_value', $test, ['key' => true]);
 
         $test = $this->getTestBuilder()
-            ->ifTrue(fn () => true)
+            ->ifTrue(static fn () => true)
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('new_value', $test);
 
         $test = $this->getTestBuilder()
-            ->ifTrue(fn () => 1)
+            ->ifTrue(static fn () => 1)
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('new_value', $test);
 
         $test = $this->getTestBuilder()
-            ->ifTrue(fn () => false)
+            ->ifTrue(static fn () => false)
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('value', $test);
 
         $test = $this->getTestBuilder()
-            ->ifTrue(fn () => 0)
+            ->ifTrue(static fn () => 0)
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('value', $test);
@@ -70,25 +71,25 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs('new_value', $test, ['key' => false]);
 
         $test = $this->getTestBuilder()
-            ->ifFalse(fn ($v) => 'value' === $v)
+            ->ifFalse(static fn ($v) => 'value' === $v)
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('value', $test);
 
         $test = $this->getTestBuilder()
-            ->ifFalse(fn ($v) => 1)
+            ->ifFalse(static fn ($v) => 1)
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('value', $test);
 
         $test = $this->getTestBuilder()
-            ->ifFalse(fn ($v) => 'other_value' === $v)
+            ->ifFalse(static fn ($v) => 'other_value' === $v)
             ->then($this->returnClosure('new_value'))
         ->end();
         $this->assertFinalizedValueIs('new_value', $test);
 
         $test = $this->getTestBuilder()
-            ->ifFalse(fn ($v) => 0)
+            ->ifFalse(static fn ($v) => 0)
             ->then($this->returnClosure('new_value'))
             ->end();
         $this->assertFinalizedValueIs('new_value', $test);
@@ -193,9 +194,7 @@ class ExprBuilderTest extends TestCase
         $this->assertFinalizedValueIs([], $test);
     }
 
-    /**
-     * @dataProvider castToArrayValues
-     */
+    #[DataProvider('castToArrayValues')]
     public function testCastToArrayExpression($configValue, array $expectedValue)
     {
         $test = $this->getTestBuilder()
@@ -286,7 +285,7 @@ class ExprBuilderTest extends TestCase
      */
     protected function returnClosure($val): \Closure
     {
-        return fn () => $val;
+        return static fn () => $val;
     }
 
     /**

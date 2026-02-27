@@ -1,7 +1,10 @@
 <?php
 
+/**
+ * @return list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>
+ */
 return static function (string|\Stringable $string, \Psr\Container\ContainerInterface $valueTransformers, \Symfony\Component\JsonStreamer\Read\Instantiator $instantiator, array $options): mixed {
-    $providers['array<int,Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>'] = static function ($data) use ($options, $valueTransformers, $instantiator, &$providers) {
+    $providers['list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>'] = static function ($data) use ($options, $valueTransformers, $instantiator, &$providers) {
         $iterable = static function ($data) use ($options, $valueTransformers, $instantiator, &$providers) {
             foreach ($data as $k => $v) {
                 yield $k => $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy']($v);
@@ -14,5 +17,5 @@ return static function (string|\Stringable $string, \Psr\Container\ContainerInte
             return '_symfony_missing_value' !== $v;
         }));
     };
-    return $providers['array<int,Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>'](\Symfony\Component\JsonStreamer\Read\Decoder::decodeString((string) $string));
+    return $providers['list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy>'](\Symfony\Component\JsonStreamer\Read\Decoder::decodeString((string) $string));
 };

@@ -24,18 +24,29 @@ class StateMachineValidator implements DefinitionValidatorInterface
         $transitionFromNames = [];
         foreach ($definition->getTransitions() as $transition) {
             // Make sure that each transition has exactly one TO
-            if (1 !== \count($transition->getTos())) {
-                throw new InvalidDefinitionException(\sprintf('A transition in StateMachine can only have one output. But the transition "%s" in StateMachine "%s" has %d outputs.', $transition->getName(), $name, \count($transition->getTos())));
+            if (1 !== \count($transition->getTos(true))) {
+                throw new InvalidDefinitionException(\sprintf('A transition in StateMachine can only have one output. But the transition "%s" in StateMachine "%s" has %d outputs.', $transition->getName(), $name, \count($transition->getTos(true))));
+            }
+            foreach ($transition->getFroms(true) as $arc) {
+                if (1 < $arc->weight) {
+                    throw new InvalidDefinitionException(\sprintf('A transition in StateMachine can only have arc with weight equals to one. But the transition "%s" in StateMachine "%s" has an arc from "%s" to the transition with a weight equals to %d.', $transition->getName(), $name, $arc->place, $arc->weight));
+                }
             }
 
             // Make sure that each transition has exactly one FROM
-            $froms = $transition->getFroms();
-            if (1 !== \count($froms)) {
-                throw new InvalidDefinitionException(\sprintf('A transition in StateMachine can only have one input. But the transition "%s" in StateMachine "%s" has %d inputs.', $transition->getName(), $name, \count($froms)));
+            $fromArcs = $transition->getFroms(true);
+            if (1 !== \count($fromArcs)) {
+                throw new InvalidDefinitionException(\sprintf('A transition in StateMachine can only have one input. But the transition "%s" in StateMachine "%s" has %d inputs.', $transition->getName(), $name, \count($fromArcs)));
+            }
+            foreach ($transition->getTos(true) as $arc) {
+                if (1 !== $arc->weight) {
+                    throw new InvalidDefinitionException(\sprintf('A transition in StateMachine can only have arc with weight equals to one. But the transition "%s" in StateMachine "%s" has an arc from the transition to "%s" with a weight equals to %d.', $transition->getName(), $name, $arc->place, $arc->weight));
+                }
             }
 
             // Enforcing uniqueness of the names of transitions starting at each node
-            $from = reset($froms);
+            $fromArc = reset($fromArcs);
+            $from = $fromArc->place;
             if (isset($transitionFromNames[$from][$transition->getName()])) {
                 throw new InvalidDefinitionException(\sprintf('A transition from a place/state must have an unique name. Multiple transitions named "%s" from place/state "%s" were found on StateMachine "%s".', $transition->getName(), $from, $name));
             }

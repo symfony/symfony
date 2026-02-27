@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\DependencyInjection\Tests;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 
@@ -24,9 +25,7 @@ class ChildDefinitionTest extends TestCase
         $this->assertSame([], $def->getChanges());
     }
 
-    /**
-     * @dataProvider getPropertyTests
-     */
+    #[DataProvider('getPropertyTests')]
     public function testSetProperty($property, $changeKey)
     {
         $def = new ChildDefinition('foo');

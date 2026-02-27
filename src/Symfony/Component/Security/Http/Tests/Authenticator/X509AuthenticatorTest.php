@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Security\Http\Tests\Authenticator;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
@@ -29,9 +30,7 @@ class X509AuthenticatorTest extends TestCase
         $this->authenticator = new X509Authenticator($this->userProvider, new TokenStorage(), 'main');
     }
 
-    /**
-     * @dataProvider provideServerVars
-     */
+    #[DataProvider('provideServerVars')]
     public function testAuthentication($username, $credentials)
     {
         $serverVars = [];
@@ -57,9 +56,7 @@ class X509AuthenticatorTest extends TestCase
         yield ['TheUser', ''];
     }
 
-    /**
-     * @dataProvider provideServerVarsNoUser
-     */
+    #[DataProvider('provideServerVarsNoUser')]
     public function testAuthenticationNoUser($emailAddress, $credentials)
     {
         $request = $this->createRequest(['SSL_CLIENT_S_DN' => $credentials]);
@@ -120,9 +117,7 @@ class X509AuthenticatorTest extends TestCase
         $this->assertEquals('cert@example.com', $passport->getUser()->getUserIdentifier());
     }
 
-    /**
-     * @dataProvider provideServerVarsUserIdentifier
-     */
+    #[DataProvider('provideServerVarsUserIdentifier')]
     public function testAuthenticationCustomCredentialsUserIdentifier($username, $credentials)
     {
         $authenticator = new X509Authenticator($this->userProvider, new TokenStorage(), 'main', 'SSL_CLIENT_S_DN_Email', 'SSL_CLIENT_S_DN', null, 'CN');

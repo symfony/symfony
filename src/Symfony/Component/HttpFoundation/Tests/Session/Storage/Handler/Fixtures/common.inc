@@ -86,7 +86,7 @@ class TestSessionHandler extends AbstractSessionHandler
     {
         echo __FUNCTION__, "\n";
 
-        return true;
+        return parent::updateTimestamp($sessionId, $data);
     }
 
     public function write(string $sessionId, string $data): bool

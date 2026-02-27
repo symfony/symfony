@@ -55,12 +55,12 @@ class UnionType extends Type implements CompositeTypeInterface
             }
         }
 
-        usort($types, fn (Type $a, Type $b): int => (string) $a <=> (string) $b);
+        usort($types, static fn (Type $a, Type $b): int => (string) $a <=> (string) $b);
         $this->types = array_values(array_unique($types));
 
         $builtinTypesIdentifiers = array_map(
-            fn (BuiltinType $t): TypeIdentifier => $t->getTypeIdentifier(),
-            array_filter($this->types, fn (Type $t): bool => $t instanceof BuiltinType),
+            static fn (BuiltinType $t): TypeIdentifier => $t->getTypeIdentifier(),
+            array_filter($this->types, static fn (Type $t): bool => $t instanceof BuiltinType),
         );
 
         if ((\in_array(TypeIdentifier::TRUE, $builtinTypesIdentifiers, true) || \in_array(TypeIdentifier::FALSE, $builtinTypesIdentifiers, true)) && \in_array(TypeIdentifier::BOOL, $builtinTypesIdentifiers, true)) {
@@ -71,7 +71,7 @@ class UnionType extends Type implements CompositeTypeInterface
             throw new InvalidArgumentException('Cannot create union with both "true" and "false", "bool" should be used instead.');
         }
 
-        if (\in_array(TypeIdentifier::OBJECT, $builtinTypesIdentifiers, true) && \count(array_filter($this->types, fn (Type $t): bool => $t instanceof ObjectType))) {
+        if (\in_array(TypeIdentifier::OBJECT, $builtinTypesIdentifiers, true) && \count(array_filter($this->types, static fn (Type $t): bool => $t instanceof ObjectType))) {
             throw new InvalidArgumentException('Cannot create union with both "object" and class type.');
         }
     }

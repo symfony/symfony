@@ -980,7 +980,7 @@ return [
         ],
         'VND' => [
             '₫',
-            'vientnamski dong',
+            'vietnamski dong',
         ],
         'VUV' => [
             'VUV',
@@ -997,6 +997,10 @@ return [
         'XCD' => [
             'XCD',
             'vzhodnokaribski dolar',
+        ],
+        'XCG' => [
+            'Cg.',
+            'karibski gulden',
         ],
         'XEU' => [
             'XEU',
@@ -1065,6 +1069,10 @@ return [
         'ZWD' => [
             'ZWD',
             'zimbabvejski dolar',
+        ],
+        'ZWG' => [
+            'ZWG',
+            'zimbabvejsko zlato',
         ],
         'ZWL' => [
             'ZWL',

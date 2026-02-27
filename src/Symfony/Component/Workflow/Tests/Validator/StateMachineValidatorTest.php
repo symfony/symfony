@@ -12,6 +12,7 @@
 namespace Symfony\Component\Workflow\Tests\Validator;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Workflow\Arc;
 use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Exception\InvalidDefinitionException;
 use Symfony\Component\Workflow\Transition;
@@ -122,6 +123,34 @@ class StateMachineValidatorTest extends TestCase
 
         $this->expectException(InvalidDefinitionException::class);
         $this->expectExceptionMessage('The state machine "foo" cannot store many places. But the definition has 2 initial places. Only one is supported.');
+
+        (new StateMachineValidator())->validate($definition, 'foo');
+    }
+
+    public function testWithArcInFromTooHeavy()
+    {
+        $places = ['a', 'b'];
+        $transitions = [
+            new Transition('t1', [new Arc('a', 2)], [new Arc('b', 1)]),
+        ];
+        $definition = new Definition($places, $transitions);
+
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('A transition in StateMachine can only have arc with weight equals to one. But the transition "t1" in StateMachine "foo" has an arc from "a" to the transition with a weight equals to 2.');
+
+        (new StateMachineValidator())->validate($definition, 'foo');
+    }
+
+    public function testWithArcInToTooHeavy()
+    {
+        $places = ['a', 'b'];
+        $transitions = [
+            new Transition('t1', [new Arc('a', 1)], [new Arc('b', 2)]),
+        ];
+        $definition = new Definition($places, $transitions);
+
+        $this->expectException(InvalidDefinitionException::class);
+        $this->expectExceptionMessage('A transition in StateMachine can only have arc with weight equals to one. But the transition "t1" in StateMachine "foo" has an arc from the transition to "b" with a weight equals to 2.');
 
         (new StateMachineValidator())->validate($definition, 'foo');
     }

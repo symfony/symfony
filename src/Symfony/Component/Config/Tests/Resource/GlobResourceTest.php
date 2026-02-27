@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Config\Tests\Resource;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Resource\GlobResource;
 
@@ -25,23 +26,18 @@ class GlobResourceTest extends TestCase
         touch($dir.'/Resource/.hiddenFile');
     }
 
-    public function testIterator()
+    #[TestWith(['/Resource'])]
+    #[TestWith(['/**/Resource'])]
+    #[TestWith(['/**/Resource/'])]
+    public function testIterator(string $pattern)
     {
         $dir = \dirname(__DIR__).\DIRECTORY_SEPARATOR.'Fixtures';
-        $resource = new GlobResource($dir, '/Resource', true);
+        $resource = new GlobResource($dir, $pattern, true);
 
         $paths = iterator_to_array($resource);
 
         $file = $dir.'/Resource'.\DIRECTORY_SEPARATOR.'ConditionalClass.php';
         $this->assertEquals([$file => new \SplFileInfo($file)], $paths);
-        $this->assertInstanceOf(\SplFileInfo::class, current($paths));
-        $this->assertSame($dir, $resource->getPrefix());
-
-        $resource = new GlobResource($dir, '/**/Resource', true);
-
-        $paths = iterator_to_array($resource);
-
-        $this->assertEquals([$file => $file], $paths);
         $this->assertInstanceOf(\SplFileInfo::class, current($paths));
         $this->assertSame($dir, $resource->getPrefix());
     }
@@ -176,6 +172,8 @@ class GlobResourceTest extends TestCase
         $expected = [
             $dir.'/Exclude/ExcludeToo/AnotheExcludedFile.txt',
             $dir.'/ExcludeTrailingSlash/exclude/baz.txt',
+            $dir.'/Include/SubDir/ExcludeFile.txt',
+            $dir.'/Include/SubDir/IncludeFile.txt',
             $dir.'/foo.xml',
         ];
 

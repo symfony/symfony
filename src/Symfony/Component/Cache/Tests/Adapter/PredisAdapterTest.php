@@ -11,12 +11,11 @@
 
 namespace Symfony\Component\Cache\Tests\Adapter;
 
+use PHPUnit\Framework\Attributes\Group;
 use Predis\Connection\StreamConnection;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 
-/**
- * @group integration
- */
+#[Group('integration')]
 class PredisAdapterTest extends AbstractRedisAdapterTestCase
 {
     public static function setUpBeforeClass(): void
@@ -73,7 +72,7 @@ class PredisAdapterTest extends AbstractRedisAdapterTestCase
             'scheme' => 'tls',
             'host' => $redisHost[0],
             'port' => (int) ($redisHost[1] ?? 6379),
-            'ssl' => ['verify_peer' => '0'],
+            'ssl' => ['verify_peer' => false],
             'persistent' => false,
             'timeout' => 3,
             'read_write_timeout' => 0,

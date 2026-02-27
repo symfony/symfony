@@ -16,6 +16,7 @@ use AsyncAws\Core\Exception\Http\NetworkException;
 use AsyncAws\Core\Sts\Result\GetCallerIdentityResponse;
 use AsyncAws\Core\Sts\StsClient;
 use AsyncAws\Core\Test\ResultMockFactory;
+use AsyncAws\Sqs\Enum\MessageSystemAttributeName;
 use AsyncAws\Sqs\Enum\QueueAttributeName;
 use AsyncAws\Sqs\Result\GetQueueUrlResult;
 use AsyncAws\Sqs\Result\QueueExistsWaiter;
@@ -309,11 +310,13 @@ class ConnectionTest extends TestCase
                 'VisibilityTimeout' => null,
                 'MaxNumberOfMessages' => 9,
                 'MessageAttributeNames' => ['All'],
+                'MessageSystemAttributeNames' => [MessageSystemAttributeName::ALL],
                 'WaitTimeSeconds' => 20]], $firstResult],
             [[['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
                 'VisibilityTimeout' => null,
                 'MaxNumberOfMessages' => 9,
                 'MessageAttributeNames' => ['All'],
+                'MessageSystemAttributeNames' => [MessageSystemAttributeName::ALL],
                 'WaitTimeSeconds' => 20]], $secondResult],
         ];
 
@@ -353,11 +356,13 @@ class ConnectionTest extends TestCase
                 'VisibilityTimeout' => null,
                 'MaxNumberOfMessages' => 10,
                 'MessageAttributeNames' => ['All'],
+                'MessageSystemAttributeNames' => [MessageSystemAttributeName::ALL],
                 'WaitTimeSeconds' => 20]], $firstResult],
             [[['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
                 'VisibilityTimeout' => null,
                 'MaxNumberOfMessages' => 10,
                 'MessageAttributeNames' => ['All'],
+                'MessageSystemAttributeNames' => [MessageSystemAttributeName::ALL],
                 'WaitTimeSeconds' => 20]], $secondResult],
         ];
 
@@ -374,6 +379,46 @@ class ConnectionTest extends TestCase
         $connection = new Connection(['queue_name' => 'queue', 'account' => 123, 'auto_setup' => false, 'buffer_size' => 9], $client);
         $this->assertNotNull($connection->get(12));
         $this->assertNull($connection->get(12));
+    }
+
+    public function testGetReturnsSystemAttributes()
+    {
+        $client = $this->createMock(SqsClient::class);
+        $client
+            ->method('getQueueUrl')
+            ->willReturnMap([
+                [['QueueName' => 'queue', 'QueueOwnerAWSAccountId' => 123], ResultMockFactory::create(GetQueueUrlResult::class, ['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue'])],
+            ]);
+
+        $result = ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
+            new Message([
+                'MessageId' => 1,
+                'Body' => 'this is a test',
+                'Attributes' => [
+                    MessageSystemAttributeName::APPROXIMATE_RECEIVE_COUNT => '3',
+                    MessageSystemAttributeName::SENT_TIMESTAMP => '1638000000000',
+                ],
+            ]),
+        ]]);
+
+        $client->expects($this->once())
+            ->method('receiveMessage')
+            ->with([
+                'QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+                'VisibilityTimeout' => null,
+                'MaxNumberOfMessages' => 9,
+                'MessageAttributeNames' => ['All'],
+                'MessageSystemAttributeNames' => [MessageSystemAttributeName::ALL],
+                'WaitTimeSeconds' => 20,
+            ])
+            ->willReturn($result)
+        ;
+
+        $connection = new Connection(['queue_name' => 'queue', 'account' => 123, 'auto_setup' => false], $client);
+
+        $message = $connection->get();
+        $this->assertNotNull($message);
+        $this->assertSame(['ApproximateReceiveCount' => '3', 'SentTimestamp' => '1638000000000'], $message[0]['system_attributes']);
     }
 
     public function testUnexpectedSqsError()

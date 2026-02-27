@@ -20,11 +20,20 @@ class AmazonSqsReceivedStamp implements NonSendableStampInterface
 {
     public function __construct(
         private string $id,
+        private array $systemAttributes = [],
     ) {
     }
 
     public function getId(): string
     {
         return $this->id;
+    }
+
+    /**
+     * @return array<string, string> SQS system attributes (e.g. ApproximateReceiveCount, SentTimestamp)
+     */
+    public function getSystemAttributes(): array
+    {
+        return $this->systemAttributes;
     }
 }

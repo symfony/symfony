@@ -238,6 +238,7 @@ class Connection
                 'VisibilityTimeout' => $this->configuration['visibility_timeout'],
                 'MaxNumberOfMessages' => min($fetchSize, 10), // SQS limitation
                 'MessageAttributeNames' => ['All'],
+                'MessageSystemAttributeNames' => [MessageSystemAttributeName::ALL],
                 'WaitTimeSeconds' => $this->configuration['wait_time'],
             ]);
         }
@@ -274,6 +275,7 @@ class Connection
                 'id' => $message->getReceiptHandle(),
                 'body' => $message->getBody(),
                 'headers' => $headers,
+                'system_attributes' => $message->getAttributes(),
             ];
         }
 

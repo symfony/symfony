@@ -67,7 +67,6 @@ class MapEntityCollectionTest extends TestCase
             filters: [DummyDoctrineFilter::class],
             defaultOrdering: ['createdAt' => MapEntityCollection::ORDERING_DESC],
             returnPaginator: false,
-            nameConverter: $nameConverter,
         );
 
         $this->assertSame('App\Entity\Order', $attribute->getClass());
@@ -77,7 +76,6 @@ class MapEntityCollectionTest extends TestCase
         $this->assertSame([DummyDoctrineFilter::class], $attribute->getFilters());
         $this->assertSame(['createdAt' => MapEntityCollection::ORDERING_DESC], $attribute->getDefaultOrdering());
         $this->assertFalse($attribute->isReturnPaginator());
-        $this->assertSame($nameConverter, $attribute->getNameConverter());
     }
 }
 

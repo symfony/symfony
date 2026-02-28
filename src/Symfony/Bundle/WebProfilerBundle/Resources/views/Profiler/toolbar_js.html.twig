@@ -500,18 +500,18 @@
                         var sfwdt = this.getSfwdt(token);
 
                         if ('closed' === getPreference('toolbar/displayState')) {
-                            addClass(sfwdt, 'sf-toolbar-closed');
-                            removeClass(sfwdt, 'sf-toolbar-opened');
+                            addClass(sfwdt.parentNode, 'sf-toolbar-closed');
+                            removeClass(sfwdt.parentNode, 'sf-toolbar-opened');
                         } else {
-                            addClass(sfwdt, 'sf-toolbar-opened');
-                            removeClass(sfwdt, 'sf-toolbar-closed');
+                            addClass(sfwdt.parentNode, 'sf-toolbar-opened');
+                            removeClass(sfwdt.parentNode, 'sf-toolbar-closed');
                         }
                     },
 
                     hideToolbar: function(token) {
                         var sfwdt = this.getSfwdt(token);
-                        addClass(sfwdt, 'sf-toolbar-closed');
-                        removeClass(sfwdt, 'sf-toolbar-opened');
+                        addClass(sfwdt.parentNode, 'sf-toolbar-closed');
+                        removeClass(sfwdt.parentNode, 'sf-toolbar-opened');
                     },
 
                     initToolbar: function(token) {
@@ -521,7 +521,7 @@
                         addEventListener(toggleButton, 'click', function (event) {
                             event.preventDefault();
 
-                            const newState = 'opened' === getPreference('toolbar/displayState') ? 'closed' : 'opened';
+                            const newState = 'closed' === getPreference('toolbar/displayState') ? 'opened' : 'closed';
                             setPreference('toolbar/displayState', newState);
                             'opened' === newState ? Sfjs.showToolbar(token) : Sfjs.hideToolbar(token);
                         });
@@ -649,7 +649,7 @@
                                         An error occurred while loading the web debug toolbar. <a href="{{ url('_profiler_home')|escape('js') }}' + newToken + '">Open the web profiler.</a>\
                                     </div>\
                                 ';
-                                    sfwdt.setAttribute('class', 'sf-toolbar sf-error-toolbar');
+                                    sfwdt.parentNode.setAttribute('class', 'sf-toolbar sf-error-toolbar');
                                 }
                             },
                             options

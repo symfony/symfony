@@ -159,7 +159,7 @@ class EntityCollectionValueResolver implements ValueResolverInterface
     ): void {
         foreach ($parameters as $key => $value) {
             if (\in_array($value, [MappingType::LIMIT, MappingType::PAGE, MappingType::OFFSET], true)) {
-                throw new \LogicException(\sprintf('Doctrine parameter "%s" is not supported.', $value));
+                throw new \LogicException(\sprintf('Doctrine parameter "%s" is not supported.', $value->value));
             }
 
             $this->addCondition(

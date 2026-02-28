@@ -201,7 +201,7 @@ class EntityCollectionValueResolverTest extends TestCase
         );
 
         $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Doctrine parameter "pageSize" is not supported.');
+        $this->expectExceptionMessage('Doctrine parameter "limit" is not supported.');
 
         $resolver->mapEntityCollection($event);
     }

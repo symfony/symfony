@@ -1,6 +1,13 @@
 <?php
 
-declare(strict_types=1);
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Symfony\Bridge\Doctrine\Tests\ArgumentResolver;
 
@@ -20,7 +27,7 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 #[CoversClass(MapEntityCollection::class)]
 class MapEntityCollectionTest extends TestCase
 {
-    public function testAttributeFlags(): void
+    public function testAttributeFlags()
     {
         $reflection = new \ReflectionClass(MapEntityCollection::class);
         $attributes = $reflection->getAttributes(\Attribute::class);
@@ -32,7 +39,7 @@ class MapEntityCollectionTest extends TestCase
         );
     }
 
-    public function testDefaultConfiguration(): void
+    public function testDefaultConfiguration()
     {
         $attribute = new MapEntityCollection('App\Entity\Product');
 
@@ -48,7 +55,7 @@ class MapEntityCollectionTest extends TestCase
         $this->assertNull($attribute->getNameConverter());
     }
 
-    public function testCustomConfiguration(): void
+    public function testCustomConfiguration()
     {
         $nameConverter = $this->createStub(NameConverterInterface::class);
 
@@ -80,6 +87,7 @@ final class DummyDoctrineFilter implements DoctrineFilterInterface
         QueryBuilder $queryBuilder,
         MapEntityCollection $attribute,
         Request $request,
-        ?object $queryStringObject = null
-    ): void {}
+        ?object $queryStringObject = null,
+    ): void {
+    }
 }

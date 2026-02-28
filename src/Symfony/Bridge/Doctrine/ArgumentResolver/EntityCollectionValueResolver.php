@@ -1,8 +1,5 @@
 <?php
 
-
-declare(strict_types=1);
-
 /*
  * This file is part of the Symfony package.
  *
@@ -230,6 +227,6 @@ class EntityCollectionValueResolver implements ValueResolverInterface
             }
         }
 
-        throw new UnprocessableEntityHttpException('Pagination parameter must be an integer');
+        throw new UnprocessableEntityHttpException('Pagination parameter must be an integer.');
     }
 }

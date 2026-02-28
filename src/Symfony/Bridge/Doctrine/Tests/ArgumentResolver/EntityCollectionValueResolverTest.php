@@ -1,6 +1,13 @@
 <?php
 
-declare(strict_types=1);
+/*
+ * This file is part of the Symfony package.
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace Symfony\Bridge\Doctrine\Tests\ArgumentResolver;
 
@@ -32,7 +39,7 @@ use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInt
 #[CoversClass(EntityCollectionValueResolver::class)]
 class EntityCollectionValueResolverTest extends TestCase
 {
-    public function testResolveReturnsMapEntityCollectionAttributes(): void
+    public function testResolveReturnsMapEntityCollectionAttributes()
     {
         $attribute = new MapEntityCollection('App\Entity\Product');
         $argument = $this->createMock(ArgumentMetadata::class);
@@ -56,7 +63,7 @@ class EntityCollectionValueResolverTest extends TestCase
         $this->assertSame([$attribute], $resolved);
     }
 
-    public function testMapEntityCollectionReplacesArgumentWithResolvedCollection(): void
+    public function testMapEntityCollectionReplacesArgumentWithResolvedCollection()
     {
         $query = $this->createStub(Query::class);
         $query->method('getResult')->willReturn(['row-1', 'row-2']);
@@ -101,7 +108,7 @@ class EntityCollectionValueResolverTest extends TestCase
         $this->assertSame(['first', ['row-1', 'row-2'], 'third'], $event->getArguments());
     }
 
-    public function testMapEntityCollectionReturnsPaginatorWhenEnabled(): void
+    public function testMapEntityCollectionReturnsPaginatorWhenEnabled()
     {
         $query = $this->createStub(Query::class);
 
@@ -137,7 +144,7 @@ class EntityCollectionValueResolverTest extends TestCase
         $this->assertInstanceOf(Paginator::class, $resolvedArgument);
     }
 
-    public function testMapEntityCollectionThrowsWhenManagerIsNotEntityManager(): void
+    public function testMapEntityCollectionThrowsWhenManagerIsNotEntityManager()
     {
         $registry = $this->createStub(ManagerRegistry::class);
         $registry->method('getManagerForClass')->willReturn(null);
@@ -160,7 +167,7 @@ class EntityCollectionValueResolverTest extends TestCase
         $resolver->mapEntityCollection($event);
     }
 
-    public function testMapEntityCollectionRejectsUnsupportedDoctrineLimitParameter(): void
+    public function testMapEntityCollectionRejectsUnsupportedDoctrineLimitParameter()
     {
         $expr = $this->createStub(Expr::class);
 
@@ -206,7 +213,7 @@ class EntityCollectionValueResolverTest extends TestCase
         $resolver->mapEntityCollection($event);
     }
 
-    public function testMapEntityCollectionAppliesQueryStringMapping(): void
+    public function testMapEntityCollectionAppliesQueryStringMapping()
     {
         $query = $this->createStub(Query::class);
         $query->method('getResult')->willReturn([]);
@@ -257,9 +264,7 @@ class EntityCollectionValueResolverTest extends TestCase
         $propertyAccessor = $this->createStub(PropertyAccessorInterface::class);
         $propertyAccessor
             ->method('getValue')
-            ->willReturnCallback(static function (object $object, string $property): mixed {
-                return $object->{$property};
-            })
+            ->willReturnCallback(static fn (object $object, string $property): mixed => $object->{$property})
         ;
 
         $queryInput = new MapEntityCollectionQueryInput(page: 2, size: 20, status: 'active', ignored: 'skip');
@@ -275,7 +280,7 @@ class EntityCollectionValueResolverTest extends TestCase
         );
         $event = $this->createControllerArgumentsEvent(
             arguments: [$attribute, $queryInput],
-            controller: static function (array $collection, MapEntityCollectionQueryInput $query): void {},
+            controller: static function (array $collection, MapEntityCollectionQueryInput $query) {},
         );
 
         $resolver = $this->createResolver(
@@ -291,7 +296,7 @@ class EntityCollectionValueResolverTest extends TestCase
         $this->assertIsArray($event->getArguments()[0]);
     }
 
-    public function testMapEntityCollectionAppliesDefaultOrderingWhenOrderByIsMissing(): void
+    public function testMapEntityCollectionAppliesDefaultOrderingWhenOrderByIsMissing()
     {
         $query = $this->createStub(Query::class);
         $query->method('getResult')->willReturn([]);
@@ -331,7 +336,7 @@ class EntityCollectionValueResolverTest extends TestCase
         $resolver->mapEntityCollection($event);
     }
 
-    public function testMapEntityCollectionDoesNotApplyDefaultOrderingWhenOrderByExists(): void
+    public function testMapEntityCollectionDoesNotApplyDefaultOrderingWhenOrderByExists()
     {
         $query = $this->createStub(Query::class);
         $query->method('getResult')->willReturn([]);
@@ -430,5 +435,6 @@ final class MapEntityCollectionQueryInput
         public int $size,
         public string $status,
         public string $ignored,
-    ) {}
+    ) {
+    }
 }

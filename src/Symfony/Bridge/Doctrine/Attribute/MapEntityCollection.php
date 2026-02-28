@@ -1,5 +1,8 @@
 <?php
 
+
+declare(strict_types=1);
+
 /*
  * This file is part of the Symfony package.
  *
@@ -9,26 +12,27 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace Symfony\Bridge\Doctrine\Attribute;
 
-use Attribute;
-use Doctrine\Common\Collections\Order;
 use Symfony\Bridge\Doctrine\ArgumentResolver\EntityCollectionAsset\DoctrineFilterInterface;
-use Symfony\Bridge\Doctrine\ArgumentResolver\EntityCollectionResolver;
+use Symfony\Bridge\Doctrine\ArgumentResolver\EntityCollectionValueResolver;
 use Symfony\Component\HttpKernel\Attribute\ValueResolver;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
-#[Attribute(Attribute::TARGET_PARAMETER)]
+#[\Attribute(\Attribute::TARGET_PARAMETER)]
 class MapEntityCollection extends ValueResolver
 {
+    public const ORDERING_ASC = 'ASC';
+    public const ORDERING_DESC = 'DESC';
+
     /**
-     * @param class-string $class
-     * @param array<string, string> $queryMapping
-     * @param array<string, mixed> $doctrineParameters
-     * @param class-string<DoctrineFilterInterface>[] $filters
-     * @param array<string, Order> $defaultOrdering
+     * @see ../ArgumentResolver/EntityCollectionAsset/MapEntityCollection.md Full usage guide and parameter reference.
+     *
+     * @param class-string                                          $class
+     * @param class-string<DoctrineFilterInterface>[]               $filters
+     * @param array<string, self::ORDERING_ASC|self::ORDERING_DESC> $defaultOrdering
+     * @param array<string, mixed>                                  $doctrineParameters
+     * @param array<string, string>                                 $queryMapping
      */
     public function __construct(
         private readonly string $class,
@@ -39,9 +43,8 @@ class MapEntityCollection extends ValueResolver
         private readonly array $defaultOrdering = [],
         private readonly bool $returnPaginator = true,
         private readonly ?NameConverterInterface $nameConverter = null,
-    )
-    {
-        parent::__construct(EntityCollectionResolver::class);
+    ) {
+        parent::__construct(EntityCollectionValueResolver::class);
     }
 
     /**
@@ -82,7 +85,7 @@ class MapEntityCollection extends ValueResolver
     }
 
     /**
-     * @return array<string, Order>
+     * @return array<string, self::ORDERING_ASC|self::ORDERING_DESC>
      */
     public function getDefaultOrdering(): array
     {

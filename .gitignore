@@ -11,3 +11,9 @@ composer.phar
 package.tar
 /packages.json
 /.phpunit
+
+# IDE/editor local configs
+.idea/
+.vscode/
+.cursor/
+.history/

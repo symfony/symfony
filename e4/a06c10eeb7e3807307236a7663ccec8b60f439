@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-03-02T09:37:04Z
+
+Why is it needed? What's the current behavior?
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2026-03-02T09:41:49Z
+
+When the bundle is used with HttpKernel 5.4 you will get this error:
+
+> You have requested a non-existent parameter "kernel.runtime_mode.web".

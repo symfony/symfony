@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by mttsch at 2026-03-01T07:06:36Z
+
+The spacing after "→" in the screenshot looks to be missing or less than before the arrow.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-03-01T17:56:45Z
+
+@mttsch it's there in the code, I guess it's just a rendering issue that'll depend on your setup, font used, etc.

@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-02-26T11:06:02Z
+
+Should this target 6.4 or 7.4 ? The property is not typed in 6.4.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-26T11:10:13Z
+
+Works either way, no strong opinion on this.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-02-26T11:15:45Z
+
+> The intent is to signal "not yet initialized" so that the generated `getParameterBag()` (which checks `!isset($this->parameterBag)`) lazily builds a `FrozenParameterBag`.
+
+I see no such generated method doing the check in the fixtures edited in this PR. Are you sure this fix works ?

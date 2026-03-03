@@ -1,0 +1,43 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2026-02-25T16:03:20Z
+
+What is this `str_replace('_', '\\', ...)` thing about that I found in the existing code?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2026-02-25T18:14:31Z
+
+I experimented with this change in my own projects to see if it fits my needs.
+
+I was using PHPUnit 12.5.14 with the built-in deprecation reporting features and it turns out that I need to configure PHPUnit with `ignoreIndirectDeprecations="false"` to see all the deprecation notices I'd like to see. This, at the same time, causes other notices to show up that I'd rather not be notified about.
+
+My guess is that this has to do with how PHPUnit classifies code when the deprecation notice is emitted from the DebugClassLoader doing the autoloading. Probably https://github.com/sebastianbergmann/phpunit/issues/6435.
+
+For the time being, I have the impression that one can get better results – with regard to this feature of DebugClassLoader – by still using the PHPUnit Bridge.
+
+So, I have added code to the PHPUnit bridge to make the vendor prefix mapping configurable from the PHPUnit config file.
+
+https://github.com/symfony/recipes/pull/1401 sounds as if Symfony is pushing towards getting rid of the PHPUnit bridge.
+
+Are my observations plausible and is this difference between the PHPUnit bridge and native PHPUnit features something I should voice more loudly (somewhere else)?
+
+---------------------------------------------------------------------------
+
+by stof at 2026-02-26T12:15:08Z
+
+@mpdude the deprecation reporting feature of the phpunit-bridge only supports PHPUnit 9 and older. The hacks it uses to hook into the PHPUnit runner are incompatible with the new architecture of the runner in PHPUnit 10+.
+
+We are collaborating with the PHPUnit team to improve the PHPUnit deprecation reporting. I figured out a few weeks ago that the phpunit-bridge classification logic (the logic defining whether a deprecation is self, direct or indirect) has special handling of the DebugClassLoader deprecations, and I now have an in-progress discussion with Sebastian Bergmann to identify the kind of PHPunit extension points that would allow implementing such special logic for the PHPUnit deprecation reporting feature (and potentially also other cases that are currently not well classified even in the phpunit-bridge).
+
+However, classifying the deprecations as direct or indirect is totally separate from deciding whether the deprecation should be triggered or no.
+
+---------------------------------------------------------------------------
+
+by mpdude at 2026-02-26T12:19:24Z
+
+Agree – it was more of a note to myself. I think the change I proposed here is sane and makes sense.
+
+It's only that it does not directly make the messages I am looking for show up in PHPUnit; for the time being, that requires to configure PHPUnit to show "indirect" deprecations as well.
+
+I understand that I should try to move away from the Symfony PHPUnit Bridge and that work is already ongoing to improve the classification logic in PHPUnit.

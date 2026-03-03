@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by 99Vicky at 2026-03-03T09:58:40Z
+
+> Please add a test case.
+
+I added two test cases, that check whether the content ID in the generated JSON payload sent to the API contains the expected value (with and without custom content ID).

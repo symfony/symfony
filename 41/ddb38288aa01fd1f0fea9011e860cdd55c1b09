@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-02-26T15:05:09Z
+
+This needs a `conflict` rule to *actually* enforce that expression-language 7.4+ is used in downstream projects. For now, only a `require-dev` constraint defines this, and this is only having an effect in our CI, not in projects using the package.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-02-26T15:07:43Z
+
+Ah right, composer.json updated as well

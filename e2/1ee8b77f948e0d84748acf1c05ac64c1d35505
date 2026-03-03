@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by zoglo at 2026-02-27T18:29:36Z
+
+Failing test seems unrelated
+
+---------------------------------------------------------------------------
+
+by ahoehne at 2026-02-28T21:05:20Z
+
+Hi, after nearly being done creating the mr, i noticed yours.
+Since i was doing the 7.4 mr anyway and i saw you offered that, i figured it won't harm - especially since class names seem to differ.
+it's covering an first-click bug aswell, so it's hopefully helpful for this mr aswell =)
+https://github.com/symfony/symfony/pull/63530
+
+---------------------------------------------------------------------------
+
+by zoglo at 2026-03-02T08:54:46Z
+
+> Hi, after nearly being done creating the mr, i noticed yours. Since i was doing the 7.4 mr anyway and i saw you offered that, i figured it won't harm - especially since class names seem to differ. it's covering an first-click bug aswell, so it's hopefully helpful for this mr aswell =) #63530
+
+You are right, that's another bug that was introduced 👍 Could be fixed in this PR as well.
+
+Just a reminder, will work on that later today but PR is not ready as is, hence the draft
+
+---------------------------------------------------------------------------
+
+by zoglo at 2026-03-02T23:32:29Z
+
+This PR doesn’t need to be merged upstream, #63530 already covers the changes for Symfony 7.4 (due to new features for the toolbar that have been added in later versions)

@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by mpdude at 2026-02-26T08:38:40Z
+
+* I don't see where the Psalm issue comes from
+* FabBot CS fixups seem to be unrelated
+* My feeling is that the high/low deps tests fail because they are not using the PHPUnit bridge with changes from this PR, but rather one installed as an external dependency. Would that make sense? Do I need to add a `path` repository entry to `composer.json`?

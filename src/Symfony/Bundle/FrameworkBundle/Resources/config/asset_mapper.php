@@ -15,6 +15,7 @@ use Symfony\Component\AssetMapper\AssetMapper;
 use Symfony\Component\AssetMapper\AssetMapperCompiler;
 use Symfony\Component\AssetMapper\AssetMapperDevServerSubscriber;
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\AssetMapperPathProviderInterface;
 use Symfony\Component\AssetMapper\AssetMapperRepository;
 use Symfony\Component\AssetMapper\Command\AssetMapperCompileCommand;
 use Symfony\Component\AssetMapper\Command\CompressAssetsCommand;
@@ -84,7 +85,11 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('array of excluded path patterns'),
                 abstract_arg('exclude dot files'),
                 param('kernel.debug'),
+                tagged_iterator('asset_mapper.path_provider'),
             ])
+
+        ->instanceof(AssetMapperPathProviderInterface::class)
+            ->tag('asset_mapper.path_provider')
 
         ->set('asset_mapper.public_assets_path_resolver', PublicAssetsPathResolver::class)
             ->args([

@@ -12,6 +12,7 @@
 namespace Symfony\Component\AssetMapper\Tests;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\AssetMapper\AssetMapperPathProviderInterface;
 use Symfony\Component\AssetMapper\AssetMapperRepository;
 use Symfony\Component\Finder\Glob;
 
@@ -181,5 +182,55 @@ class AssetMapperRepositoryTest extends TestCase
 
         $actualAssets = array_keys($repository->all());
         $this->assertEquals(['.dotfile'], $actualAssets);
+    }
+
+    public function testPathProvidersAreUsed()
+    {
+        $provider = $this->createStub(AssetMapperPathProviderInterface::class);
+        $provider->method('getPaths')->willReturn([
+            __DIR__.'/Fixtures/dir1' => '',
+            __DIR__.'/Fixtures/dir2' => 'dir2_namespace',
+        ]);
+
+        $repository = new AssetMapperRepository([], __DIR__, [], true, true, [$provider]);
+
+        $this->assertSame(realpath(__DIR__.'/Fixtures/dir1/file1.css'), $repository->find('file1.css'));
+        $this->assertSame(realpath(__DIR__.'/Fixtures/dir2/file4.js'), $repository->find('dir2_namespace/file4.js'));
+        $this->assertNull($repository->find('file4.js'));
+    }
+
+    public function testPathProvidersAreUsedInAll()
+    {
+        $provider = $this->createStub(AssetMapperPathProviderInterface::class);
+        $provider->method('getPaths')->willReturn([
+            __DIR__.'/Fixtures/dir1' => '',
+        ]);
+
+        $repository = new AssetMapperRepository([], __DIR__, [], true, true, [$provider]);
+
+        $actualAllAssets = $repository->all();
+        $this->assertCount(2, $actualAllAssets);
+        $this->assertArrayHasKey('file1.css', $actualAllAssets);
+        $this->assertArrayHasKey('file2.js', $actualAllAssets);
+    }
+
+    public function testPathProvidersAreMergedWithStaticPaths()
+    {
+        $provider = $this->createStub(AssetMapperPathProviderInterface::class);
+        $provider->method('getPaths')->willReturn([
+            __DIR__.'/Fixtures/dir2' => '',
+        ]);
+
+        $repository = new AssetMapperRepository(
+            [__DIR__.'/Fixtures/dir1' => ''],
+            __DIR__,
+            [],
+            true,
+            true,
+            [$provider]
+        );
+
+        $this->assertSame(realpath(__DIR__.'/Fixtures/dir1/file1.css'), $repository->find('file1.css'));
+        $this->assertSame(realpath(__DIR__.'/Fixtures/dir2/file4.js'), $repository->find('file4.js'));
     }
 }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `AssetMapperPathProviderInterface` to allow dynamically providing asset paths (e.g. from glob patterns); implement it and tag the service with `asset_mapper.path_provider`
+
 8.0
 ---
 

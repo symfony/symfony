@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\AssetMapper;
 
+use Symfony\Component\AssetMapper\AssetMapperPathProviderInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 
@@ -28,6 +29,7 @@ class AssetMapperRepository
     /**
      * @param string[] $paths Array of assets paths: key is the path, value is the namespace
      *                        (empty string for no namespace)
+     * @param iterable<AssetMapperPathProviderInterface> $pathProviders
      */
     public function __construct(
         private readonly array $paths,
@@ -35,6 +37,7 @@ class AssetMapperRepository
         private readonly array $excludedPathPatterns = [],
         private readonly bool $excludeDotFiles = true,
         private readonly bool $debug = true,
+        private readonly iterable $pathProviders = [],
     ) {
     }
 
@@ -146,7 +149,12 @@ class AssetMapperRepository
         }
 
         $this->absolutePaths = [];
-        foreach ($this->paths as $path => $namespace) {
+        $allPaths = $this->paths;
+        foreach ($this->pathProviders as $provider) {
+            $allPaths += $provider->getPaths();
+        }
+
+        foreach ($allPaths as $path => $namespace) {
             if ($filesystem->isAbsolutePath($path)) {
                 if (!file_exists($path) && $this->debug) {
                     throw new \InvalidArgumentException(\sprintf('The asset mapper directory "%s" does not exist.', $path));

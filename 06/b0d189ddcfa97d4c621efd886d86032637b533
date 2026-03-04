@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-03-04T14:21:28Z
+
+As an additional benefit, this removes the dependency on `symfony/clock` in that bridge package (the package now has optional integration with any psr/clock, but works without the symfony clock package). So you could move the requirement (added in https://github.com/symfony/symfony/pull/63402) to a dev requirement.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-04T14:27:09Z
+
+> move the requirement (added in https://github.com/symfony/symfony/pull/63402) to a dev requirement.
+
+I removed it actually: clock is a dep of messenger already

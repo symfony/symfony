@@ -75,6 +75,9 @@ class SymfonyRuntime extends GenericRuntime
     private readonly Command $command;
     private readonly Request $request;
 
+    /** @var array<string, RuntimeTypeResolverInterface> */
+    private array $typeResolverInstances = [];
+
     /**
      * @param array{
      *   debug?: ?bool,
@@ -93,6 +96,7 @@ class SymfonyRuntime extends GenericRuntime
      *   dotenv_overload?: ?bool,
      *   dotenv_extra_paths?: ?string[],
      *   worker_loop_max?: int, // Use 0 or a negative integer to never restart the worker. Default: 500
+     *   type-resolvers?: array<string, class-string<RuntimeTypeResolverInterface>>, // Maps type names to resolver class names
      * } $options
      */
     public function __construct(array $options = [])
@@ -222,6 +226,16 @@ class SymfonyRuntime extends GenericRuntime
 
     protected function resolveType(string $type): mixed
     {
+        if (isset($this->options['type-resolvers'][$type])) {
+            $resolverClass = $this->options['type-resolvers'][$type];
+
+            if (!isset($this->typeResolverInstances[$resolverClass])) {
+                $this->typeResolverInstances[$resolverClass] = $this->instantiateTypeResolver($resolverClass);
+            }
+
+            return $this->typeResolverInstances[$resolverClass]->resolveType($type);
+        }
+
         return match ($type) {
             Request::class => $this->request ??= Request::createFromGlobals(),
             InputInterface::class => $this->getInput(),
@@ -230,6 +244,31 @@ class SymfonyRuntime extends GenericRuntime
             Command::class => $this->command ??= new Command(),
             default => null,
         };
+    }
+
+    protected function instantiateTypeResolver(string $resolverClass): RuntimeTypeResolverInterface
+    {
+        if (!class_exists($resolverClass)) {
+            throw new \LogicException(\sprintf('Type resolver class "%s" does not exist.', $resolverClass));
+        }
+
+        if (!is_subclass_of($resolverClass, RuntimeTypeResolverInterface::class)) {
+            throw new \LogicException(\sprintf('Type resolver class "%s" must implement "%s".', $resolverClass, RuntimeTypeResolverInterface::class));
+        }
+
+        $constructor = new \ReflectionClass($resolverClass)->getConstructor();
+
+        if (null === $constructor || 0 === $constructor->getNumberOfParameters()) {
+            return new $resolverClass();
+        }
+
+        $arguments = [];
+        foreach ($constructor->getParameters() as $parameter) {
+            $type = $parameter->getType();
+            $arguments[] = $this->getArgument($parameter, $type instanceof \ReflectionNamedType ? $type->getName() : null);
+        }
+
+        return new $resolverClass(...$arguments);
     }
 
     protected static function register(GenericRuntime $runtime): GenericRuntime

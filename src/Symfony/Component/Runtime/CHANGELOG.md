@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `resolveType()` for customizing how types are resolved in runtimes extending `SymfonyRuntime`
+ * Add `RuntimeTypeResolverInterface` and support for `type-resolvers` option in `SymfonyRuntime` to allow registering type resolvers in `composer.json` without needing a custom runtime
 
 7.4
 ---

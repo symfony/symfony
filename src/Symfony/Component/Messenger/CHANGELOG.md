@@ -11,6 +11,7 @@ CHANGELOG
  * Add a `--redispatch` option to the `messenger:failed:retry` command to send messages back to their transport instead of handling them in the command
  * Allow prioritizing receivers so that `messenger:consume --all` consumes receivers in a predefined order
  * Add an optional `extra` key to the encoded envelope passed to `SerializerInterface::decode()`, holding metadata added by the receiving transport
+ * Add an optional `LoggingMiddleware` logging the processing time and memory usage of each message
 
 8.1
 ---

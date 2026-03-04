@@ -34,6 +34,7 @@ use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
 use Symfony\Component\Messenger\Middleware\HandleMessageMiddleware;
+use Symfony\Component\Messenger\Middleware\LoggingMiddleware;
 use Symfony\Component\Messenger\Middleware\RejectRedeliveredMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\RouterContextMiddleware;
 use Symfony\Component\Messenger\Middleware\SendMessageMiddleware;
@@ -154,6 +155,13 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('router'),
             ])
+
+        ->set('messenger.middleware.logging', LoggingMiddleware::class)
+            ->args([
+                service('logger'),
+                service('clock'),
+            ])
+            ->tag('monolog.logger', ['channel' => 'messenger'])
 
         // Discovery
         ->set('messenger.receiver_locator', ServiceLocator::class)

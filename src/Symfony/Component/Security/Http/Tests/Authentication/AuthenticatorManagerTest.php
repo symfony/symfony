@@ -37,6 +37,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
+use Symfony\Component\Security\Http\Tests\Fixtures\DummyStatelessSupportsAuthenticator;
 use Symfony\Component\Security\Http\Tests\Fixtures\DummySupportsAuthenticator;
 
 class AuthenticatorManagerTest extends TestCase
@@ -385,6 +386,52 @@ class AuthenticatorManagerTest extends TestCase
         $this->assertSame($this->response, $response);
         $this->assertStringContainsString($authenticator::class, $logger->logContexts[0]['authenticator']);
         $this->assertSame($this->token, $this->tokenStorage->getToken());
+    }
+
+    public function testSupportsSetStatelessAttributeWhenAllAuthenticatorsAreStateless()
+    {
+        $manager = $this->createManager([
+            new DummyStatelessSupportsAuthenticator(true),
+            new DummyStatelessSupportsAuthenticator(null),
+        ], exposeSecurityErrors: ExposeSecurityLevel::None);
+
+        $manager->supports($this->request);
+
+        $this->assertTrue($this->request->attributes->get('_security_stateless'));
+    }
+
+    public function testSupportsDoesNotSetStatelessAttributeWhenMixedAuthenticators()
+    {
+        $manager = $this->createManager([
+            new DummyStatelessSupportsAuthenticator(true),
+            self::createDummySupportsAuthenticator(true),
+        ], exposeSecurityErrors: ExposeSecurityLevel::None);
+
+        $manager->supports($this->request);
+
+        $this->assertNull($this->request->attributes->get('_security_stateless'));
+    }
+
+    public function testSupportsDoesNotSetStatelessAttributeWhenNoAuthenticatorsSupport()
+    {
+        $manager = $this->createManager([
+            new DummyStatelessSupportsAuthenticator(false),
+        ], exposeSecurityErrors: ExposeSecurityLevel::None);
+
+        $manager->supports($this->request);
+
+        $this->assertNull($this->request->attributes->get('_security_stateless'));
+    }
+
+    public function testSupportsSetStatelessAttributeWithTraceableAuthenticator()
+    {
+        $manager = $this->createManager([
+            new TraceableAuthenticator(new DummyStatelessSupportsAuthenticator(true)),
+        ], exposeSecurityErrors: ExposeSecurityLevel::None);
+
+        $manager->supports($this->request);
+
+        $this->assertTrue($this->request->attributes->get('_security_stateless'));
     }
 
     private static function createDummySupportsAuthenticator(?bool $supports = true)

@@ -47,6 +47,8 @@ CHANGELOG
 7.4
 ---
 
+ * Add `StatelessAuthenticatorInterface` to mark authenticators that do not require session persistence
+ * `ContextListener` now skips session persistence for tokens implementing `StatelessTokenInterface` or requests with the `_security_stateless` attribute
  * Deprecate extending the `RememberMeDetails` class with a constructor expecting the user FQCN
 
    Before:

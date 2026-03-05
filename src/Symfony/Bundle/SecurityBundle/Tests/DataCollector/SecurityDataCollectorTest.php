@@ -429,6 +429,43 @@ class SecurityDataCollectorTest extends TestCase
         $this->assertSame([], $dataCollector->getVoters());
     }
 
+    public function testProfilerCookiesNotSetForStatelessRequest()
+    {
+        $tokenStorage = new TokenStorage();
+        $tokenStorage->setToken(new UsernamePasswordToken(new InMemoryUser('user', 'pass', ['ROLE_USER']), 'provider', ['ROLE_USER']));
+
+        $request = new Request();
+        $request->attributes->set('_security_stateless', true);
+        $response = new Response();
+
+        $firewallConfig = new FirewallConfig('main', 'security.request_matcher.main', 'security.user_checker.main');
+        $firewallMap = $this->getMockBuilder(FirewallMap::class)->disableOriginalConstructor()->getMock();
+        $firewallMap->method('getFirewallConfig')->with($request)->willReturn($firewallConfig);
+
+        $firewall = new TraceableFirewallListener($firewallMap, new EventDispatcher(), new LogoutUrlGenerator());
+
+        // Simulate a listener being present so the cookie condition would normally pass
+        $listener = new class extends AbstractListener {
+            public function supports(Request $request): ?bool
+            {
+                return true;
+            }
+
+            public function authenticate(RequestEvent $event): void
+            {
+            }
+        };
+        $event = new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST);
+        $firewallMap->method('getListeners')->with($request)->willReturn([[$listener], null, null]);
+        $firewall->onKernelRequest($event);
+
+        $collector = new SecurityDataCollector($tokenStorage, $this->getRoleHierarchy(), null, null, $firewallMap, $firewall);
+        $collector->collect($request, $response);
+
+        // No profiler cookies should be set on the response
+        $this->assertEmpty($response->headers->getCookies());
+    }
+
     public static function provideRoles(): array
     {
         return [

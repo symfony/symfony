@@ -201,7 +201,7 @@ class SecurityDataCollector extends DataCollector implements LateDataCollectorIn
 
         $this->data['authenticators'] = $this->firewall ? $this->firewall->getAuthenticatorsInfo() : [];
 
-        if ($this->data['listeners'] && !($this->data['firewall']['stateless'] ?? true)) {
+        if ($this->data['listeners'] && !$request->attributes->get('_security_stateless') && !($this->data['firewall']['stateless'] ?? true)) {
             $authCookieName = "{$this->data['firewall']['name']}_auth_profile_token";
             $deauthCookieName = "{$this->data['firewall']['name']}_deauth_profile_token";
             $profileToken = $response->headers->get('X-Debug-Token');

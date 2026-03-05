@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolver;
 use Symfony\Component\Security\Core\Authentication\AuthenticationTrustResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
+use Symfony\Component\Security\Core\Authentication\Token\StatelessTokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -169,7 +170,11 @@ class ContextListener extends AbstractListener
         $usageIndexReference = \PHP_INT_MIN;
         $token = $this->tokenStorage->getToken();
 
-        if (!$this->trustResolver->isAuthenticated($token)) {
+        $isStateless = $token instanceof StatelessTokenInterface || $request->attributes->get('_security_stateless');
+
+        if ($isStateless) {
+            $this->logger?->debug('Skipping session persistence for stateless authentication.', ['key' => $this->sessionKey]);
+        } elseif (!$this->trustResolver->isAuthenticated($token)) {
             if ($request->hasPreviousSession()) {
                 $session->remove($this->sessionKey);
             }
@@ -179,7 +184,9 @@ class ContextListener extends AbstractListener
             $this->logger?->debug('Stored the security token in the session.', ['key' => $this->sessionKey]);
         }
 
-        if ($this->sessionTrackerEnabler && $session->getId() === $sessionId) {
+        if ($isStateless) {
+            $usageIndexReference = 0;
+        } elseif ($this->sessionTrackerEnabler && $session->getId() === $sessionId) {
             $usageIndexReference = $usageIndexValue;
         } else {
             $usageIndexReference = $usageIndexReference - \PHP_INT_MIN + $usageIndexValue;

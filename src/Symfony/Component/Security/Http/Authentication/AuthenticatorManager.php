@@ -31,6 +31,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Authenticator\StatelessAuthenticatorInterface;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
@@ -118,6 +119,10 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
 
         if (!$authenticators) {
             return false;
+        }
+
+        if (!array_filter($authenticators, static fn ($a) => !($a instanceof StatelessAuthenticatorInterface || ($a instanceof TraceableAuthenticator && $a->getAuthenticator() instanceof StatelessAuthenticatorInterface)))) {
+            $request->attributes->set('_security_stateless', true);
         }
 
         return $lazy ? null : true;

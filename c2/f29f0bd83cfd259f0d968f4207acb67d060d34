@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-03-05T11:39:40Z
+
+should we also deep clone on saving that state ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-05T12:30:40Z
+
+> should we also deep clone on saving that state ?
+
+why not, updated :)

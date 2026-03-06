@@ -66,6 +66,8 @@ use Symfony\Component\Serializer\Tests\Fixtures\DummyWithObjectOrBool;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyWithObjectOrNull;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyWithStringObject;
 use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectDummyWithContextAttribute;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectInner;
+use Symfony\Component\Serializer\Tests\Normalizer\Features\ObjectOuter;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeResolver\ReflectionTypeResolver;
 
@@ -985,6 +987,26 @@ class AbstractObjectNormalizerTest extends TestCase
         $serializer = new Serializer([new ObjectNormalizer(propertyTypeExtractor: $extractor)]);
 
         $this->assertEquals(new DummyWithIntOrString(1), $serializer->denormalize(['value' => 1], DummyWithIntOrString::class));
+    }
+
+    public function testDenormalizeUsesPhpDocCollectionTypeWhenConstructorArrayIsNullable()
+    {
+        $serializer = new Serializer([
+            new BackedEnumNormalizer(),
+            new ArrayDenormalizer(),
+            new ObjectNormalizer(
+                propertyTypeExtractor: new PropertyInfoExtractor([], [new PhpDocExtractor(), new ReflectionExtractor()]),
+            ),
+        ]);
+
+        $report = $serializer->denormalize([
+            'items' => [
+                ['type' => 'logon_succeeded'],
+            ],
+        ], NullableCollectionReport::class);
+
+        $this->assertContainsOnlyInstancesOf(NullableCollectionItem::class, $report->items);
+        $this->assertSame(NullableCollectionItemType::LOGON_SUCCEEDED, $report->items[0]->type);
     }
 
     public function testDenormalizeWithNumberAsSerializedNameAndNoArrayReindex()
@@ -1958,6 +1980,30 @@ class DummyWithIntOrString
 {
     public function __construct(
         public readonly int|string $value,
+    ) {
+    }
+}
+
+enum NullableCollectionItemType: string
+{
+    case LOGON_SUCCEEDED = 'logon_succeeded';
+}
+
+class NullableCollectionItem
+{
+    public function __construct(
+        public readonly ?NullableCollectionItemType $type,
+    ) {
+    }
+}
+
+class NullableCollectionReport
+{
+    /**
+     * @param list<NullableCollectionItem> $items
+     */
+    public function __construct(
+        public readonly ?array $items,
     ) {
     }
 }

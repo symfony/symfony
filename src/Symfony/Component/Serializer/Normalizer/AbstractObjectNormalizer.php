@@ -1013,12 +1013,22 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         if (null !== $parameterType && $parameterTypeResolver ??= class_exists(ReflectionTypeResolver::class) ? new ReflectionTypeResolver() : false) {
             $resolvedParameterType = $parameterTypeResolver->resolve($parameterType);
-            if ($resolvedParameterType->isSatisfiedBy(static fn (Type $t) => match (true) {
-                $t instanceof BuiltinType && TypeIdentifier::NULL !== $t->getTypeIdentifier() => !$type->isIdentifiedBy($t->getTypeIdentifier()),
-                $t instanceof ObjectType => !$type->isIdentifiedBy($t->getClassName()),
+            $parameterBaseType = $resolvedParameterType instanceof NullableType ? $resolvedParameterType->getWrappedType() : $resolvedParameterType;
+            $propertyBaseType = $type instanceof NullableType ? $type->getWrappedType() : $type;
+
+            if ($parameterBaseType->isSatisfiedBy(static fn (Type $t) => match (true) {
+                $t instanceof BuiltinType && TypeIdentifier::NULL !== $t->getTypeIdentifier() => !$propertyBaseType->isIdentifiedBy($t->getTypeIdentifier()),
+                $t instanceof ObjectType => !$propertyBaseType->isIdentifiedBy($t->getClassName()),
                 default => false,
             })) {
                 $type = $resolvedParameterType;
+            } elseif (
+                $resolvedParameterType->isNullable() !== $type->isNullable()
+                && $parameterBaseType instanceof BuiltinType
+                && TypeIdentifier::ARRAY === $parameterBaseType->getTypeIdentifier()
+                && $propertyBaseType instanceof CollectionType
+            ) {
+                $type = $resolvedParameterType->isNullable() ? Type::nullable($propertyBaseType) : $propertyBaseType;
             }
         } elseif ($parameterType instanceof \ReflectionNamedType) {
             if ($parameterType->isBuiltin()) {

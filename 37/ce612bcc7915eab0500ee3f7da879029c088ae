@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-02-26T11:25:06Z
+
+I'm wondering whether we should go with 24h as the default maxTtl, or with something bigger (especially given that we change the behavior in a minor version)

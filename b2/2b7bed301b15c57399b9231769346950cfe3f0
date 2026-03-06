@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-27T14:37:04Z
+
+Can you please rebase/target 8.1? All new features/improvements go there.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-03T07:30:29Z
+
+Related to #62958 and https://github.com/standard-webhooks/standard-webhooks/blob/main/spec/standard-webhooks.md#webhook-headers-sending-metadata-to-consumers

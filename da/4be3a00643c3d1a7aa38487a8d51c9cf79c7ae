@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by rrajkomar at 2026-02-13T14:10:20Z
+
+Note: if possible, it would be nice to add the ClassRuleConditionCallableInterface in 7.4 and replace the `$fn instanceof Targetclass` condition on ObjectMapper line 155
+
+This would allow end users to implement ClassRuleConditions on their own if they're still on 7.4 at this point
+
+---------------------------------------------------------------------------
+
+by stof at 2026-02-13T14:46:39Z
+
+@rrajkomar we cannot add new features in 7.4
+
+---------------------------------------------------------------------------
+
+by rrajkomar at 2026-02-13T14:48:28Z
+
+> @rrajkomar we cannot add new features in 7.4
+
+I was only refering to the empty interface and the related test adjustment, not to a complete feature.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-02-13T15:38:29Z
+
+Adding a new interface is adding a new feature in the public API of the component. In terms of semver, this qualifies as a change going in a minor release, not a patch release.

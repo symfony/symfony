@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-10T09:35:17Z
+
+Can't ObjectMapper solve this concern already?
+
+---------------------------------------------------------------------------
+
+by mtarld at 2026-02-10T09:41:27Z
+
+Unfortunately no, ObjectMapper maps objects to objects while here we convert objects to scalar.
+
+Plus, here the conversation is really deep in the generated PHP code (which allows to be fast). Calling an external component might hurt performances IMO.

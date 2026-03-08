@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add clock-awareness to comparison and range validators for testable date comparisons
  * Add the `Xml` constraint for validating XML content
+ * Add `Sum` constraint to validate the sum of iterable values
 
 8.0
 ---

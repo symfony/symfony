@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-09T19:55:08Z
+
+PR is ready, it now works also with `decorates_tag`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-09T19:57:07Z
+
+Screenshot of my demo app FYI:
+
+<img width="768" height="882" alt="image" src="https://github.com/user-attachments/assets/032e2043-5eae-48f2-9380-c5381d38f180" />

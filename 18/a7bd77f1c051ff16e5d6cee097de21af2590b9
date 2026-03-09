@@ -1,0 +1,18 @@
+---------------------------------------------------------------------------
+
+by guillaumeVDP at 2026-03-09T09:56:09Z
+
+The Fabbot/Checks wants me to remove part of the AuthenticatorManager constructor's phpdoc. Do I have to remove that since you told me to document all args of the new API ? @nicolas-grekas
+I might have misunderstand something, maybe we should only document changes ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-09T10:04:08Z
+
+fabbot is right this time
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-09T11:54:30Z
+
+there are tests to look at

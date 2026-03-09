@@ -1,0 +1,311 @@
+---------------------------------------------------------------------------
+
+by AurelienPillevesse at 2023-08-14T13:38:06Z
+
+Maybe I'm wrong but seems that something related to ```mapQueryString``` and ```mapRequestPayload``` is in this file and I see nothing from yours :
+https://github.com/symfony/symfony/blob/16a4681b5b7a20f60c12f0ab1e2d22dbdf4ba50b/src/Symfony/Component/HttpKernel/Controller/ArgumentResolver/RequestPayloadValueResolver.php#L84
+
+Why did not add in the same file?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2023-08-21T17:10:04Z
+
+Too bad the PR was changed after @robert-sykes suggestion. I think these are 2 distinct ideas. The original PR description mentions a single attribute per header, same as how MapQueryParameter works. There are valid cases for that, where you only want and need a single header scalar.
+
+The updated code now requires you to map a header to a header object.
+
+Would be great to also keep supporting the original one for just a single header.
+
+See this comment where a similar situation happened: https://github.com/symfony/symfony/pull/49134#issuecomment-1508323229
+
+---------------------------------------------------------------------------
+
+by robert-sykes at 2023-08-21T18:53:16Z
+
+> Too bad the PR was changed after @robert-sykes suggestion. I think these are 2 distinct ideas. The original PR description mentions a single attribute per header, same as how MapQueryParameter works. There are valid cases for that, where you only want and need a single header scalar.
+>
+> The updated code now requires you to map a header to a header object.
+>
+> Would be great to also keep supporting the original one for just a single header.
+>
+> See this comment where a similar situation happened: [#49134 (comment)](https://github.com/symfony/symfony/pull/49134#issuecomment-1508323229)
+
+I'm all for this, to be fair.  I did imply this in my original comment where I said  `You can merge it with your current concept and have a bit of best of both? Map individual Headers to an string, or an object or even just an array if required?` That said - I didn't push it any further in my commentary, apologies.
+
+@StevenRenaux You could check the type and if it's a string map to that similar to your original commit, otherwise if it's object map to those fields instead. We get best of both worlds this way. What do you think?
+
+---------------------------------------------------------------------------
+
+by StevenRenaux at 2023-08-21T19:48:10Z
+
+Hey, I will try to do it and I didn't understand well for sure but we are there to share and go further 😉
+
+---------------------------------------------------------------------------
+
+by robert-sykes at 2023-08-21T21:33:36Z
+
+> Hey, I will try to do it and I didn't understand well for sure but we are there to share and go further 😉
+
+No problem at all. If you need a hand let me know, more than happy to pair on this with you. :)
+
+---------------------------------------------------------------------------
+
+by StevenRenaux at 2023-08-22T15:22:50Z
+
+To get back to the original Issue I suggest this
+
+```php
+namespace App\Controller;
+
+class TestController extends AbstractController
+{
+    #[Route(path: '/', name: 'test')]
+    public function test(
+        #[MapRequestHeader] HeaderRequestDto $headerRequestDto,
+        #[MapRequestHeader(name: 'user-agent')] string $agent,
+        #[MapRequestHeader] array $accept
+    ): Response
+    {
+        dd(
+            $headerRequestDto,
+//      App\Entity\HeaderRequestDto {
+//        accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
+//        agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0"
+//        acceptEncoding: "gzip, deflate, br"
+//        host: "localhost:8000"
+//      }
+
+            $agent,
+//      "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/116.0"
+
+            $accept
+//      array:6 [
+//          0 => "text/html"
+//          1 => "application/xhtml+xml"
+//          2 => "application/xml;q=0.9"
+//          3 => "image/avif"
+//          4 => "image/webp"
+//          5 => "*/*;q=0.8"
+//      ]
+        );
+    }
+}
+```
+And  a Dto  could look like this :
+
+```php
+namespace App\Entity;
+
+use Symfony\Component\Serializer\Annotation\SerializedName;
+use Symfony\Component\Validator\Constraints as Assert;
+
+class HeaderRequestDto
+{
+    public function __construct(
+        public readonly string $accept,
+        #[Assert\EqualTo('test', groups: ['test'])]
+        #[SerializedName('user-agent')] public readonly string $agent = 'agent',
+        #[SerializedName('accept-encoding')] public readonly string $acceptEncoding,
+        #[Assert\EqualTo('localhost', groups: ['valid'])]
+        public readonly string $host
+    ) {
+    }
+}
+
+```
+
+We only use kebab-case (as returned by HeaderBag) now to get some property like 'user-agent'.
+And if we want an array rather than a string for the property as `accept` it will return an array after an explode with a coma delimiter.
+
+---------------------------------------------------------------------------
+
+by StevenRenaux at 2023-10-05T08:44:47Z
+
+@reviewers Sorry everyone if you were notified about this PR, the rebase didn't worked well the first time
+
+---------------------------------------------------------------------------
+
+by mathroc at 2023-12-09T11:29:41Z
+
+I also implemented something at work, but made some different design choices, so just sharing.
+
+I've handled string vs array of a single header differently: I made 2 attributes `#[FromFirstHeader]` (that can resolve to a non array scalar or a ValueObject (e.g. `\DateTimeImmutable`) & `#[FromHeader]` that resolves to `array<T>`
+
+And when creating a DTO it's another attribute `#[FromHeaders]`. In my case, it resolves to DTO that have array properties
+
+---
+
+also, when resolving a single header to a int or float, I have some handmade rules to cast them, don't know if that would be controversial:
+
+```php
+[$value, $validType] = match ($type) {
+    'int' => [(int) $value, (string) $value === (string) (int) $value],
+    'float' => [(float) $value, (string) $value === (string) (float) $value],
+    'string' => [(string) $value, true],
+    default => throw new LogicException("FromHeader: Invalid type $type"),
+};
+
+if (!$validType) {
+    throw new SomeException(
+        "Header `$name` is not a valid `$type`.",
+    );
+}
+````
+
+---
+
+and last point, I also have a `$constraints` on the attributes that are checked. can be useful for scalar since they can't have validation attributes on them
+
+---
+
+none of them are blockers I think, so I'll let you decide if there's something to pick from this. the only one I would be a bit disappointed if it was not included is the ability to deserialize a single header to a ValueObject
+
+---------------------------------------------------------------------------
+
+by mindaugasvcs at 2024-01-15T11:36:35Z
+
+How to also validate multiple values from a single header, like 'bytes 0-10/16'? Using RegEx I can extract 0, 10, 16.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2024-08-20T08:40:21Z
+
+Hi @StevenRenaux! What's the current state of this PR? :slightly_smiling_face:
+
+---------------------------------------------------------------------------
+
+by StevenRenaux at 2024-08-20T08:45:03Z
+
+> Hi @StevenRenaux! What's the current state of this PR? 🙂
+
+@alexandre-daubois Waiting for review, since the last requested update.
+
+---------------------------------------------------------------------------
+
+by StevenRenaux at 2025-01-07T13:27:17Z
+
+Back to the basics of PR, using only the MapRequestHeader attribute. Mapping to a DTO does not seem like a relevant or common use case or if it is really necessary could be done in a future PR.
+
+The allowed types are therefore:
+
+- `string`
+- `array`
+- `AcceptHeader`
+
+When the header parameter cannot be determined by the variable name, we can specify the name argument in the attribute.
+
+````php
+public function test(
+    #[MapRequestHeader('user-agent')] ?string $bar,
+): Response
+{
+  dump($bar);
+  //  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+}
+````
+
+If we are looking for a header of type Accept-* with an array type, we will use the dedicated methods to retrieve this data.
+
+https://symfony.com/doc/current/components/http_foundation.html#accessing-accept-headers-data
+
+````php
+public function test(
+    #[MapRequestHeader] array $accept,
+): Response
+{
+  dump($accept);
+  //        array:7 [▼
+  //          0 => "text/html"
+  //          1 => "application/xhtml+xml"
+  //          2 => "image/avif"
+  //          3 => "image/webp"
+  //          4 => "image/apng"
+  //          5 => "application/xml"
+  //          6 => "*/*"
+  //        ]
+}
+````
+
+And with AcceptHeader type
+
+````php
+public function test(
+    #[MapRequestHeader(name: 'accept-encoding')] AcceptHeader $encoding,
+): Response
+{
+  dump($encoding);
+  //        Symfony\Component\HttpFoundation\AcceptHeader {#4727 ▼
+  //            -items: array:4 [▼
+  //                "gzip" =>
+  //                    Symfony\Component\HttpFoundation\AcceptHeaderItem {#2437 ▼
+  //                        -value: "gzip"
+  //                        -quality: 1.0
+  //                        -index: 0
+  //                        -attributes: []
+  //                }
+  //                "deflate" =>
+  //                    Symfony\Component\HttpFoundation\AcceptHeaderItem {#4882 ▼
+  //                        -value: "deflate"
+  //                        -quality: 1.0
+  //                        -index: 1
+  //                        -attributes: []
+  //                }
+  //                "br" =>
+  //                    Symfony\Component\HttpFoundation\AcceptHeaderItem {#4549 ▼
+  //                        -value: "br"
+  //                        -quality: 1.0
+  //                        -index: 2
+  //                        -attributes: []
+  //                }
+  //                "zstd" =>
+  //                    Symfony\Component\HttpFoundation\AcceptHeaderItem {#4773 ▼
+  //                        -value: "zstd"
+  //                        -quality: 1.0
+  //                        -index: 3
+  //                        -attributes: []
+  //                }
+  //            ]
+  //              -sorted: false
+  //        }
+}
+````
+
+---------------------------------------------------------------------------
+
+by MatTheCat at 2025-01-10T09:52:02Z
+
+It bugs me the `array` type has two semantics whether it applies to an `Accept-*` header or not. Plus
+
+- in the first case there already is the `AcceptHeader` type.
+- in the second case only the first value is returned in an array, but
+  - there can be many
+  - the first value can actually be many values combined by the SAPI
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-05-26T11:25:54Z
+
+@StevenRenaux What's needed to get this to a mergeable state? I would love this to be included in the new Symfony version.
+
+---------------------------------------------------------------------------
+
+by StevenRenaux at 2025-05-26T11:36:39Z
+
+> @StevenRenaux What's needed to get this to a mergeable state? I would love this to be included in the new Symfony version.
+
+@ruudk Waiting reviews from core-contributors, but it's seems to late for merging into the next 7.3 version.
+Feel free also to review, approve...
+I think at the moment it's fine to get a simple implementation as it is because it's the kind of stuff you can't statifies every problematics.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-05-26T11:37:52Z
+
+Could you rebase it, so that the tests go green?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2025-05-26T11:49:55Z
+
+@StevenRenaux Thanks! 🙏 It needs a few tweaks in https://github.com/symfony/symfony/actions/runs/15253101552/job/42894283925?pr=51379

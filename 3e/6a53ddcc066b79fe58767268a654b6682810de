@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-10T17:27:52Z
+
+I didn't check the code but from afar, there should be a deprecation about interface B missing the method - or the `@method` as a transitory measure. That's all what needs a fix IMHO because once that deprecation will be addressed on the interface, a new one will show up for concrete classes. Makes sense?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2026-03-10T18:23:02Z
+
+Why should the `B` interface need to add the method on itself, either explicitly or through `@method`, when it inherits it from the `A` base interface?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-10T18:27:09Z
+
+both should be accepted to me, to allow better transitions. WDYT? I was thinking about reusing the same-namespace rule maybe ?
+
+---------------------------------------------------------------------------
+
+by mpdude at 2026-03-10T20:00:42Z
+
+I am afraid I do not understand your reply. Could you please try to re-phrase it?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-10T20:39:02Z
+
+> Why should the B interface need to add the method on itself, either explicitly or through @method, when it inherits it from the A base interface?
+
+ah, I read that too fast, makes sense!

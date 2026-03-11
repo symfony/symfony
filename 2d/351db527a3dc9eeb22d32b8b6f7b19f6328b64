@@ -1,0 +1,54 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-22T09:50:14Z
+
+I'm not super convinced we need this. The RFC defines the functions so hardocding the behavior is required. Testing internal API (the new classes) doesn't really improve overall coverage either to me. We already (or should) ensure we test the behavior of the user-land exposed API of course.
+Lazy loading also doesn't make a strong argument to me. We're treading a few inlined opcodes with the sames wrapped in more class-related boilerplate.
+That my sentiment here :)
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-12-22T13:34:11Z
+
+The idea is to improve maintainability of built-in functions by extracting them from an already pretty big file such as `JsonCrawler`. The idea is also to have one dedicated mechanism to load and execute any function (custom or built-in one) instead of dealing with two different loading/executing logic, depending on the fact its builtin or not.
+
+Indeed, it doesn't change anything for people using the crawler, but on the maintainer side, we will only have one logic to deal with. Responsibilities are better separated. I understand that lazy-loading is not _the_ argument here, but I think that's a nice-to-have worth mentioning
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2025-12-23T08:49:34Z
+
+Still unconvinced sorry: `+68/-106` that's the diffstat on JsonCrawler. We're not really making the file smaller. And maintenance isn't going to be a concern for these functions IMHO. Splitting adds indirection on the contrary to me.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2025-12-30T08:31:41Z
+
+Status: Needs work
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-30T09:00:52Z
+
+What's the status here @alexandre-daubois ?
+I'm seeing the PR title is out of sync since you removed the split in classes?
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-01-30T10:38:29Z
+
+Just rebased, fixed the title and a few things.
+
+Status: Needs review
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-02-14T20:37:28Z
+
+Extra interface removed and Psalm failure fixed as well!
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-03-11T08:15:27Z
+
+Works for me. I fixed the tests (Fabbot is wrong on this one). Thanks!

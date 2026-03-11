@@ -126,6 +126,8 @@ use Symfony\Component\Lock\Serializer\LockKeyNormalizer;
 use Symfony\Component\Lock\Store\StoreFactory;
 use Symfony\Component\Mailer\Bridge as MailerBridge;
 use Symfony\Component\Mailer\Command\MailerTestCommand;
+use Symfony\Component\Mailer\EventListener\PgpMimeEncryptedMessageListener;
+use Symfony\Component\Mailer\EventListener\PgpMimeSignedMessageListener;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mercure\HubRegistry;
 use Symfony\Component\Messenger\Attribute\AsMessage;
@@ -3177,6 +3179,36 @@ class FrameworkExtension extends Extension
             $container->setParameter('mailer.smime_encrypter.cipher', $config['smime_encrypter']['cipher']);
         } else {
             $container->removeDefinition('mailer.smime_encrypter.listener');
+        }
+
+        if ($config['pgp_signer']['enabled']) {
+            if (!class_exists(PgpMimeSignedMessageListener::class)) {
+                throw new LogicException('PGP/MIME signed messages support cannot be enabled as this version of the Mailer component does not support it.');
+            }
+            $smimeSigner = $container->getDefinition('mailer.pgp_signer');
+            $smimeSigner->setArgument(0, $config['pgp_signer']['secret_key']);
+            $smimeSigner->setArgument(1, $config['pgp_signer']['public_key']);
+            $smimeSigner->setArgument(2, $config['pgp_signer']['passphrase']);
+            $smimeSigner->setArgument(3, [
+                'binary' => $config['pgp_signer']['binary'],
+                'digest_algorithm' => $config['pgp_signer']['digest_algorithm'],
+            ]);
+        } else {
+            $container->removeDefinition('mailer.pgp_signer');
+            $container->removeDefinition('mailer.pgp_signer.listener');
+        }
+
+        if ($config['pgp_encrypter']['enabled']) {
+            if (!class_exists(PgpMimeEncryptedMessageListener::class)) {
+                throw new LogicException('PGP/MIME encrypted messages support cannot be enabled as this version of the Mailer component does not support it.');
+            }
+            $container->setAlias('mailer.pgp_encrypter.repository', $config['pgp_encrypter']['repository']);
+            $container->setParameter('mailer.pgp_encrypter.binary', $config['pgp_encrypter']['binary']);
+            $container->setParameter('mailer.pgp_encrypter.cipher_algorithm', $config['pgp_encrypter']['cipher_algorithm']);
+            $container->setParameter('mailer.pgp_encrypter.timeout', $config['pgp_encrypter']['timeout']);
+            $container->setParameter('mailer.pgp_encrypter.fail_on_missing_key', $config['pgp_encrypter']['fail_on_missing_key']);
+        } else {
+            $container->removeDefinition('mailer.pgp_encrypter.listener');
         }
 
         if ($webhookEnabled) {

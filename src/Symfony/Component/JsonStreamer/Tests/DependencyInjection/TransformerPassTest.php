@@ -12,10 +12,10 @@
 namespace Symfony\Component\JsonStreamer\Tests\DependencyInjection;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\JsonStreamer\DependencyInjection\TransformerPass;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\BooleanToStringValueTransformer;
 use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
@@ -48,10 +48,13 @@ class TransformerPassTest extends TestCase
 
         (new TransformerPass())->process($container);
 
-        $locator = $container->getDefinition('json_streamer.stream_reader')->getArgument(0);
-        $this->assertInstanceOf(ServiceLocatorArgument::class, $locator);
+        $locatorRef = $container->getDefinition('json_streamer.stream_reader')->getArgument(0);
+        $this->assertEquals(new Reference('json_streamer.transformers'), $locatorRef);
 
-        $map = $locator->getValues();
+        $locatorDef = $container->getDefinition('json_streamer.transformers');
+        $this->assertSame(ServiceLocator::class, $locatorDef->getClass());
+
+        $map = $locatorDef->getArgument(0);
         $this->assertArrayHasKey('my_transformer', $map);
         $this->assertEquals(new Reference('my_transformer'), $map['my_transformer']);
     }
@@ -70,12 +73,35 @@ class TransformerPassTest extends TestCase
 
         (new TransformerPass())->process($container);
 
-        $locator = $container->getDefinition('json_streamer.stream_writer')->getArgument(0);
-        $this->assertInstanceOf(ServiceLocatorArgument::class, $locator);
+        $locatorRef = $container->getDefinition('json_streamer.stream_writer')->getArgument(0);
+        $this->assertEquals(new Reference('json_streamer.transformers'), $locatorRef);
 
-        $map = $locator->getValues();
+        $locatorDef = $container->getDefinition('json_streamer.transformers');
+        $this->assertSame(ServiceLocator::class, $locatorDef->getClass());
+
+        $map = $locatorDef->getArgument(0);
         $this->assertArrayHasKey(DateTimeValueObjectTransformer::getValueObjectClassName(), $map);
         $this->assertEquals(new Reference('my_object_transformer'), $map[DateTimeValueObjectTransformer::getValueObjectClassName()]);
+    }
+
+    public function testValueObjectTransformerRegisteredUnderClassNameId()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('json_streamer.stream_reader')->setArguments([null]);
+        $container->register('json_streamer.stream_writer')->setArguments([null]);
+        $container->register('.json_streamer.cache_warmer.streamer')->setArguments([null, null]);
+
+        $container->register('my_object_transformer')
+            ->setClass(DateTimeValueObjectTransformer::class)
+            ->addTag('json_streamer.value_object_transformer');
+
+        (new TransformerPass())->process($container);
+
+        $valueObjectClassName = DateTimeValueObjectTransformer::getValueObjectClassName();
+        $this->assertTrue($container->hasDefinition($valueObjectClassName));
+        $this->assertTrue($container->getDefinition($valueObjectClassName)->hasTag('json_streamer.value_transformer'));
+        $this->assertSame(DateTimeValueObjectTransformer::class, $container->getDefinition($valueObjectClassName)->getClass());
     }
 
     public function testThrowOnInvalidPropertyTransformer()

@@ -107,6 +107,9 @@ return static function (ContainerConfigurator $container) {
         ->set('.json_streamer.value_object_transformer.date_time', DateTimeValueObjectTransformer::class)
             ->tag('json_streamer.value_object_transformer')
 
+        ->set(\DateTimeInterface::class, DateTimeValueObjectTransformer::class)
+            ->tag('json_streamer.value_transformer')
+
         // cache
         ->set('.json_streamer.cache_warmer.streamer', StreamerCacheWarmer::class)
             ->args([

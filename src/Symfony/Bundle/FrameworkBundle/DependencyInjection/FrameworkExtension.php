@@ -2235,6 +2235,7 @@ class FrameworkExtension extends Extension
             $container->getDefinition('.json_streamer.cache_warmer.streamer')->replaceArgument(7, $valueTransformers);
 
             $container->removeDefinition('.json_streamer.value_object_transformer.date_time');
+            $container->removeDefinition(\DateTimeInterface::class);
         }
 
         // FC layer for "symfony/json-streamer" >= 8.1

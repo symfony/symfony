@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\JsonStreamer\Transformer\ValueObjectTransformerInterface;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
@@ -30,6 +31,11 @@ class DeprecateJsonStreamerValueTransformerTagPass implements CompilerPassInterf
         foreach ($container->findTaggedServiceIds('json_streamer.value_transformer', true) as $id => $_) {
             $definition = $container->getDefinition($id);
             if ($definition->hasTag('json_streamer.property_value_transformer')) {
+                continue;
+            }
+
+            $class = $container->getParameterBag()->resolveValue($definition->getClass());
+            if (\is_string($class) && is_a($class, ValueObjectTransformerInterface::class, true)) {
                 continue;
             }
 

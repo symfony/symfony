@@ -1079,7 +1079,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         ]), $finder->in(self::$tmpDir)->getIterator());
     }
 
-    public function testIn()
+    public function testFindFilesInMultipleDirectories()
     {
         $finder = $this->buildFinder();
         $iterator = $finder->files()->name('*.php')->depth('< 1')->in([self::$tmpDir, __DIR__])->getIterator();

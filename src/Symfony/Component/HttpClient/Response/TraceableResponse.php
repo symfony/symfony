@@ -12,11 +12,13 @@
 namespace Symfony\Component\HttpClient\Response;
 
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
+use Symfony\Component\HttpClient\Cookie\CookieStore;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\RedirectionException;
 use Symfony\Component\HttpClient\Exception\ServerException;
 use Symfony\Component\HttpClient\TraceableHttpClient;
 use Symfony\Component\Stopwatch\StopwatchEvent;
+use Symfony\Contracts\HttpClient\Cookie\CookieStoreInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\RedirectionExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
@@ -82,6 +84,14 @@ class TraceableResponse implements ResponseInterface, StreamableInterface
                 $this->event->lap();
             }
         }
+    }
+
+    /**
+     * @see TransportResponseTrait::getCookies() for full documentation and BC note
+     */
+    public function getCookies(bool $throw = true): CookieStoreInterface
+    {
+        return CookieStore::extractFromResponse($this->response, $throw);
     }
 
     public function getContent(bool $throw = true): string

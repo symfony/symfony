@@ -16,9 +16,11 @@ use Symfony\Component\HttpClient\Chunk\DataChunk;
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\FirstChunk;
 use Symfony\Component\HttpClient\Chunk\LastChunk;
+use Symfony\Component\HttpClient\Cookie\CookieStore;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Internal\Canary;
 use Symfony\Component\HttpClient\Internal\ClientState;
+use Symfony\Contracts\HttpClient\Cookie\CookieStoreInterface;
 
 /**
  * Implements common logic for transport-level response classes.
@@ -68,6 +70,28 @@ trait TransportResponseTrait
         }
 
         return $this->headers;
+    }
+
+    /**
+     * Gets the cookies set by the response (extracted from Set-Cookie headers).
+     *
+     * Only name=value pairs are extracted; cookie attributes (Path, Domain, Secure,
+     * HttpOnly, SameSite, Expires) are intentionally ignored — this store is meant
+     * for use as outgoing request cookies on a subsequent request.
+     *
+     * Non-RFC-compliant cookies from the server are silently skipped.
+     *
+     * Note: this method is not part of ResponseInterface because adding it would be
+     * a backwards-compatibility break for existing implementations. Type-hint against
+     * the concrete response class (e.g. CurlResponse, NativeResponse, MockResponse)
+     * or against ResponseInterface and call getCookies() without a type-check if you
+     * control all response implementations in your project.
+     *
+     * @param bool $throw Whether an exception should be thrown on 3/4/5xx status codes
+     */
+    public function getCookies(bool $throw = true): CookieStoreInterface
+    {
+        return CookieStore::extractFromResponse($this, $throw);
     }
 
     public function cancel(): void

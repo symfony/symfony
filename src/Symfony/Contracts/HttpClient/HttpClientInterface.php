@@ -30,6 +30,12 @@ interface HttpClientInterface
         'auth_basic' => null,
         // string - a token enabling HTTP Bearer authorization (RFC 6750)
         'auth_bearer' => null,
+        // CookieStoreInterface|array|string - cookies to send with the request; if a
+        //   CookieStoreInterface or array is provided, it is serialized as "name=value" pairs;
+        //   alternatively, cookies can still be passed via the "headers" option using the "Cookie" key.
+        // If both "cookies" and "headers" options provide Cookie data, the "cookies" option takes
+        // precedence and overrides any Cookie header set via the "headers" option
+        'cookies' => null,
         // string[] - associative array of query string values to merge with the request's URL
         'query' => [],
         // iterable|string[]|string[][] - headers names provided as keys or as part of values

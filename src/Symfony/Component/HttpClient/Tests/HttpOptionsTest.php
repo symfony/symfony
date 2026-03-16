@@ -13,6 +13,7 @@ namespace Symfony\Component\HttpClient\Tests;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Cookie\CookieStore;
 use Symfony\Component\HttpClient\HttpOptions;
 
 /**
@@ -53,5 +54,24 @@ class HttpOptionsTest extends TestCase
     public function testSetMaxConnectDuration()
     {
         $this->assertSame(5.0, (new HttpOptions())->setMaxConnectDuration(5.0)->toArray()['max_connect_duration']);
+    }
+
+    public function testSetCookiesWithString()
+    {
+        $options = (new HttpOptions())->setCookies('flavor=chocolate; size=medium');
+        $this->assertSame('flavor=chocolate; size=medium', $options->toArray()['cookies']);
+    }
+
+    public function testSetCookiesWithArray()
+    {
+        $options = (new HttpOptions())->setCookies(['flavor' => 'chocolate', 'size' => 'medium']);
+        $this->assertSame(['flavor' => 'chocolate', 'size' => 'medium'], $options->toArray()['cookies']);
+    }
+
+    public function testSetCookiesWithCookieStore()
+    {
+        $store = CookieStore::fromArray(['flavor' => 'chocolate']);
+        $options = (new HttpOptions())->setCookies($store);
+        $this->assertSame($store, $options->toArray()['cookies']);
     }
 }

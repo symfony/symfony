@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Symfony\Component\HttpClient\Cookie\Cookie;
+use Symfony\Component\HttpClient\Cookie\CookieStore;
+use Symfony\Contracts\HttpClient\Cookie\CookieStoreInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -59,6 +62,18 @@ class HttpOptions
     public function setQuery(array $query): static
     {
         $this->options['query'] = $query;
+
+        return $this;
+    }
+
+    /**
+     * @param CookieStoreInterface|array<string, string|Cookie>|list<string|Cookie>|string $cookies
+     *
+     * @return $this
+     */
+    public function setCookies(CookieStoreInterface|array|string $cookies): static
+    {
+        $this->options['cookies'] = $cookies;
 
         return $this;
     }

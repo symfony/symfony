@@ -11,11 +11,14 @@
 
 namespace Symfony\Component\HttpClient;
 
+use Symfony\Component\HttpClient\Cookie\CookieStore;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\Response\StreamableInterface;
 use Symfony\Component\HttpClient\Response\StreamWrapper;
+use Symfony\Component\HttpClient\Internal\Canary;
 use Symfony\Component\Mime\MimeTypes;
+use Symfony\Contracts\HttpClient\Cookie\CookieStoreInterface;
 
 /**
  * Provides the common logic from writing HttpClientInterface implementations.
@@ -165,8 +168,22 @@ trait HttpClientTrait
             if (($options['auth_bearer'] ?? false) && !($options['normalized_headers']['authorization'] ?? false)) {
                 $options['normalized_headers']['authorization'] = ['Authorization: Bearer '.$options['auth_bearer']];
             }
+            // Merge cookies with headers; "cookies" option takes precedence over any Cookie header
+            if (isset($options['cookies'])) {
+                $cookies = $options['cookies'];
+                if (\is_array($cookies)) {
+                    $cookies = CookieStore::fromArray($cookies);
+                } elseif (\is_string($cookies)) {
+                    $cookies = CookieStore::fromString($cookies);
+                } elseif (!$cookies instanceof CookieStoreInterface) {
+                    throw new InvalidArgumentException(\sprintf('Option "cookies" must be a string, an array, or a "%s", "%s" given.', CookieStoreInterface::class, get_debug_type($cookies)));
+                }
+                if ('' !== (string) $cookies) {
+                    $options['normalized_headers']['cookie'] = ['Cookie: '.$cookies];
+                }
+            }
 
-            unset($options['auth_basic'], $options['auth_bearer']);
+            unset($options['auth_basic'], $options['auth_bearer'], $options['cookies']);
 
             // Parse base URI
             if (\is_string($baseUri = $options['base_uri'] ?? null)) {

@@ -13,7 +13,9 @@ namespace Symfony\Component\HttpClient\Response;
 
 use Symfony\Component\HttpClient\Chunk\ErrorChunk;
 use Symfony\Component\HttpClient\Chunk\LastChunk;
+use Symfony\Component\HttpClient\Cookie\CookieStore;
 use Symfony\Component\HttpClient\Exception\TransportException;
+use Symfony\Contracts\HttpClient\Cookie\CookieStoreInterface;
 use Symfony\Contracts\HttpClient\ChunkInterface;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
@@ -114,6 +116,14 @@ class AsyncResponse implements ResponseInterface, StreamableInterface
         }
 
         return $headers;
+    }
+
+    /**
+     * @see TransportResponseTrait::getCookies() for full documentation and BC note
+     */
+    public function getCookies(bool $throw = true): CookieStoreInterface
+    {
+        return CookieStore::extractFromResponse($this, $throw);
     }
 
     public function getInfo(?string $type = null): mixed

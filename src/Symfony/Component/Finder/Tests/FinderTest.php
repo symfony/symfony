@@ -924,7 +924,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testSort()
     {
         $finder = $this->buildFinder();
-        $this->assertSame($finder, $finder->sort(fn (\SplFileInfo $a, \SplFileInfo $b) => strcmp($a->getRealPath(), $b->getRealPath())));
+        $this->assertSame($finder, $finder->sort(static fn (\SplFileInfo $a, \SplFileInfo $b) => strcmp($a->getRealPath(), $b->getRealPath())));
         $this->assertOrderedIterator($this->toAbsolute([
             'Zephire.php',
             'foo',
@@ -980,7 +980,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
     public function testFilter()
     {
         $finder = $this->buildFinder();
-        $this->assertSame($finder, $finder->filter(fn (\SplFileInfo $f) => str_contains($f, 'test')));
+        $this->assertSame($finder, $finder->filter(static fn (\SplFileInfo $f) => str_contains($f, 'test')));
         $this->assertIterator($this->toAbsolute(['test.php', 'test.py']), $finder->in(self::$tmpDir)->getIterator());
     }
 
@@ -1007,7 +1007,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
         $finder = $this->buildFinder();
         $finder
             ->in($this->vfsScheme.'://x')
-            ->filter(fn (): bool => true, true) // does nothing
+            ->filter(static fn (): bool => true, true) // does nothing
             ->filter(function (\SplFileInfo $file): bool {
                 $path = $this->stripSchemeFromVfsPath($file->getPathname());
 
@@ -1017,7 +1017,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
 
                 return $res;
             }, true)
-            ->filter(fn (): bool => true, true); // does nothing
+            ->filter(static fn (): bool => true, true); // does nothing
 
         $this->assertSameVfsIterator([
             'x/a.php',
@@ -1376,10 +1376,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
             ['key' => $dir.'a'.\DIRECTORY_SEPARATOR.'b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2'],
         ];
 
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            usort($expected, static fn ($a, $b) => $a['key'] <=> $b['key']);
-        }
-
         $this->assertSame($expected, self::formatForAssert($finder));
     }
 
@@ -1415,10 +1411,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
             ['key' => $dir.'a/b/c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'c2'],
         ];
 
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            usort($expected, static fn ($a, $b) => $a['key'] <=> $b['key']);
-        }
-
         $this->assertSame($expected, self::formatForAssert($finder));
     }
 
@@ -1453,10 +1445,6 @@ class FinderTest extends Iterator\RealIteratorTestCase
             ['key' => $dir.'a/b/c/c1', 'relativePathname' => $dir.'a/b/c/c1'],
             ['key' => $dir.'a/b'.\DIRECTORY_SEPARATOR.'c'.\DIRECTORY_SEPARATOR.'c2', 'relativePathname' => 'c'.\DIRECTORY_SEPARATOR.'c2'],
         ];
-
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            usort($expected, static fn ($a, $b) => $a['key'] <=> $b['key']);
-        }
 
         $this->assertSame($expected, self::formatForAssert($finder));
     }

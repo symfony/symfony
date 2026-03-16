@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Finder\Tests\Iterator;
 
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Iterator\SortableIterator;
 
 class SortableIteratorTest extends RealIteratorTestCase
@@ -22,6 +23,50 @@ class SortableIteratorTest extends RealIteratorTestCase
             $this->fail('__construct() throws an \InvalidArgumentException exception if the mode is not valid');
         } catch (\Exception $e) {
             $this->assertInstanceOf(\InvalidArgumentException::class, $e, '__construct() throws an \InvalidArgumentException exception if the mode is not valid');
+        }
+    }
+
+    /**
+     * @dataProvider getPathComparisonModes
+     */
+    public function testSortUsesPlatformPathSemantics(int $sortMode)
+    {
+        $filesystem = new Filesystem();
+        $directory = sys_get_temp_dir().'/sortable_iterator_'.strtr(uniqid('', true), '.', '_');
+
+        mkdir($directory);
+
+        try {
+            if ('\\' === \DIRECTORY_SEPARATOR) {
+                mkdir($directory.\DIRECTORY_SEPARATOR.'Folder');
+                $firstPath = $directory.\DIRECTORY_SEPARATOR.'Folder'.\DIRECTORY_SEPARATOR.'Sub.php';
+                $secondPath = $directory.\DIRECTORY_SEPARATOR.'FolderBase.php';
+            } else {
+                $firstPath = $directory.'/Folder\\Sub.php';
+                $secondPath = $directory.'/FolderBase.php';
+            }
+
+            touch($firstPath);
+            touch($secondPath);
+
+            $iterator = new SortableIterator(new \ArrayIterator([
+                new \SplFileInfo($firstPath),
+                new \SplFileInfo($secondPath),
+            ]), $sortMode);
+
+            if ('\\' === \DIRECTORY_SEPARATOR) {
+                $expected = [$firstPath, $secondPath];
+            } else {
+                $expected = SortableIterator::SORT_BY_NAME_CASE_INSENSITIVE === $sortMode
+                    ? [$firstPath, $secondPath]
+                    : [$secondPath, $firstPath];
+            }
+
+            $this->assertSame($expected, array_map(static function (\SplFileInfo $file) {
+                return $file->getPathname();
+            }, iterator_to_array($iterator, false)));
+        } finally {
+            $filesystem->remove($directory);
         }
     }
 
@@ -268,6 +313,17 @@ class SortableIteratorTest extends RealIteratorTestCase
             [SortableIterator::SORT_BY_MODIFIED_TIME, self::toAbsolute($sortByModifiedTime)],
             [SortableIterator::SORT_BY_NAME_NATURAL, self::toAbsolute($sortByNameNatural)],
             [fn (\SplFileInfo $a, \SplFileInfo $b) => strcmp($a->getRealPath(), $b->getRealPath()), self::toAbsolute($customComparison)],
+        ];
+    }
+
+    public static function getPathComparisonModes()
+    {
+        return [
+            [SortableIterator::SORT_BY_NAME],
+            [SortableIterator::SORT_BY_NAME_NATURAL],
+            [SortableIterator::SORT_BY_NAME_CASE_INSENSITIVE],
+            [SortableIterator::SORT_BY_NAME_NATURAL_CASE_INSENSITIVE],
+            [SortableIterator::SORT_BY_TYPE],
         ];
     }
 }

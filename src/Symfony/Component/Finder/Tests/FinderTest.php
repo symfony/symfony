@@ -877,18 +877,10 @@ class FinderTest extends Iterator\RealIteratorTestCase
     {
         $finder = $this->buildFinder();
         $this->assertSame($finder, $finder->sortByCaseInsensitiveName(true));
-
-        $expected = ['foo'];
-
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            $expected[] = 'foo bar';
-            $expected[] = 'foo/bar.tmp';
-        } else {
-            $expected[] = 'foo/bar.tmp';
-            $expected[] = 'foo bar';
-        }
-
-        $expected = array_merge($expected, [
+        $expected = [
+            'foo',
+            'foo/bar.tmp',
+            'foo bar',
             'qux',
             'qux/baz_1_2.py',
             'qux/baz_100_1.py',
@@ -903,7 +895,7 @@ class FinderTest extends Iterator\RealIteratorTestCase
             'toto',
             'zebulon.php',
             'Zephire.php',
-        ]);
+        ];
         $this->assertOrderedIterator($this->toAbsolute($expected), $finder->in(self::$tmpDir)->getIterator());
 
         $finder = $this->buildFinder();

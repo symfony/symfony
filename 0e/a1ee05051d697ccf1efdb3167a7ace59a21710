@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by wazum at 2026-03-12T07:10:54Z
+
+The Psalm and Fabbot failures are pre-existing issues in `Connection.php`, not introduced by this PR:
+
+**Psalm** — 3 errors on untouched lines: `RedisCluster::offsetGet` (line 380, from `xpending` return type in stubs) and `Relay\Relay` undefined (lines 761–762, extension not available in CI). These exist on the 6.4 branch but aren't normally surfaced because the CI baseline is regenerated per run and Connection.php isn't usually in the diff.
+
+**Fabbot** — suggests renaming `$paramss` to `$params` (lines 244–262), but that would break multi-host DSN parsing: `$paramss` is intentionally double-s as it holds an array of `$params` arrays, and the rename would cause `array_merge(...$params)` to shadow itself before the subsequent `array_map` uses the original value.

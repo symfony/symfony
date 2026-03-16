@@ -1,0 +1,37 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-03-15T12:18:41Z
+
+It looks like you unchecked the "Allow edits from maintainer" box. That is fine, but please note that if you have multiple commits, you'll need to squash your commits into one before this can be merged. Or, you can check the "Allow edits from maintainers" box and the maintainer can squash for you.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-16T10:53:57Z
+
+What about merging this in the existing FrankenPhpWorkerRunner?
+
+> private Response|HttpKernelInterface $app
+
+Also, please rebase/retarget for 8.1 since that's a new feature, and updated the changelog accordingly.
+
+---------------------------------------------------------------------------
+
+by guillaume-sainthillier at 2026-03-16T10:55:23Z
+
+> What about merging this in the existing FrankenPhpWorkerRunner?
+>
+> > private Response|HttpKernelInterface $app
+>
+> Also, please rebase/retarget for 8.1 since that's a new feature, and updated the changelog accordingly.
+
+no problem, will do that
+
+---------------------------------------------------------------------------
+
+by guillaume-sainthillier at 2026-03-16T11:23:54Z
+
+@nicolas-grekas current CI errors does not seems to be related to the current edits, ready for review imo 👍

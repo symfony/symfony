@@ -40,6 +40,21 @@ class ContainerLintCommandTest extends AbstractWebTestCase
         $this->assertStringContainsString($expectedOutput, $tester->getDisplay());
     }
 
+    public function testLintContainerDetectsTypeErrorOnTaggedServices()
+    {
+        $kernel = static::createKernel([
+            'test_case' => 'ContainerLint',
+            'root_config' => 'config.yml',
+            'debug' => true,
+        ]);
+        $this->application = new Application($kernel);
+
+        $tester = $this->createCommandTester();
+        $exitCode = $tester->execute([]);
+
+        $this->assertSame(1, $exitCode, 'lint:container should detect type errors on services referenced only via tagged iterators in debug mode');
+    }
+
     public static function containerLintProvider(): array
     {
         return [

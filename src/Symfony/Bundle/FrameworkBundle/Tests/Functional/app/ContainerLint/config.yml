@@ -1,0 +1,15 @@
+imports:
+    - { resource: ../config/default.yml }
+
+services:
+    tagged_consumer:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TaggedConsumer
+        arguments:
+            - !tagged_iterator 'app.handler'
+        public: true
+    tagged_with_wrong_type:
+        class: Symfony\Bundle\FrameworkBundle\Tests\Fixtures\TaggedServiceWithTypeMismatch
+        arguments:
+            - '@tagged_consumer'
+        tags:
+            - { name: 'app.handler' }

@@ -21,6 +21,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\Compiler\CheckTypeDeclarationsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
+use Symfony\Component\DependencyInjection\Compiler\RemoveUnusedDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveFactoryClassPass;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -102,6 +103,10 @@ final class ContainerLintCommand extends Command
             $container->getCompilerPassConfig()->setBeforeOptimizationPasses([]);
             $container->getCompilerPassConfig()->setOptimizationPasses([new ResolveFactoryClassPass()]);
             $container->getCompilerPassConfig()->setBeforeRemovingPasses([]);
+            $container->getCompilerPassConfig()->setRemovingPasses(array_filter(
+                $container->getCompilerPassConfig()->getRemovingPasses(),
+                fn ($pass) => !$pass instanceof RemoveUnusedDefinitionsPass,
+            ));
         }
 
         $container->setParameter('container.build_hash', 'lint_container');

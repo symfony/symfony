@@ -1,0 +1,57 @@
+---------------------------------------------------------------------------
+
+by theofidry at 2024-07-01T19:06:51Z
+
+@chalasr updated
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-07-13T14:03:01Z
+
+Should the `getRawX()` methods introduced here replace the `ArgvInput::getRawTokens()`?
+/cc @lyrixx - does they work for castor's usecase?
+
+As discussed, I'm not entirely convinced we need `unparse()`:
+- `parse()` is not defined by `InputInterface`
+- could the mentioned use case be solved through manipulating the retval of `__toString()`?
+- overall, use cases for parse()/unparse() are marginal, so is it worth it?
+
+---------------------------------------------------------------------------
+
+by theofidry at 2024-07-14T06:54:06Z
+
+>Should the `getRawX()` methods introduced here replace the `ArgvInput::getRawTokens()`?
+
+They could, but to this effect if what you're looking for is what `getRawTokens()` provides, then it's simpler than using `getRawX()`.
+
+>parse() is not defined by InputInterface
+
+`parse()` is not, but it's caller, and why this unparse is needed, is `InputInterface::bind()`, it's just that `::unbind()` be closer to a `reset()` IMO.
+
+>could the mentioned use case be solved through manipulating the retval of __toString()?
+
+As highlighted in the description, they cannot, at least not with the same level of sketchiness as the workaround currently employed which as listed in the "user-land alternative" section. Rather than manipulating a string, I would rather use raw tokens, but that is only available for `ArgvInput` and you still need to work out manipulating the tokens based on the input option names and types (e.g. negatable).
+
+>overall, use cases for parse()/unparse() are marginal, so is it worth it?
+
+Can't decide on that, but to fix it "correctly" it is certainly the right place. Personally I find weird that the framework does not provide the primitive to reverse the transformation it does.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2024-12-07T09:38:53Z
+
+Ready for another approval @symfony/mergers
+
+---------------------------------------------------------------------------
+
+by theofidry at 2025-04-18T20:58:22Z
+
+Addressed the last pieces of feedback and rebased it.
+
+I also updated the description. A TL:DR; for a usage in the wild is https://github.com/webmozarts/console-parallelization/pull/328 which shows the hacky boilertemplate used to achieve this otherwise.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2025-04-18T21:41:57Z
+
+Sorry to be late in the review. I think it's a good feature, but the implementation can be improved.

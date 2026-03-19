@@ -14,7 +14,7 @@ namespace Symfony\Component\RemoteEvent\Attribute;
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-#[\Attribute(\Attribute::TARGET_CLASS)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::IS_REPEATABLE)]
 class AsRemoteEventConsumer
 {
     /**

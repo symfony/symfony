@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `PgpMimeSignedMessageListener`
+
 8.0
 ---
 

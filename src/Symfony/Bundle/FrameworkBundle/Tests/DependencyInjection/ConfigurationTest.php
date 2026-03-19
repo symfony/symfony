@@ -939,6 +939,22 @@ class ConfigurationTest extends TestCase
                     'repository' => '',
                     'cipher' => null,
                 ],
+                'pgp_signer' => [
+                    'enabled' => false,
+                    'secret_key' => '',
+                    'public_key' => null,
+                    'passphrase' => null,
+                    'binary' => 'gpg',
+                    'digest_algorithm' => 'SHA512',
+                ],
+                'pgp_encrypter' => [
+                    'enabled' => false,
+                    'repository' => '',
+                    'binary' => 'gpg',
+                    'cipher_algorithm' => 'AES256',
+                    'timeout' => 60,
+                    'fail_on_missing_key' => true,
+                ],
             ],
             'notifier' => [
                 'enabled' => !class_exists(FullStack::class) && class_exists(Notifier::class),

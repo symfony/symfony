@@ -17,6 +17,8 @@ use Symfony\Component\Mailer\EventListener\EnvelopeListener;
 use Symfony\Component\Mailer\EventListener\MessageListener;
 use Symfony\Component\Mailer\EventListener\MessageLoggerListener;
 use Symfony\Component\Mailer\EventListener\MessengerTransportListener;
+use Symfony\Component\Mailer\EventListener\PgpMimeEncryptedMessageListener;
+use Symfony\Component\Mailer\EventListener\PgpMimeSignedMessageListener;
 use Symfony\Component\Mailer\EventListener\SmimeEncryptedMessageListener;
 use Symfony\Component\Mailer\EventListener\SmimeSignedMessageListener;
 use Symfony\Component\Mailer\Mailer;
@@ -27,6 +29,7 @@ use Symfony\Component\Mailer\Transport\TransportInterface;
 use Symfony\Component\Mailer\Transport\Transports;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 use Symfony\Component\Mime\Crypto\SMimeSigner;
+use Symfony\Component\MimePgp\PgpSigner;
 
 return static function (ContainerConfigurator $container) {
     $container->services()
@@ -113,6 +116,30 @@ return static function (ContainerConfigurator $container) {
             ->args([
                 service('mailer.smime_encrypter.repository'),
                 param('mailer.smime_encrypter.cipher'),
+            ])
+            ->tag('kernel.event_subscriber')
+
+        ->set('mailer.pgp_signer', PgpSigner::class)
+        ->args([
+            abstract_arg('secret_key'),
+            abstract_arg('public_key'),
+            abstract_arg('passphrase'),
+            abstract_arg('options'),
+        ])
+
+        ->set('mailer.pgp_signer.listener', PgpMimeSignedMessageListener::class)
+            ->args([
+                service('mailer.pgp_signer'),
+            ])
+            ->tag('kernel.event_subscriber')
+
+        ->set('mailer.pgp_encrypter.listener', PgpMimeEncryptedMessageListener::class)
+            ->args([
+                service('mailer.pgp_encrypter.repository'),
+                param('mailer.pgp_encrypter.binary'),
+                param('mailer.pgp_encrypter.cipher_algorithm'),
+                param('mailer.pgp_encrypter.timeout'),
+                param('mailer.pgp_encrypter.fail_on_missing_key'),
             ])
             ->tag('kernel.event_subscriber')
 

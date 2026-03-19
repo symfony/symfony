@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-03-19T07:33:35Z
+
+I'm not sure to which extent we should support the cases where extensions are loaded but functions are disabled. This isn't about this specific PR in particular, but rather an open question regarding our policy. If one decides to disable `strlen()`, we can't really do anything about it. I'm curious to hear opinions about this.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-19T08:26:26Z
+
+@alexandre-daubois we don't provide any guaranties, but when community contribs come in on the topic, we accept them. If that works for them and doesn't incur maintenance nightmare, that's good enough.

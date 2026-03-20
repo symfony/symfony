@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler;
+namespace Symfony\Component\Console\DependencyInjection;
 
 use Symfony\Component\Console\ArgumentResolver\ValueResolver\TraceableValueResolver;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;

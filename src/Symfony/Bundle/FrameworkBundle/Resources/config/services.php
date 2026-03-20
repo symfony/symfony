@@ -29,7 +29,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\DependencyInjection\ReverseContainer;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface as EventDispatcherInterfaceComponentAlias;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpFoundation\Request;
@@ -57,7 +57,7 @@ use Symfony\Component\String\LazyString;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Workflow\WorkflowEvents;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEventDispatcherInterface;
 
 return static function (ContainerConfigurator $container) {
     // this parameter is used at compile time in RegisterListenersPass
@@ -81,8 +81,8 @@ return static function (ContainerConfigurator $container) {
             ->public()
             ->tag('container.hot_path')
             ->tag('event_dispatcher.dispatcher', ['name' => 'event_dispatcher'])
-        ->alias(EventDispatcherInterfaceComponentAlias::class, 'event_dispatcher')
         ->alias(EventDispatcherInterface::class, 'event_dispatcher')
+        ->alias(ContractsEventDispatcherInterface::class, 'event_dispatcher')
         ->alias(PsrEventDispatcherInterface::class, 'event_dispatcher')
 
         ->set('http_kernel', HttpKernel::class)

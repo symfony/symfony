@@ -515,7 +515,8 @@ trait KernelTrait
             }
 
             $file = (new \ReflectionObject($this))->getFileName();
-            $kernelLoader = $loader->getResolver()->resolve($file);
+            $kernelLoader = new PhpFileLoader($container, new FileLocator($this), $this->getEnvironment());
+            $kernelLoader->setResolver($loader->getResolver());
             $kernelLoader->setCurrentDir(\dirname($file));
             $instanceof = &\Closure::bind(fn &() => $this->instanceof, $kernelLoader, $kernelLoader)();
 

@@ -76,7 +76,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
-use Symfony\Component\Dotenv\Command\DebugCommand;
+use Symfony\Component\Dotenv\Command\DebugCommand as DotenvDebugCommand;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -308,7 +308,7 @@ class FrameworkExtension extends Extension
                 $container->removeDefinition('console.command.translation_lint');
             }
 
-            if (!class_exists(DebugCommand::class)) {
+            if (!class_exists(DotenvDebugCommand::class)) {
                 $container->removeDefinition('console.command.dotenv_debug');
             }
 
@@ -679,20 +679,6 @@ class FrameworkExtension extends Extension
             ->addTag('assets.package');
         $container->registerForAutoconfiguration(AssetCompilerInterface::class)
             ->addTag('asset_mapper.compiler');
-        $container->registerAttributeForAutoconfiguration(AsCommand::class, static function (ChildDefinition $definition, AsCommand $attribute, \ReflectionClass|\ReflectionMethod $reflector) {
-            $tagAttributes = [
-                'command' => $attribute->name,
-                'description' => $attribute->description,
-                'help' => $attribute->help ?? null,
-            ];
-
-            if ($reflector instanceof \ReflectionMethod) {
-                $tagAttributes['method'] = $reflector->getName();
-            }
-
-            $definition->addTag('console.command', $tagAttributes);
-            $definition->addTag('console.command.service_arguments');
-        });
         $container->registerForAutoconfiguration(Command::class)
             ->addTag('console.command')
             ->addTag('console.command.service_arguments');
@@ -768,6 +754,21 @@ class FrameworkExtension extends Extension
             ->addTag('mime.mime_type_guesser');
         $container->registerForAutoconfiguration(LoggerAwareInterface::class)
             ->addMethodCall('setLogger', [new Reference('logger')]);
+
+        $container->registerAttributeForAutoconfiguration(AsCommand::class, static function (ChildDefinition $definition, AsCommand $attribute, \ReflectionClass|\ReflectionMethod $reflector) {
+            $tagAttributes = [
+                'command' => $attribute->name,
+                'description' => $attribute->description,
+                'help' => $attribute->help ?? null,
+            ];
+
+            if ($reflector instanceof \ReflectionMethod) {
+                $tagAttributes['method'] = $reflector->getName();
+            }
+
+            $definition->addTag('console.command', $tagAttributes);
+            $definition->addTag('console.command.service_arguments');
+        });
 
         $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector) {
             $tagAttributes = get_object_vars($attribute);

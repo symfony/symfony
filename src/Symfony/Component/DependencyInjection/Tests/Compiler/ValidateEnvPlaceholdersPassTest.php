@@ -314,6 +314,32 @@ class ValidateEnvPlaceholdersPassTest extends TestCase
         $this->assertSame('1', $container->getParameter('boolish'));
     }
 
+    public function testFloatEnvWithMinConstraint()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension($ext = new EnvExtension());
+        $container->prependExtensionConfig('env_extension', $expected = [
+            'float_node_with_min' => '%env(float:MESSENGER_MULTIPLIER)%',
+        ]);
+
+        $this->doProcess($container);
+
+        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
+    }
+
+    public function testIntEnvWithMinConstraint()
+    {
+        $container = new ContainerBuilder();
+        $container->registerExtension($ext = new EnvExtension());
+        $container->prependExtensionConfig('env_extension', $expected = [
+            'int_node_with_min' => '%env(int:MESSENGER_MAX_RETRIES)%',
+        ]);
+
+        $this->doProcess($container);
+
+        $this->assertSame($expected, $container->resolveEnvPlaceholders($ext->getConfig()));
+    }
+
     private function doProcess(ContainerBuilder $container): void
     {
         (new MergeExtensionConfigurationPass())->process($container);
@@ -339,6 +365,8 @@ class EnvConfiguration implements ConfigurationInterface
                 ->end()
                 ->integerNode('int_node')->end()
                 ->floatNode('float_node')->end()
+                ->floatNode('float_node_with_min')->min(1)->end()
+                ->integerNode('int_node_with_min')->min(1)->end()
                 ->booleanNode('bool_node')->end()
                 ->arrayNode('array_node')
                     ->beforeNormalization()

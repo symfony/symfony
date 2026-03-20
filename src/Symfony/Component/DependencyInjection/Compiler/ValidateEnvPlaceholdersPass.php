@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
  */
 class ValidateEnvPlaceholdersPass implements CompilerPassInterface
 {
-    private const TYPE_FIXTURES = ['array' => [], 'bool' => false, 'float' => 0.0, 'int' => 0, 'string' => ''];
+    private const TYPE_FIXTURES = ['array' => [], 'bool' => false, 'float' => 1.0, 'int' => 1, 'string' => ''];
 
     private array $extensionConfig = [];
 

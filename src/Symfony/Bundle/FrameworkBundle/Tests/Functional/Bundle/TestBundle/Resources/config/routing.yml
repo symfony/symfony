@@ -61,6 +61,10 @@ send_email:
     path:     /send_email
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\EmailController::indexAction }
 
+send_email_with_template:
+    path:     /send_email_with_template
+    defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\EmailController::sendEmailWithTemplateAction }
+
 http_client_call:
     path:     /http_client_call
     defaults: { _controller: Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\Controller\HttpClientController::index }

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `EmailTextBodyMatchesRegex` and `EmailHtmlBodyMatchesRegex` constraints
+
 8.0
 ---
 

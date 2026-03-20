@@ -26,6 +26,7 @@ CHANGELOG
  * Deprecate setting `caching.max_ttl` to `null`, use a positive integer instead
  * Deprecate `senders` nesting level for messenger routing config; use string or a list of strings instead
  * Allow configuring Webhook's header names and signing algo
+ * Add `assertEmailTextBodyMatchesRegex()`, `assertEmailTextBodyNotMatchesRegex()`, `assertEmailHtmlBodyMatchesRegex()` and `assertEmailHtmlBodyNotMatchesRegex()` to the `MailerAssertionsTrait`
 
 8.0
 ---

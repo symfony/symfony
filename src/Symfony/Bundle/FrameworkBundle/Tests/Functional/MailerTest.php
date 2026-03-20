@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FullStack;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -19,6 +20,8 @@ use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mailer\Transport\AbstractTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Test\Constraint\EmailHtmlBodyMatchesRegex;
+use Symfony\Component\Mime\Test\Constraint\EmailTextBodyMatchesRegex;
 
 class MailerTest extends AbstractWebTestCase
 {
@@ -109,5 +112,39 @@ class MailerTest extends AbstractWebTestCase
         $this->assertEmailAddressContains($email, 'Reply-To', 'me@symfony.com');
         $this->assertEmailAddressNotContains($email, 'To', 'helene@symfony.com');
         $this->assertEmailAddressNotContains($email, 'Reply-To', 'helene@symfony.com');
+    }
+
+    #[RequiresMethod(EmailHtmlBodyMatchesRegex::class, '__construct')]
+    #[RequiresMethod(EmailTextBodyMatchesRegex::class, '__construct')]
+    public function testMailerAssertionsWithRegex()
+    {
+        $client = $this->createClient(['test_case' => 'Mailer', 'root_config' => 'config.yml', 'debug' => true]);
+        $client->request('GET', '/send_email_with_template');
+
+        $this->assertEmailCount(1);
+        $first = 0;
+        if (!class_exists(FullStack::class)) {
+            $this->assertQueuedEmailCount(1);
+            $first = 1;
+            $this->assertEmailIsQueued($this->getMailerEvent(0));
+        }
+        $this->assertEmailIsNotQueued($this->getMailerEvent($first));
+
+        $email = $this->getMailerMessage($first);
+        $this->assertEmailAddressContains($email, 'From', 'sanmartindev@gmail.com');
+        $this->assertEmailAddressContains($email, 'To', 'other_account@example.com');
+        $this->assertEmailSubjectContains($email, 'Welcome');
+        $this->assertEmailHtmlBodyContains($email, '<h1>Welcome!</h1>');
+        $this->assertEmailHtmlBodyContains($email, '<p>Your user is santysisi</p>');
+        $this->assertEmailHtmlBodyMatchesRegex($email, '<p>Your password is [A-Za-z0-9]{7,10}[0-9][!@#$%^&*]</p>');
+        $this->assertEmailHtmlBodyMatchesRegex($email, '<a href="https://mysuperwebapplication/activate/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/">Activate your account</a>');
+        $this->assertEmailHtmlBodyNotMatchesRegex($email, '<p>Your password is [A-Za-z0-9]{7,10}[0-9][!@#$%^&*]{100}</p>');
+        $this->assertEmailHtmlBodyNotMatchesRegex($email, '<a href="https://mysuperwebapplication/activate/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}/">Activate your account</a>');
+        $this->assertEmailTextBodyContains($email, 'Welcome!');
+        $this->assertEmailTextBodyContains($email, 'Your user is santysisi');
+        $this->assertEmailTextBodyMatchesRegex($email, 'Your password is [A-Za-z0-9]{7,10}[0-9][!@#$%^&*]');
+        $this->assertEmailTextBodyMatchesRegex($email, 'Link for Activate your account: https://mysuperwebapplication/activate/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/');
+        $this->assertEmailTextBodyNotMatchesRegex($email, 'Your password is [A-Za-z0-9]{7,10}[0-9][!@#$%^&*]{100}');
+        $this->assertEmailTextBodyNotMatchesRegex($email, 'Link for Activate your account: https://mysuperwebapplication/activate/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}/');
     }
 }

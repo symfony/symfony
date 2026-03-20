@@ -65,6 +65,38 @@ trait MailerAssertionsTrait
         self::assertThat($email, new LogicalNot(new MimeConstraint\EmailHtmlBodyContains($text)), $message);
     }
 
+    public static function assertEmailTextBodyMatchesRegex(RawMessage $email, string $regex, string $message = ''): void
+    {
+        if (!class_exists(MimeConstraint\EmailTextBodyMatchesRegex::class)) {
+            throw new \LogicException('The `assertEmailTextBodyMatchesRegex` method requires symfony/mime >= 8.1.');
+        }
+        self::assertThat($email, new MimeConstraint\EmailTextBodyMatchesRegex($regex), $message);
+    }
+
+    public static function assertEmailTextBodyNotMatchesRegex(RawMessage $email, string $regex, string $message = ''): void
+    {
+        if (!class_exists(MimeConstraint\EmailTextBodyMatchesRegex::class)) {
+            throw new \LogicException('The `assertEmailTextBodyNotMatchesRegex` method requires symfony/mime >= 8.1.');
+        }
+        self::assertThat($email, new LogicalNot(new MimeConstraint\EmailTextBodyMatchesRegex($regex)), $message);
+    }
+
+    public static function assertEmailHtmlBodyMatchesRegex(RawMessage $email, string $regex, string $message = ''): void
+    {
+        if (!class_exists(MimeConstraint\EmailHtmlBodyMatchesRegex::class)) {
+            throw new \LogicException('The `assertEmailHtmlBodyMatchesRegex` method requires symfony/mime >= 8.1.');
+        }
+        self::assertThat($email, new MimeConstraint\EmailHtmlBodyMatchesRegex($regex), $message);
+    }
+
+    public static function assertEmailHtmlBodyNotMatchesRegex(RawMessage $email, string $regex, string $message = ''): void
+    {
+        if (!class_exists(MimeConstraint\EmailHtmlBodyMatchesRegex::class)) {
+            throw new \LogicException('The `assertEmailHtmlBodyNotMatchesRegex` method requires symfony/mime >= 8.1.');
+        }
+        self::assertThat($email, new LogicalNot(new MimeConstraint\EmailHtmlBodyMatchesRegex($regex)), $message);
+    }
+
     public static function assertEmailHasHeader(RawMessage $email, string $headerName, string $message = ''): void
     {
         self::assertThat($email, new MimeConstraint\EmailHasHeader($headerName), $message);

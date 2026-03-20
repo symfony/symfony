@@ -507,6 +507,39 @@ class ObjectNormalizerTest extends TestCase
         $this->assertSame('foo', $obj->items[0]->name);
     }
 
+    public function testCollectionPropertyTypeNotOverriddenByMixedConstructorParameterType()
+    {
+        $extractor = new class implements PropertyTypeExtractorInterface {
+            public function getTypes(string $class, string $property, array $context = []): ?array
+            {
+                return null;
+            }
+
+            public function getType(string $class, string $property, array $context = []): ?Type
+            {
+                if (MixedArrayWithObjectsDummy::class === $class && 'items' === $property) {
+                    return Type::array(Type::object(MixedArrayItemDummy::class));
+                }
+
+                return null;
+            }
+        };
+
+        $normalizer = new ObjectNormalizer(null, null, null, $extractor);
+        $serializer = new Serializer([new ArrayDenormalizer(), $normalizer]);
+        $normalizer->setSerializer($serializer);
+
+        $obj = $normalizer->denormalize(
+            ['items' => [['name' => 'foo']]],
+            MixedArrayWithObjectsDummy::class,
+        );
+
+        $this->assertInstanceOf(MixedArrayWithObjectsDummy::class, $obj);
+        $this->assertCount(1, $obj->items);
+        $this->assertInstanceOf(MixedArrayItemDummy::class, $obj->items[0]);
+        $this->assertSame('foo', $obj->items[0]->name);
+    }
+
     public function testConstructorWithObjectTypeHintDenormalize()
     {
         $data = [
@@ -2355,4 +2388,21 @@ class NullableArrayItemDummy
 class ObjectTypedDummy
 {
     public string $name;
+}
+
+class MixedArrayWithObjectsDummy
+{
+    public function __construct(
+        /** @var MixedArrayItemDummy[] */
+        public mixed $items = null,
+    ) {
+    }
+}
+
+class MixedArrayItemDummy
+{
+    public function __construct(
+        public string $name,
+    ) {
+    }
 }

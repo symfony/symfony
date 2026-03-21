@@ -25,6 +25,8 @@ use Psr\Log\LogLevel;
 use Symfony\Component\DependencyInjection\Argument\LazyClosure;
 use Symfony\Component\ErrorHandler\Internal\TentativeTypes;
 use Symfony\Component\VarExporter\LazyObjectInterface;
+use Symfony\Contracts\Deprecation\IssueTriggerContextInterface;
+use Symfony\Contracts\Deprecation\IssueTriggerContextProvider;
 
 /**
  * Autoloader checking if the class is really defined in the file found.
@@ -53,7 +55,7 @@ use Symfony\Component\VarExporter\LazyObjectInterface;
  * @author Nicolas Grekas <p@tchwork.com>
  * @author Guilhem Niot <guilhem.niot@gmail.com>
  */
-class DebugClassLoader
+class DebugClassLoader implements IssueTriggerContextProvider
 {
     private const SPECIAL_RETURN_TYPES = [
         'void' => 'void',
@@ -164,6 +166,8 @@ class DebugClassLoader
      */
     private static array $vendorPrefixCache = [];
 
+    private ?DebugClassLoaderDeprecationNotice $currentDeprecationNotice = null;
+
     public function __construct(callable $classLoader)
     {
         $this->classLoader = $classLoader;
@@ -206,6 +210,11 @@ class DebugClassLoader
     public function getClassLoader(): callable
     {
         return $this->classLoader;
+    }
+
+    public function getIssueTriggerContext(): ?IssueTriggerContextInterface
+    {
+        return $this->currentDeprecationNotice;
     }
 
     /**
@@ -385,9 +394,11 @@ class DebugClassLoader
 
             $deprecations = $this->checkAnnotations($refl, $name);
 
-            foreach ($deprecations as $message) {
-                @trigger_error($message, \E_USER_DEPRECATED);
+            foreach ($deprecations as $deprecation) {
+                $this->currentDeprecationNotice = $deprecation;
+                @trigger_error((string) $deprecation, \E_USER_DEPRECATED);
             }
+            $this->currentDeprecationNotice = null;
         }
 
         if (!$file) {
@@ -407,6 +418,9 @@ class DebugClassLoader
         }
     }
 
+    /**
+     * @return list<DebugClassLoaderDeprecationNotice>
+     */
     public function checkAnnotations(\ReflectionClass $refl, string $class): array
     {
         if (
@@ -464,7 +478,7 @@ class DebugClassLoader
             }
 
             if (isset(self::$final[$parent])) {
-                $deprecations[] = \sprintf('The "%s" class is considered final%s It may change without further notice as of its next major version. You should not extend it from "%s".', $parent, self::$final[$parent], $className);
+                $deprecations[] = new DebugClassLoaderDeprecationNotice(\sprintf('The "%s" class is considered final%s It may change without further notice as of its next major version. You should not extend it from "%s".', $parent, self::$final[$parent], $className), $class, $parent);
             }
         }
 
@@ -486,10 +500,10 @@ class DebugClassLoader
                 $type = class_exists($class, false) ? 'class' : (interface_exists($class, false) ? 'interface' : 'trait');
                 $verb = class_exists($use, false) || interface_exists($class, false) ? 'extends' : (interface_exists($use, false) ? 'implements' : 'uses');
 
-                $deprecations[] = \sprintf('The "%s" %s %s "%s" that is deprecated%s', $className, $type, $verb, $use, self::$deprecated[$use]);
+                $deprecations[] = new DebugClassLoaderDeprecationNotice(\sprintf('The "%s" %s %s "%s" that is deprecated%s', $className, $type, $verb, $use, self::$deprecated[$use]), $class, $use);
             }
             if (isset(self::$internal[$use]) && !$this->areFromTheSameVendor($class, $use)) {
-                $deprecations[] = \sprintf('The "%s" %s is considered internal%s It may change without further notice. You should not use it from "%s".', $use, class_exists($use, false) ? 'class' : (interface_exists($use, false) ? 'interface' : 'trait'), self::$internal[$use], $className);
+                $deprecations[] = new DebugClassLoaderDeprecationNotice(\sprintf('The "%s" %s is considered internal%s It may change without further notice. You should not use it from "%s".', $use, class_exists($use, false) ? 'class' : (interface_exists($use, false) ? 'interface' : 'trait'), self::$internal[$use], $className), $class, $use);
             }
             if (isset(self::$method[$use])) {
                 if ($refl->isAbstract() || $refl->isInterface()) {
@@ -517,7 +531,7 @@ class DebugClassLoader
                         }
                         $realName = substr($name, 0, strpos($name, '('));
                         if (!$refl->hasMethod($realName) || !($methodRefl = $refl->getMethod($realName))->isPublic() || ($static xor $methodRefl->isStatic())) {
-                            $deprecations[] = \sprintf('Class "%s" should implement method "%s::%s%s"%s', $className, ($static ? 'static ' : '').$interface, $name, $returnType ? ': '.$returnType : '', null === $description ? '.' : ': '.$description);
+                            $deprecations[] = new DebugClassLoaderDeprecationNotice(\sprintf('Class "%s" should implement method "%s::%s%s"%s', $className, ($static ? 'static ' : '').$interface, $name, $returnType ? ': '.$returnType : '', null === $description ? '.' : ': '.$description), $class, $interface);
                         }
                     }
                 }
@@ -575,13 +589,13 @@ class DebugClassLoader
 
             if ($parent && isset(self::$finalMethods[$parent][$method->name])) {
                 [$declaringClass, $message] = self::$finalMethods[$parent][$method->name];
-                $deprecations[] = \sprintf('The "%s::%s()" method is considered final%s It may change without further notice as of its next major version. You should not extend it from "%s".', $declaringClass, $method->name, $message, $className);
+                $deprecations[] = new DebugClassLoaderDeprecationNotice(\sprintf('The "%s::%s()" method is considered final%s It may change without further notice as of its next major version. You should not extend it from "%s".', $declaringClass, $method->name, $message, $className), $class, $declaringClass);
             }
 
             if (isset(self::$internalMethods[$class][$method->name])) {
                 [$declaringClass, $message] = self::$internalMethods[$class][$method->name];
                 if (!$this->areFromTheSameVendor($traitClass ?? $class, $declaringClass)) {
-                    $deprecations[] = \sprintf('The "%s::%s()" method is considered internal%s It may change without further notice. You should not extend it from "%s".', $declaringClass, $method->name, $message, $className);
+                    $deprecations[] = new DebugClassLoaderDeprecationNotice(\sprintf('The "%s::%s()" method is considered internal%s It may change without further notice. You should not extend it from "%s".', $declaringClass, $method->name, $message, $className), $class, $declaringClass);
                 }
             }
 
@@ -600,7 +614,7 @@ class DebugClassLoader
 
                 foreach (self::$annotatedParameters[$class][$method->name] as $parameterName => $deprecation) {
                     if (!isset($definedParameters[$parameterName]) && !isset($doc['param'][$parameterName])) {
-                        $deprecations[] = \sprintf($deprecation, $className);
+                        $deprecations[] = new DebugClassLoaderDeprecationNotice(\sprintf($deprecation, $className), $class, null);
                     }
                 }
             }
@@ -636,7 +650,7 @@ class DebugClassLoader
                     if ('docblock' === $this->patchTypes['force']) {
                         $this->patchMethod($method, $returnType, $declaringFile, $normalizedType);
                     } elseif ('' !== $declaringClass && $this->patchTypes['deprecations']) {
-                        $deprecations[] = \sprintf('Method "%s::%s()" might add "%s" as a native return type declaration in the future. Do the same in %s "%s" now to avoid errors or add an explicit @return annotation to suppress this message.', $declaringClass, $method->name, $normalizedType, interface_exists($declaringClass) ? 'implementation' : 'child class', $className);
+                        $deprecations[] = new DebugClassLoaderDeprecationNotice(\sprintf('Method "%s::%s()" might add "%s" as a native return type declaration in the future. Do the same in %s "%s" now to avoid errors or add an explicit @return annotation to suppress this message.', $declaringClass, $method->name, $normalizedType, interface_exists($declaringClass) ? 'implementation' : 'child class', $className), $class, $declaringClass);
                     }
                 }
             }
@@ -705,7 +719,7 @@ class DebugClassLoader
                 foreach ($parentAndOwnInterfaces as $use) {
                     if (isset(self::${$type}[$use][$r->name]) && !isset($doc['deprecated']) && ('finalConstants' === $type || substr($use, 0, strrpos($use, '\\')) !== substr($use, 0, strrpos($class, '\\')))) {
                         $msg = 'finalConstants' === $type ? '%s" constant' : '$%s" property';
-                        $deprecations[] = \sprintf('The "%s::'.$msg.' is considered final. You should not override it in "%s".', self::${$type}[$use][$r->name], $r->name, $class);
+                        $deprecations[] = new DebugClassLoaderDeprecationNotice(\sprintf('The "%s::'.$msg.' is considered final. You should not override it in "%s".', self::${$type}[$use][$r->name], $r->name, $class), $class, self::${$type}[$use][$r->name]);
                     }
                 }
 

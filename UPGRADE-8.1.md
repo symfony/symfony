@@ -96,6 +96,10 @@ Messenger
    they are routed through the normal retry/failure transport path instead
  * Add argument `$fetchSize` to `ReceiverInterface::get()` and `QueueReceiverInterface::getFromQueues()`
 
+Object Mapper
+-------------
+* Deprecate the `source` property in Map Attribute, use `sources` instead to allow multiple sources
+
 Security
 --------
 

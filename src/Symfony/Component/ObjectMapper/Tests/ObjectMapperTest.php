@@ -80,9 +80,11 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\MapTargetToSource\B as MapTarg
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleSourceProperty\A as MultipleSourcePropertyA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleSourceProperty\B as MultipleSourcePropertyB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleSourceProperty\C as MultipleSourcePropertyC;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleSourceProperty\D as MultipleSourcePropertyD;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\A as MultipleTargetPropertyA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\B as MultipleTargetPropertyB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\C as MultipleTargetPropertyC;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\D as MultipleTargetPropertyD;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargets\A as MultipleTargetsA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargets\C as MultipleTargetsC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MyProxy;
@@ -125,6 +127,9 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformC
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformCollection\TransformCollectionD;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformMultiSource\MultiplePropertiesClass as MultiSourceMultiPropClass;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformMultiSource\SourceClass as MultiSourceSourceClass;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\TransformMultiSource\TargetClass as MultiSourceTargetClass;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 final class ObjectMapperTest extends TestCase
@@ -691,6 +696,93 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame(49.99, $target->items[1]->amount);
     }
 
+    public function testMapCollectionWithMerging()
+    {
+        $source = new NestedCollectionOrderSource();
+        $source->items = [
+            new LineItemSource('Product B', 10, 49.90),
+            new LineItemSource('Product C', 2, 11.98),
+        ];
+
+        $target = new NestedCollectionOrderTarget();
+        $target->items = [
+            new LineItemTarget('Product A', 1, 5.99),
+            new LineItemTarget('Product B', 1, 4.99),
+        ];
+
+        $mapper = new ObjectMapper();
+        $mapper->map($source, $target);
+
+        $this->assertInstanceOf(NestedCollectionOrderTarget::class, $target);
+        $this->assertCount(2, $target->items);
+        $this->assertInstanceOf(LineItemTarget::class, $target->items[0]);
+        $this->assertInstanceOf(LineItemTarget::class, $target->items[1]);
+
+        $this->assertSame('Product B', $target->items[0]->productName);
+        $this->assertSame(10, $target->items[0]->quantity);
+        $this->assertSame(49.90, $target->items[0]->amount);
+
+        $this->assertSame('Product C', $target->items[1]->productName);
+        $this->assertSame(2, $target->items[1]->quantity);
+        $this->assertSame(11.98, $target->items[1]->amount);
+
+        $sourceWithKeys = new NestedCollectionOrderSource();
+        $sourceWithKeys->items = [
+            'a' => new LineItemTarget('Product A', 1, 5.99),
+            'b' => new LineItemSource('Product B', 10, 49.90),
+            'c' => new LineItemSource('Product C', 2, 11.98),
+        ];
+
+        $targetWithKeys = new NestedCollectionOrderTarget();
+        $targetWithKeys->items = [
+            'a' => new LineItemTarget('Product A', 1, 6.50),
+            'b' => new LineItemTarget('Product B', 1, 4.99),
+        ];
+
+        $mapper = new ObjectMapper();
+        $mapper->map($sourceWithKeys, $targetWithKeys);
+
+        $this->assertInstanceOf(NestedCollectionOrderTarget::class, $targetWithKeys);
+        $this->assertCount(3, $targetWithKeys->items);
+        $this->assertInstanceOf(LineItemTarget::class, $targetWithKeys->items['a']);
+        $this->assertInstanceOf(LineItemTarget::class, $targetWithKeys->items['b']);
+        $this->assertInstanceOf(LineItemTarget::class, $targetWithKeys->items['c']);
+
+        $this->assertSame('Product A', $targetWithKeys->items['a']->productName);
+        $this->assertSame(1, $targetWithKeys->items['a']->quantity);
+        $this->assertSame(5.99, $targetWithKeys->items['a']->amount);
+
+        $this->assertSame('Product B', $targetWithKeys->items['b']->productName);
+        $this->assertSame(10, $targetWithKeys->items['b']->quantity);
+        $this->assertSame(49.90, $targetWithKeys->items['b']->amount);
+
+        $this->assertSame('Product C', $targetWithKeys->items['c']->productName);
+        $this->assertSame(2, $targetWithKeys->items['c']->quantity);
+        $this->assertSame(11.98, $targetWithKeys->items['c']->amount);
+    }
+
+    public function testMultipleSourcesMapping()
+    {
+        $source = new MultiSourceSourceClass();
+
+        $mapper = new ObjectMapper();
+        $target = $mapper->map($source, MultiSourceTargetClass::class);
+        $this->assertInstanceOf(MultiSourceTargetClass::class, $target);
+        $this->assertInstanceOf(MultiSourceMultiPropClass::class, $target->multiplePropertiesClass);
+        $this->assertSame('foo', $target->multiplePropertiesClass->foo);
+        $this->assertSame('bar', $target->multiplePropertiesClass->bar);
+
+        $target = new MultiSourceTargetClass(
+            new MultiSourceMultiPropClass('baz', 'qux')
+        );
+
+        $mapper->map($source, $target);
+        $this->assertInstanceOf(MultiSourceTargetClass::class, $target);
+        $this->assertInstanceOf(MultiSourceMultiPropClass::class, $target->multiplePropertiesClass);
+        $this->assertSame('foo', $target->multiplePropertiesClass->foo);
+        $this->assertSame('bar', $target->multiplePropertiesClass->bar);
+    }
+
     public function testEmbedsAreLazyLoadedByDefault()
     {
         $mapper = new ObjectMapper();
@@ -846,14 +938,48 @@ final class ObjectMapperTest extends TestCase
         );
     }
 
-    public function testMultipleTargetsWithoutConditionThrowsExceptionWhenNoTargetProvided()
+    public function testMultipleSourcesWithoutConditionThrowsExceptionWhenDuplicateSourceTargetComboProvided()
     {
         $this->expectException(MappingException::class);
         $this->expectExceptionMessage('Ambiguous mapping');
 
-        $source = new MultipleTargetPropertyA();
+        $source = new MultipleSourcePropertyB();
+
+        $mapper = new ObjectMapper();
+        $mapper->map($source, MultipleSourcePropertyD::class);
+    }
+
+    public function testMultipleSourcesWithoutDuplicateSourceTargetDoesNotThrowException()
+    {
+        $source = new MultipleSourcePropertyB();
+
+        $mapper = new ObjectMapper();
+        $target = $mapper->map($source, MultipleSourcePropertyA::class);
+
+        $this->assertInstanceOf(MultipleSourcePropertyA::class, $target);
+        $this->assertEquals('test', $target->something);
+        $this->assertEquals('TEST', $target->somethingOther);
+    }
+
+    public function testMultipleTargetsWithoutConditionThrowsExceptionWhenDuplicateSourceTargetComboProvided()
+    {
+        $this->expectException(MappingException::class);
+        $this->expectExceptionMessage('Ambiguous mapping');
+
+        $source = new MultipleTargetPropertyD();
         $mapper = new ObjectMapper();
         $mapper->map($source);
+    }
+
+    public function testMultipleTargetsWithoutDuplicateSourcetargetDoesNotThrowException()
+    {
+        $source = new MultipleTargetPropertyA();
+        $mapper = new ObjectMapper();
+        $target = $mapper->map($source);
+
+        $this->assertInstanceOf(MultipleTargetPropertyB::class, $target);
+        $this->assertEquals('TEST', $target->foo);
+        $this->assertEquals('testother', $target->otherFoo);
     }
 
     public function testConditionalMappingAppliedToConstructorArguments()

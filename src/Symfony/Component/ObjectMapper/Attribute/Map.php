@@ -27,7 +27,9 @@ class Map
      */
     public function __construct(
         public readonly ?string $target = null,
+        /** @deprecated since Symfony 8.1, use "sources" instead */
         public readonly ?string $source = null,
+        public readonly array $sources = [],
         public readonly mixed $if = null,
         public readonly mixed $transform = null,
     ) {

@@ -38,7 +38,13 @@ final class ReflectionObjectMapperMetadataFactory implements ObjectMapperMetadat
             $mappings = [];
             foreach ($attributes as $attribute) {
                 $map = $attribute->newInstance();
-                $mappings[] = new Mapping($map->target, $map->source, $map->if, $map->transform);
+
+                $sources = [];
+                if ($map->sources || $map->source) {
+                    $sources = $map->sources ?: [$map->source];
+                }
+
+                $mappings[] = new Mapping($map->target, null, $sources, $map->if, $map->transform);
             }
 
             return $this->attributesCache[$key] = $mappings;

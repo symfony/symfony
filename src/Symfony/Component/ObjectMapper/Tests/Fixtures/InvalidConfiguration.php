@@ -16,7 +16,7 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 #[Map(D::class)]
 class InvalidConfiguration
 {
-    public function __construct(#[Map('baz')] public readonly string $foo, #[Map(transform: 'wrongMethod')] public readonly string $bar)
+    public function __construct(#[Map('baz')] public readonly string $foo, #[Map(transform: 'wrongMethod')] public readonly string $bat)
     {
     }
 }

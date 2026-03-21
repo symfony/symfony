@@ -11,6 +11,8 @@ CHANGELOG
  * Add `SourceClass`, `ClassRule`, and `ClassRuleList` condition callables to match mapping rules based on source/target class
  * Allow `TargetClass` and `SourceClass` to accept arrays of class FQDNs
  * Add `IsNotNull` built-in condition to skip mapping when a source property value is null
+ * Add full source-based Map support
+ * Allow for merging mappings for standalone objects and iterable
 
 7.4
 ---

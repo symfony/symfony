@@ -26,5 +26,5 @@ interface TransformCallableInterface
      * @param T       $source The object we're working on
      * @param T2|null $target The target we're mapping to
      */
-    public function __invoke(mixed $value, object $source, ?object $target): mixed;
+    public function __invoke(mixed $value, object $source, ?object $target, mixed $targetValue): mixed;
 }

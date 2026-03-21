@@ -15,7 +15,7 @@ use Symfony\Component\ObjectMapper\TransformCallableInterface;
 
 class TransformToString implements TransformCallableInterface
 {
-    public function __invoke(mixed $value, object $source, ?object $target): mixed
+    public function __invoke(mixed $value, object $source, ?object $target, mixed $targetValue): mixed
     {
         return 'str';
     }

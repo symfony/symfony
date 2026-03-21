@@ -38,7 +38,7 @@ class MapCollection implements TransformCallableInterface, ObjectMapperAwareInte
         return $clone;
     }
 
-    public function __invoke(mixed $value, object $source, ?object $target): mixed
+    public function __invoke(mixed $value, object $source, ?object $target, mixed $targetValue): mixed
     {
         if (!is_iterable($value)) {
             throw new MappingException(\sprintf('The MapCollection transform expects an iterable, "%s" given.', get_debug_type($value)));
@@ -47,7 +47,9 @@ class MapCollection implements TransformCallableInterface, ObjectMapperAwareInte
         $objectMapper = $this->objectMapper ??= new ObjectMapper();
         $values = [];
         foreach ($value as $k => $v) {
-            $values[$k] = $objectMapper->map($v, $this->targetClass);
+            $values[$k] = isset($targetValue[$k])
+                ? $objectMapper->map($v, $targetValue[$k])
+                : $objectMapper->map($v, $this->targetClass);
         }
 
         return $values;

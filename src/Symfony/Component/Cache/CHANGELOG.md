@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `MemoryAwareArrayAdapter` for in-memory non-serialized caching with memory aware LRU eviction policy 
+   for long-running processes like MQ workers, swoole, FrankenPHP etc.
+
 8.0
 ---
 

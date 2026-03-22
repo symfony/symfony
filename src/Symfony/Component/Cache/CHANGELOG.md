@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `InMemoryLRUCache` for in-memory caching with LRU eviction policy for long-running processes like workers, swoole, frankenPHP
+
 8.0
 ---
 

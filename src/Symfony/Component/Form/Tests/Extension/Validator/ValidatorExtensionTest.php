@@ -78,7 +78,7 @@ class ValidatorExtensionTest extends TestCase
             ->getValidator();
 
         // create with an early return condition
-        $extension = new ValidatorExtension($validator, false);
+        $extension = new ValidatorExtension($validator);
 
         // verify the extension is functional after an early return
         $this->assertInstanceOf(ValidatorTypeGuesser::class, $extension->loadTypeGuesser());

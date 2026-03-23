@@ -18,6 +18,7 @@ use Symfony\Component\Cache\Adapter\Psr16Adapter;
 use Symfony\Component\Cache\InMemoryLRUSimpleCache;
 use Symfony\Component\Cache\MemoryUsageCalculator;
 use Symfony\Component\Cache\Tests\Adapter\AdapterTestCase;
+use Symfony\Component\Clock\MockClock;
 
 #[Group('time-sensitive')]
 final class InMemoryLRUSimpleCacheAdapterTest extends AdapterTestCase
@@ -34,18 +35,16 @@ final class InMemoryLRUSimpleCacheAdapterTest extends AdapterTestCase
         'testNotUnserializable' => 'InMemoryLRUCache does not support serialization.',
         'testClearPrefix' => 'InMemoryLRUSimpleCache cannot clear by prefix',
         'testDefaultLifeTime' => 'InMemoryLRUSimpleCache does not allow configuring a default lifetime.',
+        'testExpiration' => 'Testing expiration slows down the test suite',
+        'testPrune' => 'Testing prune slows down the test suite',
     ];
 
     #[\Override]
     public static function setUpBeforeClass(): void
     {
-        // clock requires using `time` to time-sensitive tests
-        self::$clock = new class implements ClockInterface {
-            public function now(): \DateTimeImmutable
-            {
-                return \DateTimeImmutable::createFromTimestamp(time());
-            }
-        };
+        // load class before test to be sure that MemoryUsageCalculator is reachable
+        class_exists(InMemoryLRUSimpleCache::class);
+
         // always calculate 0 for memory usage to avoid flaky tests
         self::$memoryUsageCalculator = new class implements MemoryUsageCalculator {
             public function calculate(): int
@@ -53,17 +52,14 @@ final class InMemoryLRUSimpleCacheAdapterTest extends AdapterTestCase
                 return 0;
             }
         };
+        self::$clock = new MockClock();
+
         parent::setUpBeforeClass();
     }
 
     public function createCachePool(): CacheItemPoolInterface
     {
-        return new Psr16Adapter(
-            new InMemoryLRUSimpleCache(
-                clock: self::$clock,
-                memoryUsageCalculator: self::$memoryUsageCalculator,
-            ),
-        );
+        return new Psr16Adapter(new InMemoryLRUSimpleCache(self::$clock, self::$memoryUsageCalculator));
     }
 
     protected function isPruned(CacheItemPoolInterface $cache, string $name): bool

@@ -1,0 +1,44 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-03-21T12:58:59Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.1" but it seems your PR description refers to branch "8.1 for features / 6.4, 7.4, 8.0 for bug fixes".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by yceruto at 2026-03-21T18:34:18Z
+
+Nice! just wondering how this validation step aligns with `#[Ask]` and `#[AskChoice]` (`ValidateQuestionInputListener`) and how the violations are displayed to users?
+
+---------------------------------------------------------------------------
+
+by yceruto at 2026-03-21T19:34:27Z
+
+```bash
+> bin/console app:validated-input --email=not-an-email
+
+  Object(Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\ValidatedInput).name:
+      This value should not be blank. (code c1051bb4-d103-4f74-8988-acbcafc7fdc3)
+  Object(Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\ValidatedInput).email:
+      This value is not a valid email address. (code bd79c0ab-ddba-46cc-a703-a7a4b08de310)
+
+app:validated-input [--email EMAIL] [--] <name>
+```
+This is the current output on failures. Since the user only knows the command's arguments/options, displaying violations based on DTO properties can be confusing. Also the property names don't necessarily match the argument or option names.
+
+Is it possible to normalize the violations list and map defined arguments/options to violations? I'd also remove the uid code from the output.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-03-22T00:22:29Z
+
+@yceruto Good call, thanks! Much cleaner now
+
+<img width="1113" height="224" alt="Screenshot 2026-03-22 at 01 18 57" src="https://github.com/user-attachments/assets/215b9f89-818b-4839-9039-1b2348981f8b" />

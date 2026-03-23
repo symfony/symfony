@@ -13,7 +13,7 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
-use Symfony\Component\Cache\Adapter\InMemoryLRUSimpleCache;
+use Symfony\Component\Cache\InMemoryLRUSimpleCache;
 use Symfony\Component\Cache\MemoryUsageCalculator;
 
 final class InMemoryLRUSimpleCacheTest extends TestCase

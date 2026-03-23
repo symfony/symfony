@@ -9,13 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Adapter;
+namespace Symfony\Component\Cache;
 
 use Psr\Clock\ClockInterface;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
-use Symfony\Component\Cache\MemoryUsageCalculator;
-use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Traits\LRUCache;
 use Symfony\Component\Clock\NativeClock;
 

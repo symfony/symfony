@@ -14,8 +14,8 @@ namespace Symfony\Component\Cache\Tests\Adapter;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Clock\ClockInterface;
-use Symfony\Component\Cache\Adapter\InMemoryLRUSimpleCache;
 use Symfony\Component\Cache\Adapter\Psr16Adapter;
+use Symfony\Component\Cache\InMemoryLRUSimpleCache;
 use Symfony\Component\Cache\MemoryUsageCalculator;
 
 #[Group('time-sensitive')]

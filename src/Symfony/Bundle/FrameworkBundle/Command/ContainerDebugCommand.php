@@ -23,6 +23,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
@@ -182,6 +183,12 @@ class ContainerDebugCommand extends Command
             if (isset($options['id']) && isset($kernel->getContainer()->getRemovedIds()[$options['id']])) {
                 $errorIo->note(\sprintf('The "%s" service or alias has been removed or inlined when the container was compiled.', $options['id']));
             }
+        } catch (ParameterNotFoundException $e) {
+            if (isset($options['parameter']) && $options['parameter'] === $e->getKey()) {
+                throw new InvalidArgumentException(\sprintf('You have requested a non-existent parameter "%s".', $options['parameter']));
+            }
+
+            throw $e;
         } catch (ServiceNotFoundException $e) {
             if ('' !== $e->getId() && '@' === $e->getId()[0]) {
                 throw new ServiceNotFoundException($e->getId(), $e->getSourceId(), null, [substr($e->getId(), 1)]);

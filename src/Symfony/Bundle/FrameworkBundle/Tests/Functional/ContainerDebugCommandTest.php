@@ -426,6 +426,34 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         ];
     }
 
+    public function testNonExistentParameterDisplaysClearErrorMessage()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:container', '--parameter' => '.non_existent_build_parameter']);
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $this->assertStringContainsString('You have requested a non-existent parameter ".non_existent_build_parameter".', $tester->getDisplay());
+    }
+
+    public function testNonExistentRegularParameterDisplaysClearErrorMessage()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:container', '--parameter' => 'non_existent_parameter']);
+
+        $this->assertSame(1, $tester->getStatusCode());
+        $this->assertStringContainsString('You have requested a non-existent parameter "non_existent_parameter".', $tester->getDisplay());
+    }
+
     private function runDecorationStackWithFormat(string $format): string
     {
         static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml']);

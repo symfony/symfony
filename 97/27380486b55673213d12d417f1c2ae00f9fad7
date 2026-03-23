@@ -1,0 +1,14 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-03-20T13:03:53Z
+
+Why is this PR doing a change in the Serializer component as well ? Do you have unrelated commits in your branch ?
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-20T13:49:41Z
+
+> Why is this PR doing a change in the Serializer component as well ? Do you have unrelated commits in your branch ?
+
+@stof
+You're absolutely right, thanks for catching this! I had an unrelated commit in my branch. I've rebased to remove it. Sorry for the confusion, and thank you for taking the time to review!

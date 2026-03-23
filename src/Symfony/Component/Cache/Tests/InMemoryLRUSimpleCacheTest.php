@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Tests\Adapter;
+namespace Symfony\Component\Cache\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
@@ -223,39 +223,37 @@ final class InMemoryLRUSimpleCacheTest extends TestCase
             hardMemoryLimit: 350,
         );
 
-        // set the cache itself to read estimated memory as if it were measuring actual memory usage
-        $memoryUsageCalculator->setCache($cache);
-
-        $cache->set('a', new \stdClass()); // 34
+        $memoryUsageCalculator->advance(30);
+        $cache->set('a', new \stdClass());
         $this->assertNotNull($cache->get('a'));
 
-        $cache->set('b', new \stdClass()); // 68
+        $memoryUsageCalculator->advance(30);
+        $cache->set('b', new \stdClass());
         $this->assertNotNull($cache->get('a'));
         $this->assertNotNull($cache->get('b'));
 
-        $cache->set('c', new \stdClass()); // 102
+        $memoryUsageCalculator->advance(30);
+        $cache->set('c', new \stdClass());
         $this->assertNotNull($cache->get('a'));
         $this->assertNotNull($cache->get('b'));
         $this->assertNotNull($cache->get('c'));
 
-        $cache->set('d', new \stdClass()); // 136
+        $memoryUsageCalculator->advance(30);
+        $cache->set('d', new \stdClass());
         $this->assertNotNull($cache->get('a'));
         $this->assertNotNull($cache->get('b'));
         $this->assertNotNull($cache->get('c'));
         $this->assertNotNull($cache->get('d'));
 
         $this->assertLessThanOrEqual(
-            150,
-            self::readProperty($cache, 'estimatedMemory'),
+            120,
+            $memoryUsageCalculator->calculate(),
         );
 
-        $cache->set(
-            'e',
-            (object) [
-                'Name' => 'Test',
-                'Last' => 'Tests',
-            ],
-        ); // +115 => 251 -> soft eviction started => 217 (251 - 34)
+        // simulate large object creation + 131 => 120 + 131 = 251 -> soft eviction started (251-30)
+        $memoryUsageCalculator->advance(131);
+        $memoryUsageCalculator->advanceOnConsecutiveCalculationCalls(0, 0, 0, -30);
+        $cache->set('e', new \stdClass());
         $this->assertNull($cache->get('a'));
         $this->assertNotNull($cache->get('b'));
         $this->assertNotNull($cache->get('c'));
@@ -264,10 +262,12 @@ final class InMemoryLRUSimpleCacheTest extends TestCase
 
         $this->assertLessThanOrEqual(
             250,
-            self::readProperty($cache, 'estimatedMemory'),
+            $memoryUsageCalculator->calculate(),
         );
 
-        $cache->set('f', new \stdClass()); // +34 => 251 => soft eviction => 217
+        $memoryUsageCalculator->advance(30);
+        $memoryUsageCalculator->advanceOnConsecutiveCalculationCalls(0, 0, 0, -30);
+        $cache->set('f', new \stdClass()); // +30 => 251 => soft eviction started again
         $this->assertNull($cache->get('b'));
         $this->assertNotNull($cache->get('c'));
         $this->assertNotNull($cache->get('d'));
@@ -276,19 +276,13 @@ final class InMemoryLRUSimpleCacheTest extends TestCase
 
         $this->assertLessThanOrEqual(
             250,
-            self::readProperty($cache, 'estimatedMemory'),
+            $memoryUsageCalculator->calculate(),
         );
 
-        // large object + 232 => 217 + 232 = 449 -> hard eviction started
-        $cache->set(
-            'g',
-            (object) [
-                'Name' => 'Test',
-                'Surname' => 'Testing',
-                'Reason' => 'Mandatory',
-                'Dimension' => 'Relative',
-            ],
-        );
+        // large object + 230 => 221 + 230 = 451 -> hard eviction started
+        $memoryUsageCalculator->advance(230);
+        $memoryUsageCalculator->advanceOnConsecutiveCalculationCalls(0, -30, -30, -131, -30);
+        $cache->set('g', new \stdClass());
         $this->assertNull($cache->get('c'));
         $this->assertNull($cache->get('d'));
         $this->assertNull($cache->get('e'));
@@ -297,16 +291,8 @@ final class InMemoryLRUSimpleCacheTest extends TestCase
 
         $this->assertLessThanOrEqual(
             250,
-            self::readProperty($cache, 'estimatedMemory'),
+            $memoryUsageCalculator->calculate(),
         );
-    }
-
-    public static function readProperty(object $instance, string $property): mixed
-    {
-        $newScope = $instance::class;
-        $invoker = static fn ($instance) => $instance->{$property};
-
-        return \Closure::bind($invoker, null, $newScope)($instance);
     }
 
     private function createCache(
@@ -350,20 +336,28 @@ final class InMemoryLRUSimpleCacheTest extends TestCase
     private function memoryUsageCalculator(): MemoryUsageCalculator
     {
         return new class implements MemoryUsageCalculator {
-            private ?InMemoryLRUSimpleCache $cache = null;
+            private int $estimatedMemory = 0;
 
-            public function setCache(InMemoryLRUSimpleCache $cache): void
+            private array $consecutiveCalculations = [];
+
+            public function advance(int $size): void
             {
-                $this->cache = $cache;
+                $this->estimatedMemory += $size;
+            }
+
+            public function advanceOnConsecutiveCalculationCalls(int ...$sizes): void
+            {
+                array_push($this->consecutiveCalculations, ...$sizes);
             }
 
             public function calculate(): int
             {
-                if (null === $this->cache) {
-                    return 0;
+                $advancedSize = array_shift($this->consecutiveCalculations);
+                if (null !== $advancedSize) {
+                    $this->estimatedMemory += $advancedSize;
                 }
 
-                return InMemoryLRUSimpleCacheTest::readProperty($this->cache, 'estimatedMemory');
+                return $this->estimatedMemory;
             }
         };
     }

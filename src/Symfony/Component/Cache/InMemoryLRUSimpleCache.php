@@ -56,6 +56,7 @@ final class InMemoryLRUSimpleCache implements CacheInterface, PruneableInterface
     public function set($key, $value, $ttl = null): bool
     {
         $this->assertValidKey($key);
+        $this->assertValidValue($value);
 
         $this->doSet((string) $key, $value, $this->clock->now(), $this->normalizeTtl($ttl));
 
@@ -152,6 +153,13 @@ final class InMemoryLRUSimpleCache implements CacheInterface, PruneableInterface
 
         if (preg_match('#[{}()/\\\\@:]#', (string) $key)) {
             throw new InvalidArgumentException('Invalid key characters - Key: '.$key);
+        }
+    }
+
+    private function assertValidValue(mixed $value): void
+    {
+        if ($value instanceof \Closure) {
+            throw new InvalidArgumentException('Closures cannot be cached.');
         }
     }
 }

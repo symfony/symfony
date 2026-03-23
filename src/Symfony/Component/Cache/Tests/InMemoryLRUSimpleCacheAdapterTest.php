@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Symfony\Component\Cache\Tests\Adapter;
+namespace Symfony\Component\Cache\Tests;
 
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
@@ -17,6 +17,7 @@ use Psr\Clock\ClockInterface;
 use Symfony\Component\Cache\Adapter\Psr16Adapter;
 use Symfony\Component\Cache\InMemoryLRUSimpleCache;
 use Symfony\Component\Cache\MemoryUsageCalculator;
+use Symfony\Component\Cache\Tests\Adapter\AdapterTestCase;
 
 #[Group('time-sensitive')]
 final class InMemoryLRUSimpleCacheAdapterTest extends AdapterTestCase
@@ -27,7 +28,9 @@ final class InMemoryLRUSimpleCacheAdapterTest extends AdapterTestCase
 
     protected $skippedTests = [
         'testDeferredSaveWithoutCommit' => 'Assumes a shared cache which InMemoryLRUCache is not.',
+        'testHasItemReturnsFalseWhenDeferredItemIsExpired' => 'Assumes a shared cache which InMemoryLRUCache is not.',
         'testSaveWithoutExpire' => 'Assumes a shared cache which InMemoryLRUCache is not.',
+        'testGetMetadata' => 'InMemoryLRUCache does not keep metadata.',
         'testNotUnserializable' => 'InMemoryLRUCache does not support serialization.',
         'testClearPrefix' => 'InMemoryLRUSimpleCache cannot clear by prefix',
         'testDefaultLifeTime' => 'InMemoryLRUSimpleCache does not allow configuring a default lifetime.',

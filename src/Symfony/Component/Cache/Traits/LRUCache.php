@@ -15,8 +15,6 @@ use Symfony\Component\Cache\MemoryUsageCalculator;
 
 trait LRUCache
 {
-    use LRUMemoryTracker;
-
     private MemoryUsageCalculator $memoryUsageCalculator;
 
     private ?int $maxItems;
@@ -41,7 +39,6 @@ trait LRUCache
         ?int $hardMemoryLimit,
     ): void {
         $this->memoryUsageCalculator = $memoryUsageCalculator;
-
         $this->maxItems = $maxItems;
         $this->softMemoryLimit = $softMemoryLimit;
         $this->hardMemoryLimit = $hardMemoryLimit;
@@ -76,19 +73,15 @@ trait LRUCache
 
     private function doSet(string $key, mixed $value, \DateTimeImmutable $at, ?int $ttl = null): void
     {
-        $size = $this->estimateMemorySize($value);
-
         if (isset($this->map[$key])) {
             $this->remove($this->map[$key]);
         }
 
         $expiresAt = null !== $ttl ? $at->getTimestamp() + $ttl : null;
-        $node = new Node($key, $value, $size, $expiresAt);
+        $node = new Node($key, $value, $expiresAt);
         $this->addToFront($node);
         $this->map[$key] = $node;
 
-        $this->allocateMemorySize($size);
-        $this->tick($this->memoryUsageCalculator);
         $this->evictIfNeeded($at);
     }
 
@@ -106,7 +99,6 @@ trait LRUCache
         $this->map = [];
         $this->head = null;
         $this->tail = null;
-        $this->restartTracking();
     }
 
     private function isExpired(Node $node, \DateTimeImmutable $at): bool
@@ -223,7 +215,6 @@ trait LRUCache
     private function remove(Node $node): void
     {
         unset($this->map[$node->key]);
-        $this->releaseMemorySize($node->size);
         $this->unlink($node);
     }
 
@@ -281,7 +272,6 @@ final class Node
     public function __construct(
         public string $key,
         public mixed $value,
-        public int $size,
         public ?int $expiresAt,
         public ?self $prev = null,
         public ?self $next = null,

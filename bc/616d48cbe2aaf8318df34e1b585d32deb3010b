@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by LachlanArthur at 2026-03-20T17:21:19Z
+
+I've added a test that emulates the stream timeout before the headers are received, but it's not exactly the same as a real-world timeout.
+
+In the test the EventSourceHttpClient is provided with a sequence of two mocked responses. The first MockResponse throws an exception which pollutes the $lastError in the EventSourceHttpClient in a very similar way to a timeout. Then the second MockResponse is used with a zero reconnectionTime to fulfil the events.
+
+In real-life there is only a single response which is slow at sending the response headers, but I could not work out a way to use the `@group time-sensitive` clock mocking to inject a sleep at the correct place, since most of the mocks build the response bodies as arrays synchronously.

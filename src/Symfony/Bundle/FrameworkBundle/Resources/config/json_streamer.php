@@ -20,9 +20,11 @@ use Symfony\Component\JsonStreamer\Mapping\Read\AttributePropertyMetadataLoader 
 use Symfony\Component\JsonStreamer\Mapping\Read\DateTimeTypePropertyMetadataLoader as ReadDateTimeTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\Write\AttributePropertyMetadataLoader as WriteAttributePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\Write\DateTimeTypePropertyMetadataLoader as WriteDateTimeTypePropertyMetadataLoader;
+use Symfony\Component\JsonStreamer\Transformer\BcMathNumberValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\DateIntervalValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Transformer\DateTimeZoneValueObjectTransformer;
+use Symfony\Component\JsonStreamer\Transformer\GmpNumberValueObjectTransformer;
 use Symfony\Component\JsonStreamer\ValueTransformer\DateTimeToStringValueTransformer;
 use Symfony\Component\JsonStreamer\ValueTransformer\StringToDateTimeValueTransformer;
 
@@ -113,6 +115,12 @@ return static function (ContainerConfigurator $container) {
             ->tag('json_streamer.value_object_transformer')
 
         ->set('.json_streamer.value_object_transformer.date_time_zone', DateTimeZoneValueObjectTransformer::class)
+            ->tag('json_streamer.value_object_transformer')
+
+        ->set('.json_streamer.value_object_transformer.bcmath_number', BcMathNumberValueObjectTransformer::class)
+            ->tag('json_streamer.value_object_transformer')
+
+        ->set('.json_streamer.value_object_transformer.gmp_number', GmpNumberValueObjectTransformer::class)
             ->tag('json_streamer.value_object_transformer')
 
         // cache

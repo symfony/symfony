@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `BcMath\Number` value object support with `BcMathNumberValueObjectTransformer`
+ * Add `GMP` value object support with `GmpNumberValueObjectTransformer`
+
 8.1
 ---
 

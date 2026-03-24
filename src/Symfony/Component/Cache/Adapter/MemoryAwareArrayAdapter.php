@@ -26,7 +26,7 @@ final class MemoryAwareArrayAdapter implements AdapterInterface, CacheInterface,
 
     private ArrayAdapter $arrayAdapter;
 
-    private MemoryUsageCalculator $memoryUsageCalculator;
+    private ?\Closure $memoryUsageCalculator;
 
     private int $softMemoryLimit;
 
@@ -45,7 +45,7 @@ final class MemoryAwareArrayAdapter implements AdapterInterface, CacheInterface,
         string|int|null $softMemoryLimit = null,
         string|int|null $hardMemoryLimit = null,
         ?int $maxEvictionPerRun = null,
-        ?MemoryUsageCalculator $memoryUsageCalculator = null,
+        ?\Closure $memoryUsageCalculator = null,
         ?ClockInterface $clock = null,
     ) {
         if (!$softMemoryLimit && !$hardMemoryLimit) {
@@ -61,7 +61,7 @@ final class MemoryAwareArrayAdapter implements AdapterInterface, CacheInterface,
         $this->maxEvictionPerRun = $maxEvictionPerRun ?? self::MAX_EVICTION_PER_RUN;
         $this->hardMemoryLimit = self::parseMemoryLimit($hardMemoryLimit);
         $this->softMemoryLimit = self::parseMemoryLimit($softMemoryLimit);
-        $this->memoryUsageCalculator = $memoryUsageCalculator ?? new PhpMemoryUsageCalculator();
+        $this->memoryUsageCalculator = $memoryUsageCalculator;
         $this->arrayAdapter = new ArrayAdapter(
             $defaultLifetime,
             false,
@@ -160,7 +160,7 @@ final class MemoryAwareArrayAdapter implements AdapterInterface, CacheInterface,
 
     private function evictHardLimited(): void
     {
-        if (!$this->hardMemoryLimit || $this->hardMemoryLimit >= $this->memoryUsageCalculator->calculate()) {
+        if (!$this->hardMemoryLimit || $this->hardMemoryLimit >= $this->realMemoryUsage()) {
             return;
         }
 
@@ -170,7 +170,7 @@ final class MemoryAwareArrayAdapter implements AdapterInterface, CacheInterface,
 
     private function evictSoftLimited(): void
     {
-        if (!$this->softMemoryLimit || $this->softMemoryLimit >= $this->memoryUsageCalculator->calculate()) {
+        if (!$this->softMemoryLimit || $this->softMemoryLimit >= $this->realMemoryUsage()) {
             return;
         }
         $target = (int) ($this->softMemoryLimit * 0.9); // hysteresis target
@@ -183,7 +183,7 @@ final class MemoryAwareArrayAdapter implements AdapterInterface, CacheInterface,
             return;
         }
         $evicted = 0;
-        while ($target < $this->memoryUsageCalculator->calculate() && $this->maxEvictionPerRun > $evicted) {
+        while ($target < $this->realMemoryUsage() && $this->maxEvictionPerRun > $evicted) {
             if (false === $this->evictBatch($ratio)) {
                 break;
             }
@@ -220,6 +220,13 @@ final class MemoryAwareArrayAdapter implements AdapterInterface, CacheInterface,
         return $this->delete($key);
     }
 
+    private function realMemoryUsage(): int
+    {
+        $calculator = $this->memoryUsageCalculator;
+
+        return $calculator ? $calculator() : memory_get_usage(true);
+    }
+
     private static function parseMemoryLimit(string|int|null $value): int
     {
         if (null === $value || -1 === $value || '' === $value) {
@@ -243,18 +250,5 @@ final class MemoryAwareArrayAdapter implements AdapterInterface, CacheInterface,
         $value *= $multiplier;
 
         return $value;
-    }
-}
-
-interface MemoryUsageCalculator
-{
-    public function calculate(): int;
-}
-
-final class PhpMemoryUsageCalculator implements MemoryUsageCalculator
-{
-    public function calculate(): int
-    {
-        return memory_get_usage(true);
     }
 }

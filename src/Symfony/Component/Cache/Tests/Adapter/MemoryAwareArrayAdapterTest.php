@@ -15,7 +15,6 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\MemoryAwareArrayAdapter;
-use Symfony\Component\Cache\Adapter\MemoryUsageCalculator;
 use Symfony\Component\Cache\Tests\Adapter\ArrayAdapterTest;
 use Symfony\Component\Clock\MockClock;
 
@@ -71,7 +70,7 @@ class MemoryAwareArrayAdapterTest extends ArrayAdapterTest
             250,
             350,
             null,
-            $memoryUsageCalculator,
+            $memoryUsageCalculator->createCalculator(),
             new MockClock(),
         );
 
@@ -163,9 +162,9 @@ class MemoryAwareArrayAdapterTest extends ArrayAdapterTest
         );
     }
 
-    private function memoryUsageCalculator(): MemoryUsageCalculator
+    private function memoryUsageCalculator(): object
     {
-        return new class implements MemoryUsageCalculator {
+        return new class {
             private int $estimatedMemory = 0;
 
             private array $consecutiveCalculations = [];
@@ -188,6 +187,11 @@ class MemoryAwareArrayAdapterTest extends ArrayAdapterTest
                 }
 
                 return $this->estimatedMemory;
+            }
+
+            public function createCalculator(): \Closure
+            {
+                return fn () => $this->calculate();
             }
         };
     }

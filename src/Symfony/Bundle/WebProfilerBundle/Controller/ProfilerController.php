@@ -13,8 +13,10 @@ namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
+use Symfony\Bundle\WebProfilerBundle\Profiler\ProfilerDataSerializer;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -71,10 +73,7 @@ class ProfilerController
         $panel = $request->query->get('panel');
         $page = $request->query->get('page', 'home');
         $profileType = $request->query->get('type', 'request');
-
-        if ('latest' === $token && $latest = current($this->profiler->find(null, null, 1, null, null, null, null, static fn ($profile) => $profileType === $profile['virtual_type']))) {
-            $token = $latest['token'];
-        }
+        $token = $this->resolveLatestToken($token, $profileType);
 
         if (!$profile = $this->profiler->loadProfile($token)) {
             return $this->renderWithCspNonces($request, '@WebProfiler/Profiler/info.html.twig', ['about' => 'no_token', 'token' => $token, 'request' => $request, 'profile_type' => $profileType]);
@@ -114,6 +113,48 @@ class ProfilerController
             'profiler_markup_version' => 3, // 1 = original profiler, 2 = Symfony 2.8+ profiler, 3 = Symfony 6.2+ profiler
             'profile_type' => $profileType,
         ]);
+    }
+
+    /**
+     * Returns a JSON overview of a profile.
+     */
+    public function dataAction(Request $request, string $token): JsonResponse
+    {
+        $this->denyAccessIfProfilerDisabled();
+
+        $token = $this->resolveLatestToken($token, $request->query->get('type', 'request'));
+
+        if (!$profile = $this->profiler->loadProfile($token)) {
+            return new JsonResponse(['error' => \sprintf('No profile found for token "%s".', $token)], 404);
+        }
+
+        return new JsonResponse(ProfilerDataSerializer::buildOverview($profile));
+    }
+
+    /**
+     * Returns a JSON representation of a single collector's data.
+     */
+    public function collectorAction(Request $request, string $token, string $collector): JsonResponse
+    {
+        $this->denyAccessIfProfilerDisabled();
+
+        $token = $this->resolveLatestToken($token, $request->query->get('type', 'request'));
+
+        if (!$profile = $this->profiler->loadProfile($token)) {
+            return new JsonResponse(['error' => \sprintf('No profile found for token "%s".', $token)], 404);
+        }
+
+        $supported = ProfilerDataSerializer::getSupportedCollectors();
+
+        if (!\in_array($collector, $supported, true)) {
+            return new JsonResponse(['error' => \sprintf('Collector "%s" is not available as JSON. Supported collectors: %s.', $collector, implode(', ', $supported))], 404);
+        }
+
+        if (!$profile->hasCollector($collector)) {
+            return new JsonResponse(['error' => \sprintf('Collector "%s" is not available for token "%s".', $collector, $token)], 404);
+        }
+
+        return new JsonResponse(ProfilerDataSerializer::buildCollectorData($profile, $collector));
     }
 
     /**
@@ -402,6 +443,15 @@ class ProfilerController
     protected function getTemplateManager(): TemplateManager
     {
         return $this->templateManager ??= new TemplateManager($this->profiler, $this->twig, $this->templates);
+    }
+
+    private function resolveLatestToken(string $token, string $profileType): string
+    {
+        if ('latest' === $token && $latest = current($this->profiler->find(null, null, 1, null, null, null, null, static fn ($profile) => $profileType === $profile['virtual_type']))) {
+            return $latest['token'];
+        }
+
+        return $token;
     }
 
     /**

@@ -48,4 +48,10 @@ return static function (RoutingConfigurator $routes): void {
     $routes->add('_profiler_exception_css', '/{token}/exception.css')
         ->controller('web_profiler.controller.exception_panel::stylesheet')
     ;
+    $routes->add('_profiler_data', '/{token}/data.json')
+        ->controller('web_profiler.controller.profiler::dataAction')
+    ;
+    $routes->add('_profiler_collector', '/{token}/data/{collector}.json')
+        ->controller('web_profiler.controller.profiler::collectorAction')
+    ;
 };

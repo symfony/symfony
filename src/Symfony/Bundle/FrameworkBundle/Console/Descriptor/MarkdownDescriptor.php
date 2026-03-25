@@ -153,7 +153,7 @@ class MarkdownDescriptor extends Descriptor
         $this->write($title."\n".str_repeat('=', \strlen($title)));
 
         $serviceIds = isset($options['tag']) && $options['tag']
-            ? $this->sortTaggedServicesByPriority($container->findTaggedServiceIds($options['tag']))
+            ? $this->sortTaggedServicesByPriority($container->findTaggedServiceIds($options['tag']), $container)
             : $this->sortServiceIds($container->getServiceIds());
         $services = ['definitions' => [], 'aliases' => [], 'services' => []];
 

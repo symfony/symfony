@@ -88,7 +88,7 @@ class JsonDescriptor extends Descriptor
     protected function describeContainerServices(ContainerBuilder $container, array $options = []): void
     {
         $serviceIds = isset($options['tag']) && $options['tag']
-            ? $this->sortTaggedServicesByPriority($container->findTaggedServiceIds($options['tag']))
+            ? $this->sortTaggedServicesByPriority($container->findTaggedServiceIds($options['tag']), $container)
             : $this->sortServiceIds($container->getServiceIds());
         $showHidden = isset($options['show_hidden']) && $options['show_hidden'];
         $omitTags = isset($options['omit_tags']) && $options['omit_tags'];

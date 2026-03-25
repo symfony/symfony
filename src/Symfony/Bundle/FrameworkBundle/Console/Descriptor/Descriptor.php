@@ -15,6 +15,7 @@ use Symfony\Component\Config\Resource\ClassExistenceResource;
 use Symfony\Component\Console\Descriptor\DescriptorInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\Alias;
+use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Compiler\AnalyzeServiceReferencesPass;
 use Symfony\Component\DependencyInjection\Compiler\ServiceReferenceGraphEdge;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -231,21 +232,57 @@ abstract class Descriptor implements DescriptorInterface
         return $serviceIds;
     }
 
-    protected function sortTaggedServicesByPriority(array $services): array
+    protected function sortTaggedServicesByPriority(array $services, ?ContainerBuilder $container = null): array
     {
         $maxPriority = [];
         foreach ($services as $service => $tags) {
             $maxPriority[$service] = \PHP_INT_MIN;
+            $hasExplicitPriority = false;
             foreach ($tags as $tag) {
                 $currentPriority = $tag['priority'] ?? 0;
+                if (isset($tag['priority'])) {
+                    $hasExplicitPriority = true;
+                }
                 if ($maxPriority[$service] < $currentPriority) {
                     $maxPriority[$service] = $currentPriority;
+                }
+            }
+            if (!$hasExplicitPriority && null !== $container) {
+                $attributePriority = $this->getAsTaggedItemPriority($service, $container);
+                if (null !== $attributePriority) {
+                    $maxPriority[$service] = $attributePriority;
                 }
             }
         }
         uasort($maxPriority, fn ($a, $b) => $b <=> $a);
 
         return array_keys($maxPriority);
+    }
+
+    private function getAsTaggedItemPriority(string $serviceId, ContainerBuilder $container): ?int
+    {
+        if (!$container->hasDefinition($serviceId)) {
+            return null;
+        }
+
+        $definition = $container->getDefinition($serviceId);
+        $class = $definition->getClass();
+
+        try {
+            $class = $container->getParameterBag()->resolveValue($class) ?: null;
+        } catch (\Throwable) {
+            return null;
+        }
+
+        if (null === $class || !$reflector = $container->getReflectionClass($class)) {
+            return null;
+        }
+
+        foreach ($reflector->getAttributes(AsTaggedItem::class) as $attribute) {
+            return $attribute->newInstance()->priority;
+        }
+
+        return null;
     }
 
     protected function sortTagsByPriority(array $tags): array

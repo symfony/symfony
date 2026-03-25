@@ -297,7 +297,7 @@ class XmlDescriptor extends Descriptor
         $dom->appendChild($containerXML = $dom->createElement('container'));
 
         $serviceIds = $tag
-            ? $this->sortTaggedServicesByPriority($container->findTaggedServiceIds($tag))
+            ? $this->sortTaggedServicesByPriority($container->findTaggedServiceIds($tag), $container)
             : $this->sortServiceIds($container->getServiceIds());
         if ($filter) {
             $serviceIds = array_filter($serviceIds, $filter);

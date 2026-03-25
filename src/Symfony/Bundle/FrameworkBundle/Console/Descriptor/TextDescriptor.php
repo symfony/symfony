@@ -232,7 +232,7 @@ class TextDescriptor extends Descriptor
         $options['output']->title($title);
 
         $serviceIds = isset($options['tag']) && $options['tag']
-            ? $this->sortTaggedServicesByPriority($container->findTaggedServiceIds($options['tag']))
+            ? $this->sortTaggedServicesByPriority($container->findTaggedServiceIds($options['tag']), $container)
             : $this->sortServiceIds($container->getServiceIds());
         $maxTags = [];
 

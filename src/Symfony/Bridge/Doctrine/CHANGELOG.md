@@ -4,6 +4,7 @@ CHANGELOG
 8.1
 ---
 
+ * Add `#[AsDoctrineType]` attribute to auto-register custom Doctrine DBAL types
  * Add option `uid_format` to `EntityType`
  * Deprecate setting an `$aliasMap` in `RegisterMappingsPass`. Namespace aliases are no longer supported in Doctrine.
 

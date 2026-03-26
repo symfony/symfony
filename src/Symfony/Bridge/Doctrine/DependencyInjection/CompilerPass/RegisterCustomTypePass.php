@@ -40,11 +40,22 @@ final class RegisterCustomTypePass implements CompilerPassInterface
         foreach ($container->getDefinitions() as $definition) {
             $class = $definition->getClass();
 
-            if (null === $class || !class_exists($class) || !is_a($class, Type::class, true)) {
+            if (null === $class) {
                 continue;
             }
 
-            $reflectionClass = new \ReflectionClass($class);
+            $class = $container->getParameterBag()->resolveValue($class);
+
+            if (!\is_string($class)) {
+                continue;
+            }
+
+            $reflectionClass = $container->getReflectionClass($class);
+
+            if (null === $reflectionClass || !$reflectionClass->isSubclassOf(Type::class)) {
+                continue;
+            }
+
             $attributes = $reflectionClass->getAttributes(AsDoctrineType::class);
 
             if ([] === $attributes) {

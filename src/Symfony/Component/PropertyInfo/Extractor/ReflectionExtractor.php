@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\PropertyInfo\Extractor;
 
+use Symfony\Component\PropertyInfo\Attribute\WithAccessors;
+use Symfony\Component\PropertyInfo\Exception\MappingException;
 use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
@@ -85,6 +87,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
     private array $arrayMutatorPrefixesFirst;
     private array $arrayMutatorPrefixesLast;
     private TypeResolverInterface $typeResolver;
+    /** @var array<string, WithAccessors|null> */
+    private array $accessorsAttributes = [];
+    /** @var array<string, array<string, string>> */
+    private array $accessorMethodToPropertyMap = [];
 
     /**
      * @param string[]|null $mutatorPrefixes
@@ -141,7 +147,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
                 continue;
             }
 
-            $propertyName = $this->getPropertyName($reflectionMethod->name, $reflectionProperties);
+            $propertyName = $this->getPropertyName($reflectionClass, $reflectionMethod->name, $reflectionProperties);
             if (!$propertyName || isset($properties[$propertyName])) {
                 continue;
             }
@@ -160,6 +166,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             $refClass = new \ReflectionClass($class);
         } catch (\ReflectionException) {
             return null;
+        }
+
+        if (null !== $accessors = $this->getAccessorsAttribute($refClass, $property)) {
+            return $this->extractTypeFromAccessors($refClass, $class, $property, $accessors);
         }
 
         [$mutatorReflection, $prefix] = $this->getMutatorMethod($refClass, $property);
@@ -287,6 +297,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return null;
         }
 
+        if (null !== $accessors = $this->getAccessorsAttribute($refClass, $property)) {
+            return null !== $accessors->setter || null !== $accessors->adder;
+        }
+
         // First test with the camelized property name
         [$reflectionMethod] = $this->getMutatorMethod($refClass, $this->camelize($property));
         if (null !== $reflectionMethod) {
@@ -332,6 +346,12 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return null;
         }
 
+        if (null !== $methodName = $this->getAccessorsAttribute($reflClass, $property)?->getter) {
+            $method = $reflClass->getMethod($methodName);
+
+            return new PropertyReadInfo(PropertyReadInfo::TYPE_METHOD, $methodName, $this->getReadVisibilityForMethod($method), $method->isStatic(), false);
+        }
+
         $allowGetterSetter = $context['enable_getter_setter_extraction'] ?? false;
         $magicMethods = $context['enable_magic_methods_extraction'] ?? $this->magicMethodsFlags;
         $allowMagicCall = (bool) ($magicMethods & self::ALLOW_MAGIC_CALL);
@@ -375,12 +395,34 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return null;
         }
 
+        $allowAdderRemover = $context['enable_adder_remover_extraction'] ?? true;
+
+        $accessorsAttribute = $this->getAccessorsAttribute($reflClass, $property);
+        $adderAccessName = $accessorsAttribute?->adder;
+        $removerAccessName = $accessorsAttribute?->remover;
+
+        if ($allowAdderRemover && null !== $adderAccessName && null !== $removerAccessName) {
+            $adderMethod = $reflClass->getMethod($adderAccessName);
+            $removerMethod = $reflClass->getMethod($removerAccessName);
+
+            $mutator = new PropertyWriteInfo(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER);
+            $mutator->setAdderInfo(new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $adderAccessName, $this->getWriteVisibilityForMethod($adderMethod), $adderMethod->isStatic()));
+            $mutator->setRemoverInfo(new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $removerAccessName, $this->getWriteVisibilityForMethod($removerMethod), $removerMethod->isStatic()));
+
+            return $mutator;
+        }
+
+        if (null !== $methodName = $accessorsAttribute?->setter) {
+            $method = $reflClass->getMethod($methodName);
+
+            return new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $methodName, $this->getWriteVisibilityForMethod($method), $method->isStatic());
+        }
+
         $allowGetterSetter = $context['enable_getter_setter_extraction'] ?? false;
         $magicMethods = $context['enable_magic_methods_extraction'] ?? $this->magicMethodsFlags;
         $allowMagicCall = (bool) ($magicMethods & self::ALLOW_MAGIC_CALL);
         $allowMagicSet = (bool) ($magicMethods & self::ALLOW_MAGIC_SET);
         $allowConstruct = $context['enable_constructor_extraction'] ?? $this->enableConstructorExtraction;
-        $allowAdderRemover = $context['enable_adder_remover_extraction'] ?? true;
 
         $constructor = $reflClass->getConstructor();
         $errors = [];
@@ -396,19 +438,21 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $camelized = $this->camelize($property);
         $nonCamelized = ucfirst($property);
 
-        [$adderAccessName, $removerAccessName, $adderAndRemoverErrors] = $this->findAdderAndRemover($reflClass, $camelized);
-        if ($allowAdderRemover && null !== $adderAccessName && null !== $removerAccessName) {
-            $adderMethod = $reflClass->getMethod($adderAccessName);
-            $removerMethod = $reflClass->getMethod($removerAccessName);
+        if (null === $adderAccessName || null === $removerAccessName) {
+            [$adderAccessName, $removerAccessName, $adderAndRemoverErrors] = $this->findAdderAndRemover($reflClass, $camelized);
+            if ($allowAdderRemover && null !== $adderAccessName && null !== $removerAccessName) {
+                $adderMethod = $reflClass->getMethod($adderAccessName);
+                $removerMethod = $reflClass->getMethod($removerAccessName);
 
-            $mutator = new PropertyWriteInfo(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER);
-            $mutator->setAdderInfo(new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $adderAccessName, $this->getWriteVisibilityForMethod($adderMethod), $adderMethod->isStatic()));
-            $mutator->setRemoverInfo(new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $removerAccessName, $this->getWriteVisibilityForMethod($removerMethod), $removerMethod->isStatic()));
+                $mutator = new PropertyWriteInfo(PropertyWriteInfo::TYPE_ADDER_AND_REMOVER);
+                $mutator->setAdderInfo(new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $adderAccessName, $this->getWriteVisibilityForMethod($adderMethod), $adderMethod->isStatic()));
+                $mutator->setRemoverInfo(new PropertyWriteInfo(PropertyWriteInfo::TYPE_METHOD, $removerAccessName, $this->getWriteVisibilityForMethod($removerMethod), $removerMethod->isStatic()));
 
-            return $mutator;
+                return $mutator;
+            }
+
+            $errors[] = $adderAndRemoverErrors;
         }
-
-        $errors[] = $adderAndRemoverErrors;
 
         foreach ($this->mutatorPrefixes as $mutatorPrefix) {
             $methodName = $mutatorPrefix.$camelized;
@@ -648,8 +692,12 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         return null;
     }
 
-    private function getPropertyName(string $methodName, array $reflectionProperties): ?string
+    private function getPropertyName(\ReflectionClass $refClass, string $methodName, array $reflectionProperties): ?string
     {
+        if (null !== $propertyName = $this->getAccessorMethodFromAttribute($refClass, $reflectionProperties, $methodName)) {
+            return $propertyName;
+        }
+
         $pattern = implode('|', array_merge($this->accessorPrefixes, $this->mutatorPrefixes));
 
         if ('' !== $pattern && preg_match('/^('.$pattern.')(.+)$/i', $methodName, $matches)) {
@@ -851,5 +899,122 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         return PropertyWriteInfo::VISIBILITY_PUBLIC;
+    }
+
+    /**
+     * Resolves the type from the methods named by the attribute.
+     *
+     * A named method is used as is: the prefix gating and the singular/plural guessing that drive
+     * discovery must not second-guess a choice the application made explicit.
+     */
+    private function extractTypeFromAccessors(\ReflectionClass $refClass, string $class, string $property, WithAccessors $accessors): ?Type
+    {
+        if (null !== $accessors->adder) {
+            try {
+                $type = $this->typeResolver->resolve($refClass->getMethod($accessors->adder)->getParameters()[0]);
+
+                if (!$type instanceof CollectionType) {
+                    $type = $this->isNullableProperty($class, $property) ? Type::nullable(Type::list($type)) : Type::list($type);
+                }
+
+                return $type;
+            } catch (UnsupportedException) {
+            }
+        }
+
+        if (null !== $accessors->setter) {
+            try {
+                return $this->typeResolver->resolve($refClass->getMethod($accessors->setter)->getParameters()[0]);
+            } catch (UnsupportedException) {
+            }
+        }
+
+        if (null !== $accessors->getter) {
+            try {
+                return $this->typeResolver->resolve($refClass->getMethod($accessors->getter));
+            } catch (UnsupportedException) {
+            }
+        }
+
+        try {
+            return $this->typeResolver->resolve($refClass->getProperty($property));
+        } catch (\ReflectionException|UnsupportedException) {
+        }
+
+        return null;
+    }
+
+    private function getAccessorsAttribute(\ReflectionClass $refClass, string $property): ?WithAccessors
+    {
+        $propertyHash = $refClass->name.'::'.$property;
+
+        if (\array_key_exists($propertyHash, $this->accessorsAttributes)) {
+            return $this->accessorsAttributes[$propertyHash];
+        }
+
+        if (!$refClass->hasProperty($property)) {
+            if ($parentClass = $refClass->getParentClass()) {
+                return $this->accessorsAttributes[$propertyHash] = $this->getAccessorsAttribute($parentClass, $property);
+            }
+
+            return $this->accessorsAttributes[$propertyHash] = null;
+        }
+
+        $refProperty = $refClass->getProperty($property);
+
+        /** @var \ReflectionAttribute<WithAccessors> $refAttribute */
+        if (null === $refAttribute = $refProperty->getAttributes(WithAccessors::class)[0] ?? null) {
+            return $this->accessorsAttributes[$propertyHash] = null;
+        }
+
+        $accessorsAttribute = $refAttribute->newInstance();
+
+        $invalidAccessors = [];
+        foreach ([$accessorsAttribute->getter, $accessorsAttribute->setter, $accessorsAttribute->adder, $accessorsAttribute->remover] as $accessor) {
+            if (null !== $accessor && !$refClass->hasMethod($accessor)) {
+                $invalidAccessors[] = $accessor;
+            }
+        }
+
+        if ($invalidAccessors) {
+            throw new MappingException(\sprintf('Invalid #[WithAccessors] mapping on property "%s" of class "%s". The following methods are missing: "%s".', $refProperty->name, $refClass->name, implode('", "', $invalidAccessors)), $refClass->name, $invalidAccessors);
+        }
+
+        return $this->accessorsAttributes[$propertyHash] = $accessorsAttribute;
+    }
+
+    /**
+     * @param \ReflectionProperty[] $reflectionProperties
+     */
+    private function getAccessorMethodFromAttribute(\ReflectionClass $refClass, array $reflectionProperties, string $method): ?string
+    {
+        $className = $refClass->name;
+
+        if (!\array_key_exists($className, $this->accessorMethodToPropertyMap)) {
+            $map = [];
+            foreach ($reflectionProperties as $refProperty) {
+                if (null === $accessorsAttribute = $this->getAccessorsAttribute($refClass, $refProperty->name)) {
+                    continue;
+                }
+
+                foreach ([$accessorsAttribute->getter, $accessorsAttribute->setter, $accessorsAttribute->adder, $accessorsAttribute->remover] as $accessor) {
+                    if (null !== $accessor) {
+                        $map[$accessor] = $refProperty->name;
+                    }
+                }
+            }
+
+            $this->accessorMethodToPropertyMap[$className] = $map;
+        }
+
+        if (isset($this->accessorMethodToPropertyMap[$className][$method])) {
+            return $this->accessorMethodToPropertyMap[$className][$method];
+        }
+
+        if ($parentClass = $refClass->getParentClass()) {
+            return $this->getAccessorMethodFromAttribute($parentClass, $parentClass->getProperties(), $method);
+        }
+
+        return null;
     }
 }

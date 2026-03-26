@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Allow defining accessors and mutators via a `#[WithAccessors]` attribute
+
 8.1
 ---
 

@@ -34,7 +34,7 @@ final class RegisterCustomTypePass implements CompilerPassInterface
             return;
         }
 
-        /** @var array<string, array{class: class-string<Type>}> $types */
+        /** @var array<string, mixed> $types */
         $types = $container->getParameter('doctrine.dbal.connection_factory.types');
 
         foreach ($container->getDefinitions() as $definition) {

@@ -14,7 +14,8 @@ namespace Symfony\Bridge\Doctrine\Attribute;
 /**
  * Registers a custom Doctrine DBAL type automatically.
  *
- * When used on a class extending {@see \Doctrine\DBAL\Types\Type}, the type
+ * When used on a class extending {@see \Doctrine\DBAL\Types\Type} that is
+ * registered as a service (i.e. present as a container definition), the type
  * will be registered without needing manual configuration in doctrine.yaml.
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]

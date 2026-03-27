@@ -1,0 +1,49 @@
+---------------------------------------------------------------------------
+
+by samMANAGEMENT at 2025-05-07T19:59:36Z
+
+nice work!
+
+---------------------------------------------------------------------------
+
+by Oviglo at 2025-05-09T07:16:28Z
+
+> nice work!
+
+Thanks, I will writing tests
+
+---------------------------------------------------------------------------
+
+by acrobat at 2025-08-22T12:24:56Z
+
+Which tasks are still todo or how can we move this PR forward?
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-08-23T06:06:13Z
+
+As mentioned in the PR description, we would need some tests.
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2025-08-23T09:24:30Z
+
+I would really be interested in getting to know how widespread Daisy UI actually is before considering to add it to the core.
+
+---------------------------------------------------------------------------
+
+by Oviglo at 2025-09-03T12:01:05Z
+
+I'm busy right now but I promise to finish this feature soon.
+
+---------------------------------------------------------------------------
+
+by fabpot at 2025-09-04T05:34:34Z
+
+According to https://github.com/saadeghi/daisyui, it's quite popular.
+
+---------------------------------------------------------------------------
+
+by Oviglo at 2025-11-03T07:50:51Z
+
+Please, can you say me what I need to do for testing ? Html contains needed classes ?

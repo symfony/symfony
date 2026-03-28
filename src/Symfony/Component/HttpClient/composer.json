@@ -34,6 +34,8 @@
         "guzzlehttp/guzzle": "^7.10",
         "nyholm/psr7": "^1.0",
         "php-http/httplug": "^1.0|^2.0",
+        "php-standard-library/http-client": "dev-next",
+        "php-standard-library/dns": "dev-next",
         "psr/http-client": "^1.0",
         "symfony/dependency-injection": "^7.4|^8.0",
         "symfony/cache": "^7.4|^8.0",

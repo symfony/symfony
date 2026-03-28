@@ -1,0 +1,20 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-03-27T17:23:11Z
+
+Thank you!
+The PR title should be "for maintainers"?
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2026-03-28T07:41:34Z
+
+@fabpot the copilot comments does not looks that wrong, but decide on your own if it makes sense for you. I am always curious how Copilot behaves in different kind of PRs, so I requested a review
+
+---------------------------------------------------------------------------
+
+by fabpot at 2026-03-28T09:21:29Z
+
+> @fabpot the copilot comments does not looks that wrong, but decide on your own if it makes sense for you. I am always curious how Copilot behaves in different kind of PRs, so I requested a review
+
+Not everything. But it helped me clarify some language.

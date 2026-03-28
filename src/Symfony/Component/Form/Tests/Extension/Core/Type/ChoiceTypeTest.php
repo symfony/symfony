@@ -2109,6 +2109,26 @@ class ChoiceTypeTest extends BaseTypeTestCase
         $this->assertSame('choice_translation_domain', $form->children[1]->vars['translation_domain']);
     }
 
+    public function testPlaceholderUsesTranslationDomainInsteadOfChoiceTranslationDomain()
+    {
+        $form = $this->factory->create(static::TESTED_TYPE, null, [
+            'translation_domain' => 'form_domain',
+            'choices' => [
+                'choice1' => true,
+                'choice2' => false,
+            ],
+            'choice_translation_domain' => 'choice_domain',
+            'expanded' => true,
+            'required' => false,
+            'placeholder' => 'Please select',
+        ])->createView();
+
+        $this->assertCount(3, $form->children);
+        $this->assertSame('form_domain', $form->children['placeholder']->vars['translation_domain']);
+        $this->assertSame('choice_domain', $form->children[0]->vars['translation_domain']);
+        $this->assertSame('choice_domain', $form->children[1]->vars['translation_domain']);
+    }
+
     #[DataProvider('provideTrimCases')]
     public function testTrimIsDisabled($multiple, $expanded)
     {

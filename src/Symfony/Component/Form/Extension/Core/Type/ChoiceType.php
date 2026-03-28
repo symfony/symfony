@@ -437,7 +437,7 @@ class ChoiceType extends AbstractType
             'label_html' => $options['label_html'],
             'attr' => $choiceView->attr,
             'label_translation_parameters' => $choiceView->labelTranslationParameters,
-            'translation_domain' => $options['choice_translation_domain'],
+            'translation_domain' => 'placeholder' === $name ? $options['translation_domain'] : $options['choice_translation_domain'],
             'block_name' => 'entry',
         ];
 

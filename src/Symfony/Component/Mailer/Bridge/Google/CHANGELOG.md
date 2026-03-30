@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add the `gmail+api` transport, using the Gmail API with OAuth2 service account authentication
+
 4.4.0
 -----
 

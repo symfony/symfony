@@ -35,6 +35,7 @@ use Symfony\Bridge\Twig\Extension\YamlExtension;
 use Symfony\Bridge\Twig\Translation\TwigExtractor;
 use Symfony\Bundle\TwigBundle\CacheWarmer\TemplateCacheWarmer;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfigurator;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfiguratorInterface;
 use Symfony\Bundle\TwigBundle\TemplateIterator;
 use Twig\Cache\ChainCache;
 use Twig\Cache\FilesystemCache;
@@ -171,6 +172,7 @@ return static function (ContainerConfigurator $container) {
                 abstract_arg('decimal point, set in TwigExtension'),
                 abstract_arg('thousands separator, set in TwigExtension'),
             ])
+        ->alias(EnvironmentConfiguratorInterface::class, 'twig.configurator.environment')
 
         ->set('twig.runtime_loader', ContainerRuntimeLoader::class)
             ->args([abstract_arg('runtime locator')])

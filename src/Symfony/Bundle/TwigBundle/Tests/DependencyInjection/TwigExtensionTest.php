@@ -12,6 +12,7 @@
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfiguratorInterface;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 use Symfony\Bundle\TwigBundle\Tests\DependencyInjection\AcmeBundle\AcmeBundle;
@@ -184,6 +185,17 @@ class TwigExtensionTest extends TestCase
         $this->assertSame(2, $environmentConfigurator->getArgument(3));
         $this->assertSame(',', $environmentConfigurator->getArgument(4));
         $this->assertSame('.', $environmentConfigurator->getArgument(5));
+    }
+
+    public function testEnvironmentConfiguratorInterfaceAlias()
+    {
+        $container = $this->createContainer();
+        $container->registerExtension(new TwigExtension());
+        $container->loadFromExtension('twig');
+        $this->compileContainer($container);
+
+        $this->assertTrue($container->hasAlias(EnvironmentConfiguratorInterface::class));
+        $this->assertSame('twig.configurator.environment', (string) $container->getAlias(EnvironmentConfiguratorInterface::class));
     }
 
     public function testGlobalsWithDifferentTypesAndValues()

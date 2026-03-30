@@ -20,7 +20,7 @@ use Twig\Extension\CoreExtension;
  *
  * @author Christian Flothmann <christian.flothmann@xabbuh.de>
  */
-class EnvironmentConfigurator
+class EnvironmentConfigurator implements EnvironmentConfiguratorInterface
 {
     public function __construct(
         private string $dateFormat,

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `EnvironmentConfiguratorInterface` to allow decorating the Twig environment configurator via an interface
+
 8.0
 ---
 

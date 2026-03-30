@@ -1,0 +1,51 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2026-03-25T09:41:22Z
+
+According to the bug report, the 7.4 branch is affected by this bug. Please rebase your changes onto 7.4 and target that branch. If 6.4 is also affected (haven't checked), please target 6.4 instead.
+
+see https://symfony.com/doc/current/contributing/code/pull_requests.html#choose-the-right-branch
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-25T09:56:02Z
+
+@derrabus
+
+Thanks for the heads up! I've rebased the changes onto 6.4 since the bug is indeed present there as well. The PR now targets the correct branch. 👍
+
+---------------------------------------------------------------------------
+
+by derrabus at 2026-03-25T10:05:20Z
+
+We could adjust the test to expect your new exception class instead of the generic `LogicException`.
+
+https://github.com/symfony/symfony/blob/bc616d48cbe2aaf8318df34e1b585d32deb3010b/src/Symfony/Component/Dotenv/Tests/DotenvTest.php#L649-L650
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-25T11:35:45Z
+
+Thanks @derrabus for the suggestion! 👍
+
+You're absolutely right — I went a bit too fast and missed updating the test to use the new `VariableCircularReferenceException` class instead of the generic `LogicException`.
+
+I've just pushed a fix for that. Thanks for catching it!
+
+---------------------------------------------------------------------------
+
+by xabbuh at 2026-03-25T12:51:10Z
+
+@Amoifr Did you forget pushing the test update?
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-25T14:28:47Z
+
+@xabbuh You're right, I had pushed to the wrong branch by mistake. It's fixed now — the test update is there. Sorry for the confusion!
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-29T16:15:59Z
+
+Thanks @alexandre-daubois for the review! Fixed the `@author` tag. Ready for another look! 🙏

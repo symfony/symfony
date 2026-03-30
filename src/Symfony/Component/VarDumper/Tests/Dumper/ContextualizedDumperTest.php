@@ -29,9 +29,10 @@ class ContextualizedDumperTest extends TestCase
         $_ENV['SYMFONY_IDE'] = $_SERVER['SYMFONY_IDE'] = '';
         $wrappedDumper = new CliDumper('php://output');
         $wrappedDumper->setColors(true);
+        $wrappedDumper->setDisplayOptions(['fileLinkFormat' => 'file://%f#L%l']);
 
         $var = 'example';
-        $href = \sprintf('file://%s#L%s', __FILE__, 40);
+        $href = \sprintf('file://%s#L%s', __FILE__, 41);
         $dumper = new ContextualizedDumper($wrappedDumper, [new SourceContextProvider()]);
         $cloner = new VarCloner();
         $data = $cloner->cloneVar($var);

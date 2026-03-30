@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2026-03-24T13:36:04Z
+
+```
+There were 3 PHPUnit test runner warnings:
+
+1) Function trigger_deprecation cannot be configured as a deprecation trigger because it is not declared
+
+2) Method Doctrine\Deprecations\Deprecation::trigger cannot be configured as a deprecation trigger because it is not declared
+
+3) Method Doctrine\Deprecations\Deprecation::triggerIfCalledFromOutside cannot be configured as a deprecation trigger because it is not declared
+```
+
+That's a bummer. I don't think I want to maintain this configuration differently on each component. 🙈

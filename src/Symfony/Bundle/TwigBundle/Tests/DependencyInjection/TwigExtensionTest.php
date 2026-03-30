@@ -12,8 +12,8 @@
 namespace Symfony\Bundle\TwigBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
-use Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfiguratorInterface;
 use Symfony\Bundle\TwigBundle\DependencyInjection\Compiler\RuntimeLoaderPass;
+use Symfony\Bundle\TwigBundle\DependencyInjection\Configurator\EnvironmentConfiguratorInterface;
 use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
 use Symfony\Bundle\TwigBundle\Tests\DependencyInjection\AcmeBundle\AcmeBundle;
 use Symfony\Bundle\TwigBundle\Tests\TestCase;

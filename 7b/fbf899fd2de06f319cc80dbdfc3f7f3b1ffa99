@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by wazum at 2026-03-22T12:26:46Z
+
+The Psalm errors are pre-existing — they come from the same `$listener` variable in `postProcess()` where Psalm does not narrow the type through the `if (!$listener instanceof WrappedListener) { continue; }` guard. The existing calls (`$listener->getWrappedListener()`, `$listener->getPretty()`, `$listener->wasCalled()`) have the same issue and are covered by the baseline. The new lines just add more calls on the same variable in the same loop.

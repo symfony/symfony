@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by van-sprundel at 2026-03-27T14:07:45Z
+
+> 1) Symfony\Component\Cache\Tests\Adapter\FilesystemTagAwareAdapterTest::testCommitDoesNotFailWhenTagSaveFails
+Undefined property: Symfony\Component\Cache\Tests\Fixtures\FailingTagFilesystemAdapter::$rootNamespace
+>
+> /home/runner/work/symfony/symfony/src/Symfony/Component/Cache/Adapter/AbstractTagAwareAdapter.php:197
+> /home/runner/work/symfony/symfony/src/Symfony/Component/Cache/Tests/Adapter/FilesystemTagAwareAdapterTest.php:40
+
+After this it looks good for review

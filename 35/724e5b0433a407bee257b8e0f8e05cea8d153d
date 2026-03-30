@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-25T11:39:57Z
+
+Hi @carsonbot,
+
+(I've seen Terminator, I know you have to speak nicely to robots, they'll remember it when the time comes)
+
+I believe there might be an error here — this PR already targets the `6.4` branch, which is listed as one of the maintained branches (6.4, 7.4, 8.0, 8.1).
+
+The bug was introduced in 6.4.24 (via #61242), so `6.4` is the correct target branch as the oldest maintained branch where the fix applies.
+
+Could you please double-check? Thanks!
+
+---------------------------------------------------------------------------
+
+by ayyoub-afwallah at 2026-03-25T14:00:22Z
+
+> (I've seen Terminator, I know you have to speak nicely to robots, they'll remember it when the time comes)
+
+this cracked me up haha. however, carson gave u that comment becuase u were targetting 7.2, which is no longer maintained.
+
+the real issue here is that carson doesn't now how to delete its outdated comments 😔 [294](https://github.com/symfony-tools/carsonbot/pull/294) should fix it
+
+---------------------------------------------------------------------------
+
+by dpagini at 2026-03-25T20:56:27Z
+
+I actually just opened another issue #63773 but I believe this PR will also fix my problem.  👍  Thank you!
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-26T07:06:36Z
+
+@dpagini happy to read this ! :muscle:
+
+---------------------------------------------------------------------------
+
+by nitesh-voya at 2026-03-26T14:02:19Z
+
+yes this fixing for me as well. Hope to get new release soon.

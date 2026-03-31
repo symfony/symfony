@@ -55,6 +55,27 @@ use Symfony\Component\Process\Process;
 
 class ApplicationTest extends TestCase
 {
+    public function testCompleteCommandIsNotMutedByNegativeShellVerbosity()
+    {
+        putenv('SHELL_VERBOSITY=-1');
+        $_ENV['SHELL_VERBOSITY'] = '-1';
+        $_SERVER['SHELL_VERBOSITY'] = '-1';
+
+        $application = new Application();
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run([
+            'command' => '_complete',
+            '--shell' => 'bash',
+            '--api-version' => CompleteCommand::COMPLETION_API_VERSION,
+            '--current' => 1,
+            '--input' => ['bin/console'],
+        ], ['decorated' => false]);
+
+        $this->assertStringContainsString("help\n", $tester->getDisplay(true));
+    }
+
     protected static string $fixturesPath;
 
     private string|false $colSize;

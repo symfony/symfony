@@ -992,6 +992,12 @@ class Application implements ResetInterface
                 break;
         }
 
+        // Keep completion output visible even when SHELL_VERBOSITY is inherited as quiet.
+        if ('_complete' === $input->getFirstArgument()) {
+            $shellVerbosity = 0;
+            $output->setVerbosity(OutputInterface::VERBOSITY_NORMAL);
+        }
+
         if (true === $input->hasParameterOption(['--quiet', '-q'], true)) {
             $output->setVerbosity(OutputInterface::VERBOSITY_QUIET);
             $shellVerbosity = -1;

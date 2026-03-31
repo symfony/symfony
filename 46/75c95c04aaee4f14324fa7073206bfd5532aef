@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-30T13:50:41Z
+
+This doesn't look correct to me: this would allow tagged iterators under eg parameters.
+The fix would rather be in PhpFileLoader IIUC.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-03-30T14:18:57Z
+
+> This doesn't look correct to me: this would allow tagged iterators under eg parameters. The fix would rather be in PhpFileLoader IIUC.
+
+We already have `ReferenceConfigurator` and `InlineServiceConfigurator` handled at the same level. These are also not accepted as parameters.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-30T14:33:55Z
+
+Then it's quite possible that we need a fix on 6.4 derived from this PR, and another for 7.4 with a patch in PhpFileLoader.
+🤔

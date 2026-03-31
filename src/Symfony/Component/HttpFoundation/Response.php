@@ -1284,7 +1284,15 @@ class Response
      */
     public function isRedirect(?string $location = null): bool
     {
-        return \in_array($this->statusCode, [201, 204, 301, 302, 303, 307, 308]) && (null === $location ?: $location == $this->headers->get('Location'));
+        if (null === $location) {
+            if (\in_array($this->statusCode, [201, 301, 302, 303, 307, 308], true)) {
+                return true;
+            }
+
+            return 204 === $this->statusCode && null !== $this->headers->get('Location');
+        }
+
+        return \in_array($this->statusCode, [201, 204, 301, 302, 303, 307, 308], true) && $location == $this->headers->get('Location');
     }
 
     /**

@@ -916,7 +916,7 @@ class ResponseTest extends ResponseTestCase
 
     public function testIsRedirectRedirection()
     {
-        foreach ([301, 302, 303, 307] as $code) {
+        foreach ([301, 302, 303, 307, 308] as $code) {
             $response = new Response('', $code);
             $this->assertTrue($response->isRedirection());
             $this->assertTrue($response->isRedirect());
@@ -935,6 +935,14 @@ class ResponseTest extends ResponseTestCase
         $this->assertFalse($response->isRedirect());
 
         $response = new Response('', 301, ['Location' => '/good-uri']);
+        $this->assertFalse($response->isRedirect('/bad-uri'));
+        $this->assertTrue($response->isRedirect('/good-uri'));
+
+        $response = new Response('', 204);
+        $this->assertFalse($response->isRedirect());
+
+        $response = new Response('', 204, ['Location' => '/good-uri']);
+        $this->assertTrue($response->isRedirect());
         $this->assertFalse($response->isRedirect('/bad-uri'));
         $this->assertTrue($response->isRedirect('/good-uri'));
     }

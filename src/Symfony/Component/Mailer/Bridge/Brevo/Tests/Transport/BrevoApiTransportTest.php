@@ -181,4 +181,53 @@ class BrevoApiTransportTest extends TestCase
 
         $this->assertSame('foobar', $message->getMessageId());
     }
+
+    public function testPayloadPrefersMessageFromOverEnvelopeSender()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $body = json_decode($options['body'], true);
+            $this->assertSame('from@example.com', $body['sender']['email']);
+            $this->assertSame('From Name', $body['sender']['name']);
+
+            return new JsonMockResponse(['messageId' => 'foobar'], ['http_code' => 201]);
+        });
+
+        $transport = new BrevoApiTransport('ACCESS_KEY', $client);
+
+        $email = new Email();
+        $email->subject('Hello!')
+            ->to(new Address('to@example.com', 'To Name'))
+            ->from(new Address('from@example.com', 'From Name'))
+            ->text('Hello there!');
+
+        $envelope = new Envelope(new Address('envelope@example.com', 'Envelope Name'), [new Address('to@example.com', 'To Name')]);
+
+        $message = $transport->send($email, $envelope);
+        $this->assertSame('foobar', $message->getMessageId());
+    }
+
+    public function testPayloadPrefersMessageSenderOverFromAndEnvelopeSender()
+    {
+        $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {
+            $body = json_decode($options['body'], true);
+            $this->assertSame('sender@example.com', $body['sender']['email']);
+            $this->assertSame('Sender Name', $body['sender']['name']);
+
+            return new JsonMockResponse(['messageId' => 'foobar'], ['http_code' => 201]);
+        });
+
+        $transport = new BrevoApiTransport('ACCESS_KEY', $client);
+
+        $email = new Email();
+        $email->subject('Hello!')
+            ->to(new Address('to@example.com', 'To Name'))
+            ->from(new Address('from@example.com', 'From Name'))
+            ->sender(new Address('sender@example.com', 'Sender Name'))
+            ->text('Hello there!');
+
+        $envelope = new Envelope(new Address('envelope@example.com', 'Envelope Name'), [new Address('to@example.com', 'To Name')]);
+
+        $message = $transport->send($email, $envelope);
+        $this->assertSame('foobar', $message->getMessageId());
+    }
 }

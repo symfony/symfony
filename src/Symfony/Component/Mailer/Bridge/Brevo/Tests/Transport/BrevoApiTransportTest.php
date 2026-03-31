@@ -181,4 +181,35 @@ class BrevoApiTransportTest extends TestCase
 
         $this->assertSame('foobar', $message->getMessageId());
     }
+
+    public function testPayloadPrefersMessageFromOverEnvelopeSender()
+    {
+        $email = new Email();
+        $email->from(new Address('from@example.com', 'From Name'));
+
+        $envelope = new Envelope(new Address('envelope@example.com', 'Envelope Name'), [new Address('to@example.com')]);
+
+        $transport = new BrevoApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(BrevoApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertSame('from@example.com', $payload['sender']['email']);
+        $this->assertSame('From Name', $payload['sender']['name']);
+    }
+
+    public function testPayloadPrefersMessageSenderOverFromAndEnvelopeSender()
+    {
+        $email = new Email();
+        $email->from(new Address('from@example.com', 'From Name'));
+        $email->sender(new Address('sender@example.com', 'Sender Name'));
+
+        $envelope = new Envelope(new Address('envelope@example.com', 'Envelope Name'), [new Address('to@example.com')]);
+
+        $transport = new BrevoApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(BrevoApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertSame('sender@example.com', $payload['sender']['email']);
+        $this->assertSame('Sender Name', $payload['sender']['name']);
+    }
 }

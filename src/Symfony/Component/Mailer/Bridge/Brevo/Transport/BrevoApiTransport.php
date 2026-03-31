@@ -88,8 +88,13 @@ final class BrevoApiTransport extends AbstractApiTransport
 
     private function getPayload(Email $email, Envelope $envelope): array
     {
+        $sender = $email->getSender();
+        if (!$sender && ($from = $email->getFrom())) {
+            $sender = $from[0];
+        }
+
         $payload = [
-            'sender' => $this->formatAddress($envelope->getSender()),
+            'sender' => $this->formatAddress($sender ?? $envelope->getSender()),
             'to' => $this->formatAddresses($this->getRecipients($email, $envelope)),
             'subject' => $email->getSubject(),
         ];

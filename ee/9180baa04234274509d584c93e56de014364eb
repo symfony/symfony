@@ -1,0 +1,137 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-22T17:02:37Z
+
+I don't understand what you mean @yceruto:
+About having an AbstractKernel in DI, that looks fine to me: this puts the boilerplate to use all the infra in DI + Config in DI itself. Legit IMHO.
+About hard coupling I don't see what you mean, this is an optional feature.
+Can you please elaborate?
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-03-22T17:45:09Z
+
+Well it’s a new concept for this component that is not strictly related to its domain. Yet we need a place for it which is either in DI or in its own Kernel component/contract. DI looks like a good tradeoff to me.
+
+---------------------------------------------------------------------------
+
+by derrabus at 2026-03-23T11:21:29Z
+
+Thank you for opening this PR! Sorry for my wall of text, but I somewhat felt that this PR is missing a discussion of the problem before reviewing a potential solution. If I'm derailing the review of this PR too much, I can also open a new issue for the discussion if you like.
+
+---
+
+I remember that we've talked about this topic years ago, when I used DI in a console application I was working on. I submitted a talk on that for SymfonyLive, but you found it not interesting enough so we went for a different proposal of mine. And yet here we are. 😅
+
+Next thing I remember is a discussion on Twitter where the author of another console application was very vocal on how they switched from Symfony DI to a different container because of performance issues that, as it turned out, could've been solved by not compiling the whole container on-the-fly whenever a CLI command was invoked. I don't want to reiterate this, but the learning I took from that incident is that you have to take a very steep learning curve only poorly supported by documentation when you want to use the component the right way without going through HttpKernel.
+
+From what I recall (I don't have access to my application anymore on which I wanted to base my talk on), the DI component already got me very far out of the box. It was all there if you knew how to glue the pieces together.
+
+The first problem was the whole bootstrapping process of the application. I first wrote some glue code that checked if the compiled container was already there and ran the compiler otherwise. But that approach wasn't very developer-friendly. I had to remember to always delete the container whenever I made changes to the application. All the nice cache invalidation logic we know from Symfony web applications was missing and hard to set up. I remember that I've borrowed some code from HttpKernel and FrameworkBundle to get closer to that level of DX.
+
+I understand that this lack of DX and usability is the gap that you're attempting to close and that's great!
+
+The second problem that I've had was that I lost access to Symfony's great ecosystem of bundles when developing applications without HttpKernel. You need logging in Symfony? Use MonologBundle! Oh, you need it in a console-only app? Okay, here's Monolog, here is a collection of glue code we call Monolog bridge, good luck assembling this! Bundles usually depend on HttpKernel, despite DI having its own extension system that we leverage and hide behind the bundle system.
+
+The third problem was rather depolyment-related: Usually, you don't deploy a console application as you would deploy a web application. Instead, you probably would distribute the application including the compiled container as a PHAR file. And at that point I felt like I was completely on my own.
+
+Not sure, how strongly we wan Symfony to become a framework for console applications, but I think we need to solved these three problems if we want that to happen.
+
+---
+
+Now, regarding the approch proposed in this PR. I understand that we're alienating with the idea that the DI components takes over the bootstrapping part from the HttpKernel component. I believe the reason for that is that neither the HttpKernel component was a good place for the code that's being moved now. To me, the HttpKernel is the component that handles the process of turning an HTTP request into a response. That component on its own should not care about extensibility or configuration, but it does.
+
+What do you think about a new dedicated component (e.g. ApplicationKernel maybe?) that takes over some responsibilities from HttpKernel and FrameworkBundle and can be used for web and console applications alike?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-23T16:55:01Z
+
+> What do you think about a new dedicated component (e.g. ApplicationKernel maybe?) that takes over some responsibilities from HttpKernel and FrameworkBundle and can be used for web and console applications alike
+
+To me, that's the rabbit hole that prevented us from moving forward on this topic for years.
+Short answer: better not dig it :)
+
+But I'm fine adding support for bundles. I've now moved bundle-related code from HK to a new `AbstractBundle` class in DI. BC preserved of course. No need to deprecate IMHO, the impact would be too big for too little gains (bundles should first move to the new bundle class by mean of contributions, when and as console apps are built using this new subsystem).
+
+I intentionally didn't move the interfaces to DI. To me, we don't need a full abstraction in DI. Abstract classes are good enough.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-23T16:56:51Z
+
+Oh, and about PHAR stuff, that's a separate concern. I'd first be happy to be able to build pure console apps with DI - eg a command that starts an amphp server.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-03-23T18:55:29Z
+
+Strong 👎 for adding an AbstractBundle to DI, that's too much concerns for a so well scoped and already quite feature rich component to me.
+I think it's worth digging the idea of a dedicated place for this pieces of code. Since these are only abstractions that proven useful, what about a contract?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-23T19:01:39Z
+
+Arf, to me we're mostly interested in implementations (= abstract classes), not abstractions (= interfaces). Not a fit for contracts.
+And these two classes are all we need, and they're 100% tighten to DI.
+Not worth a component nor anything split out to me.
+We're falling into this rabbit hole...
+
+---------------------------------------------------------------------------
+
+by derrabus at 2026-03-24T09:22:46Z
+
+> > What do you think about a new dedicated component (e.g. ApplicationKernel maybe?) that takes over some responsibilities from HttpKernel and FrameworkBundle and can be used for web and console applications alike
+>
+> To me, that's the rabbit hole that prevented us from moving forward on this topic for years. Short answer: better not dig it :)
+
+My rationale here is: If we move that logic to another component and we're not happy with its new location either, why not move it to a dedicated one? The first iteration of that component might not be the pinnacle of modern software architecture, but it could be a good start. We can do that without digging the rabbit hole.
+
+> But I'm fine adding support for bundles. I've now moved bundle-related code from HK to a new `AbstractBundle` class in DI.
+
+Using bundles without HttpKernel is of course great, but that's one more concept that technically does not belong there.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-26T16:01:10Z
+
+PR updated with a BC layer in HttpKernel to wrap a DI-`AbstractBundle` in a HK-`BundleInterface`. This enables bundles that don't depend on HttpKernel to still properly work with it (with MonologBundle as a canonical example). Spotted by @stof.
+
+About splitting this out of DI / in a new component: this doesn't make sense at all to me. A bundle's job is to configure services. 100%-DI domain. Same for a kernel, who's role is to bootstrap a container, 100%-DI again. DI+Config to be fully descriptive.
+
+`AbstractKernel` + `AbstractBundle` are pure glue code that embed conventions that proved useful. They don't form a domain on their own either. Not a fit split as a component.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-26T16:15:26Z
+
+More thoughts: these classes are consumers of DI's API, not extensions of its domain.
+
+`DI\Loader\YamlFileLoader` is quite similar if you think about it: it depends on the Config component for YAML parsing, but it lives in DI because its job is loading service definitions. Similarly, AbstractKernel's job is bootstrapping a container. It's the canonical consumer of ContainerBuilder + PhpDumper + ConfigCache. Where else would it go?
+
+It's two opt-in classes in a subnamespace. They don't affect existing code paths, are optional features (like `YamlFileLoader`).
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-03-27T13:06:03Z
+
+Thanks for the discussion in this PR and IRL. The added API being indeed purely about DI and given the arguments against putting this in a dedicated package, I'm fine with this. Removing my -1
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-27T19:35:03Z
+
+Should be good for another round of reviews. SymfonyLive Paris was productive to brainstorm about this with @stof esp.!
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-01T17:08:39Z
+
+@theofidry see https://github.com/symfony/symfony/pull/63715 for the next step. I don't plan to move more stuff.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-04-01T18:25:36Z
+
+Thank you @nicolas-grekas.

@@ -7,6 +7,7 @@ CHANGELOG
  * Allow computing tag attributes per tagged service when using `#[AutoconfigureTag]`, `#[Autoconfigure]` or `_instanceof`: pass a `\Closure` receiving the concrete class-string (requires PHP 8.5), or a `[class-string, method]` callable resolved against each concrete class (works on PHP 8.4)
  * Call `#[Required]` methods in the order defined by the attribute's `$priority` argument
  * Add support for injecting a service as a lazy proxy on a per-argument basis, using the `!lazy_proxy` YAML tag, the `@~` reference prefix or the `lazy_proxy()` function in the PHP-DSL
+ * Add `#[AsFactory]` attribute to register a class or method as a factory for another service
 
 8.1
 ---

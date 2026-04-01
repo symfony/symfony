@@ -45,6 +45,7 @@ class PassConfig
                 new ResolveClassPass(),
                 new RegisterAutoconfigureAttributesPass(),
                 new AutowireAsDecoratorPass(),
+                new RegisterAsFactoryPass(),
                 new AttributeAutoconfigurationPass(),
                 new ResolveInstanceofConditionalsPass(),
                 new RegisterEnvVarProcessorsPass(),

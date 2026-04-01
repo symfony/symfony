@@ -1,0 +1,151 @@
+---------------------------------------------------------------------------
+
+by ruudk at 2026-03-26T07:05:20Z
+
+@Spomky @nicolas-grekas Ready for review.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-03-27T10:09:22Z
+
+RFC says
+> Use of the "use" member is OPTIONAL, unless the application requires its presence.
+
+Should we provide a config entry let application developers decide if they require the presence `use` parameter or not?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2026-03-27T10:32:23Z
+
+Why does it matter? To me, it seems this is a hint from the server to the client to make it easier to validate the JWT. So optional. Not that important?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-03-27T10:36:21Z
+
+Hi @ruudk,
+
+Good catch! Applications should indeed be able to use keys without requiring the `use` or `key_opts` properties.
+However, as @welcoMattic pointed out, applications should also have the option to enforce the presence of those properties when needed.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2026-03-27T10:40:13Z
+
+What do you suggest to call this option? Then I'll add it
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-03-27T10:43:30Z
+
+Something like `required_jwk_use_parameter: true|false`? WDYT @Spomky?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-03-27T10:47:10Z
+
+`enforce_usage_verification`? internally this filters out using both `use` and `key_opt`.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-03-27T10:51:43Z
+
+> `enforce_usage_verification`? internally this filters out using both `use` and `key_opt`.
+
+What about `enforce_key_usage_verification`?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-03-27T10:56:15Z
+
+Good to me.
+The method could look like as follows (not tested):
+
+```php
+private function filterSignatureKeys(array $keys, bool $enforcedUsage): array
+{
+    return array_filter($keys, function (array $jwk) use ($enforcedUsage): bool {
+        if ($enforcedUsage) {
+            if (isset($jwk['use']) && $jwk['use'] === 'sig') {
+                return true;
+            }
+            if (isset($jwk['key_ops']) && is_array($jwk['key_ops'])) {
+                return !empty(array_intersect($jwk['key_ops'], ['sign', 'verify']));
+            }
+            return false;
+        }
+
+        if (isset($jwk['use']) && $jwk['use'] === 'enc') {
+            return false;
+        }
+        if (isset($jwk['key_ops']) && is_array($jwk['key_ops'])) {
+            $encOps = ['encrypt', 'decrypt', 'wrapKey', 'unwrapKey', 'deriveKey', 'deriveBits'];
+            $sigOps = ['sign', 'verify'];
+            $hasEnc = !empty(array_intersect($jwk['key_ops'], $encOps));
+            $hasSig = !empty(array_intersect($jwk['key_ops'], $sigOps));
+            if ($hasEnc && !$hasSig) {
+                return false;
+            }
+        }
+
+        return true;
+    });
+}
+```
+
+---------------------------------------------------------------------------
+
+by ruudk at 2026-03-27T14:46:38Z
+
+@Spomky It's ready :) Thanks for the help!
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-03-27T14:48:59Z
+
+Given the new option, this PR seems more like a feature than a bugfix, no?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2026-03-27T14:52:41Z
+
+Hmmmmm. I do think this is a bug. Symfony's OIDC does not work with [SPIRE OIDC server](https://spiffe.io/docs/latest/keyless/vault/readme/).
+
+I wanted to fix this like a bug fix ;) not to bring this as a feature with a config option.
+
+That we now solve by making it configurable with a sensible default that keeps the current behavior.
+
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-03-27T14:55:44Z
+
+Due to our Backward Compatibility Promise, this is the way we handle this kind of support addition. In fact, for Symfony it's a new feature (a new thing supported).
+
+If you need this in 7.4, the easy way is to decorate the `OidcTokenHandler`.
+
+---------------------------------------------------------------------------
+
+by ruudk at 2026-03-27T14:59:15Z
+
+Should I target 8.1?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2026-03-27T15:06:48Z
+
+Can you remove the bug label?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2026-03-27T15:17:05Z
+
+> If you need this in 7.4, the easy way is to decorate the `OidcTokenHandler`.
+
+How do you see that happening? I can't extend the class, since it's final.
+I would have to copy the whole class, and then register it as `security.access_token_handler.oidc`?
+
+---------------------------------------------------------------------------
+
+by ruudk at 2026-04-01T18:15:37Z
+
+What's needed to get this merged? :)

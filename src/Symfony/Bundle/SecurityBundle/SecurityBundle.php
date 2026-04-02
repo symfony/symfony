@@ -38,6 +38,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\JsonLogin
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\JsonLoginLdapFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\LoginLinkFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\LoginThrottlingFactory;
+use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\OidcLoginFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RememberMeFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\RemoteUserFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\X509Factory;
@@ -76,6 +77,7 @@ class SecurityBundle extends Bundle
         $extension->addAuthenticatorFactory(new CustomAuthenticatorFactory());
         $extension->addAuthenticatorFactory(new LoginThrottlingFactory());
         $extension->addAuthenticatorFactory(new LoginLinkFactory());
+        $extension->addAuthenticatorFactory(new OidcLoginFactory());
         $extension->addAuthenticatorFactory(new AccessTokenFactory([
             new ServiceTokenHandlerFactory(),
             new OidcUserInfoTokenHandlerFactory(),

@@ -4,6 +4,7 @@ CHANGELOG
 8.1
 ---
 
+ * Add `oidc_login` firewall authenticator for the OpenID Connect Authorization Code Flow
  * Add support for the `clientHints`, `prefetchCache`, and `prerenderCache` `ClearSite-Data` directives
  * Add support for `#[AsTaggedItem]` attribute to configure voter priority
  * Deprecate the `security.erase_credentials` configuration option and the `security.authentication.manager.erase_credentials` container parameter, as the `eraseCredentials()` method was removed in Symfony 8.0

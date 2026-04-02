@@ -137,6 +137,22 @@ final class InputBag extends ParameterBag
     }
 
     /**
+     * Returns an input value by name.
+     *
+     * @template TDefault of string|int|float|bool|array|null
+     *
+     * @param TDefault $default The default value if the input key does not exist
+     *
+     * @return TDefault|TInput
+     */
+    public function getValue(string $key, mixed $default = null): string|int|float|bool|array|null
+    {
+        $value = parent::get($key, $this);
+
+        return $this === $value ? $default : $value;
+    }
+
+    /**
      * @throws BadRequestException if the input value is an array and \FILTER_REQUIRE_ARRAY or \FILTER_FORCE_ARRAY is not set
      * @throws BadRequestException if the input value is invalid and \FILTER_NULL_ON_FAILURE is not set
      */

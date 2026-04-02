@@ -91,6 +91,30 @@ class InputBagTest extends TestCase
         $this->assertNull($bag->get('foo[bar]'));
     }
 
+    public function testGetValue()
+    {
+        $bag = new InputBag([
+            'foo' => 'bar',
+            'null' => null,
+            'int' => 1,
+            'float' => 1.0,
+            'bool' => false,
+            'array' => [1, 2, 3],
+        ]);
+
+        $this->assertSame('bar', $bag->getValue('foo'), '->getValue() gets the value of a string parameter');
+        $this->assertSame('default', $bag->getValue('unknown', 'default'), '->getValue() returns second argument as default if a parameter is not defined');
+        $this->assertNull($bag->getValue('null', 'default'), '->getValue() returns null if null is set');
+        $this->assertSame(1, $bag->getValue('int'), '->getValue() gets the value of an int parameter');
+        $this->assertSame(1.0, $bag->getValue('float'), '->getValue() gets the value of a float parameter');
+        $this->assertFalse($bag->getValue('bool'), '->getValue() gets the value of a bool parameter');
+        $this->assertSame(1, $bag->getValue('int'), '->getValue() gets the value of an int parameter');
+        $this->assertCount(3, $bag->getValue('array'), '->getValue() gets the value of an array parameter');
+        $this->assertSame(1, $bag->getValue('array')[0], '->getValue() gets the value of an array parameter');
+        $this->assertSame(2, $bag->getValue('array')[1], '->getValue() gets the value of an array parameter');
+        $this->assertSame(3, $bag->getValue('array')[2], '->getValue() gets the value of an array parameter');
+    }
+
     public function testFilterArray()
     {
         $bag = new InputBag([

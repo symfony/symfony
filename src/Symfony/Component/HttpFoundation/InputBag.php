@@ -24,6 +24,16 @@ use Symfony\Component\HttpFoundation\Exception\UnexpectedValueException;
 final class InputBag extends ParameterBag
 {
     /**
+     * Check if input value is scalar.
+     */
+    public function isScalar(string $key): bool
+    {
+        $value = parent::get($key);
+
+        return \is_scalar($value);
+    }
+
+    /**
      * Returns a scalar input value by name.
      *
      * @template TDefault of string|int|float|bool|null

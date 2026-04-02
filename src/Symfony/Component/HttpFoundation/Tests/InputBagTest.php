@@ -18,6 +18,25 @@ use Symfony\Component\HttpFoundation\Tests\Fixtures\FooEnum;
 
 class InputBagTest extends TestCase
 {
+    public function testIsScalar()
+    {
+        $bag = new InputBag([
+            'foo' => 'bar',
+            'int' => 1,
+            'float' => 1.0,
+            'bool' => false,
+            'null' => null,
+            'array' => [1, 2, 3],
+        ]);
+
+        $this->assertTrue($bag->isScalar('foo'), '->isScalar() checks a string value');
+        $this->assertTrue($bag->isScalar('int'), '->isScalar() checks an int value');
+        $this->assertTrue($bag->isScalar('float'), '->isScalar() checks a float value');
+        $this->assertTrue($bag->isScalar('bool'), '->isScalar() checks a bool value');
+        $this->assertFalse($bag->isScalar('null'), '->isScalar() checks a null value');
+        $this->assertFalse($bag->isScalar('array'), '->isScalar() checks an array value');
+    }
+
     public function testGet()
     {
         $bag = new InputBag(['foo' => 'bar', 'null' => null, 'int' => 1, 'float' => 1.0, 'bool' => false, 'stringable' => new class implements \Stringable {

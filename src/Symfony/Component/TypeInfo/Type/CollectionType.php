@@ -23,6 +23,14 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  *
  * @template T of BuiltinType<TypeIdentifier::ARRAY>|BuiltinType<TypeIdentifier::ITERABLE>|ObjectType|GenericType
  *
+ * @extends Type<(
+ *     T is BuiltinType<TypeIdentifier::ARRAY> ? array :
+ *     T is BuiltinType<TypeIdentifier::ITERABLE> ? iterable :
+ *     T is GenericType<BuiltinType<TypeIdentifier::ARRAY>> ? array :
+ *     T is GenericType<BuiltinType<TypeIdentifier::ITERABLE>> ? iterable :
+ *     object
+ * )>
+ *
  * @implements WrappingTypeInterface<T>
  */
 class CollectionType extends Type implements WrappingTypeInterface
@@ -185,11 +193,11 @@ class CollectionType extends Type implements WrappingTypeInterface
 
     public function accepts(mixed $value): bool
     {
-        if (!parent::accepts($value)) {
+        if ($this->isList() && (!\is_array($value) || !array_is_list($value))) {
             return false;
         }
 
-        if ($this->isList() && (!\is_array($value) || !array_is_list($value))) {
+        if (!parent::accepts($value)) {
             return false;
         }
 

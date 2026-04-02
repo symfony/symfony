@@ -19,6 +19,25 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
  * @template T of TypeIdentifier
+ *
+ * @extends Type<(
+ *     T is TypeIdentifier::ARRAY ? array :
+ *     T is TypeIdentifier::BOOL ? bool :
+ *     T is TypeIdentifier::CALLABLE ? callable :
+ *     T is TypeIdentifier::FALSE ? false :
+ *     T is TypeIdentifier::FLOAT ? float :
+ *     T is TypeIdentifier::INT ? int :
+ *     T is TypeIdentifier::ITERABLE ? iterable :
+ *     T is TypeIdentifier::MIXED ? mixed :
+ *     T is TypeIdentifier::NULL ? null :
+ *     T is TypeIdentifier::OBJECT ? object :
+ *     T is TypeIdentifier::RESOURCE ? resource :
+ *     T is TypeIdentifier::STRING ? string :
+ *     T is TypeIdentifier::TRUE ? true :
+ *     T is TypeIdentifier::NEVER ? never :
+ *     T is TypeIdentifier::VOID ? void :
+ *     mixed
+ * )>
  */
 final class BuiltinType extends Type
 {

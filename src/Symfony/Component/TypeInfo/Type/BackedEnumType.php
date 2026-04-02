@@ -18,7 +18,7 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
- * @template T of class-string<\BackedEnum>
+ * @template T of \BackedEnum
  * @template U of BuiltinType<TypeIdentifier::INT>|BuiltinType<TypeIdentifier::STRING>
  *
  * @extends EnumType<T>
@@ -26,8 +26,8 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
 final class BackedEnumType extends EnumType
 {
     /**
-     * @param T $className
-     * @param U $backingType
+     * @param class-string<T> $className
+     * @param U               $backingType
      */
     public function __construct(
         string $className,

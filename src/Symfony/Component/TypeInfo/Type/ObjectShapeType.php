@@ -29,6 +29,8 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  * accessors are not visible.
  *
  * @author Benjamin Franzke <ben@bnf.dev>
+ *
+ * @extends Type<object>
  */
 final class ObjectShapeType extends Type
 {

@@ -15,7 +15,7 @@ namespace Symfony\Component\TypeInfo\Type;
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
  * @author Baptiste Leduc <baptiste.leduc@gmail.com>
  *
- * @template T of class-string<\UnitEnum>
+ * @template T of \UnitEnum
  *
  * @extends ObjectType<T>
  */

@@ -21,6 +21,8 @@ use Symfony\Component\TypeInfo\Type;
  *
  * @template T of Type
  *
+ * @extends Type<mixed>
+ *
  * @implements WrappingTypeInterface<T>
  */
 final class TemplateType extends Type implements WrappingTypeInterface

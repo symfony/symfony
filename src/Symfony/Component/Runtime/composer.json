@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": ">=8.1",
-        "composer-plugin-api": "^1.0|^2.0"
+        "composer-plugin-api": "^1.0|^2.0",
+        "ext-filter": "*"
     },
     "require-dev": {
         "composer/composer": "^1.0.2|^2.0",

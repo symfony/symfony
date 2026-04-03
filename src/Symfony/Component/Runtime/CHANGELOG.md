@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add argument `bool $debug = false` to `HttpKernelRunner::__construct()`
+ * Add `ext-filter` to platform reqs
 
 5.4
 ---

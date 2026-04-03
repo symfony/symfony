@@ -16,13 +16,14 @@ use Symfony\Component\PropertyInfo\PropertyAccessExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyDescriptionExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyInitializableExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyListExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyNameExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\TypeInfo\Type;
 
 /**
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class DummyExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyInitializableExtractorInterface, ConstructorArgumentTypeExtractorInterface
+class DummyExtractor implements PropertyListExtractorInterface, PropertyDescriptionExtractorInterface, PropertyTypeExtractorInterface, PropertyAccessExtractorInterface, PropertyNameExtractorInterface, PropertyInitializableExtractorInterface, ConstructorArgumentTypeExtractorInterface
 {
     public function getShortDescription($class, $property, array $context = []): ?string
     {
@@ -57,6 +58,11 @@ class DummyExtractor implements PropertyListExtractorInterface, PropertyDescript
     public function getProperties($class, array $context = []): ?array
     {
         return ['a', 'b'];
+    }
+
+    public function getPropertyName(string $class, string $method, array $context = []): ?string
+    {
+        return 'property';
     }
 
     public function isInitializable(string $class, string $property, array $context = []): ?bool

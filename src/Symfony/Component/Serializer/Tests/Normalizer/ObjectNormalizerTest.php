@@ -53,6 +53,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\Attributes\GroupDummyWithIsPrefixedProperty;
 use Symfony\Component\Serializer\Tests\Fixtures\CircularReferenceDummy;
+use Symfony\Component\Serializer\Tests\Fixtures\ContainingWithAccessorsDummy;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyFirstChildQuux;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyPrivatePropertyWithoutGetter;
 use Symfony\Component\Serializer\Tests\Fixtures\DummyWithObjectConstructor;
@@ -1196,6 +1197,81 @@ class ObjectNormalizerTest extends TestCase
             null,
             $propertyAccessorBuilder->getPropertyAccessor(),
         );
+    }
+
+    public function testNormalizeWithAnExtractorThatDoesNotExtractPropertyNames()
+    {
+        // an extractor written against PropertyInfoExtractorInterface before getProperty() was added to it
+        $extractor = new class implements PropertyInfoExtractorInterface {
+            public function getType(string $class, string $property, array $context = []): ?Type
+            {
+                return null;
+            }
+
+            public function getShortDescription(string $class, string $property, array $context = []): ?string
+            {
+                return null;
+            }
+
+            public function getLongDescription(string $class, string $property, array $context = []): ?string
+            {
+                return null;
+            }
+
+            public function isReadable(string $class, string $property, array $context = []): ?bool
+            {
+                return true;
+            }
+
+            public function isWritable(string $class, string $property, array $context = []): ?bool
+            {
+                return true;
+            }
+
+            public function getProperties(string $class, array $context = []): ?array
+            {
+                return null;
+            }
+        };
+
+        $normalizer = new ObjectNormalizer(propertyInfoExtractor: $extractor);
+        $normalizer->setSerializer(new Serializer([$normalizer]));
+
+        $obj = new ObjectDummy();
+        $obj->setFoo('foo');
+        $obj->bar = 'bar';
+
+        $normalized = $normalizer->normalize($obj);
+
+        $this->assertSame('foo', $normalized['foo']);
+        $this->assertSame('bar', $normalized['bar']);
+    }
+
+    public function testNormalizeContainingWithAccessorsAttribute()
+    {
+        $normalizer = $this->getNormalizerForAccessors();
+
+        $object = new ContainingWithAccessorsDummy('Alice', 5, true);
+        $normalized = $normalizer->normalize($object);
+
+        $this->assertSame([
+            'name' => 'Alice',
+            'priority' => 5,
+            'active' => true,
+        ], $normalized);
+    }
+
+    public function testDenormalizeContainingWithAccessorsAttribute()
+    {
+        $normalizer = $this->getNormalizerForAccessors();
+
+        $object = $normalizer->denormalize([
+            'name' => 'Bob',
+            'priority' => 3,
+        ], ContainingWithAccessorsDummy::class);
+
+        $this->assertSame('Bob', $object->retrieveName());
+        $this->assertSame(3, $object->currentPriority());
     }
 
     public function testNormalizeWithMethodNamesSimilarToAccessors()

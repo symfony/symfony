@@ -18,6 +18,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\PropertyInfo\PropertyInfoExtractorInterface;
+use Symfony\Component\PropertyInfo\PropertyNameExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyWriteInfo;
 use Symfony\Component\Serializer\Attribute\Ignore;
@@ -82,7 +83,11 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
 
         foreach ($reflClass->getMethods(\ReflectionMethod::IS_PUBLIC) as $reflMethod) {
             $name = $reflMethod->name;
-            $attributeName = $this->getAttributeNameFromAccessor($reflClass, $reflMethod, false);
+            // getProperty() is only advertised through @method on PropertyInfoExtractorInterface, so an
+            // extractor predating it keeps the previous resolution instead of fataling
+            $attributeName = $this->propertyInfoExtractor instanceof PropertyNameExtractorInterface
+                ? $this->propertyInfoExtractor->getPropertyName($class, $name)
+                : $this->getAttributeNameFromAccessor($reflClass, $reflMethod, false);
 
             if ($this->hasPropertyForAccessor($reflMethod->getDeclaringClass(), $name) && (null === $attributeName || $this->hasAttributeNameCollision($reflClass, $attributeName, $name))) {
                 $attributeName = $name;

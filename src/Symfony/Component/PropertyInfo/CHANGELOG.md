@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Allow defining accessors and mutators via a `#[WithAccessors]` attribute
+ * Add `PropertyNameExtractorInterface` and `getPropertyName()` to enable property name extraction from an accessor or mutator
 
 8.1
 ---

@@ -34,7 +34,7 @@ final class SecurityExtension extends AbstractExtension
     ) {
     }
 
-    public function isGranted(mixed $role, mixed $object = null, ?string $field = null, ?AccessDecision $accessDecision = null): bool
+    public function isGranted(mixed $attribute, mixed $subject = null, ?string $field = null, ?AccessDecision $accessDecision = null): bool
     {
         if (null === $this->securityChecker) {
             return false;
@@ -45,24 +45,24 @@ final class SecurityExtension extends AbstractExtension
                 throw new \LogicException('Passing a $field to the "is_granted()" function requires symfony/acl. Try running "composer require symfony/acl-bundle" if you need field-level access control.');
             }
 
-            $object = new FieldVote($object, $field);
+            $subject = new FieldVote($subject, $field);
         }
 
         try {
-            return $this->securityChecker->isGranted($role, $object, $accessDecision);
+            return $this->securityChecker->isGranted($attribute, $subject, $accessDecision);
         } catch (AuthenticationCredentialsNotFoundException) {
             return false;
         }
     }
 
-    public function getAccessDecision(mixed $role, mixed $object = null, ?string $field = null): AccessDecision
+    public function getAccessDecision(mixed $attribute, mixed $subject = null, ?string $field = null): AccessDecision
     {
         if (!class_exists(AccessDecision::class)) {
             throw new \LogicException(\sprintf('Using the "access_decision()" function requires symfony/security-core >= 7.3. Try running "composer %s symfony/security-core".', $this->securityChecker ? 'update' : 'require'));
         }
 
         $accessDecision = new AccessDecision();
-        $this->isGranted($role, $object, $field, $accessDecision);
+        $this->isGranted($attribute, $subject, $field, $accessDecision);
 
         return $accessDecision;
     }

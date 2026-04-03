@@ -32,7 +32,7 @@ class Unique extends Constraint
         self::IS_NOT_UNIQUE => 'IS_NOT_UNIQUE',
     ];
 
-    public string $message = 'The value {{ duplicate_value }} is duplicated.';
+    public string $message = 'This collection should contain only unique elements.';
     /** @var callable|null */
     public $normalizer;
 

@@ -343,7 +343,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             )
         );
 
-        $this->buildViolation('The value {{ duplicate_value }} is duplicated.')
+        $this->buildViolation('This collection should contain only unique elements.')
             ->setParameter('{{ value }}', 'array')
             ->setParameter('{{ duplicate_value }}', 'array')
             ->setCode(Unique::IS_NOT_UNIQUE)
@@ -372,7 +372,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             )
         );
 
-        $this->buildViolation('The value {{ duplicate_value }} is duplicated.')
+        $this->buildViolation('This collection should contain only unique elements.')
             ->setParameter('{{ value }}', 'array')
             ->setParameter('{{ duplicate_value }}', 'array')
             ->setCode(Unique::IS_NOT_UNIQUE)
@@ -400,7 +400,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                 errorPath: 'code',
             )
         );
-        $this->buildViolation('The value {{ duplicate_value }} is duplicated.')
+        $this->buildViolation('This collection should contain only unique elements.')
             ->setParameter('{{ value }}', 'array')
             ->setParameter('{{ duplicate_value }}', 'array')
             ->setCode(Unique::IS_NOT_UNIQUE)
@@ -416,19 +416,19 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         );
 
         $this
-            ->buildViolation('The value {{ duplicate_value }} is duplicated.')
+            ->buildViolation('This collection should contain only unique elements.')
             ->setParameter('{{ value }}', '"a1"')
             ->setParameter('{{ duplicate_value }}', '"a1"')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->atPath('property.path[2]')
 
-            ->buildNextViolation('The value {{ duplicate_value }} is duplicated.')
+            ->buildNextViolation('This collection should contain only unique elements.')
             ->setParameter('{{ value }}', '"a1"')
             ->setParameter('{{ duplicate_value }}', '"a1"')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->atPath('property.path[3]')
 
-            ->buildNextViolation('The value {{ duplicate_value }} is duplicated.')
+            ->buildNextViolation('This collection should contain only unique elements.')
             ->setParameter('{{ value }}', '"a2"')
             ->setParameter('{{ duplicate_value }}', '"a2"')
             ->setCode(Unique::IS_NOT_UNIQUE)
@@ -464,19 +464,19 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         );
 
         $this
-            ->buildViolation('The value {{ duplicate_value }} is duplicated.')
+            ->buildViolation('This collection should contain only unique elements.')
             ->setParameter('{{ value }}', 'array')
             ->setParameter('{{ duplicate_value }}', 'array')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->atPath('property.path[2].code')
 
-            ->buildNextViolation('The value {{ duplicate_value }} is duplicated.')
+            ->buildNextViolation('This collection should contain only unique elements.')
             ->setParameter('{{ value }}', 'array')
             ->setParameter('{{ duplicate_value }}', 'array')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->atPath('property.path[3].code')
 
-            ->buildNextViolation('The value {{ duplicate_value }} is duplicated.')
+            ->buildNextViolation('This collection should contain only unique elements.')
             ->setParameter('{{ value }}', 'array')
             ->setParameter('{{ duplicate_value }}', 'array')
             ->setCode(Unique::IS_NOT_UNIQUE)

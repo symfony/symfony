@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add clock-awareness to comparison and range validators for testable date comparisons
  * Add the `Xml` constraint for validating XML content
+ * Add `{{ duplicate_value }}` message parameter to the `Unique` constraint
 
 8.0
 ---

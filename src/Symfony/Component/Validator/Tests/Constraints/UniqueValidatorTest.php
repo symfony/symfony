@@ -58,13 +58,14 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidValues')]
-    public function testInvalidValues($value, $expectedMessageParam)
+    public function testInvalidValues($value, $expectedValueParam, $expectedDuplicateValueParam)
     {
         $constraint = new Unique(message: 'myMessage');
         $this->validator->validate($value, $constraint);
 
         $this->buildViolation('myMessage')
-             ->setParameter('{{ value }}', $expectedMessageParam)
+             ->setParameter('{{ value }}', $expectedValueParam)
+             ->setParameter('{{ duplicate_value }}', $expectedDuplicateValueParam)
              ->setCode(Unique::IS_NOT_UNIQUE)
              ->assertRaised();
     }
@@ -74,12 +75,12 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         $object = new \stdClass();
 
         return [
-            yield 'not unique booleans' => [[true, true], 'true'],
-            yield 'not unique integers' => [[1, 2, 3, 3], 3],
-            yield 'not unique floats' => [[0.1, 0.2, 0.1], 0.1],
-            yield 'not unique string' => [['a', 'b', 'a'], '"a"'],
-            yield 'not unique arrays' => [[[1, 1], [2, 3], [1, 1]], 'array'],
-            yield 'not unique objects' => [[$object, $object], 'object'],
+            yield 'not unique booleans' => [[true, true], 'true', 'true'],
+            yield 'not unique integers' => [[1, 2, 3, 3], 3, 3],
+            yield 'not unique floats' => [[0.1, 0.2, 0.1], 0.1, 0.1],
+            yield 'not unique string' => [['a', 'b', 'a'], '"a"', '"a"'],
+            yield 'not unique arrays' => [[[1, 1], [2, 3], [1, 1]], 'array', 'array'],
+            yield 'not unique objects' => [[$object, $object], 'object', 'object'],
         ];
     }
 
@@ -90,6 +91,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '3')
+            ->setParameter('{{ duplicate_value }}', '3')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->assertRaised();
     }
@@ -140,6 +142,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', 'array')
+            ->setParameter('{{ duplicate_value }}', 'array')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->assertRaised();
     }
@@ -164,6 +167,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '1')
+            ->setParameter('{{ duplicate_value }}', '1')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->assertRaised();
     }
@@ -188,6 +192,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"hello"')
+            ->setParameter('{{ duplicate_value }}', '"hello"')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->assertRaised();
     }
@@ -249,7 +254,7 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
     }
 
     #[DataProvider('getInvalidCollectionValues')]
-    public function testInvalidCollectionValues(array $value, array $fields, string $expectedMessageParam)
+    public function testInvalidCollectionValues(array $value, array $fields, string $expectedValueParam, string $expectedDuplicateValueParam)
     {
         $this->validator->validate($value, new Unique(
             message: 'myMessage',
@@ -257,7 +262,8 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         ));
 
         $this->buildViolation('myMessage')
-            ->setParameter('{{ value }}', $expectedMessageParam)
+            ->setParameter('{{ value }}', $expectedValueParam)
+            ->setParameter('{{ duplicate_value }}', $expectedDuplicateValueParam)
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->assertRaised();
     }
@@ -268,24 +274,26 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             'unique string' => [[
                 ['lang' => 'eng', 'translation' => 'hi'],
                 ['lang' => 'eng', 'translation' => 'hello'],
-            ], ['lang'], 'array'],
+            ], ['lang'], 'array', 'array'],
             'unique floats' => [[
                 ['latitude' => 51.509865, 'longitude' => -0.118092, 'poi' => 'capital'],
                 ['latitude' => 52.520008, 'longitude' => 13.404954],
                 ['latitude' => 51.509865, 'longitude' => -0.118092],
-            ], ['latitude', 'longitude'], 'array'],
+            ], ['latitude', 'longitude'], 'array', 'array'],
             'unique int' => [[
                 ['id' => 1, 'email' => 'bar@email.com'],
                 ['id' => 1, 'email' => 'foo@email.com'],
-            ], ['id'], 'array'],
+            ], ['id'], 'array', 'array'],
             'unique null' => [
                 [null, null],
                 [],
+                'null',
                 'null',
             ],
             'unique field null' => [
                 [['nullField' => null], ['nullField' => null]],
                 ['nullField'],
+                'array',
                 'array',
             ],
         ];
@@ -335,8 +343,9 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             )
         );
 
-        $this->buildViolation('This collection should contain only unique elements.')
+        $this->buildViolation('The value {{ duplicate_value }} is duplicated.')
             ->setParameter('{{ value }}', 'array')
+            ->setParameter('{{ duplicate_value }}', 'array')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->atPath('property.path[2].code')
             ->assertRaised();
@@ -363,8 +372,9 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
             )
         );
 
-        $this->buildViolation('This collection should contain only unique elements.')
+        $this->buildViolation('The value {{ duplicate_value }} is duplicated.')
             ->setParameter('{{ value }}', 'array')
+            ->setParameter('{{ duplicate_value }}', 'array')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->atPath('property.path[2].code')
             ->assertRaised();
@@ -390,9 +400,9 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
                 errorPath: 'code',
             )
         );
-
-        $this->buildViolation('This collection should contain only unique elements.')
+        $this->buildViolation('The value {{ duplicate_value }} is duplicated.')
             ->setParameter('{{ value }}', 'array')
+            ->setParameter('{{ duplicate_value }}', 'array')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->atPath('property.path[c].code')
             ->assertRaised();
@@ -406,18 +416,21 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         );
 
         $this
-            ->buildViolation('This collection should contain only unique elements.')
+            ->buildViolation('The value {{ duplicate_value }} is duplicated.')
             ->setParameter('{{ value }}', '"a1"')
+            ->setParameter('{{ duplicate_value }}', '"a1"')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->atPath('property.path[2]')
 
-            ->buildNextViolation('This collection should contain only unique elements.')
+            ->buildNextViolation('The value {{ duplicate_value }} is duplicated.')
             ->setParameter('{{ value }}', '"a1"')
+            ->setParameter('{{ duplicate_value }}', '"a1"')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->atPath('property.path[3]')
 
-            ->buildNextViolation('This collection should contain only unique elements.')
+            ->buildNextViolation('The value {{ duplicate_value }} is duplicated.')
             ->setParameter('{{ value }}', '"a2"')
+            ->setParameter('{{ duplicate_value }}', '"a2"')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->atPath('property.path[4]')
 
@@ -451,21 +464,37 @@ class UniqueValidatorTest extends ConstraintValidatorTestCase
         );
 
         $this
-            ->buildViolation('This collection should contain only unique elements.')
+            ->buildViolation('The value {{ duplicate_value }} is duplicated.')
             ->setParameter('{{ value }}', 'array')
+            ->setParameter('{{ duplicate_value }}', 'array')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->atPath('property.path[2].code')
 
-            ->buildNextViolation('This collection should contain only unique elements.')
+            ->buildNextViolation('The value {{ duplicate_value }} is duplicated.')
             ->setParameter('{{ value }}', 'array')
+            ->setParameter('{{ duplicate_value }}', 'array')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->atPath('property.path[3].code')
 
-            ->buildNextViolation('This collection should contain only unique elements.')
+            ->buildNextViolation('The value {{ duplicate_value }} is duplicated.')
             ->setParameter('{{ value }}', 'array')
+            ->setParameter('{{ duplicate_value }}', 'array')
             ->setCode(Unique::IS_NOT_UNIQUE)
             ->atPath('property.path[4].code')
 
+            ->assertRaised();
+    }
+
+    public function testDuplicateValuePlaceholderWithStringableObject()
+    {
+        $object = new StringableObject('foo@example.com');
+
+        $this->validator->validate([$object, $object], new Unique(message: 'myMessage'));
+
+        $this->buildViolation('myMessage')
+            ->setParameter('{{ value }}', 'object')
+            ->setParameter('{{ duplicate_value }}', 'foo@example.com')
+            ->setCode(Unique::IS_NOT_UNIQUE)
             ->assertRaised();
     }
 
@@ -482,5 +511,18 @@ class CallableClass
     public static function execute(\stdClass $object)
     {
         return [$object->name, $object->email];
+    }
+}
+
+class StringableObject implements \Stringable
+{
+    public function __construct(
+        private string $value,
+    ) {
+    }
+
+    public function __toString(): string
+    {
+        return $this->value;
     }
 }

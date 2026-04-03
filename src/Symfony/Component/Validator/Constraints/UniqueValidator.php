@@ -53,6 +53,7 @@ class UniqueValidator extends ConstraintValidator
 
             $violationBuilder = $this->context->buildViolation($constraint->message)
                 ->setParameter('{{ value }}', $this->formatValue($element))
+                ->setParameter('{{ duplicate_value }}', $this->formatValue($element, self::OBJECT_TO_STRING))
                 ->setCode(Unique::IS_NOT_UNIQUE);
 
             if (!$constraint->stopOnFirstError || null !== $constraint->errorPath) {

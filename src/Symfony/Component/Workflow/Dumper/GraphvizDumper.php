@@ -125,7 +125,7 @@ class GraphvizDumper implements DumperInterface
             $metadata = [];
             if ($withMetadata) {
                 $metadata = $workflowMetadata->getTransitionMetadata($transition);
-                unset($metadata['label']);
+                unset($metadata['label'], $metadata['bg_color']);
             }
 
             $transitions[] = [
@@ -154,7 +154,11 @@ class GraphvizDumper implements DumperInterface
             }
 
             if ($withMetadata) {
-                $escapedLabel = \sprintf('<<B>%s</B>%s>', $this->escape($placeName), $this->addMetadata($place['attributes']['metadata']));
+                unset($place['attributes']['metadata']['bg_color']);
+                $description = $place['attributes']['metadata']['description'] ?? null;
+                unset($place['attributes']['metadata']['description']);
+                $descriptionLabel = null !== $description ? \sprintf('<BR/><I>%s</I>', $this->escape($description)) : '';
+                $escapedLabel = \sprintf('<<B>%s</B>%s%s>', $this->escape($placeName), $this->addMetadata($place['attributes']['metadata']), $descriptionLabel);
                 // Don't include metadata in default attributes used to format the place
                 unset($place['attributes']['metadata']);
             } else {
@@ -176,7 +180,10 @@ class GraphvizDumper implements DumperInterface
 
         foreach ($transitions as $i => $place) {
             if ($withMetadata) {
-                $escapedLabel = \sprintf('<<B>%s</B>%s>', $this->escape($place['name']), $this->addMetadata($place['metadata']));
+                $description = $place['metadata']['description'] ?? null;
+                unset($place['metadata']['description']);
+                $descriptionLabel = null !== $description ? \sprintf('<BR/><I>%s</I>', $this->escape($description)) : '';
+                $escapedLabel = \sprintf('<<B>%s</B>%s%s>', $this->escape($place['name']), $this->addMetadata($place['metadata']), $descriptionLabel);
             } else {
                 $escapedLabel = '"'.$this->escape($place['name']).'"';
             }

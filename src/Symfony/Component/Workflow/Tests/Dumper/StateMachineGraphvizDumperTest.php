@@ -12,9 +12,12 @@
 namespace Symfony\Component\Workflow\Tests\Dumper;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Workflow\Definition;
 use Symfony\Component\Workflow\Dumper\StateMachineGraphvizDumper;
 use Symfony\Component\Workflow\Marking;
+use Symfony\Component\Workflow\Metadata\InMemoryMetadataStore;
 use Symfony\Component\Workflow\Tests\WorkflowBuilderTrait;
+use Symfony\Component\Workflow\Transition;
 
 class StateMachineGraphvizDumperTest extends TestCase
 {
@@ -75,5 +78,28 @@ class StateMachineGraphvizDumperTest extends TestCase
         $dump = (new StateMachineGraphvizDumper())->dump($definition, $marking);
 
         $this->assertEquals($expected, $dump);
+    }
+
+    public function testDumpWithMetadata()
+    {
+        $places = ['open', 'in_progress', 'done'];
+        $transitions = [];
+        $transitions[] = new Transition('start', 'open', 'in_progress');
+        $transitions[] = new Transition('finish', 'in_progress', 'done');
+
+        $placesMetadata = [
+            'open' => ['bg_color' => 'Gold', 'description' => 'Initial state'],
+            'done' => ['bg_color' => 'LimeGreen'],
+        ];
+        $inMemoryMetadataStore = new InMemoryMetadataStore([], $placesMetadata);
+
+        $definition = new Definition($places, $transitions, null, $inMemoryMetadataStore);
+        $dump = (new StateMachineGraphvizDumper())->dump($definition, null, ['with-metadata' => true]);
+
+        // bg_color should not appear as text, description should be in italics
+        $this->assertStringContainsString('fillcolor="Gold"', $dump);
+        $this->assertStringNotContainsString('bg_color', $dump);
+        $this->assertStringContainsString('<I>Initial state</I>', $dump);
+        $this->assertStringContainsString('fillcolor="LimeGreen"', $dump);
     }
 }

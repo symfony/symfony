@@ -490,6 +490,92 @@ class EntityValueResolverTest extends TestCase
         $resolver->resolve($request, $argument);
     }
 
+    public function testClosureMapsToArgument()
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        $request = new Request();
+        $request->attributes->set('id', 5);
+        $argument = $this->createArgument(
+            'stdClass',
+            new MapEntity(expr: static fn (Request $request, ObjectRepository $repository) => $repository->findOneBy(['id' => $request->attributes->get('id')])),
+            'arg1'
+        );
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects($this->never())
+            ->method('find');
+        $repository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['id' => 5])
+            ->willReturn($object = new \stdClass());
+
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->with(\stdClass::class)
+            ->willReturn($repository);
+
+        $this->assertSame([$object], $resolver->resolve($request, $argument));
+    }
+
+    public function testClosureReturnsNullThrows404()
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        $request = new Request();
+        $argument = $this->createArgument(
+            'stdClass',
+            new MapEntity(expr: static fn () => null),
+            'arg1'
+        );
+
+        $repository = self::createStub(ObjectRepository::class);
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->with(\stdClass::class)
+            ->willReturn($repository);
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $resolver->resolve($request, $argument);
+    }
+
+    public function testClosureFailureReturns404()
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry);
+
+        $request = new Request();
+        $argument = $this->createArgument(
+            'stdClass',
+            new MapEntity(expr: static function (Request $request, ObjectRepository $repository) {
+                $repository->findOneBy(['id' => $request->attributes->get('id')]);
+
+                throw new ConversionException();
+            }),
+            'arg1'
+        );
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['id' => null]);
+
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->with(\stdClass::class)
+            ->willReturn($repository);
+
+        $this->expectException(NotFoundHttpException::class);
+
+        $resolver->resolve($request, $argument);
+    }
+
     public function testAlreadyResolved()
     {
         $manager = $this->createStub(ObjectManager::class);

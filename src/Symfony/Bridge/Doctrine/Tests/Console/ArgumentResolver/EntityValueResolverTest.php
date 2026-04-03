@@ -11,6 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Tests\Console\ArgumentResolver;
 
+use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
@@ -24,6 +25,7 @@ use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
@@ -249,6 +251,65 @@ class EntityValueResolverTest extends TestCase
         $member = $this->createMember('entity', \stdClass::class, new MapEntity(expr: 'repository.findOneByCustomMethod(entity)'));
 
         $this->assertSame([$object], iterator_to_array($resolver->resolve('entity', $input, $member)));
+    }
+
+    public function testResolveWithClosure()
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry, null, new MapEntity(expr: static fn (InputInterface $input, ObjectRepository $repository) => $repository->findOneBy(['id' => $input->getArgument('entity')])));
+
+        $input = new ArrayInput(['entity' => 1], new InputDefinition([
+            new InputArgument('entity'),
+        ]));
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects($this->never())
+            ->method('find');
+        $repository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['id' => 1])
+            ->willReturn($object = new \stdClass());
+
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->with(\stdClass::class)
+            ->willReturn($repository);
+
+        $member = $this->createMember('entity', \stdClass::class);
+
+        $this->assertSame([$object], iterator_to_array($resolver->resolve('entity', $input, $member)));
+    }
+
+    public function testResolveWithClosureFailureThrowsException()
+    {
+        $manager = $this->createMock(ObjectManager::class);
+        $registry = $this->createRegistry($manager);
+        $resolver = new EntityValueResolver($registry, null, new MapEntity(expr: static function (InputInterface $input, ObjectRepository $repository) {
+            $repository->findOneBy(['id' => $input->getArgument('entity')]);
+
+            throw new ConversionException();
+        }));
+
+        $input = new ArrayInput(['entity' => 1], new InputDefinition([
+            new InputArgument('entity'),
+        ]));
+
+        $repository = $this->createMock(ObjectRepository::class);
+        $repository->expects($this->once())
+            ->method('findOneBy')
+            ->with(['id' => 1]);
+
+        $manager->expects($this->once())
+            ->method('getRepository')
+            ->with(\stdClass::class)
+            ->willReturn($repository);
+
+        $member = $this->createMember('entity', \stdClass::class);
+
+        $this->expectException(RuntimeException::class);
+
+        iterator_to_array($resolver->resolve('entity', $input, $member));
     }
 
     public function testResolveWithStripNull()

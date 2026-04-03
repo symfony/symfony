@@ -11,7 +11,10 @@
 
 namespace Symfony\Bridge\Doctrine\Attribute;
 
+use Doctrine\Persistence\ObjectRepository;
 use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\ValueResolver;
 
 /**
@@ -23,7 +26,7 @@ class MapEntity extends ValueResolver
     /**
      * @param class-string|null          $class         The entity class
      * @param string|null                $objectManager Specify the object manager used to retrieve the entity
-     * @param string|null                $expr          An expression to fetch the entity using the {@see https://symfony.com/doc/current/components/expression_language.html ExpressionLanguage} syntax.
+     * @param string|\Closure<T of ObjectRepository>(Request|InputInterface, T):(object|iterable|null)|null $expr An expression or closure to fetch the entity.
      *                                                  Any request attribute are available as a variable, and your entity repository in the 'repository' variable.
      * @param array<string, string>|null $mapping       Configures the properties and values to use with the findOneBy() method
      *                                                  The key is the route placeholder name and the value is the Doctrine property name.
@@ -40,7 +43,7 @@ class MapEntity extends ValueResolver
     public function __construct(
         public ?string $class = null,
         public ?string $objectManager = null,
-        public ?string $expr = null,
+        public string|\Closure|null $expr = null,
         public ?array $mapping = null,
         public ?array $exclude = null,
         public ?bool $stripNull = null,

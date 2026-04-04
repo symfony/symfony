@@ -84,6 +84,34 @@ class BrevoApiTransportTest extends TestCase
         $this->assertEquals('bar', $payload['headers']['foo']);
     }
 
+    public function testParamsWithMixedTypes()
+    {
+        $params = [
+            'name' => 'John',
+            'age' => 30,
+            'active' => true,
+            'address' => ['street' => '123 Main St', 'city' => 'Paris'],
+            'items' => ['apple', 'banana'],
+        ];
+
+        $email = new Email();
+        $email->getHeaders()
+            ->addTextHeader('templateId', 1)
+            ->addTextHeader('params', json_encode($params));
+        $envelope = new Envelope(new Address('alice@system.com', 'Alice'), [new Address('bob@system.com', 'Bob')]);
+
+        $transport = new BrevoApiTransport('ACCESS_KEY');
+        $method = new \ReflectionMethod(BrevoApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $this->assertArrayHasKey('params', $payload);
+        $this->assertSame('John', $payload['params']['name']);
+        $this->assertSame(30, $payload['params']['age']);
+        $this->assertTrue($payload['params']['active']);
+        $this->assertSame(['street' => '123 Main St', 'city' => 'Paris'], $payload['params']['address']);
+        $this->assertSame(['apple', 'banana'], $payload['params']['items']);
+    }
+
     public function testSendThrowsForErrorResponse()
     {
         $client = new MockHttpClient(function (string $method, string $url, array $options): ResponseInterface {

@@ -20,7 +20,12 @@ where:
 With API, you can use custom headers.
 
 ```php
-$params = ['param1' => 'foo', 'param2' => 'bar'];
+// Template params with mixed types (arrays, integers, booleans)
+$params = [
+    'name' => 'John',
+    'age' => 30,
+    'items' => ['apple', 'banana'],
+];
 $json = json_encode(['custom_header_1' => 'custom_value_1']);
 
 $email = new Email();
@@ -31,7 +36,7 @@ $email
     ->add(new TagHeader('TagInHeaders2'))
     ->addTextHeader('sender.ip', '1.2.3.4')
     ->addTextHeader('templateId', 1)
-    ->addParameterizedHeader('params', 'params', $params)
+    ->addTextHeader('params', json_encode($params))
     ->addTextHeader('foo', 'bar')
 ;
 ```

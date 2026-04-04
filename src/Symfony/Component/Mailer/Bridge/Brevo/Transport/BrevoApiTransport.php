@@ -22,6 +22,7 @@ use Symfony\Component\Mailer\Transport\AbstractApiTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Header\Headers;
+use Symfony\Component\Mime\Header\ParameterizedHeader;
 use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -159,7 +160,13 @@ final class BrevoApiTransport extends AbstractApiTransport
                 continue;
             }
             if ('params' === $name) {
-                $headersAndTags[$header->getName()] = $header->getParameters();
+                if ($header instanceof ParameterizedHeader) {
+                    // Legacy: ParameterizedHeader only supports string values
+                    $headersAndTags['params'] = $header->getParameters();
+                } else {
+                    // JSON-encoded params support mixed types (arrays, integers, booleans)
+                    $headersAndTags['params'] = json_decode($header->getBodyAsString(), true, 512, \JSON_THROW_ON_ERROR);
+                }
 
                 continue;
             }

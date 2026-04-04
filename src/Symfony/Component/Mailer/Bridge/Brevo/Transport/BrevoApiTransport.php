@@ -79,12 +79,7 @@ final class BrevoApiTransport extends AbstractApiTransport
      */
     private function formatAddresses(array $addresses): array
     {
-        $formattedAddresses = [];
-        foreach ($addresses as $address) {
-            $formattedAddresses[] = $this->formatAddress($address);
-        }
-
-        return $formattedAddresses;
+        return array_map($this->formatAddress(...), $addresses);
     }
 
     private function getPayload(Email $email, Envelope $envelope): array
@@ -98,7 +93,7 @@ final class BrevoApiTransport extends AbstractApiTransport
             $payload['attachment'] = $attachments;
         }
         if ($emails = $email->getReplyTo()) {
-            $payload['replyTo'] = current($this->formatAddresses($emails));
+            $payload['replyTo'] = $this->formatAddress($emails[0]);
         }
         if ($emails = $email->getCc()) {
             $payload['cc'] = $this->formatAddresses($emails);

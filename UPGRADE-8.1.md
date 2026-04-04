@@ -74,6 +74,7 @@ HttpFoundation
 HttpKernel
 ----------
 
+ * Add `JsonAwareDataCollectorInterface` for data collectors to expose JSON through the profiler's `/{token}/data/{collector}.json` endpoint
  * Deprecate `BundleInterface`, use the one from the DependencyInjection component instead
  * Deprecate `MergeExtensionConfigurationPass`, use the one from the DependencyInjection component instead
  * Deprecate `FileLocator`, use the one from the DependencyInjection component instead

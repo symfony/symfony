@@ -4,7 +4,7 @@ CHANGELOG
 8.1
 ---
 
- * Add JSON endpoints for profiler data (`/{token}/data.json` and `/{token}/data/{collector}.json`)
+ * Add JSON endpoints for profiler data (`/{token}/data.json` and `/{token}/data/{collector}.json`) with `JsonAwareDataCollectorInterface`-based extensibility
  * Add console command value resolvers durations to Performances panel
  * Add error indicator to profiler list view for profiles with errors
  * Add cURL copy paste button in the Request/Response tab

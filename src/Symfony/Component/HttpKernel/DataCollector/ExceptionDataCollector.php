@@ -20,8 +20,10 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @final
  */
-class ExceptionDataCollector extends DataCollector
+class ExceptionDataCollector extends DataCollector implements JsonAwareDataCollectorInterface
 {
+    private const MAX_TRACE_FRAMES = 50;
+
     public function collect(Request $request, Response $response, ?\Throwable $exception = null): void
     {
         if (null !== $exception) {
@@ -59,6 +61,35 @@ class ExceptionDataCollector extends DataCollector
     public function getTrace(): array
     {
         return $this->data['exception']->getTrace();
+    }
+
+    public function toJsonArray(bool $verbose = false): array
+    {
+        if (!$this->hasException()) {
+            return ['has_exception' => false];
+        }
+
+        $exception = $this->getException();
+
+        $data = [
+            'has_exception' => true,
+            'class' => $exception->getClass(),
+            'message' => $this->getMessage(),
+            'code' => $this->getCode(),
+            'status_code' => $this->getStatusCode(),
+            'file' => $exception->getFile(),
+            'line' => $exception->getLine(),
+        ];
+
+        if ($verbose) {
+            $trace = \array_slice($this->getTrace(), 0, self::MAX_TRACE_FRAMES);
+            foreach ($trace as &$frame) {
+                unset($frame['args']);
+            }
+            $data['trace'] = $trace;
+        }
+
+        return $data;
     }
 
     public function getName(): string

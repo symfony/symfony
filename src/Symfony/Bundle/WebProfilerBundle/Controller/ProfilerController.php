@@ -13,7 +13,7 @@ namespace Symfony\Bundle\WebProfilerBundle\Controller;
 
 use Symfony\Bundle\FullStack;
 use Symfony\Bundle\WebProfilerBundle\Csp\ContentSecurityPolicyHandler;
-use Symfony\Bundle\WebProfilerBundle\Profiler\ProfilerDataSerializer;
+use Symfony\Bundle\WebProfilerBundle\Profiler\ProfilerJsonRedactor;
 use Symfony\Bundle\WebProfilerBundle\Profiler\TemplateManager;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,7 +23,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\AutoExpireFlashBag;
 use Symfony\Component\HttpKernel\DataCollector\DumpDataCollector;
 use Symfony\Component\HttpKernel\DataCollector\ExceptionDataCollector;
+use Symfony\Component\HttpKernel\DataCollector\JsonAwareDataCollectorInterface;
+use Symfony\Component\HttpKernel\DataCollector\LoggerDataCollector;
+use Symfony\Component\HttpKernel\DataCollector\MemoryDataCollector;
+use Symfony\Component\HttpKernel\DataCollector\TimeDataCollector;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Component\HttpKernel\Profiler\Profiler;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Twig\Environment;
@@ -128,7 +133,7 @@ class ProfilerController
             return new JsonResponse(['error' => \sprintf('No profile found for token "%s".', $token)], 404);
         }
 
-        return new JsonResponse(ProfilerDataSerializer::buildOverview($profile));
+        return new JsonResponse($this->buildOverviewData($profile));
     }
 
     /**
@@ -144,17 +149,19 @@ class ProfilerController
             return new JsonResponse(['error' => \sprintf('No profile found for token "%s".', $token)], 404);
         }
 
-        $supported = ProfilerDataSerializer::getSupportedCollectors();
-
-        if (!\in_array($collector, $supported, true)) {
-            return new JsonResponse(['error' => \sprintf('Collector "%s" is not available as JSON. Supported collectors: %s.', $collector, implode(', ', $supported))], 404);
-        }
-
         if (!$profile->hasCollector($collector)) {
             return new JsonResponse(['error' => \sprintf('Collector "%s" is not available for token "%s".', $collector, $token)], 404);
         }
 
-        return new JsonResponse(ProfilerDataSerializer::buildCollectorData($profile, $collector));
+        $collectorObj = $profile->getCollector($collector);
+
+        if (!$collectorObj instanceof JsonAwareDataCollectorInterface) {
+            return new JsonResponse(['error' => \sprintf('Collector "%s" does not support JSON output.', $collector)], 400);
+        }
+
+        $verbose = $request->query->getBoolean('verbose');
+
+        return new JsonResponse(ProfilerJsonRedactor::redact($collectorObj->toJsonArray($verbose)));
     }
 
     /**
@@ -443,6 +450,51 @@ class ProfilerController
     protected function getTemplateManager(): TemplateManager
     {
         return $this->templateManager ??= new TemplateManager($this->profiler, $this->twig, $this->templates);
+    }
+
+    private function buildOverviewData(Profile $profile): array
+    {
+        $statusCode = $profile->getStatusCode();
+
+        $data = [
+            'token' => $profile->getToken(),
+            'method' => $profile->getMethod(),
+            'url' => $profile->getUrl(),
+            'status_code' => $statusCode,
+            'ip' => $profile->getIp(),
+            'time' => $profile->getTime(),
+            'collectors' => array_keys($profile->getCollectors()),
+        ];
+
+        $data['has_errors'] = $profile->hasErrors();
+
+        if (null !== $statusCode) {
+            $data['status_text'] = Response::$statusTexts[$statusCode] ?? '';
+        }
+
+        $metrics = [];
+
+        if ($profile->hasCollector('time') && ($time = $profile->getCollector('time')) instanceof TimeDataCollector) {
+            $metrics['duration_ms'] = $time->getDuration();
+        }
+
+        if ($profile->hasCollector('memory') && ($memory = $profile->getCollector('memory')) instanceof MemoryDataCollector) {
+            $metrics['memory_bytes'] = $memory->getMemory();
+        }
+
+        if ($profile->hasCollector('exception') && ($exception = $profile->getCollector('exception')) instanceof ExceptionDataCollector) {
+            $metrics['has_exception'] = $exception->hasException();
+        }
+
+        if ($profile->hasCollector('logger') && ($logger = $profile->getCollector('logger')) instanceof LoggerDataCollector) {
+            $metrics['error_count'] = $logger->countErrors();
+        }
+
+        if ($metrics) {
+            $data['metrics'] = $metrics;
+        }
+
+        return $data;
     }
 
     private function resolveLatestToken(string $token, string $profileType): string

@@ -94,6 +94,26 @@ abstract class DataCollector implements DataCollectorInterface
         $this->data = $data['data'] ?? $data["\0*\0data"];
     }
 
+    /**
+     * Recursively resolves Data objects to plain values suitable for JSON serialization.
+     *
+     * This is the reverse complement to {@see cloneVar()}: while cloneVar() wraps
+     * PHP values into Data objects for the VarDumper, this method unwraps them back
+     * to plain scalars and arrays.
+     */
+    protected function resolveData(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if ($value instanceof Data) {
+                $data[$key] = $value->getValue(true);
+            } elseif (\is_array($value)) {
+                $data[$key] = $this->resolveData($value);
+            }
+        }
+
+        return $data;
+    }
+
     public function reset(): void
     {
         $this->data = [];

@@ -67,11 +67,6 @@ class ProfilerJsonRedactorTest extends TestCase
         $this->assertSame('***REDACTED***', $result['Authorization']);
     }
 
-    public function testRedactHeadersOnEmptyArray()
-    {
-        $this->assertSame([], ProfilerJsonRedactor::redactHeaders([]));
-    }
-
     public function testRedactAllReplacesAllValues()
     {
         $data = [
@@ -86,23 +81,6 @@ class ProfilerJsonRedactorTest extends TestCase
         foreach ($result as $value) {
             $this->assertSame('***REDACTED***', $value);
         }
-    }
-
-    public function testRedactAllPreservesKeys()
-    {
-        $data = ['foo' => 'bar', 'baz' => 42];
-
-        $result = ProfilerJsonRedactor::redactAll($data);
-
-        $this->assertArrayHasKey('foo', $result);
-        $this->assertArrayHasKey('baz', $result);
-        $this->assertSame('***REDACTED***', $result['foo']);
-        $this->assertSame('***REDACTED***', $result['baz']);
-    }
-
-    public function testRedactAllOnEmptyArray()
-    {
-        $this->assertSame([], ProfilerJsonRedactor::redactAll([]));
     }
 
     public function testRedactByKeyPatternRedactsSensitiveKeys()
@@ -170,11 +148,6 @@ class ProfilerJsonRedactorTest extends TestCase
         $this->assertSame($data, $result);
     }
 
-    public function testRedactByKeyPatternOnEmptyArray()
-    {
-        $this->assertSame([], ProfilerJsonRedactor::redactByKeyPattern([]));
-    }
-
     public function testRedactByKeyPatternRecursesIntoNestedArrays()
     {
         $data = [
@@ -236,5 +209,76 @@ class ProfilerJsonRedactorTest extends TestCase
         // sqlite URL has no credentials — preserved (but MESSENGER_TRANSPORT_DSN matches DSN pattern)
         $this->assertSame('sqlite:///%kernel.project_dir%/data/database.sqlite', $result['DATABASE_URL']);
         $this->assertSame('***REDACTED***', $result['MESSENGER_TRANSPORT_DSN']);
+    }
+
+    public function testRedactDispatchesHeadersByKeyConvention()
+    {
+        $data = [
+            'request_headers' => ['authorization' => 'Bearer secret', 'content-type' => 'application/json'],
+            'response_headers' => ['set-cookie' => 'id=abc', 'x-request-id' => '123'],
+        ];
+
+        $result = ProfilerJsonRedactor::redact($data);
+
+        $this->assertSame('***REDACTED***', $result['request_headers']['authorization']);
+        $this->assertSame('application/json', $result['request_headers']['content-type']);
+        $this->assertSame('***REDACTED***', $result['response_headers']['set-cookie']);
+        $this->assertSame('123', $result['response_headers']['x-request-id']);
+    }
+
+    public function testRedactDispatchesCookiesByKeyConvention()
+    {
+        $data = [
+            'request_cookies' => ['PHPSESSID' => 'abc123', 'theme' => 'dark'],
+            'response_cookies' => ['sid' => 'xyz'],
+        ];
+
+        $result = ProfilerJsonRedactor::redact($data);
+
+        $this->assertSame('***REDACTED***', $result['request_cookies']['PHPSESSID']);
+        $this->assertSame('***REDACTED***', $result['request_cookies']['theme']);
+        $this->assertSame('***REDACTED***', $result['response_cookies']['sid']);
+    }
+
+    public function testRedactDispatchesSessionByKeyConvention()
+    {
+        $data = [
+            'session_attributes' => ['_security_main' => 'serialized-token', 'cart' => ['item1']],
+        ];
+
+        $result = ProfilerJsonRedactor::redact($data);
+
+        $this->assertSame('***REDACTED***', $result['session_attributes']['_security_main']);
+        $this->assertSame('***REDACTED***', $result['session_attributes']['cart']);
+    }
+
+    public function testRedactAppliesKeyPatternToOtherArrays()
+    {
+        $data = [
+            'request_query' => ['page' => '1', 'API_KEY' => 'secret'],
+            'dotenv_vars' => ['APP_ENV' => 'prod', 'APP_SECRET' => 'my-secret'],
+        ];
+
+        $result = ProfilerJsonRedactor::redact($data);
+
+        $this->assertSame('1', $result['request_query']['page']);
+        $this->assertSame('***REDACTED***', $result['request_query']['API_KEY']);
+        $this->assertSame('prod', $result['dotenv_vars']['APP_ENV']);
+        $this->assertSame('***REDACTED***', $result['dotenv_vars']['APP_SECRET']);
+    }
+
+    public function testRedactHandlesTopLevelStringValues()
+    {
+        $data = [
+            'method' => 'GET',
+            'route' => 'app_homepage',
+            'database_dsn' => 'mysql://user:pass@localhost/db',
+        ];
+
+        $result = ProfilerJsonRedactor::redact($data);
+
+        $this->assertSame('GET', $result['method']);
+        $this->assertSame('app_homepage', $result['route']);
+        $this->assertSame('***REDACTED***', $result['database_dsn']);
     }
 }

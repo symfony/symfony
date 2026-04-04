@@ -89,4 +89,29 @@ class DataCollectorTest extends TestCase
 
         $this->assertNotNull($c->getData()->parent);
     }
+
+    public function testResolveDataUnwrapsDataObjects()
+    {
+        $cloner = new VarCloner();
+        $data = [
+            'scalar' => 'hello',
+            'number' => 42,
+            'cloned' => $cloner->cloneVar('resolved-value'),
+            'nested' => [
+                'inner_cloned' => $cloner->cloneVar(['a', 'b']),
+                'inner_scalar' => true,
+            ],
+        ];
+
+        $c = new CloneVarDataCollector(null);
+        $method = new \ReflectionMethod($c, 'resolveData');
+
+        $result = $method->invoke($c, $data);
+
+        $this->assertSame('hello', $result['scalar']);
+        $this->assertSame(42, $result['number']);
+        $this->assertSame('resolved-value', $result['cloned']);
+        $this->assertSame(['a', 'b'], $result['nested']['inner_cloned']);
+        $this->assertTrue($result['nested']['inner_scalar']);
+    }
 }

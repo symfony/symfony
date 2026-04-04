@@ -30,7 +30,7 @@ use Symfony\Component\VarDumper\Cloner\Data;
  *
  * @final
  */
-class RequestDataCollector extends DataCollector implements EventSubscriberInterface, LateDataCollectorInterface
+class RequestDataCollector extends DataCollector implements EventSubscriberInterface, LateDataCollectorInterface, JsonAwareDataCollectorInterface
 {
     /**
      * @var \SplObjectStorage<Request, callable>
@@ -390,6 +390,46 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return [
             KernelEvents::CONTROLLER => 'onKernelController',
             KernelEvents::RESPONSE => 'onKernelResponse',
+        ];
+    }
+
+    /**
+     * Returns the request and response data as a JSON-serializable array.
+     *
+     * Intentional omissions:
+     * - curlCommand: embeds authorization headers in a string value
+     * - request_server: exposes $_SERVER with env vars and filesystem paths
+     * - session_metadata: excluded to avoid false redaction (key contains "session")
+     * - content/pretty_json: raw request body, potentially very large
+     * - request_files: binary upload metadata
+     * - session_usages: internal profiler bookkeeping
+     */
+    public function toJsonArray(bool $verbose = false): array
+    {
+        $controller = $this->getController();
+        if ($controller instanceof Data) {
+            $controller = $controller->getValue(true) ?? '';
+        }
+
+        return [
+            'method' => $this->getMethod(),
+            'path_info' => $this->getPathInfo(),
+            'route' => $this->getRoute(),
+            'route_params' => $this->resolveData($this->getRouteParams()),
+            'status_code' => $this->getStatusCode(),
+            'status_text' => $this->getStatusText(),
+            'content_type' => $this->getContentType(),
+            'format' => $this->getFormat(),
+            'locale' => $this->getLocale(),
+            'controller' => $controller,
+            'request_query' => $this->resolveData($this->getRequestQuery()->all()),
+            'request_request' => $this->resolveData($this->getRequestRequest()->all()),
+            'request_headers' => $this->resolveData($this->getRequestHeaders()->all()),
+            'request_cookies' => $this->resolveData($this->getRequestCookies()->all()),
+            'response_headers' => $this->resolveData($this->getResponseHeaders()->all()),
+            'response_cookies' => $this->resolveData($this->getResponseCookies()->all()),
+            'session_attributes' => $this->resolveData($this->getSessionAttributes()),
+            'dotenv_vars' => $this->resolveData($this->getDotenvVars()->all()),
         ];
     }
 

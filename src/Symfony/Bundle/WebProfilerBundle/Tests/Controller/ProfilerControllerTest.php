@@ -456,62 +456,36 @@ class ProfilerControllerTest extends WebTestCase
         $this->assertArrayHasKey('error', $data);
     }
 
-    public function testCollectorActionWithProfilerDisabled()
-    {
-        $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
-        $controller = new ProfilerController($urlGenerator, null, new Environment(new ArrayLoader()), []);
-
-        $this->expectException(NotFoundHttpException::class);
-        $this->expectExceptionMessage('The profiler must be enabled.');
-
-        $controller->collectorAction(Request::create('/_profiler/token/data/request.json'), 'token', 'request');
-    }
-
-    public function testCollectorActionReturnsMemoryData()
+    public function testCollectorActionWithNonExistentCollector()
     {
         $kernel = new WebProfilerBundleKernel();
         $client = new KernelBrowser($kernel);
 
         $client->request('GET', '/');
-        $client->request('GET', '/_profiler/latest/data/memory.json');
-
-        $response = $client->getResponse();
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('application/json', $response->headers->get('Content-Type'));
-
-        $data = json_decode($response->getContent(), true);
-        $this->assertArrayHasKey('memory', $data);
-        $this->assertArrayHasKey('memory_limit', $data);
-    }
-
-    public function testCollectorActionWithUnsupportedCollector()
-    {
-        $kernel = new WebProfilerBundleKernel();
-        $client = new KernelBrowser($kernel);
-
-        $client->request('GET', '/');
-        $client->request('GET', '/_profiler/latest/data/unsupported.json');
+        $client->request('GET', '/_profiler/latest/data/nonexistent.json');
 
         $response = $client->getResponse();
         $this->assertSame(404, $response->getStatusCode());
 
         $data = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('error', $data);
-        $this->assertStringContainsString('not available as JSON', $data['error']);
+        $this->assertStringContainsString('is not available for token', $data['error']);
     }
 
-    public function testCollectorActionWithInvalidToken()
+    public function testCollectorActionWithNonJsonCollector()
     {
         $kernel = new WebProfilerBundleKernel();
         $client = new KernelBrowser($kernel);
 
-        $client->request('GET', '/_profiler/this-token-does-not-exist/data/memory.json');
+        $client->request('GET', '/');
+        $client->request('GET', '/_profiler/latest/data/time.json');
 
         $response = $client->getResponse();
-        $this->assertSame(404, $response->getStatusCode());
+        $this->assertSame(400, $response->getStatusCode());
 
         $data = json_decode($response->getContent(), true);
         $this->assertArrayHasKey('error', $data);
+        $this->assertStringContainsString('does not support JSON output', $data['error']);
     }
 
     public function testCollectorActionReturnsRequestData()

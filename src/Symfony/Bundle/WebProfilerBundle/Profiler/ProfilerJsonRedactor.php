@@ -101,6 +101,49 @@ final class ProfilerJsonRedactor
     }
 
     /**
+     * Applies convention-based redaction to a collector's toJsonArray() output.
+     *
+     * Dispatches to the appropriate strategy based on key naming conventions:
+     * - Keys containing "_headers" or equal to "headers": redactHeaders()
+     * - Keys containing "_cookies" or "session": redactAll()
+     * - Scalar string values: connection-string detection + key-pattern check
+     * - All other array values: redactByKeyPattern() recursively
+     *
+     * @param array<string, mixed> $data
+     *
+     * @return array<string, mixed>
+     */
+    public static function redact(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            $lowerKey = strtolower((string) $key);
+
+            if (\is_array($value)) {
+                if (str_contains($lowerKey, '_headers') || 'headers' === $lowerKey) {
+                    $data[$key] = self::redactHeaders($value);
+                } elseif (str_contains($lowerKey, '_cookies') || str_contains($lowerKey, 'session')) {
+                    $data[$key] = self::redactAll($value);
+                } else {
+                    $data[$key] = self::redactByKeyPattern($value);
+                }
+            } elseif (\is_string($value)) {
+                $upperKey = strtoupper((string) $key);
+                foreach (self::SENSITIVE_ENV_PATTERNS as $pattern) {
+                    if (str_contains($upperKey, $pattern)) {
+                        $data[$key] = self::REDACTED;
+                        continue 2;
+                    }
+                }
+                if (self::looksLikeConnectionString($value)) {
+                    $data[$key] = self::REDACTED;
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Detects connection strings containing credentials (e.g., mysql://user:pass@host/db).
      */
     private static function looksLikeConnectionString(string $value): bool

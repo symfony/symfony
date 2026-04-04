@@ -29,6 +29,21 @@ class MemoryDataCollectorTest extends TestCase
         $this->assertSame('memory', $collector->getName());
     }
 
+    public function testToJsonArray()
+    {
+        $collector = new MemoryDataCollector();
+        $collector->collect(new Request(), new Response());
+        $collector->lateCollect();
+
+        $json = $collector->toJsonArray();
+
+        $this->assertArrayHasKey('memory', $json);
+        $this->assertArrayHasKey('memory_limit', $json);
+        $this->assertCount(2, $json);
+        $this->assertSame($collector->getMemory(), $json['memory']);
+        $this->assertSame($collector->getMemoryLimit(), $json['memory_limit']);
+    }
+
     #[DataProvider('getBytesConversionTestData')]
     public function testBytesConversion($limit, $bytes)
     {

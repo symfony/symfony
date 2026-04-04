@@ -569,4 +569,63 @@ class RequestDataCollectorTest extends TestCase
         $c = new RequestDataCollector();
         $this->assertSame('', $c->getCurlCommand());
     }
+
+    public function testToJsonArrayKeys()
+    {
+        $c = new RequestDataCollector();
+        $c->collect($this->createRequest(), $this->createResponse());
+        $c->lateCollect();
+
+        $json = $c->toJsonArray();
+
+        $expectedKeys = [
+            'method', 'path_info', 'route', 'route_params',
+            'status_code', 'status_text', 'content_type', 'format', 'locale',
+            'controller', 'request_query', 'request_request',
+            'request_headers', 'request_cookies',
+            'response_headers', 'response_cookies',
+            'session_attributes', 'dotenv_vars',
+        ];
+
+        foreach ($expectedKeys as $key) {
+            $this->assertArrayHasKey($key, $json, \sprintf('Missing key "%s" in toJsonArray() output.', $key));
+        }
+
+        // request_server must NOT be present (security: exposes $_SERVER)
+        $this->assertArrayNotHasKey('request_server', $json);
+        // curlCommand must NOT be present (embeds secrets)
+        $this->assertArrayNotHasKey('curlCommand', $json);
+    }
+
+    public function testToJsonArrayValues()
+    {
+        $c = new RequestDataCollector();
+        $c->collect($this->createRequest(), $this->createResponse());
+        $c->lateCollect();
+
+        $json = $c->toJsonArray();
+
+        $this->assertSame('GET', $json['method']);
+        $this->assertSame('/foo', $json['path_info']);
+        $this->assertSame('foobar', $json['route']);
+        $this->assertSame(['name' => 'foo'], $json['route_params']);
+        $this->assertSame(200, $json['status_code']);
+        $this->assertSame('OK', $json['status_text']);
+        $this->assertSame('application/json', $json['content_type']);
+        $this->assertSame('html', $json['format']);
+        $this->assertSame('en', $json['locale']);
+    }
+
+    public function testToJsonArrayContainsNoDataObjects()
+    {
+        $c = new RequestDataCollector();
+        $c->collect($this->createRequest(), $this->createResponse());
+        $c->lateCollect();
+
+        $json = $c->toJsonArray();
+
+        array_walk_recursive($json, function ($value, $key) {
+            $this->assertNotInstanceOf(\Symfony\Component\VarDumper\Cloner\Data::class, $value, \sprintf('Key "%s" still contains a Data object.', $key));
+        });
+    }
 }

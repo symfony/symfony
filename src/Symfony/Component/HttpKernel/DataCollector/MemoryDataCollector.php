@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @final
  */
-class MemoryDataCollector extends DataCollector implements LateDataCollectorInterface
+class MemoryDataCollector extends DataCollector implements LateDataCollectorInterface, JsonAwareDataCollectorInterface
 {
     public function __construct()
     {
@@ -57,6 +57,14 @@ class MemoryDataCollector extends DataCollector implements LateDataCollectorInte
     public function updateMemoryUsage(): void
     {
         $this->data['memory'] = memory_get_peak_usage(true);
+    }
+
+    public function toJsonArray(bool $verbose = false): array
+    {
+        return [
+            'memory' => $this->getMemory(),
+            'memory_limit' => $this->getMemoryLimit(),
+        ];
     }
 
     public function getName(): string

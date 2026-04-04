@@ -4,6 +4,8 @@ CHANGELOG
 8.1
 ---
 
+ * Add `JsonAwareDataCollectorInterface` for collectors to expose JSON through the profiler
+ * Add `DataCollector::resolveData()` as the reverse complement to `cloneVar()`
  * Add `#[MapRequestHeader]` to map a header from `Request` to a controller argument
  * Add `hasErrors()` method to `Profile` to track profiles with errors (exceptions or error-level logs)
  * Validate typed route parameters before calling controllers and return an HTTP error when an invalid value is provided

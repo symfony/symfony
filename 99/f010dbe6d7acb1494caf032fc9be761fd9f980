@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by derrabus at 2026-04-06T10:19:53Z
+
+> Element 'deprecationTrigger', attribute 'ignoreUndefinedTriggers': The attribute 'ignoreUndefinedTriggers' is not allowed.
+
+The option is only available on PHPUnit 13.1. Can we skip the config file validation on earlier PHPUnit releases?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-06T10:20:51Z
+
+> skip the config file validation on earlier PHPUnit releases
+
+how do we do that? I pushed some monkey-patching logic in the root phpunit script, have a look
+
+---------------------------------------------------------------------------
+
+by derrabus at 2026-04-06T10:24:45Z
+
+> how do we do that?
+
+I don't know. 🙈
+
+> I pushed some monkey-patching logic in the root phpunit script, have a look
+
+Works for me. We can remove that logic on 8.x anyway.

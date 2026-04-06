@@ -55,7 +55,7 @@ class ContainerConfigurator extends AbstractConfigurator
             throw new InvalidArgumentException(\sprintf('There is no extension able to load the configuration for "%s" (in "%s"). Looked for namespace "%s", found "%s".', $namespace, $this->file, $namespace, $extensions ? implode('", "', $extensions) : 'none'));
         }
 
-        $this->container->loadFromExtension($namespace, static::processValue($config));
+        $this->container->loadFromExtension($namespace, static::processValue($config, true));
     }
 
     final public function import(string $resource, ?string $type = null, bool|string $ignoreErrors = false): void

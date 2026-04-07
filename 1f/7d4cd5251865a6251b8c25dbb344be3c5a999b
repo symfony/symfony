@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-04-03T11:58:31Z
+
+Hey!
+
+Oh no, it looks like you have made this PR towards a branch that is not maintained anymore. :/
+Could you update the [PR base branch](https://docs.github.com/en/free-pro-team@latest/github/collaborating-with-issues-and-pull-requests/changing-the-base-branch-of-a-pull-request) to target one of these branches instead? 6.4, 7.4, 8.0, 8.1.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by stof at 2026-04-03T12:13:29Z
+
+Refactoring for performance improvement is generally not treated as a bugfix, so this should target the 8.1 branch.
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-03T12:20:48Z
+
+Done, rebased on 8.1. Thanks @stof!
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-06T07:45:55Z
+
+@staabm Good catch! You're right, the fallback was unnecessary since the parameter is always provided from `calculateColumnsWidth()`. Fixed in 200cceea8b – made the parameter non-optional.
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-07T06:24:18Z
+
+Thanks @GromNaN for the detailed review and the optimization suggestions! 🙏
+
+I've applied the PCRE optimization and fixed the comment. Here are the benchmark results:
+
+### Helper::width() micro-benchmark (10,000 iterations)
+| Input type | Before (µs) | After (µs) |
+|------------|-------------|------------|
+| ASCII string | 0.098 | 0.094 |
+| Unicode string | 20.367 | 20.149 |
+| Control chars | 2.829 | 2.920 |
+
+### Table rendering benchmark
+| Scenario | Before (ms/iter) | After (ms/iter) |
+|----------|------------------|-----------------|
+| Simple table (4 rows) | 0.0687 | 0.0628 |
+| Large table (100 rows) | 1.159 | 1.085 |
+| Colspan table | 0.0752 | 0.0695 |
+
+The PCRE optimization is elegant but the gain is within statistical noise - the main benefit is cleaner code by avoiding the redundant UTF-8 validity check.
+
+Regarding the colspan split optimization: I tried implementing the "skip when content fits" approach, but it broke some edge cases in the test suite. The interaction between `maxColumnWidths` initialization and the iterative width calculation made it tricky to get right without a more significant refactor. Happy to revisit if you have specific guidance on how to approach it!

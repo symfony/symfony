@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-06T18:02:18Z
+
+BTW, in  #63710, I left cache-warmers as a concept for HttpKernel. I'm wondering if the concept should move to DI. Any opinion on this?
+
+---------------------------------------------------------------------------
+
+by mahono at 2026-04-06T18:17:49Z
+
+> BTW, in #63710, I left cache-warmers as a concept for HttpKernel. I'm wondering if the concept should move to DI. Any opinion on this?
+
+Totally makes sense to me to move it to DI as well. Even if it is not directly about the container. It is about preparing the application to be ready. I see this as a core part that also makes perfect sense for both, HTTP and Console. Now that you moved things from HttpKernel to DI, this should go there, too.

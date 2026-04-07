@@ -20,6 +20,8 @@ use Symfony\Component\Validator\Exception\OutOfBoundsException;
  *
  * @extends \ArrayAccess<int, ConstraintViolationInterface>
  * @extends \Traversable<int, ConstraintViolationInterface>
+ *
+ * @method static findByCodes(string|string[] $codes) Returns a new instance with violations matching the given error codes. Not implementing it is deprecated since Symfony 8.1.
  */
 interface ConstraintViolationListInterface extends \Traversable, \Countable, \ArrayAccess
 {

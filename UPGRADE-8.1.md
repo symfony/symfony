@@ -123,3 +123,8 @@ Uid
 ---
 
  * Add argument `$format` to `Ulid::isValid()`
+
+Validator
+---------
+
+ * Implementing `ConstraintViolationListInterface` without implementing `findByCodes()` is deprecated

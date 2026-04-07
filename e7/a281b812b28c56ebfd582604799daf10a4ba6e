@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-06T17:14:09Z
+
+Hi! 👋
+
+This fixes the regression introduced in 6.4.36/7.4.8/8.0.8 where variables like `MY_VAR="${MY_VAR}_suffix"` were incorrectly treated as self-referencing with default syntax.
+
+The issue was that the regex matched any self-reference, but it should only match `:-` and `:=` patterns. The fix also preserves resolved values across multiple `load()` calls so they can be used for concatenation.
+
+Thanks @bartgloudemans for the detailed bug report — the reproduction script made debugging much easier!

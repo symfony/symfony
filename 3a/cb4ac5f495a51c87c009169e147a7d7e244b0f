@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-07T06:56:17Z
+
+FTR my first iteration used an interface, but this is a static concern indeed; an attribute fits better as a description (e.g. one can list what RequiresBundle describes in their `bundles.php` if they want to skip the reflection logic - conceptually)

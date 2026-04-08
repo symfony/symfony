@@ -564,6 +564,21 @@ class ConfigurationTest extends TestCase
         $this->assertFalse($configuration->isIgnoredDeprecation(new Deprecation('Many occurrences', $trace, '')));
     }
 
+    public function testMultipleIgnoreFiles()
+    {
+        $file1 = $this->createFile();
+        file_put_contents($file1, '/Test message .*/');
+
+        $file2 = $this->createFile();
+        file_put_contents($file2, '/^\d+ occurrences/');
+
+        $configuration = Configuration::fromUrlEncodedString('ignoreFile[]='.urlencode($file1).'&ignoreFile[]='.urlencode($file2));
+        $trace = debug_backtrace();
+        $this->assertTrue($configuration->isIgnoredDeprecation(new Deprecation('Test message 1', $trace, '')));
+        $this->assertTrue($configuration->isIgnoredDeprecation(new Deprecation('42 occurrences', $trace, '')));
+        $this->assertFalse($configuration->isIgnoredDeprecation(new Deprecation('Something else', $trace, '')));
+    }
+
     public function testIgnoreFilePatternInvalid()
     {
         $filename = $this->createFile();

@@ -65,12 +65,12 @@ class Configuration
      * @param int[]       $thresholds       A hash associating groups to thresholds
      * @param string      $regex            Will be matched against messages, to decide whether to display a stack trace
      * @param bool[]      $verboseOutput    Keyed by groups
-     * @param string      $ignoreFile       The path to the ignore deprecation patterns file
-     * @param bool        $generateBaseline Whether to generate or update the baseline file
-     * @param string      $baselineFile     The path to the baseline file
-     * @param string|null $logFile          The path to the log file
+     * @param string|string[] $ignoreFile    The path(s) to the ignore deprecation patterns file(s)
+     * @param bool            $generateBaseline Whether to generate or update the baseline file
+     * @param string          $baselineFile     The path to the baseline file
+     * @param string|null     $logFile          The path to the log file
      */
-    private function __construct(array $thresholds = [], string $regex = '', array $verboseOutput = [], string $ignoreFile = '', bool $generateBaseline = false, string $baselineFile = '', ?string $logFile = null)
+    private function __construct(array $thresholds = [], string $regex = '', array $verboseOutput = [], string|array $ignoreFile = '', bool $generateBaseline = false, string $baselineFile = '', ?string $logFile = null)
     {
         $groups = ['total', 'indirect', 'direct', 'self'];
 
@@ -116,15 +116,18 @@ class Configuration
             $this->verboseOutput[$group] = $status;
         }
 
-        if ($ignoreFile) {
-            if (!is_file($ignoreFile)) {
-                throw new \InvalidArgumentException(\sprintf('The ignoreFile "%s" does not exist.', $ignoreFile));
+        foreach ((array) $ignoreFile as $file) {
+            if (!$file) {
+                continue;
             }
-            set_error_handler(static function ($t, $m) use ($ignoreFile, &$line) {
-                throw new \RuntimeException(\sprintf('Invalid pattern found in "%s" on line "%d"', $ignoreFile, 1 + $line).substr($m, 12));
+            if (!is_file($file)) {
+                throw new \InvalidArgumentException(\sprintf('The ignoreFile "%s" does not exist.', $file));
+            }
+            set_error_handler(static function ($t, $m) use ($file, &$line) {
+                throw new \RuntimeException(\sprintf('Invalid pattern found in "%s" on line "%d"', $file, 1 + $line).substr($m, 12));
             });
             try {
-                foreach (file($ignoreFile) as $line => $pattern) {
+                foreach (file($file) as $line => $pattern) {
                     if ('#' !== (trim($pattern)[0] ?? '#')) {
                         preg_match($pattern, '');
                         $this->ignoreDeprecationPatterns[] = $pattern;

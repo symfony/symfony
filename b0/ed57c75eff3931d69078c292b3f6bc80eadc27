@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-04-08T10:32:23Z
+
+The documentation at https://developers.mailersend.com/api/v1/webhooks.html#webhooks-overview says that the test webhook is signed with a fixed secret, not the actual secret of that webhook, so this implementation looks incomplete.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-04-08T10:36:41Z
+
+Btw, reading the mailersend webhook doc told me that they have a version 2 of their webhook payload: https://www.mailersend.com/help/webhooks
+
+This request parser supports the 1.0 (legacy) payload format only. It would be great to document that (and maybe doing another PR targeting the next version of Symfony to add support for the version 2 of the payload format)
+
+---------------------------------------------------------------------------
+
+by mwansinck at 2026-04-08T10:39:29Z
+
+> The documentation at https://developers.mailersend.com/api/v1/webhooks.html#webhooks-overview says that the test webhook is signed with a fixed secret, not the actual secret of that webhook, so this implementation looks incomplete.
+
+I did overlook this because we didn't had a secret configured on development, so this part was skipped.  I will fix this
+
+---------------------------------------------------------------------------
+
+by mwansinck at 2026-04-08T13:19:35Z
+
+> The documentation at https://developers.mailersend.com/api/v1/webhooks.html#webhooks-overview says that the test webhook is signed with a fixed secret, not the actual secret of that webhook, so this implementation looks incomplete.
+
+@stof I solved this
+However, i had to workaround a limitation of the Webhook component as discussed in #51837, for now I "abuse" RejectWebhookException, because this is the least invasive way to return an empty response with a 2xx status code.
+When returning null instead of doing this, the WebhookController will return a createRejectedResponse because there are no events parsed from the request.

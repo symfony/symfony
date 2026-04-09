@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-07T09:17:45Z
+
+@nicolas-grekas Good point\! I've updated the PR to leverage `ObjectMapperAwareInterface` instead. The `ObjectMapper` now automatically injects itself into transforms implementing the interface — no service registration needed anymore.

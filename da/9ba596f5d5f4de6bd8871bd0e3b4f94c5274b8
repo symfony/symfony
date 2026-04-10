@@ -1,0 +1,147 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-04-08T16:11:25Z
+
+@nicolas-grekas please make that deep-clone extension compatible with PIE.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-04-08T16:36:05Z
+
+btw, would it be possible to have tests comparing `DeepCloner::toArray()` and `deepclone_to_array` (and the `fromArray` family as well) to ensure that they actually behave the same (and so that `DeepCloner::fromArray(deepclone_to_array($value))` actually works, which is important if the intermediate value is stored or transmitted)
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-04-09T22:55:50Z
+
+Benchmark on PHP 8.5.2 (macOS, Apple Silicon), 1000 iterations with warmup.
+
+| | Pure PHP | ext-deepclone | Speedup |
+|---|---|---|---|
+| Scalar (int) | 0.001 ms/op | 0.001 ms/op | ~1× |
+| Simple array (100 ints) | 0.005 ms/op | 0.001 ms/op | **4×** |
+| Nested array (10×10×10) | 0.023 ms/op | 0.002 ms/op | **15×** |
+| stdClass object graph | 0.017 ms/op | 0.003 ms/op | **6×** |
+| Shared references | 0.006 ms/op | 0.001 ms/op | **5×** |
+| DateTime array (5 dates) | 0.012 ms/op | 0.009 ms/op | 1.3× |
+| DTO graph (20 users+addresses) | 0.051 ms/op | 0.011 ms/op | **4.6×** |
+| `toArray()` (DTO graph) | 0.040 ms/op | 0.008 ms/op | **5×** |
+| `fromArray()->clone()` (DTO graph) | 0.013 ms/op | 0.005 ms/op | 2.6× |
+
+The gains on nested arrays (15×) exceed the 3–5× advertised in the PR description thanks to copy-on-write kicking in for immutable scalar arrays. The DateTime case benefits the least (1.3×) as `__serialize`/`__unserialize` PHP method calls dominate. **On realistic DTO graphs the pure PHP implementation is ~3× slower than `unserialize(serialize())`, which is the key use case this PR addresses.**
+
+<details>
+<summary>Benchmark script</summary>
+
+```php
+<?php
+
+/**
+ * Benchmark: ext-deepclone vs pure PHP implementation.
+ *
+ * Usage:
+ *   php benchmark-deepclone.php
+ *   php -d extension=deepclone.so benchmark-deepclone.php   # if not auto-loaded
+ */
+
+require __DIR__.'/vendor/autoload.php';
+
+use Symfony\Component\VarExporter\DeepCloner;
+
+$extensionLoaded = extension_loaded('deepclone');
+echo '=== DeepCloner Benchmark ==='.PHP_EOL;
+echo 'ext-deepclone: '.($extensionLoaded ? 'YES (v'.phpversion('deepclone').')' : 'NO (pure PHP)').PHP_EOL;
+echo 'PHP: '.PHP_VERSION.PHP_EOL;
+echo PHP_EOL;
+
+$iterations = 1_000;
+
+function bench(string $label, callable $fn, int $iterations): void
+{
+    for ($i = 0; $i < 10; ++$i) { $fn(); } // warmup
+
+    $start = hrtime(true);
+    for ($i = 0; $i < $iterations; ++$i) { $fn(); }
+    $elapsed = (hrtime(true) - $start) / 1e6;
+
+    printf("  %-40s %8.2f ms  (%6.3f ms/op)\n", $label, $elapsed, $elapsed / $iterations);
+}
+
+$scalar = 42;
+$simpleArray = range(1, 100);
+$nestedArray = array_fill(0, 10, array_fill(0, 10, array_fill(0, 10, 'value')));
+
+$stdObject = new stdClass();
+$stdObject->name = 'Symfony';
+$stdObject->version = '8.1';
+$stdObject->tags = ['php', 'framework', 'oss'];
+$stdObject->meta = new stdClass();
+$stdObject->meta->created = new DateTime('2005-01-01');
+$stdObject->meta->stars = 30_000;
+
+$shared = new stdClass();
+$shared->value = 'shared';
+$graph = new stdClass();
+$graph->a = $shared;
+$graph->b = $shared;
+$graph->c = new stdClass();
+$graph->c->ref = $shared;
+
+$dates = array_map(fn($d) => new DateTime($d),
+    ['2020-01-01', '2021-06-15', '2022-12-31', '2023-03-10', '2024-07-04']);
+
+class Address {
+    public function __construct(
+        public string $street, public string $city, public string $country,
+    ) {}
+}
+class User {
+    public array $tags = [];
+    public ?Address $address = null;
+    public function __construct(public string $name, public int $age) {}
+}
+$users = [];
+for ($i = 0; $i < 20; ++$i) {
+    $u = new User("User $i", 20 + $i);
+    $u->address = new Address("$i Main St", 'Paris', 'France');
+    $u->tags = ["tag$i", 'common'];
+    $users[] = $u;
+}
+
+echo '--- Scalar (int) ---'.PHP_EOL;
+bench('DeepCloner::deepClone(42)', fn() => DeepCloner::deepClone($scalar), $iterations);
+bench('unserialize(serialize(42))', fn() => unserialize(serialize($scalar)), $iterations);
+
+echo PHP_EOL.'--- Simple array (100 ints) ---'.PHP_EOL;
+bench('DeepCloner::deepClone($simpleArray)', fn() => DeepCloner::deepClone($simpleArray), $iterations);
+bench('unserialize(serialize($simpleArray))', fn() => unserialize(serialize($simpleArray)), $iterations);
+
+echo PHP_EOL.'--- Nested array (10x10x10) ---'.PHP_EOL;
+bench('DeepCloner::deepClone($nestedArray)', fn() => DeepCloner::deepClone($nestedArray), $iterations);
+bench('unserialize(serialize($nestedArray))', fn() => unserialize(serialize($nestedArray)), $iterations);
+
+echo PHP_EOL.'--- stdClass object graph ---'.PHP_EOL;
+bench('DeepCloner::deepClone($stdObject)', fn() => DeepCloner::deepClone($stdObject), $iterations);
+bench('unserialize(serialize($stdObject))', fn() => unserialize(serialize($stdObject)), $iterations);
+
+echo PHP_EOL.'--- Shared references graph ---'.PHP_EOL;
+bench('DeepCloner::deepClone($graph)', fn() => DeepCloner::deepClone($graph), $iterations);
+bench('unserialize(serialize($graph))', fn() => unserialize(serialize($graph)), $iterations);
+
+echo PHP_EOL.'--- DateTime array (5 dates) ---'.PHP_EOL;
+bench('DeepCloner::deepClone($dates)', fn() => DeepCloner::deepClone($dates), $iterations);
+bench('unserialize(serialize($dates))', fn() => unserialize(serialize($dates)), $iterations);
+
+echo PHP_EOL.'--- Realistic DTO graph (20 users+addresses) ---'.PHP_EOL;
+bench('DeepCloner::deepClone($users)', fn() => DeepCloner::deepClone($users), $iterations);
+bench('unserialize(serialize($users))', fn() => unserialize(serialize($users)), $iterations);
+
+echo PHP_EOL.'--- toArray / fromArray round-trip ---'.PHP_EOL;
+bench('new DeepCloner($users)->toArray()', fn() => new DeepCloner($users)->toArray(), $iterations);
+$payload = (new DeepCloner($users))->toArray();
+bench('DeepCloner::fromArray($payload)->clone()', function () use ($payload) {
+    return DeepCloner::fromArray($payload)->clone();
+}, $iterations);
+```
+
+</details>

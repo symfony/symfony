@@ -51,6 +51,7 @@ use Twig\ExtensionSet;
 use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
 use Twig\Profiler\Profile;
+use Twig\Runtime\EscaperRuntime;
 use Twig\RuntimeLoader\ContainerRuntimeLoader;
 use Twig\Template;
 use Twig\TemplateWrapper;
@@ -147,6 +148,11 @@ return static function (ContainerConfigurator $container) {
 
         ->set('twig.runtime.httpkernel', HttpKernelRuntime::class)
             ->args([service('fragment.handler'), service('fragment.uri_generator')->ignoreOnInvalid()])
+            ->tag('twig.runtime')
+
+        ->set('twig.runtime.escaper', EscaperRuntime::class)
+            ->args([abstract_arg('charset, set in TwigExtension')])
+            ->tag('twig.runtime')
 
         ->set('twig.extension.httpfoundation', HttpFoundationExtension::class)
             ->args([service('url_helper')])
@@ -189,6 +195,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set('twig.runtime.serializer', SerializerRuntime::class)
             ->args([service('serializer')])
+            ->tag('twig.runtime')
 
         ->set('twig.extension.serializer', SerializerExtension::class)
 

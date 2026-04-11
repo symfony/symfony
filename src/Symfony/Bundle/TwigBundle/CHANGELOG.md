@@ -4,6 +4,9 @@ CHANGELOG
 8.1
 ---
 
+ * Register `Twig\Runtime\EscaperRuntime` as the `twig.runtime.escaper` service, tagged as `twig.runtime`.
+   This makes `EscaperRuntime` decoratable and configurable via DI without breaking Twig's lazy-loading,
+   providing a better extension point than decorating the environment configurator.
  * Add `EnvironmentConfiguratorInterface` to allow decorating the Twig environment configurator via an interface
 
 8.0

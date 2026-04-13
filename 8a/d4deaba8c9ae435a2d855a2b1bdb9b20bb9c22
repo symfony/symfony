@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-04-13T09:05:14Z
+
+Could you also apply the CS fixes suggested by fabbot in this PR? Thanks.
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-04-13T09:07:55Z
+
+Well, I'm surprised because it asks to add `: void` to test methods, which we never did. Did something changed and I missed the memo?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-04-13T09:15:30Z
+
+> Well, I'm surprised because it asks to add `: void` to test methods, which we never did. Did something changed and I missed the memo?
+
+Oh, you're right. I read the diff the wrong way around and thought it was asking to remove them on other methods. We're having a problem with fabbot.

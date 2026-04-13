@@ -2571,6 +2571,41 @@ abstract class AbstractLayoutTestCase extends FormLayoutTestCase
         $this->assertSame('<form name="form" method="get" action="http://example.com/directory" class="foobar">', $html);
     }
 
+    public function testStartTagRendersTheFormNameByDefault()
+    {
+        $form = $this->factory->createNamedBuilder('my_form', 'Symfony\Component\Form\Extension\Core\Type\FormType')
+            ->getForm();
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertStringContainsString(' name="my_form"', $html);
+    }
+
+    public function testStartTagWithNameDisabledFromAttr()
+    {
+        $form = $this->factory->createNamedBuilder('my_form', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+            'attr' => ['name' => false],
+        ])
+            ->getForm();
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertStringNotContainsString(' name="', $html);
+    }
+
+    public function testStartTagWithNameOverriddenFromAttr()
+    {
+        $form = $this->factory->createNamedBuilder('my_form', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, [
+            'attr' => ['name' => 'custom'],
+        ])
+            ->getForm();
+
+        $html = $this->renderStart($form->createView());
+
+        $this->assertStringContainsString(' name="custom"', $html);
+        $this->assertStringNotContainsString('my_form', $html);
+    }
+
     public function testWidgetAttributes()
     {
         $form = $this->factory->createNamed('text', 'Symfony\Component\Form\Extension\Core\Type\TextType', 'value', [

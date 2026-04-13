@@ -8,6 +8,7 @@ CHANGELOG
  * Add the `normalize` filter to normalize values with the Serializer component
  * Add the `impersonation_form()` and `impersonation_exit_form()` functions to build a form that switches the user with a POST
  * Render an `id` attribute on the `<form>` element when a child uses `form_attr`, so that the reference resolves
+ * Render the `name` attribute of the `<form>` element through `attr`, so that `attr: {name: false}` disables it and `attr: {name: '...'}` overrides it
  * Render `<optgroup>` labels from `ChoiceGroupView::$label`, which allows translatable choice group labels
  * Deprecate the `render_hinclude()` Twig function; use `render_esi()` or `render()`, or Symfony UX Turbo, instead
 

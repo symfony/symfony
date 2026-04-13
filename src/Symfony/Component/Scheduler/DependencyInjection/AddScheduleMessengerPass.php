@@ -64,7 +64,7 @@ class AddScheduleMessengerPass implements CompilerPassInterface
                 if ($serviceDefinition->hasTag('console.command')) {
                     /** @var AsCommand|null $attribute */
                     $attribute = ($container->getReflectionClass($serviceDefinition->getClass())->getAttributes(AsCommand::class)[0] ?? null)?->newInstance();
-                    $commandName = $attribute?->name;
+                    $commandName = explode('|', $attribute?->name ?? '')[0];
 
                     if (\is_array($arguments = $tagAttributes['arguments'] ?? '')) {
                         $input = (string) new ArrayInput(['command' => $commandName, ...$arguments]);

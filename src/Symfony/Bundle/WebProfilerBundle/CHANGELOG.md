@@ -8,6 +8,9 @@ CHANGELOG
  * Add error indicator to profiler list view for profiles with errors
  * Add cURL copy paste button in the Request/Response tab
  * Add support for streamed responses in the debug toolbar
+ * Disable the profiler for Chrome DevTools `automatic workspace folders` probes
+   (`/.well-known/appspecific/com.chrome.devtools.json`) to avoid polluting the
+   profile list
 
 8.0
 ---

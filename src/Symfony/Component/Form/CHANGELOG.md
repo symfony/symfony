@@ -69,6 +69,7 @@ CHANGELOG
  * Deprecate `PostSubmitEvent::setData()`, use `PreSubmitDataEvent::setData()` or `SubmitDataEvent::setData()` instead
  * Add `duplicate_preferred_choices` option in `ChoiceType`
  * Add `$duplicatePreferredChoices` parameter to `ChoiceListFactoryInterface::createView()`
+ * Remove deprecation `No expectations were configured for the mock object for ...`
 
 6.3
 ---

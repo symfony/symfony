@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-09T09:23:34Z
+
+All feedback addressed in the latest push! Fixtures merged, logic deduplicated, syntax cleaned up.
+
+@mtarld thank you for this excellent review — every single point was spot on and the code is much cleaner now. Really appreciate the time you took to go through it so thoroughly! 🙏
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-14T08:23:29Z
+
+Thanks both for clarifying! 🙏
+
+Pushed f68fc41 to address it: `collectUses()` now strips the leading `\` so that the values stored in `$uses` always match what `TypeContext::normalize()` produces for inline class names. Updated the two test expectations that were encoding the old (inconsistent) behavior — `TypeContextFactoryTest::testCollectUses`, `testCollectUsesWindowsLineEndings`, and `TypeContextTest::testNormalize`.
+
+Let me know if you'd prefer this in a separate PR instead — happy to split it if it helps the bugfix vs feature classification.

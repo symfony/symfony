@@ -1,0 +1,34 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2026-04-13T14:18:08Z
+
+Hey!
+
+Thanks for your PR. You are targeting branch "8.1" but it seems your PR description refers to branch "8.1 for features".
+Could you update the PR description or change target branch? This helps core maintainers a lot.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-04-13T20:59:51Z
+
+Thank you for this very helpful improvement!
+
+While testing locally, I found two minor issues; I’m not sure if they can be fixed.
+
+1. When using only the keyboard navigation, the last panel (Symfony version) is incorrectly positioned. See the screenshot.
+
+<img width="243" height="351" alt="image" src="https://github.com/user-attachments/assets/db10c129-6c96-4de0-a93a-ebd3e25ac104" />
+
+2. When using the keyboard navigation first, then the mouse, 2 panels can be displayed at the same time; overlapping each other.
+
+<img width="588" height="232" alt="image" src="https://github.com/user-attachments/assets/3a5b8bd6-d284-44cd-b8ad-b4422a2f498c" />
+
+---------------------------------------------------------------------------
+
+by maelanleborgne at 2026-04-14T12:46:52Z
+
+Very nice improvement, thank you for the PR :pray:

@@ -17,6 +17,7 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
+use Symfony\Component\Cache\CacheItem;
 use Symfony\Component\Cache\PruneableInterface;
 use Symfony\Component\Cache\Tests\Fixtures\PrunableAdapter;
 use Symfony\Component\Filesystem\Filesystem;
@@ -226,5 +227,27 @@ class TagAwareAdapterTest extends AdapterTestCase
         foreach ($pool->getItems([$itemKey1, $itemKey2]) as $item) {
             // run generator
         }
+    }
+
+    public function testResetClearsInternalStateEvenOnCommitFailure()
+    {
+        $pool = new class extends ArrayAdapter {
+            public function commit(): bool { return false; }
+        };
+
+        $adapter = new TagAwareAdapter($pool);
+        $item = $adapter->getItem('foo');
+        $item->set('bar');
+        $adapter->saveDeferred($item);
+
+        // Simulate some known tag versions
+        $propertyTags = new \ReflectionProperty($adapter, 'knownTagVersions');
+        $propertyTags->setValue($adapter, ['tag1' => 1]);
+
+        $adapter->reset();
+
+        $propertyDeferred = new \ReflectionProperty($adapter, 'deferred');
+        $this->assertEmpty($propertyDeferred->getValue($adapter), 'The deferred items must be cleared even if commit fails.');
+        $this->assertEmpty($propertyTags->getValue($adapter), 'The known tag versions must be cleared even if commit fails.');
     }
 }

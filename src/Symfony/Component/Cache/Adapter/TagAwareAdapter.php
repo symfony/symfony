@@ -288,10 +288,14 @@ class TagAwareAdapter implements TagAwareAdapterInterface, TagAwareCacheInterfac
      */
     public function reset()
     {
-        $this->commit();
-        $this->knownTagVersions = [];
-        $this->pool instanceof ResettableInterface && $this->pool->reset();
-        $this->tags instanceof ResettableInterface && $this->tags->reset();
+        try {
+            $this->commit();
+        } finally {
+            $this->knownTagVersions = [];
+            $this->deferred = [];
+            $this->pool instanceof ResettableInterface && $this->pool->reset();
+            $this->tags instanceof ResettableInterface && $this->tags->reset();
+        }
     }
 
     public function __serialize(): array

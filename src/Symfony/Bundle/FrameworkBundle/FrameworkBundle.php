@@ -17,7 +17,6 @@ use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPas
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DeprecateJsonStreamerValueTransformerTagPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ErrorLoggerCompilerPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FeatureFlagPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonPathPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;

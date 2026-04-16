@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-04-16T12:58:42Z
+
+shouldn't this require bumping the min version of the polyfill ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-16T13:01:17Z
+
+I didn't release a new polyfill version since https://github.com/symfony/symfony/pull/63972

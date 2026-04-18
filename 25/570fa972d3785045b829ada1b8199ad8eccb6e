@@ -1,0 +1,21 @@
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-04-18T10:17:47Z
+
+@GromNaN thanks for the review! I've addressed both comments in a96b2c3:
+- Removed the issue reference from the test comment.
+- Used a distinct log message `Keeping array build parameter "%s" for placeholder resolution.` for preserved array parameters, as you suggested.
+
+Could you take another look when you have a moment?
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-04-18T10:33:48Z
+
+Could you update the PR description with the new log message. Thanks
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-04-18T10:36:03Z
+
+@GromNaN done — PR description updated with the new `Keeping array build parameter "%s" for placeholder resolution.` log message in both the summary and the Before/After example.

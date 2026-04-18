@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-04-14T12:22:37Z
+
+I suggest adding the [`@psalm-inheritors` tag](https://psalm.dev/docs/annotating_code/supported_annotations/#psalm-inheritors) on the interface, to exclude custom implementations from our BC policy
+
+---------------------------------------------------------------------------
+
+by takashiraki at 2026-04-14T13:39:02Z
+
+@stof
+Thanks for the suggestion! I agree that approach makes sense to keep the BC policy clear.
+
+One concern though — `@psalm-inheritors` is Psalm-specific. Do you think I should also add something for PHPStan users, or is Psalm coverage sufficient here?
+
+---------------------------------------------------------------------------
+
+by stof at 2026-04-14T14:06:02Z
+
+@takashiraki phpstan has an equivalent feature (through `@phpstan-sealed`), and it reads the `@psalm-inheritors` tag as well to support libraries where the maintainer used the psalm tag (Psalm does not yet read the phpstan tag though, as [this is not implemented yet](https://github.com/vimeo/psalm/issues/11510)). This will support both phpstan and psalm, which is sufficient with our current rule.
+
+---------------------------------------------------------------------------
+
+by takashiraki at 2026-04-14T15:12:16Z
+
+@stof
+Thanks for the clarification! I wasn't aware that PHPStan reads @psalm-inheritors as well. I'll add the tag to both interfaces.

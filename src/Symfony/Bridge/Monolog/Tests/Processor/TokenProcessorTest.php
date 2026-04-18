@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\Monolog\Processor\TokenProcessor;
 use Symfony\Bridge\Monolog\Tests\RecordFactory;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\User\InMemoryUser;
 
@@ -38,5 +39,20 @@ class TokenProcessorTest extends TestCase
         $this->assertArrayHasKey('token', $record['extra']);
         $this->assertEquals($token->getUserIdentifier(), $record['extra']['token']['user_identifier']);
         $this->assertEquals(['ROLE_USER'], $record['extra']['token']['roles']);
+    }
+
+    public function testProcessorSwallowsTokenStorageErrors()
+    {
+        $tokenStorage = $this->createMock(TokenStorageInterface::class);
+        $tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willThrowException(new \Error('Call to a member function getRepository() on null'));
+
+        $processor = new TokenProcessor($tokenStorage);
+        $record = RecordFactory::create();
+        $record = $processor($record);
+
+        $this->assertArrayHasKey('token', $record['extra']);
+        $this->assertNull($record['extra']['token']);
     }
 }

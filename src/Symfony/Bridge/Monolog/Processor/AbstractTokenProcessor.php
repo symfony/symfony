@@ -45,7 +45,17 @@ abstract class AbstractTokenProcessor
     {
         $record['extra'][$this->getKey()] = null;
 
-        if (null !== $token = $this->getToken()) {
+        try {
+            $token = $this->getToken();
+        } catch (\Throwable) {
+            // A log record processor must never throw: it can be triggered from
+            // within an error handler chain (e.g. a deprecation emitted while
+            // the container is still initializing) where the token storage
+            // cannot be resolved yet.
+            return $record;
+        }
+
+        if (null !== $token) {
             $record['extra'][$this->getKey()] = [
                 'authenticated' => (bool) $token->getUser(),
                 'roles' => $token->getRoleNames(),

@@ -32,6 +32,8 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Quote;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\QuoteRequestView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\QuoteWithToys;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\QuoteWithToysRequestView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassRule\A as ClassRuleA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassRule\B as ClassRuleB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassRule\C as ClassRuleC;
@@ -823,6 +825,27 @@ final class ObjectMapperTest extends TestCase
 
         $this->assertInstanceOf(CostRequestWithSourceView::class, $costRequestView);
         $this->assertEquals('bar', $costRequestView->foo);
+    }
+
+    public function testClassMapAppliesTransformWithoutExplicitSource()
+    {
+        $classMap = [
+            QuoteWithToys::class => QuoteWithToysRequestView::class,
+            Cost::class => CostRequestView::class,
+        ];
+
+        $quote = new QuoteWithToys('q1', [new Cost(10, 20), new Cost(30, 40)]);
+
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), $classMap));
+
+        $view = $mapper->map($quote);
+
+        $this->assertInstanceOf(QuoteWithToysRequestView::class, $view);
+        $this->assertSame('q1', $view->id);
+        $this->assertCount(2, $view->toys);
+        $this->assertContainsOnlyInstancesOf(CostRequestView::class, $view->toys);
+        $this->assertSame(10, $view->toys[0]->amount);
+        $this->assertSame(40, $view->toys[1]->tax);
     }
 
     public function testMissingSourcePropertiesAreIgnored()

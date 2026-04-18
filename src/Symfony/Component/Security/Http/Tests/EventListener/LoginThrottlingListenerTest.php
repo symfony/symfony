@@ -84,6 +84,24 @@ class LoginThrottlingListenerTest extends TestCase
         $this->listener->checkPassport($this->createCheckPassportEvent($passports[0]));
     }
 
+    public function testLocalLimiterIsPerUsernameAcrossIPs()
+    {
+        $passports = [$this->createPassport('wouter'), $this->createPassport('wouter')];
+
+        for ($i = 0; $i < 3; ++$i) {
+            $request = $this->createRequest('192.168.1.'.$i);
+            $this->requestStack->push($request);
+            $this->listener->checkPassport($this->createCheckPassportEvent($passports[0]));
+            $this->listener->onFailedLogin($this->createLoginFailedEvent($passports[0]));
+            $this->requestStack->pop();
+        }
+
+        $request = $this->createRequest('192.168.1.99');
+        $this->requestStack->push($request);
+        $this->expectException(TooManyLoginAttemptsAuthenticationException::class);
+        $this->listener->checkPassport($this->createCheckPassportEvent($passports[1]));
+    }
+
     public function testPreventsLoginWhenOverGlobalThreshold()
     {
         $request = $this->createRequest();

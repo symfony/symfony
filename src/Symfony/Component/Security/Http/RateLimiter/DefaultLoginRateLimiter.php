@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
  * A default login throttling limiter.
  *
  * This limiter prevents breadth-first attacks by enforcing
- * a limit on username+IP and a (higher) limit on IP.
+ * a limit on username and a (higher) limit on IP.
  *
  * @author Wouter de Jong <wouter@wouterj.nl>
  */
@@ -52,7 +52,7 @@ final class DefaultLoginRateLimiter extends AbstractRequestRateLimiter
 
         return [
             $this->globalFactory->create($this->hash($request->getClientIp())),
-            $this->localFactory->create($this->hash($username.'-'.$request->getClientIp())),
+            $this->localFactory->create($this->hash($username)),
         ];
     }
 

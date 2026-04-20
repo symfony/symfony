@@ -17,6 +17,15 @@ use Symfony\Component\String\UnicodeString;
 
 class UnicodeStringTest extends AbstractUnicodeTestCase
 {
+    public function testJoinNormalizesJoinedStrings(): void
+    {
+        // "é" in NFC (\xC3\xA9) vs NFD (\x65\xCC\x81)
+        $nfc = "\xC3\xA9";
+        $nfd = "\x65\xCC\x81";
+
+        $this->assertSame($nfc.', '.$nfc.' and '.$nfc, (string) (new UnicodeString(', '))->join([$nfd, $nfd, $nfd], ' and '));
+    }
+
     #[DataProvider('provideTrimNormalization')]
     public function testTrimPrefixNormalization(string $expected, string $string, $prefix)
     {

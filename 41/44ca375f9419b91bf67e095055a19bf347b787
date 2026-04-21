@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-04-18T16:18:51Z
+
+Fixed Fabbot failure in latest push (commit `35b7623`): added `static` keyword to the non-capturing closure in `TranslationExtractCommandTest::testFillOnlyDoesNotTouchMarkersInOtherDomains()` per PHP-CS-Fixer rule. Other CI failures (`Unit Tests 8.6`) are the known Serializer fixture flake, unrelated.

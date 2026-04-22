@@ -80,6 +80,16 @@ class Entity extends EntityParent implements EntityInterfaceB
     #[Assert\Type('integer')]
     protected ?int $other;
 
+    protected string $withHook {
+        get{
+            $prop = new \ReflectionProperty(self::class, 'withHook');
+            if (!$prop->isInitialized($this)) {
+                $this->withHook = $this->firstName;//whatever
+            }
+            return $this->withHook;
+        }
+    }
+
     public function __construct($internal = null)
     {
         $this->internal = $internal;

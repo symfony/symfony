@@ -79,4 +79,13 @@ class PropertyMetadataTest extends TestCase
         $this->assertNull($notUnsetMetadata->getPropertyValue($entity));
         $this->assertEquals(42, $metadata->getPropertyValue($entity));
     }
+
+    public function testGetPropertyValueFromUninitializedPropertyShouldUseHookIfPresent()
+    {
+        $entity = new Entity();
+        $entity->firstName = 'foobar';
+        $metadata = new PropertyMetadata(self::CLASSNAME, 'withHook');
+
+        $this->assertEquals('foobar', $metadata->getPropertyValue($entity));
+    }
 }

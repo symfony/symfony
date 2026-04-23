@@ -200,7 +200,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
 
         $host = parse_url($this->info['redirect_url'] ?? $this->url, \PHP_URL_HOST);
         $this->multi->lastTimeout = null;
-        $this->multi->openHandles[$this->id] = [&$this->pauseExpiry, $h, $this->buffer, $this->onProgress, &$this->remaining, &$this->info, $host];
+        $this->multi->openHandles[$this->id] = [&$this->pauseExpiry, $h, $this->buffer, $this->onProgress, &$this->remaining, &$this->info, $host, ''];
         $this->multi->hosts[$host] = 1 + ($this->multi->hosts[$host] ?? 0);
     }
 
@@ -253,6 +253,12 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
 
                     if (-1 !== $remaining) {
                         $remaining -= \strlen($data);
+                    } else {
+                        // keep a rolling tail of the raw chunked stream to detect proper termination
+                        // at completion; the dechunk filter's state can no longer be probed once the
+                        // buffer has been seeked since PHP 8.6
+                        $tail = $multi->openHandles[$i][7].$data;
+                        $multi->openHandles[$i][7] = \strlen($tail) > 256 ? substr($tail, -256) : $tail;
                     }
                 }
             } catch (\Throwable $e) {
@@ -295,7 +301,7 @@ final class NativeResponse implements ResponseInterface, StreamableInterface
                 if (null === $e) {
                     if (0 < $remaining) {
                         $e = new TransportException(\sprintf('Transfer closed with %s bytes remaining to read.', $remaining));
-                    } elseif (-1 === $remaining && fwrite($buffer, '-') && '' !== stream_get_contents($buffer, -1, 0)) {
+                    } elseif (-1 === $remaining && !preg_match("/(?:^|\r\n)0(?:;[^\r\n]*)?\r\n(?:[^\r\n]+\r\n)*\r\n\$/", $multi->openHandles[$i][7])) {
                         $e = new TransportException('Transfer closed with outstanding data remaining from chunked response.');
                     }
                 }

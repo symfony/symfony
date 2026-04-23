@@ -513,15 +513,14 @@ trait HttpClientTrait
         $h = fopen('php://temp', 'w+');
         stream_filter_append($h, 'dechunk', \STREAM_FILTER_WRITE);
         fwrite($h, $body);
-        $body = stream_get_contents($h, -1, 0);
-        rewind($h);
-        ftruncate($h, 0);
 
-        if (fwrite($h, '-') && '' !== stream_get_contents($h, -1, 0)) {
+        $before = ftell($h);
+        fwrite($h, '-');
+        if (ftell($h) > $before) {
             throw new TransportException('Request body has broken chunked encoding.');
         }
 
-        return $body;
+        return stream_get_contents($h, -1, 0);
     }
 
     /**

@@ -85,6 +85,8 @@ class Response
     public const HTTP_NOT_EXTENDED = 510;                                                // RFC2774
     public const HTTP_NETWORK_AUTHENTICATION_REQUIRED = 511;                             // RFC6585
 
+    public const HEADER_X_ROBOTS_TAG = 'X-Robots-Tag';
+
     /**
      * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
      */

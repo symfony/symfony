@@ -1117,4 +1117,16 @@ class ConfigurationTest extends TestCase
             'http_cache' => ['terminate_on_cache_hit' => true],
         ]]);
     }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testIdeDeprecation()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.2: Setting the "framework.ide" configuration option is deprecated, use the "SYMFONY_IDE" env var instead.');
+
+        $processor = new Processor();
+        $processor->processConfiguration(new Configuration(true), [[
+            'ide' => 'phpstorm',
+        ]]);
+    }
 }

@@ -60,7 +60,6 @@ framework:
                      enable_max_depth: false
     type_info: ~
     property_info: ~
-    ide: file%%link%%format
     request:
         formats:
             csv: ['text/csv', 'text/plain']

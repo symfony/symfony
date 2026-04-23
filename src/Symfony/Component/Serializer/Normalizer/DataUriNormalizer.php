@@ -68,7 +68,7 @@ class DataUriNormalizer implements NormalizerInterface, DenormalizerInterface, C
 
         $splFileObject->rewind();
         while (!$splFileObject->eof()) {
-            $data .= $splFileObject->fgets();
+            $data .= $splFileObject->fread(8192);
         }
 
         if ('text' === explode('/', $mimeType, 2)[0]) {

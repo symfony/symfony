@@ -51,6 +51,11 @@ class PropertyMetadata extends MemberMetadata
             // There is no way to check if a property has been unset or if it is uninitialized.
             // When trying to access an uninitialized property, __get method is triggered.
 
+            // If there's a Get hook, use it to get the value
+            if (\PHP_VERSION_ID >= 80400 && $reflProperty->hasHook(\PropertyHookType::Get)) {
+                return $reflProperty->getHook(\PropertyHookType::Get)->invoke($object);
+            }
+
             // If __get method is not present, no fallback is possible
             // Otherwise we need to catch an Error in case we are trying to access an uninitialized but set property.
             if (!method_exists($object, '__get')) {

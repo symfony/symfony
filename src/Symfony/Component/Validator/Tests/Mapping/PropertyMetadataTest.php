@@ -11,11 +11,13 @@
 
 namespace Symfony\Component\Validator\Tests\Mapping;
 
+use PHPUnit\Framework\Attributes\RequiresPhp;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Mapping\PropertyMetadata;
 use Symfony\Component\Validator\Tests\Fixtures\Entity_74;
 use Symfony\Component\Validator\Tests\Fixtures\Entity_74_Proxy;
+use Symfony\Component\Validator\Tests\Fixtures\EntityWithHook;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\Entity;
 use Symfony\Component\Validator\Tests\Fixtures\NestedAttribute\EntityParent;
 
@@ -78,5 +80,15 @@ class PropertyMetadataTest extends TestCase
 
         $this->assertNull($notUnsetMetadata->getPropertyValue($entity));
         $this->assertEquals(42, $metadata->getPropertyValue($entity));
+    }
+
+    #[RequiresPhp('>=8.4.0')]
+    public function testGetPropertyValueFromUninitializedPropertyShouldUseHookIfPresent()
+    {
+        $entity = new EntityWithHook();
+        $entity->name = 'FOOBAR';
+        $metadata = new PropertyMetadata(EntityWithHook::class, 'withHook');
+
+        $this->assertEquals('foobar', $metadata->getPropertyValue($entity));
     }
 }

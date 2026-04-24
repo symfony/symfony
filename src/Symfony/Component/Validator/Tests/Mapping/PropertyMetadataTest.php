@@ -79,4 +79,21 @@ class PropertyMetadataTest extends TestCase
         $this->assertNull($notUnsetMetadata->getPropertyValue($entity));
         $this->assertEquals(42, $metadata->getPropertyValue($entity));
     }
+
+    public function testGetPropertyValueUsesPropertyGetHook()
+    {
+        $entity = new EntityWithPropertyGetHook();
+        $metadata = new PropertyMetadata(EntityWithPropertyGetHook::class, 'value');
+
+        $this->assertSame('hook value', $metadata->getPropertyValue($entity));
+    }
+}
+
+class EntityWithPropertyGetHook
+{
+    public string $value {
+        get {
+            return $this->value ?? 'hook value';
+        }
+    }
 }

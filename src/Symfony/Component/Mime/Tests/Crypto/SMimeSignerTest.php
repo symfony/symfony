@@ -151,6 +151,38 @@ class SMimeSignerTest extends SMimeTestCase
         $this->assertMessageSignatureIsValid($signedMessage, $message);
     }
 
+    public function testDefaultSignOptionsIncludePkcs7Binary()
+    {
+        // Regression guard for #63638: openssl_pkcs7_sign() canonicalizes its input unless
+        // PKCS7_BINARY is set, which can corrupt CRLF-sensitive multipart boundaries and
+        // binary parts. The default options MUST keep PKCS7_BINARY alongside PKCS7_DETACHED.
+
+        $signer = new SMimeSigner($this->samplesDir.'sign.crt', $this->samplesDir.'sign.key');
+
+        $signOptions = (new \ReflectionProperty(SMimeSigner::class, 'signOptions'))->getValue($signer);
+
+        $this->assertSame(\PKCS7_BINARY, $signOptions & \PKCS7_BINARY, 'Default signOptions must include PKCS7_BINARY to preserve MIME content during signing.');
+        $this->assertSame(\PKCS7_DETACHED, $signOptions & \PKCS7_DETACHED, 'Default signOptions must keep PKCS7_DETACHED.');
+    }
+
+    public function testExplicitSignOptionsAreRespected()
+    {
+        // Callers passing an explicit $signOptions keep full control — the default
+        // PKCS7_BINARY is not silently OR'd in.
+
+        $signer = new SMimeSigner(
+            $this->samplesDir.'sign.crt',
+            $this->samplesDir.'sign.key',
+            null,
+            null,
+            \PKCS7_DETACHED,
+        );
+
+        $signOptions = (new \ReflectionProperty(SMimeSigner::class, 'signOptions'))->getValue($signer);
+
+        $this->assertSame(\PKCS7_DETACHED, $signOptions);
+    }
+
     private function assertMessageSignatureIsValid(Message $message, Message $originalMessage): void
     {
         $messageFile = $this->generateTmpFilename();

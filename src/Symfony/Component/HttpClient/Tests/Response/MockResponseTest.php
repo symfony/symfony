@@ -13,7 +13,6 @@ namespace Symfony\Component\HttpClient\Tests\Response;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpClient\Exception\EmptyResponseBodyException;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
 use Symfony\Component\HttpClient\Exception\JsonDecodeException;
 use Symfony\Component\HttpClient\Exception\JsonException;
@@ -81,7 +80,7 @@ class MockResponseTest extends TestCase
             'content' => '',
             'responseHeaders' => [],
             'message' => 'Response body is empty.',
-            'expectedException' => EmptyResponseBodyException::class,
+            'expectedException' => JsonDecodeException::class,
         ];
 
         yield 'invalid JSON syntax' => [
@@ -125,6 +124,32 @@ class MockResponseTest extends TestCase
         $response = new MockResponse($content, ['response_headers' => $responseHeaders]);
         $response = MockResponse::fromRequest('GET', 'https://example.com/file.json', [], $response);
         $response->toArray();
+    }
+
+    /**
+     * @return iterable<string, array{string, mixed}>
+     */
+    public static function jsonNotArrayDecodedValues(): iterable
+    {
+        yield 'null'   => ['null',   null];
+        yield 'string' => ['"foo"',  'foo'];
+        yield 'int'    => ['42',     42];
+        yield 'float'  => ['3.14',   3.14];
+        yield 'bool'   => ['true',   true];
+    }
+
+    #[DataProvider('jsonNotArrayDecodedValues')]
+    public function testJsonNotArrayExceptionExposesDecodedValue(string $jsonContent, mixed $expectedDecodedValue)
+    {
+        $response = new MockResponse($jsonContent);
+        $response = MockResponse::fromRequest('GET', 'https://example.com/file.json', [], $response);
+
+        try {
+            $response->toArray();
+            $this->fail('Expected JsonNotArrayException was not thrown.');
+        } catch (JsonNotArrayException $e) {
+            $this->assertSame($expectedDecodedValue, $e->getDecodedValue());
+        }
     }
 
     public function testErrorIsTakenIntoAccountInInitialization()

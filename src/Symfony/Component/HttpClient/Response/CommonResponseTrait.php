@@ -12,7 +12,6 @@
 namespace Symfony\Component\HttpClient\Response;
 
 use Symfony\Component\HttpClient\Exception\ClientException;
-use Symfony\Component\HttpClient\Exception\EmptyResponseBodyException;
 use Symfony\Component\HttpClient\Exception\JsonDecodeException;
 use Symfony\Component\HttpClient\Exception\JsonNotArrayException;
 use Symfony\Component\HttpClient\Exception\RedirectionException;
@@ -79,7 +78,7 @@ trait CommonResponseTrait
     public function toArray(bool $throw = true): array
     {
         if ('' === $content = $this->getContent($throw)) {
-            throw new EmptyResponseBodyException('Response body is empty.');
+            throw new JsonDecodeException('Response body is empty.');
         }
 
         if (null !== $this->jsonData) {
@@ -93,7 +92,7 @@ trait CommonResponseTrait
         }
 
         if (!\is_array($content)) {
-            throw new JsonNotArrayException(\sprintf('JSON content was expected to decode to an array, "%s" returned for "%s".', get_debug_type($content), $this->getInfo('url')));
+            throw new JsonNotArrayException(\sprintf('JSON content was expected to decode to an array, "%s" returned for "%s".', get_debug_type($content), $this->getInfo('url')), $content);
         }
 
         if (null !== $this->content) {

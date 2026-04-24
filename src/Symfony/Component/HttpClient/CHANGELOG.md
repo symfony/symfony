@@ -4,9 +4,10 @@ CHANGELOG
 8.1
 ---
 
- * Add `EmptyResponseBodyException`, `JsonDecodeException` and `JsonNotArrayException`
-   specific subclasses of `JsonException`, thrown by `ResponseInterface::toArray()` to let
-   callers distinguish the three decoding failure modes by type
+ * Add `JsonDecodeException` and `JsonNotArrayException` specific subclasses of `JsonException`,
+   thrown by `ResponseInterface::toArray()` to let callers distinguish a decoding failure (empty
+   body or malformed JSON) from a successfully decoded non-array value. `JsonNotArrayException`
+   exposes the actual decoded value via `getDecodedValue()`
  * Add support for the `max_connect_duration` option
  * Add option `extra.use_persistent_connections` to `CurlHttpClient` to control the use of persistent connections introduced in PHP 8.5
  * Add `GuzzleHttpHandler` that allows using Symfony HttpClient as a Guzzle handler

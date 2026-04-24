@@ -13,8 +13,11 @@ namespace Symfony\Component\HttpClient\Tests\Response;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpClient\Exception\EmptyResponseBodyException;
 use Symfony\Component\HttpClient\Exception\InvalidArgumentException;
+use Symfony\Component\HttpClient\Exception\JsonDecodeException;
 use Symfony\Component\HttpClient\Exception\JsonException;
+use Symfony\Component\HttpClient\Exception\JsonNotArrayException;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -49,9 +52,9 @@ class MockResponseTest extends TestCase
     }
 
     #[DataProvider('toArrayErrors')]
-    public function testToArrayError($content, $responseHeaders, $message)
+    public function testToArrayError($content, $responseHeaders, $message, string $expectedException = JsonException::class)
     {
-        $this->expectException(JsonException::class);
+        $this->expectException($expectedException);
         $this->expectExceptionMessage($message);
 
         $response = new MockResponse($content, ['response_headers' => $responseHeaders]);
@@ -74,35 +77,54 @@ class MockResponseTest extends TestCase
 
     public static function toArrayErrors()
     {
-        yield [
+        yield 'empty body' => [
             'content' => '',
             'responseHeaders' => [],
             'message' => 'Response body is empty.',
+            'expectedException' => EmptyResponseBodyException::class,
         ];
 
-        yield [
+        yield 'invalid JSON syntax' => [
             'content' => 'not json',
             'responseHeaders' => [],
             'message' => \PHP_VERSION_ID < 80600 ? 'Syntax error for "https://example.com/file.json".' : 'Syntax error near location 1:1 for "https://example.com/file.json".',
+            'expectedException' => JsonDecodeException::class,
         ];
 
-        yield [
+        yield 'malformed JSON' => [
             'content' => '[1,2}',
             'responseHeaders' => [],
             'message' => \PHP_VERSION_ID < 80600 ? 'State mismatch (invalid or malformed JSON) for "https://example.com/file.json".' : 'State mismatch (invalid or malformed JSON) near location 1:5 for "https://example.com/file.json".',
+            'expectedException' => JsonDecodeException::class,
         ];
 
-        yield [
+        yield 'JSON decodes to string' => [
             'content' => '"not an array"',
             'responseHeaders' => [],
             'message' => 'JSON content was expected to decode to an array, "string" returned for "https://example.com/file.json".',
+            'expectedException' => JsonNotArrayException::class,
         ];
 
-        yield [
+        yield 'JSON decodes to int' => [
             'content' => '8',
             'responseHeaders' => [],
             'message' => 'JSON content was expected to decode to an array, "int" returned for "https://example.com/file.json".',
+            'expectedException' => JsonNotArrayException::class,
         ];
+    }
+
+    /**
+     * Backward-compatibility check: all toArray() decoding failures must still be catchable
+     * via the parent JsonException / \JsonException class.
+     */
+    #[DataProvider('toArrayErrors')]
+    public function testToArrayErrorIsBackwardCompatible($content, $responseHeaders, $message, string $expectedException = JsonException::class)
+    {
+        $this->expectException(JsonException::class);
+
+        $response = new MockResponse($content, ['response_headers' => $responseHeaders]);
+        $response = MockResponse::fromRequest('GET', 'https://example.com/file.json', [], $response);
+        $response->toArray();
     }
 
     public function testErrorIsTakenIntoAccountInInitialization()

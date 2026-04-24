@@ -11,13 +11,9 @@
 
 namespace Symfony\Component\HttpClient\Exception;
 
-use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
-
 /**
- * Thrown by responses' toArray() method when their content cannot be JSON-decoded.
- *
- * @author Nicolas Grekas <p@tchwork.com>
+ * Thrown by responses' toArray() method when json_decode() fails.
  */
-class JsonException extends \JsonException implements DecodingExceptionInterface
+final class JsonDecodeException extends JsonException
 {
 }

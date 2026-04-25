@@ -131,11 +131,11 @@ class MockResponseTest extends TestCase
      */
     public static function jsonNotArrayDecodedValues(): iterable
     {
-        yield 'null'   => ['null',   null];
+        yield 'null' => ['null',   null];
         yield 'string' => ['"foo"',  'foo'];
-        yield 'int'    => ['42',     42];
-        yield 'float'  => ['3.14',   3.14];
-        yield 'bool'   => ['true',   true];
+        yield 'int' => ['42',     42];
+        yield 'float' => ['3.14',   3.14];
+        yield 'bool' => ['true',   true];
     }
 
     #[DataProvider('jsonNotArrayDecodedValues')]

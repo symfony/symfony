@@ -807,6 +807,15 @@ class UrlSanitizerTest extends TestCase
             'a\\/\\/' => ['scheme' => null, 'host' => null],
             'test-a-colon.html' => ['scheme' => null, 'host' => null],
             'test-a-colon-b.html' => ['scheme' => null, 'host' => null],
+            'https://example.com/path with space' => ['scheme' => 'https', 'host' => 'example.com'],
+            'https://example.com:80/path with space' => ['scheme' => 'https', 'host' => 'example.com'],
+            'example.com/path with space' => ['scheme' => null, 'host' => 'example.com'],
+            'example.com:80/path with space' => ['scheme' => null, 'host' => 'example.com'],
+            'https://user@example.com/path with space' => ['scheme' => 'http', 'host' => 'example.com'],
+            'https://user with space@/www.example.com/path with space' => null,
+            '//example.com/path with space' => ['scheme' => null, 'host' => 'example.com'],
+            '/file with space.html' => ['scheme' => null, 'host' => null],
+            'file with space.html' => null,
         ];
 
         foreach ($urls as $url => $expected) {

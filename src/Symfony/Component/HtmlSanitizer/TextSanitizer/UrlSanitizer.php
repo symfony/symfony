@@ -94,13 +94,30 @@ final class UrlSanitizer
         }
 
         try {
-            // Replace space character with URL-encoded variant for compatibility with browsers' behavior
-            $url = str_replace(' ', '%20', $url);
-            $parsedUrl = UriString::parse($url);
+            // Replace space character (if any) with URL-encoded variant for compatibility with browsers' behavior.
+            // Logic is applied only if there is a `/` character. Otherwise, it's not possible to determine if we have a path or host without parsing
+            if (str_contains($url, ' ') && str_contains($url, '/')) {
+                if (str_contains($url, '://')) {
+                    // Get the path portion of the string if it exists. The method varies in case we have the userinfo portion.
+                    if (str_contains($url, '@')) {
+                        $path = \preg_replace('/(.*:\/\/[^\/@]+@[^\/]+\/?)(.*)/u', '$2', $url);
+                    } else {
+                        $path = \preg_replace('/(.*:\/\/[^\/]+\/?)(.*)/u', '$2', $url);
+                    }
+                } else {
+                    $path = \preg_replace('/([^\/]+\/?)(.*)/u', '$2', $url);
+                }
 
-            if (preg_match('/\s/', $url)) {
+                // Replace space only in the path
+                $url = \str_replace($path, \str_replace(' ', '%20', $path), $url);
+            }
+
+            // Early exit, if the string contains whitespace, since should be encoded as per RFC3986
+            if (\preg_match('/\s/', $url)) {
                 return null;
             }
+
+            $parsedUrl = UriString::parse($url);
 
             if (isset($parsedUrl['host']) && self::decodeUnreservedCharacters($parsedUrl['host']) !== $parsedUrl['host']) {
                 return null;
@@ -123,10 +140,10 @@ final class UrlSanitizer
             return \in_array(null, $allowedHosts, true);
         }
 
-        $parts = array_reverse(explode('.', $host));
+        $parts = \array_reverse(\explode('.', $host));
 
         foreach ($allowedHosts as $allowedHost) {
-            if (self::matchAllowedHostParts($parts, array_reverse(explode('.', $allowedHost)))) {
+            if (self::matchAllowedHostParts($parts, \array_reverse(\explode('.', $allowedHost)))) {
                 return true;
             }
         }
@@ -151,7 +168,7 @@ final class UrlSanitizer
      */
     private static function decodeUnreservedCharacters(string $host): string
     {
-        return preg_replace_callback(
+        return \preg_replace_callback(
             ',%(2[1-9A-Fa-f]|[3-7][0-9A-Fa-f]|61|62|64|65|66|7[AB]|5F),',
             static fn (array $matches): string => rawurldecode($matches[0]),
             $host

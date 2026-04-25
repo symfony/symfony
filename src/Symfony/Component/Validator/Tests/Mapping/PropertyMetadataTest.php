@@ -24,6 +24,7 @@ class PropertyMetadataTest extends TestCase
     private const CLASSNAME = Entity::class;
     private const CLASSNAME_74 = 'Symfony\Component\Validator\Tests\Fixtures\Entity_74';
     private const CLASSNAME_74_PROXY = 'Symfony\Component\Validator\Tests\Fixtures\Entity_74_Proxy';
+    private const CLASSNAME_84_PROPERTY_HOOK = 'Symfony\Component\Validator\Tests\Fixtures\Entity_84_PropertyHook';
     private const PARENTCLASS = EntityParent::class;
 
     public function testInvalidPropertyName()
@@ -78,5 +79,18 @@ class PropertyMetadataTest extends TestCase
 
         $this->assertNull($notUnsetMetadata->getPropertyValue($entity));
         $this->assertEquals(42, $metadata->getPropertyValue($entity));
+    }
+
+    public function testGetPropertyValueFromUninitializedPropertyWithGetHook()
+    {
+        if (\PHP_VERSION_ID < 80400) {
+            $this->markTestSkipped('PHP 8.4 is required.');
+        }
+
+        $className = self::CLASSNAME_84_PROPERTY_HOOK;
+        $entity = new $className();
+        $metadata = new PropertyMetadata($className, 'uninitialized');
+
+        $this->assertSame(42, $metadata->getPropertyValue($entity));
     }
 }

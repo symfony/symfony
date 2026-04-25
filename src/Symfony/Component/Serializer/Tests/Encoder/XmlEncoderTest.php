@@ -582,6 +582,23 @@ class XmlEncoderTest extends TestCase
         $this->assertEquals(get_object_vars($obj), $this->encoder->decode($source, 'xml'));
     }
 
+    public function testDecodeWithoutRootNodeThrows()
+    {
+        $source = <<<'XML'
+            <?xml version="1.0"?>
+            <root />
+            XML;
+
+        $this->expectException(NotEncodableValueException::class);
+        $this->expectExceptionMessage('Root node not found.');
+
+        $this->encoder->decode(
+            $source,
+            'xml',
+            [XmlEncoder::DECODER_IGNORED_NODE_TYPES => [\XML_ELEMENT_NODE]]
+        );
+    }
+
     public function testDecodeIgnoreWhiteSpace()
     {
         $source = <<<'XML'

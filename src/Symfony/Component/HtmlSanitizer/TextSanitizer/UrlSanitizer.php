@@ -109,7 +109,7 @@ final class UrlSanitizer
                 }
 
                 // Replace space only in the path
-                $url = str_replace($path, \str_replace(' ', '%20', $path), $url);
+                $url = str_replace($path, str_replace(' ', '%20', $path), $url);
             }
 
             // Early exit, if the string contains whitespace, since should be encoded as per RFC3986

@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+* Replace space character with URL-encoded variant before parsing URLs for compatibility with browsers' behavior
+
 8.0
 ---
 

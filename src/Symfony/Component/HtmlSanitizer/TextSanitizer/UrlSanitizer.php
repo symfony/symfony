@@ -94,6 +94,8 @@ final class UrlSanitizer
         }
 
         try {
+            // Replace space character with URL-encoded variant for compatibility with browsers' behavior
+            $url = str_replace(' ', '%20', $url);
             $parsedUrl = UriString::parse($url);
 
             if (preg_match('/\s/', $url)) {

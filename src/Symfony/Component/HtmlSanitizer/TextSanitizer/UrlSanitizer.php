@@ -96,6 +96,11 @@ final class UrlSanitizer
         try {
             // Replace space character (if any) with URL-encoded variant for compatibility with browsers' behavior.
             if (str_contains($url, ' ')) {
+                // If string starts with space - it is most likely to be malformed
+                if (str_starts_with($url, ' ')) {
+                    return null;
+                }
+
                 if (str_contains($url, '/')) {
                     // Normalize scheme separator, in case we have a string with escaped slashes
                     $workingUrl = str_replace(':\/\/', '://', $url);
@@ -103,18 +108,21 @@ final class UrlSanitizer
                     if (str_contains($workingUrl, '://')) {
                         // Get the path portion of the string if it exists. The method varies in case we have the userinfo portion.
                         if (str_contains($workingUrl, '@')) {
-                            $path = preg_replace('/(.*:\/\/[^\/?@]+@[^\/?]+[\/?]?)(.*)/u', '$2', $workingUrl);
+                            $path = preg_replace('/(^.*:\/\/[^\/?@]+@[^\/?]+[\/?]?)(.*)/u', '$2', $workingUrl);
                         } else {
-                            $path = preg_replace('/(.*:\/\/[^\/?]+[\/?]?)(.*)/u', '$2', $workingUrl);
+                            $path = preg_replace('/(^.*:\/\/[^\/?]+[\/?]?)(.*)/u', '$2', $workingUrl);
                         }
                     } else {
-                        $path = preg_replace('/([^\/]+[\/?]?)(.*)/u', '$2', $workingUrl);
+                        $path = preg_replace('/(^[^\/]+[\/?]?)(.*)/u', '$2', $workingUrl);
                     }
 
                     // Replace space only in the path
                     $url = str_replace($path, str_replace(' ', '%20', $path), $url);
+                } elseif (str_contains($url, ':')) {
+                    // Replace space only in path, if there is no authority portion
+                    $path = preg_replace('/(^[^\/]+[\/?]?)(.*)/u', '$2', $url);
+                    $url = str_replace($path, str_replace(' ', '%20', $path), $url);
                 } else {
-                    // UriString treats strings without `/` as path, so replace the space directly
                     $url = str_replace(' ', '%20', $url);
                 }
             }

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Mime\Tests\Header;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
 use Symfony\Component\Mime\Header\ParameterizedHeader;
 
 class ParameterizedHeaderTest extends TestCase
@@ -323,5 +324,45 @@ class ParameterizedHeaderTest extends TestCase
         $header = new ParameterizedHeader('Content-Type', 'text/html');
         $header->setParameters(['charset' => 'utf-8', 'delsp' => 'yes']);
         $this->assertEquals('utf-8', $header->getParameter('charset'));
+    }
+
+    /**
+     * @dataProvider provideInvalidParameterNames
+     */
+    public function testConstructorRejectsInvalidParameterName(string $name)
+    {
+        $this->expectException(RfcComplianceException::class);
+        new ParameterizedHeader('Content-Type', 'text/plain', [$name => 'value']);
+    }
+
+    /**
+     * @dataProvider provideInvalidParameterNames
+     */
+    public function testSetParameterRejectsInvalidParameterName(string $name)
+    {
+        $header = new ParameterizedHeader('Content-Type', 'text/plain');
+        $this->expectException(RfcComplianceException::class);
+        $header->setParameter($name, 'value');
+    }
+
+    /**
+     * @dataProvider provideInvalidParameterNames
+     */
+    public function testSetParametersRejectsInvalidParameterName(string $name)
+    {
+        $header = new ParameterizedHeader('Content-Type', 'text/plain');
+        $this->expectException(RfcComplianceException::class);
+        $header->setParameters([$name => 'value']);
+    }
+
+    public static function provideInvalidParameterNames(): iterable
+    {
+        yield 'CRLF injection' => ["name\r\nX-Injected: bar"];
+        yield 'LF only' => ["name\nX-Injected: bar"];
+        yield 'CR only' => ["name\rX-Injected: bar"];
+        yield 'space' => ['my param'];
+        yield 'semicolon' => ['na;me'];
+        yield 'equals' => ['na=me'];
+        yield 'quote' => ['na"me'];
     }
 }

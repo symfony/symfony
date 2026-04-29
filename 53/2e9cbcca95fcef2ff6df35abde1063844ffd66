@@ -1,0 +1,40 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-04-18T21:24:48Z
+
+I'm not sure what the expected behavior is. The Messenger configuration allows for either:
+- retrying failed messages, in which case we should keep the lock as proposed in this PR,
+- or moving the failed message to a failed queue; in that case, we need to release the lock to allow a new message to be added.
+
+What do you think @VincentLanglet?
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-04-18T21:59:21Z
+
+Good catch, thanks. From inside the middleware there's no way to tell retry from failure — routing happens after `next()` throws.
+
+Clean split: keep the middleware fix (plugs the `finally` race on retry), add a listener on `WorkerMessageFailedEvent` that releases the lock when `!willRetry()` and the envelope carries a `DeduplicateStamp`. That covers the failed-transport path.
+
+Happy to push that on top here, or split to a follow-up if you prefer this PR narrow.
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2026-04-19T09:32:30Z
+
+I agree with @GromNaN
+
+While I understand the issue, the lock will still need to be released when the message fail and is not added back to the queue in order to allow adding another message.
+
+So the lock need to be eventually renewed only when the message fail and is added back to the queue.
+
+NB: Be aware that in case of success is your user do again the action there wont be lock and the message will be added in the queue so the message will be retreated soon. In compare to this, it's not a big deal having two messages in the queue. The main purpose is to avoid having dozen of similar message.
+But I agree it would be awesome to deduplicate more
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-04-22T21:13:28Z
+
+Thanks for the review @GromNaN, @VincentLanglet — agreed on the split, middleware can't tell retry from failure from inside `handle()` so the lock release belongs on the failure event.
+
+Pushed `dbea108`: new `ReleaseDeduplicationLockOnFailureListener` on `WorkerMessageFailedEvent` at priority 0 (runs after `SendFailedMessageForRetryListener` at 100, so `willRetry()` is set). It releases the lock only when `!willRetry()`, a `DeduplicateStamp` is present, and `!onlyDeduplicateInQueue` (that path is already released at the consumer step by the middleware). Wired in `FrameworkBundle` under `messenger.failure.*`, removed alongside the dedup middleware when the Lock component is disabled. CHANGELOG updated and 5 unit tests cover the four branches + priority ordering.

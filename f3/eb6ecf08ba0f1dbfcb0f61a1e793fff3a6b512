@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by mrossard at 2026-04-27T12:04:32Z
+
+I'm not sure how to handle the psalm errors. Should I just add something along those lines to suppress the error or is there a better way to do this?
+```php
+/** @psalm-suppress UndefinedClass */
+/** @psalm-suppress UndefinedMethod */
+```
+
+---------------------------------------------------------------------------
+
+by stof at 2026-04-28T08:39:21Z
+
+@mrossard just ignore them if they are not relevant. We use the CI job as an helper for review, but we don't require it to be green (we review the kind of things it reports instead). And that CI job reports only *new* violations introduced in the PR.
+
+---------------------------------------------------------------------------
+
+by mrossard at 2026-04-28T08:42:31Z
+
+> @mrossard just ignore them if they are not relevant. We use the CI job as an helper for review, but we don't require it to be green (we review the kind of things it reports instead). And that CI job reports only _new_ violations introduced in the PR.
+
+Thanks for the feedback - and generally guiding me through this !

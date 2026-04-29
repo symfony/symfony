@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-04-27T07:49:07Z
+
+There are potentially many classes for optional dependencies. Ultimately, I wonder if it wouldn't be more appropriate to leverage the `DebugClassLoader` to generate this exception using a generic mechanism?

@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-04-18T21:17:25Z
+
+This `message` key isn't documented anywhere and no API client use it. I think a better option would be to make the error message the HTTP status code's when it's not 422. That would handle every possible error in a better way than an empty string.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-04-22T16:42:08Z
+
+Thanks @nicolas-grekas, applied the suggestion in `405b808` — `$errorMessage` now falls back to `'HTTP '.$statusCode` when neither `Message` nor `message` is present in the Postmark payload, instead of the previous empty string. Also dropped the now-obsolete inline comment block.
+
+Added `testSendThrowsWithStatusCodeFallbackWhenResponseHasNoMessage` to cover the new fallback path (502 response with `request_id` only) — it asserts `"Unable to send an email: HTTP 502 (code 0)."`. The two existing error-shape tests are unaffected since they still populate the `Message` / `message` keys.
+
+Happy to tighten anything else.

@@ -1,0 +1,70 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-21T05:24:56Z
+
+I'd rather not merge this, the change is too big to be worth it.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-04-21T09:28:43Z
+
+> We should revert all cases where a method from tests is called, as well as all calls to the constructors of PHP attribute classes.
+
+Attribute constructors are indeed covered by BC for named arguments. And we *do* want to keep tests for them.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-04-21T09:30:12Z
+
+> I'd rather not merge this, the change is too big to be worth it.
+
+This change is too big because the PR currently changes too many things compared to the original discussion.
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2026-04-21T10:27:41Z
+
+Idea to disable named arguments while keeping them for readability and help future readers: comment them like this:
+
+```diff
+- $argument = $this->createArgument('stdClass', new MapEntity(mapping: ['arg'], stripNull: true), 'arg', true);
++ $argument = $this->createArgument('stdClass', new MapEntity(/* mapping: */ ['arg'], /* stripNull: */ true), 'arg', true);
+```
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-04-21T10:31:24Z
+
+> Idea to disable named arguments while keeping them for readability and help future readers: comment them like this:
+>
+> ```diff
+> - $argument = $this->createArgument('stdClass', new MapEntity(mapping: ['arg'], stripNull: true), 'arg', true);
+> + $argument = $this->createArgument('stdClass', new MapEntity(/* mapping: */ ['arg'], /* stripNull: */ true), 'arg', true);
+> ```
+
+There's a risk that it won't be in sync with the code anymore.
+I prefer it when the IDE shows the names of the implicit arguments. https://www.jetbrains.com/help/phpstorm/inlay-hints.html
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2026-04-21T10:33:23Z
+
+> > Idea to disable named arguments while keeping them for readability and help future readers: comment them like this:
+> > ```diff
+> > - $argument = $this->createArgument('stdClass', new MapEntity(mapping: ['arg'], stripNull: true), 'arg', true);
+> > + $argument = $this->createArgument('stdClass', new MapEntity(/* mapping: */ ['arg'], /* stripNull: */ true), 'arg', true);
+> > ```
+>
+> There's a risk that it won't be in sync with the code anymore. I prefer it when the IDE shows the names of the implicit arguments. https://www.jetbrains.com/help/phpstorm/inlay-hints.html
+
+Fair enough, I was about to write about IDEs like PHPStorm.
+
+Here is a better example in the previous PR: https://github.com/symfony/symfony/pull/63999/changes#diff-f5a5ed91b3d20a6373d89d911bbdde4419eadefd7957baf91b68d1b16ff4d186
+
+Since GitHub does not show the named arguments, future reviews of changes on these lines will be challenging.
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-04-28T12:38:15Z
+
+@nicolas-grekas this PR is much smaller now

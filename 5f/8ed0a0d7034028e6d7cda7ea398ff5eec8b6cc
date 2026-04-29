@@ -1,0 +1,9 @@
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-04-22T16:40:23Z
+
+Thanks for the review @nicolas-grekas — noted on both points.
+
+Pushed `2f0fc27`: stripped the issue reference and every inline comment from `testReservationDebtSurvivesCacheExpiration`. The test name and the four `reserve()` / `consume()` assertions carry the intent on their own, no prose needed.
+
+The production change in `TokenBucketLimiter::getExpirationTime()` is untouched. Let me know if you'd like anything tightened further.

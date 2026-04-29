@@ -1,0 +1,63 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-03-26T16:53:40Z
+
+@fabpot it would be great to add `@internal` tags on all classes that are meant to stay internal. It would help reviewing things (no need to ask about adding interfaces on final classes if they are meant to be internal anyway for instance).
+
+---------------------------------------------------------------------------
+
+by fabpot at 2026-03-27T06:55:03Z
+
+> @fabpot it would be great to add `@internal` tags on all classes that are meant to stay internal. It would help reviewing things (no need to ask about adding interfaces on final classes if they are meant to be internal anyway for instance).
+
+I've done a firsrt pass, making some classes internal. I might be a bit too agressive, but it's always easier to remove an internal tag than adding one: 35 internals classes vs 62 public as of now.
+
+---------------------------------------------------------------------------
+
+by pawelkudzia at 2026-03-29T09:47:37Z
+
+@fabpot Nice feature, thank you.
+
+I see that you used type safety features, which of course are fundamental, but why didn’t you use `declare(strict_types=1)`? What could be the reasons for not using this mode while still relying on type declarations? Using typing in PHP should be, at least in my opinion, something natural and fundamental.
+
+---------------------------------------------------------------------------
+
+by garak at 2026-03-30T12:58:03Z
+
+@pawelkudzia
+>
+> I see that you used type safety features, which of course are fundamental, but why didn’t you use `declare(strict_types=1)`? What could be the reasons for not using this mode while still relying on type declarations? Using typing in PHP should be, at least in my opinion, something natural and fundamental.
+
+See #28423
+
+---------------------------------------------------------------------------
+
+by pawelkudzia at 2026-03-31T18:40:01Z
+
+@garak Thanks for the link.
+
+Hmm, I don’t fully understand. In the discussion, it was mentioned that adding `strict_types` supposedly wouldn’t matter for the external world (user code), but on the other hand, it could have an effect in the case of using callbacks. After all, code from the framework itself is also used internally, and mistakes can happen. The fact that someone takes care of type verification is one thing, but I’m more wondering whether this responsibility could be shifted to the interpreter. For now, these examples aren’t clear to me, and I’m probably missing something.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-31T18:44:16Z
+
+Our policy on strict types is settled. You might find more info at https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/pull/9384 (and linked pages).
+(then please don't hijack this discussion with unrelated stuff.)
+
+---------------------------------------------------------------------------
+
+by WebMamba at 2026-04-27T15:29:45Z
+
+I just tried the PR to create a multi-agent CLI, and it works really well. I
+ tried to follow an interface similar to Claude Code's and didn't run into any limitations. The only difficulty I encountered was with the blinking animation — at first I thought it was a bit much to pull in Amp just to keep my loader blinking, but the code turned out to be quite simple. I ended up with something pretty straightforward to build it. So thanks @fabpot, this component is impressively well done.
+
+https://github.com/user-attachments/assets/9f4ad44f-2803-43b2-bdc6-f927b15ec3ab
+
+---------------------------------------------------------------------------
+
+by tacman at 2026-04-27T15:33:37Z
+
+Very cool! You might want to try asciinema, it's perfect for this.
+
+For example, https://asciinema.org/a/912786 shows this TUI component with  https://github.com/GromNaN/symfony-tui-games

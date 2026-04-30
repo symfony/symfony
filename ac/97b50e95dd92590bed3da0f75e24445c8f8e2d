@@ -1,0 +1,7 @@
+---------------------------------------------------------------------------
+
+by Pierstoval at 2025-12-30T18:20:56Z
+
+Hello, sorry for being late to the party: I rebased everything on SF 8.1-dev, added support for array messages in the constraint, and adapted the tests.
+
+Waiting for your feedback 👍

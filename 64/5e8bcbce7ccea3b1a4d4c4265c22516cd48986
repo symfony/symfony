@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-30T15:13:16Z
+
+failures are related (except the testDsCompatibility one)
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-30T15:41:42Z
+
+Thanks for the heads-up @nicolas-grekas! 🙏 You were right, the failures all traced back to two real issues — `testDsCompatibility` aside.
+
+Pushed 9a3163a4762 with:
+
+1. **`symfony/http-kernel`**: added `"symfony/var-dumper": "<8.1"` to the `conflict` block. With low-deps, composer was resolving var-dumper to a 7.4.x version that doesn't have `HtmlDumper::setNonce()` (which only landed via #63762 on 8.1) — hence the `Call to undefined method` errors in `DumpDataCollectorTest::testNonceIsForwardedToHtmlDumperOnGetDumps` and `WebDebugToolbarListenerTest::testCspNonceIsForwarded…`.
+
+2. **`symfony/web-profiler-bundle`**: same idea, added `"symfony/http-kernel": "<8.1"` to the conflict block since the listener now calls `DumpDataCollector::setNonce()` introduced in this PR.
+
+3. Two trivial PHP-CS-Fixer fixes Fabbot was asking for (a stray space before `$this->applyNonceTo($dumper);` and a missing `static` on a closure in the existing `testNonceCanBeAClosureResolvedPerDump`).

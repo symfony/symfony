@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by MatTheCat at 2026-04-30T12:18:55Z
+
+So I guess if we want to provide the right type through a plugin we should just type `\Closure` in the PHPDoc? That way people who don’t have the plugin won’t get false negatives?
+
+---------------------------------------------------------------------------
+
+by stof at 2026-04-30T13:01:38Z
+
+For now, we should indeed probably use `\Closure` without describing the signature, as a quick fix.
+I don't think there is a way to describe in phpdoc that this closure must accept a type corresponding to the place where the attribute is used (also hard when using the constraints not as an attribute btw).

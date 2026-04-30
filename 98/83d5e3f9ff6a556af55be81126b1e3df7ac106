@@ -1,0 +1,108 @@
+---------------------------------------------------------------------------
+
+by canvural at 2025-11-06T15:00:40Z
+
+@chalasr Friendly ping for a review 🙂
+
+---------------------------------------------------------------------------
+
+by chalasr at 2025-11-06T18:31:57Z
+
+Thanks for the PR @canvural. Symfony 7.4 is in stabilization phase for a few weeks now, which means the 7.4 branch is in feature-freeze and the core team focuses on stabilizing it until it gets released which is planed for the end of November. I won't miss reviewing your PR afterward
+
+---------------------------------------------------------------------------
+
+by wouterj at 2025-11-06T18:34:04Z
+
+You beat me on it! :) This is definitely on the list for 8.1
+
+---------------------------------------------------------------------------
+
+by canvural at 2025-11-06T20:52:05Z
+
+Aah, didn't know about the feature freeze. Thanks for the explanation.
+
+---------------------------------------------------------------------------
+
+by alexislefebvre at 2025-12-06T16:05:11Z
+
+I was wondering if my system would support this, because it looked like it was supported on Windows platforms first, and there are not much documentation about this feature. Update: some other links can be found on [unix.stackexchange.com](https://unix.stackexchange.com/questions/801884/how-to-test-that-my-terminal-can-report-progress-with-osc-94-sequences).
+
+So I wrote a test to check it, and it works! I use “GNOME Terminal 3.56.2 using VTE 0.80.3” on Ubuntu 25.10, it shows a circle filling up. But it’s shown in the tab so I must have at least 2 tabs in the window to see the progress.
+
+Bash:
+
+```bash
+for i in $(seq 0 10 100) ; do echo -n -e "\033]9;4;1;${i}\033\\" ; echo -n "${i} " ; sleep 0.5 ; done ; echo -n -e "\033]9;4;0;${i}\033\\" ; echo
+```
+
+Fish:
+
+```bash
+for i in (seq 0 10 100) ; echo -n -e "\033]9;4;1;$i\033\\" ; echo -n "$i " ; sleep 0.5 ; end ; echo -n -e "\033]9;4;0;100\033\\" ; echo
+```
+
+---------------------------------------------------------------------------
+
+by canvural at 2026-01-07T11:29:05Z
+
+@chalasr Another friendly ping for this one 🙂
+
+---------------------------------------------------------------------------
+
+by chalasr at 2026-01-15T14:44:23Z
+
+this needs a second approval from someone else than me :) 👋 mergers
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-01-29T17:23:29Z
+
+Friendly up @canvural
+
+---------------------------------------------------------------------------
+
+by wouterj at 2026-01-31T10:07:23Z
+
+Thanks for working on this! Would be cool to get this in a future version of Symfony.
+
+While looking at the code, I have 2 questions, but they might very well be just me not knowing enough context:
+
+A) What is the need of the extra properties and methods? Can't we always output the escape sequences (or add them as new format placeholders?). The `ProgressBar` should have enough information to determine the state and percentage already.
+
+B) How would we handle [multiple progress bars](https://symfony.com/doc/current/components/console/helpers/progressbar.html#displaying-multiple-progress-bars)? Should we force the user to only enable this for one progress bar at the time? Should we somehow share state between all running progress bars and show the least progressed information? Is this somehow supported already in the OSC 0;4 standard?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-02-14T13:38:09Z
+
+This can give nice visual hints when the terminal is in the background, by allowing the icon of the term to report the status. This is supported eg by:
+- Windows Terminal / ConEmu → progress appears on the taskbar icon
+- WezTerm → tab and window progress
+- some Linux terminals (VTE-based) → tab indicators
+
+<img width="141" height="112" alt="image" src="https://github.com/user-attachments/assets/3f7da1bf-2a3c-4a1e-bd72-e6fca5b7a374" />
+
+<img width="136" height="87" alt="image" src="https://github.com/user-attachments/assets/a8eb52b1-9111-4fbb-8ccd-b48543a71674" />
+
+For the record, the basic form of the escape sequence is:
+
+`ESC ] 9 ; 4 ; state ; progress ST`
+
+Where:
+
+- state is a number from 0 to 4 describing what to do.
+- progress (optional) is a percentage 0–100.
+
+Meaning of the state values:
+- `0` Remove/hide the progress indicator
+- `1` Set progress to given percentage
+- `2` Set error state (often shown in red)
+- `3` Indeterminate (spinner or pulsing state)
+- `4` Pause/Awaiting state (optional use)
+
+We could use state `2` when an exception occurs
+and state `4` when entering interaction
+for the multi progress bar case, we could use `3` and/or allow defining a master progress bar.
+
+Maybe worth adding in this PR also? @canvural WDYT?

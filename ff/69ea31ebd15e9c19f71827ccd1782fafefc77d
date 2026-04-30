@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-04-10T16:52:33Z
+
+As a follow-up, we can add the `twig.safe_class` resource tag to register them via the service container:
+
+```php
+->set(ComponentAttributes::class)
+    ->resourceTag('twig.safe_class', ['strategy' => 'html'])
+```
+
+A compiler pass would collect the tagged classes and call `addSafeClass()` on `twig.runtime.escaper`.
+
+Edit: I went ahead and added the resource tag in a second commit.
+
+---------------------------------------------------------------------------
+
+by GromNaN at 2026-04-10T22:08:14Z
+
+Projects that would benefit from this feature:
+- https://github.com/symfony/ux/pull/3455
+- [open-dxp](https://github.com/open-dxp/opendxp/blob/eb8f32cfc99dfff62c64bf2dcc9d9d3cabbd204a/lib/Twig/TwigEnvironmentConfigurator.php#L47)
+- [pimcore](https://github.com/pimcore/pimcore/blob/37c14edb2693c4632187e2e78b6915c62af43042/lib/Twig/TwigEnvironmentConfigurator.php#L36)
+- [sylius-navigation-plugin](https://github.com/Setono/sylius-navigation-plugin/blob/a3a6b9fd537aa495acddcaf6361ca472da5a6624/src/Twig/TwigEnvironmentConfigurator.php#L27)

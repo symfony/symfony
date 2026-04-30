@@ -1,0 +1,41 @@
+---------------------------------------------------------------------------
+
+by michaelthieulin at 2026-04-03T15:36:10Z
+
+Hi @lyrixx 👋
+
+I opened #63903 which addresses #60210 (removing `bg_color` and `description` from the metadata text in the Graphviz dump). It touches the same files as your PR, so there will be merge conflicts.
+
+My changes are complementary to yours:
+
+- **`bg_color`** is filtered out from the metadata text for both places and transitions (since it's already applied as `fillcolor`, displaying it as text is redundant)
+- **`description`** is rendered in italics (`<I>...</I>`) instead of being shown as raw `description: value` text
+
+Since your PR refactors `addPlaces()` and `addTransitions()` to always use the HTML label format (removing the `if ($withMetadata)` branching), it would make sense to integrate the `bg_color`/`description` handling directly into your PR — the logic is small:
+
+1. In `findPlaces()` / `addPlaces()`: `unset` `bg_color` and `description` from metadata, render description separately with `<I>`
+2. Same for transitions in `findTransitions()` / `addTransitions()`
+
+Before I spend more time on this: do you think #60210 is still relevant given your refactoring, or does your PR already address the visual clutter concern in a different way? Happy to rebase on top of your branch, or close my PR if it's no longer needed.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-04-07T09:45:06Z
+
+~~the example in the PR description looks weird to me. All *places* are showing `onTransition` listeners, which are related to transitions, not to places.~~ I confused the transitions vs places, also because transition boxes are now huge compared to places.
+
+Also, those listeners seem to be the same for all places. Is it worth it ? Should we exclude listeners that apply to *all* transitions ?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-04-12T17:02:11Z
+
+> Also, those listeners seem to be the same for all places. Is it worth it ? Should we exclude listeners that apply to _all_ transitions ?
+
+It depends, some listener can be added on one transition
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-04-23T14:00:55Z
+
+PR rebased (conflicts fixed)

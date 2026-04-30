@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2026-04-07T19:34:01Z
+
+Nice first contrib, welcome :)
+Can you mention this feature in FrameworkBundle's CHANGELOG.md?
+
+---------------------------------------------------------------------------
+
+by michaelthieulin at 2026-04-07T20:09:33Z
+
+Thanks Robin! I've just added the CHANGELOG entry. 🙏
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-04-13T08:15:24Z
+
+Can you rebase and fix conflicts please?
+
+---------------------------------------------------------------------------
+
+by michaelthieulin at 2026-04-13T09:57:14Z
+
+Hello, the rebase is done.

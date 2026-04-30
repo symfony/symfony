@@ -1,0 +1,16 @@
+---------------------------------------------------------------------------
+
+by welcoMattic at 2026-03-27T11:12:10Z
+
+LGTM, but not sure if this one should be a feature or a bug fix.
+
+In a way, it "breaks" existing apps that expect this placeholder to not be translated (kind of weird, but it's the actual behavior).
+
+@nicolas-grekas what's your opinion here?
+
+---------------------------------------------------------------------------
+
+by Spomky at 2026-03-27T13:03:28Z
+
+Ping @stof who may have a better advise on this PR.
+One point could be the `'placeholder' === $name` that may not be the right way to find the placeholder in some cases.

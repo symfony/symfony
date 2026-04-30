@@ -1,0 +1,19 @@
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-04-23T14:04:18Z
+
+For the record, it only cast the string when it's a root level of the dump. PR ready for 8.1
+
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-04-25T16:35:58Z
+
+> For the record, it only cast the string when it's a root level of the dump
+
+Why this choice? It became unreadable otherwise?
+
+---------------------------------------------------------------------------
+
+by lyrixx at 2026-04-26T21:23:22Z
+
+Class string can be used in array key or other properties. It could be strange to enhance them when not requested directly

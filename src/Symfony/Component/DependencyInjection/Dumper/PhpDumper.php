@@ -31,6 +31,7 @@ use Symfony\Component\DependencyInjection\Exception\EnvParameterException;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Exception\RuntimeException;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\ExpressionLanguage;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\LazyServiceDumper;
@@ -993,6 +994,16 @@ class PhpDumper extends Dumper
         [$callCount, $behavior] = $this->serviceCalls[$targetId];
 
         if ($id === $targetId) {
+            if (!$forConstructor && $definition->getFactory()) {
+                // A circular reference loops back to a factory-built service through
+                // a non-constructor edge (method call, property or configurator). The
+                // soft-circular resolution would emit "$instance = $a->build()" before
+                // the inlined builder's method calls have run, returning an unconfigured
+                // instance. There is no safe ordering: bail out instead of producing
+                // broken code.
+                throw new ServiceCircularReferenceException($id, [$id, $id]);
+            }
+
             return $this->addInlineService($id, $definition, $definition);
         }
 

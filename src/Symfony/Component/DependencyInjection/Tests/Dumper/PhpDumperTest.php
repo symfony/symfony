@@ -994,6 +994,32 @@ class PhpDumperTest extends TestCase
         $this->assertTrue($container->get('bar')->callPassed(), '->dump() initializes properties before method calls');
     }
 
+    public function testCircularReferenceWithFactoryThroughMethodCallIsRejected()
+    {
+        // product is built by a factory whose builder has method calls; one of
+        // those method calls (useExtension) brings the cycle back to product
+        // through a non-constructor edge. Generating an early-instance pattern
+        // here would call the factory before the builder has been configured,
+        // returning a half-built service. Bail out instead of producing broken
+        // code.
+        $container = new ContainerBuilder();
+        $container->register('builder', 'stdClass')
+            ->addMethodCall('useExtension', [new Reference('extension')]);
+        $container->register('product', 'stdClass')
+            ->setFactory([new Reference('builder'), 'build'])
+            ->setPublic(true);
+        $container->register('extension', 'stdClass')
+            ->addArgument(new Reference('product'));
+        $container->compile();
+
+        $dumper = new PhpDumper($container);
+
+        $this->expectException(ServiceCircularReferenceException::class);
+        $this->expectExceptionMessage('Circular reference detected for service "product"');
+
+        $dumper->dump();
+    }
+
     public function testCircularReferenceAllowanceForLazyServices()
     {
         $container = new ContainerBuilder();

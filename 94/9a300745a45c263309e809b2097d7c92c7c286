@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-18T08:09:53Z
+
+Thanks @GromNaN comments addressed!
+
+---------------------------------------------------------------------------
+
+by bendavies at 2026-04-19T09:10:08Z
+
+Awesome, we need this.
+
+My concern would be that it's not clear when to use this one over the existing Autowire.
+
+Could it not be argued that `Autowire(env: ...)` could be fixed/improved rather than introducing a new one? I guess you are considering that a BC break.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-19T20:35:50Z
+
+> Autowire(env: ...) could be fixed/improved rather than introducing a new one
+
+that's a good idea, and that works! see updated PR description

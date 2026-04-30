@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-04-30T10:22:52Z
+
+I think this should go in 8.1 as a new feature rather than treating it as a bugfix applying in LTS branches.
+What do you think @nicolas-grekas ?
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-30T15:35:19Z
+
+Yes as a new feature, with a changelog entry therefor.

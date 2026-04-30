@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-29T16:06:42Z
+
+Thanks @alexandre-daubois for the review! 🙏
+
+Fixed all three points:
+- Moved comments to assertion messages
+- Added trailing newline
+
+Ready for another look when you have a moment!

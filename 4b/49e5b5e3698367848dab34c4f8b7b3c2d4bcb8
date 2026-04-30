@@ -1,0 +1,45 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-03-28T17:26:47Z
+
+Thanks @Spomky for the approval and the great suggestion! 🙏
+
+You're absolutely right - currently `WebDebugToolbarListener` disables CSP entirely when there are dumps, which is... how shall I put it... "a bit like using a sledgehammer to crack a nut" 🔨🥜
+
+Here's a concrete implementation approach:
+
+**1. Add a `setNonce()` method to `DumpDataCollector`:**
+```php
+// In DumpDataCollector
+private ?string $nonce = null;
+
+public function setNonce(?string $nonce): void
+{
+    $this->nonce = $nonce;
+}
+```
+
+**2. Inject the nonce from `WebDebugToolbarListener`:**
+```php
+// In WebDebugToolbarListener::onKernelResponse()
+$nonces = $this->cspHandler?->updateResponseHeaders($request, $response) ?? [];
+
+// Instead of disabling CSP, inject the nonce
+if ($this->dumpDataCollector && isset($nonces['csp_script_nonce'])) {
+    $this->dumpDataCollector->setNonce($nonces['csp_script_nonce']);
+}
+// Remove the disableCsp() call
+```
+
+**3. Use the nonce when creating HtmlDumper instances:**
+```php
+// In DumpDataCollector::getDumps(), ::collect(), ::__destruct()
+$dumper = new HtmlDumper($data, $this->charset);
+if ($this->nonce) {
+    $dumper->setNonce($this->nonce);
+}
+```
+
+This would allow keeping CSP active while still having functional dumps. Should I create a follow-up PR for this?
+
+As the French would say: *"Petit à petit, l'oiseau fait son nid"* 🐦

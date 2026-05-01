@@ -35,9 +35,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Command implements SignalableCommandInterface
 {
     // see https://tldp.org/LDP/abs/html/exitcodes.html
-    public const SUCCESS = 0;
-    public const FAILURE = 1;
-    public const INVALID = 2;
+    public const int SUCCESS = 0;
+    public const int FAILURE = 1;
+    public const int INVALID = 2;
 
     private ?Application $application = null;
     private ?string $name = null;

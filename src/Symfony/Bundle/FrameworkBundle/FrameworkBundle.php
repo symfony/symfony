@@ -94,6 +94,8 @@ class_exists(Registry::class);
  */
 class FrameworkBundle extends Bundle
 {
+    private ?ErrorHandler $registeredErrorHandler = null;
+
     /**
      * @return void
      */
@@ -106,6 +108,7 @@ class FrameworkBundle extends Bundle
             restore_error_handler();
         } else {
             $handler = [ErrorHandler::register(null, false)];
+            $this->registeredErrorHandler = $handler[0];
         }
 
         if (!$this->container->has('debug.error_handler_configurator')) {
@@ -128,6 +131,38 @@ class FrameworkBundle extends Bundle
         // The service is made public by AddMimeTypeGuesserPass only when custom guessers are tagged.
         if ($this->container->has('mime_types')) {
             $this->container->get('mime_types');
+        }
+    }
+
+    /**
+     * @return void
+     */
+    public function shutdown()
+    {
+        if (null === $this->registeredErrorHandler) {
+            return;
+        }
+
+        $registered = $this->registeredErrorHandler;
+        $this->registeredErrorHandler = null;
+
+        // Restore the error handler we registered in boot() if it is still on top
+        // of the stack. Otherwise leave the stack untouched — another component
+        // pushed its own handler on top and is responsible for popping it.
+        // ErrorHandler::register() installs the handler as `[$instance, 'handleError']`
+        // / `[$instance, 'handleException']`, so the active callable is an array
+        // whose first element is the ErrorHandler instance — that is what we
+        // compare against.
+        $current = set_error_handler(static fn (): bool => false);
+        restore_error_handler();
+        if (\is_array($current) && ($current[0] ?? null) === $registered) {
+            restore_error_handler();
+        }
+
+        $current = set_exception_handler(static fn () => null);
+        restore_exception_handler();
+        if (\is_array($current) && ($current[0] ?? null) === $registered) {
+            restore_exception_handler();
         }
     }
 

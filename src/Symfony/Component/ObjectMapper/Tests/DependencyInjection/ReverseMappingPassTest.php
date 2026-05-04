@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\ObjectMapper\DependencyInjection\ReverseMappingPass;
+use Symfony\Component\ObjectMapper\Metadata\ReverseClassObjectMapperMetadataFactory;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Cost;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Quote;
@@ -78,6 +79,27 @@ final class ReverseMappingPassTest extends TestCase
         (new ReverseMappingPass())->process($container);
 
         $this->assertSame([], $factory->getArgument(1));
+    }
+
+    public function testAbstractMappedClassesAreNotRejected()
+    {
+        $container = new ContainerBuilder();
+        $container->register('object_mapper.metadata_factory.reverse_class', ReverseClassObjectMapperMetadataFactory::class)
+            ->setArguments([null, []]);
+
+        // #[Map] is meant to live on an abstract parent so children inherit it;
+        // such a resource must not be rejected at compile time.
+        $container->register('source', 'Foo\AbstractSource')
+            ->setAbstract(true)
+            ->addTag('object_mapper.map', ['source' => 'Foo\AbstractSource', 'target' => 'Foo\Target'])
+            ->addResourceTag('container.excluded');
+
+        (new ReverseMappingPass())->process($container);
+
+        $this->assertSame(
+            ['Foo\AbstractSource' => ['Foo\Target']],
+            $container->getDefinition('object_mapper.metadata_factory.reverse_class')->getArgument(1),
+        );
     }
 
     private function registerReverseClassFactory(ContainerBuilder $container): Definition

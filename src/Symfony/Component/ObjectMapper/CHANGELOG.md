@@ -6,6 +6,7 @@ CHANGELOG
 
  * Add automatic conversion between `BackedEnum` and scalar types (both ways)
  * Add a `MappingAwareTransformCallableInterface` to pass the `Map` attribute being applied to transformers
+ * Add class-level Inheritance for `#[Map]` attribute
 
 8.1
 ---

@@ -90,6 +90,11 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\TargetUser;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\User;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\Flatten\UserProfile;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\HydrateObject\SourceOnly;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InheritedClassMap\ChildOfLineItemSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InheritedClassMap\InheritedReverseChildSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InheritedClassMap\InheritedReverseSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InheritedClassMap\InheritedReverseTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\InheritedClassMap\OverridingChildOfLineItemSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InitializedConstructor\A as InitializedConstructorA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InitializedConstructor\B as InitializedConstructorB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InitializedConstructor\C as InitializedConstructorC;
@@ -980,6 +985,32 @@ final class ObjectMapperTest extends TestCase
         $this->assertInstanceOf(CostRequestView::class, $quoteRequestView->cost);
         $this->assertEquals(10, $quoteRequestView->cost->amount);
         $this->assertEquals(20, $quoteRequestView->cost->tax);
+    }
+
+    public function testInheritedClassMapFromParent()
+    {
+        $out = (new ObjectMapper())->map(new ChildOfLineItemSource());
+        $this->assertInstanceOf(LineItemTarget::class, $out);
+    }
+
+    public function testInheritedClassMapIsOverriddenByChild()
+    {
+        $out = (new ObjectMapper())->map(new OverridingChildOfLineItemSource());
+        $this->assertInstanceOf(Target::class, $out);
+    }
+
+    public function testInheritedReverseClassMapFromParent()
+    {
+        $classMap = [
+            InheritedReverseSource::class => InheritedReverseTarget::class,
+        ];
+
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), $classMap));
+
+        $out = $mapper->map(new InheritedReverseChildSource());
+
+        $this->assertInstanceOf(InheritedReverseTarget::class, $out);
+        $this->assertSame('foo', $out->id);
     }
 
     public function testClassMapWithSourceAttribute()

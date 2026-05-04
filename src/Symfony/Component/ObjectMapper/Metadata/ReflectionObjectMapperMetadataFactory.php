@@ -37,11 +37,17 @@ final class ReflectionObjectMapperMetadataFactory implements ObjectMapperMetadat
             }
 
             $refl = $this->reflectionClassCache[$object::class] ??= new \ReflectionClass($object);
-            $target = $refl;
-            if ($property && null === $target = $this->getPropertyFromHierarchy($refl, $property)) {
-                return $this->attributesCache[$key] = [];
+            if ($property) {
+                if (null === $target = $this->getPropertyFromHierarchy($refl, $property)) {
+                    return $this->attributesCache[$key] = [];
+                }
+                $attributes = $target->getAttributes(Map::class, \ReflectionAttribute::IS_INSTANCEOF);
+            } else {
+                $attributes = [];
+                for ($parent = $refl; $parent && !$attributes; $parent = $parent->getParentClass()) {
+                    $attributes = $parent->getAttributes(Map::class, \ReflectionAttribute::IS_INSTANCEOF);
+                }
             }
-            $attributes = $target->getAttributes(Map::class, \ReflectionAttribute::IS_INSTANCEOF);
             $mappings = [];
             foreach ($attributes as $attribute) {
                 $map = $attribute->newInstance();

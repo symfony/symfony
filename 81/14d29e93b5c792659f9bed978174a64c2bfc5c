@@ -1,0 +1,55 @@
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-03T05:44:51Z
+
+Note: CI may show some failures in `TableTest` — these are pre-existing and unrelated to this PR. I verified by running tests on a clean `8.1` branch before my changes. 🙂
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-07T11:06:05Z
+
+No, this only applies to Unix TTYs. On Windows (including Windows Terminal with PowerShell) and non-TTY outputs, it falls back to regular space characters — so no change in behavior there.
+
+Were you hoping it would work on Windows Terminal as well, or just checking the scope?
+
+---------------------------------------------------------------------------
+
+by dkarlovi at 2026-04-07T13:27:34Z
+
+> No, this only applies to Unix TTYs. On Windows (including Windows Terminal with PowerShell) and non-TTY outputs, it falls back to regular space characters — so no change in behavior there.
+>
+> Were you hoping it would work on Windows Terminal as well, or just checking the scope?
+
+@Amoifr I'm asking because I know [PowerShell supports ANSI escape sequences](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_special_characters?view=powershell-7.6&viewFallbackFrom=powershell-7.3#escape-e) and I'm pretty sure Windows Terminal does too, it's possible that "doesn't work on Windows" is too coarse, it would probably work there too.
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-07T14:29:19Z
+
+Good point! You're right that Windows Terminal and modern PowerShell do support ANSI escape sequences.
+
+The current implementation relies on `stream_isatty()` which returns `false` on Windows even in capable terminals. This could be improved in a follow-up by detecting Windows Terminal specifically (via `WT_SESSION` env var for example).
+
+For now, I kept it conservative to avoid breaking edge cases, but I'm happy to explore better Windows detection if that's desired.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-07T14:36:22Z
+
+We already have color detection for Windows, can't this be used?
+
+---------------------------------------------------------------------------
+
+by stof at 2026-04-07T14:36:30Z
+
+We already have logic in other places of Symfony using `sapi_windows_vt100_support` to handle Windows properly.
+
+---------------------------------------------------------------------------
+
+by Amoifr at 2026-04-07T15:15:49Z
+
+Thanks for the pointer! I'll admit I initially thought the discussion was drifting from the original scope — turns out I just wasn't aware of `sapi_windows_vt100_support()`. 😅
+
+It makes total sense to use the same approach as `StreamOutput::hasColorSupport()`, so I've updated the PR accordingly. ECH should now work on Windows Terminal and other VT100-capable terminals as well.
+
+Thanks for the guidance!

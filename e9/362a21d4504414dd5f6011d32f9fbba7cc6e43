@@ -1,0 +1,102 @@
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-05-01T23:02:44Z
+
+Reproduced the bug locally — sharing the exact steps so reviewers can verify the regression and the fix without running PHPUnit.
+
+### Environment
+
+- Docker image: `php:8.4-cli` (`PHP 8.4.20 (cli) (built: Apr 22 2026 01:24:37) (NTS)`)
+- libxml: PHP-bundled
+- Tmp dir with a space in its name: `/tmp/dir with space/` (mimics a Windows user profile such as `C:\Users\John Doe\AppData\Local\Temp`)
+- No Symfony bootstrap — pure libxml repro of the failing call site (`DOMDocument::schemaValidateSource()` with the `xsd:include` schema produced inside `XliffUtils::shouldEnableEntityLoader()`)
+
+### Repro script
+
+```php
+<?php
+$tmpfile = tempnam('/tmp/dir with space', 'symfony');
+file_put_contents($tmpfile, '<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:element name="test" type="testType" />
+  <xsd:complexType name="testType"/>
+</xsd:schema>');
+
+set_error_handler(function ($severity, $message) {
+    if (!(error_reporting() & $severity)) {
+        echo "  [SILENCED] severity=$severity msg=$message\n";
+        return true;
+    }
+    return false;
+});
+
+function probe(string $label, string $schema): void {
+    echo "=== $label ===\n";
+    $dom = new DOMDocument();
+    $dom->loadXML('<?xml version="1.0"?><test/>');
+    @$dom->schemaValidateSource($schema);
+    echo "(end)\n";
+}
+
+// BEFORE patch — raw concat (current code on 6.4)
+$beforeSchema = '<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:include schemaLocation="file:///'.str_replace('\\', '/', $tmpfile).'" />
+</xsd:schema>';
+
+// AFTER patch — rawurlencode segments
+$parts = explode('/', str_replace('\\', '/', $tmpfile));
+$drive = '\\' === DIRECTORY_SEPARATOR ? array_shift($parts).'/' : '';
+$encodedUrl = 'file:///'.$drive.implode('/', array_map('rawurlencode', $parts));
+$afterSchema = '<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <xsd:include schemaLocation="'.$encodedUrl.'" />
+</xsd:schema>';
+
+probe('BEFORE patch', $beforeSchema);
+probe('AFTER  patch', $afterSchema);
+unlink($tmpfile);
+```
+
+### Run
+
+```bash
+docker run --rm -v /tmp:/tmp php:8.4-cli php /tmp/repro-63253.php
+```
+
+### Output
+
+```
+=== BEFORE patch ===
+  [SILENCED] severity=2 msg=DOMDocument::schemaValidateSource(): Internal error: xmlSchemaParseIncludeOrRedefine, could not build an URI from the schemaLocation.
+  [SILENCED] severity=2 msg=DOMDocument::schemaValidateSource(): Internal error: xmlSchemaParse, An internal error occurred.
+  [SILENCED] severity=2 msg=DOMDocument::schemaValidateSource(): Invalid Schema
+(end)
+=== AFTER  patch ===
+(end)
+```
+
+The third silenced warning — `DOMDocument::schemaValidateSource(): Invalid Schema` — is the exact message reported in the issue. Symfony's `ErrorHandler` picks up `@`-silenced warnings via `set_error_handler` and routes them through `SilencedErrorContext`, which is what `stof` was hinting at: it is the error handler configuration that surfaces these as log entries despite the `@`.
+
+### Test that captures this in PHPUnit
+
+The branch already had a helper-level data-provider test (`testGetTmpFileUrlEncodesPathSegments`); I just added an integration test that goes through libxml itself:
+
+`testEncodedUrlPreventsLibxmlInvalidSchemaErrors` creates a tmp dir whose name contains a space, runs `DOMDocument::schemaValidateSource()` on a schema that includes the file via the encoded URL (no errors expected) and via the raw-concat URL (errors expected). The assertion fails when the patch is reverted, with libxml emitting:
+
+```
+xmlSchemaParseIncludeOrRedefine, could not build an URI from the schemaLocation.
+xmlSchemaParse, An internal error occurred.
+```
+
+Branch was force-pushed with the new integration test on top of the original patch.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-05-03T04:57:40Z
+
+Iterated on the test in two follow-up commits (no change to the production fix).
+
+The first attempt rewrote the test as a single end-to-end run through `validateSchema()`, gated by `@runInSeparateProcess` and `putenv("TMPDIR=...")` to relocate the temp dir under a path with spaces. Empirical run revealed that `sys_get_temp_dir()` caches its return on first read, so neither approach actually changes the path the test exercises — the "regression test" would stay green even with the fix reverted.
+
+Replaced with two independent tests: a data-provider asserting the helper's encoding output, and a libxml smoke test that builds the encoded URL inline (no coupling to the helper's name) and asserts no `Invalid Schema` PHP warning nor libxml URI-parsing error is emitted. Both pipelines were verified to fire on the buggy raw URL and stay silent on the encoded one. Dropped the fragile negative assertion on the raw URL.

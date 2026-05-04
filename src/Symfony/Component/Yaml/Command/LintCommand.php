@@ -13,6 +13,7 @@ namespace Symfony\Component\Yaml\Command;
 
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\CI\GithubActionReporter;
+use Symfony\Component\Console\CI\GitlabCiReporter;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Completion\CompletionInput;
 use Symfony\Component\Console\Completion\CompletionSuggestions;
@@ -154,8 +155,29 @@ class LintCommand extends Command
             'txt' => $this->displayTxt($io, $files),
             'json' => $this->displayJson($io, $files),
             'github' => $this->displayTxt($io, $files, true),
+            'gitlab' => $this->displayGitlab($io, $files),
             default => throw new InvalidArgumentException(\sprintf('Supported formats are "%s".', implode('", "', $this->getAvailableFormatOptions()))),
         };
+    }
+
+    private function displayGitlab(SymfonyStyle $io, array $filesInfo): int
+    {
+        $reporter = new GitlabCiReporter($io, 'yaml-lint');
+        $erroredFiles = 0;
+
+        foreach ($filesInfo as $info) {
+            if ($info['valid']) {
+                continue;
+            }
+
+            ++$erroredFiles;
+
+            $reporter->error($info['message'], $info['file'] ?? 'php://stdin', $info['line']);
+        }
+
+        $reporter->write();
+
+        return min($erroredFiles, 1);
     }
 
     private function displayTxt(SymfonyStyle $io, array $filesInfo, bool $errorAsGithubAnnotations = false): int
@@ -272,6 +294,6 @@ class LintCommand extends Command
     /** @return string[] */
     private function getAvailableFormatOptions(): array
     {
-        return ['txt', 'json', 'github'];
+        return ['txt', 'json', 'github', 'gitlab'];
     }
 }

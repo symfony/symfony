@@ -1,0 +1,83 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-02T13:42:35Z
+
+We should likely replace this by an exception when the dbal adapter is used with a wrong version of dbal.
+That'd be via a feature test (class_exists or similar) and a message that's actionable
+
+---------------------------------------------------------------------------
+
+by derrabus at 2026-04-02T13:51:18Z
+
+We have the same conflict rule in HttpFoundation and Lock. We could think about moving the affected classes to Doctrine Bridge. This way, we could still allow Composer to solve such conflicts.
+
+---------------------------------------------------------------------------
+
+by flack at 2026-04-03T09:37:20Z
+
+I've looked a bit at the feature detection approach, but I was wondering, couldn't we also simply use composer's builtin functionality? Something like
+
+```php
+if (   !Composer\InstalledVersions::isInstalled('doctrine/dbal')
+    || version_compare(Composer\InstalledVersions::getVersion('doctrine/dbal'), '4.3', '<')) {
+    throw new Exception('You need doctrine/dbal > 4.3 to use this adapter');
+}
+```
+
+Akin to how you would check for installed extensions with `extension_loaded($name)` and `phpversion($name)`
+
+EDIT: Looks like you'd need to require `"composer-runtime-api": "^2"` for this to work. Both `doctrine/orm` and `doctrine/dbal` have this in their composer.json, but symfony packages don't (at least not the ones I'm currently using), see https://getcomposer.org/doc/07-runtime.md#installed-versions for more details
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-07T20:39:41Z
+
+We always prefer feature testing vs coupling to composer API.
+Also: is this really worth it? In the near term, this won't be needed...
+
+---------------------------------------------------------------------------
+
+by flack at 2026-04-07T20:52:21Z
+
+yeah, I'm fine with simply removing the conflict also. Just thought that composer-based check could be used to provide the actionable message you were mentioning above. And yes, maybe feature-based would be nicer, but the api-based one could be exactly equivalent to what you would put into composer.json, only evaluated at runtime instead of at install time, so it might be easier to maintain in the longer run.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-07T20:56:11Z
+
+I meant keeping the conflict ;)
+
+---------------------------------------------------------------------------
+
+by flack at 2026-04-07T21:04:58Z
+
+Meh.
+
+I mean I understand that it gives a slight convenience advantage to users of the adapter because it prevents them from installing an incompatible version, but I still think it's technically wrong. There is no conflict between Symfony Cache and dbal <4.3. There is only a conflict with an optional adapter that doesn't even work out of the box (because you have to separately install dbal).
+
+Maybe my use-case is not the most common, but allowing it doesn't prevent any existing use cases. Also, if you had adapters for 20 different optional libraries, would you really want to introduce conflicts for all of those? At some point, that would become impractial, no?
+
+EDIT: Or to give another example: The included dbal adapter doesn't work with version 3, but maybe I want to write my own Dbal3Adapter in my project. API-wise that would totally work, but I still couldn't get it to run because composer will refuse to install.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-08T11:11:38Z
+
+Yeah, I tried resisting :D
+
+Here is the patch that removed support for previous DBAL versions, might be useful to get inspiration from:
+https://github.com/symfony/symfony/commit/c2106970820c98fd011a3b100279966d0fcb3317#diff-6f3ed9629adec15a83efcec6c83826296acb7e55159a0b0ca4289dd9cdab27dc
+
+---------------------------------------------------------------------------
+
+by flack at 2026-04-08T12:38:43Z
+
+@nicolas-grekas ok, thanks, but I think we might be talking a bit past each other: I'm not actually trying to use dbal 3 inside of Symfony components, my dbal usage is completely independent from my Symfony usage. I have DB logic based on Doctrine 2, and I use Symfony components for various tasks like routing, form handling etc., but there is no overlap, and I don't need to reimplement anything Symfony may have removed, the only thing blocking my code from working is that one line in composer.json that declares the conflict.
+
+(also, as mentioned above, reimplementing something that was removed from symfony wouldn't work anyways, because composer would not allow me to install the required set of packages)
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-04-13T08:10:30Z
+
+I understand than. I linked there because the feature-check we're looking for can be borrowed from that patch.

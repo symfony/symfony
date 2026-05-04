@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-05-02T08:21:45Z
+
+Dropped the test in b29deda203d — the regression isn't reachable without either real LDAP I/O or pegging to a libldap error string, both fragile. The cast itself is trivial and BC-safe; happy to add a test if you have a stable angle in mind.

@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-03-30T15:20:40Z
+
+Can you please rebase/retarget for 8.1? That's a new feature (don't miss adding a changelog entry in the component)
+
+---------------------------------------------------------------------------
+
+by vvaswani at 2026-03-30T21:21:26Z
+
+> Can you please rebase/retarget for 8.1? That's a new feature (don't miss adding a changelog entry in the component)
+
+@nicolas-grekas not sure if I did this correctly, can you check?
+
+The red CI for 8.4 seems unrelated, not sure how to fix these?
+
+- the fail in src/Symfony/Component/Security/Http is caused by PHPUnit/deprecation-trigger configuration, not by the changes in my PR.
+- the RelayClusterStoreTest fails but this seems to relate to the Relay cluster test setup / Relay version behavior.
+- the HttpFoundation: ResponseFunctionalTest hits localhost:80 but gets a normal 200 OK response from Caddy/PHP instead of the early-hints/FrankenPHP behavior.
+
+---------------------------------------------------------------------------
+
+by vvaswani at 2026-04-11T09:11:39Z
+
+The tests are failing but for 8.4/8.5/8.6 while my change is targeting 8.1, so I'm not sure if this needs attention or how to test for 8.1. Please provide advice on this.

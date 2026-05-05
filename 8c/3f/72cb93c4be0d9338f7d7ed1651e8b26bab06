@@ -1,0 +1,53 @@
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-10-24T08:05:20Z
+
+@stof The CI seems to fail because the `Psr\Clock\ClockInterface` interface is not found in a test. The other limiters were not developed using PSR-20 `ClockInterface` but regular `time()` functions and mocked using the `ClockMock` offered by the PhpUnit Bridge.
+
+What should I do in this case? Rewrite the code using regular `time()` functions or require the `psr/clock` at least in `--dev` for testing?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-10-24T08:48:21Z
+
+you need to add a dev requirement for that optional dependency.
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-10-24T09:11:16Z
+
+> you need to add a dev requirement for that optional dependency.
+
+Are we sure it's not just a regular dependency, since it's now used in `CalendarWindowLimiter.php`?
+
+---------------------------------------------------------------------------
+
+by stof at 2025-10-24T09:50:31Z
+
+the clock is optional in that limiter.
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2025-10-25T09:25:37Z
+
+Everything seems fine on my end 😁. The tests that crashed in CI don't seem to be related to my code.
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2026-05-04T13:26:37Z
+
+Thanks @nicolas-grekas. The new implementation is better than introducing a separate `CalendarWindowLimiter` that would have duplicated most of `FixedWindowLimiter`.
+
+That said, the anchor mechanism is not immediately intuitive — the year component of `anchor_at` is only significant for non-calendar intervals (e.g. `400 days`), but for standard ones (e.g. `1 month`), it is irrelevant and might mislead users into thinking it matters. If I understand well, `anchor_at: '2024-01-05'` and `anchor_at: '2099-01-05'` combined with `interval: 1 month` would produce the exact same result (resetting on the 5th of each month), which is not obvious at first glance. We should make sure to document this well, with concrete examples in the doc'
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-04T13:30:38Z
+
+Correct, that's an anchor. It looks important to me to be able to express that not all monthly-subscriptions start on the 1st of the month. Can you think of any better way to express this?
+
+---------------------------------------------------------------------------
+
+by Crovitche-1623 at 2026-05-04T13:35:09Z
+
+No no everything is good for me. Good documentation should do the trick. I'll try to take care of it and try to write something descriptive enough. Thanks for the review and the new implementation 👍🏻

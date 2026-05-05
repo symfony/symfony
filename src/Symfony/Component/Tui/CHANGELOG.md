@@ -14,6 +14,7 @@ CHANGELOG
  * Reuse unchanged rendered line segments during differential updates
  * Add `AbstractWidget::attachChild()` and `AbstractWidget::detachChild()` to wire child widgets
  * Add multi-select support to `SelectListWidget`
+ * Add the tab widget
  * [BC BREAK] Add `$multiselect` as the third argument of `SelectListWidget::__construct()`, moving `$keybindings` to fourth position
  * Add `KeyBindingWidget` to display the keybindings of the focused widget
 

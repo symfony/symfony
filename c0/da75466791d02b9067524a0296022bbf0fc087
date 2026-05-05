@@ -1,0 +1,27 @@
+---------------------------------------------------------------------------
+
+by Pechynho at 2026-03-25T08:54:24Z
+
+Sorry for the force push – that was a mistake on my part, won't happen again.
+
+Regarding the review: I removed `@internal` from `getTrackedResettables()` as it is called from `ServicesResetter` in the HttpKernel component. `trackForReset()` keeps `@internal` since it's only called from generated container code within the DI component.
+
+---------------------------------------------------------------------------
+
+by stof at 2026-04-01T17:42:54Z
+
+I discussed this with @nicolas-grekas and we agreed that ServicesResetter should probably live in the DI component (especially after #63710), which would allow keeping those new methods internal.
+
+I'm also wondering whether we should inject the weakmap directly in the ServicesResetter instead of the main Container.
+
+---------------------------------------------------------------------------
+
+by Pechynho at 2026-04-03T09:32:38Z
+
+  Thanks for the review! I've addressed the feedback:
+
+  - Moved ServicesResetter, ServicesResetterInterface, and ResettableServicePass from HttpKernel to the DependencyInjection component
+  - Injected the WeakMap directly into ServicesResetter instead of the whole Container — via an inline Definition with factory [service_container, getResetMap]
+  - Both Container::trackForReset() and Container::getResetMap() are now @internal
+  - Deprecated the original HttpKernel classes with BC shims following the pattern from #63710
+  - Updated all consumers (FrameworkBundle, Messenger, tests) and added an UPGRADE-8.1.md entry

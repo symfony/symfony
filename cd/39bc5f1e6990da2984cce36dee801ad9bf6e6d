@@ -1,0 +1,25 @@
+---------------------------------------------------------------------------
+
+by alexandre-daubois at 2026-03-12T10:07:47Z
+
+This is the first time I come across this annotation, I didn't know PHPStan supports this.
+
+However, it looks very verbose and I'm not sure to understand the added-value. Could you enlighten me on this point?
+
+---------------------------------------------------------------------------
+
+by janedbal at 2026-03-12T10:37:19Z
+
+Main usecase is imo exception propagation, for example:
+
+```php
+$cache->get(
+     "key",
+     function (ItemInterface $item): void {
+         $item->expiresAfter(300);
+         throw new CheckedException(); // with param-immediately-invoked-callable, this is propagated to call-site and need to be handled
+     },
+);
+```
+
+[More about checked exceptions in PHPStan](https://phpstan.org/blog/bring-your-exceptions-under-control)

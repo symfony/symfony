@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by mttsch at 2026-05-04T19:25:46Z
+
+See https://github.com/symfony/symfony/actions/runs/25335859143/job/74280808720?pr=64115 where classes like `Symfony\Component\VarDumper\Tests\Fixtures\NotLoadableClass` are analyzed, which should be excluded via `src/Symfony/*/*/Tests/*`.
+
+---------------------------------------------------------------------------
+
+by mttsch at 2026-05-04T19:32:32Z
+
+Locally, `./vendor/bin/phpstan analyse --generate-baseline=.github/sa-tools/phpstan.baseline.neon --allow-empty-baseline src/Symfony/Component/VarDumper` no longer fails, not sure why it still fails in the pipeline.

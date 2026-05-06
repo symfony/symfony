@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add `ChoiceFormField::selectByText()` to select an option by its visible text content
+
 8.1
 ---
 

@@ -439,6 +439,238 @@ class ChoiceFormFieldTest extends FormFieldTestCase
         $this->assertSame('', $field->getValue());
     }
 
+    public function testSelectByText()
+    {
+        $node = $this->createSelectNodeWithLabels([
+            ['value' => 'ok', 'text' => 'This is ok'],
+            ['value' => 'ko', 'text' => 'This is ko'],
+        ]);
+        $field = new ChoiceFormField($node);
+
+        $field->selectByText('This is ok');
+        $this->assertSame('ok', $field->getValue(), '->selectByText() resolves the option text to its underlying value');
+
+        $field->selectByText('This is ko');
+        $this->assertSame('ko', $field->getValue(), '->selectByText() can change the selected option');
+    }
+
+    public function testSelectByTextWithValueEqualToText()
+    {
+        $node = $this->createSelectNode(['foo' => false, 'bar' => false]);
+        $field = new ChoiceFormField($node);
+
+        $field->selectByText('bar');
+        $this->assertSame('bar', $field->getValue(), '->selectByText() works when value and text are identical');
+    }
+
+    public function testSelectByTextNormalizesWhitespace()
+    {
+        $node = $this->createSelectNodeWithLabels([
+            ['value' => 'ok', 'text' => "  This  is\n\tok  "],
+        ]);
+        $field = new ChoiceFormField($node);
+
+        $field->selectByText('This is ok');
+        $this->assertSame('ok', $field->getValue(), '->selectByText() collapses whitespace sequences in the option text');
+
+        $field->selectByText("\tThis\nis  ok\n");
+        $this->assertSame('ok', $field->getValue(), '->selectByText() collapses whitespace in the input as well');
+    }
+
+    public function testSelectByTextWithDuplicatesPicksFirst()
+    {
+        $node = $this->createSelectNodeWithLabels([
+            ['value' => 'first', 'text' => 'Same label'],
+            ['value' => 'second', 'text' => 'Same label'],
+        ]);
+        $field = new ChoiceFormField($node);
+
+        $field->selectByText('Same label');
+        $this->assertSame('first', $field->getValue(), '->selectByText() returns the first matching option');
+    }
+
+    public function testSelectByTextAllowsDisabledOption()
+    {
+        $node = $this->createSelectNodeWithLabels([
+            ['value' => 'ok', 'text' => 'This is ok', 'disabled' => true],
+            ['value' => 'ko', 'text' => 'This is ko'],
+        ]);
+        $field = new ChoiceFormField($node);
+
+        $field->selectByText('This is ok');
+        $this->assertSame('ok', $field->getValue(), '->selectByText() can pick a disabled option, mirroring select()');
+    }
+
+    public function testSelectByTextOnMultipleSelect()
+    {
+        $node = $this->createSelectNodeWithLabels(
+            [
+                ['value' => 'ok', 'text' => 'This is ok'],
+                ['value' => 'ko', 'text' => 'This is ko'],
+            ],
+            ['multiple' => 'multiple'],
+        );
+        $field = new ChoiceFormField($node);
+
+        $field->selectByText('This is ok');
+        $this->assertSame(['ok'], $field->getValue(), '->selectByText() works with <select multiple>');
+
+        $field->selectByText('This is ko');
+        $this->assertSame(['ko'], $field->getValue(), '->selectByText() replaces the previous selection on a multiple select, mirroring setValue()');
+    }
+
+    public function testSelectByTextOnMultipleSelectWithArray()
+    {
+        $node = $this->createSelectNodeWithLabels(
+            [
+                ['value' => 'ok', 'text' => 'This is ok'],
+                ['value' => 'ko', 'text' => 'This is ko'],
+            ],
+            ['multiple' => 'multiple'],
+        );
+        $field = new ChoiceFormField($node);
+
+        $field->selectByText(['This is ok', 'This is ko']);
+        $this->assertSame(['ok', 'ko'], $field->getValue(), '->selectByText() accepts an array of texts on <select multiple>');
+    }
+
+    public function testSelectByTextRejectsArrayOnSingleSelect()
+    {
+        $node = $this->createSelectNodeWithLabels([
+            ['value' => 'ok', 'text' => 'This is ok'],
+        ]);
+        $field = new ChoiceFormField($node);
+
+        try {
+            $field->selectByText(['This is ok']);
+            $this->fail('->selectByText() rejects an array input on a non-multiple select, mirroring setValue()');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertStringContainsString('cannot be an array', $e->getMessage());
+        }
+    }
+
+    public function testSelectByTextOnOptionWithoutValueAttribute()
+    {
+        $node = $this->createSelectNodeWithEmptyOption(['Foo' => false, 'Bar' => false]);
+        $field = new ChoiceFormField($node);
+
+        $field->selectByText('Bar');
+        $this->assertSame('Bar', $field->getValue(), '->selectByText() resolves to nodeValue when <option> has no value attribute');
+    }
+
+    public function testSelectByTextRejectsRawValueWhenItDiffersFromText()
+    {
+        $node = $this->createSelectNodeWithLabels([
+            ['value' => 'ok', 'text' => 'Visible'],
+        ]);
+        $field = new ChoiceFormField($node);
+
+        try {
+            $field->selectByText('ok');
+            $this->fail('->selectByText() does not match an option by its underlying value');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertStringContainsString('has no option with text', $e->getMessage());
+        }
+    }
+
+    public function testSelectByTextWithEmptyText()
+    {
+        $node = $this->createSelectNodeWithLabels([
+            ['value' => 'x', 'text' => ''],
+            ['value' => 'y', 'text' => 'Y label'],
+        ]);
+        $field = new ChoiceFormField($node);
+
+        $field->selectByText('');
+        $this->assertSame('x', $field->getValue(), '->selectByText() can match an <option> with empty text');
+    }
+
+    public function testSelectByTextWithHtmlEntities()
+    {
+        $document = new \DOMDocument();
+        $document->loadHTML('<select name="name"><option value="tj">Tom &amp; Jerry</option></select>');
+        $node = $document->getElementsByTagName('select')->item(0);
+
+        $field = new ChoiceFormField($node);
+        $field->selectByText('Tom & Jerry');
+        $this->assertSame('tj', $field->getValue(), '->selectByText() compares decoded text content');
+    }
+
+    public function testSelectByTextStillThrowsAfterDisableValidation()
+    {
+        $node = $this->createSelectNodeWithLabels([['value' => 'ok', 'text' => 'Label']]);
+        $field = new ChoiceFormField($node);
+        $field->disableValidation();
+
+        try {
+            $field->selectByText('Unknown');
+            $this->fail('->selectByText() throws even with validation disabled (text-based lookup is not relaxed)');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertStringContainsString('has no option with text', $e->getMessage());
+        }
+    }
+
+    public function testSelectByTextWithOptgroup()
+    {
+        $document = new \DOMDocument();
+        $node = $document->createElement('select');
+        $node->setAttribute('name', 'name');
+
+        $group = $document->createElement('optgroup');
+        $group->setAttribute('label', 'Group A');
+        $option = $document->createElement('option', 'Nested label');
+        $option->setAttribute('value', 'nested');
+        $group->appendChild($option);
+        $node->appendChild($group);
+
+        $field = new ChoiceFormField($node);
+        $field->selectByText('Nested label');
+        $this->assertSame('nested', $field->getValue(), '->selectByText() resolves options nested in <optgroup>');
+    }
+
+    public function testSelectByTextThrowsForUnknownText()
+    {
+        $node = $this->createSelectNodeWithLabels([
+            ['value' => 'opt-value', 'text' => 'Visible label'],
+        ]);
+        $field = new ChoiceFormField($node);
+
+        try {
+            $field->selectByText('Does not exist');
+            $this->fail('->selectByText() throws an \InvalidArgumentException when no option matches');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertStringContainsString('has no option with text', $e->getMessage());
+            $this->assertStringContainsString('Visible label', $e->getMessage(), 'the error message lists option texts');
+            $this->assertStringNotContainsString('opt-value', $e->getMessage(), 'the error message does not leak option values');
+        }
+    }
+
+    public function testSelectByTextThrowsForRadio()
+    {
+        $node = $this->createNode('input', '', ['type' => 'radio', 'name' => 'name', 'value' => 'foo']);
+        $field = new ChoiceFormField($node);
+
+        try {
+            $field->selectByText('foo');
+            $this->fail('->selectByText() throws a \LogicException for radio buttons');
+        } catch (\LogicException $e) {
+            $this->assertStringContainsString('not a select', $e->getMessage());
+        }
+    }
+
+    public function testSelectByTextThrowsForCheckbox()
+    {
+        $node = $this->createNode('input', '', ['type' => 'checkbox', 'name' => 'name', 'value' => 'foo']);
+        $field = new ChoiceFormField($node);
+
+        try {
+            $field->selectByText('foo');
+            $this->fail('->selectByText() throws a \LogicException for checkboxes');
+        } catch (\LogicException $e) {
+            $this->assertStringContainsString('not a select', $e->getMessage());
+        }
+    }
+
     protected function createSelectNode($options, $attributes = [], $selectedAttrText = 'selected')
     {
         $document = new \DOMDocument();
@@ -477,6 +709,35 @@ class ChoiceFormFieldTest extends FormFieldTestCase
                 $option->setAttribute('selected', 'selected');
             }
             $node->appendChild($option);
+        }
+
+        return $node;
+    }
+
+    /**
+     * Creates a <select> node where each option has an explicit value and a
+     * distinct visible text content.
+     *
+     * @param array<array{value: string, text: string, disabled?: bool}> $options
+     * @param array<string, string>                                      $attributes
+     */
+    protected function createSelectNodeWithLabels(array $options, array $attributes = []): \DOMElement
+    {
+        $document = new \DOMDocument();
+        $node = $document->createElement('select');
+
+        foreach ($attributes as $name => $value) {
+            $node->setAttribute($name, $value);
+        }
+        $node->setAttribute('name', 'name');
+
+        foreach ($options as $option) {
+            $optionNode = $document->createElement('option', $option['text']);
+            $optionNode->setAttribute('value', $option['value']);
+            if ($option['disabled'] ?? false) {
+                $optionNode->setAttribute('disabled', 'disabled');
+            }
+            $node->appendChild($optionNode);
         }
 
         return $node;

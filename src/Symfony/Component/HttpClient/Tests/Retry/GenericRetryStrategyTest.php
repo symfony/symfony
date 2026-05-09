@@ -123,7 +123,7 @@ class GenericRetryStrategyTest extends TestCase
     }
 
     #[DataProvider('provideDelayWithRetryAfter')]
-    public function testGetDelayWithRetryAfterInSeconds(int $retryAfter, int $maxDelay, int $expectedDelay): void
+    public function testGetDelayWithRetryAfterInSeconds(int $retryAfter, int $maxDelay, int $expectedDelay)
     {
         $strategy = new GenericRetryStrategy([], 1000, 2, $maxDelay, 0);
         $context = $this->getContextWithHeaders(0, 'GET', 'http://example.com/', 200, ['retry-after' => [$retryAfter]]);

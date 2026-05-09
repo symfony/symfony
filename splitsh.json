@@ -123,6 +123,7 @@
         "ovh-cloud-notifier": "src/Symfony/Component/Notifier/Bridge/OvhCloud",
         "pager-duty-notifier": "src/Symfony/Component/Notifier/Bridge/PagerDuty",
         "plivo-notifier": "src/Symfony/Component/Notifier/Bridge/Plivo",
+        "prelude-notifier": "src/Symfony/Component/Notifier/Bridge/Prelude",
         "primotexto-notifier": "src/Symfony/Component/Notifier/Bridge/Primotexto",
         "pushover-notifier": "src/Symfony/Component/Notifier/Bridge/Pushover",
         "pushy-notifier": "src/Symfony/Component/Notifier/Bridge/Pushy",
@@ -174,6 +175,7 @@
         "serializer": "src/Symfony/Component/Serializer",
         "stopwatch": "src/Symfony/Component/Stopwatch",
         "string": "src/Symfony/Component/String",
+        "tui": "src/Symfony/Component/Tui",
         "translation": {
             "prefixes": [{ "from": "src/Symfony/Component/Translation", "to": "", "excludes": ["Bridge"] }]
         },
@@ -196,6 +198,7 @@
         }
     },
     "defaults": {
-        "git_constraint": "<1.8.2"
+        "git_constraint": "<1.8.2",
+        "tag_skip": "patch"
     }
 }

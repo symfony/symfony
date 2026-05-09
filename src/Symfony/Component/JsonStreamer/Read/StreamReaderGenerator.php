@@ -11,15 +11,14 @@
 
 namespace Symfony\Component\JsonStreamer\Read;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\JsonStreamer\DataModel\Read\BackedEnumNode;
 use Symfony\Component\JsonStreamer\DataModel\Read\CollectionNode;
 use Symfony\Component\JsonStreamer\DataModel\Read\CompositeNode;
 use Symfony\Component\JsonStreamer\DataModel\Read\DataModelNodeInterface;
-use Symfony\Component\JsonStreamer\DataModel\Read\DateTimeNode;
 use Symfony\Component\JsonStreamer\DataModel\Read\ObjectNode;
 use Symfony\Component\JsonStreamer\DataModel\Read\ScalarNode;
-use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Exception\UnsupportedException;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
@@ -47,6 +46,7 @@ final class StreamReaderGenerator
 
     public function __construct(
         private PropertyMetadataLoaderInterface $propertyMetadataLoader,
+        private ContainerInterface $transformers,
         private string $streamReadersDir,
         ?ConfigCacheFactoryInterface $cacheFactory = null,
     ) {
@@ -62,7 +62,7 @@ final class StreamReaderGenerator
     {
         $path = \sprintf('%s%s%s.json%s.php', $this->streamReadersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) $type), $decodeFromStream ? '.stream' : '');
         $generateContent = function () use ($type, $decodeFromStream, $options): string {
-            $this->phpGenerator ??= new PhpGenerator();
+            $this->phpGenerator ??= new PhpGenerator($this->transformers);
 
             return $this->phpGenerator->generate($this->createDataModel($type, $options), $decodeFromStream, $options);
         };
@@ -76,7 +76,7 @@ final class StreamReaderGenerator
      * @param array<string, mixed> $options
      * @param array<string, mixed> $context
      */
-    private function createDataModel(Type $type, array $options = [], array $context = []): DataModelNodeInterface
+    private function createDataModel(Type $type, array $options = [], array &$context = []): DataModelNodeInterface
     {
         $context['original_type'] ??= $type;
 
@@ -94,14 +94,6 @@ final class StreamReaderGenerator
 
         if ($type instanceof GenericType) {
             $type = $type->getWrappedType();
-        }
-
-        if ($type instanceof ObjectType && is_a($type->getClassName(), \DateTimeInterface::class, true)) {
-            if (is_a($type->getClassName(), \DateTime::class, true)) {
-                throw new InvalidArgumentException('The "DateTime" class is not supported. Use "DateTimeImmutable" instead.');
-            }
-
-            return new DateTimeNode($type);
         }
 
         if ($type instanceof ObjectType && !$type instanceof EnumType) {
@@ -128,7 +120,7 @@ final class StreamReaderGenerator
                     'accessor' => static function (string $accessor) use ($propertyMetadata): string {
                         foreach ($propertyMetadata->getValueTransformers() as $valueTransformer) {
                             if (\is_string($valueTransformer)) {
-                                $accessor = "\$valueTransformers->get('$valueTransformer')->transform($accessor, \$options)";
+                                $accessor = "\$transformers->get('$valueTransformer')->transform($accessor, \$options)";
 
                                 continue;
                             }

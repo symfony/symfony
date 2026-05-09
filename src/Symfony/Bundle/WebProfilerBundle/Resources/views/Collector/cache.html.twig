@@ -36,7 +36,7 @@
 
 {% block menu %}
     <span class="label {{ collector.totals.calls == 0 ? 'disabled' }}">
-        <span class="icon">
+        <span class="icon" aria-hidden="true">
             {{ source('@WebProfiler/Icon/cache.svg') }}
         </span>
         <strong>Cache</strong>

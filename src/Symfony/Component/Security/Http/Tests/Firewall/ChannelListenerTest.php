@@ -12,7 +12,6 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\HeaderBag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestMatcher\SchemeRequestMatcher;
@@ -86,7 +85,7 @@ class ChannelListenerTest extends TestCase
     public function testSupportsWithoutHeaders()
     {
         $request = Request::create('http://symfony.com');
-        $request->headers = new HeaderBag();
+        $request->headers->replace([]);
 
         $accessMap = new AccessMap();
         $accessMap->add(new SchemeRequestMatcher('http'), [], 'https');

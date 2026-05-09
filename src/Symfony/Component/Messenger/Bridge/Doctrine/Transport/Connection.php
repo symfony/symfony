@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection as DBALConnection;
 use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Exception\TableNotFoundException;
@@ -154,14 +155,14 @@ class Connection implements ResetInterface
         ]);
     }
 
-    public function get(): ?array
+    public function get(int $fetchSize = 1): ?array
     {
         get:
         $this->driverConnection->beginTransaction();
         try {
             $query = $this->createAvailableMessagesQueryBuilder()
                 ->orderBy('available_at', 'ASC')
-                ->setMaxResults(1);
+                ->setMaxResults($fetchSize);
 
             if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
                 $query->select('m.id');
@@ -181,13 +182,13 @@ class Connection implements ResetInterface
 
             $sql = $this->addLockMode($query, $sql);
 
-            $doctrineEnvelope = $this->executeQuery(
+            $doctrineEnvelopes = $this->executeQuery(
                 $sql,
                 $query->getParameters(),
                 $query->getParameterTypes()
-            )->fetchAssociative();
+            )->fetchAllAssociative();
 
-            if (false === $doctrineEnvelope) {
+            if ([] === $doctrineEnvelopes) {
                 $this->driverConnection->commit();
                 $this->queueEmptiedAt = microtime(true) * 1000;
 
@@ -197,23 +198,41 @@ class Connection implements ResetInterface
             // We need to be sure to empty the queue before blocking again
             $this->queueEmptiedAt = null;
 
-            $doctrineEnvelope = $this->decodeEnvelopeHeaders($doctrineEnvelope);
+            $doctrineEnvelopes = array_map($this->decodeEnvelopeHeaders(...), $doctrineEnvelopes);
 
-            $queryBuilder = $this->driverConnection->createQueryBuilder()
-                ->update($this->configuration['table_name'])
-                ->set('delivered_at', '?')
-                ->where('id = ?');
             $now = new \DateTimeImmutable('UTC');
-            $this->executeStatement($queryBuilder->getSQL(), [
-                $now,
-                $doctrineEnvelope['id'],
-            ], [
-                Types::DATETIME_IMMUTABLE,
-            ]);
+
+            if (1 === \count($doctrineEnvelopes)) {
+                $queryBuilder = $this->driverConnection->createQueryBuilder()
+                    ->update($this->configuration['table_name'])
+                    ->set('delivered_at', '?')
+                    ->where('id = ?');
+
+                $this->executeStatement($queryBuilder->getSQL(), [
+                    $now,
+                    $doctrineEnvelopes[0]['id'],
+                ], [
+                    Types::DATETIME_IMMUTABLE,
+                ]);
+            } else {
+                $ids = array_column($doctrineEnvelopes, 'id');
+                $queryBuilder = $this->driverConnection->createQueryBuilder()
+                    ->update($this->configuration['table_name'])
+                    ->set('delivered_at', '?')
+                    ->where('id IN (?)');
+
+                $this->executeStatement($queryBuilder->getSQL(), [
+                    $now,
+                    $ids,
+                ], [
+                    Types::DATETIME_IMMUTABLE,
+                    ArrayParameterType::STRING,
+                ]);
+            }
 
             $this->driverConnection->commit();
 
-            return $doctrineEnvelope;
+            return $doctrineEnvelopes;
         } catch (\Throwable $e) {
             $this->driverConnection->rollBack();
 
@@ -333,6 +352,8 @@ class Connection implements ResetInterface
 
     /**
      * @internal
+     *
+     * @param-immediately-invoked-callable $isSameDatabase
      */
     public function configureSchema(Schema $schema, DBALConnection $forConnection, \Closure $isSameDatabase): void
     {

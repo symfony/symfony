@@ -31,7 +31,7 @@ interface VoterInterface
      * ACCESS_GRANTED, ACCESS_DENIED, or ACCESS_ABSTAIN.
      *
      * @param mixed     $subject    The subject to secure
-     * @param array     $attributes An array of attributes associated with the method being invoked
+     * @param mixed[]   $attributes An array of attributes associated with the method being invoked
      * @param Vote|null $vote       Should be used to explain the vote
      *
      * @return self::ACCESS_*

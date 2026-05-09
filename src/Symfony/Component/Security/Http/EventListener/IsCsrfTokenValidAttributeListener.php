@@ -54,7 +54,11 @@ final class IsCsrfTokenValidAttributeListener implements EventSubscriberInterfac
     private function processAttribute(IsCsrfTokenValid $attribute, ControllerArgumentsEvent $event): void
     {
         $request = $event->getRequest();
-        $id = $event->evaluate($attribute->id, $this->expressionLanguage);
+
+        if (!\is_string($id = $event->evaluate($attribute->id, $this->expressionLanguage))) {
+            throw new \TypeError(\sprintf('The value of the "$id" option of the "%s" attribute must evaluate to a string, "%s" given.', IsCsrfTokenValid::class, get_debug_type($id)));
+        }
+
         $methods = array_map('strtoupper', (array) $attribute->methods);
 
         if ($methods && !\in_array($request->getMethod(), $methods, true)) {

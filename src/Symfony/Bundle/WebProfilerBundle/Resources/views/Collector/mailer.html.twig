@@ -220,7 +220,7 @@
     {% set events = collector.events %}
 
     <span class="label {{ events.messages is empty ? 'disabled' }}">
-        <span class="icon">{{ source('@WebProfiler/Icon/mailer.svg') }}</span>
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/mailer.svg') }}</span>
 
         <strong>Emails</strong>
         {% if events.messages|length > 0 %}

@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -296,12 +298,14 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
             'policy' => 'fixed_window',
             'limit' => 10,
             'interval' => '1 hour',
+            'anchor_at' => null,
             'id' => 'first',
         ], $container->getDefinition('limiter.first')->getArgument(0));
         $this->assertSame([
             'policy' => 'sliding_window',
             'limit' => 10,
             'interval' => '1 hour',
+            'anchor_at' => null,
             'id' => 'second',
         ], $container->getDefinition('limiter.second')->getArgument(0));
 
@@ -349,6 +353,25 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         });
     }
 
+    public function testRateLimiterAnchorAtRequiresMonthlyOrYearlyInterval()
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('The "anchor_at" option requires an "interval" of at least one month.');
+
+        $this->createContainerFromClosure(static function ($container) {
+            $container->loadFromExtension('framework', [
+                'rate_limiter' => [
+                    'sub_month' => [
+                        'policy' => 'fixed_window',
+                        'limit' => 10,
+                        'interval' => '1 hour',
+                        'anchor_at' => '2024-01-01 00:00:00 UTC',
+                    ],
+                ],
+            ]);
+        });
+    }
+
     #[DataProvider('emailValidationModeProvider')]
     public function testValidatorEmailValidationMode(string $mode)
     {
@@ -370,6 +393,40 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
         }
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacyMessengerSigningSerializerWiring()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.1: Using the "senders" nesting level for messenger routing configuration is deprecated and will be removed in version 9.0. Use a flat list of senders instead.');
+
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->register('signed_handler', 'stdClass')
+                ->addTag('messenger.message_handler', ['handles' => DummyMessage::class, 'sign' => true]);
+
+            $container->loadFromExtension('framework', [
+                'messenger' => [
+                    'transports' => [
+                        'async' => ['dsn' => 'in-memory://'],
+                    ],
+                    'routing' => [
+                        DummyMessage::class => ['senders' => ['async']],
+                    ],
+                    'buses' => [
+                        'message_bus' => ['default_middleware' => ['enabled' => true]],
+                    ],
+                ],
+            ]);
+        });
+
+        $this->assertTrue($container->hasDefinition('messenger.signing_serializer'));
+        $mapping = $container->getDefinition('messenger.signing_serializer')->getArgument(2);
+        $this->assertArrayHasKey(DummyMessage::class, $mapping);
+        $this->assertNotEmpty($mapping[DummyMessage::class]);
+
+        $this->assertTrue($container->hasDefinition('message_bus'));
+        $this->assertSame('message_bus', (string) $container->getAlias('messenger.default_bus'));
+    }
+
     public function testMessengerSigningSerializerWiring()
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
@@ -382,7 +439,7 @@ class PhpFrameworkExtensionTest extends FrameworkExtensionTestCase
                         'async' => ['dsn' => 'in-memory://'],
                     ],
                     'routing' => [
-                        DummyMessage::class => ['senders' => ['async']],
+                        DummyMessage::class => ['async'],
                     ],
                     'buses' => [
                         'message_bus' => ['default_middleware' => ['enabled' => true]],

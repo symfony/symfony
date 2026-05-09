@@ -36,6 +36,10 @@ use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\Form\Guess\ValueGuess;
 
+if (!interface_exists(FormTypeGuesserInterface::class)) {
+    throw new \LogicException('You cannot use the "Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser" class as the "symfony/form" package is not installed. Try running "composer require symfony/form".');
+}
+
 class DoctrineOrmTypeGuesser implements FormTypeGuesserInterface
 {
     private array $cache = [];

@@ -93,7 +93,7 @@
 
 {% block menu %}
     <span class="label {{ not collector.handledCount ? 'disabled' }}">
-        <span class="icon">{{ source('@WebProfiler/Icon/serializer.svg') }}</span>
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/serializer.svg') }}</span>
         <strong>Serializer</strong>
     </span>
 {% endblock %}

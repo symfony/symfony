@@ -30,9 +30,13 @@ class RegisterListenersPass implements CompilerPassInterface
 
     /**
      * @return $this
+     *
+     * @deprecated since Symfony 8.1, use AddEventAliasesPass instead
      */
     public function setHotPathEvents(array $hotPathEvents): static
     {
+        trigger_deprecation('symfony/event-dispatcher', '8.1', 'The "%s()" method is deprecated, use "%s" instead.', __METHOD__, AddEventAliasesPass::class);
+
         $this->hotPathEvents = array_flip($hotPathEvents);
 
         return $this;
@@ -40,9 +44,13 @@ class RegisterListenersPass implements CompilerPassInterface
 
     /**
      * @return $this
+     *
+     * @deprecated since Symfony 8.1, use AddEventAliasesPass instead
      */
     public function setNoPreloadEvents(array $noPreloadEvents): static
     {
+        trigger_deprecation('symfony/event-dispatcher', '8.1', 'The "%s()" method is deprecated, use "%s" instead.', __METHOD__, AddEventAliasesPass::class);
+
         $this->noPreloadEvents = array_flip($noPreloadEvents);
 
         return $this;
@@ -58,6 +66,14 @@ class RegisterListenersPass implements CompilerPassInterface
 
         if ($container->hasParameter('event_dispatcher.event_aliases')) {
             $aliases = $container->getParameter('event_dispatcher.event_aliases');
+        }
+
+        if ($container->hasParameter('event_dispatcher.hot_path_events')) {
+            $this->hotPathEvents += array_flip($container->getParameter('event_dispatcher.hot_path_events'));
+        }
+
+        if ($container->hasParameter('event_dispatcher.no_preload_events')) {
+            $this->noPreloadEvents += array_flip($container->getParameter('event_dispatcher.no_preload_events'));
         }
 
         $globalDispatcherDefinition = $container->findDefinition('event_dispatcher');

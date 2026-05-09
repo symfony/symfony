@@ -56,7 +56,7 @@
 
 {% block menu %}
     <span class="label {{- collector.violationsCount ? ' label-status-error' }} {{ collector.calls is empty ? 'disabled' }}">
-        <span class="icon">{{ source('@WebProfiler/Icon/validator.svg') }}</span>
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/validator.svg') }}</span>
         <strong>Validator</strong>
         {% if collector.violationsCount > 0 %}
             <span class="count">

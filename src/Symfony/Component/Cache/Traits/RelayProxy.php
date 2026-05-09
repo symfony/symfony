@@ -12,6 +12,8 @@
 namespace Symfony\Component\Cache\Traits;
 
 use Symfony\Component\Cache\Traits\Relay\Relay20Trait;
+use Symfony\Component\Cache\Traits\Relay\Relay21Trait;
+use Symfony\Component\Cache\Traits\Relay\Relay22Trait;
 use Symfony\Component\VarExporter\LazyObjectInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -29,6 +31,8 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         resetLazyObject as reset;
     }
     use Relay20Trait;
+    use Relay21Trait;
+    use Relay22Trait;
 
     public function __construct($host = null, $port = 6379, $connect_timeout = 0.0, $command_timeout = 0.0, #[\SensitiveParameter] $context = [], $database = 0)
     {
@@ -195,7 +199,7 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
         return $this->initializeLazyObject()->close(...\func_get_args());
     }
 
-    public function cmsIncrBy($key, $field, $value, ...$fields_and_falues): \Relay\Relay|array|false
+    public function cmsIncrBy($key, $field, $value, ...$fields_and_values): \Relay\Relay|array|false
     {
         return $this->initializeLazyObject()->cmsIncrBy(...\func_get_args());
     }
@@ -893,11 +897,6 @@ class RelayProxy extends \Relay\Relay implements ResetInterface, LazyObjectInter
     public function jsonSet($key, $path, $value, $condition = null): \Relay\Relay|bool
     {
         return $this->initializeLazyObject()->jsonSet(...\func_get_args());
-    }
-
-    public function jsonStrAppend($key, $value, $path = null): \Relay\Relay|array|false
-    {
-        return $this->initializeLazyObject()->jsonStrAppend(...\func_get_args());
     }
 
     public function jsonStrLen($key, $path = null): \Relay\Relay|array|false

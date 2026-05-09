@@ -96,7 +96,7 @@ abstract class AbstractServiceConfigurator extends AbstractConfigurator
      *
      * @param InlineServiceConfigurator[]|ReferenceConfigurator[] $services
      */
-    final public function stack(string $id, array $services): AliasConfigurator
+    final public function stack(string $id, array $services): StackConfigurator
     {
         $this->__destruct();
 

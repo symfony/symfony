@@ -59,8 +59,8 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $this->connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
 
         $encoded = $this->connection->get();
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        $this->assertEquals('{"message": "Hi"}', $encoded[0]['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $encoded[0]['headers']);
 
         $this->assertNull($this->connection->get());
     }
@@ -72,8 +72,8 @@ class DoctrinePostgreSqlIntegrationTest extends TestCase
         $connection->send('{"message": "Hi"}', ['type' => DummyMessage::class]);
 
         $encoded = $connection->get();
-        $this->assertEquals('{"message": "Hi"}', $encoded['body']);
-        $this->assertEquals(['type' => DummyMessage::class], $encoded['headers']);
+        $this->assertEquals('{"message": "Hi"}', $encoded[0]['body']);
+        $this->assertEquals(['type' => DummyMessage::class], $encoded[0]['headers']);
 
         $this->assertNull($connection->get());
     }

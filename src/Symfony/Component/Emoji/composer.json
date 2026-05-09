@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "ext-intl": "*"
     },
     "require-dev": {

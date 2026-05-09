@@ -21,6 +21,7 @@ use Symfony\Component\PropertyInfo\Tests\Fixtures\AsymmetricVisibility;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ConstructorDummy;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DefaultValue;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\Dummy;
+use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithAccessorWithoutProperty;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\DummyWithHasser;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\NotInstantiable;
 use Symfony\Component\PropertyInfo\Tests\Fixtures\ParentDummy;
@@ -541,6 +542,16 @@ class ReflectionExtractorTest extends TestCase
         $this->assertTrue($this->extractor->isWritable(VirtualProperties::class, 'virtualHook'));
     }
 
+    public function testPropertyHookExpandedSetterType()
+    {
+        $this->assertEquals(Type::nullable(Type::string()), $this->extractor->getType(VirtualProperties::class, 'expandedSetterType'));
+    }
+
+    public function testPropertyHookSameSetterType()
+    {
+        $this->assertEquals(Type::string(), $this->extractor->getType(VirtualProperties::class, 'sameSetterType'));
+    }
+
     #[DataProvider('provideAsymmetricVisibilityMutator')]
     public function testAsymmetricVisibilityMutator(string $property, string $readVisibility, string $writeVisibility)
     {
@@ -814,5 +825,13 @@ class ReflectionExtractorTest extends TestCase
     public function testIsserUsedForBoolPropertyWithoutOtherTypeSource()
     {
         $this->assertEquals(Type::bool(), $this->extractor->getType(DummyWithHasser::class, 'enabled'));
+    }
+
+    public function testAccessorWithoutProperty()
+    {
+        $this->assertEquals(Type::bool(), $this->extractor->getType(DummyWithAccessorWithoutProperty::class, 'url'));
+        $this->assertEquals(Type::bool(), $this->extractor->getType(DummyWithAccessorWithoutProperty::class, 'view'));
+        $this->assertEquals(Type::bool(), $this->extractor->getType(DummyWithAccessorWithoutProperty::class, 'active'));
+        $this->assertEquals(Type::bool(), $this->extractor->getType(DummyWithAccessorWithoutProperty::class, 'fromConstructor'));
     }
 }

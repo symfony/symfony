@@ -11,14 +11,17 @@
 
 namespace Symfony\Component\EventDispatcher\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -153,6 +156,8 @@ class RegisterListenersPassTest extends TestCase
         $this->assertEquals($expectedCalls, $definition->getMethodCalls());
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testHotPathEvents()
     {
         $container = new ContainerBuilder();
@@ -165,6 +170,8 @@ class RegisterListenersPassTest extends TestCase
         $this->assertTrue($container->getDefinition('foo')->hasTag('container.hot_path'));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testNoPreloadEvents()
     {
         $container = new ContainerBuilder();
@@ -184,6 +191,55 @@ class RegisterListenersPassTest extends TestCase
         $this->assertFalse($container->getDefinition('foo')->hasTag('container.no_preload'));
         $this->assertTrue($container->getDefinition('bar')->hasTag('container.no_preload'));
         $this->assertFalse($container->getDefinition('baz')->hasTag('container.no_preload'));
+    }
+
+    public function testHotPathEventsViaAddEventAliasesPass()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', SubscriberService::class)->addTag('kernel.event_subscriber', []);
+        $container->register('event_dispatcher', 'stdClass');
+
+        (new AddEventAliasesPass([], ['event']))->process($container);
+        (new RegisterListenersPass())->process($container);
+
+        $this->assertTrue($container->getDefinition('foo')->hasTag('container.hot_path'));
+    }
+
+    public function testNoPreloadEventsViaAddEventAliasesPass()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', SubscriberService::class)->addTag('kernel.event_subscriber', []);
+        $container->register('bar')->addTag('kernel.event_listener', ['event' => 'cold_event']);
+        $container->register('baz')
+            ->addTag('kernel.event_listener', ['event' => 'event'])
+            ->addTag('kernel.event_listener', ['event' => 'cold_event']);
+        $container->register('event_dispatcher', 'stdClass');
+
+        (new AddEventAliasesPass([], ['event'], ['cold_event']))->process($container);
+        (new RegisterListenersPass())->process($container);
+
+        $this->assertFalse($container->getDefinition('foo')->hasTag('container.no_preload'));
+        $this->assertTrue($container->getDefinition('bar')->hasTag('container.no_preload'));
+        $this->assertFalse($container->getDefinition('baz')->hasTag('container.no_preload'));
+    }
+
+    public function testMultipleAddEventAliasesPassMerge()
+    {
+        $container = new ContainerBuilder();
+
+        $container->register('foo', SubscriberService::class)->addTag('kernel.event_subscriber', []);
+        $container->register('bar')->addTag('kernel.event_listener', ['event' => 'cold_event']);
+        $container->register('event_dispatcher', 'stdClass');
+
+        // Two passes contribute different metadata (like two bundles would)
+        (new AddEventAliasesPass([], ['event']))->process($container);
+        (new AddEventAliasesPass([], [], ['cold_event']))->process($container);
+        (new RegisterListenersPass())->process($container);
+
+        $this->assertTrue($container->getDefinition('foo')->hasTag('container.hot_path'));
+        $this->assertTrue($container->getDefinition('bar')->hasTag('container.no_preload'));
     }
 
     public function testEventSubscriberUnresolvableClassName()
@@ -530,10 +586,13 @@ class RegisterListenersPassTest extends TestCase
     private function createContainerBuilder(): ContainerBuilder
     {
         $container = new ContainerBuilder();
-        $container->setParameter('kernel.debug', true);
-        $container->setParameter('kernel.project_dir', __DIR__);
-        $container->setParameter('kernel.container_class', 'testContainer');
-        (new FrameworkExtension())->load([], $container);
+        $container->registerAttributeForAutoconfiguration(AsEventListener::class, static function (ChildDefinition $definition, AsEventListener $attribute, \ReflectionClass|\ReflectionMethod $reflector) {
+            $tagAttributes = get_object_vars($attribute);
+            if ($reflector instanceof \ReflectionMethod) {
+                $tagAttributes['method'] = $reflector->getName();
+            }
+            $definition->addTag('kernel.event_listener', $tagAttributes);
+        });
 
         return $container;
     }

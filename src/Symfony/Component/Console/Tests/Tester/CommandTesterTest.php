@@ -695,7 +695,7 @@ class CommandTesterTest extends TestCase
 
         $result = (new CommandTester($command))->run();
 
-        $this->assertIsSuccessful($result);
+        $this->assertCommandIsSuccessful($result);
         $this->assertSame(0, $result->statusCode);
         $this->assertSame("bar\n", $result->getDisplay());
     }
@@ -722,7 +722,7 @@ class CommandTesterTest extends TestCase
         $tester = new CommandTester($command);
         $result = $tester->run(interactiveInputs: ['Bobby', 'Fine', 'France']);
 
-        $this->assertResultEquals(
+        $this->assertCommandResultEquals(
             $result,
             0,
             '',

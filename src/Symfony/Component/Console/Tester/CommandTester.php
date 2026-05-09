@@ -89,7 +89,7 @@ class CommandTester
         $testOutput = new TestOutput($decorated ?? $this->decorated, $verbosity ?? $this->verbosity, $this->outputFormatter);
         $statusCode = $this->command->run($input, $testOutput);
 
-        return ExecutionResult::fromExecution($input, $statusCode, $testOutput, $normalizers);
+        return new ExecutionResult($input, $statusCode, $testOutput, $normalizers);
     }
 
     /**

@@ -53,9 +53,20 @@ class Process implements \IteratorAggregate
     public const ITER_SKIP_OUT = 4;     // Use this flag to skip STDOUT while iterating
     public const ITER_SKIP_ERR = 8;     // Use this flag to skip STDERR while iterating
 
+    /**
+     * Maximum number of UTF-16 code units allowed in the Windows environment block.
+     *
+     * The Win32 CreateProcess API encodes env vars as KEY=VALUE\0 in UTF-16LE,
+     * terminated by an extra \0. Exceeding this limit causes proc_open() to hang
+     * silently rather than returning false.
+     *
+     * @see https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-createprocessa
+     */
+    private const WINDOWS_ENV_BLOCK_MAX_LENGTH = 32767;
+
     /** @var \Closure('out'|'err', string):bool|null */
     private ?\Closure $callback = null;
-    /** @var list<string>|string */
+    /** @var string[]|string */
     private array|string $commandline;
     private ?string $cwd;
     /** @var EnvArray */
@@ -140,7 +151,7 @@ class Process implements \IteratorAggregate
     ];
 
     /**
-     * @param list<string>   $command The command to run and its arguments listed as separate entries
+     * @param string[]       $command The command to run and its arguments listed as separate entries
      * @param string|null    $cwd     The working directory or null to use the working dir of the current PHP process
      * @param EnvArray|null  $env     The environment variables or null to use the same environment as the current PHP process
      * @param mixed          $input   The input as stream resource, scalar or \Traversable, or null for no input
@@ -353,6 +364,10 @@ class Process implements \IteratorAggregate
             }
         }
 
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->validateWindowsEnvBlockSize($envPairs);
+        }
+
         if (!is_dir($this->cwd)) {
             throw new RuntimeException(\sprintf('The provided cwd "%s" does not exist.', $this->cwd));
         }
@@ -488,6 +503,8 @@ class Process implements \IteratorAggregate
      * The callback receives the type of output (out or err) and some bytes
      * from the output in real-time while writing the standard input to the process.
      * It allows to have feedback from the independent process during execution.
+     *
+     * @param-immediately-invoked-callable $callback
      *
      * @param (callable('out'|'err', string):bool)|null $callback A PHP callback to run whenever there is some
      *                                                            output available on STDOUT or STDERR
@@ -1695,5 +1712,17 @@ class Process implements \IteratorAggregate
         $env = ('\\' === \DIRECTORY_SEPARATOR ? array_intersect_ukey($env, $_SERVER, 'strcasecmp') : array_intersect_key($env, $_SERVER)) ?: $env;
 
         return $_ENV + ('\\' === \DIRECTORY_SEPARATOR ? array_diff_ukey($env, $_ENV, 'strcasecmp') : $env);
+    }
+
+    private function validateWindowsEnvBlockSize(array $envPairs): void
+    {
+        $block = implode("\0", $envPairs)."\0";
+        @preg_replace('/./u', '', $block, -1, $blockLength)
+            ?? preg_replace('/./', '', $block, -1, $blockLength);
+        $blockLength += 1 + preg_match_all('/[\xF0-\xF4][\x80-\xBF]{3}/', $block);
+
+        if ($blockLength > self::WINDOWS_ENV_BLOCK_MAX_LENGTH) {
+            throw new InvalidArgumentException(\sprintf('The environment block size (%d) exceeds the Windows limit of %d UTF-16 code units.', $blockLength, self::WINDOWS_ENV_BLOCK_MAX_LENGTH));
+        }
     }
 }

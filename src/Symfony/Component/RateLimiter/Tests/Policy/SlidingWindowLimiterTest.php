@@ -69,6 +69,20 @@ class SlidingWindowLimiterTest extends TestCase
         $this->assertTrue($limiter->consume()->isAccepted());
     }
 
+    public function testConsumeLastToken()
+    {
+        $limiter = $this->createLimiter();
+        $limiter->consume(9);
+
+        $rateLimit = $limiter->consume(1);
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(
+            \DateTimeImmutable::createFromFormat('U', (string) floor(microtime(true) + 12)),
+            $rateLimit->getRetryAfter()
+        );
+    }
+
     public function testReserve()
     {
         $limiter = $this->createLimiter();
@@ -112,6 +126,10 @@ class SlidingWindowLimiterTest extends TestCase
     public function testNegativeConsume()
     {
         $limiter = $this->createLimiter();
+
+        // negative consume without previous hits should have no effect
+        $rateLimit = $limiter->consume(-1);
+        $this->assertEquals(10, $rateLimit->getRemainingTokens());
 
         $limiter->consume(10);
 

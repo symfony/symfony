@@ -37,49 +37,67 @@ class RedisReceiver implements KeepaliveReceiverInterface, MessageCountAwareInte
         $this->serializer = $serializer ?? new PhpSerializer();
     }
 
-    public function get(): iterable
+    /**
+     * @param int $fetchSize
+     */
+    public function get(/* int $fetchSize = 1 */): iterable
     {
-        if (null === $message = $this->connection->get()) {
+        $fetchSize = \func_num_args() > 0 ? max(1, func_get_arg(0)) : 1;
+
+        if (null === $messages = $this->connection->get($fetchSize)) {
             return [];
         }
 
-        if (null === $message['data']) {
-            try {
-                $this->connection->reject($message['id']);
-            } catch (TransportException $e) {
-                if ($e->getPrevious()) {
-                    throw $e;
+        $envelopes = [];
+        $shouldRetry = false;
+
+        foreach ($messages as $message) {
+            if (null === $message['data']) {
+                $shouldRetry = true;
+
+                try {
+                    $this->connection->reject($message['id']);
+                } catch (TransportException $e) {
+                    if ($e->getPrevious()) {
+                        throw $e;
+                    }
                 }
+
+                continue;
             }
 
-            return $this->get();
-        }
-
-        if (null === $redisEnvelope = json_decode($message['data']['message'] ?? '', true)) {
-            return [];
-        }
-
-        try {
-            if (\array_key_exists('body', $redisEnvelope) && \array_key_exists('headers', $redisEnvelope)) {
-                $envelope = $this->serializer->decode([
-                    'body' => $redisEnvelope['body'],
-                    'headers' => $redisEnvelope['headers'],
-                ]);
-            } else {
-                $envelope = $this->serializer->decode($redisEnvelope);
+            if (null === $redisEnvelope = json_decode($message['data']['message'] ?? '', true)) {
+                continue;
             }
-        } catch (MessageDecodingFailedException $exception) {
-            $this->connection->reject($message['id']);
 
-            throw $exception;
-        }
-
-        return [$envelope
-            ->withoutAll(TransportMessageIdStamp::class)
-            ->with(
+            $stamps = [
                 new RedisReceivedStamp($message['id']),
-                new TransportMessageIdStamp($message['id'])
-            )];
+                new TransportMessageIdStamp($message['id']),
+            ];
+
+            try {
+                if (\array_key_exists('body', $redisEnvelope) && \array_key_exists('headers', $redisEnvelope)) {
+                    $envelope = $this->serializer->decode($redisEnvelope = [
+                        'body' => $redisEnvelope['body'],
+                        'headers' => $redisEnvelope['headers'],
+                    ]);
+                } else {
+                    $envelope = $this->serializer->decode($redisEnvelope);
+                }
+            } catch (MessageDecodingFailedException $e) {
+                $envelopes[] = MessageDecodingFailedException::wrap($redisEnvelope, $e->getMessage(), $e->getCode(), $e)->with(...$stamps);
+
+                continue;
+            }
+
+            $envelopes[] = $envelope->withoutAll(TransportMessageIdStamp::class)->with(...$stamps);
+        }
+
+        if (!$envelopes && $shouldRetry) {
+            return $this->get($fetchSize);
+        }
+
+        return $envelopes;
     }
 
     public function ack(Envelope $envelope): void

@@ -88,8 +88,9 @@ class TraceableFirewallListenerTest extends TestCase
         $supportingAuthenticator = $this->createMock(DummyAuthenticator::class);
         $supportingAuthenticator
             ->method('supports')
-            ->with($request)
-            ->willReturn(true);
+            ->willReturnMap([
+                [$request, true],
+            ]);
         $supportingAuthenticator
             ->expects($this->once())
             ->method('authenticate')

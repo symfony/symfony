@@ -59,7 +59,7 @@ _sf_{{ COMMAND_NAME }}() {
     fi
 
     # Use eval to handle any environment variables and such
-    out=$(eval ${requestComp} 2>/dev/null)
+    out=$(eval SHELL_VERBOSITY=0 ${requestComp} 2>/dev/null)
 
     while IFS='\n' read -r comp; do
         if [ -n "$comp" ]; then

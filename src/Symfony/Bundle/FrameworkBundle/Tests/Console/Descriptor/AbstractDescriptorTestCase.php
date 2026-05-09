@@ -276,6 +276,11 @@ abstract class AbstractDescriptorTestCase extends TestCase
 
     abstract protected static function getFormat();
 
+    protected function normalizeOutput(string $output): string
+    {
+        return $output;
+    }
+
     private function assertDescription($expectedDescription, $describedObject, array $options = [])
     {
         $options['is_debug'] = false;
@@ -293,7 +298,7 @@ abstract class AbstractDescriptorTestCase extends TestCase
         if ('json' === $this->getFormat()) {
             $this->assertEquals(json_encode(json_decode($expectedDescription), \JSON_PRETTY_PRINT), json_encode(json_decode($output->fetch()), \JSON_PRETTY_PRINT));
         } else {
-            $this->assertEquals(trim($expectedDescription), trim(str_replace(\PHP_EOL, "\n", $output->fetch())));
+            $this->assertEquals(trim($expectedDescription), trim($this->normalizeOutput($output->fetch())));
         }
     }
 

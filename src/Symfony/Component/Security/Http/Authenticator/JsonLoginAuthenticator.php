@@ -21,6 +21,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
@@ -146,22 +147,30 @@ class JsonLoginAuthenticator implements InteractiveAuthenticatorInterface
         try {
             $credentials['username'] = $this->propertyAccessor->getValue($data, $this->options['username_path']);
 
-            if (!\is_string($credentials['username']) || '' === $credentials['username']) {
-                throw new BadRequestHttpException(\sprintf('The key "%s" must be a non-empty string.', $this->options['username_path']));
+            if (!\is_string($credentials['username'])) {
+                throw new BadRequestHttpException(\sprintf('The key "%s" must be a string.', $this->options['username_path']));
             }
         } catch (AccessException $e) {
             throw new BadRequestHttpException(\sprintf('The key "%s" must be provided.', $this->options['username_path']), $e);
+        }
+
+        if ('' === $credentials['username']) {
+            throw new BadCredentialsException(\sprintf('The key "%s" must not be empty.', $this->options['username_path']));
         }
 
         try {
             $credentials['password'] = $this->propertyAccessor->getValue($data, $this->options['password_path']);
             $this->propertyAccessor->setValue($data, $this->options['password_path'], null);
 
-            if (!\is_string($credentials['password']) || '' === $credentials['password']) {
-                throw new BadRequestHttpException(\sprintf('The key "%s" must be a non-empty string.', $this->options['password_path']));
+            if (!\is_string($credentials['password'])) {
+                throw new BadRequestHttpException(\sprintf('The key "%s" must be a string.', $this->options['password_path']));
             }
         } catch (AccessException $e) {
             throw new BadRequestHttpException(\sprintf('The key "%s" must be provided.', $this->options['password_path']), $e);
+        }
+
+        if ('' === $credentials['password']) {
+            throw new BadCredentialsException(\sprintf('The key "%s" must not be empty.', $this->options['password_path']));
         }
 
         return $credentials;

@@ -14,6 +14,7 @@ namespace Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty;
 class C
 {
     public string $foo = 'donotmap';
+    public string $otherFoo;
     public string $bar;
     public string $doesNotExistInTargetB;
 }

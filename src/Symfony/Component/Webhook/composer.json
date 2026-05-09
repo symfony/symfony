@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "symfony/http-foundation": "^7.4|^8.0",
         "symfony/http-kernel": "^7.4|^8.0",
         "symfony/messenger": "^7.4|^8.0",

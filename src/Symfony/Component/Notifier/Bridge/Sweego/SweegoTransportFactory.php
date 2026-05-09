@@ -31,10 +31,10 @@ final class SweegoTransportFactory extends AbstractTransportFactory
         $apiKey = $this->getUser($dsn);
         $region = $dsn->getRequiredOption(SweegoOptions::REGION);
         $campaignType = $dsn->getRequiredOption(SweegoOptions::CAMPAIGN_TYPE);
-        $bat = $dsn->getOption(SweegoOptions::BAT);
+        $bat = $dsn->getBooleanOption(SweegoOptions::BAT, false);
         $campaignId = $dsn->getOption(SweegoOptions::CAMPAIGN_ID);
-        $shortenUrls = $dsn->getOption(SweegoOptions::SHORTEN_URLS);
-        $shortenWithProtocol = $dsn->getOption(SweegoOptions::SHORTEN_WITH_PROTOCOL);
+        $shortenUrls = $dsn->getBooleanOption(SweegoOptions::SHORTEN_URLS, true);
+        $shortenWithProtocol = $dsn->getBooleanOption(SweegoOptions::SHORTEN_WITH_PROTOCOL, true);
         $host = 'default' === $dsn->getHost() ? null : $dsn->getHost();
         $port = $dsn->getPort();
 

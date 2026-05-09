@@ -25,14 +25,14 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new CardScheme(schemes: []));
+        $this->validate(null, new CardScheme(schemes: []));
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new CardScheme(schemes: []));
+        $this->validate('', new CardScheme(schemes: []));
 
         $this->assertNoViolation();
     }
@@ -40,7 +40,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidNumbers')]
     public function testValidNumbers($scheme, $number)
     {
-        $this->validator->validate($number, new CardScheme(schemes: $scheme));
+        $this->validate($number, new CardScheme(schemes: $scheme));
 
         $this->assertNoViolation();
     }
@@ -48,7 +48,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidNumbers')]
     public function testValidNumbersWithNewLine($scheme, $number)
     {
-        $this->validator->validate($number."\n", new CardScheme(schemes: $scheme, message: 'myMessage'));
+        $this->validate($number."\n", new CardScheme(schemes: $scheme, message: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$number."\n\"")
@@ -58,7 +58,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
 
     public function testValidNumberWithOrderedArguments()
     {
-        $this->validator->validate(
+        $this->validate(
             '5555555555554444',
             new CardScheme([CardScheme::MASTERCARD, CardScheme::VISA])
         );
@@ -74,7 +74,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($number, $constraint);
+        $this->validate($number, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', \is_string($number) ? '"'.$number.'"' : $number)
@@ -84,7 +84,7 @@ class CardSchemeValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidNumberNamedArguments()
     {
-        $this->validator->validate(
+        $this->validate(
             '2721001234567890',
             eval('use Symfony\Component\Validator\Constraints\CardScheme; return new CardScheme(schemes: [CardScheme::MASTERCARD, CardScheme::VISA], message: "myMessage");')
         );

@@ -34,21 +34,21 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Video());
+        $this->validate(null, new Video());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Video());
+        $this->validate('', new Video());
 
         $this->assertNoViolation();
     }
 
     public function testValidVideo()
     {
-        $this->validator->validate(__DIR__.'/Fixtures/test.mp4', new Video());
+        $this->validate(__DIR__.'/Fixtures/test.mp4', new Video());
 
         $this->assertNoViolation();
     }
@@ -56,7 +56,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     public function testFileNotFound()
     {
         $constraint = new Video(notFoundMessage: 'myMessage');
-        $this->validator->validate('foobar', $constraint);
+        $this->validate('foobar', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ file }}', '"foobar"')
@@ -73,7 +73,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
             maxHeight: 2,
         );
 
-        $this->validator->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
 
         $this->assertNoViolation();
     }
@@ -81,7 +81,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     public function testWidthTooSmall()
     {
         $constraint = new Video(minWidth: 3, minWidthMessage: 'myMessage');
-        $this->validator->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ width }}', '2')
@@ -93,7 +93,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     public function testWidthTooBig()
     {
         $constraint = new Video(maxWidth: 1, maxWidthMessage: 'myMessage');
-        $this->validator->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ width }}', '2')
@@ -105,7 +105,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     public function testHeightTooSmall()
     {
         $constraint = new Video(minHeight: 3, minHeightMessage: 'myMessage');
-        $this->validator->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ height }}', '2')
@@ -117,7 +117,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     public function testHeightTooBig()
     {
         $constraint = new Video(maxHeight: 1, maxHeightMessage: 'myMessage');
-        $this->validator->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ height }}', '2')
@@ -129,7 +129,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     public function testPixelsTooFew()
     {
         $constraint = new Video(minPixels: 5, minPixelsMessage: 'myMessage');
-        $this->validator->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ pixels }}', '4')
@@ -143,7 +143,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     public function testPixelsTooMany()
     {
         $constraint = new Video(maxPixels: 3, maxPixelsMessage: 'myMessage');
-        $this->validator->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ pixels }}', '4')
@@ -157,7 +157,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     public function testRatioTooSmall()
     {
         $constraint = new Video(minRatio: 2, minRatioMessage: 'myMessage');
-        $this->validator->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ ratio }}', 1)
@@ -169,7 +169,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     public function testRatioTooBig()
     {
         $constraint = new Video(maxRatio: 0.5, maxRatioMessage: 'myMessage');
-        $this->validator->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ ratio }}', 1)
@@ -182,7 +182,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Video(maxRatio: 1.33);
 
-        $this->validator->validate(__DIR__.'/Fixtures/test_4by3.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test_4by3.mp4', $constraint);
 
         $this->assertNoViolation();
     }
@@ -191,7 +191,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Video(minRatio: 4 / 3);
 
-        $this->validator->validate(__DIR__.'/Fixtures/test_4by3.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test_4by3.mp4', $constraint);
 
         $this->assertNoViolation();
     }
@@ -200,7 +200,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Video(maxRatio: 16 / 9);
 
-        $this->validator->validate(__DIR__.'/Fixtures/test_16by9.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test_16by9.mp4', $constraint);
 
         $this->assertNoViolation();
     }
@@ -208,7 +208,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     public function testSquareNotAllowed()
     {
         $constraint = new Video(allowSquare: false, allowSquareMessage: 'myMessage');
-        $this->validator->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ width }}', 2)
@@ -220,7 +220,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     public function testLandscapeNotAllowed()
     {
         $constraint = new Video(allowLandscape: false, allowLandscapeMessage: 'myMessage');
-        $this->validator->validate(__DIR__.'/Fixtures/test_landscape.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test_landscape.mp4', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ width }}', 2)
@@ -232,7 +232,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     public function testPortraitNotAllowed()
     {
         $constraint = new Video(allowPortrait: false, allowPortraitMessage: 'myMessage');
-        $this->validator->validate(__DIR__.'/Fixtures/test_portrait.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test_portrait.mp4', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ width }}', 1)
@@ -245,7 +245,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Video(maxRatio: 1);
 
-        $this->validator->validate(__DIR__.'/Fixtures/test_corrupted.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test_corrupted.mp4', $constraint);
 
         $this->buildViolation('The video file is corrupted.')
             ->setCode(Video::CORRUPTED_VIDEO_ERROR)
@@ -254,7 +254,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidMimeType()
     {
-        $this->validator->validate(__DIR__.'/Fixtures/ccc.txt', $constraint = new Video());
+        $this->validate(__DIR__.'/Fixtures/ccc.txt', $constraint = new Video());
 
         $this->assertSame('video/*', $constraint->mimeTypes);
 
@@ -273,7 +273,7 @@ class VideoValidatorTest extends ConstraintValidatorTestCase
             'video/mkv',
             'video/mov',
         ]);
-        $this->validator->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
+        $this->validate(__DIR__.'/Fixtures/test.mp4', $constraint);
 
         $this->buildViolation('The mime type of the file is invalid ({{ type }}). Allowed mime types are {{ types }}.')
             ->setParameter('{{ file }}', \sprintf('"%s/Fixtures/test.mp4"', __DIR__))

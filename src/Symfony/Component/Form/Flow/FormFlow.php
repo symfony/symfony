@@ -202,6 +202,9 @@ class FormFlow extends Form implements FormFlowInterface
         }
     }
 
+    /**
+     * @param-immediately-invoked-callable $direction
+     */
     private function move(\Closure $direction): bool
     {
         $data = $this->getData();

@@ -21,7 +21,6 @@ use phpDocumentor\Reflection\Types\Array_;
 use phpDocumentor\Reflection\Types\Collection;
 use phpDocumentor\Reflection\Types\Compound;
 use phpDocumentor\Reflection\Types\Integer;
-use phpDocumentor\Reflection\Types\Mixed_;
 use phpDocumentor\Reflection\Types\Null_;
 use phpDocumentor\Reflection\Types\Nullable;
 use phpDocumentor\Reflection\Types\Scalar as LegacyScalar;

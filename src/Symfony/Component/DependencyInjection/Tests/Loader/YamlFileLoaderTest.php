@@ -22,6 +22,7 @@ use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Resource\GlobResource;
 use Symfony\Component\DependencyInjection\Argument\BoundArgument;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
@@ -483,6 +484,21 @@ class YamlFileLoaderTest extends TestCase
         $loader->load('services_with_short_service_closure.yml');
 
         $this->assertEquals(new ServiceClosureArgument(new Reference('bar')), $container->getDefinition('foo')->getArgument(0));
+    }
+
+    public function testParseEnvClosure()
+    {
+        $container = new ContainerBuilder();
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('services_with_env_closure.yml');
+
+        $arguments = $container->getDefinition('foo')->getArguments();
+        $bag = $container->getParameterBag();
+
+        $this->assertEquals(new EnvClosureArgument($bag->resolveValue('%env(FOO)%')), $arguments[0]);
+        $this->assertEquals(new EnvClosureArgument($bag->resolveValue('%env(FOO)%'), null, true), $arguments[1]);
+        $this->assertEquals(new EnvClosureArgument($bag->resolveValue('%env(BAR)%'), 'def', true), $arguments[2]);
+        $this->assertEquals(new EnvClosureArgument($bag->resolveValue('%env(FOO)%'), 42, false), $arguments[3]);
     }
 
     public function testNameOnlyTagsAreAllowedAsString()
@@ -1183,6 +1199,58 @@ class YamlFileLoaderTest extends TestCase
             'inner' => $expected,
         ];
         $this->assertEquals($expected, $container->get('stack_e'));
+    }
+
+    public function testStackDecorates()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('stack_decorates.yaml');
+
+        $container->compile();
+
+        $expected = (object) [
+            'label' => 'A',
+            'inner' => (object) [
+                'label' => 'B',
+                'inner' => (object) [
+                    'label' => 'original',
+                ],
+            ],
+        ];
+        $this->assertEquals($expected, $container->get('original_service'));
+    }
+
+    public function testStackDecoratesTag()
+    {
+        $container = new ContainerBuilder();
+
+        $loader = new YamlFileLoader($container, new FileLocator(self::$fixturesPath.'/yaml'));
+        $loader->load('stack_decorates_tag.yaml');
+
+        $container->compile();
+
+        $expectedFoo = (object) [
+            'label' => 'A',
+            'inner' => (object) [
+                'label' => 'B',
+                'inner' => (object) [
+                    'label' => 'foo',
+                ],
+            ],
+        ];
+        $expectedBar = (object) [
+            'label' => 'A',
+            'inner' => (object) [
+                'label' => 'B',
+                'inner' => (object) [
+                    'label' => 'bar',
+                ],
+            ],
+        ];
+        $this->assertEquals($expectedFoo, $container->get('foo'));
+        $this->assertEquals($expectedBar, $container->get('bar'));
     }
 
     public function testWhenEnv()

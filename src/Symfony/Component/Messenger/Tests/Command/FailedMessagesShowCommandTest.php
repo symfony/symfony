@@ -266,6 +266,46 @@ class FailedMessagesShowCommandTest extends TestCase
         $this->assertStringContainsString('stdClass   2', $tester->getDisplay(true));
     }
 
+    public function testStatsIgnoresDefaultMaxAndCountsAllMessages()
+    {
+        $envelope = new Envelope(new \stdClass(), [
+            new TransportMessageIdStamp(15),
+            new SentToFailureTransportStamp('async'),
+            new RedeliveryStamp(0),
+            ErrorDetailsStamp::create(new \RuntimeException('Things are bad!')),
+        ]);
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->with(null)->willReturn([$envelope, $envelope, $envelope]);
+
+        $failureTransportName = 'failure_receiver';
+
+        $command = new FailedMessagesShowCommand($failureTransportName, new ServiceLocator([$failureTransportName => static fn () => $receiver]));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--stats' => true]);
+        $this->assertStringContainsString('stdClass   3', $tester->getDisplay(true));
+    }
+
+    public function testStatsHonorsExplicitMax()
+    {
+        $envelope = new Envelope(new \stdClass(), [
+            new TransportMessageIdStamp(15),
+            new SentToFailureTransportStamp('async'),
+            new RedeliveryStamp(0),
+            ErrorDetailsStamp::create(new \RuntimeException('Things are bad!')),
+        ]);
+        $receiver = $this->createMock(ListableReceiverInterface::class);
+        $receiver->expects($this->once())->method('all')->with(10)->willReturn([$envelope]);
+
+        $failureTransportName = 'failure_receiver';
+
+        $command = new FailedMessagesShowCommand($failureTransportName, new ServiceLocator([$failureTransportName => static fn () => $receiver]));
+
+        $tester = new CommandTester($command);
+        $tester->execute(['--stats' => true, '--max' => 10]);
+        $this->assertStringContainsString('stdClass   1', $tester->getDisplay(true));
+    }
+
     public function testInvalidMessagesThrowsExceptionWithServiceLocator()
     {
         $receiver = $this->createStub(ListableReceiverInterface::class);

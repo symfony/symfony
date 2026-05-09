@@ -13,5 +13,5 @@
 // in a deprecated way.
 
 include __DIR__.'/../lib/SomeService.php';
-$defraculator = new \acme\lib\SomeService();
+$defraculator = new acme\lib\SomeService();
 $defraculator->deprecatedApi();

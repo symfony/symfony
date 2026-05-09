@@ -249,7 +249,7 @@ class AppVariableTest extends TestCase
 
     public function testGetCurrentRoute()
     {
-        $this->setRequestStack(new Request(attributes: ['_route' => 'some_route']));
+        $this->setRequestStack(new Request([], [], ['_route' => 'some_route']));
 
         $this->assertSame('some_route', $this->appVariable->getCurrent_route());
     }
@@ -263,7 +263,7 @@ class AppVariableTest extends TestCase
     public function testGetCurrentRouteParameters()
     {
         $routeParams = ['some_param' => true];
-        $this->setRequestStack(new Request(attributes: ['_route_params' => $routeParams]));
+        $this->setRequestStack(new Request([], [], ['_route_params' => $routeParams]));
 
         $this->assertSame($routeParams, $this->appVariable->getCurrent_route_parameters());
     }

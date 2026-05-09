@@ -153,7 +153,7 @@ final class AzureApiTransport extends AbstractApiTransport
             ];
 
             if ('inline' === $disposition) {
-                $att['content_id'] = $filename;
+                $att['contentId'] = $attachment->getContentId();
             }
 
             $attachments[] = $att;

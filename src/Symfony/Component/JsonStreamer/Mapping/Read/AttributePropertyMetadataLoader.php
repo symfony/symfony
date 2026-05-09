@@ -17,7 +17,8 @@ use Symfony\Component\JsonStreamer\Attribute\ValueTransformer;
 use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
-use Symfony\Component\JsonStreamer\ValueTransformer\ValueTransformerInterface;
+use Symfony\Component\JsonStreamer\Transformer\PropertyValueTransformerInterface;
+use Symfony\Component\JsonStreamer\Transformer\ValueObjectTransformerInterface;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolverInterface;
 
 /**
@@ -31,7 +32,7 @@ final class AttributePropertyMetadataLoader implements PropertyMetadataLoaderInt
 {
     public function __construct(
         private PropertyMetadataLoaderInterface $decorated,
-        private ContainerInterface $valueTransformers,
+        private ContainerInterface $transformers,
         private TypeResolverInterface $typeResolver,
     ) {
     }
@@ -62,7 +63,7 @@ final class AttributePropertyMetadataLoader implements PropertyMetadataLoaderInt
             }
 
             if (\is_string($valueTransformer)) {
-                $valueTransformerService = $this->getAndValidateValueTransformerService($valueTransformer);
+                $valueTransformerService = $this->getAndValidatePropertyValueTransformerService($valueTransformer);
 
                 $result[$streamedName] = $initialMetadata
                     ->withType($valueTransformerService::getStreamValueType())
@@ -109,17 +110,21 @@ final class AttributePropertyMetadataLoader implements PropertyMetadataLoaderInt
         return $metadata;
     }
 
-    private function getAndValidateValueTransformerService(string $valueTransformerId): ValueTransformerInterface
+    private function getAndValidatePropertyValueTransformerService(string $id): PropertyValueTransformerInterface
     {
-        if (!$this->valueTransformers->has($valueTransformerId)) {
-            throw new InvalidArgumentException(\sprintf('You have requested a non-existent value transformer service "%s". Did you implement "%s"?', $valueTransformerId, ValueTransformerInterface::class));
+        if (!$this->transformers->has($id)) {
+            throw new InvalidArgumentException(\sprintf('You have requested a non-existent property value transformer service "%s". Did you implement "%s"?', $id, PropertyValueTransformerInterface::class));
         }
 
-        $valueTransformer = $this->valueTransformers->get($valueTransformerId);
-        if (!$valueTransformer instanceof ValueTransformerInterface) {
-            throw new InvalidArgumentException(\sprintf('The "%s" value transformer service does not implement "%s".', $valueTransformerId, ValueTransformerInterface::class));
+        $transformer = $this->transformers->get($id);
+        if ($transformer instanceof ValueObjectTransformerInterface) {
+            throw new InvalidArgumentException(\sprintf('"%s" is a "%s" and must not be specified as a property value transformer.', $id, ValueObjectTransformerInterface::class));
         }
 
-        return $valueTransformer;
+        if (!$transformer instanceof PropertyValueTransformerInterface) {
+            throw new InvalidArgumentException(\sprintf('The "%s" property value transformer service does not implement "%s".', $id, PropertyValueTransformerInterface::class));
+        }
+
+        return $transformer;
     }
 }

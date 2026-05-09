@@ -413,6 +413,7 @@ class Theme {
             'doctrine': '#fd8c73',
             'messenger_middleware': '#ff8182',
             'controller.argument_value_resolver': '#c297ff',
+            'command.argument_value_resolver': '#b87ce8',
             'http_client': '#d4a72c',
         };
 

@@ -12,31 +12,16 @@
 namespace Symfony\Component\HttpKernel\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass as BaseMergeExtensionConfigurationPass;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+
+trigger_deprecation('symfony/http-kernel', '8.1', 'The "%s" class is deprecated, use "%s" from the DependencyInjection component instead.', MergeExtensionConfigurationPass::class, BaseMergeExtensionConfigurationPass::class);
 
 /**
  * Ensures certain extensions are always loaded.
  *
  * @author Kris Wallsmith <kris@symfony.com>
+ *
+ * @deprecated since Symfony 8.1, use MergeExtensionConfigurationPass from the DependencyInjection component instead
  */
 class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPass
 {
-    /**
-     * @param string[] $extensions
-     */
-    public function __construct(
-        private array $extensions,
-    ) {
-    }
-
-    public function process(ContainerBuilder $container): void
-    {
-        foreach ($this->extensions as $extension) {
-            if (!\count($container->getExtensionConfig($extension))) {
-                $container->loadFromExtension($extension, []);
-            }
-        }
-
-        parent::process($container);
-    }
 }

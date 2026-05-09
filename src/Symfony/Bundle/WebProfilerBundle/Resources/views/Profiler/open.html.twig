@@ -13,7 +13,7 @@
 
         {% set source = file_info.pathname|file_excerpt(line, -1) %}
         <div id="content">
-            <div id="main">
+            <main id="main">
                 <div id="source">
                     <h1 class="source-file-name">{{ file }}{% if 0 < line %} <small>line {{ line }}</small>{% endif %}</h1>
 
@@ -45,7 +45,7 @@
 
                     <a class="doc-link" href="https://symfony.com/doc/{{ constant('Symfony\\Component\\HttpKernel\\Kernel::VERSION') }}/reference/configuration/framework.html#ide" rel="help">Open this file in your IDE?</a>
                 </div>
-            </div>
+            </main>
         </div>
     </div>
 

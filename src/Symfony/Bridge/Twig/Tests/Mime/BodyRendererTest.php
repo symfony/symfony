@@ -18,6 +18,7 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\HtmlToTextConverter\DefaultHtmlToTextConverter;
 use Symfony\Component\Mime\HtmlToTextConverter\HtmlToTextConverterInterface;
+use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\AlternativePart;
 use Symfony\Component\Translation\LocaleSwitcher;
 use Twig\Environment;
@@ -146,6 +147,21 @@ class BodyRendererTest extends TestCase
 
         $this->assertEquals('Locale: fr', $email->getTextBody());
         $this->assertEquals('Locale: fr', $email->getHtmlBody());
+    }
+
+    public function testImageReturnsDataPartContentId()
+    {
+        $email = $this->prepareEmail(null, '{{ email.image("image.jpg") }}');
+        $html = $email->getHtmlBody();
+
+        $this->assertStringStartsWith('cid:', $html);
+        $cid = substr($html, 4);
+
+        $inlineParts = array_filter($email->getAttachments(), static fn (DataPart $part) => $part->hasContentId());
+        $this->assertCount(1, $inlineParts);
+
+        $inlinePart = reset($inlineParts);
+        $this->assertSame($cid, $inlinePart->getContentId());
     }
 
     private function prepareEmail(?string $text, ?string $html, array $context = [], ?HtmlToTextConverterInterface $converter = null, ?LocaleSwitcher $localeSwitcher = null, ?string $locale = null): TemplatedEmail

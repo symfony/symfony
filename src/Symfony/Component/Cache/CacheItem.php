@@ -170,6 +170,10 @@ final class CacheItem implements ItemInterface
         }
         $valueWrapper = self::VALUE_WRAPPER;
 
+        if ($this->value instanceof $valueWrapper) {
+            return new $valueWrapper($this->value->value, $m + ['expiry' => $this->expiry] + $this->value->metadata);
+        }
+
         return new $valueWrapper($this->value, $m + ['expiry' => $this->expiry]);
     }
 

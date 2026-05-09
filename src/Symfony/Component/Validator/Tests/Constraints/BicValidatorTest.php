@@ -31,14 +31,14 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Bic());
+        $this->validate(null, new Bic());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Bic());
+        $this->validate('', new Bic());
 
         $this->assertNoViolation();
     }
@@ -51,7 +51,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
         $this->setObject($object);
 
-        $this->validator->validate('SOGEFRPP', $constraint);
+        $this->validate('SOGEFRPP', $constraint);
 
         $this->assertNoViolation();
     }
@@ -65,7 +65,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
         $this->setObject($object);
 
-        $this->validator->validate('UNCRIT2B912', $constraint);
+        $this->validate('UNCRIT2B912', $constraint);
 
         $this->buildViolation('Constraint Message')
             ->setParameter('{{ value }}', '"UNCRIT2B912"')
@@ -83,7 +83,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
         $this->setObject(new BicDummy());
 
-        $this->validator->validate('UNCRIT2B912', $constraint);
+        $this->validate('UNCRIT2B912', $constraint);
 
         $this->buildViolation('Constraint Message')
             ->setParameter('{{ value }}', '"UNCRIT2B912"')
@@ -96,7 +96,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     {
         $this->setObject(new BicTypedDummy());
 
-        $this->validator->validate('UNCRIT2B912', new Bic(ibanPropertyPath: 'iban'));
+        $this->validate('UNCRIT2B912', new Bic(ibanPropertyPath: 'iban'));
 
         $this->assertNoViolation();
     }
@@ -106,7 +106,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Bic(iban: 'FR14 2004 1010 0505 0001 3M02 606');
         $constraint->ibanMessage = 'Constraint Message';
 
-        $this->validator->validate('SOGEFRPP', $constraint);
+        $this->validate('SOGEFRPP', $constraint);
 
         $this->assertNoViolation();
     }
@@ -116,7 +116,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
         $constraint = new Bic(iban: 'FR14 2004 1010 0505 0001 3M02 606');
         $constraint->ibanMessage = 'Constraint Message';
 
-        $this->validator->validate('UNCRIT2B912', $constraint);
+        $this->validate('UNCRIT2B912', $constraint);
 
         $this->buildViolation('Constraint Message')
             ->setParameter('{{ value }}', '"UNCRIT2B912"')
@@ -132,7 +132,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
         [$constraint] = $classMetadata->getPropertyMetadata('bic1')[0]->getConstraints();
 
-        $this->validator->validate('UNCRIT2B912', $constraint);
+        $this->validate('UNCRIT2B912', $constraint);
 
         $this->buildViolation('Constraint Message')
             ->setParameter('{{ value }}', '"UNCRIT2B912"')
@@ -147,7 +147,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
         $this->setObject(null);
 
-        $this->validator->validate('UNCRIT2B912', $constraint);
+        $this->validate('UNCRIT2B912', $constraint);
 
         $this->assertNoViolation();
     }
@@ -181,19 +181,19 @@ class BicValidatorTest extends ConstraintValidatorTestCase
 
         $this->setObject($object);
 
-        $this->validator->validate('UNCRIT2B912', $constraint);
+        $this->validate('UNCRIT2B912', $constraint);
     }
 
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new Bic());
+        $this->validate(new \stdClass(), new Bic());
     }
 
     #[DataProvider('getValidBics')]
     public function testValidBics($bic)
     {
-        $this->validator->validate($bic, new Bic());
+        $this->validate($bic, new Bic());
 
         $this->assertNoViolation();
     }
@@ -218,7 +218,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($bic, $constraint);
+        $this->validate($bic, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$bic.'"')
@@ -231,7 +231,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Bic(message: 'myMessage');
 
-        $this->validator->validate($bic, $constraint);
+        $this->validate($bic, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$bic.'"')
@@ -272,7 +272,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     public function testValidBicSpecialCases(string $bic, string $iban)
     {
         $constraint = new Bic(iban: $iban);
-        $this->validator->validate($bic, $constraint);
+        $this->validate($bic, $constraint);
 
         $this->assertNoViolation();
     }
@@ -310,7 +310,7 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidBicsWithNormalizerToUpper')]
     public function testValidBicsWithNormalizerToUpper($bic)
     {
-        $this->validator->validate($bic, new Bic(mode: Bic::VALIDATION_MODE_CASE_INSENSITIVE));
+        $this->validate($bic, new Bic(mode: Bic::VALIDATION_MODE_CASE_INSENSITIVE));
 
         $this->assertNoViolation();
     }
@@ -329,10 +329,10 @@ class BicValidatorTest extends ConstraintValidatorTestCase
     public function testFailOnInvalidMode()
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->validator->validate('ASPKAT2LXXX', new Bic(mode: 'invalid'));
+        $this->validate('ASPKAT2LXXX', new Bic(mode: 'invalid'));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->validator->validate('ASPKAT2LXXX', new Bic(options: ['mode' => 'invalid']));
+        $this->validate('ASPKAT2LXXX', new Bic(options: ['mode' => 'invalid']));
     }
 }
 

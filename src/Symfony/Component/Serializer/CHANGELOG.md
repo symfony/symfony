@@ -6,6 +6,9 @@ CHANGELOG
 
  * Improve `NotNormalizableValueException` exception messages in `BackedEnumNormalizer` to contain more useful information
  * Trigger a deprecation when a date could not be parsed using the default format
+ * Add `AbstractObjectNormalizer::ENABLE_TYPE_CONVERSION` for scalar type transformation
+ * Add `COLLECT_EXTRA_ATTRIBUTES_ERRORS` option to `Serializer` to collect extra-attributes errors during denormalization
+ * Deprecate `PartialDenormalizationException::getErrors()`, use `getNotNormalizableValueErrors()` instead
 
 8.0
 ---

@@ -14,6 +14,7 @@ namespace Symfony\Component\Messenger\Tests\Transport\Serialization;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Tests\Fixtures\ChildDummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessage;
 use Symfony\Component\Messenger\Tests\Fixtures\DummyMessageInterface;
@@ -65,8 +66,9 @@ class SigningSerializerTest extends TestCase
         $envelope = new Envelope(new DummyMessage('hello'));
         $encoded = $inner->encode($envelope);
 
-        $this->expectException(InvalidMessageSignatureException::class);
-        $serializer->decode($encoded);
+        $envelope = $serializer->decode($encoded);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
     }
 
     public function testDecodeRejectsInvalidSignature()
@@ -76,8 +78,9 @@ class SigningSerializerTest extends TestCase
         $encoded = $serializer->encode($envelope);
         $encoded['headers']['Body-Sign'] = 'tampered';
 
-        $this->expectException(InvalidMessageSignatureException::class);
-        $serializer->decode($encoded);
+        $envelope = $serializer->decode($encoded);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
     }
 
     public function testEncodeSignsWhenSignedTypeIsInterfaceImplementedByMessage()
@@ -95,7 +98,6 @@ class SigningSerializerTest extends TestCase
     public function testDecodeVerifiesWhenSignedTypeIsParentClassOfMessage()
     {
         $serializer = $this->createSerializer([DummyMessage::class]);
-        $inner = new PhpSerializer();
 
         // Encode with signature by using the SigningSerializer against a child instance
         $encoded = $serializer->encode(new Envelope(new ChildDummyMessage('child')));
@@ -103,8 +105,9 @@ class SigningSerializerTest extends TestCase
         // Tamper by removing signature to ensure verification occurs for child type
         unset($encoded['headers']['Body-Sign']);
 
-        $this->expectException(InvalidMessageSignatureException::class);
-        $serializer->decode($encoded);
+        $envelope = $serializer->decode($encoded);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelope->getMessage());
+        $this->assertInstanceOf(InvalidMessageSignatureException::class, $envelope->getMessage()->getPrevious());
     }
 
     private function createSerializer(array $signedTypes): SerializerInterface

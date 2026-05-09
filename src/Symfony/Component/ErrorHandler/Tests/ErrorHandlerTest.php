@@ -20,6 +20,8 @@ use Psr\Log\NullLogger;
 use Symfony\Component\ErrorHandler\BufferingLogger;
 use Symfony\Component\ErrorHandler\Error\ClassNotFoundError;
 use Symfony\Component\ErrorHandler\Error\FatalError;
+use Symfony\Component\ErrorHandler\Error\MaxExecutionTimeError;
+use Symfony\Component\ErrorHandler\Error\OutOfMemoryError;
 use Symfony\Component\ErrorHandler\ErrorHandler;
 use Symfony\Component\ErrorHandler\Exception\SilencedErrorContext;
 use Symfony\Component\ErrorHandler\Tests\Fixtures\ErrorHandlerThatUsesThePreviousOne;
@@ -550,6 +552,84 @@ class ErrorHandlerTest extends TestCase
     }
 
     #[WithoutErrorHandler]
+    public function testHandleFatalErrorCreatesOutOfMemoryError()
+    {
+        try {
+            $handler = ErrorHandler::register();
+
+            $error = [
+                'type' => \E_ERROR,
+                'message' => 'Allowed memory size of 536870912 bytes exhausted (tried to allocate 4096 bytes)',
+                'file' => 'bar',
+                'line' => 123,
+            ];
+
+            $handler->setExceptionHandler(static function () use (&$args) {
+                $args = \func_get_args();
+            });
+
+            $handler->handleFatalError($error);
+
+            $this->assertInstanceOf(OutOfMemoryError::class, $args[0]);
+        } finally {
+            restore_error_handler();
+            restore_exception_handler();
+        }
+    }
+
+    #[WithoutErrorHandler]
+    public function testHandleFatalErrorCreatesOutOfMemoryErrorForOutOfMemoryMessage()
+    {
+        try {
+            $handler = ErrorHandler::register();
+
+            $error = [
+                'type' => \E_ERROR,
+                'message' => 'Out of memory (allocated 536870912) (tried to allocate 4096 bytes)',
+                'file' => 'bar',
+                'line' => 123,
+            ];
+
+            $handler->setExceptionHandler(static function () use (&$args) {
+                $args = \func_get_args();
+            });
+
+            $handler->handleFatalError($error);
+
+            $this->assertInstanceOf(OutOfMemoryError::class, $args[0]);
+        } finally {
+            restore_error_handler();
+            restore_exception_handler();
+        }
+    }
+
+    #[WithoutErrorHandler]
+    public function testHandleFatalErrorCreatesMaxExecutionTimeError()
+    {
+        try {
+            $handler = ErrorHandler::register();
+
+            $error = [
+                'type' => \E_ERROR,
+                'message' => 'Maximum execution time of 30 seconds exceeded',
+                'file' => 'bar',
+                'line' => 123,
+            ];
+
+            $handler->setExceptionHandler(static function () use (&$args) {
+                $args = \func_get_args();
+            });
+
+            $handler->handleFatalError($error);
+
+            $this->assertInstanceOf(MaxExecutionTimeError::class, $args[0]);
+        } finally {
+            restore_error_handler();
+            restore_exception_handler();
+        }
+    }
+
+    #[WithoutErrorHandler]
     public function testHandleErrorException()
     {
         $exception = new \Error("Class 'IReallyReallyDoNotExistAnywhereInTheRepositoryISwear' not found");
@@ -589,6 +669,46 @@ class ErrorHandlerTest extends TestCase
         $response = ob_get_clean();
 
         self::assertStringContainsString('Class Foo not found', $response);
+    }
+
+    #[WithoutErrorHandler]
+    public function testRenderExceptionWithOutOfMemoryError()
+    {
+        $handler = new ErrorHandler();
+        $handler->setExceptionHandler([$handler, 'renderException']);
+
+        $error = [
+            'type' => \E_ERROR,
+            'message' => 'Allowed memory size of 536870912 bytes exhausted',
+            'file' => 'foo.php',
+            'line' => 1,
+        ];
+
+        ob_start();
+        $handler->handleException(new OutOfMemoryError('', 0, $error));
+        $response = ob_get_clean();
+
+        self::assertStringContainsString('Allowed memory size of 536870912 bytes exhausted', $response);
+    }
+
+    #[WithoutErrorHandler]
+    public function testRenderExceptionWithMaxExecutionTimeError()
+    {
+        $handler = new ErrorHandler();
+        $handler->setExceptionHandler([$handler, 'renderException']);
+
+        $error = [
+            'type' => \E_ERROR,
+            'message' => 'Maximum execution time of 30 seconds exceeded',
+            'file' => 'foo.php',
+            'line' => 1,
+        ];
+
+        ob_start();
+        $handler->handleException(new MaxExecutionTimeError('', 0, $error));
+        $response = ob_get_clean();
+
+        self::assertStringContainsString('Maximum execution time of 30 seconds exceeded', $response);
     }
 
     #[DataProvider('errorHandlerWhenLoggingProvider')]

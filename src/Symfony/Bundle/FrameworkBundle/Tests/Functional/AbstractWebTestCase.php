@@ -36,12 +36,13 @@ abstract class AbstractWebTestCase extends BaseWebTestCase
 
     protected static function deleteTmpDir()
     {
-        if (!file_exists($dir = sys_get_temp_dir().'/'.static::getVarDir())) {
-            return;
+        $fs = new Filesystem();
+
+        if (file_exists($dir = sys_get_temp_dir().'/'.static::getVarDir())) {
+            $fs->remove($dir);
         }
 
-        $fs = new Filesystem();
-        $fs->remove($dir);
+        $fs->remove(__DIR__.'/app/config/reference.php');
     }
 
     protected static function getKernelClass(): string

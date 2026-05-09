@@ -133,7 +133,8 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                     $payload = $payloadMapper($request, $argument->metadata, $argument);
                 } catch (PartialDenormalizationException $e) {
                     $trans = $this->translator ? $this->translator->trans(...) : static fn ($m, $p) => strtr($m, $p);
-                    foreach ($e->getErrors() as $error) {
+                    $errors = method_exists($e, 'getNotNormalizableValueErrors') ? $e->getNotNormalizableValueErrors() : $e->getErrors();
+                    foreach ($errors as $error) {
                         $parameters = [];
                         $template = 'This value was of an unexpected type.';
                         if ($expectedTypes = $error->getExpectedTypes()) {
@@ -158,7 +159,12 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                         $constraints = new Assert\All($constraints);
                     }
                     $groups = $this->resolveValidationGroups($argument->validationGroups ?? null, $event);
-                    $violations->addAll($this->validator->validate($payload, $constraints, $groups));
+
+                    if ($argument instanceof MapUploadedFile) {
+                        $violations->addAll($this->validator->startContext()->atPath($argument->metadata->getName())->validate($payload, $constraints, $groups)->getViolations());
+                    } else {
+                        $violations->addAll($this->validator->validate($payload, $constraints, $groups));
+                    }
                 }
 
                 if (\count($violations)) {
@@ -168,7 +174,8 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
                 try {
                     $payload = $payloadMapper($request, $argument->metadata, $argument);
                 } catch (PartialDenormalizationException $e) {
-                    throw HttpException::fromStatusCode($validationFailedCode, implode("\n", array_map(static fn ($e) => $e->getMessage(), $e->getErrors())), $e);
+                    $errors = method_exists($e, 'getNotNormalizableValueErrors') ? $e->getNotNormalizableValueErrors() : $e->getErrors();
+                    throw HttpException::fromStatusCode($validationFailedCode, implode("\n", array_map(static fn ($e) => $e->getMessage(), $errors)), $e);
                 } catch (SerializerInvalidArgumentException $e) {
                     throw HttpException::fromStatusCode($validationFailedCode, $e->getMessage(), $e);
                 }
@@ -202,7 +209,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
 
     private function mapQueryString(Request $request, ArgumentMetadata $argument, MapQueryString $attribute): ?object
     {
-        if (!($data = $request->query->all($attribute->key)) && ($argument->isNullable() || $argument->hasDefaultValue())) {
+        if (!($data = $request->query->all($attribute->key)) && ($argument->isNullable() || $argument->hasDefaultValue()) && !$attribute->mapWhenEmpty) {
             return null;
         }
 
@@ -211,8 +218,12 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
 
     private function mapRequestPayload(Request $request, ArgumentMetadata $argument, MapRequestPayload $attribute): object|array|null
     {
-        if ('' === ($data = $request->request->all() ?: $request->getContent()) && ($argument->isNullable() || $argument->hasDefaultValue())) {
-            return null;
+        if ('' === $data = $request->request->all() ?: $request->getContent()) {
+            if ($attribute->mapWhenEmpty) {
+                $data = [];
+            } elseif ($argument->isNullable() || $argument->hasDefaultValue()) {
+                return null;
+            }
         }
 
         if (null === $format = $request->getContentTypeFormat()) {
@@ -232,7 +243,7 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         if (\is_array($data)) {
             $data = $this->mergeParamsAndFiles($data, $request->files->all());
 
-            return $this->serializer->denormalize($data, $type, 'csv', $attribute->serializationContext + self::CONTEXT_DENORMALIZE + ('form' === $format ? ['filter_bool' => true] : []));
+            return $this->serializer->denormalize($data, $type, self::hasNonStringScalar($data) ? $format : 'csv', $attribute->serializationContext + self::CONTEXT_DENORMALIZE + ('form' === $format ? ['filter_bool' => true] : []));
         }
 
         if ('form' === $format) {
@@ -318,5 +329,22 @@ class RequestPayloadValueResolver implements ValueResolverInterface, EventSubscr
         }
 
         return $validationGroups;
+    }
+
+    private static function hasNonStringScalar(array $data): bool
+    {
+        $stack = [$data];
+
+        while ($stack) {
+            foreach (array_pop($stack) as $v) {
+                if (\is_array($v)) {
+                    $stack[] = $v;
+                } elseif (!\is_string($v)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

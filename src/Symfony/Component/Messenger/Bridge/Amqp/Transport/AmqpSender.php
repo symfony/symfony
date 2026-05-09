@@ -15,6 +15,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\TransportException;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Messenger\Stamp\RedeliveryStamp;
+use Symfony\Component\Messenger\Stamp\SentToFailureTransportStamp;
 use Symfony\Component\Messenger\Stamp\TransportMessageIdStamp;
 use Symfony\Component\Messenger\Transport\Sender\SenderInterface;
 use Symfony\Component\Messenger\Transport\Serialization\PhpSerializer;
@@ -40,31 +41,31 @@ class AmqpSender implements SenderInterface
     {
         $encodedMessage = $this->serializer->encode($envelope);
 
-        /** @var DelayStamp|null $delayStamp */
         $delayStamp = $envelope->last(DelayStamp::class);
         $delay = $delayStamp ? $delayStamp->getDelay() : 0;
 
-        /** @var AmqpStamp|null $amqpStamp */
         $amqpStamp = $envelope->last(AmqpStamp::class);
-        if (isset($encodedMessage['headers']['Content-Type'])) {
-            $contentType = $encodedMessage['headers']['Content-Type'];
+        if ($contentType = $encodedMessage['headers']['Content-Type'] ?? null) {
             unset($encodedMessage['headers']['Content-Type']);
 
-            if (!$amqpStamp || !isset($amqpStamp->getAttributes()['content_type'])) {
+            if (!($amqpStamp?->getAttributes()['content_type'] ?? null)) {
                 $amqpStamp = AmqpStamp::createWithAttributes(['content_type' => $contentType], $amqpStamp);
             }
         }
 
-        if ($amqpStamp instanceof AmqpStamp && isset($amqpStamp->getAttributes()['message_id'])) {
+        if ($priorityStamp = $envelope->last(AmqpPriorityStamp::class)) {
+            $amqpStamp = AmqpStamp::createWithAttributes(['priority' => $priorityStamp->priority], $amqpStamp);
+        }
+
+        if ($amqpStamp?->getAttributes()['message_id'] ?? null) {
             $envelope = $envelope->with(new TransportMessageIdStamp($amqpStamp->getAttributes()['message_id']));
         }
 
-        $amqpReceivedStamp = $envelope->last(AmqpReceivedStamp::class);
-        if ($amqpReceivedStamp instanceof AmqpReceivedStamp) {
+        if ($amqpReceivedStamp = $envelope->last(AmqpReceivedStamp::class)) {
             $amqpStamp = AmqpStamp::createFromAmqpEnvelope(
                 $amqpReceivedStamp->getAmqpEnvelope(),
                 $amqpStamp,
-                $envelope->last(RedeliveryStamp::class) ? $amqpReceivedStamp->getQueueName() : null
+                $envelope->last(RedeliveryStamp::class) && !$envelope->last(SentToFailureTransportStamp::class) ? $amqpReceivedStamp->getQueueName() : null
             );
         }
 

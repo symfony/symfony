@@ -27,6 +27,12 @@ abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator impl
 {
     /**
      * Return the URL to the login page.
+     *
+     * The default `supports()` implementation below compares this value
+     * character-for-character against the current request path
+     * (`$request->getBaseUrl().$request->getPathInfo()`), so this must return a
+     * path (e.g. `/login`). If you build the URL via `HttpUtils::generateUri()`,
+     * which may produce an absolute URL, also override `supports()`.
      */
     abstract protected function getLoginUrl(Request $request): string;
 
@@ -34,8 +40,10 @@ abstract class AbstractLoginFormAuthenticator extends AbstractAuthenticator impl
      * Override to change the request conditions that have to be
      * matched in order to handle the login form submit.
      *
-     * This default implementation handles all POST requests to the
-     * login path (@see getLoginUrl()).
+     * This default implementation handles POST requests whose path equals
+     * the value returned by `getLoginUrl()`; the comparison is strict,
+     * so `getLoginUrl()` must return a path rather than an absolute URL.
+     * Or this method need to be overridden.
      */
     public function supports(Request $request): bool
     {

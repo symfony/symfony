@@ -11,8 +11,13 @@
 
 namespace Symfony\Component\Form\Tests\Extension\HttpFoundation;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
+use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationRequestHandler;
+use Symfony\Component\Form\Extension\HttpFoundation\Type\FormTypeHttpFoundationExtension;
+use Symfony\Component\Form\FormBuilder;
+use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\Tests\AbstractRequestHandlerTestCase;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,7 +51,7 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTestCase
 
     protected function getUploadedFile($suffix = '')
     {
-        return new UploadedFile(__DIR__.'/../../Fixtures/foo'.$suffix, 'foo'.$suffix);
+        return new UploadedFile(__DIR__.'/../../Fixtures/foo'.$suffix, 'foo'.$suffix, null, null, true);
     }
 
     protected function getInvalidFile()
@@ -63,5 +68,21 @@ class HttpFoundationRequestHandlerTest extends AbstractRequestHandlerTestCase
         }
 
         return new UploadedFile(__DIR__.'/../../Fixtures/foo', 'foo', null, null, $errorCode, true);
+    }
+
+    protected function createBuilder($name, $compound = false, array $options = [])
+    {
+        $factory = Forms::createFormFactoryBuilder()
+            ->addTypeExtension(new FormTypeHttpFoundationExtension($this->requestHandler))
+            ->getFormFactory();
+
+        $builder = new FormBuilder($name, null, new EventDispatcher(), $factory, $options);
+        $builder->setCompound($compound);
+
+        if ($compound) {
+            $builder->setDataMapper(new DataMapper());
+        }
+
+        return $builder;
     }
 }

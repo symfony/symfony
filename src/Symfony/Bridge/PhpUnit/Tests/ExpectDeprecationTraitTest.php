@@ -17,7 +17,7 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
 
-#[RequiresPhpunit('<10')]
+#[RequiresPhpunit('<10.0.0')]
 final class ExpectDeprecationTraitTest extends TestCase
 {
     use ExpectDeprecationTrait;

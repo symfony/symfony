@@ -8,7 +8,7 @@ Array
     [0] => bar
 )
 $_SESSION is not empty
-write
+updateTimestamp
 destroy
 close
 $_SESSION is empty

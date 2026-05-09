@@ -49,6 +49,13 @@ class RateLimiterFactoryTest extends TestCase
             'limit' => 5,
             'interval' => '5 seconds',
         ]];
+        yield [FixedWindowLimiter::class, [
+            'policy' => 'fixed_window',
+            'id' => 'test',
+            'limit' => 10,
+            'interval' => '1 month',
+            'anchor_at' => '2024-01-05 00:00:00 UTC',
+        ]];
         yield [SlidingWindowLimiter::class, [
             'policy' => 'sliding_window',
             'id' => 'test',
@@ -74,6 +81,20 @@ class RateLimiterFactoryTest extends TestCase
         yield [MissingOptionsException::class, [
             'policy' => 'token_bucket',
         ]];
+    }
+
+    public function testAnchorAtRejectedOnNonFixedWindow()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The "anchor_at" option is only supported with the "fixed_window" policy.');
+
+        new RateLimiterFactory([
+            'policy' => 'sliding_window',
+            'id' => 'test',
+            'limit' => 5,
+            'interval' => '5 seconds',
+            'anchor_at' => '2024-01-05 00:00:00 UTC',
+        ], new InMemoryStorage());
     }
 
     #[Group('time-sensitive')]

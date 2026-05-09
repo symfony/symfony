@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Console\Tester;
 
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\TestOutput;
 
 /**
@@ -25,19 +24,11 @@ final class ExecutionResult
     /**
      * @param array<\Closure(string): string> $normalizers
      */
-    public static function fromExecution(InputInterface $input, int $statusCode, TestOutput $output, array $normalizers = []): self
-    {
-        return new self($input->__toString(), $statusCode, $output, $normalizers);
-    }
-
-    /**
-     * @param array<\Closure(string): string> $normalizers
-     */
     public function __construct(
         public readonly string $input,
         public readonly int $statusCode,
         private readonly TestOutput $output,
-        private readonly array $normalizers,
+        private readonly array $normalizers = [],
     ) {
     }
 

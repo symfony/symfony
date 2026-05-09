@@ -6,6 +6,9 @@ CHANGELOG
 
  * Add support for the `max_connect_duration` option
  * Add option `extra.use_persistent_connections` to `CurlHttpClient` to control the use of persistent connections introduced in PHP 8.5
+ * Add `GuzzleHttpHandler` that allows using Symfony HttpClient as a Guzzle handler
+ * Change `$maxTtl` argument of `CachingHttpClient` to default to `86400` (24h) instead of `null`
+ * Deprecate passing `null` as `$maxTtl` to `CachingHttpClient`, pass a positive integer instead
 
 8.0
 ---

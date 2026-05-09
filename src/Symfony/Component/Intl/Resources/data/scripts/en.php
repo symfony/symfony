@@ -156,7 +156,7 @@ return [
         'Samr' => 'Samaritan',
         'Sara' => 'Sarati',
         'Sarb' => 'Old South Arabian',
-        'Saur' => 'Saurashtra',
+        'Saur' => 'Sourashtra',
         'Sgnw' => 'SignWriting',
         'Shaw' => 'Shavian',
         'Shrd' => 'Sharada',

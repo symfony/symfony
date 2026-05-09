@@ -33,7 +33,7 @@ class ResponseIsUnprocessableTest extends TestCase
 
     public function testReducedVerbosity()
     {
-        $constraint = new ResponseIsUnprocessable(verbose: false);
+        $constraint = new ResponseIsUnprocessable(false);
 
         try {
             $constraint->evaluate(new Response('Response body'));

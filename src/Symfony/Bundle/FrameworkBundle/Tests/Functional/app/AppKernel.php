@@ -119,7 +119,10 @@ class AppKernel extends Kernel implements ExtensionInterface, ConfigurationInter
     {
         $treeBuilder = new TreeBuilder('foo');
         $rootNode = $treeBuilder->getRootNode();
-        $rootNode->children()->scalarNode('foo')->defaultValue('bar')->end()->end();
+        $rootNode->children()
+            ->scalarNode('foo')->defaultValue('bar')->end()
+            ->scalarNode('vault_test_secret')->defaultValue('')->end()
+        ->end();
 
         return $treeBuilder;
     }

@@ -180,6 +180,11 @@ trait BrowserKitAssertionsTrait
         self::assertThat(self::getRequest(), $constraint, $message);
     }
 
+    public static function assertSessionHasFlashMessage(string $messageType, string|array $messages = ''): void
+    {
+        static::assertThat(self::getRequest(), new ResponseConstraint\SessionHasFlashMessage($messageType, $messages));
+    }
+
     public static function assertThatForResponse(Constraint $constraint, string $message = ''): void
     {
         try {

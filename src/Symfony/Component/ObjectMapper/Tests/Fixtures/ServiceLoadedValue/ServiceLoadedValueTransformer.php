@@ -26,8 +26,14 @@ class ServiceLoadedValueTransformer implements TransformCallableInterface
     public function __invoke(mixed $value, object $source, ?object $target): mixed
     {
         $metadata = $this->metadata->create($value);
-        \assert(count($metadata) === 1);
-        \assert($metadata[0]->target === LoadedValue::class);
+
+        if (1 !== \count($metadata)) {
+            throw new \LogicException('Exactly one metadata should be returned.');
+        }
+        if (LoadedValue::class !== $metadata[0]->target) {
+            throw new \LogicException('The target should be '.LoadedValue::class.'.');
+        }
+
         return $this->serviceLoadedValue->get();
     }
 }

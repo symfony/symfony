@@ -15,10 +15,12 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\Compiler\ResettableServicePass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,8 +28,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
-use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
-use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Kernel;
@@ -320,12 +320,8 @@ class KernelTest extends TestCase
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Trying to register two bundles with the same name "DuplicateName"');
-        $fooBundle = $this->createStub(BundleInterface::class);
-        $fooBundle->method('getName')->willReturn('DuplicateName');
-        $barBundle = $this->createStub(BundleInterface::class);
-        $barBundle->method('getName')->willReturn('DuplicateName');
 
-        $kernel = new KernelForTest('test', false, true, [$fooBundle, $barBundle]);
+        $kernel = new KernelForTest('test', false, true, [new DuplicateNameBundleA(), new DuplicateNameBundleB()]);
         $kernel->boot();
     }
 
@@ -464,6 +460,21 @@ class KernelTest extends TestCase
 
         $this->assertTrue($kernel->warmedUp);
         $this->assertSame(realpath($kernel->getBuildDir()), $kernel->warmedUpBuildDir);
+    }
+
+    public function testWarmupIsNotRunOnSubsequentBoot()
+    {
+        $kernel = new CustomProjectDirKernel();
+        $kernel->boot();
+
+        $this->assertTrue($kernel->warmedUp);
+
+        $kernel->shutdown();
+
+        $kernel = new CustomProjectDirKernel();
+        $kernel->boot();
+
+        $this->assertFalse($kernel->warmedUp);
     }
 
     public function testServicesResetter()
@@ -669,7 +680,7 @@ class KernelTest extends TestCase
         ;
 
         $kernel = $kernelMockBuilder->getMock();
-        $kernel->expects($this->any())
+        $kernel
             ->method('registerBundles')
             ->willReturn($bundles)
         ;
@@ -866,4 +877,14 @@ class KernelForTestWithLoadClassCache extends KernelForTest
     public function doLoadClassCache(): void
     {
     }
+}
+
+class DuplicateNameBundleA extends Bundle
+{
+    protected string $name = 'DuplicateName';
+}
+
+class DuplicateNameBundleB extends Bundle
+{
+    protected string $name = 'DuplicateName';
 }

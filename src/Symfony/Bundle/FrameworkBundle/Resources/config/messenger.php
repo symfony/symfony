@@ -19,6 +19,7 @@ use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportF
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
 use Symfony\Component\Messenger\EventListener\AddErrorDetailsStampListener;
 use Symfony\Component\Messenger\EventListener\DispatchPcntlSignalListener;
+use Symfony\Component\Messenger\EventListener\ReleaseDeduplicationLockOnFailureListener;
 use Symfony\Component\Messenger\EventListener\ResetMemoryUsageListener;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\SendFailedMessageForRetryListener;
@@ -28,6 +29,7 @@ use Symfony\Component\Messenger\EventListener\StopWorkerOnRestartSignalListener;
 use Symfony\Component\Messenger\Handler\RedispatchMessageHandler;
 use Symfony\Component\Messenger\Middleware\AddBusNameStampMiddleware;
 use Symfony\Component\Messenger\Middleware\AddDefaultStampsMiddleware;
+use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\Messenger\Middleware\DispatchAfterCurrentBusMiddleware;
 use Symfony\Component\Messenger\Middleware\FailedMessageProcessingMiddleware;
@@ -106,6 +108,8 @@ return static function (ContainerConfigurator $container) {
             ->abstract()
             ->args([
                 abstract_arg('bus handler resolver'),
+                false,
+                service('clock')->nullOnInvalid(),
             ])
             ->tag('monolog.logger', ['channel' => 'messenger'])
             ->call('setLogger', [service('logger')->ignoreOnInvalid()])
@@ -130,6 +134,15 @@ return static function (ContainerConfigurator $container) {
         ->set('messenger.middleware.reject_redelivered_message_middleware', RejectRedeliveredMessageMiddleware::class)
 
         ->set('messenger.middleware.failed_message_processing_middleware', FailedMessageProcessingMiddleware::class)
+
+        ->set('messenger.transport.serializer_locator', ServiceLocator::class)
+            ->args([[]])
+            ->tag('container.service_locator')
+
+        ->set('messenger.middleware.decode_failed_message_middleware', DecodeFailedMessageMiddleware::class)
+            ->args([
+                service('messenger.transport.serializer_locator'),
+            ])
 
         ->set('messenger.middleware.traceable', TraceableMiddleware::class)
             ->abstract()
@@ -216,10 +229,17 @@ return static function (ContainerConfigurator $container) {
         ->set('messenger.failure.add_error_details_stamp_listener', AddErrorDetailsStampListener::class)
             ->tag('kernel.event_subscriber')
 
+        ->set('messenger.failure.release_deduplication_lock_on_failure_listener', ReleaseDeduplicationLockOnFailureListener::class)
+            ->args([
+                service('lock.factory'),
+            ])
+            ->tag('kernel.event_subscriber')
+
         ->set('messenger.failure.send_failed_message_to_failure_transport_listener', SendFailedMessageToFailureTransportListener::class)
             ->args([
                 abstract_arg('failure transports'),
                 service('logger')->ignoreOnInvalid(),
+                abstract_arg('failure transports by name'),
             ])
             ->tag('kernel.event_subscriber')
             ->tag('monolog.logger', ['channel' => 'messenger'])

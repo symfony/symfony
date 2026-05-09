@@ -824,6 +824,26 @@ class QuestionHelperTest extends AbstractQuestionHelperTestCase
         $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream('')), $this->createOutputInterface(), $question);
     }
 
+    public function testValidatorExceptionPropagatesOnEmptyInput()
+    {
+        $dialog = new QuestionHelper();
+
+        $question = new Question('What\'s your name?');
+        $question->setValidator(static function ($value) {
+            if ('' === $value || null === $value) {
+                throw new \InvalidArgumentException('A value is required.');
+            }
+
+            return $value;
+        });
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A value is required.');
+
+        // Simulate setInputs(['']), which writes "\n" to the stream then EOF
+        $dialog->ask($this->createStreamableInputInterfaceMock($this->getInputStream("\n")), $this->createOutputInterface(), $question);
+    }
+
     public function testQuestionValidatorRepeatsThePrompt()
     {
         $tries = 0;

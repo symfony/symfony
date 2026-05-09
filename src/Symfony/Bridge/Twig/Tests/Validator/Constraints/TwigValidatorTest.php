@@ -15,6 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use Symfony\Bridge\Twig\Validator\Constraints\Twig;
 use Symfony\Bridge\Twig\Validator\Constraints\TwigValidator;
+use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Test\ConstraintValidatorTestCase;
 use Twig\DeprecatedCallableInfo;
 use Twig\Environment;
@@ -40,7 +41,7 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidValues')]
     public function testTwigIsValid($value)
     {
-        $this->validator->validate($value, new Twig());
+        $this->validate($value, new Twig());
 
         $this->assertNoViolation();
     }
@@ -50,7 +51,7 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Twig('myMessageTest');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->buildViolation('myMessageTest')
             ->setParameter('{{ error }}', $message)
@@ -67,7 +68,7 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Twig(skipDeprecations: true);
 
-        $this->validator->validate('{{ name|deprecated_filter }}', $constraint);
+        $this->validate('{{ name|deprecated_filter }}', $constraint);
 
         $this->assertNoViolation();
     }
@@ -76,7 +77,7 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Twig(skipDeprecations: false);
 
-        $this->validator->validate('{{ name|deprecated_filter }}', $constraint);
+        $this->validate('{{ name|deprecated_filter }}', $constraint);
 
         $this->buildViolation($constraint->message)
             ->setParameter('{{ error }}', 'Since foo/bar 1.1: Twig Filter "deprecated_filter" is deprecated.')
@@ -109,5 +110,15 @@ class TwigValidatorTest extends ConstraintValidatorTestCase
             // Invalid variable syntax
             ['Hello {{ .name }}', 'Unexpected token "operator" of value "." at line 1.', 1],
         ];
+    }
+
+    // TODO remove this in Symfony 9.0 (or earlier, when dropping support for symfony/validator < 8.1)
+    protected function validate(mixed $value, Constraint $constraint): void
+    {
+        if (method_exists(parent::class, 'validate')) {
+            parent::validate($value, $constraint);
+        } else {
+            $this->validator->validate($value, $constraint);
+        }
     }
 }

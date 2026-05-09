@@ -17,6 +17,6 @@ final class MyUnannotatedController
 {
     public function myAction(): Response
     {
-        return new Response(status: Response::HTTP_NO_CONTENT);
+        return new Response('', Response::HTTP_NO_CONTENT);
     }
 }

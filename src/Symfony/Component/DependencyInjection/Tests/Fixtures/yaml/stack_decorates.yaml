@@ -1,0 +1,18 @@
+services:
+    original_service:
+        class: stdClass
+        public: true
+        properties:
+            label: original
+
+    my_stack:
+        decorates: original_service
+        stack:
+            - class: stdClass
+              properties:
+                  label: A
+                  inner: '@.inner'
+            - class: stdClass
+              properties:
+                  label: B
+                  inner: '@.inner'

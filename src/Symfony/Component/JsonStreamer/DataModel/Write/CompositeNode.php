@@ -29,7 +29,6 @@ final class CompositeNode implements DataModelNodeInterface
     private const NODE_PRECISION = [
         CollectionNode::class => 3,
         ObjectNode::class => 2,
-        DateTimeNode::class => 1,
         BackedEnumNode::class => 1,
         ScalarNode::class => 0,
     ];
@@ -56,7 +55,7 @@ final class CompositeNode implements DataModelNodeInterface
             }
         }
 
-        usort($nodes, static fn (CollectionNode|ObjectNode|DateTimeNode|BackedEnumNode|ScalarNode $a, CollectionNode|ObjectNode|DateTimeNode|BackedEnumNode|ScalarNode $b): int => self::NODE_PRECISION[$b::class] <=> self::NODE_PRECISION[$a::class]);
+        usort($nodes, static fn (CollectionNode|ObjectNode|BackedEnumNode|ScalarNode $a, CollectionNode|ObjectNode|BackedEnumNode|ScalarNode $b): int => self::NODE_PRECISION[$b::class] <=> self::NODE_PRECISION[$a::class]);
         $this->nodes = $nodes;
     }
 

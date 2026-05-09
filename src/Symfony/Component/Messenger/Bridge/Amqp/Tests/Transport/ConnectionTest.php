@@ -34,6 +34,21 @@ class ConnectionTest extends TestCase
         Connection::fromDsn('amqp://:');
     }
 
+    public function testUserOptionIsAliasedToLogin()
+    {
+        $r = new \ReflectionProperty(Connection::class, 'connectionOptions');
+
+        $connection = new Connection(['host' => 'localhost', 'user' => 'alice'], ['name' => self::DEFAULT_EXCHANGE_NAME], [self::DEFAULT_EXCHANGE_NAME => []]);
+        $options = $r->getValue($connection);
+        $this->assertSame('alice', $options['login']);
+        $this->assertArrayNotHasKey('user', $options);
+
+        $connection = new Connection(['host' => 'localhost', 'user' => 'alice', 'login' => 'bob'], ['name' => self::DEFAULT_EXCHANGE_NAME], [self::DEFAULT_EXCHANGE_NAME => []]);
+        $options = $r->getValue($connection);
+        $this->assertSame('bob', $options['login']);
+        $this->assertArrayNotHasKey('user', $options);
+    }
+
     public function testItCanBeConstructedWithDefaults()
     {
         $this->assertEquals(

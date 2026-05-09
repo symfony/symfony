@@ -23,7 +23,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @runTestsInSeparateProcesses
  */
-#[RequiresPhpunit('<10')]
+#[RequiresPhpunit('<10.0.0')]
 #[Group('legacy')]
 class ProcessIsolationTest extends TestCase
 {

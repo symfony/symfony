@@ -106,7 +106,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
         $object = new ComparisonTest_Class(null);
         $this->setObject($object);
 
-        $this->validator->validate(5, $constraint);
+        $this->validate(5, $constraint);
 
         $this->buildViolation('Constraint Message')
             ->setParameter('{{ value }}', '5')
@@ -121,7 +121,7 @@ class IdenticalToValidatorTest extends AbstractComparisonValidatorTestCase
     {
         $this->setObject(new TypedDummy());
 
-        $this->validator->validate(5, $this->createConstraint([
+        $this->validate(5, $this->createConstraint([
             'message' => 'Constraint Message',
             'propertyPath' => 'value',
         ]));

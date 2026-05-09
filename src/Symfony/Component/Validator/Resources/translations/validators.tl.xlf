@@ -192,7 +192,7 @@
             </trans-unit>
             <trans-unit id="51" resname="No temporary folder was configured in php.ini.">
                 <source>No temporary folder was configured in php.ini, or the configured folder does not exist.</source>
-                <target state="needs-review-translation">Walang pansamantalang folder na na-configure sa php.ini, o ang naka-configure na folder ay hindi naroroon.</target>
+                <target>Walang pansamantalang folder na na-configure sa php.ini, o hindi umiiral ang na-configure na folder.</target>
             </trans-unit>
             <trans-unit id="52">
                 <source>Cannot write temporary file to disk.</source>
@@ -468,91 +468,91 @@
             </trans-unit>
             <trans-unit id="121">
                 <source>This value is not a valid Twig template.</source>
-                <target state="needs-review-translation">Ang halagang ito ay hindi isang balidong Twig template.</target>
+                <target>Ang halagang ito ay hindi wastong Twig template.</target>
             </trans-unit>
             <trans-unit id="122">
                 <source>This file is not a valid video.</source>
-                <target state="needs-review-translation">Ang file na ito ay hindi isang wastong video.</target>
+                <target>Ang file na ito ay hindi wastong video.</target>
             </trans-unit>
             <trans-unit id="123">
                 <source>The size of the video could not be detected.</source>
-                <target state="needs-review-translation">Hindi matukoy ang laki ng video.</target>
+                <target>Hindi matukoy ang laki ng video.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target state="needs-review-translation">Masyadong malaki ang lapad ng video ({{ width }}px). Ang pinahihintulutang pinakamaksimum na lapad ay {{ max_width }}px.</target>
+                <target>Masyadong malaki ang lapad ng video ({{ width }}px). Ang pinakamalaking pinapayagang lapad ay {{ max_width }}px.</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target state="needs-review-translation">Masyadong maliit ang lapad ng video ({{ width }}px). Inaasahang minimum na lapad ay {{ min_width }}px.</target>
+                <target>Masyadong maliit ang lapad ng video ({{ width }}px). Ang inaasahang pinakamababang lapad ay {{ min_width }}px.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target state="needs-review-translation">Sobrang taas ng video ({{ height }}px). Ang pinapahintulutang pinakamataas na taas ay {{ max_height }}px.</target>
+                <target>Masyadong malaki ang taas ng video ({{ height }}px). Ang pinakamalaking pinapayagang taas ay {{ max_height }}px.</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target state="needs-review-translation">Masyadong maliit ang taas ng video ({{ height }}px). Inaasahang pinakamababang taas ay {{ min_height }}px.</target>
+                <target>Masyadong maliit ang taas ng video ({{ height }}px). Ang inaasahang pinakamababang taas ay {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">Ang video ay may masyadong kaunting pixel ({{ pixels }}). Ang inaasahang pinakamababang dami ay {{ min_pixels }}.</target>
+                <target>Masyadong kakaunti ang mga pixel ng video ({{ pixels }}). Ang inaasahang pinakamababang bilang ay {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">Ang video ay may masyadong maraming pixel ({{ pixels }}). Ang inaasahang pinakamataas na bilang ay {{ max_pixels }}.</target>
+                <target>Masyadong marami ang mga pixel ng video ({{ pixels }}). Ang inaasahang pinakamataas na bilang ay {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target state="needs-review-translation">Masyadong malaki ang ratio ng video ({{ ratio }}). Ang pinahihintulutang pinakamataas na ratio ay {{ max_ratio }}.</target>
+                <target>Masyadong malaki ang ratio ng video ({{ ratio }}). Ang pinakamalaking pinapayagang ratio ay {{ max_ratio }}.</target>
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target state="needs-review-translation">Masyadong maliit ang ratio ng video ({{ ratio }}). Ang inaasahang minimum na ratio ay {{ min_ratio }}.</target>
+                <target>Masyadong maliit ang ratio ng video ({{ ratio }}). Ang inaasahang pinakamababang ratio ay {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
-                <target state="needs-review-translation">Ang video ay parisukat ({{ width }}x{{ height }}px). Hindi pinapayagan ang mga parisukat na video.</target>
+                <target>Parisukat ang video ({{ width }}x{{ height }}px). Hindi pinapayagan ang mga parisukat na video.</target>
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target state="needs-review-translation">Ang video ay nasa landscape na oryentasyon ({{ width }}x{{ height }} px). Hindi pinapayagan ang mga landscape na video.</target>
+                <target>Naka-landscape ang video ({{ width }}x{{ height }}px). Hindi pinapayagan ang mga video na naka-landscape.</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target state="needs-review-translation">Ang video ay naka-portrait ({{ width }}x{{ height }}px). Hindi pinapayagan ang mga video na naka-portrait.</target>
+                <target>Naka-portrait ang video ({{ width }}x{{ height }}px). Hindi pinapayagan ang mga video na naka-portrait.</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
-                <target state="needs-review-translation">Sira ang file ng video.</target>
+                <target>Sira ang video file.</target>
             </trans-unit>
             <trans-unit id="136">
                 <source>The video contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">May ilang stream ang video. Isa lamang na stream ang pinapayagan.</target>
+                <target>Maraming stream ang video. Iisang stream lamang ang pinapayagan.</target>
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target state="needs-review-translation">Hindi suportadong video codec "{{ codec }}".</target>
+                <target>Hindi suportadong video codec "{{ codec }}".</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target state="needs-review-translation">Hindi suportadong lalagyan ng video "{{ container }}".</target>
+                <target>Hindi suportadong video container "{{ container }}".</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
-                <target state="needs-review-translation">Ang file ng larawan ay sira.</target>
+                <target>Sira ang file ng larawan.</target>
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">Masyadong kaunti ang pixel ng larawan ({{ pixels }}). Ang inaasahang pinakamababang dami ay {{ min_pixels }}.</target>
+                <target>Masyadong kakaunti ang mga pixel ng larawan ({{ pixels }}). Ang inaasahang pinakamababang bilang ay {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">Ang larawan ay may sobrang daming pixel ({{ pixels }}). Ang inaasahang pinakamataas na dami ay {{ max_pixels }}.</target>
+                <target>Masyadong marami ang mga pixel ng larawan ({{ pixels }}). Ang inaasahang pinakamataas na bilang ay {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
-                <target state="needs-review-translation">Ang pangalan ng file na ito ay hindi tumutugma sa inaasahang hanay ng mga character.</target>
+                <target>Ang pangalan ng file na ito ay hindi tumutugma sa inaasahang charset.</target>
             </trans-unit>
         </body>
     </file>

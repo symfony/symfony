@@ -64,12 +64,14 @@ final class LockRegistry
     /**
      * Defines a set of existing files that will be used as keys to acquire locks.
      *
-     * @return array The previously defined set of files
+     * @param list<string> $files A list of existing files
+     *
+     * @return list<string> The previously defined set of files
      */
     public static function setFiles(array $files): array
     {
         $previousFiles = self::$files;
-        self::$files = $files;
+        self::$files = array_values($files);
 
         foreach (self::$openedFiles as $file) {
             if ($file) {
@@ -82,6 +84,10 @@ final class LockRegistry
         return $previousFiles;
     }
 
+    /**
+     * @param-immediately-invoked-callable $callback
+     * @param-immediately-invoked-callable $setMetadata
+     */
     public static function compute(callable $callback, ItemInterface $item, bool &$save, CacheInterface $pool, ?\Closure $setMetadata = null, ?LoggerInterface $logger = null, ?float $beta = null): mixed
     {
         if ('\\' === \DIRECTORY_SEPARATOR && null === self::$lockedFiles) {
@@ -122,14 +128,33 @@ final class LockRegistry
                 }
                 // if we failed the race, retry locking in blocking mode to wait for the winner
                 $logger?->info('Item "{key}" is locked, waiting for it to be released', ['key' => $item->getKey()]);
-                flock($lock, \LOCK_SH);
+
+                $deadline = microtime(true) + 30.0;
+                $acquired = false;
+                do {
+                    if ($acquired = flock($lock, \LOCK_SH | \LOCK_NB)) {
+                        break;
+                    }
+                    usleep(100_000);
+                } while (microtime(true) < $deadline);
+
+                if (!$acquired) {
+                    $logger?->warning('Lock on item "{key}" timed out, evicting slot', ['key' => $item->getKey()]);
+                    unset(self::$files[$key]);
+                    self::setFiles(self::$files);
+                    $lock = null;
+
+                    return self::compute($callback, $item, $save, $pool, $setMetadata, $logger, $beta);
+                }
 
                 if (\INF === $beta) {
                     $logger?->info('Force-recomputing item "{key}"', ['key' => $item->getKey()]);
                     continue;
                 }
             } finally {
-                flock($lock, \LOCK_UN);
+                if ($lock) {
+                    flock($lock, \LOCK_UN);
+                }
                 unset(self::$lockedFiles[$key]);
             }
 

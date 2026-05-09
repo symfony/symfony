@@ -16,6 +16,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Dotenv\Exception\FormatException;
 use Symfony\Component\Dotenv\Exception\PathException;
+use Symfony\Component\Dotenv\Exception\VariableCircularReferenceException;
 
 class DotenvTest extends TestCase
 {
@@ -51,7 +52,7 @@ class DotenvTest extends TestCase
             ['FOO=$(echo foo'."\n", "Missing closing parenthesis. in \".env\" at line 1.\n...FOO=$(echo foo\\n...\n                ^ line 1 offset 14"],
             ["FOO=\nBAR=\${FOO:-\'a{a}a}", "Unsupported character \"'\" found in the default value of variable \"\$FOO\". in \".env\" at line 2.\n...\\nBAR=\${FOO:-\'a{a}a}...\n                       ^ line 2 offset 24"],
             ["FOO=\nBAR=\${FOO:-a\$a}", "Unsupported character \"\$\" found in the default value of variable \"\$FOO\". in \".env\" at line 2.\n...FOO=\\nBAR=\${FOO:-a\$a}...\n                       ^ line 2 offset 20"],
-            ["FOO=\nBAR=\${FOO:-a\"a}", "Unclosed braces on variable expansion in \".env\" at line 2.\n...FOO=\\nBAR=\${FOO:-a\"a}...\n                    ^ line 2 offset 17"],
+            ["FOO=\nBAR=\${FOO:-a\"a}", "Missing quote to end the value in \".env\" at line 2.\n...FOO=\\nBAR=\${FOO:-a\"a}...\n                       ^ line 2 offset 20"],
             ['_=FOO', "Invalid character in variable name in \".env\" at line 1.\n..._=FOO...\n  ^ line 1 offset 0"],
         ];
 
@@ -234,6 +235,41 @@ class DotenvTest extends TestCase
         $this->assertSame('BAZ', $bar);
     }
 
+    public function testLoadDoesNotReResolveAlreadyLoadedVars()
+    {
+        unset($_ENV['FOO'], $_ENV['BAR'], $_ENV['SYMFONY_DOTENV_VARS']);
+        unset($_SERVER['FOO'], $_SERVER['BAR'], $_SERVER['SYMFONY_DOTENV_VARS']);
+        putenv('FOO');
+        putenv('BAR');
+        putenv('SYMFONY_DOTENV_VARS');
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+
+        $path1 = tempnam($tmpdir, 'sf-');
+        $path2 = tempnam($tmpdir, 'sf-');
+
+        file_put_contents($path1, "FOO='This\$isokay'");
+        file_put_contents($path2, "BAR='hello'");
+
+        try {
+            (new Dotenv())->load($path1);
+            $this->assertSame('This$isokay', $_ENV['FOO']);
+
+            (new Dotenv())->load($path2);
+            $this->assertSame('This$isokay', $_ENV['FOO']);
+            $this->assertSame('hello', $_ENV['BAR']);
+        } finally {
+            unset($_ENV['FOO'], $_ENV['BAR'], $_ENV['SYMFONY_DOTENV_VARS']);
+            unset($_SERVER['FOO'], $_SERVER['BAR'], $_SERVER['SYMFONY_DOTENV_VARS']);
+            putenv('FOO');
+            putenv('BAR');
+            putenv('SYMFONY_DOTENV_VARS');
+            unlink($path1);
+            unlink($path2);
+            rmdir($tmpdir);
+        }
+    }
+
     public function testLoadEnv()
     {
         $resetContext = static function (): void {
@@ -357,6 +393,384 @@ class DotenvTest extends TestCase
         $resetContext();
         unset($_ENV['EXISTING_KEY'], $_SERVER['EXISTING_KEY']);
         putenv('EXISTING_KEY');
+        rmdir($tmpdir);
+    }
+
+    public function testLoadEnvResolvesVariablesFromOverriddenFiles()
+    {
+        $resetContext = static function (): void {
+            unset($_ENV['SYMFONY_DOTENV_VARS'], $_ENV['REDIS_HOST'], $_ENV['LOCK_DSN'], $_ENV['HOST'], $_ENV['DSN'], $_ENV['FOO'], $_ENV['BAR'], $_ENV['DATABASE_URL'], $_ENV['TEST_APP_ENV']);
+            unset($_SERVER['SYMFONY_DOTENV_VARS'], $_SERVER['REDIS_HOST'], $_SERVER['LOCK_DSN'], $_SERVER['HOST'], $_SERVER['DSN'], $_SERVER['FOO'], $_SERVER['BAR'], $_SERVER['DATABASE_URL'], $_SERVER['TEST_APP_ENV']);
+            putenv('SYMFONY_DOTENV_VARS');
+            putenv('REDIS_HOST');
+            putenv('LOCK_DSN');
+            putenv('HOST');
+            putenv('DSN');
+            putenv('FOO');
+            putenv('BAR');
+            putenv('DATABASE_URL');
+            putenv('TEST_APP_ENV');
+        };
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $path = tempnam($tmpdir, 'sf-');
+
+        // .env defines REDIS_HOST and LOCK_DSN referencing it
+        file_put_contents($path, "REDIS_HOST=localhost\nLOCK_DSN=redis://\${REDIS_HOST}");
+        // .env.local overrides REDIS_HOST
+        file_put_contents("$path.local", 'REDIS_HOST=aaa');
+
+        $resetContext();
+        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('aaa', getenv('REDIS_HOST'));
+        $this->assertSame('redis://aaa', getenv('LOCK_DSN'));
+
+        // backslash + variable in double-quoted value must resolve correctly
+        file_put_contents($path, "HOST=localhost\nDSN=\"path\\\\\${HOST}\"");
+        file_put_contents("$path.local", 'HOST=override');
+
+        $resetContext();
+        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('override', getenv('HOST'));
+        $this->assertSame('path\\override', getenv('DSN'));
+
+        // single-quoted $ must stay literal and not be resolved
+        file_put_contents($path, "BAR=hello\nFOO='\$BAR'");
+        file_put_contents("$path.local", 'BAR=world');
+
+        $resetContext();
+        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('$BAR', getenv('FOO'));
+        $this->assertSame('world', getenv('BAR'));
+
+        // escaped $ in double-quoted value must stay literal during deferred resolution
+        file_put_contents($path, 'FOO="\$2y\$10\$AAAAAAAAAAAAAAAAAAAAAAAAAA.BBBBBBBBBBBBBBBBBBBBBB"');
+        file_put_contents("$path.local", 'BAR=dummy');
+
+        $resetContext();
+        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('$2y$10$AAAAAAAAAAAAAAAAAAAAAAAAAA.BBBBBBBBBBBBBBBBBBBBBB', getenv('FOO'));
+
+        // escaped $ in unquoted value must stay literal during deferred resolution
+        file_put_contents($path, 'FOO=\$2y\$10\$AAAAAAAAAAAAAAAAAAAAAAAAAA.BBBBBBBBBBBBBBBBBBBBBB');
+        file_put_contents("$path.local", 'BAR=dummy');
+
+        $resetContext();
+        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('$2y$10$AAAAAAAAAAAAAAAAAAAAAAAAAA.BBBBBBBBBBBBBBBBBBBBBB', getenv('FOO'));
+
+        // double backslash in unquoted value without $ must be unescaped during deferred resolution
+        file_put_contents($path, 'DATABASE_URL=sqlsrv://user:pass@localhost\\\\SQLEXPRESS/db');
+        file_put_contents("$path.local", 'BAR=dummy');
+
+        $resetContext();
+        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('sqlsrv://user:pass@localhost\\SQLEXPRESS/db', getenv('DATABASE_URL'));
+
+        // double backslash + variable in cross-file resolution must not double-unescape
+        file_put_contents($path, "HOST=localhost\nDSN=\"path\\\\\\\\:\${HOST}\"");
+        file_put_contents("$path.local", 'HOST=override');
+
+        $resetContext();
+        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('path\\\\:override', getenv('DSN'));
+
+        $resetContext();
+        unlink("$path.local");
+        unlink($path);
+        rmdir($tmpdir);
+    }
+
+    public function testLoadMultiplePathsResolvesVariables()
+    {
+        unset($_ENV['SYMFONY_DOTENV_VARS'], $_ENV['HOST'], $_ENV['URL']);
+        unset($_SERVER['SYMFONY_DOTENV_VARS'], $_SERVER['HOST'], $_SERVER['URL']);
+        putenv('SYMFONY_DOTENV_VARS');
+        putenv('HOST');
+        putenv('URL');
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $path1 = tempnam($tmpdir, 'sf-');
+        $path2 = tempnam($tmpdir, 'sf-');
+
+        file_put_contents($path1, "HOST=localhost\nURL=http://\${HOST}");
+        file_put_contents($path2, 'HOST=production');
+
+        (new Dotenv())->usePutenv()->load($path1, $path2);
+
+        $this->assertSame('production', getenv('HOST'));
+        $this->assertSame('http://production', getenv('URL'));
+
+        putenv('SYMFONY_DOTENV_VARS');
+        putenv('HOST');
+        putenv('URL');
+        unlink($path1);
+        unlink($path2);
+        rmdir($tmpdir);
+    }
+
+    public function testLoadEnvResolvesCommandsWithOverriddenVars()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test cannot be run on Windows.');
+        }
+
+        $resetContext = static function (): void {
+            unset($_ENV['SYMFONY_DOTENV_VARS'], $_ENV['HOST'], $_ENV['RESOLVED'], $_ENV['TEST_APP_ENV']);
+            unset($_SERVER['SYMFONY_DOTENV_VARS'], $_SERVER['HOST'], $_SERVER['RESOLVED'], $_SERVER['TEST_APP_ENV']);
+            putenv('SYMFONY_DOTENV_VARS');
+            putenv('HOST');
+            putenv('RESOLVED');
+            putenv('TEST_APP_ENV');
+        };
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $path = tempnam($tmpdir, 'sf-');
+
+        file_put_contents($path, "HOST=original\nRESOLVED=\"\$(echo \${HOST})\"");
+        file_put_contents("$path.local", 'HOST=overridden');
+
+        $resetContext();
+        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('overridden', getenv('HOST'));
+        $this->assertSame('overridden', getenv('RESOLVED'));
+
+        $resetContext();
+        unlink("$path.local");
+        unlink($path);
+        rmdir($tmpdir);
+    }
+
+    public function testLoadEnvResolvesUnquotedCommandsWithOverriddenVars()
+    {
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $this->markTestSkipped('This test cannot be run on Windows.');
+        }
+
+        $resetContext = static function (): void {
+            unset($_ENV['SYMFONY_DOTENV_VARS'], $_ENV['HOST'], $_ENV['RESOLVED'], $_ENV['TEST_APP_ENV']);
+            unset($_SERVER['SYMFONY_DOTENV_VARS'], $_SERVER['HOST'], $_SERVER['RESOLVED'], $_SERVER['TEST_APP_ENV']);
+        };
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $path = tempnam($tmpdir, 'sf-');
+
+        file_put_contents($path, "HOST=original\nRESOLVED=\$(echo \${HOST})");
+        file_put_contents("$path.local", 'HOST=overridden');
+
+        $resetContext();
+        (new Dotenv())->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('overridden', $_ENV['HOST']);
+        $this->assertSame('overridden', $_ENV['RESOLVED']);
+
+        $resetContext();
+        unlink("$path.local");
+        unlink($path);
+        rmdir($tmpdir);
+    }
+
+    public function testLoadEnvSelfReferencingVariableWithDefault()
+    {
+        $resetContext = static function (): void {
+            unset($_ENV['SYMFONY_DOTENV_VARS'], $_ENV['MY_VAR'], $_ENV['TEST_APP_ENV']);
+            unset($_SERVER['SYMFONY_DOTENV_VARS'], $_SERVER['MY_VAR'], $_SERVER['TEST_APP_ENV']);
+            putenv('SYMFONY_DOTENV_VARS');
+            putenv('MY_VAR');
+            putenv('TEST_APP_ENV');
+        };
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $path = tempnam($tmpdir, 'sf-');
+
+        // Self-referencing variable with default value
+        file_put_contents($path, 'MY_VAR="${MY_VAR:-default_value}"');
+
+        $resetContext();
+        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('default_value', getenv('MY_VAR'));
+
+        // When host env is set, it should take precedence
+        $resetContext();
+        putenv('MY_VAR=host_value');
+        $_ENV['MY_VAR'] = 'host_value';
+        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('host_value', getenv('MY_VAR'));
+
+        // Self-referencing variable with := (assign default)
+        file_put_contents($path, 'MY_VAR="${MY_VAR:=fallback}"');
+
+        $resetContext();
+        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('fallback', getenv('MY_VAR'));
+
+        $resetContext();
+        putenv('MY_VAR');
+        unlink($path);
+        @rmdir($tmpdir);
+    }
+
+    public function testLoadSelfReferencingVariableWithSuffix()
+    {
+        $resetContext = static function (): void {
+            unset($_ENV['SYMFONY_DOTENV_VARS'], $_ENV['MY_VAR']);
+            unset($_SERVER['SYMFONY_DOTENV_VARS'], $_SERVER['MY_VAR']);
+            putenv('SYMFONY_DOTENV_VARS');
+            putenv('MY_VAR');
+        };
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $basePath = tempnam($tmpdir, 'sf-');
+        $overridePath = tempnam($tmpdir, 'sf-');
+
+        // Base file sets original value, override file appends suffix
+        file_put_contents($basePath, 'MY_VAR=original');
+        file_put_contents($overridePath, 'MY_VAR="${MY_VAR}_suffix"');
+
+        $resetContext();
+        $dotenv = (new Dotenv())->usePutenv();
+        $dotenv->load($basePath);
+        $dotenv->load($overridePath);
+
+        $this->assertSame('original_suffix', getenv('MY_VAR'));
+
+        // Test with prefix instead of suffix
+        file_put_contents($overridePath, 'MY_VAR="prefix_${MY_VAR}"');
+
+        $resetContext();
+        $dotenv = (new Dotenv())->usePutenv();
+        $dotenv->load($basePath);
+        $dotenv->load($overridePath);
+
+        $this->assertSame('prefix_original', getenv('MY_VAR'));
+
+        // Test chained loads (three files)
+        $thirdPath = tempnam($tmpdir, 'sf-');
+        file_put_contents($overridePath, 'MY_VAR="${MY_VAR}_middle"');
+        file_put_contents($thirdPath, 'MY_VAR="${MY_VAR}_end"');
+
+        $resetContext();
+        $dotenv = (new Dotenv())->usePutenv();
+        $dotenv->load($basePath);
+        $dotenv->load($overridePath);
+        $dotenv->load($thirdPath);
+
+        $this->assertSame('original_middle_end', getenv('MY_VAR'));
+
+        $resetContext();
+        unlink($basePath);
+        unlink($overridePath);
+        unlink($thirdPath);
+        @rmdir($tmpdir);
+    }
+
+    public function testLoadEnvSelfReferencingEnvKeyControlsFileLoading()
+    {
+        $resetContext = static function (): void {
+            unset($_ENV['SYMFONY_DOTENV_VARS'], $_ENV['TEST_APP_ENV'], $_ENV['FOO']);
+            unset($_SERVER['SYMFONY_DOTENV_VARS'], $_SERVER['TEST_APP_ENV'], $_SERVER['FOO']);
+            putenv('SYMFONY_DOTENV_VARS');
+            putenv('TEST_APP_ENV');
+            putenv('FOO');
+        };
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $path = tempnam($tmpdir, 'sf-');
+
+        // APP_ENV with self-referencing default must control which .env files are loaded
+        file_put_contents($path, 'TEST_APP_ENV="${TEST_APP_ENV:-dev}"'."\nFOO=bar");
+        file_put_contents("$path.dev", 'FOO=devbar');
+
+        $resetContext();
+        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('dev', getenv('TEST_APP_ENV'));
+        $this->assertSame('devbar', getenv('FOO'));
+
+        // Host env should override the default and control file loading
+        $resetContext();
+        file_put_contents("$path.prod", 'FOO=prodbar');
+        putenv('TEST_APP_ENV=prod');
+        $_ENV['TEST_APP_ENV'] = 'prod';
+        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('prod', getenv('TEST_APP_ENV'));
+        $this->assertSame('prodbar', getenv('FOO'));
+
+        $resetContext();
+        putenv('TEST_APP_ENV');
+        @unlink("$path.dev");
+        @unlink("$path.prod");
+        unlink($path);
+        @rmdir($tmpdir);
+    }
+
+    public function testLoadEnvThrowsOnCircularVariableReferences()
+    {
+        $resetContext = static function (): void {
+            unset($_ENV['SYMFONY_DOTENV_VARS'], $_ENV['A'], $_ENV['B'], $_ENV['TEST_APP_ENV']);
+            unset($_SERVER['SYMFONY_DOTENV_VARS'], $_SERVER['A'], $_SERVER['B'], $_SERVER['TEST_APP_ENV']);
+        };
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $path1 = tempnam($tmpdir, 'sf-');
+        $path2 = tempnam($tmpdir, 'sf-');
+
+        // Mutual references that grow each pass — never stabilize
+        file_put_contents($path1, 'A=${B}x');
+        file_put_contents($path2, 'B=${A}y');
+
+        $resetContext();
+        try {
+            $this->expectException(VariableCircularReferenceException::class);
+            $this->expectExceptionMessage('Too many levels of variable indirection');
+            (new Dotenv())->load($path1, $path2);
+        } finally {
+            $resetContext();
+            unlink($path1);
+            unlink($path2);
+            rmdir($tmpdir);
+        }
+    }
+
+    public function testLoadEnvUnquotedSpaceWithVariableDoesNotThrow()
+    {
+        $resetContext = static function (): void {
+            unset($_ENV['SYMFONY_DOTENV_VARS'], $_ENV['PREFIX'], $_ENV['LABEL'], $_ENV['TEST_APP_ENV']);
+            unset($_SERVER['SYMFONY_DOTENV_VARS'], $_SERVER['PREFIX'], $_SERVER['LABEL'], $_SERVER['TEST_APP_ENV']);
+            putenv('SYMFONY_DOTENV_VARS');
+            putenv('PREFIX');
+            putenv('LABEL');
+            putenv('TEST_APP_ENV');
+        };
+
+        @mkdir($tmpdir = sys_get_temp_dir().'/dotenv');
+        $path = tempnam($tmpdir, 'sf-');
+
+        // Unquoted value with a space and a variable reference
+        file_put_contents($path, "PREFIX=hello\nLABEL=\${PREFIX} world");
+        file_put_contents("$path.local", 'PREFIX=overridden');
+
+        $resetContext();
+        (new Dotenv())->usePutenv()->loadEnv($path, 'TEST_APP_ENV');
+
+        $this->assertSame('overridden', getenv('PREFIX'));
+        $this->assertSame('overridden world', getenv('LABEL'));
+
+        $resetContext();
+        unlink("$path.local");
+        unlink($path);
         rmdir($tmpdir);
     }
 

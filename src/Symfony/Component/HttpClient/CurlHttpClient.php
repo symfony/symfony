@@ -385,6 +385,8 @@ final class CurlHttpClient implements HttpClientInterface, LoggerAwareInterface,
 
     /**
      * Wraps the request's body callback to allow it to return strings longer than curl requested.
+     *
+     * @param-immediately-invoked-callable $body
      */
     private static function readRequestBody(int $length, \Closure $body, string &$buffer, bool &$eof): string
     {

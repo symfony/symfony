@@ -11,12 +11,12 @@
 
 namespace Symfony\Component\JsonStreamer\Write;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\ConfigCacheFactoryInterface;
 use Symfony\Component\JsonStreamer\DataModel\Write\BackedEnumNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\CollectionNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\CompositeNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\DataModelNodeInterface;
-use Symfony\Component\JsonStreamer\DataModel\Write\DateTimeNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\ObjectNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\ScalarNode;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
@@ -46,6 +46,7 @@ final class StreamWriterGenerator
 
     public function __construct(
         private PropertyMetadataLoaderInterface $propertyMetadataLoader,
+        private ContainerInterface $transformers,
         private string $streamWritersDir,
         ?ConfigCacheFactoryInterface $cacheFactory = null,
     ) {
@@ -61,7 +62,7 @@ final class StreamWriterGenerator
     {
         $path = \sprintf('%s%s%s.json.php', $this->streamWritersDir, \DIRECTORY_SEPARATOR, hash('xxh128', (string) $type));
         $generateContent = function () use ($type, $options): string {
-            $this->phpGenerator ??= new PhpGenerator();
+            $this->phpGenerator ??= new PhpGenerator($this->transformers);
 
             return $this->phpGenerator->generate($this->createDataModel($type, '$data', $options), $options);
         };
@@ -75,7 +76,7 @@ final class StreamWriterGenerator
      * @param array<string, mixed> $options
      * @param array<string, mixed> $context
      */
-    private function createDataModel(Type $type, string $accessor, array $options = [], array $context = []): DataModelNodeInterface
+    private function createDataModel(Type $type, string $accessor, array $options = [], array &$context = []): DataModelNodeInterface
     {
         $context['original_type'] ??= $type;
         $context['depth'] ??= 0;
@@ -94,10 +95,6 @@ final class StreamWriterGenerator
 
         if ($type instanceof GenericType) {
             $type = $type->getWrappedType();
-        }
-
-        if ($type instanceof ObjectType && is_a($type->getClassName(), \DateTimeInterface::class, true)) {
-            return new DateTimeNode($accessor, $type);
         }
 
         if ($type instanceof ObjectType && !$type instanceof EnumType) {
@@ -124,7 +121,8 @@ final class StreamWriterGenerator
 
                 foreach ($propertyMetadata->getValueTransformers() as $valueTransformer) {
                     if (\is_string($valueTransformer)) {
-                        $valueTransformerServiceAccessor = "\$valueTransformers->get('$valueTransformer')";
+                        $valueTransformerServiceAccessor = "\$transformers->get('$valueTransformer')";
+
                         $propertyAccessor = "{$valueTransformerServiceAccessor}->transform($propertyAccessor, ['_current_object' => $accessor] + \$options)";
 
                         continue;
@@ -152,13 +150,15 @@ final class StreamWriterGenerator
 
         if ($type instanceof CollectionType) {
             ++$context['depth'];
-
-            return new CollectionNode(
+            $node = new CollectionNode(
                 $accessor,
                 $type,
                 $this->createDataModel($type->getCollectionValueType(), '$value'.$context['depth'], $options, $context),
                 $this->createDataModel($type->getCollectionKeyType(), '$key'.$context['depth'], $options, $context),
             );
+            --$context['depth'];
+
+            return $node;
         }
 
         throw new UnsupportedException(\sprintf('"%s" type is not supported.', (string) $type));

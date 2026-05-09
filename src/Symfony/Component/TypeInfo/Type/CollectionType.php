@@ -175,6 +175,9 @@ class CollectionType extends Type implements WrappingTypeInterface
         return $defaultCollectionValueType;
     }
 
+    /**
+     * @param-immediately-invoked-callable $specification
+     */
     public function wrappedTypeIsSatisfiedBy(callable $specification): bool
     {
         return $this->getWrappedType()->isSatisfiedBy($specification);

@@ -57,6 +57,13 @@ final class Ldap implements LdapInterface
         return $this->adapter->escape($subject, $ignore, $flags);
     }
 
+    public function reset(): void
+    {
+        if (method_exists($this->adapter, 'reset')) {
+            $this->adapter->reset();
+        }
+    }
+
     /**
      * Creates a new Ldap instance.
      *

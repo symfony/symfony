@@ -21,7 +21,7 @@ class ProjectServiceContainer extends \Symfony\Component\DependencyInjection\Tes
     public function __construct()
     {
         parent::__construct();
-        $this->parameterBag = null;
+        unset($this->parameterBag);
 
         $this->services = $this->privates = [];
 
@@ -36,5 +36,56 @@ class ProjectServiceContainer extends \Symfony\Component\DependencyInjection\Tes
     public function isCompiled(): bool
     {
         return true;
+    }
+
+    public function getParameter(string $name): array|bool|string|int|float|\UnitEnum|null
+    {
+        if (isset($this->loadedDynamicParameters[$name])) {
+            $value = $this->loadedDynamicParameters[$name] ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
+        } elseif (\array_key_exists($name, $this->parameters) && '.' !== ($name[0] ?? '')) {
+            $value = $this->parameters[$name];
+        } else {
+            throw new ParameterNotFoundException($name);
+        }
+
+        return $value;
+    }
+
+    public function hasParameter(string $name): bool
+    {
+        return \array_key_exists($name, $this->parameters) || isset($this->loadedDynamicParameters[$name]);
+    }
+
+    public function setParameter(string $name, $value): void
+    {
+        throw new LogicException('Impossible to call set() on a frozen ParameterBag.');
+    }
+
+    public function getParameterBag(): ParameterBagInterface
+    {
+        if (!isset($this->parameterBag)) {
+            $parameters = $this->parameters;
+            foreach ($this->loadedDynamicParameters as $name => $loaded) {
+                $parameters[$name] = $loaded ? $this->dynamicParameters[$name] : $this->getDynamicParameter($name);
+            }
+            $this->parameterBag = new FrozenParameterBag($parameters, []);
+        }
+
+        return $this->parameterBag;
+    }
+
+    private $loadedDynamicParameters = [];
+    private $dynamicParameters = [];
+
+    private function getDynamicParameter(string $name)
+    {
+        throw new ParameterNotFoundException($name);
+    }
+
+    protected function getDefaultParameters(): array
+    {
+        return [
+
+        ];
     }
 }

@@ -528,10 +528,11 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->method('findRootImportMapEntry')
             ->with('@popperjs/core')
             ->willReturn(ImportMapEntry::createRemote('@popperjs/core', ImportMapType::JS, './vendor/@popperjs/core.js', '1.2.3', 'could_be_anything', false));
-        $importMapConfigReader->expects($this->any())
+        $importMapConfigReader
             ->method('convertPathToFilesystemPath')
-            ->with('./vendor/@popperjs/core.js')
-            ->willReturn('/path/to/vendor/@popperjs/core.js');
+            ->willReturnMap([
+                ['./vendor/@popperjs/core.js', '/path/to/vendor/@popperjs/core.js'],
+            ]);
 
         $assetMapper = $this->createMock(AssetMapperInterface::class);
         $assetMapper->expects($this->once())
@@ -555,10 +556,11 @@ class JavaScriptImportPathCompilerTest extends TestCase
             ->method('findRootImportMapEntry')
             ->with('foobar')
             ->willReturn(ImportMapEntry::createRemote('foobar', ImportMapType::JS, 'foo.js', '1.2.3', 'foobar', false));
-        $importMapConfigReader->expects($this->any())
+        $importMapConfigReader
             ->method('convertPathToFilesystemPath')
-            ->with('foo.js')
-            ->willReturn('foo.js');
+            ->willReturnMap([
+                ['foo.js', 'foo.js'],
+            ]);
 
         $assetMapper = $this->createMock(AssetMapperInterface::class);
         $assetMapper->expects($this->once())

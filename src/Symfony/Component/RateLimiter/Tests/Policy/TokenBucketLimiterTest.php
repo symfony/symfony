@@ -104,6 +104,35 @@ class TokenBucketLimiterTest extends TestCase
         $this->assertSame(10, $rateLimit->getLimit());
     }
 
+    public function testConsumeLastToken()
+    {
+        $rate = Rate::perSecond(1);
+        $limiter = $this->createLimiter(10, $rate);
+
+        $rateLimit = $limiter->consume(10);
+        $this->assertSame(0, $rateLimit->getRemainingTokens());
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEqualsWithDelta(time(), $rateLimit->getRetryAfter()->getTimestamp(), 10);
+    }
+
+    public function testConsumeZeroTokens()
+    {
+        $rate = Rate::perSecond(1);
+        $limiter = $this->createLimiter(10, $rate);
+
+        $rateLimit = $limiter->consume(0);
+        $this->assertTrue($rateLimit->isAccepted());
+        $this->assertEquals(time(), $rateLimit->getRetryAfter()->getTimestamp());
+
+        $limiter->reset();
+        $limiter->consume(10);
+
+        $rateLimit = $limiter->consume(0);
+        $this->assertTrue($rateLimit->isAccepted());
+        // no tokens available, retryAfter should point to when the next token regenerates
+        $this->assertEqualsWithDelta(time() + 1, $rateLimit->getRetryAfter()->getTimestamp(), 1);
+    }
+
     public function testWaitIntervalOnConsumeOverLimit()
     {
         $limiter = $this->createLimiter();
@@ -173,6 +202,10 @@ class TokenBucketLimiterTest extends TestCase
     {
         $limiter = $this->createLimiter();
 
+        // negative consume without previous hits should have no effect
+        $rateLimit = $limiter->consume(-1);
+        $this->assertEquals(10, $rateLimit->getRemainingTokens());
+
         $limiter->consume(10);
 
         for ($i = 1; $i <= 3; ++$i) {
@@ -206,6 +239,21 @@ class TokenBucketLimiterTest extends TestCase
                 $expected = 999;
             }
         }
+    }
+
+    public function testReservationDebtSurvivesCacheExpiration()
+    {
+        $rate = new Rate(\DateInterval::createFromDateString('10 seconds'), 10);
+        $limiter = $this->createLimiter(10, $rate);
+
+        $limiter->consume(10);
+
+        $this->assertEquals(10, $limiter->reserve(1)->getWaitDuration());
+
+        sleep(11);
+
+        $this->assertEquals(0, $limiter->reserve(9)->getWaitDuration());
+        $this->assertEquals(10, $limiter->reserve(1)->getWaitDuration());
     }
 
     private function createLimiter($initialTokens = 10, ?Rate $rate = null)

@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\ValidatorBuilder;
 
 class UploadedFileValueResolverTest extends TestCase
@@ -235,6 +236,37 @@ class UploadedFileValueResolverTest extends TestCase
         $this->expectExceptionMessageMatches('/^The file is too large/');
 
         $resolver->onKernelControllerArguments($event);
+    }
+
+    #[DataProvider('provideContext')]
+    public function testConstraintsViolationHasArgumentNameAsPropertyPath(RequestPayloadValueResolver $resolver, Request $request)
+    {
+        $attribute = new MapUploadedFile(constraints: new Assert\File(maxSize: 50));
+        $argument = new ArgumentMetadata(
+            'bar',
+            UploadedFile::class,
+            false,
+            false,
+            null,
+            false,
+            [$attribute::class => $attribute]
+        );
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            static function () {},
+            $resolver->resolve($request, $argument),
+            $request,
+            HttpKernelInterface::MAIN_REQUEST
+        );
+
+        try {
+            $resolver->onKernelControllerArguments($event);
+            $this->fail(\sprintf('Expected "%s" to be thrown.', HttpException::class));
+        } catch (HttpException $e) {
+            $validationFailedException = $e->getPrevious();
+            $this->assertInstanceOf(ValidationFailedException::class, $validationFailedException);
+            $this->assertSame('bar', $validationFailedException->getViolations()[0]->getPropertyPath());
+        }
     }
 
     #[DataProvider('provideContext')]

@@ -51,9 +51,9 @@ class ImportMapGeneratorTest extends TestCase
     {
         $manager = $this->createImportMapGenerator();
         $this->mockImportMap([
-            ImportMapEntry::createLocal('entry1', ImportMapType::JS, path: '/any', isEntrypoint: true),
-            ImportMapEntry::createLocal('entry2', ImportMapType::JS, path: '/any', isEntrypoint: true),
-            ImportMapEntry::createLocal('not_entrypoint', ImportMapType::JS, path: '/any', isEntrypoint: false),
+            ImportMapEntry::createLocal('entry1', ImportMapType::JS, '/any', true),
+            ImportMapEntry::createLocal('entry2', ImportMapType::JS, '/any', true),
+            ImportMapEntry::createLocal('not_entrypoint', ImportMapType::JS, '/any', false),
         ]);
 
         $this->assertEquals(['entry1', 'entry2'], $manager->getEntrypointNames());
@@ -601,7 +601,7 @@ class ImportMapGeneratorTest extends TestCase
         $this->mockAssetMapper([$entryAsset, ...$mappedAssets]);
         // put the entry asset in the importmap
         $this->mockImportMap([
-            ImportMapEntry::createLocal('the_entrypoint_name', ImportMapType::JS, path: $entryAsset->logicalPath, isEntrypoint: true),
+            ImportMapEntry::createLocal('the_entrypoint_name', ImportMapType::JS, $entryAsset->logicalPath, true),
         ]);
 
         $this->assertEquals($expected, $manager->findEagerEntrypointImports('the_entrypoint_name'));
@@ -739,7 +739,7 @@ class ImportMapGeneratorTest extends TestCase
 
     private static function createLocalEntry(string $importName, string $path, ImportMapType $type = ImportMapType::JS, bool $isEntrypoint = false): ImportMapEntry
     {
-        return ImportMapEntry::createLocal($importName, $type, path: $path, isEntrypoint: $isEntrypoint);
+        return ImportMapEntry::createLocal($importName, $type, $path, $isEntrypoint);
     }
 
     private static function createRemoteEntry(string $importName, string $version, ?string $path = null, ImportMapType $type = ImportMapType::JS, ?string $packageSpecifier = null): ImportMapEntry
@@ -747,7 +747,7 @@ class ImportMapGeneratorTest extends TestCase
         $packageSpecifier ??= $importName;
         $path ??= '/vendor/any-path.js';
 
-        return ImportMapEntry::createRemote($importName, $type, path: $path, version: $version, packageModuleSpecifier: $packageSpecifier, isEntrypoint: false);
+        return ImportMapEntry::createRemote($importName, $type, $path, $version, $packageSpecifier, false);
     }
 
     /**

@@ -46,7 +46,7 @@ final class RateLimiterFactory implements RateLimiterFactoryInterface
 
         return match ($this->config['policy']) {
             'token_bucket' => new TokenBucketLimiter($id, $this->config['limit'], $this->config['rate'], $this->storage, $lock),
-            'fixed_window' => new FixedWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock),
+            'fixed_window' => new FixedWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock, $this->config['anchor_at']),
             'sliding_window' => new SlidingWindowLimiter($id, $this->config['limit'], $this->config['interval'], $this->storage, $lock),
             'no_limit' => new NoLimiter(),
             default => throw new \LogicException(\sprintf('Limiter policy "%s" does not exists, it must be either "token_bucket", "sliding_window", "fixed_window" or "no_limit".', $this->config['policy'])),
@@ -56,9 +56,9 @@ final class RateLimiterFactory implements RateLimiterFactoryInterface
     private static function configureOptions(OptionsResolver $options): void
     {
         $intervalNormalizer = static function (Options $options, string $interval): \DateInterval {
-            // Create DateTimeImmutable from unix timesatmp, so the default timezone is ignored and we don't need to
+            // Create DateTimeImmutable from unix timestamp, so the default timezone is ignored and we don't need to
             // deal with quirks happening when modifying dates using a timezone with DST.
-            $now = \DateTimeImmutable::createFromFormat('U', time());
+            $now = \DateTimeImmutable::createFromFormat('U', (string) time());
 
             try {
                 $nowPlusInterval = @$now->modify('+'.$interval);
@@ -94,6 +94,25 @@ final class RateLimiterFactory implements RateLimiterFactoryInterface
                     }
 
                     return new Rate($value['interval'], $value['amount']);
+                })
+            ->define('anchor_at')
+                ->default(null)
+                ->allowedTypes('null', 'string', \DateTimeInterface::class)
+                ->normalize(static function (Options $options, mixed $value): ?\DateTimeImmutable {
+                    if (null === $value) {
+                        return null;
+                    }
+                    if ('fixed_window' !== $options['policy']) {
+                        throw new \LogicException('The "anchor_at" option is only supported with the "fixed_window" policy.');
+                    }
+                    if ($value instanceof \DateTimeInterface) {
+                        return $value instanceof \DateTimeImmutable ? $value : \DateTimeImmutable::createFromInterface($value);
+                    }
+                    try {
+                        return new \DateTimeImmutable($value);
+                    } catch (\Exception $e) {
+                        throw new \LogicException(\sprintf('Cannot parse "anchor_at" value "%s".', $value), 0, $e);
+                    }
                 })
         ;
     }

@@ -78,4 +78,51 @@ class LdapTest extends TestCase
         $this->expectException(DriverNotFoundException::class);
         Ldap::create('foo');
     }
+
+    public function testResetDelegatesToAdapter()
+    {
+        $adapter = new class implements AdapterInterface {
+            public bool $resetCalled = false;
+
+            public function getConnection(): ConnectionInterface
+            {
+                throw new \BadMethodCallException();
+            }
+
+            public function createQuery(string $dn, string $query, array $options = []): QueryInterface
+            {
+                throw new \BadMethodCallException();
+            }
+
+            public function getEntryManager(): \Symfony\Component\Ldap\Adapter\EntryManagerInterface
+            {
+                throw new \BadMethodCallException();
+            }
+
+            public function escape(string $subject, string $ignore = '', int $flags = 0): string
+            {
+                throw new \BadMethodCallException();
+            }
+
+            public function reset(): void
+            {
+                $this->resetCalled = true;
+            }
+        };
+
+        $ldap = new Ldap($adapter);
+        $ldap->reset();
+
+        $this->assertTrue($adapter->resetCalled);
+    }
+
+    public function testResetWithAdapterWithoutResetMethod()
+    {
+        $adapter = $this->createStub(AdapterInterface::class);
+
+        $ldap = new Ldap($adapter);
+        $ldap->reset();
+
+        $this->addToAssertionCount(1);
+    }
 }

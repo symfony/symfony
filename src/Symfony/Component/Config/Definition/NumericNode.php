@@ -34,6 +34,10 @@ class NumericNode extends ScalarNode
     {
         $value = parent::finalizeValue($value);
 
+        if ($this->isHandlingPlaceholder()) {
+            return $value;
+        }
+
         $errorMsg = null;
         if (isset($this->min) && $value < $this->min) {
             $errorMsg = \sprintf('The value %s is too small for path "%s". Should be greater than or equal to %s', $value, $this->getPath(), $this->min);

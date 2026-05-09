@@ -190,7 +190,7 @@
 
 {% block menu %}
     <span class="label {{ not collector.firewall or not collector.token ? 'disabled' }}">
-        <span class="icon">{{ source('@Security/Collector/icon.svg') }}</span>
+        <span class="icon" aria-hidden="true">{{ source('@Security/Collector/icon.svg') }}</span>
         <strong>Security</strong>
     </span>
 {% endblock %}
@@ -534,7 +534,7 @@
                                     <tr class="voter_result">
                                         <td class="font-normal text-small text-muted nowrap">{{ loop.index }}</td>
                                         <td class="font-normal">
-                                            {% set result = decision.result|default(null) %}
+                                            {% set result = decision.result ?? null %}
                                             {% if result is same as(true) %}
                                                 <span class="label status-success same-width">GRANTED</span>
                                             {% elseif result is same as(false) %}

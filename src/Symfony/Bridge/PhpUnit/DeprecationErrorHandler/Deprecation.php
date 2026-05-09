@@ -336,6 +336,10 @@ class Deprecation
                             array_merge($loader->getPrefixes(), $loader->getPrefixesPsr4()),
                             $paths
                         );
+                        $paths = self::addSourcePathsFromPrefixes(
+                            ['fallback' => $loader->getFallbackDirs(), 'fallback_psr4' => $loader->getFallbackDirsPsr4()],
+                            $paths
+                        );
                     }
                 }
             }

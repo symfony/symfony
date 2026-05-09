@@ -22,5 +22,8 @@ class A
     #[Map(target: 'bar')]
     public string $something = 'test';
 
+    #[Map(target: 'otherFoo', transform: 'strtolower', if: new TargetClass([B::class, C::class]))]
+    public string $somethingOther = 'TESTOTHER';
+
     public string $doesNotExistInTargetB = 'foo';
 }

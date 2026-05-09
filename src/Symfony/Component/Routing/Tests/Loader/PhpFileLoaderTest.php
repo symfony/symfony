@@ -281,6 +281,37 @@ class PhpFileLoaderTest extends TestCase
         $this->assertEquals($expectedCollection, $routeCollection);
     }
 
+    public function testCollectionPrefixCanDisableTrailingSlashOnRoot()
+    {
+        $locator = new FileLocator([__DIR__.'/../Fixtures']);
+        $loader = new PhpFileLoader($locator);
+        $routeCollection = $loader->load('php_dsl_collection_prefix_no_trailing_slash.php');
+
+        $expectedCollection = new RouteCollection();
+        $expectedCollection->add('c_slash', new Route('/categories'));
+        $expectedCollection->add('c_empty', new Route('/categories'));
+        $expectedCollection->add('c_show', new Route('/categories/{id}'));
+        $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_collection_prefix_no_trailing_slash.php')));
+
+        $this->assertEquals($expectedCollection, $routeCollection);
+    }
+
+    public function testCollectionLocalizedPrefixCanDisableTrailingSlashOnRoot()
+    {
+        $locator = new FileLocator([__DIR__.'/../Fixtures']);
+        $loader = new PhpFileLoader($locator);
+        $routeCollection = $loader->load('php_dsl_collection_localized_prefix_no_trailing_slash.php');
+
+        $expectedCollection = new RouteCollection();
+        $expectedCollection->add('c_slash.en', (new Route('/categories'))->setDefaults(['_locale' => 'en', '_canonical_route' => 'c_slash'])->setRequirement('_locale', 'en'));
+        $expectedCollection->add('c_slash.fr', (new Route('/categorias'))->setDefaults(['_locale' => 'fr', '_canonical_route' => 'c_slash'])->setRequirement('_locale', 'fr'));
+        $expectedCollection->add('c_show.en', (new Route('/categories/{id}'))->setDefaults(['_locale' => 'en', '_canonical_route' => 'c_show'])->setRequirement('_locale', 'en'));
+        $expectedCollection->add('c_show.fr', (new Route('/categorias/{id}'))->setDefaults(['_locale' => 'fr', '_canonical_route' => 'c_show'])->setRequirement('_locale', 'fr'));
+        $expectedCollection->addResource(new FileResource(realpath(__DIR__.'/../Fixtures/php_dsl_collection_localized_prefix_no_trailing_slash.php')));
+
+        $this->assertEquals($expectedCollection, $routeCollection);
+    }
+
     public function testImportingRoutesWithHostsInImporter()
     {
         $loader = new PhpFileLoader(new FileLocator([__DIR__.'/../Fixtures/locale_and_host']));

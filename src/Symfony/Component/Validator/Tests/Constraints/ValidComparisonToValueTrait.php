@@ -20,7 +20,7 @@ trait ValidComparisonToValueTrait
     {
         $constraint = $this->createConstraint(['value' => $comparisonValue]);
 
-        $this->validator->validate($dirtyValue, $constraint);
+        $this->validate($dirtyValue, $constraint);
 
         $this->assertNoViolation();
     }

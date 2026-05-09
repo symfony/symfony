@@ -3,7 +3,7 @@
 /**
  * @param Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes|int|list<Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum> $data
  */
-return static function (mixed $data, \Psr\Container\ContainerInterface $valueTransformers, array $options): \Traversable {
+return static function (mixed $data, \Psr\Container\ContainerInterface $transformers, array $options): \Traversable {
     try {
         if (\is_array($data)) {
             yield "[";
@@ -28,6 +28,6 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $valueTra
             throw new \Symfony\Component\JsonStreamer\Exception\UnexpectedValueException(\sprintf('Unexpected "%s" value.', \get_debug_type($data)));
         }
     } catch (\JsonException $e) {
-        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException($e->getMessage(), 0, $e);
+        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException("Cannot encode \"Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithNameAttributes|int|list<Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Enum\\DummyBackedEnum>\" to JSON: {$e->getMessage()}.", 0, $e);
     }
 };

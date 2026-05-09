@@ -134,4 +134,13 @@ class MetadataBagTest extends TestCase
 
         $this->assertIsInt($bag->getLifetime());
     }
+
+    public function testCookieLifetimeFromConstructor()
+    {
+        $bag = new MetadataBag('_sf2_meta', 0, 60);
+        $sessionMetadata = [];
+        $bag->initialize($sessionMetadata);
+
+        $this->assertSame(60, $bag->getLifetime());
+    }
 }

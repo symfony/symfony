@@ -461,7 +461,7 @@ class PhpStanExtractorTest extends TestCase
     #[DataProvider('allowPrivateAccessProvider')]
     public function testAllowPrivateAccess(bool $allowPrivateAccess, Type $expectedType)
     {
-        $extractor = new PhpStanExtractor(allowPrivateAccess: $allowPrivateAccess);
+        $extractor = new PhpStanExtractor(null, null, null, $allowPrivateAccess);
 
         $this->assertEquals($expectedType, $extractor->getType(DummyPropertyAndGetterWithDifferentTypes::class, 'foo'));
     }
@@ -477,7 +477,7 @@ class PhpStanExtractorTest extends TestCase
     public function testGenericInterface()
     {
         $this->assertEquals(
-            Type::generic(Type::enum(\BackedEnum::class), Type::string()),
+            Type::generic(Type::object(\BackedEnum::class), Type::string()),
             $this->extractor->getType(Dummy::class, 'genericInterface'),
         );
     }

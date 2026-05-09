@@ -63,7 +63,6 @@ final class CrowdinProvider implements ProviderInterface
                 }
 
                 $content = $this->xliffFileDumper->formatCatalogue($catalogue, $domain, ['default_locale' => $this->defaultLocale]);
-
                 $fileId = $this->getFileIdByDomain($fileList, $domain);
 
                 if ($catalogue->getLocale() === $this->defaultLocale) {
@@ -102,18 +101,60 @@ final class CrowdinProvider implements ProviderInterface
                         continue;
                     }
 
-                    $responses[] = $this->uploadTranslations($fileId, $domain, $content, $languageMapping[$locale] ?? $locale);
+                    $responses[] = $this->importTranslations($fileId, $domain, $content, $languageMapping[$locale] ?? $locale);
                 }
             }
         }
 
-        foreach ($responses as $response) {
-            if (200 !== $statusCode = $response->getStatusCode()) {
-                $this->logger->error(\sprintf('Unable to upload translations to Crowdin: "%s".', $response->getContent(false)));
+        $this->waitForImportCompletion($responses);
+    }
 
-                if (500 <= $statusCode) {
-                    throw new ProviderException('Unable to upload translations to Crowdin.', $response);
+    private function waitForImportCompletion(array $responses): void
+    {
+        while ($responses) {
+            foreach ($responses as $index => $response) {
+                if (202 !== $statusCode = $response->getStatusCode()) {
+                    $this->logger->error(\sprintf('Unable to upload translations to Crowdin: "%s".', $response->getContent(false)));
+
+                    if (500 <= $statusCode) {
+                        throw new ProviderException('Unable to upload translations to Crowdin.', $response);
+                    }
+
+                    unset($responses[$index]);
+                    continue;
                 }
+
+                $importStatusResponse = $this->checkImportTranslationsStatus($response->toArray()['data']['identifier']);
+
+                if (200 !== $importStatusResponse->getStatusCode()) {
+                    $this->logger->error(\sprintf('Unable to check import translations status: "%s".', $importStatusResponse->getContent(false)));
+
+                    unset($responses[$index]);
+                    continue;
+                }
+
+                $importStatusData = $importStatusResponse->toArray()['data'];
+
+                if ('finished' === $importStatusData['status']) {
+                    unset($responses[$index]);
+                    continue;
+                }
+
+                if ('failed' === $importStatusData['status']) {
+                    $message = $importStatusData['attributes']['error']['message'] ?? null;
+
+                    if ($message) {
+                        $this->logger->error(\sprintf('Unable to upload translations to Crowdin: "%s".', $message));
+                    } else {
+                        $this->logger->error('Unable to upload translations to Crowdin.');
+                    }
+
+                    unset($responses[$index]);
+                }
+            }
+
+            if ($responses) {
+                sleep(1);
             }
         }
     }
@@ -282,20 +323,30 @@ final class CrowdinProvider implements ProviderInterface
         return $response->toArray()['data'];
     }
 
-    private function uploadTranslations(int $fileId, string $domain, string $content, string $locale): ResponseInterface
+    private function importTranslations(int $fileId, string $domain, string $content, string $locale): ResponseInterface
     {
         $storageId = $this->addStorage($domain, $content);
 
         /*
-         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.translations.postOnLanguage (Crowdin API)
-         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.translations.postOnLanguage (Crowdin Enterprise API)
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.translations.imports (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.translations.enterprise.imports (Crowdin Enterprise API)
          */
-        return $this->client->request('POST', 'translations/'.str_replace('_', '-', $locale), [
+        return $this->client->request('POST', 'translations/imports', [
             'json' => [
                 'storageId' => $storageId,
+                'languageIds' => [str_replace('_', '-', $locale)],
                 'fileId' => $fileId,
             ],
         ]);
+    }
+
+    private function checkImportTranslationsStatus(string $importTranslationId): ResponseInterface
+    {
+        /*
+         * @see https://developer.crowdin.com/api/v2/#operation/api.projects.translations.imports.get (Crowdin API)
+         * @see https://developer.crowdin.com/enterprise/api/v2/#operation/api.projects.translations.enterprise.imports.get (Crowdin Enterprise API)
+         */
+        return $this->client->request('GET', 'translations/imports/'.$importTranslationId);
     }
 
     private function exportProjectTranslations(string $languageId, int $fileId): ResponseInterface

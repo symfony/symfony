@@ -16,13 +16,13 @@ use Symfony\Component\JsonStreamer\DataModel\Write\BackedEnumNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\CollectionNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\CompositeNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\DataModelNodeInterface;
-use Symfony\Component\JsonStreamer\DataModel\Write\DateTimeNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\ObjectNode;
 use Symfony\Component\JsonStreamer\DataModel\Write\ScalarNode;
 use Symfony\Component\JsonStreamer\Exception\LogicException;
 use Symfony\Component\JsonStreamer\Exception\NotEncodableValueException;
 use Symfony\Component\JsonStreamer\Exception\RuntimeException;
 use Symfony\Component\JsonStreamer\Exception\UnexpectedValueException;
+use Symfony\Component\JsonStreamer\PhpGeneratorTrait;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\Type\NullableType;
 use Symfony\Component\TypeInfo\Type\ObjectType;
@@ -38,7 +38,14 @@ use Symfony\Component\TypeInfo\TypeIdentifier;
  */
 final class PhpGenerator
 {
+    use PhpGeneratorTrait;
+
     private string $yieldBuffer = '';
+
+    public function __construct(
+        private ContainerInterface $transformers,
+    ) {
+    }
 
     /**
      * @param array<string, mixed> $options
@@ -66,12 +73,12 @@ final class PhpGenerator
             .$this->line('/**', $context)
             .$this->line(' * @param '.$dataModel->getType().' $data', $context)
             .$this->line(' */', $context)
-            .$this->line('return static function (mixed $data, \\'.ContainerInterface::class.' $valueTransformers, array $options): \\Traversable {', $context)
+            .$this->line('return static function (mixed $data, \\'.ContainerInterface::class.' $transformers, array $options): \\Traversable {', $context)
             .implode('', $generators)
             .$this->line('    try {', $context)
             .$yields
             .$this->line('    } catch (\\JsonException $e) {', $context)
-            .$this->line('        throw new \\'.NotEncodableValueException::class.'($e->getMessage(), 0, $e);', $context)
+            .$this->line(\sprintf('        throw new \\%s("Cannot encode \\"%s\\" to JSON: {$e->getMessage()}.", 0, $e);', NotEncodableValueException::class, addcslashes($dataModel->getType(), '\\')), $context)
             .$this->line('    }', $context)
             .$this->line('};', $context);
     }
@@ -84,6 +91,12 @@ final class PhpGenerator
      */
     private function generateObjectGenerators(DataModelNodeInterface $node, array $options, array &$context): array
     {
+        if ($node instanceof ObjectNode && $node->isMock()) {
+            $context['mocks'][$node->getIdentifier()] = true;
+
+            return [];
+        }
+
         if ($context['generated_generators'][$node->getIdentifier()] ?? false) {
             return [];
         }
@@ -105,9 +118,7 @@ final class PhpGenerator
         }
 
         if ($node instanceof ObjectNode) {
-            if ($node->isMock()) {
-                $context['mocks'][$node->getIdentifier()] = true;
-
+            if ($this->getValueObjectTransformerId($node->getType()->getClassName())) {
                 return [];
             }
 
@@ -119,7 +130,7 @@ final class PhpGenerator
             --$context['indentation_level'];
 
             $generators = [
-                $node->getIdentifier() => $this->line('$generators[\''.$node->getIdentifier().'\'] = static function ($data, $depth) use ($valueTransformers, $options, &$generators) {', $context)
+                $node->getIdentifier() => $this->line('$generators[\''.$node->getIdentifier().'\'] = static function ($data, $depth) use ($transformers, $options, &$generators) {', $context)
                     .$this->line('    if ($depth >= 512) {', $context)
                     .$this->line('        throw new \\'.NotEncodableValueException::class.'(\'Maximum stack depth exceeded\');', $context)
                     .$this->line('    }', $context)
@@ -169,10 +180,6 @@ final class PhpGenerator
 
         if ($dataModelNode instanceof BackedEnumNode) {
             return $this->yield($this->encode("{$accessor}->value", $context), $context);
-        }
-
-        if ($dataModelNode instanceof DateTimeNode) {
-            return $this->yield($this->encode("\$valueTransformers->get('json_streamer.value_transformer.date_time_to_string')->transform({$accessor}, \$options)", $context), $context);
         }
 
         if ($dataModelNode instanceof CompositeNode) {
@@ -243,6 +250,12 @@ final class PhpGenerator
         }
 
         if ($dataModelNode instanceof ObjectNode) {
+            if ($valueObjectTransformerId = $this->getValueObjectTransformerId($dataModelNode->getType()->getClassName())) {
+                $rawValue = "\$transformers->get('$valueObjectTransformerId')->transform({$dataModelNode->getAccessor()}, \$options)";
+
+                return $this->yield($this->encode($rawValue, $context), $context);
+            }
+
             if (isset($context['generated_generators'][$dataModelNode->getIdentifier()]) || $dataModelNode->isMock()) {
                 $depthArgument = ($context['generating_generator'] ?? false) ? '$depth + 1' : (string) $context['depth'];
 
@@ -407,14 +420,6 @@ final class PhpGenerator
         }
 
         throw new LogicException(\sprintf('Unexpected "%s" type.', $type::class));
-    }
-
-    /**
-     * @param array<string, mixed> $context
-     */
-    private function line(string $line, array $context): string
-    {
-        return str_repeat('    ', $context['indentation_level']).$line."\n";
     }
 
     /**

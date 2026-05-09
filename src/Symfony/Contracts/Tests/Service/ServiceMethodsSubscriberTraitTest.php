@@ -38,7 +38,7 @@ class ServiceMethodsSubscriberTraitTest extends TestCase
         $this->assertEquals($expected, ChildTestService::getSubscribedServices());
     }
 
-    #[RequiresPhp('>= 8.4')]
+    #[RequiresPhp('>= 8.4.0')]
     public function testHookedProperties()
     {
         $this->assertSame([
@@ -66,7 +66,7 @@ class ServiceMethodsSubscriberTraitTest extends TestCase
         NonHookedPropertyService::getSubscribedServices();
     }
 
-    #[RequiresPhp('>= 8.4')]
+    #[RequiresPhp('>= 8.4.0')]
     public function testPropertyWithGetHookRequired()
     {
         $this->expectException(\LogicException::class);

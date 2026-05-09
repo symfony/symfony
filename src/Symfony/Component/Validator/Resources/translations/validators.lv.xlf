@@ -472,87 +472,87 @@
             </trans-unit>
             <trans-unit id="122">
                 <source>This file is not a valid video.</source>
-                <target state="needs-review-translation">Šī datne nav derīgs video fails.</target>
+                <target>Šī datne nav derīgs video fails.</target>
             </trans-unit>
             <trans-unit id="123">
                 <source>The size of the video could not be detected.</source>
-                <target state="needs-review-translation">Neizdevās noteikt video izmēru.</target>
+                <target>Neizdevās noteikt video izmēru.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target state="needs-review-translation">Video platums ir pārāk liels ({{ width }}px). Atļautais maksimālais platums ir {{ max_width }}px.</target>
+                <target>Video platums ir pārāk liels ({{ width }}px). Atļautais maksimālais platums ir {{ max_width }}px.</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target state="needs-review-translation">Video platums ir pārāk mazs ({{ width }}px). Sagaidāmais minimālais platums ir {{ min_width }}px.</target>
+                <target>Video platums ir pārāk mazs ({{ width }}px). Sagaidāmais minimālais platums ir {{ min_width }}px.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target state="needs-review-translation">Video augstums ir pārāk liels ({{ height }}px). Atļautais maksimālais augstums ir {{ max_height }}px.</target>
+                <target>Video augstums ir pārāk liels ({{ height }}px). Atļautais maksimālais augstums ir {{ max_height }}px.</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target state="needs-review-translation">Video augstums ir pārāk mazs ({{ height }}px). Sagaidāmais minimālais augstums ir {{ min_height }}px.</target>
+                <target>Video augstums ir pārāk mazs ({{ height }}px). Sagaidāmais minimālais augstums ir {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">Video ir pārāk maz pikseļu ({{ pixels }}). Sagaidāmais minimālais daudzums ir {{ min_pixels }}.</target>
+                <target>Video ir pārāk maz pikseļu ({{ pixels }}). Sagaidāmais minimālais daudzums ir {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">Video ir pārāk daudz pikseļu ({{ pixels }}). Paredzētais maksimālais daudzums ir {{ max_pixels }}.</target>
+                <target>Video ir pārāk daudz pikseļu ({{ pixels }}). Paredzētais maksimālais daudzums ir {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target state="needs-review-translation">Video attiecība ir pārāk liela ({{ ratio }}). Atļautā maksimālā attiecība ir {{ max_ratio }}.</target>
+                <target>Video attiecība ir pārāk liela ({{ ratio }}). Atļautā maksimālā attiecība ir {{ max_ratio }}.</target>
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target state="needs-review-translation">Video attiecība ir pārāk maza ({{ ratio }}). Sagaidāmā minimālā attiecība ir {{ min_ratio }}.</target>
+                <target>Video attiecība ir pārāk maza ({{ ratio }}). Sagaidāmā minimālā attiecība ir {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
-                <target state="needs-review-translation">Video ir kvadrātveida ({{ width }}x{{ height }}px). Kvadrātveida video nav atļauti.</target>
+                <target>Video ir kvadrātveida ({{ width }}x{{ height }}px). Kvadrātveida video nav atļauti.</target>
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target state="needs-review-translation">Video ir ainavas orientācijā ({{ width }}x{{ height }} px). Ainavas formāta video nav atļauti.</target>
+                <target>Video ir ainavas orientācijā ({{ width }}x{{ height }} px). Ainavas formāta video nav atļauti.</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target state="needs-review-translation">Video ir portreta orientācijā ({{ width }}x{{ height }}px). Portreta orientācijas video nav atļauti.</target>
+                <target>Video ir portreta orientācijā ({{ width }}x{{ height }}px). Portreta orientācijas video nav atļauti.</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
-                <target state="needs-review-translation">Video fails ir bojāts.</target>
+                <target>Video fails ir bojāts.</target>
             </trans-unit>
             <trans-unit id="136">
                 <source>The video contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">Video satur vairākus straumējumus. Atļauta ir tikai viena straume.</target>
+                <target>Video satur vairākus straumējumus. Atļauta ir tikai viena straume.</target>
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target state="needs-review-translation">Neatbalstīts video kodeks “{{ codec }}”.</target>
+                <target>Neatbalstīts video kodeks "{{ codec }}".</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target state="needs-review-translation">Neatbalstīts video konteiners "{{ container }}".</target>
+                <target>Neatbalstīts video konteiners "{{ container }}".</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
-                <target state="needs-review-translation">Attēla fails ir bojāts.</target>
+                <target>Attēla fails ir bojāts.</target>
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">Attēlam ir par maz pikseļu ({{ pixels }}). Sagaidāmais minimālais daudzums ir {{ min_pixels }}.</target>
+                <target>Attēlam ir par maz pikseļu ({{ pixels }}). Sagaidāmais minimālais daudzums ir {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">Attēlam ir pārāk daudz pikseļu ({{ pixels }}). Sagaidāmais maksimālais daudzums ir {{ max_pixels }}.</target>
+                <target>Attēlam ir pārāk daudz pikseļu ({{ pixels }}). Sagaidāmais maksimālais daudzums ir {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
-                <target state="needs-review-translation">Šis faila nosaukums neatbilst paredzētajam rakstzīmju kopumam.</target>
+                <target>Šis faila nosaukums neatbilst paredzētajam rakstzīmju kopumam.</target>
             </trans-unit>
         </body>
     </file>

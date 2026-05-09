@@ -112,7 +112,7 @@ final class UrlSanitizer
 
     private static function isHostlessScheme(?string $scheme): bool
     {
-        return \in_array($scheme, ['blob', 'chrome', 'data', 'file', 'geo', 'mailto', 'maps', 'tel', 'view-source'], true);
+        return \in_array($scheme, ['blob', 'chrome', 'data', 'file', 'geo', 'mailto', 'maps', 'tel', 'sms', 'view-source'], true);
     }
 
     private static function isAllowedHost(?string $host, array $allowedHosts): bool

@@ -35,8 +35,12 @@ final class ServiceLocatorTagPass extends AbstractRecursivePass
     protected function processValue(mixed $value, bool $isRoot = false): mixed
     {
         if ($value instanceof ServiceLocatorArgument) {
-            if ($value->getTaggedIteratorArgument()) {
-                $value->setValues($this->findAndSortTaggedServices($value->getTaggedIteratorArgument(), $this->container));
+            if ($taggedIterator = $value->getTaggedIteratorArgument()) {
+                $exclude = $taggedIterator->getExclude();
+                if ($taggedIterator->excludeSelf()) {
+                    $exclude[] = $this->currentId;
+                }
+                $value->setValues($this->findAndSortTaggedServices($taggedIterator, $this->container, $exclude));
             }
 
             return self::register($this->container, $value->getValues());

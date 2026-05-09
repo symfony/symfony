@@ -111,7 +111,7 @@ final class WhenTest extends TestCase
         self::assertSame(['foo'], $quuxConstraint->groups);
     }
 
-    #[RequiresPhp('>=8.5')]
+    #[RequiresPhp('>=8.5.0')]
     public function testAttributesWithClosure()
     {
         $loader = new AttributeLoader();

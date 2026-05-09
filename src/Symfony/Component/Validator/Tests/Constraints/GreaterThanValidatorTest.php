@@ -89,13 +89,12 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
     {
         $clock = new MockClock('2025-01-15 00:00:00 UTC');
         $this->validator = new GreaterThanValidator(null, $clock);
-        $this->validator->initialize($this->context);
 
         // Value is 20 days after the frozen "now", compared to "-10 days" (Jan 5)
         $value = new \DateTimeImmutable('2025-01-20 00:00:00 UTC');
         $constraint = new GreaterThan('-10 days');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -104,13 +103,12 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
     {
         $clock = new MockClock('2025-01-15 00:00:00 UTC');
         $this->validator = new GreaterThanValidator(null, $clock);
-        $this->validator->initialize($this->context);
 
         // Value (Jan 1) is before the frozen "now" (Jan 15) minus 10 days (Jan 5)
         $value = new \DateTimeImmutable('2025-01-01 00:00:00 UTC');
         $constraint = new GreaterThan(value: '-10 days', message: 'myMessage');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $comparedValue = $clock->now()->modify('-10 days');
 
@@ -131,7 +129,7 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
         $value = new \DateTimeImmutable('2025-06-01 00:00:00 UTC');
         $constraint = new GreaterThan('2025-01-01');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }
@@ -142,7 +140,7 @@ class GreaterThanValidatorTest extends AbstractComparisonValidatorTestCase
         $value = new \DateTimeImmutable('2000-01-01 UTC');
         $constraint = new GreaterThan('1999-01-01');
 
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
 
         $this->assertNoViolation();
     }

@@ -38,7 +38,7 @@ final class ZstandardCompressor implements SupportedCompressorInterface
      */
     private function createStreamContext()
     {
-        return stream_context_create(['zstd' => ['level' => ZSTD_COMPRESS_LEVEL_MAX]]);
+        return stream_context_create(['zstd' => ['level' => \ZSTD_COMPRESS_LEVEL_MAX]]);
     }
 
     private function compressWithBinary(string $path): void

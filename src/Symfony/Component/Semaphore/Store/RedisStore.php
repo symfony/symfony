@@ -253,6 +253,8 @@ class RedisStore implements PersistingStoreInterface
     /**
      * @template T
      *
+     * @param-immediately-invoked-callable $callback
+     *
      * @param callable(): T $callback
      *
      * @return T

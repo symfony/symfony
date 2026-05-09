@@ -111,8 +111,8 @@ class TemplateControllerTest extends TestCase
         $twig = new Environment($loader);
         $controller = new TemplateController($twig);
 
-        $this->assertSame('image/svg+xml', $controller->templateAction($templateName, headers: ['Content-Type' => 'image/svg+xml'])->headers->get('Content-Type'));
-        $this->assertSame('image/svg+xml', $controller($templateName, headers: ['Content-Type' => 'image/svg+xml'])->headers->get('Content-Type'));
+        $this->assertSame('image/svg+xml', $controller->templateAction($templateName, null, null, null, [], 200, ['Content-Type' => 'image/svg+xml'])->headers->get('Content-Type'));
+        $this->assertSame('image/svg+xml', $controller($templateName, null, null, null, [], 200, ['Content-Type' => 'image/svg+xml'])->headers->get('Content-Type'));
 
         $this->assertNull($controller->templateAction($templateName)->headers->get('Content-Type'));
         $this->assertNull($controller($templateName)->headers->get('Content-Type'));

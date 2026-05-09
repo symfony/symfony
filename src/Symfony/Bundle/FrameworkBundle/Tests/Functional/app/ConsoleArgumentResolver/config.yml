@@ -35,3 +35,7 @@ services:
     Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\ResolverTestCommand:
         autowire: true
         autoconfigure: true
+
+    Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Console\ValidatedInputCommand:
+        autowire: true
+        autoconfigure: true

@@ -28,6 +28,8 @@ interface WrappingTypeInterface
     public function getWrappedType(): Type;
 
     /**
+     * @param-immediately-invoked-callable $specification
+     *
      * @param callable(Type): bool $specification
      */
     public function wrappedTypeIsSatisfiedBy(callable $specification): bool;

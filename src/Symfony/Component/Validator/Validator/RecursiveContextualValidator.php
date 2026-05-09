@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints\Composite;
 use Symfony\Component\Validator\Constraints\Existence;
 use Symfony\Component\Validator\Constraints\GroupSequence;
 use Symfony\Component\Validator\Constraints\Valid;
+use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\ConstraintValidatorFactoryInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Context\ExecutionContext;
@@ -747,14 +748,22 @@ class RecursiveContextualValidator implements ContextualValidatorInterface
             $context->setConstraint($constraint);
 
             $validator = $this->validatorFactory->getInstance($constraint);
-            $validator->initialize($context);
+            if (!$validator instanceof ConstraintValidator && !method_exists($validator, 'validateInContext')) {
+                // BC layer for constraint validators not implementing the new API. DebugClassLoader already triggers a deprecation.
+                $validator->initialize($context);
+            }
 
             if ($value instanceof LazyProperty) {
                 $value = $value->getPropertyValue();
             }
 
             try {
-                $validator->validate($value, $constraint);
+                if ($validator instanceof ConstraintValidator || method_exists($validator, 'validateInContext')) {
+                    $validator->validateInContext($value, $constraint, $context);
+                } else {
+                    // BC layer for constraint validators not implementing the new API. DebugClassLoader already triggers a deprecation.
+                    $validator->validate($value, $constraint);
+                }
             } catch (UnexpectedValueException $e) {
                 $context->buildViolation('This value should be of type {{ type }}.')
                     ->setParameter('{{ type }}', $e->getExpectedType())

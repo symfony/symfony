@@ -236,9 +236,30 @@ class MicroKernelTraitTest extends TestCase
 
         $this->assertSame(['test', 'dev'], $parameters['.container.known_envs']);
         $this->assertSame([
+            'Symfony\Component\DependencyInjection\Kernel\ServicesBundle' => ['all' => true],
+            'Symfony\Component\Console\ConsoleBundle' => ['all' => true],
             'Symfony\Bundle\FrameworkBundle\FrameworkBundle' => ['all' => true],
             'TestBundle' => ['test' => true, 'dev' => true],
         ], $parameters['.kernel.bundles_definition']);
+    }
+
+    public function testAllowedEnvsRestrictsKnownEnvs()
+    {
+        $kernel = $this->kernel = new AllowedEnvsKernel('prod', ['dev', 'test', 'prod']);
+
+        $parameters = $kernel->getKernelParameters();
+
+        $this->assertSame(['dev', 'test', 'prod'], $parameters['.container.known_envs']);
+    }
+
+    public function testAllowedEnvsThrowsWhenCurrentEnvNotAllowed()
+    {
+        $kernel = $this->kernel = new AllowedEnvsKernel('staging', ['dev', 'test', 'prod']);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The environment "staging" is not registered as allowed by "'.AllowedEnvsKernel::class.'::getAllowedEnvs()".');
+
+        $kernel->getKernelParameters();
     }
 
     public function testRelativeEnvDirsAreResolvedFromProjectDir()
@@ -268,5 +289,32 @@ class EnvDirKernel extends Kernel
     public function getProjectDir(): string
     {
         return $this->projectDir;
+    }
+}
+
+class AllowedEnvsKernel extends Kernel
+{
+    use MicroKernelTrait {
+        getKernelParameters as public;
+    }
+
+    public function __construct(string $environment, private array $allowedEnvs)
+    {
+        parent::__construct($environment, false);
+    }
+
+    private function getAllowedEnvs(): array
+    {
+        return $this->allowedEnvs;
+    }
+
+    public function registerBundles(): iterable
+    {
+        return [];
+    }
+
+    public function getCacheDir(): string
+    {
+        return sys_get_temp_dir().'/sf_allowed_envs_kernel/'.$this->environment;
     }
 }

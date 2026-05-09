@@ -97,12 +97,58 @@ class ArrayShapeGeneratorTest extends TestCase
         $this->assertStringContainsString($expected, ArrayShapeGenerator::generate($root));
     }
 
+    public function testPrototypedArrayNodePhpDocWithAcceptAndWrap()
+    {
+        $proto = new ArrayNodeDefinition('proto');
+        $proto
+            ->useAttributeAsKey('name')
+            ->acceptAndWrap(['string', 'backed-enum'])
+            ->prototype('scalar')->end();
+
+        $root = new ArrayNodeDefinition('root');
+        $root->append($proto);
+
+        $expected = "array{\n *     proto?: \BackedEnum|string|array<string, scalar|\Symfony\Component\Config\Loader\ParamConfigurator|null>,\n * }";
+
+        $this->assertStringContainsString($expected, ArrayShapeGenerator::generate($root->getNode()));
+    }
+
+    public function testArrayPrototypePhpDoc()
+    {
+        $proto = new ArrayNodeDefinition('proto');
+        $proto
+            ->arrayPrototype()
+                ->children()
+                    ->booleanNode('nested')->end()
+                ->end()
+            ->end();
+
+        $root = new ArrayNodeDefinition('root');
+        $root->append($proto);
+
+        $expected = "array{\n *     proto?: list<array{ // Default: []\n *         nested?: bool|\Symfony\Component\Config\Loader\ParamConfigurator,\n *     }>,\n * }";
+
+        $this->assertStringContainsString($expected, ArrayShapeGenerator::generate($root->getNode()));
+    }
+
     public function testPhpDocHandlesRequiredNode()
     {
         $child = new BooleanNode('node');
         $child->setRequired(true);
 
         $root = new ArrayNode('root');
+        $root->addChild($child);
+
+        $this->assertStringContainsString('node?: bool', ArrayShapeGenerator::generate($root));
+    }
+
+    public function testPhpDocHandlesRequiredNodeWithNoDeepMerging()
+    {
+        $child = new BooleanNode('node');
+        $child->setRequired(true);
+
+        $root = new ArrayNode('root');
+        $root->setPerformDeepMerging(false);
         $root->addChild($child);
 
         $expected = 'node: bool';

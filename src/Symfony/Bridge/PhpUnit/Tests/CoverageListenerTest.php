@@ -14,7 +14,7 @@ namespace Symfony\Bridge\PhpUnit\Tests;
 use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\TestCase;
 
-#[RequiresPhpunit('<10')]
+#[RequiresPhpunit('<10.0.0')]
 class CoverageListenerTest extends TestCase
 {
     public function test()

@@ -20,12 +20,12 @@ final class MyOtherController
     #[Route('/first', name: 'one')]
     public function firstAction(): Response
     {
-        return new Response(status: Response::HTTP_NO_CONTENT);
+        return new Response('', Response::HTTP_NO_CONTENT);
     }
 
     #[Route('/second', name: 'two')]
     public function secondAction(): Response
     {
-        return new Response(status: Response::HTTP_NO_CONTENT);
+        return new Response('', Response::HTTP_NO_CONTENT);
     }
 }

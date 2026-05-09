@@ -30,7 +30,7 @@ class TypeContextTest extends TestCase
 
         $this->assertSame(DummyWithUses::class, $typeContext->normalize('DummyWithUses'));
         $this->assertSame(Type::class, $typeContext->normalize('Type'));
-        $this->assertSame('\\'.\DateTimeImmutable::class, $typeContext->normalize('DateTime'));
+        $this->assertSame(\DateTimeImmutable::class, $typeContext->normalize('DateTime'));
         $this->assertSame('Symfony\\Component\\TypeInfo\\Tests\\Fixtures\\unknown', $typeContext->normalize('unknown'));
         $this->assertSame('unknown', $typeContext->normalize('\\unknown'));
 

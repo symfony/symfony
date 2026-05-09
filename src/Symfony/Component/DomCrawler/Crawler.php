@@ -303,6 +303,8 @@ class Crawler implements \Countable, \IteratorAggregate
      *
      * @template R of mixed
      *
+     * @param-immediately-invoked-callable $closure
+     *
      * @param \Closure(static, int):R $closure
      *
      * @return list<R> An array of values returned by the anonymous function
@@ -329,6 +331,8 @@ class Crawler implements \Countable, \IteratorAggregate
      * Reduces the list of nodes by calling an anonymous function.
      *
      * To remove a node from the list, the anonymous function must return false.
+     *
+     * @param-immediately-invoked-callable $closure
      *
      * @param \Closure(static, int):bool $closure
      */

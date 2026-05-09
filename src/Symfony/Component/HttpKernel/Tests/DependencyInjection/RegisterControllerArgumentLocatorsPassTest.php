@@ -25,6 +25,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\DependencyInjection\TypedReference;
@@ -538,6 +539,23 @@ class RegisterControllerArgumentLocatorsPassTest extends TestCase
         $this->assertFalse($locator->has('service2'));
     }
 
+    public function testAutowireAttributeInvalidReference()
+    {
+        $container = new ContainerBuilder();
+        $resolver = $container->register('argument_resolver.service', 'stdClass')->addArgument([]);
+
+        $container->register('foo', WithAutowireAttributeInvalidReference::class)
+            ->addTag('controller.service_arguments');
+
+        (new RegisterControllerArgumentLocatorsPass())->process($container);
+
+        $locatorId = (string) $resolver->getArgument(0);
+        $container->getDefinition($locatorId)->setPublic(true);
+
+        $this->expectException(ServiceNotFoundException::class);
+        $container->compile();
+    }
+
     public function testAutowireIteratorAndAutowireLocatorAttributes()
     {
         $container = new ContainerBuilder();
@@ -762,6 +780,13 @@ class WithAutowireAttribute
         string $customAutowire,
         #[AutowireCallable(service: 'some.id', method: 'bar')]
         FooInterface $autowireCallable,
+    ) {
+    }
+}
+
+class WithAutowireAttributeInvalidReference
+{
+    public function invalidReference(
         #[Autowire(service: 'invalid.id')]
         ?\stdClass $service2 = null,
     ) {

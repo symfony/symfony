@@ -75,6 +75,8 @@ class HtmlDumper extends CliDumper
         'fileLinkFormat' => null,
     ];
     private array $extraDisplayOptions = [];
+    private string|\Closure|null $nonce = null;
+    private string|\Closure|null $styleNonce = null;
 
     public function __construct($output = null, ?string $charset = null, int $flags = 0)
     {
@@ -127,6 +129,58 @@ class HtmlDumper extends CliDumper
         $this->dumpSuffix = $suffix;
     }
 
+    /**
+     * Sets nonces to be added to <script> and <style> tags for CSP compliance.
+     *
+     * Pass a string for a static nonce, or a {@see \Closure} returning a
+     * string (or null) to resolve the nonce lazily — useful for per-request
+     * nonces in long-running processes (the closure is invoked on every
+     * dump, so it can return a fresh value each time).
+     *
+     * If $styleNonce is omitted, $nonce is reused for both <script> and
+     * <style> tags; pass a distinct value when your CSP uses different
+     * nonces for the script-src and style-src directives.
+     */
+    public function setNonce(string|\Closure|null $nonce, string|\Closure|null $styleNonce = null): void
+    {
+        $this->headerIsDumped = false;
+        $this->nonce = $nonce;
+        $this->styleNonce = $styleNonce;
+    }
+
+    private function applyNonce(string $html): string
+    {
+        $scriptNonce = $this->resolveNonce($this->nonce);
+        $styleNonce = null !== $this->styleNonce ? $this->resolveNonce($this->styleNonce) : $scriptNonce;
+
+        $replacements = [];
+        if (null !== $scriptNonce) {
+            $replacements['<script>'] = '<script nonce="'.esc($scriptNonce).'">';
+        }
+        if (null !== $styleNonce) {
+            $replacements['<style>'] = '<style nonce="'.esc($styleNonce).'">';
+        }
+
+        if (!$replacements) {
+            return $html;
+        }
+
+        return str_replace(array_keys($replacements), array_values($replacements), $html);
+    }
+
+    private function resolveNonce(string|\Closure|null $nonce): ?string
+    {
+        if (!$nonce instanceof \Closure) {
+            return $nonce;
+        }
+
+        if (!\is_string(($value = $nonce()) ?? '')) {
+            throw new \LogicException(\sprintf('The nonce closure passed to "%s::setNonce()" must return a string or null, "%s" returned.', self::class, get_debug_type($value)));
+        }
+
+        return $value;
+    }
+
     public function dump(Data $data, $output = null, array $extraDisplayOptions = []): ?string
     {
         $this->extraDisplayOptions = $extraDisplayOptions;
@@ -144,7 +198,7 @@ class HtmlDumper extends CliDumper
         $this->headerIsDumped = $this->outputStream ?? $this->lineDumper;
 
         if (null !== $this->dumpHeader) {
-            return $this->dumpHeader;
+            return $this->applyNonce($this->dumpHeader);
         }
 
         $line = str_replace('{$options}', json_encode($this->displayOptions, \JSON_FORCE_OBJECT), <<<'EOHTML'
@@ -764,7 +818,9 @@ class HtmlDumper extends CliDumper
         }
         $line .= 'pre.sf-dump .sf-dump-ellipsis-note{'.$this->styles['note'].'}';
 
-        return $this->dumpHeader = preg_replace('/\s+/', ' ', $line).'</style>'.$this->dumpHeader;
+        $this->dumpHeader = preg_replace('/\s+/', ' ', $line).'</style>'.$this->dumpHeader;
+
+        return $this->applyNonce($this->dumpHeader);
     }
 
     public function dumpString(Cursor $cursor, string $str, bool $bin, int $cut): void
@@ -948,7 +1004,8 @@ class HtmlDumper extends CliDumper
                 $args[] = json_encode($this->extraDisplayOptions, \JSON_FORCE_OBJECT);
             }
             // Replace is for BC
-            $this->line .= \sprintf(str_replace('"%s"', '%s', $this->dumpSuffix), implode(', ', $args));
+            $suffix = $this->applyNonce($this->dumpSuffix);
+            $this->line .= \sprintf(str_replace('"%s"', '%s', $suffix), implode(', ', $args));
         }
         $this->lastDepth = $depth;
 

@@ -60,9 +60,13 @@ final class ProgressBar
     private ?string $previousMessage = null;
     private Cursor $cursor;
     private array $placeholders = [];
+    private ?int $oscProgressState = null;
+    private ?int $oscProgressPercent = null;
 
     private static array $formatters;
     private static array $formats;
+    private static \WeakMap $activeInstances;
+    private static int $pausedCount = 0;
 
     /**
      * @param int $max Maximum steps (0 if unknown)
@@ -358,6 +362,11 @@ final class ProgressBar
             $this->setMaxSteps($max);
         }
 
+        if ($this->output->isDecorated()) {
+            self::$activeInstances ??= new \WeakMap();
+            self::$activeInstances[$this] = true;
+        }
+
         $this->display();
     }
 
@@ -441,12 +450,12 @@ final class ProgressBar
             $this->max = $this->step;
         }
 
-        if (($this->step === $this->max || null === $this->max) && !$this->overwrite) {
-            // prevent double 100% output
-            return;
+        if (!(($this->step === $this->max || null === $this->max) && !$this->overwrite)) {
+            $this->setProgress($this->max ?? $this->step);
         }
 
-        $this->setProgress($this->max ?? $this->step);
+        unset(self::$activeInstances[$this]);
+        $this->writeOscProgressReset();
     }
 
     /**
@@ -463,6 +472,7 @@ final class ProgressBar
         }
 
         $this->overwrite($this->buildLine());
+        $this->writeOscProgress();
     }
 
     /**
@@ -483,6 +493,8 @@ final class ProgressBar
         }
 
         $this->overwrite('');
+        unset(self::$activeInstances[$this]);
+        $this->writeOscProgressReset();
     }
 
     private function setRealFormat(string $format): void
@@ -550,6 +562,108 @@ final class ProgressBar
 
         $this->output->write($message);
         ++$this->writeCount;
+    }
+
+    /**
+     * Pauses the OSC 9;4 taskbar progress indicator on all active progress bars.
+     *
+     * Calls are reentrant; each call must be paired with a {@see resumeAll()}.
+     * Useful when prompting the user for input while a progress bar is running.
+     */
+    public static function pauseAll(): void
+    {
+        if (1 !== ++self::$pausedCount) {
+            return;
+        }
+
+        foreach (self::$activeInstances ?? [] as $bar => $_) {
+            $bar->writeOscProgress();
+        }
+    }
+
+    /**
+     * Counterpart of {@see pauseAll()}.
+     */
+    public static function resumeAll(): void
+    {
+        if (0 !== --self::$pausedCount) {
+            return;
+        }
+
+        foreach (self::$activeInstances ?? [] as $bar => $_) {
+            $bar->writeOscProgress();
+        }
+    }
+
+    private function writeOscProgress(): void
+    {
+        if (!$this->output->isDecorated()) {
+            return;
+        }
+
+        if (null === $this->max) {
+            $state = 3;
+            $percent = 0;
+        } else {
+            $state = 1;
+            $percent = (int) floor(max(0.0, min(1.0, $this->percent)) * 100);
+        }
+
+        if (1 === $state && \count(self::$activeInstances ?? []) > 1) {
+            // Multiple active determinate bars: collapse to indeterminate so the taskbar
+            // doesn't flicker between unrelated percentages from each bar.
+            $state = 3;
+            $percent = 0;
+        }
+
+        if (self::$pausedCount > 0) {
+            $state = 4;
+        }
+
+        if ($this->oscProgressState === $state && $this->oscProgressPercent === $percent) {
+            return;
+        }
+
+        $this->oscProgressState = $state;
+        $this->oscProgressPercent = $percent;
+
+        $this->writeOscRaw(\sprintf("\033]9;4;%d;%d\033\\", $state, $percent));
+    }
+
+    private function writeOscProgressReset(): void
+    {
+        if (null === $this->oscProgressState) {
+            return;
+        }
+
+        $this->oscProgressState = null;
+        $this->oscProgressPercent = null;
+
+        if (\count(self::$activeInstances ?? []) > 0) {
+            // Other bars still active: let them re-evaluate their state instead of clearing the taskbar.
+            foreach (self::$activeInstances as $bar => $_) {
+                $bar->writeOscProgress();
+            }
+
+            return;
+        }
+
+        if ($this->output->isDecorated()) {
+            $this->writeOscRaw("\033]9;4;0;0\033\\");
+        }
+    }
+
+    private function writeOscRaw(string $bytes): void
+    {
+        // OSC sequences address the terminal (taskbar progress) and have no display width.
+        // For ConsoleSectionOutput, bypass section content tracking so line counting stays correct.
+        if ($this->output instanceof ConsoleSectionOutput) {
+            fwrite($this->output->getStream(), $bytes);
+
+            return;
+        }
+
+        $this->output->write($bytes);
     }
 
     private function determineBestFormat(): string

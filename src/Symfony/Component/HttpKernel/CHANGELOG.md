@@ -4,6 +4,8 @@ CHANGELOG
 8.1
 ---
 
+ * Add `setNonce()` to `DumpDataCollector` to forward CSP nonces to every `HtmlDumper` it instantiates
+ * Add `#[MapRequestHeader]` to map a header from `Request` to a controller argument
  * Add `hasErrors()` method to `Profile` to track profiles with errors (exceptions or error-level logs)
  * Validate typed route parameters before calling controllers and return an HTTP error when an invalid value is provided
  * Add `ControllerAttributeEvent` et al. to dispatch events named after controller attributes
@@ -23,6 +25,13 @@ CHANGELOG
  * Deprecate passing a `ControllerArgumentsEvent` to the `ViewEvent` constructor; pass a `ControllerArgumentsMetadata` instead
  * Support variadic argument with `#[MapRequestPayload]`
  * Add `#[Serialize]` to serialize values returned by controllers
+ * Add argument `$mapWhenEmpty` to `MapQueryString` and `MapRequestPayload` for always attempting denormalization with empty query and request payload
+ * Deprecate `Bundle::registerCommands()`, use the `#[AsCommand]` attribute or the `console.command` service tag instead of overriding this method
+ * Deprecate `BundleInterface`, use the one from the DependencyInjection component instead
+ * Deprecate `MergeExtensionConfigurationPass`, use the one from the DependencyInjection component instead
+ * Deprecate `FileLocator`, use the one from the DependencyInjection component instead
+ * Add `#[RateLimit]` attribute to declaratively enforce rate limiting on controllers.
+ * Deprecate `ServicesResetter`, `ServicesResetterInterface`, and `ResettableServicePass`, use the ones from the DependencyInjection component instead
 
 8.0
 ---

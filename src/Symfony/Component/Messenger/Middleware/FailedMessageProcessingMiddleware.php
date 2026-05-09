@@ -23,9 +23,7 @@ class FailedMessageProcessingMiddleware implements MiddlewareInterface
     public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         // look for "received" messages decorated with the SentToFailureTransportStamp
-        /** @var SentToFailureTransportStamp|null $sentToFailureStamp */
-        $sentToFailureStamp = $envelope->last(SentToFailureTransportStamp::class);
-        if (null !== $sentToFailureStamp && null !== $envelope->last(ReceivedStamp::class)) {
+        if ($envelope->last(ReceivedStamp::class) && $sentToFailureStamp = $envelope->last(SentToFailureTransportStamp::class)) {
             // mark the message as "received" from the original transport
             // this guarantees the same behavior as when originally received
             $envelope = $envelope->with(new ReceivedStamp($sentToFailureStamp->getOriginalReceiverName()));

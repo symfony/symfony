@@ -104,6 +104,15 @@ class ConnectionTest extends TestCase
         );
     }
 
+    public function testQueueNameDefault()
+    {
+        $httpClient = new MockHttpClient();
+        $this->assertEquals(
+            new Connection(['queue_name' => 'messages'], new SqsClient(['region' => 'us-east-2', 'accessKeyId' => 'key_dsn', 'accessKeySecret' => 'secret_dsn'], null, $httpClient)),
+            Connection::fromDsn('sqs://key_dsn:secret_dsn@default/?region=us-east-2', ['region' => 'eu-west-3', 'access_key' => 'key_option', 'secret_key' => 'secret_option'], $httpClient)
+        );
+    }
+
     public function testFromDsnWithRegion()
     {
         $httpClient = new MockHttpClient();
@@ -228,10 +237,11 @@ class ConnectionTest extends TestCase
     public function testKeepGettingPendingMessages()
     {
         $client = $this->createMock(SqsClient::class);
-        $client->expects($this->any())
+        $client
             ->method('getQueueUrl')
-            ->with(['QueueName' => 'queue', 'QueueOwnerAWSAccountId' => 123])
-            ->willReturn(ResultMockFactory::create(GetQueueUrlResult::class, ['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue']));
+            ->willReturnMap([
+                [['QueueName' => 'queue', 'QueueOwnerAWSAccountId' => 123], ResultMockFactory::create(GetQueueUrlResult::class, ['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue'])],
+            ]);
 
         $firstResult = ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
             new Message(['MessageId' => 1, 'Body' => 'this is a test']),
@@ -268,6 +278,48 @@ class ConnectionTest extends TestCase
         $this->assertNotNull($connection->get());
         $this->assertNotNull($connection->get());
         $this->assertNull($connection->get());
+    }
+
+    public function testGetUsesMaxOfFetchSizeAndConfiguredBufferSize()
+    {
+        $client = $this->createMock(SqsClient::class);
+        $client
+            ->method('getQueueUrl')
+            ->willReturnMap([
+                [['QueueName' => 'queue', 'QueueOwnerAWSAccountId' => 123], ResultMockFactory::create(GetQueueUrlResult::class, ['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue'])],
+            ]);
+
+        $firstResult = ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => [
+            new Message(['MessageId' => 1, 'Body' => 'this is a test']),
+        ]]);
+        $secondResult = ResultMockFactory::create(ReceiveMessageResult::class, ['Messages' => []]);
+
+        $series = [
+            [[['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+                'VisibilityTimeout' => null,
+                'MaxNumberOfMessages' => 10,
+                'MessageAttributeNames' => ['All'],
+                'WaitTimeSeconds' => 20]], $firstResult],
+            [[['QueueUrl' => 'https://sqs.us-east-2.amazonaws.com/123456789012/MyQueue',
+                'VisibilityTimeout' => null,
+                'MaxNumberOfMessages' => 10,
+                'MessageAttributeNames' => ['All'],
+                'WaitTimeSeconds' => 20]], $secondResult],
+        ];
+
+        $client->expects($this->exactly(2))
+            ->method('receiveMessage')
+            ->willReturnCallback(function (...$args) use (&$series) {
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            })
+        ;
+
+        $connection = new Connection(['queue_name' => 'queue', 'account' => 123, 'auto_setup' => false, 'buffer_size' => 9], $client);
+        $this->assertNotNull($connection->get(12));
+        $this->assertNull($connection->get(12));
     }
 
     public function testUnexpectedSqsError()

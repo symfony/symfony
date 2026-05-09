@@ -72,6 +72,17 @@ class CheckAliasValidityPassTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
+    public function testProcessIgnoresDeprecatedAlias()
+    {
+        $container = new ContainerBuilder();
+        $container->register('a')->setClass(FooNotImplementing::class);
+        $container->setAlias(FooInterface::class, 'a')
+            ->setDeprecated('vendor/package', '1.2', 'The "%alias_id%" alias is deprecated.');
+
+        $this->process($container);
+        $this->addToAssertionCount(1);
+    }
+
     protected function process(ContainerBuilder $container): void
     {
         $pass = new CheckAliasValidityPass();

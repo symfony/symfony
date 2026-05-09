@@ -137,6 +137,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
         // set some global scalars
         $container->setParameter('security.access.denied_url', $config['access_denied_url']);
         $container->setParameter('security.authentication.manager.erase_credentials', $config['erase_credentials']);
+        $container->deprecateParameter('security.authentication.manager.erase_credentials', 'symfony/security-bundle', '8.1', 'The "%s" parameter is deprecated since Symfony 8.1. It will be removed in Symfony 9.0, as the "eraseCredentials()" method was removed in Symfony 8.0.');
         $container->setParameter('security.authentication.session_strategy.strategy', $config['session_fixation_strategy']);
 
         if (isset($config['access_decision_manager']['service'])) {
@@ -512,7 +513,7 @@ class SecurityExtension extends Extension implements PrependExtensionInterface
             ->replaceArgument(0, $authenticators)
             ->replaceArgument(2, new Reference($firewallEventDispatcherId))
             ->replaceArgument(3, $id)
-            ->replaceArgument(7, $firewall['required_badges'] ?? [])
+            ->replaceArgument(6, $firewall['required_badges'] ?? [])
             ->addTag('monolog.logger', ['channel' => 'security'])
         ;
 

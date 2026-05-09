@@ -171,7 +171,7 @@
 
 {% block menu %}
     <span class="label label-status-{{ collector.symfonyState == 'eol' ? 'red' : collector.symfonyState in ['eom', 'dev'] ? 'yellow' }}">
-        <span class="icon">{{ source('@WebProfiler/Icon/config.svg') }}</span>
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/config.svg') }}</span>
         <strong>Configuration</strong>
     </span>
 {% endblock %}

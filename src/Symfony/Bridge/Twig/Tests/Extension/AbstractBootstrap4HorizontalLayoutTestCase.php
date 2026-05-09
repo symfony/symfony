@@ -12,6 +12,7 @@
 namespace Symfony\Bridge\Twig\Tests\Extension;
 
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * Abstract class providing test cases for the Bootstrap 4 horizontal Twig form theme.
@@ -20,6 +21,211 @@ use Symfony\Component\Form\FormError;
  */
 abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootstrap4LayoutTestCase
 {
+    public function testLabel()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $view = $form->createView();
+        $this->renderWidget($view, ['label' => 'foo']);
+        $html = $this->renderLabel($view);
+
+        $this->assertMatchesXpath($html,
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="name"]
+        [.="[trans]Name[/trans]"]
+    ]
+'
+        );
+    }
+
+    public function testLabelWithoutTranslation()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'translation_domain' => false,
+        ]);
+
+        $this->assertMatchesXpath($this->renderLabel($form->createView()),
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="name"]
+        [.="Name"]
+    ]
+'
+        );
+    }
+
+    public function testLabelWithCustomTextPassedAsOption()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'label' => 'Custom label',
+        ]);
+        $html = $this->renderLabel($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="name"]
+        [.="[trans]Custom label[/trans]"]
+    ]
+'
+        );
+    }
+
+    public function testLabelWithCustomTextPassedDirectly()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $html = $this->renderLabel($form->createView(), 'Custom label');
+
+        $this->assertMatchesXpath($html,
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="name"]
+        [.="[trans]Custom label[/trans]"]
+    ]
+'
+        );
+    }
+
+    public function testLabelWithCustomTextPassedAsOptionAndDirectly()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'label' => 'Custom label',
+        ]);
+        $html = $this->renderLabel($form->createView(), 'Overridden label');
+
+        $this->assertMatchesXpath($html,
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="name"]
+        [.="[trans]Overridden label[/trans]"]
+    ]
+'
+        );
+    }
+
+    public function testLabelFormatName()
+    {
+        $form = $this->factory->createNamedBuilder('myform')
+            ->add('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->getForm();
+        $view = $form->get('myfield')->createView();
+        $html = $this->renderLabel($view, null, ['label_format' => 'form.%name%']);
+
+        $this->assertMatchesXpath($html,
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="myform_myfield"]
+        [.="[trans]form.myfield[/trans]"]
+    ]
+'
+        );
+    }
+
+    public function testLabelFormatId()
+    {
+        $form = $this->factory->createNamedBuilder('myform')
+            ->add('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->getForm();
+        $view = $form->get('myfield')->createView();
+        $html = $this->renderLabel($view, null, ['label_format' => 'form.%id%']);
+
+        $this->assertMatchesXpath($html,
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="myform_myfield"]
+        [.="[trans]form.myform_myfield[/trans]"]
+    ]
+'
+        );
+    }
+
+    public function testLabelFormatAsFormOption()
+    {
+        $options = ['label_format' => 'form.%name%'];
+
+        $form = $this->factory->createNamedBuilder('myform', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, $options)
+            ->add('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType')
+            ->getForm();
+        $view = $form->get('myfield')->createView();
+        $html = $this->renderLabel($view);
+
+        $this->assertMatchesXpath($html,
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="myform_myfield"]
+        [.="[trans]form.myfield[/trans]"]
+    ]
+'
+        );
+    }
+
+    public function testLabelFormatOverriddenOption()
+    {
+        $options = ['label_format' => 'form.%name%'];
+
+        $form = $this->factory->createNamedBuilder('myform', 'Symfony\Component\Form\Extension\Core\Type\FormType', null, $options)
+            ->add('myfield', 'Symfony\Component\Form\Extension\Core\Type\TextType', ['label_format' => 'field.%name%'])
+            ->getForm();
+        $view = $form->get('myfield')->createView();
+        $html = $this->renderLabel($view);
+
+        $this->assertMatchesXpath($html,
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="myform_myfield"]
+        [.="[trans]field.myfield[/trans]"]
+    ]
+'
+        );
+    }
+
+    public function testLabelWithTranslationParameters()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
+        $html = $this->renderLabel($form->createView(), 'Address is %address%', [
+            'label_translation_parameters' => [
+                '%address%' => 'Paris, rue de la Paix',
+            ],
+        ]);
+
+        $this->assertMatchesXpath($html,
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="name"]
+        [.="[trans]Address is Paris, rue de la Paix[/trans]"]
+    ]
+'
+        );
+    }
+
+    public function testLabelWithTranslatableMessage()
+    {
+        $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType', null, [
+            'label' => new TranslatableMessage('foo'),
+        ]);
+        $html = $this->renderLabel($form->createView());
+
+        $this->assertMatchesXpath($html,
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="name"]
+        [.="[trans]foo[/trans]"]
+    ]
+'
+        );
+    }
+
     public function testRow()
     {
         $form = $this->factory->createNamed('name', 'Symfony\Component\Form\Extension\Core\Type\TextType');
@@ -30,15 +236,16 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
         $this->assertMatchesXpath($html,
             '/div
     [
-        ./label[@for="name"]
-        [
-            ./span[@class="alert alert-danger d-block"]
+        ./div
+            [@class="col-sm-2"]
+            [./label[@for="name"]]
+            [./span[@class="alert alert-danger d-block mb-1"]
                 [./span[@class="d-block"]
                     [./span[.="[trans]Error[/trans]"]]
                     [./span[.="[trans]Error![/trans]"]]
                 ]
                 [count(./span)=1]
-        ]
+            ]
         /following-sibling::div[./input[@id="name"]]
     ]
 '
@@ -53,9 +260,12 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
         $html = $this->renderLabel($view);
 
         $this->assertMatchesXpath($html,
-            '/legend
-    [@class="col-form-label col-sm-2 col-form-label required"]
-    [.="[trans]Name[/trans]"]
+            '/div
+    [@class="col-sm-2"]
+    [./legend
+        [@class="col-form-label col-form-label required"]
+        [.="[trans]Name[/trans]"]
+    ]
 '
         );
     }
@@ -70,9 +280,12 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
         ]);
 
         $this->assertMatchesXpath($html,
-            '/label
-    [@for="name"]
-    [@class="col-form-label col-sm-2 required"]
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="name"]
+        [@class="col-form-label required"]
+    ]
 '
         );
     }
@@ -87,9 +300,12 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
         ]);
 
         $this->assertMatchesXpath($html,
-            '/label
-    [@for="name"]
-    [@class="my&class col-form-label col-sm-2 required"]
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="name"]
+        [@class="my&class col-form-label required"]
+    ]
 '
         );
     }
@@ -104,10 +320,13 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
         ]);
 
         $this->assertMatchesXpath($html,
-            '/label
-    [@for="name"]
-    [@class="my&class col-form-label col-sm-2 required"]
-    [.="[trans]Custom label[/trans]"]
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="name"]
+        [@class="my&class col-form-label required"]
+        [.="[trans]Custom label[/trans]"]
+    ]
 '
         );
     }
@@ -124,10 +343,13 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
         ]);
 
         $this->assertMatchesXpath($html,
-            '/label
-    [@for="name"]
-    [@class="my&class col-form-label col-sm-2 required"]
-    [.="[trans]Custom label[/trans]"]
+            '/div
+    [@class="col-sm-2"]
+    [./label
+        [@for="name"]
+        [@class="my&class col-form-label required"]
+        [.="[trans]Custom label[/trans]"]
+    ]
 '
         );
     }
@@ -144,8 +366,8 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
             ],
         ]);
 
-        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class col-form-label col-sm-2 required"][.="[trans]<b>Bolded label</b>[/trans]"]');
-        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class col-form-label col-sm-2 required"]/b[.="Bolded label"]', 0);
+        $this->assertMatchesXpath($html, '/div[@class="col-sm-2"]/label[@for="name"][@class="my&class col-form-label required"][.="[trans]<b>Bolded label</b>[/trans]"]');
+        $this->assertMatchesXpath($html, '/div[@class="col-sm-2"]/label[@for="name"][@class="my&class col-form-label required"]/b[.="Bolded label"]', 0);
     }
 
     public function testLabelHtmlIsTrue()
@@ -161,8 +383,8 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
             ],
         ]);
 
-        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class col-form-label col-sm-2 required"][.="[trans]<b>Bolded label</b>[/trans]"]', 0);
-        $this->assertMatchesXpath($html, '/label[@for="name"][@class="my&class col-form-label col-sm-2 required"]/b[.="Bolded label"]');
+        $this->assertMatchesXpath($html, '/div[@class="col-sm-2"]/label[@for="name"][@class="my&class col-form-label required"][.="[trans]<b>Bolded label</b>[/trans]"]', 0);
+        $this->assertMatchesXpath($html, '/div[@class="col-sm-2"]/label[@for="name"][@class="my&class col-form-label required"]/b[.="Bolded label"]');
     }
 
     public function testLegendOnExpandedType()
@@ -177,9 +399,12 @@ abstract class AbstractBootstrap4HorizontalLayoutTestCase extends AbstractBootst
         $html = $this->renderLabel($view);
 
         $this->assertMatchesXpath($html,
-            '/legend
-    [@class="col-sm-2 col-form-label required"]
-    [.="[trans]Custom label[/trans]"]
+            '/div
+    [@class="col-sm-2"]
+    [./legend
+        [@class="col-form-label required"]
+        [.="[trans]Custom label[/trans]"]
+    ]
 '
         );
     }

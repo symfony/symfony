@@ -266,6 +266,9 @@ class CacheAttributeListener implements EventSubscriberInterface
         ], $request->attributes->all(), $arguments);
     }
 
+    /**
+     * @param-immediately-invoked-callable $closureOrExpression
+     */
     private function evaluate(string|Expression|\Closure $closureOrExpression, array $variables): mixed
     {
         if ($closureOrExpression instanceof \Closure) {

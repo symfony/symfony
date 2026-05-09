@@ -69,7 +69,7 @@
     {% set events = collector.events %}
 
     <span class="label {{ events.messages|length ? '' : 'disabled' }}">
-        <span class="icon">{{ source('@WebProfiler/Icon/notifier.svg') }}</span>
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/notifier.svg') }}</span>
 
         <strong>Notifications</strong>
         {% if events.messages|length > 0 %}

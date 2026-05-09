@@ -31,10 +31,39 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
      */
     public const OBJECT_TO_STRING = 2;
 
+    /**
+     * @var array<class-string<self, bool>
+     */
+    private static array $initializeOverrideCache = [];
+
     protected ExecutionContextInterface $context;
+
+    public function validateInContext(mixed $value, Constraint $constraint, ExecutionContextInterface $context): void
+    {
+        $oldContext = $this->context ?? null;
+
+        try {
+            $this->context = $context;
+            if (self::overridesInitialize(static::class)) {
+                trigger_deprecation('symfony/validator', '8.1', \sprintf('Overriding "%s::initialize()" in "%s" is deprecated. Put the additional logic in the "validate()" method instead.', self::class, static::class));
+                $this->initialize($context);
+            }
+            $this->validate($value, $constraint);
+        } finally {
+            if (null !== $oldContext) {
+                $this->context = $oldContext;
+            } else {
+                unset($this->context);
+            }
+        }
+    }
+
+    // TODO make this method protected in Symfony 9.0
+    abstract public function validate(mixed $value, Constraint $constraint): void;
 
     public function initialize(ExecutionContextInterface $context): void
     {
+        trigger_deprecation('symfony/validator', '8.1', 'The "ConstraintValidator::initialize()" method is deprecated. Use the "validateInContext()" method instead of the "initialize()" and "validate()" ones.');
         $this->context = $context;
     }
 
@@ -147,5 +176,19 @@ abstract class ConstraintValidator implements ConstraintValidatorInterface
         }
 
         return implode(', ', $values);
+    }
+
+    /**
+     * @param class-string<self> $class
+     */
+    private static function overridesInitialize(string $class): bool
+    {
+        if (isset(self::$initializeOverrideCache[$class])) {
+            return self::$initializeOverrideCache[$class];
+        }
+
+        $ref = new \ReflectionMethod($class, 'initialize');
+
+        return self::$initializeOverrideCache[$class] = self::class !== $ref->class;
     }
 }

@@ -13,8 +13,14 @@ namespace Symfony\Component\Serializer\Tests\Normalizer;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Serializer\Mapping\ClassMetadata;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 use Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter;
+use Symfony\Component\Serializer\NameConverter\MetadataAwareNameConverter;
 use Symfony\Component\Serializer\Normalizer\ConstraintViolationListNormalizer;
+use Symfony\Component\Serializer\Tests\Dummy\DummyClassOne;
+use Symfony\Component\Serializer\Tests\Dummy\DummyClassTwo;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
@@ -106,6 +112,66 @@ error',
                     'propertyPath' => '',
                     'title' => 'error',
                     'template' => 'c',
+                    'parameters' => [],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($list));
+    }
+
+    public function testNormalizeWithMetadataAwareNameConverter()
+    {
+        $attributeLoader = new AttributeLoader();
+        $attributeLoader->loadClassMetadata(new ClassMetadata(DummyClassOne::class));
+
+        $nameConverter = new MetadataAwareNameConverter(new ClassMetadataFactory($attributeLoader));
+        $normalizer = new ConstraintViolationListNormalizer([], $nameConverter);
+
+        $list = new ConstraintViolationList([
+            new ConstraintViolation('too long', 'a', [], new DummyClassOne(), 'code', ''),
+        ]);
+
+        $expected = [
+            'type' => 'https://symfony.com/errors/validation',
+            'title' => 'Validation Failed',
+            'detail' => 'identifier: too long',
+            'violations' => [
+                [
+                    'propertyPath' => 'identifier',
+                    'title' => 'too long',
+                    'template' => 'a',
+                    'parameters' => [],
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $normalizer->normalize($list));
+    }
+
+    public function testNormalizeWithMetadataAwareNameConverterAndNestedPath()
+    {
+        $attributeLoader = new AttributeLoader();
+        $attributeLoader->loadClassMetadata(new ClassMetadata(DummyClassTwo::class));
+        $attributeLoader->loadClassMetadata(new ClassMetadata(DummyClassOne::class));
+
+        $nameConverter = new MetadataAwareNameConverter(new ClassMetadataFactory($attributeLoader));
+        $normalizer = new ConstraintViolationListNormalizer([], $nameConverter);
+
+        $root = new DummyClassTwo();
+        $list = new ConstraintViolationList([
+            new ConstraintViolation('too long', 'a', [], $root, 'child.code', ''),
+        ]);
+
+        $expected = [
+            'type' => 'https://symfony.com/errors/validation',
+            'title' => 'Validation Failed',
+            'detail' => 'nested.identifier: too long',
+            'violations' => [
+                [
+                    'propertyPath' => 'nested.identifier',
+                    'title' => 'too long',
+                    'template' => 'a',
                     'parameters' => [],
                 ],
             ],

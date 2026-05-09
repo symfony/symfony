@@ -19,4 +19,3 @@ class NestedBankDataDto
     public string $iban;
     public NestedBankDto $bank;
 }
-

@@ -99,7 +99,7 @@ class Connection
      * * access_key: AWS access key
      * * secret_key: AWS secret key
      * * session_token: AWS session token (required only when using temporary credentials)
-     * * buffer_size: number of messages to prefetch (Default: 9)
+     * * buffer_size: number of messages to prefetch (Default: 9, Max: 10)
      * * wait_time: long polling duration in seconds (Default: 20)
      * * poll_timeout: amount of seconds the transport should wait for new message
      * * visibility_timeout: amount of seconds the message won't be visible
@@ -188,61 +188,58 @@ class Connection
         return new self($configuration, new SqsClient($clientConfiguration, null, $client, $logger), $queueUrl);
     }
 
-    public function get(): ?array
+    public function get(int $fetchSize = 1): ?array
     {
         if ($this->configuration['auto_setup']) {
             $this->setup();
         }
 
-        foreach ($this->getNextMessages() as $message) {
-            return $message;
+        $fetchSize = max(1, $fetchSize);
+        $messages = $this->getPendingMessages($fetchSize);
+
+        if (\count($messages) < $fetchSize
+            && $this->fetchMessages(max($fetchSize, $this->configuration['buffer_size']))
+        ) {
+            $messages = [...$messages, ...$this->getPendingMessages($fetchSize - \count($messages))];
         }
 
-        return null;
+        return $messages ?: null;
     }
 
     /**
-     * @return \Generator<int, array>
+     * @return list<array>
      */
-    private function getNextMessages(): \Generator
+    private function getPendingMessages(int $fetchSize): array
     {
-        yield from $this->getPendingMessages();
-        yield from $this->getNewMessages();
-    }
+        $messages = [];
 
-    /**
-     * @return \Generator<int, array>
-     */
-    private function getPendingMessages(): \Generator
-    {
-        while ($this->buffer) {
-            yield array_shift($this->buffer);
+        while ($fetchSize-- > 0 && $this->buffer) {
+            $messages[] = array_shift($this->buffer);
         }
+
+        return $messages;
     }
 
-    /**
-     * @return \Generator<int, array>
-     */
-    private function getNewMessages(): \Generator
+    private function fetchMessages(int $fetchSize): bool
     {
         if (null === $this->currentResponse) {
             $this->currentResponse = $this->client->receiveMessage([
                 'QueueUrl' => $this->getQueueUrl(),
                 'VisibilityTimeout' => $this->configuration['visibility_timeout'],
-                'MaxNumberOfMessages' => $this->configuration['buffer_size'],
+                'MaxNumberOfMessages' => min($fetchSize, 10), // SQS limitation
                 'MessageAttributeNames' => ['All'],
                 'WaitTimeSeconds' => $this->configuration['wait_time'],
             ]);
         }
 
-        if (!$this->fetchMessage()) {
-            return;
+        if (!$this->fetchPendingMessages()) {
+            return false;
         }
 
-        yield from $this->getPendingMessages();
+        return true;
     }
 
-    private function fetchMessage(): bool
+    private function fetchPendingMessages(): bool
     {
         if (!$this->currentResponse->resolve($this->configuration['poll_timeout'])) {
             return false;
@@ -360,7 +357,7 @@ class Connection
         return (int) ($attributes[QueueAttributeName::APPROXIMATE_NUMBER_OF_MESSAGES] ?? 0);
     }
 
-    public function send(string $body, array $headers, int $delay = 0, ?string $messageGroupId = null, ?string $messageDeduplicationId = null, ?string $xrayTraceId = null): void
+    public function send(string $body, array $headers, ?int $delay = null, ?string $messageGroupId = null, ?string $messageDeduplicationId = null, ?string $xrayTraceId = null): void
     {
         if ($this->configuration['auto_setup']) {
             $this->setup();
@@ -369,11 +366,14 @@ class Connection
         $parameters = [
             'QueueUrl' => $this->getQueueUrl(),
             'MessageBody' => $body,
-            // Maximum delay is 15 minutes. See https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-timers.html.
-            'DelaySeconds' => min(900, $delay),
             'MessageAttributes' => [],
             'MessageSystemAttributes' => [],
         ];
+
+        if (null !== $delay) {
+            // Maximum delay is 15 minutes. See https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-timers.html.
+            $parameters['DelaySeconds'] = min(900, $delay);
+        }
 
         $specialHeaders = [];
         foreach ($headers as $name => $value) {
@@ -416,13 +416,13 @@ class Connection
     {
         if (null !== $this->currentResponse) {
             // fetch current response in order to requeue in transit messages
-            if (!$this->fetchMessage()) {
+            if (!$this->fetchPendingMessages()) {
                 $this->currentResponse->cancel();
                 $this->currentResponse = null;
             }
         }
 
-        foreach ($this->getPendingMessages() as $message) {
+        foreach ($this->getPendingMessages(\count($this->buffer)) as $message) {
             $this->client->changeMessageVisibility([
                 'QueueUrl' => $this->getQueueUrl(),
                 'ReceiptHandle' => $message['id'],

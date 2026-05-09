@@ -18,8 +18,8 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\PhpUnit\ClockMock;
 use Symfony\Component\Clock\MockClock;
+use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Event\WorkerMessageFailedEvent;
 use Symfony\Component\Messenger\Event\WorkerMessageHandledEvent;
@@ -32,6 +32,7 @@ use Symfony\Component\Messenger\EventListener\ResetMemoryUsageListener;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
 use Symfony\Component\Messenger\Exception\RuntimeException;
+use Symfony\Component\Messenger\Execution\DeferredBatchMessageQueue;
 use Symfony\Component\Messenger\Handler\Acknowledger;
 use Symfony\Component\Messenger\Handler\BatchHandlerInterface;
 use Symfony\Component\Messenger\Handler\BatchHandlerTrait;
@@ -322,6 +323,72 @@ class WorkerTest extends TestCase
         $this->assertEquals(new \DateTimeImmutable('2023-03-19 14:00:03+00:00'), $clock->now());
     }
 
+    public function testWorkerDoesNotSleepWhenStoppedDuringIdleRunningEvent()
+    {
+        $clock = new MockClock('2023-03-19 14:00:00+00:00');
+        $receiver = new DummyReceiver([[]]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) {
+            if ($event->isWorkerIdle()) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $worker = new Worker([$receiver], new MessageBus(), $dispatcher, clock: $clock);
+        $worker->run(['sleep' => 1000000]);
+
+        $this->assertEquals(new \DateTimeImmutable('2023-03-19 14:00:00+00:00'), $clock->now());
+    }
+
+    public function testWorkerCapsIdleSleepToRemainingTimeLimitAfterMessageConsumption()
+    {
+        $clock = new MockClock('2023-03-19 14:00:00+00:00');
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('API'))],
+            [],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) use ($clock) {
+            if (!$event->isWorkerIdle()) {
+                $clock->sleep(50);
+            }
+        });
+
+        $worker = new Worker([$receiver], new MessageBus(), $dispatcher, clock: $clock);
+        $worker->run(['sleep' => 20000000, 'time_limit' => 60]);
+
+        $this->assertEquals(new \DateTimeImmutable('2023-03-19 14:01:00+00:00'), $clock->now());
+    }
+
+    public function testWorkerLogsWhenStoppedDueToTimeLimit()
+    {
+        $clock = new MockClock('2023-03-19 14:00:00+00:00');
+        $receiver = new DummyReceiver([[]]);
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects($this->atLeastOnce())->method('info')
+            ->willReturnCallback(function (string $message, array $context = []) use (&$timeLimitLogged) {
+                if ('Worker stopped due to time limit of {timeLimit}s exceeded' === $message) {
+                    $this->assertSame(['timeLimit' => 60], $context);
+                    $timeLimitLogged = true;
+                }
+            });
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) use ($clock) {
+            if ($event->isWorkerIdle()) {
+                $clock->sleep(70);
+            }
+        });
+
+        $worker = new Worker([$receiver], new MessageBus(), $dispatcher, $logger, clock: $clock);
+        $worker->run(['sleep' => 1000000, 'time_limit' => 60]);
+
+        $this->assertTrue($timeLimitLogged ?? false);
+    }
+
     public function testWorkerWithMultipleReceivers()
     {
         // envelopes, in their expected delivery order
@@ -373,21 +440,47 @@ class WorkerTest extends TestCase
     public function testWorkerLimitQueues()
     {
         $envelope = [new Envelope(new DummyMessage('message1'))];
-        $receiver = $this->createMock(QueueReceiverInterface::class);
-        $receiver->expects($this->once())
-            ->method('getFromQueues')
-            ->with(['foo'])
-            ->willReturn($envelope)
-        ;
-        $receiver->expects($this->never())
-            ->method('get')
-        ;
+        $receiver = new DummyQueueReceiver([$envelope]);
 
         $dispatcher = new EventDispatcher();
         $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
 
         $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, clock: new MockClock());
         $worker->run(['queues' => ['foo']]);
+
+        $this->assertSame([['foo']], $receiver->queueNames);
+        $this->assertSame([1], $receiver->getFromQueuesFetchSizes);
+    }
+
+    public function testWorkerPassesFetchSizeToReceiver()
+    {
+        $receiver = new DummyReceiver([
+            [new Envelope(new DummyMessage('message1'))],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, clock: new MockClock());
+        $worker->run(['fetch_size' => 7]);
+
+        $this->assertSame([7], $receiver->getFetchSizes());
+    }
+
+    public function testWorkerPassesFetchSizeToQueueReceiver()
+    {
+        $receiver = new DummyQueueReceiver([
+            [new Envelope(new DummyMessage('message1'))],
+        ]);
+
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addSubscriber(new StopWorkerOnMessageLimitListener(1));
+
+        $worker = new Worker(['transport' => $receiver], new MessageBus(), $dispatcher, clock: new MockClock());
+        $worker->run(['queues' => ['foo'], 'fetch_size' => 7]);
+
+        $this->assertSame([['foo']], $receiver->queueNames);
+        $this->assertSame([7], $receiver->getFromQueuesFetchSizes);
     }
 
     public function testWorkerLimitQueuesUnsupported()
@@ -513,8 +606,6 @@ class WorkerTest extends TestCase
 
     public function testFlushBatchOnIdle()
     {
-        ClockMock::withClockMock(false);
-
         $expectedMessages = [
             new DummyMessage('Hey'),
         ];
@@ -522,29 +613,35 @@ class WorkerTest extends TestCase
         $receiver = new DummyReceiver([
             [new Envelope($expectedMessages[0])],
             [],
+            [],
         ]);
 
         $handler = new DummyBatchHandler();
 
+        $clock = new MockClock();
         $middleware = new HandleMessageMiddleware(new HandlersLocator([
             DummyMessage::class => [new HandlerDescriptor($handler)],
-        ]));
+        ]), clock: $clock);
 
         $bus = new MessageBus([$middleware]);
+        $clock = new MockClock();
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver) {
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver, $clock) {
             static $i = 0;
-            if (1 < ++$i) {
+            if (1 === ++$i) {
+                $this->assertSame(0, $receiver->getAcknowledgeCount());
+                $clock->sleep(30);
+            } elseif (2 === $i) {
                 $event->getWorker()->stop();
                 $this->assertSame(1, $receiver->getAcknowledgeCount());
             } else {
                 $this->assertSame(0, $receiver->getAcknowledgeCount());
-                sleep(1);
+                $clock->sleep(1);
             }
         });
 
-        $worker = new Worker([$receiver], $bus, $dispatcher, clock: new MockClock());
+        $worker = new Worker([$receiver], $bus, $dispatcher, clock: $clock);
         $worker->run();
 
         $this->assertSame($expectedMessages, $handler->processedMessages);
@@ -552,8 +649,6 @@ class WorkerTest extends TestCase
 
     public function testFlushBatchWithIdleTimeout()
     {
-        ClockMock::withClockMock(false);
-
         $expectedMessages = [
             new DummyMessage('Hey'),
             new DummyMessage('Bob'),
@@ -570,25 +665,26 @@ class WorkerTest extends TestCase
 
         $handler = new DummyBatchHandler(batchSize: 5, idleTimeout: 3);
 
+        $clock = new MockClock();
         $middleware = new HandleMessageMiddleware(new HandlersLocator([
             DummyMessage::class => [new HandlerDescriptor($handler)],
-        ]));
+        ]), clock: $clock);
 
         $bus = new MessageBus([$middleware]);
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver) {
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver, $clock) {
             static $i = 0;
             if (6 < ++$i) { // 6 seconds = 4 messages + 3 idle timeout - 1 sec that overlaps (last message)
                 $this->assertSame(4, $receiver->getAcknowledgeCount());
                 $event->getWorker()->stop();
             } else {
                 $this->assertSame(0, $receiver->getAcknowledgeCount());
-                sleep(1);
+                $clock->sleep(1);
             }
         });
 
-        $worker = new Worker([$receiver], $bus, $dispatcher, clock: new MockClock());
+        $worker = new Worker([$receiver], $bus, $dispatcher, clock: $clock);
         $worker->run();
 
         $this->assertSame($expectedMessages, $handler->processedMessages);
@@ -596,8 +692,6 @@ class WorkerTest extends TestCase
 
     public function testFlushBatchWithoutIdleTimeout()
     {
-        ClockMock::withClockMock(false);
-
         $expectedMessages = [
             new DummyMessage('Hey'),
         ];
@@ -609,23 +703,24 @@ class WorkerTest extends TestCase
 
         $handler = new DummyBatchHandler(idleTimeout: null);
 
+        $clock = new MockClock();
         $middleware = new HandleMessageMiddleware(new HandlersLocator([
             DummyMessage::class => [new HandlerDescriptor($handler)],
-        ]));
+        ]), clock: $clock);
 
         $bus = new MessageBus([$middleware]);
 
         $dispatcher = new EventDispatcher();
-        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver) {
+        $dispatcher->addListener(WorkerRunningEvent::class, function (WorkerRunningEvent $event) use ($receiver, $clock) {
             static $i = 0;
             if (2 < ++$i) {
                 $event->getWorker()->stop();
             }
             $this->assertSame(0, $receiver->getAcknowledgeCount());
-            sleep(1);
+            $clock->sleep(1);
         });
 
-        $worker = new Worker([$receiver], $bus, $dispatcher, clock: new MockClock());
+        $worker = new Worker([$receiver], $bus, $dispatcher, clock: $clock);
         $worker->run();
 
         $this->assertSame(1, $receiver->getAcknowledgeCount());
@@ -709,6 +804,54 @@ class WorkerTest extends TestCase
         $this->assertSame($secondHandlerExpectedMessages, $secondHandler->processedMessages);
     }
 
+    public function testBatchFlushOnInactivityWhileWorkerIsBusy()
+    {
+        $batchHandler = new LargeBatchHandler();
+
+        $middleware = new HandleMessageMiddleware(new HandlersLocator([
+            DummyMessage::class => [new HandlerDescriptor($batchHandler)],
+            SecondHandlerDummyMessage::class => [new HandlerDescriptor(static function (SecondHandlerDummyMessage $message) {})],
+        ]));
+
+        $bus = new MessageBus([$middleware]);
+        $clock = new MockClock('2024-01-01 00:00:00+00:00');
+
+        // 1 batch message, then 34 non-batch messages keeping the worker busy.
+        // The batch handler requires 100 messages to flush on its own,
+        // so shouldFlush() never triggers. The worker is never idle either.
+        $envelopes = [[new Envelope(new DummyMessage('batch'))]];
+        for ($i = 0; $i < 34; ++$i) {
+            $envelopes[] = [new Envelope(new SecondHandlerDummyMessage('regular'.$i))];
+        }
+        $receiver = new DummyReceiver($envelopes);
+
+        $loopCount = 0;
+        $flushedAtLoop = null;
+        $dispatcher = new EventDispatcher();
+        $dispatcher->addListener(WorkerRunningEvent::class, static function (WorkerRunningEvent $event) use ($clock, &$loopCount, &$flushedAtLoop, $batchHandler) {
+            ++$loopCount;
+            $clock->sleep(1);
+
+            if ($batchHandler->processedMessages) {
+                $flushedAtLoop ??= $loopCount;
+            }
+
+            if (43 <= $loopCount) {
+                $event->getWorker()->stop();
+            }
+        });
+
+        $worker = new Worker(['transport' => $receiver], $bus, $dispatcher, clock: $clock);
+        $worker->run();
+
+        // The batch message was received at t=0, then only non-batch messages arrived.
+        // After 30s of batch inactivity, the worker should force-flush.
+        $this->assertNotNull($flushedAtLoop, 'Batch should have been flushed after inactivity timeout');
+        $this->assertGreaterThanOrEqual(30, $flushedAtLoop);
+        $this->assertLessThanOrEqual(33, $flushedAtLoop);
+        $this->assertSame(['batch'], array_map(static fn ($m) => $m->getMessage(), $batchHandler->processedMessages));
+    }
+
     public function testFlushRemovesNoAutoAckStampOnException()
     {
         $envelope = new Envelope(new DummyMessage('Test'));
@@ -736,12 +879,12 @@ class WorkerTest extends TestCase
 
         $worker = new Worker(['transport' => $receiver], $bus, $dispatcher, clock: new MockClock());
 
-        $reflection = new \ReflectionClass($worker);
-        $unacksProperty = $reflection->getProperty('unacks');
-        $unacks = $unacksProperty->getValue($worker);
         $dummyHandler = new DummyBatchHandler();
         $envelopeWithNoAutoAck = $envelope->with(new NoAutoAckStamp(new HandlerDescriptor($dummyHandler)));
-        $unacks[$dummyHandler] = [$envelopeWithNoAutoAck, 'transport', false];
+        $unacks = new DeferredBatchMessageQueue();
+        $acked = false;
+        $unacks->add($dummyHandler, 'transport', $envelopeWithNoAutoAck, $acked, 0.0);
+        (new \ReflectionProperty($worker, 'unacks'))->setValue($worker, $unacks);
 
         $worker->run();
 
@@ -875,9 +1018,18 @@ class WorkerTest extends TestCase
 
 class DummyQueueReceiver extends DummyReceiver implements QueueReceiverInterface
 {
-    public function getFromQueues(array $queueNames): iterable
+    public array $queueNames = [];
+    public array $getFromQueuesFetchSizes = [];
+
+    /**
+     * @param int $fetchSize
+     */
+    public function getFromQueues(array $queueNames/* , int $fetchSize = 1 */): iterable
     {
-        return $this->get();
+        $this->queueNames[] = $queueNames;
+        $this->getFromQueuesFetchSizes[] = 1 < \func_num_args() ? func_get_arg(1) : 1;
+
+        return $this->get(...\func_num_args() > 1 ? [func_get_arg(1)] : []);
     }
 }
 
@@ -954,6 +1106,32 @@ class SecondDummyBatchHandler implements BatchHandlerInterface
     private function process(array $jobs): void
     {
         $this->processedMessages = array_column($jobs, 0);
+
+        foreach ($jobs as [$job, $ack]) {
+            $ack->ack($job);
+        }
+    }
+}
+
+class LargeBatchHandler implements BatchHandlerInterface
+{
+    use BatchHandlerTrait;
+
+    public array $processedMessages = [];
+
+    public function __invoke(DummyMessage $message, ?Acknowledger $ack = null)
+    {
+        return $this->handle($message, $ack);
+    }
+
+    private function shouldFlush(): bool
+    {
+        return 100 <= \count($this->jobs);
+    }
+
+    private function process(array $jobs): void
+    {
+        $this->processedMessages = array_merge($this->processedMessages, array_column($jobs, 0));
 
         foreach ($jobs as [$job, $ack]) {
             $ack->ack($job);

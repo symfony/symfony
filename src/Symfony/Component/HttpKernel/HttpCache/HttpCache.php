@@ -570,7 +570,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         if ($this->waitForLock($request)) {
             throw new CacheWasLockedException(); // unwind back to handle(), try again
         }
-
         // backend is slow as hell, send a 503 response (to avoid the dog pile effect)
         $entry->setStatusCode(503);
         $entry->setContent('503 Service Unavailable');

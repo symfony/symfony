@@ -50,6 +50,7 @@ final class DateTimeValueResolver implements ValueResolverInterface
             $value = $input->getOption($inputName);
         }
 
+        /** @var class-string<\DateTimeImmutable>|class-string<\DateTime> $class */
         $class = \DateTimeInterface::class === $type->getName() ? \DateTimeImmutable::class : $type->getName();
 
         if (!$value) {
@@ -63,13 +64,11 @@ final class DateTimeValueResolver implements ValueResolverInterface
         }
 
         if ($value instanceof \DateTimeInterface) {
-            /** @var class-string<\DateTimeImmutable>|class-string<\DateTime> $class */
             return [$value instanceof $class ? $value : $class::createFromInterface($value)];
         }
 
         $format = $attribute?->format;
 
-        /** @var class-string<\DateTimeImmutable>|class-string<\DateTime> $class */
         if (null !== $format) {
             $date = $class::createFromFormat($format, $value, $this->clock?->now()->getTimeZone());
 

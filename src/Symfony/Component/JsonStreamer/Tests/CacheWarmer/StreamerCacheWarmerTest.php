@@ -12,10 +12,12 @@
 namespace Symfony\Component\JsonStreamer\Tests\CacheWarmer;
 
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Symfony\Component\JsonStreamer\CacheWarmer\StreamerCacheWarmer;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
+use Symfony\Component\JsonStreamer\Tests\ServiceContainer;
 use Symfony\Component\TypeInfo\TypeResolver\TypeResolver;
 
 class StreamerCacheWarmerTest extends TestCase
@@ -77,6 +79,9 @@ class StreamerCacheWarmerTest extends TestCase
             new PropertyMetadataLoader($typeResolver),
             $this->streamWritersDir,
             $this->streamReadersDir,
+            new NullLogger(),
+            null,
+            new ServiceContainer(),
         );
     }
 }

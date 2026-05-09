@@ -83,7 +83,27 @@ final class InputBag extends ParameterBag
     }
 
     /**
-     * Returns the parameter value converted to an enum.
+     * Returns the input value converted to integer.
+     *
+     * @throws BadRequestException if the value cannot be converted to integer
+     */
+    public function getInt(string $key, int $default = 0): int
+    {
+        return $this->filter($key, $default, \FILTER_VALIDATE_INT, ['flags' => \FILTER_REQUIRE_SCALAR | \FILTER_NULL_ON_FAILURE]) ?? throw new BadRequestException(\sprintf('Input value "%s" cannot be converted to "int".', $key));
+    }
+
+    /**
+     * Returns the input value converted to boolean.
+     *
+     * @throws BadRequestException if the value cannot be converted to a boolean
+     */
+    public function getBoolean(string $key, bool $default = false): bool
+    {
+        return $this->filter($key, $default, \FILTER_VALIDATE_BOOL, ['flags' => \FILTER_REQUIRE_SCALAR | \FILTER_NULL_ON_FAILURE]) ?? throw new BadRequestException(\sprintf('Input value "%s" cannot be converted to "bool".', $key));
+    }
+
+    /**
+     * Returns the input value converted to an enum.
      *
      * @template T of \BackedEnum
      *
@@ -106,7 +126,7 @@ final class InputBag extends ParameterBag
     }
 
     /**
-     * Returns the parameter value converted to string.
+     * Returns the input value converted to string.
      *
      * @throws BadRequestException if the input contains a non-scalar value
      */

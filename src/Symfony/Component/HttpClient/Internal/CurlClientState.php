@@ -54,6 +54,7 @@ final class CurlClientState extends ClientState
         foreach ($this->pushedResponses as $url => $response) {
             $this->logger?->debug(\sprintf('Unused pushed response: "%s"', $url));
             curl_multi_remove_handle($this->handle, $response->handle);
+            unset($this->handlesActivity[(int) $response->handle]);
         }
 
         $this->pushedResponses = [];
@@ -81,7 +82,11 @@ final class CurlClientState extends ClientState
             $this->share = curl_share_init();
             curl_share_setopt($this->share, \CURLSHOPT_SHARE, \CURL_LOCK_DATA_DNS);
             curl_share_setopt($this->share, \CURLSHOPT_SHARE, \CURL_LOCK_DATA_SSL_SESSION);
-            curl_share_setopt($this->share, \CURLSHOPT_SHARE, \CURL_LOCK_DATA_CONNECT);
+
+            // Don't share CURL_LOCK_DATA_CONNECT: easy handles attached to the same multi handle
+            // already share the connection cache, and adding it here creates a second pool that
+            // bypasses CURLMOPT_MAX_HOST_CONNECTIONS.
+            // See https://curl.se/libcurl/c/CURLSHOPT_SHARE.html#CURLLOCKDATACONNECT
 
             return $this->share;
         }

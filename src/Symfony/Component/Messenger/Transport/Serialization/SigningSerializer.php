@@ -13,6 +13,7 @@ namespace Symfony\Component\Messenger\Transport\Serialization;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Exception\InvalidMessageSignatureException;
+use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -54,17 +55,21 @@ final class SigningSerializer implements SerializerInterface
 
         $headers = $encodedEnvelope['headers'] ?? [];
 
-        if (!$sign = $headers['Body-Sign'] ?? null) {
-            throw new InvalidMessageSignatureException(\sprintf('Message "%s" requires a signature but none was found.', $type));
-        }
+        try {
+            if (!$sign = $headers['Body-Sign'] ?? null) {
+                throw new InvalidMessageSignatureException(\sprintf('Message "%s" requires a signature but none was found.', $type));
+            }
 
-        if ($this->algorithm !== $algo = $headers['Sign-Algo'] ?? $this->algorithm) {
-            throw new InvalidMessageSignatureException(\sprintf('Expected "%s" signature algorithm for message "%s", "%s" given.', $this->algorithm, $type, $algo));
-        }
+            if ($this->algorithm !== $algo = $headers['Sign-Algo'] ?? $this->algorithm) {
+                throw new InvalidMessageSignatureException(\sprintf('Expected "%s" signature algorithm for message "%s", "%s" given.', $this->algorithm, $type, $algo));
+            }
 
-        $expected = hash_hmac($algo, $encodedEnvelope['body'] ?? '', $this->signingKey);
-        if (!hash_equals($sign, $expected)) {
-            throw new InvalidMessageSignatureException(\sprintf('Invalid signature for message "%s".', $type));
+            $expected = hash_hmac($algo, $encodedEnvelope['body'] ?? '', $this->signingKey);
+            if (!hash_equals($sign, $expected)) {
+                throw new InvalidMessageSignatureException(\sprintf('Invalid signature for message "%s".', $type));
+            }
+        } catch (\Throwable $e) {
+            return MessageDecodingFailedException::wrap($encodedEnvelope, $e->getMessage(), (int) $e->getCode(), $e);
         }
 
         unset($headers['Body-Sign'], $headers['Sign-Algo']);

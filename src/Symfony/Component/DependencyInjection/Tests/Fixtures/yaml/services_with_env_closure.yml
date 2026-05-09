@@ -1,0 +1,9 @@
+
+services:
+    service_container:
+        class: Symfony\Component\DependencyInjection\ContainerInterface
+        public: true
+        synthetic: true
+    foo:
+        class: Foo
+        arguments: [!env_closure '%env(FOO)%', !env_closure ['%env(FOO)%', null], !env_closure ['%env(BAR)%', def], !env_closure ['%env(FOO)%', 42, false]]

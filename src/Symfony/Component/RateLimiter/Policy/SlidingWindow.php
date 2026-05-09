@@ -68,7 +68,7 @@ final class SlidingWindow implements LimiterStateInterface
 
     public function add(int $hits = 1): void
     {
-        $this->hitCount += $hits;
+        $this->hitCount = max(0, $this->hitCount + $hits);
     }
 
     /**

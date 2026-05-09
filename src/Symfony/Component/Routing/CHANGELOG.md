@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add a `$trailingSlashOnRoot` argument to `CollectionConfigurator::prefix()` to allow disabling the trailing slash on root routes
+
 8.0
 ---
 

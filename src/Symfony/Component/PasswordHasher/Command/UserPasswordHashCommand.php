@@ -101,6 +101,11 @@ class UserPasswordHashCommand extends Command
         $input->isInteractive() ? $errorIo->title('Symfony Password Hash Utility') : $errorIo->newLine();
 
         $password = $input->getArgument('password');
+
+        if ($password) {
+            $errorIo->warning('Using a password as a command argument is insecure. Use the interactive mode instead.');
+        }
+
         $userClass = $this->getUserClass($input, $io);
         $emptySalt = $input->getOption('empty-salt');
 

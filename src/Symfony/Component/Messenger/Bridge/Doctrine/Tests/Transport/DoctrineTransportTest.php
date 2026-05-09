@@ -47,7 +47,7 @@ class DoctrineTransportTest extends TestCase
         ];
 
         $serializer->expects($this->once())->method('decode')->with(['body' => 'body', 'headers' => ['my' => 'header']])->willReturn(new Envelope($decodedMessage));
-        $connection->method('get')->willReturn($doctrineEnvelope);
+        $connection->method('get')->willReturn([$doctrineEnvelope]);
 
         $envelopes = $transport->get();
         $this->assertSame($decodedMessage, $envelopes[0]->getMessage());

@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4"
+        "php": ">=8.4.1"
     },
     "require-dev": {
         "symfony/filesystem": "^7.4|^8.0"

@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Serializer\Normalizer;
 
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException as PropertyAccessInvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\InvalidTypeException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -20,6 +22,7 @@ use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\PropertyWriteInfo;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\Mapping\Loader\AccessorCollisionResolverTrait;
@@ -121,6 +124,8 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
             $this->propertyAccessor->setValue($object, $attribute, $value);
         } catch (NoSuchPropertyException) {
             // Properties not found are ignored
+        } catch (PropertyAccessInvalidArgumentException $e) {
+            throw NotNormalizableValueException::createForUnexpectedDataType(\sprintf('Failed to denormalize attribute "%s" value for class "%s": %s', $attribute, $object::class, $e->getMessage()), $value, $e instanceof InvalidTypeException ? [$e->expectedType] : ['unknown'], $context['deserialization_path'] ?? null, false, $e->getCode(), $e);
         }
     }
 
@@ -137,16 +142,27 @@ final class ObjectNormalizer extends AbstractObjectNormalizer
         }
 
         if ($context['_read_attributes'] ?? true) {
-            if (!isset(self::$isReadableCache[$class.$attribute])) {
-                self::$isReadableCache[$class.$attribute] = $this->propertyInfoExtractor->isReadable($class, $attribute) || $this->hasAttributeAccessorMethod($class, $attribute) || (\is_object($classOrObject) && $this->propertyAccessor->isReadable($classOrObject, $attribute));
-            }
+            $context = array_intersect_key($context, ['enable_getter_setter_extraction' => true, 'enable_magic_methods_extraction' => true]);
+            $cacheKey = $class.$attribute.hash('xxh128', serialize($context));
 
-            return self::$isReadableCache[$class.$attribute];
+            return self::$isReadableCache[$cacheKey] ??= $this->propertyInfoExtractor->isReadable($class, $attribute, $context) || $this->hasAttributeAccessorMethod($class, $attribute) || (\is_object($classOrObject) && $this->propertyAccessor->isReadable($classOrObject, $attribute));
         }
 
-        return self::$isWritableCache[$class.$attribute] ??= str_contains($attribute, '.')
-            || $this->propertyInfoExtractor->isWritable($class, $attribute)
-            || !\in_array($this->writeInfoExtractor->getWriteInfo($class, $attribute)?->getType(), [null, PropertyWriteInfo::TYPE_NONE, PropertyWriteInfo::TYPE_PROPERTY], true);
+        $context = array_intersect_key($context, ['enable_getter_setter_extraction' => true, 'enable_magic_methods_extraction' => true, 'enable_constructor_extraction' => true, 'enable_adder_remover_extraction' => true]);
+        $cacheKey = $class.$attribute.hash('xxh128', serialize($context));
+
+        if (isset(self::$isWritableCache[$cacheKey])) {
+            return self::$isWritableCache[$cacheKey];
+        }
+
+        if (str_contains($attribute, '.') || $this->propertyInfoExtractor->isWritable($class, $attribute, $context)) {
+            return self::$isWritableCache[$cacheKey] = true;
+        }
+
+        $writeType = $this->writeInfoExtractor->getWriteInfo($class, $attribute, $context)?->getType();
+
+        return self::$isWritableCache[$cacheKey] = !\in_array($writeType, [null, PropertyWriteInfo::TYPE_NONE], true)
+            && (PropertyWriteInfo::TYPE_PROPERTY !== $writeType || !property_exists($class, $attribute));
     }
 
     private function hasAttributeAccessorMethod(string $class, string $attribute): bool

@@ -65,4 +65,32 @@ final class DeduplicateMiddlewareTest extends MiddlewareTestCase
         $envelope3 = new Envelope($message3, [new DeduplicateStamp('id')]);
         $decorator->handle($envelope3, $this->getStackMock(true));
     }
+
+    public function testLockIsNotReleasedWhenHandlerThrows()
+    {
+        $store = SemaphoreStore::isSupported() ? new SemaphoreStore() : new FlockStore();
+        $decorator = new DeduplicateMiddleware(new LockFactory($store));
+
+        // Enqueue step — acquires the lock.
+        $enqueue = new Envelope(new DummyMessage('Hello'), [new DeduplicateStamp('id')]);
+        $decorator->handle($enqueue, $this->getStackMock(true));
+
+        // Consumer step — handler throws; the lock must NOT be released so the
+        // failed message keeps its deduplication guarantee while waiting for retry.
+        $consumed = $enqueue->with(new ReceivedStamp('transport'));
+
+        try {
+            $decorator->handle($consumed, $this->getThrowingStackMock());
+            $this->fail('The handler exception must propagate.');
+        } catch (\RuntimeException $e) {
+            $this->assertSame('Thrown from next middleware.', $e->getMessage());
+        }
+
+        // A new enqueue with the same key must be swallowed (lock still held).
+        $duplicate = new Envelope(new DummyMessage('Hello'), [new DeduplicateStamp('id')]);
+        $decorator->handle($duplicate, $this->getStackMock(false));
+
+        // Release the lock so the test leaves no stale state for re-runs.
+        $decorator->handle($consumed, $this->getStackMock(true));
+    }
 }

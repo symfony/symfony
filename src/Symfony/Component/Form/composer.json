@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "symfony/deprecation-contracts": "^2.5|^3",
         "symfony/event-dispatcher": "^7.4|^8.0",
         "symfony/options-resolver": "^7.4|^8.0",
@@ -24,7 +24,8 @@
         "symfony/polyfill-intl-icu": "^1.21",
         "symfony/polyfill-mbstring": "^1.0",
         "symfony/property-access": "^7.4|^8.0",
-        "symfony/service-contracts": "^2.5|^3"
+        "symfony/service-contracts": "^2.5|^3",
+        "symfony/var-exporter": "^8.1"
     },
     "require-dev": {
         "doctrine/collections": "^1.0|^2.0",

@@ -53,12 +53,12 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             multiple: true,
         );
 
-        $this->validator->validate('asdf', $constraint);
+        $this->validate('asdf', $constraint);
     }
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Choice(choices: ['foo', 'bar']));
+        $this->validate(null, new Choice(choices: ['foo', 'bar']));
 
         $this->assertNoViolation();
     }
@@ -66,18 +66,18 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     public function testChoicesOrCallbackExpected()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        $this->validator->validate('foobar', new Choice());
+        $this->validate('foobar', new Choice());
     }
 
     public function testValidCallbackExpected()
     {
         $this->expectException(ConstraintDefinitionException::class);
-        $this->validator->validate('foobar', new Choice(callback: 'abcd'));
+        $this->validate('foobar', new Choice(callback: 'abcd'));
     }
 
     public function testValidChoiceArray()
     {
-        $this->validator->validate('bar', new Choice(choices: ['foo', 'bar']));
+        $this->validate('bar', new Choice(choices: ['foo', 'bar']));
 
         $this->assertNoViolation();
     }
@@ -85,7 +85,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('provideConstraintsWithCallbackFunction')]
     public function testValidChoiceCallbackFunction(Choice $constraint)
     {
-        $this->validator->validate('bar', $constraint);
+        $this->validate('bar', $constraint);
 
         $this->assertNoViolation();
     }
@@ -104,7 +104,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
         $constraint = new Choice(callback: 'staticCallback');
 
-        $this->validator->validate('bar', $constraint);
+        $this->validate('bar', $constraint);
 
         $this->assertNoViolation();
     }
@@ -119,7 +119,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
         $constraint = new Choice(callback: 'staticCallbackInvalid');
 
-        $this->validator->validate('bar', $constraint);
+        $this->validate('bar', $constraint);
     }
 
     public function testValidChoiceCallbackContextObjectMethod()
@@ -129,14 +129,14 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
         $constraint = new Choice(callback: 'objectMethodCallback');
 
-        $this->validator->validate('bar', $constraint);
+        $this->validate('bar', $constraint);
 
         $this->assertNoViolation();
     }
 
     public function testMultipleChoices()
     {
-        $this->validator->validate(['baz', 'bar'], new Choice(
+        $this->validate(['baz', 'bar'], new Choice(
             choices: ['foo', 'bar', 'baz'],
             multiple: true,
         ));
@@ -146,7 +146,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidChoice()
     {
-        $this->validator->validate('baz', new Choice(choices: ['foo', 'bar'], message: 'myMessage'));
+        $this->validate('baz', new Choice(choices: ['foo', 'bar'], message: 'myMessage'));
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"baz"')
@@ -164,7 +164,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate('baz', $constraint);
+        $this->validate('baz', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"baz"')
@@ -175,7 +175,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testInvalidChoiceMultiple()
     {
-        $this->validator->validate(['foo', 'baz'], new Choice(
+        $this->validate(['foo', 'baz'], new Choice(
             choices: ['foo', 'bar'],
             multipleMessage: 'myMessage',
             multiple: true,
@@ -195,7 +195,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
         $this->setValue($value);
 
-        $this->validator->validate($value, new Choice(
+        $this->validate($value, new Choice(
             choices: ['foo', 'bar', 'moo', 'maa'],
             multiple: true,
             min: 2,
@@ -216,7 +216,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
         $this->setValue($value);
 
-        $this->validator->validate($value, new Choice(
+        $this->validate($value, new Choice(
             choices: ['foo', 'bar', 'moo', 'maa'],
             multiple: true,
             max: 2,
@@ -235,7 +235,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Choice(choices: [1, 2]);
 
-        $this->validator->validate(2, $constraint);
+        $this->validate(2, $constraint);
 
         $this->assertNoViolation();
     }
@@ -247,7 +247,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate('2', $constraint);
+        $this->validate('2', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"2"')
@@ -264,7 +264,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
             multipleMessage: 'myMessage',
         );
 
-        $this->validator->validate([2, '3'], $constraint);
+        $this->validate([2, '3'], $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"3"')
@@ -276,7 +276,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testMatchFalse()
     {
-        $this->validator->validate('foo', new Choice(
+        $this->validate('foo', new Choice(
             choices: ['foo', 'bar'],
             match: false,
         ));
@@ -290,7 +290,7 @@ class ChoiceValidatorTest extends ConstraintValidatorTestCase
 
     public function testMatchFalseWithMultiple()
     {
-        $this->validator->validate(['ccc', 'bar', 'zzz'], new Choice(
+        $this->validate(['ccc', 'bar', 'zzz'], new Choice(
             choices: ['foo', 'bar'],
             multiple: true,
             match: false,

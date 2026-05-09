@@ -20,6 +20,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Workflow\Debug\ListenerExtractor;
 use Symfony\Component\Workflow\Debug\TraceableWorkflow;
 use Symfony\Component\Workflow\Dumper\GraphvizDumper;
 use Symfony\Component\Workflow\Dumper\MermaidDumper;
@@ -37,6 +39,8 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
 #[AsCommand(name: 'workflow:dump', description: 'Dump a workflow')]
 class WorkflowDumpCommand extends Command
 {
+    private readonly ?ListenerExtractor $listenerExtractor;
+
     private const DUMP_FORMAT_OPTIONS = [
         'puml',
         'mermaid',
@@ -45,8 +49,12 @@ class WorkflowDumpCommand extends Command
 
     public function __construct(
         private ServiceProviderInterface $workflows,
+        ?EventDispatcherInterface $dispatcher = null,
     ) {
         parent::__construct();
+        if ($dispatcher) {
+            $this->listenerExtractor = new ListenerExtractor($dispatcher);
+        }
     }
 
     protected function configure(): void
@@ -57,6 +65,7 @@ class WorkflowDumpCommand extends Command
                 new InputArgument('marking', InputArgument::IS_ARRAY, 'A marking (a list of places)'),
                 new InputOption('label', 'l', InputOption::VALUE_REQUIRED, 'Label a graph'),
                 new InputOption('with-metadata', null, InputOption::VALUE_NONE, 'Include the workflow\'s metadata in the dumped graph', null),
+                new InputOption('with-listeners', null, InputOption::VALUE_NONE, 'Include the workflow\'s listeners in the dumped graph', null),
                 new InputOption('dump-format', null, InputOption::VALUE_REQUIRED, 'The dump format ['.implode('|', self::DUMP_FORMAT_OPTIONS).']', 'dot'),
             ])
             ->setHelp(<<<'EOF'
@@ -107,9 +116,18 @@ class WorkflowDumpCommand extends Command
             $marking->mark($place);
         }
 
+        $listeners = [];
+        if ($input->getOption('with-listeners')) {
+            if (!isset($this->listenerExtractor)) {
+                throw new InvalidArgumentException('You cannot use the "--with-listeners" option if a dispatcher is not injected in the constructor.');
+            }
+            $listeners = $this->listenerExtractor->extractListeners($workflowName, $definition);
+        }
+
         $options = [
             'name' => $workflowName,
             'with-metadata' => $input->getOption('with-metadata'),
+            'listeners' => $listeners,
             'nofooter' => true,
             'label' => $input->getOption('label'),
         ];

@@ -19,6 +19,7 @@ use Symfony\Component\Lock\LockInterface;
 use Symfony\Component\Lock\NoLock;
 use Symfony\Component\Lock\Store\InMemoryStore;
 use Symfony\Component\Scheduler\Generator\Checkpoint;
+use Symfony\Contracts\Cache\ItemInterface;
 
 class CheckpointTest extends TestCase
 {
@@ -149,17 +150,14 @@ class CheckpointTest extends TestCase
         $checkpoint = new Checkpoint('cache', new NoLock(), $cache = new ArrayAdapter());
         $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
 
-        // init
         $cache->get('cache', static fn () => [$now->modify('-1 min'), 3], \INF);
 
-        // action
         $acquired = $checkpoint->acquire($now);
         $lastTime = $checkpoint->time();
         $lastIndex = $checkpoint->index();
         $checkpoint->save($now, 0);
         $checkpoint->release($now, null);
 
-        // asserting
         $this->assertTrue($acquired);
         $this->assertEquals($now->modify('-1 min'), $lastTime);
         $this->assertSame(3, $lastIndex);
@@ -259,22 +257,32 @@ class CheckpointTest extends TestCase
         $checkpoint = new Checkpoint('dummy', $lock);
         $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
 
-        // init
         $checkpoint->save($now->modify('-1 min'), 3);
 
-        // action
         $acquired = $checkpoint->acquire($now);
         $lastTime = $checkpoint->time();
         $lastIndex = $checkpoint->index();
         $checkpoint->save($now, 0);
         $checkpoint->release($now, null);
 
-        // asserting
         $this->assertTrue($acquired);
         $this->assertEquals($now->modify('-1 min'), $lastTime);
         $this->assertSame(3, $lastIndex);
         $this->assertEquals($now, $checkpoint->time());
         $this->assertSame(0, $checkpoint->index());
         $this->assertFalse($lock->isAcquired());
+    }
+
+    public function testCheckpointOverridesPoolDefaultLifetime()
+    {
+        $cache = new ArrayAdapter(1);
+        $checkpoint = new Checkpoint('cache', new NoLock(), $cache);
+        $now = new \DateTimeImmutable('2020-02-20 20:20:20Z');
+
+        $checkpoint->acquire($now);
+        $checkpoint->save($now, 5);
+
+        $expiry = $cache->getItem('cache')->getMetadata()[ItemInterface::METADATA_EXPIRY] ?? null;
+        $this->assertGreaterThan(time() + 365 * 86400, $expiry);
     }
 }

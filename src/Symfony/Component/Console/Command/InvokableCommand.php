@@ -22,6 +22,7 @@ use Symfony\Component\Console\Cursor;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\RawInputInterface;
 use Symfony\Component\Console\Interaction\Interaction;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -141,6 +142,7 @@ class InvokableCommand implements SignalableCommandInterface
             if ($type instanceof \ReflectionNamedType) {
                 $argument = match ($type->getName()) {
                     InputInterface::class => $input,
+                    RawInputInterface::class => $input,
                     OutputInterface::class => $output,
                     SymfonyStyle::class => new SymfonyStyle($input, $output, $this->command->getApplication()?->getDispatcher()),
                     Cursor::class => new Cursor($output),

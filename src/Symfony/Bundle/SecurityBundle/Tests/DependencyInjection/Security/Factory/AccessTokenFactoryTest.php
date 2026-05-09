@@ -303,6 +303,8 @@ class AccessTokenFactoryTest extends TestCase
                         ->replaceArgument(0, ['base_uri' => 'https://www.example.com/realms/demo/']),
                     ],
                     'security.access_token_handler.firewall1.oidc_configuration',
+                    null,
+                    true,
                 ],
             ],
         ];
@@ -360,6 +362,8 @@ class AccessTokenFactoryTest extends TestCase
                             ->replaceArgument(0, ['base_uri' => 'https://www.api.com/realms/api/']),
                     ],
                     'security.access_token_handler.firewall1.oidc_configuration',
+                    null,
+                    true,
                 ],
             ],
         ];

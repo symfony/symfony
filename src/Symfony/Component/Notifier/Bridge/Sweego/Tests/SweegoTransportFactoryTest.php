@@ -27,8 +27,13 @@ final class SweegoTransportFactoryTest extends AbstractTransportFactoryTestCase
     public static function createProvider(): iterable
     {
         yield [
-            'sweego://host.test?region=REGION&campaign_type=CAMPAIGN_TYPE',
+            'sweego://host.test?region=REGION&campaign_type=CAMPAIGN_TYPE&bat=0&shorten_urls=1&shorten_with_protocol=1',
             'sweego://apiKey@host.test?region=REGION&campaign_type=CAMPAIGN_TYPE',
+        ];
+
+        yield [
+            'sweego://host.test?region=REGION&campaign_type=CAMPAIGN_TYPE&bat=0&shorten_urls=0&shorten_with_protocol=0',
+            'sweego://apiKey@host.test?region=REGION&campaign_type=CAMPAIGN_TYPE&bat=false&shorten_urls=false&shorten_with_protocol=false',
         ];
     }
 

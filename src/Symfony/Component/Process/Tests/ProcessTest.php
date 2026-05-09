@@ -1719,7 +1719,7 @@ class ProcessTest extends TestCase
         $process->setIgnoredSignals([\SIGTERM]);
 
         $process->start();
-        $process->stop(timeout: 0.2);
+        $process->stop(0.2);
 
         $this->assertNotSame(\SIGTERM, $process->getTermSignal());
     }
@@ -1734,7 +1734,7 @@ class ProcessTest extends TestCase
         $process = $this->getProcess(['sleep', '10']);
 
         $process->start();
-        $process->stop(timeout: 0.2);
+        $process->stop(0.2);
 
         $this->assertSame(\SIGTERM, $process->getTermSignal());
     }

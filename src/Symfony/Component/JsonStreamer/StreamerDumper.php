@@ -39,6 +39,8 @@ final class StreamerDumper
     /**
      * Dumps the generated content to the given path, optionally using config cache.
      *
+     * @param-immediately-invoked-callable $generateContent
+     *
      * @param callable(): string $generateContent
      */
     public function dump(Type $type, string $path, callable $generateContent): void

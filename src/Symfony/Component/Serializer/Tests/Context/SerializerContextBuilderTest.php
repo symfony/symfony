@@ -38,6 +38,7 @@ class SerializerContextBuilderTest extends TestCase
         $context = $this->contextBuilder
             ->withEmptyArrayAsObject($values[Serializer::EMPTY_ARRAY_AS_OBJECT])
             ->withCollectDenormalizationErrors($values[DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS])
+            ->withCollectExtraAttributesErrors($values[DenormalizerInterface::COLLECT_EXTRA_ATTRIBUTES_ERRORS])
             ->toArray();
 
         $this->assertSame($values, $context);
@@ -51,11 +52,13 @@ class SerializerContextBuilderTest extends TestCase
         yield 'With values' => [[
             Serializer::EMPTY_ARRAY_AS_OBJECT => true,
             DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => false,
+            DenormalizerInterface::COLLECT_EXTRA_ATTRIBUTES_ERRORS => false,
         ]];
 
         yield 'With null values' => [[
             Serializer::EMPTY_ARRAY_AS_OBJECT => null,
             DenormalizerInterface::COLLECT_DENORMALIZATION_ERRORS => null,
+            DenormalizerInterface::COLLECT_EXTRA_ATTRIBUTES_ERRORS => null,
         ]];
     }
 }

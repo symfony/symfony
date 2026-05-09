@@ -105,13 +105,13 @@ class Response
         'etag' => true,
     ];
 
-    public ResponseHeaderBag $headers;
+    public ResponseHeaderBag $headers {
+        set {
+            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "headers" of "%s" is deprecated; pass the header bag as a constructor argument instead.', __CLASS__);
 
-    protected string $content;
-    protected string $version;
-    protected int $statusCode;
-    protected string $statusText;
-    protected ?string $charset = null;
+            $this->headers = $value;
+        }
+    }
 
     /**
      * Status codes translation table.
@@ -189,6 +189,12 @@ class Response
         511 => 'Network Authentication Required',                             // RFC6585
     ];
 
+    protected string $content;
+    protected string $version;
+    protected int $statusCode;
+    protected string $statusText;
+    protected ?string $charset = null;
+
     /**
      * Tracks headers already sent in informational responses.
      */
@@ -199,9 +205,9 @@ class Response
      *
      * @throws \InvalidArgumentException When the HTTP status code is not valid
      */
-    public function __construct(?string $content = '', int $status = 200, array $headers = [])
+    public function __construct(?string $content = '', int $status = 200, array|ResponseHeaderBag $headers = [])
     {
-        $this->headers = new ResponseHeaderBag($headers);
+        self::setHeaders($this, $headers instanceof ResponseHeaderBag ? $headers : new ResponseHeaderBag($headers));
         $this->setContent($content);
         $this->setStatusCode($status);
         $this->setProtocolVersion('1.0');
@@ -229,7 +235,7 @@ class Response
      */
     public function __clone()
     {
-        $this->headers = clone $this->headers;
+        self::setHeaders($this, clone $this->headers);
     }
 
     /**
@@ -480,13 +486,7 @@ class Response
             throw new \InvalidArgumentException(\sprintf('The HTTP status code "%s" is not valid.', $code));
         }
 
-        if (null === $text) {
-            $this->statusText = self::$statusTexts[$code] ?? 'unknown status';
-
-            return $this;
-        }
-
-        $this->statusText = $text;
+        $this->statusText = $text ?? self::$statusTexts[$code] ?? 'unknown status';
 
         return $this;
     }
@@ -1318,5 +1318,14 @@ class Response
                 $this->headers->remove('Cache-Control');
             }
         }
+    }
+
+    private static function setHeaders(self $response, ResponseHeaderBag $headers): void
+    {
+        static $r;
+
+        $r ??= new \ReflectionProperty(self::class, 'headers');
+
+        $r->setRawValue($response, $headers);
     }
 }

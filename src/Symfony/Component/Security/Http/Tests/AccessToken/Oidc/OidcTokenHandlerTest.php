@@ -444,7 +444,98 @@ class OidcTokenHandlerTest extends TestCase
         $handler->getUserBadgeFrom($token);
     }
 
-    public function testDiscoveryIgnoresNonSignatureKeys()
+    public function testDiscoveryExcludesEncryptionKeys()
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['jwks_uri' => 'https://www.example.com/jwks.json']),
+            new JsonMockResponse([
+                'keys' => [
+                    array_merge(self::getJWK()->all(), ['use' => 'enc']),
+                    array_merge(self::getSecondJWK()->all(), ['use' => 'sig']),
+                ],
+            ]),
+        ]);
+
+        $cache = new ArrayAdapter();
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['https://www.example.com']
+        );
+        $handler->enableDiscovery($cache, $httpClient, 'oidc_non_sig_keys', enforceKeyUsageVerification: false);
+
+        $item = $this->createMock(ItemInterface::class);
+        $item->expects($this->never())->method('expiresAfter');
+        $keys = $handler->computeDiscoveryKeys($item);
+        $this->assertCount(1, $keys);
+        $this->assertSame('sig', $keys[0]['use']);
+    }
+
+    public function testDiscoveryExcludesEncryptionKeyOps()
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['jwks_uri' => 'https://www.example.com/jwks.json']),
+            new JsonMockResponse([
+                'keys' => [
+                    array_merge(self::getJWK()->all(), ['key_ops' => ['encrypt', 'decrypt']]),
+                    array_merge(self::getSecondJWK()->all(), ['key_ops' => ['sign', 'verify']]),
+                ],
+            ]),
+        ]);
+
+        $cache = new ArrayAdapter();
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['https://www.example.com']
+        );
+        $handler->enableDiscovery($cache, $httpClient, 'oidc_enc_key_ops', enforceKeyUsageVerification: false);
+
+        $item = $this->createStub(ItemInterface::class);
+        $keys = $handler->computeDiscoveryKeys($item);
+        $this->assertCount(1, $keys);
+        $this->assertSame(['sign', 'verify'], $keys[0]['key_ops']);
+    }
+
+    public function testDiscoveryIncludesKeysWithoutUsageDesignation()
+    {
+        $time = time();
+        $claims = [
+            'iat' => $time,
+            'nbf' => $time,
+            'exp' => $time + 3600,
+            'iss' => 'https://www.example.com',
+            'aud' => self::AUDIENCE,
+            'sub' => 'user-no-use-field',
+        ];
+        $token = self::buildJWS(json_encode($claims));
+
+        $jwkData = self::getJWK()->all();
+        unset($jwkData['d']);
+
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['jwks_uri' => 'https://www.example.com/jwks.json']),
+            new JsonMockResponse(['keys' => [$jwkData]]),
+        ]);
+
+        $cache = new ArrayAdapter();
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['https://www.example.com']
+        );
+        $handler->enableDiscovery($cache, $httpClient, 'oidc_no_use', enforceKeyUsageVerification: false);
+
+        $userBadge = $handler->getUserBadgeFrom($token);
+
+        $this->assertInstanceOf(UserBadge::class, $userBadge);
+        $this->assertSame('user-no-use-field', $userBadge->getUserIdentifier());
+    }
+
+    public function testDiscoveryEnforcedUsageOnlyAcceptsExplicitSignatureKeys()
     {
         $httpClient = new MockHttpClient([
             new JsonMockResponse(['jwks_uri' => 'https://www.example.com/jwks.json']),
@@ -463,10 +554,36 @@ class OidcTokenHandlerTest extends TestCase
             self::AUDIENCE,
             ['https://www.example.com']
         );
-        $handler->enableDiscovery($cache, $httpClient, 'oidc_non_sig_keys');
+        $handler->enableDiscovery($cache, $httpClient, 'oidc_enforced', enforceKeyUsageVerification: true);
 
         $item = $this->createMock(ItemInterface::class);
         $item->expects($this->never())->method('expiresAfter');
         $this->assertSame([], $handler->computeDiscoveryKeys($item));
+    }
+
+    public function testDiscoveryEnforcedUsageAcceptsKeyOpsSign()
+    {
+        $httpClient = new MockHttpClient([
+            new JsonMockResponse(['jwks_uri' => 'https://www.example.com/jwks.json']),
+            new JsonMockResponse([
+                'keys' => [
+                    array_merge(self::getJWK()->all(), ['key_ops' => ['sign']]),
+                    array_merge(self::getSecondJWK()->all(), ['key_ops' => ['encrypt']]),
+                ],
+            ]),
+        ]);
+
+        $cache = new ArrayAdapter();
+        $handler = new OidcTokenHandler(
+            new AlgorithmManager([new ES256()]),
+            null,
+            self::AUDIENCE,
+            ['https://www.example.com']
+        );
+        $handler->enableDiscovery($cache, $httpClient, 'oidc_enforced_ops', enforceKeyUsageVerification: true);
+        $item = $this->createStub(ItemInterface::class);
+        $keys = $handler->computeDiscoveryKeys($item);
+        $this->assertCount(1, $keys);
+        $this->assertSame(['sign'], $keys[0]['key_ops']);
     }
 }

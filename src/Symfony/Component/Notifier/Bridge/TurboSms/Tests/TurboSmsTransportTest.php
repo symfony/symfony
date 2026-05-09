@@ -49,7 +49,7 @@ final class TurboSmsTransportTest extends TransportTestCase
 
     public function testSuccessfulSend()
     {
-        $response = new JsonMockResponse(body: [
+        $response = new JsonMockResponse([
             'response_code' => 0,
             'response_status' => 'OK',
             'response_result' => [
@@ -60,7 +60,7 @@ final class TurboSmsTransportTest extends TransportTestCase
                     'response_status' => 'OK',
                 ],
             ],
-        ], info: ['http_code' => 200]);
+        ], ['http_code' => 200]);
 
         $client = new MockHttpClient(static function (string $method, string $url, array $options) use ($response): ResponseInterface {
             $body = json_decode($options['body'], true);
@@ -86,7 +86,7 @@ final class TurboSmsTransportTest extends TransportTestCase
 
     public function testFailedSendWithPartialAccepted()
     {
-        $response = new JsonMockResponse(body: [
+        $response = new JsonMockResponse([
             'response_code' => 0,
             'response_status' => 'OK',
             'response_result' => [
@@ -97,7 +97,7 @@ final class TurboSmsTransportTest extends TransportTestCase
                     'response_status' => 'NOT_ALLOWED_RECIPIENT_COUNTRY',
                 ],
             ],
-        ], info: ['http_code' => 200]);
+        ], ['http_code' => 200]);
 
         $client = new MockHttpClient(static fn () => $response);
 
@@ -113,11 +113,11 @@ final class TurboSmsTransportTest extends TransportTestCase
 
     public function testFailedSend()
     {
-        $response = new JsonMockResponse(body: [
+        $response = new JsonMockResponse([
             'response_code' => 103,
             'response_status' => 'REQUIRED_TOKEN',
             'response_result' => null,
-        ], info: ['http_code' => 400]);
+        ], ['http_code' => 400]);
 
         $client = new MockHttpClient(static fn (): ResponseInterface => $response);
 

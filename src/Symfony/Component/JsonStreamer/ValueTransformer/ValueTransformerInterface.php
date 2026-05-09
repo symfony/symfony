@@ -11,22 +11,17 @@
 
 namespace Symfony\Component\JsonStreamer\ValueTransformer;
 
-use Symfony\Component\TypeInfo\Type;
+use Symfony\Component\JsonStreamer\Transformer\PropertyValueTransformerInterface;
+
+trigger_deprecation('symfony/json-streamer', '8.1', 'The "%s" interface is deprecated, use "%s" instead.', ValueTransformerInterface::class, PropertyValueTransformerInterface::class);
 
 /**
  * Transforms a native value before stream writing and after stream reading.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
+ *
+ * @deprecated since Symfony 8.1, use Symfony\Component\JsonStreamer\Transformer\PropertyValueTransformerInterface instead
  */
-interface ValueTransformerInterface
+interface ValueTransformerInterface extends PropertyValueTransformerInterface
 {
-    /**
-     * @param array{
-     *     _current_object?: object, // When writing stream: the object holding the current property
-     *     ...<string, mixed>,
-     * } $options
-     */
-    public function transform(mixed $value, array $options = []): mixed;
-
-    public static function getStreamValueType(): Type;
 }

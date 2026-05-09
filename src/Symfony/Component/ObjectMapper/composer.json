@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "psr/container": "^2.0"
     },
     "require-dev": {

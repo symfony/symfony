@@ -15,6 +15,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\RawInputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Dotenv\Dotenv;
@@ -169,19 +170,23 @@ class SymfonyRuntime extends GenericRuntime
     public function getRunner(?object $application): RunnerInterface
     {
         if ($application instanceof HttpKernelInterface) {
-            if ($_SERVER['FRANKENPHP_WORKER'] ?? false) {
+            if (filter_var($_SERVER['FRANKENPHP_WORKER'] ?? false, \FILTER_VALIDATE_BOOL)) {
                 return new FrankenPhpWorkerRunner($application, $this->options['worker_loop_max']);
             }
 
-            return new HttpKernelRunner($application, $this->request ??= Request::createFromGlobals(), $this->options['debug'] ?? false);
+            return new HttpKernelRunner($application, $this->resolveType(Request::class), $this->options['debug'] ?? false);
         }
 
         if ($application instanceof Response) {
+            if (filter_var($_SERVER['FRANKENPHP_WORKER'] ?? false, \FILTER_VALIDATE_BOOL)) {
+                return new FrankenPhpWorkerRunner($application, $this->options['worker_loop_max']);
+            }
+
             return new ResponseRunner($application);
         }
 
         if ($application instanceof Command) {
-            $console = $this->console ??= new Application();
+            $console = $this->resolveType(Application::class);
             $console->setName($application->getName() ?: $console->getName());
 
             if (!$application->getName() || !$console->has($application->getName())) {
@@ -203,13 +208,13 @@ class SymfonyRuntime extends GenericRuntime
         if ($application instanceof Application) {
             set_time_limit(0);
             $defaultEnv = !isset($this->options['env']) ? ($_SERVER[$this->options['env_var_name']] ?? 'dev') : null;
-            $output = $this->output ??= new ConsoleOutput();
+            $output = $this->resolveType(OutputInterface::class);
 
-            return new ConsoleApplicationRunner($application, $defaultEnv, $this->getInput(), $output);
+            return new ConsoleApplicationRunner($application, $defaultEnv, $this->resolveType(InputInterface::class), $output);
         }
 
         if (isset($this->command)) {
-            $this->getInput()->bind($this->command->getDefinition());
+            $this->resolveType(InputInterface::class)->bind($this->command->getDefinition());
         }
 
         return parent::getRunner($application);
@@ -217,13 +222,19 @@ class SymfonyRuntime extends GenericRuntime
 
     protected function getArgument(\ReflectionParameter $parameter, ?string $type): mixed
     {
+        return $this->resolveType($type) ?? parent::getArgument($parameter, $type);
+    }
+
+    protected function resolveType(string $type): mixed
+    {
         return match ($type) {
             Request::class => $this->request ??= Request::createFromGlobals(),
             InputInterface::class => $this->getInput(),
+            RawInputInterface::class => $this->getInput(),
             OutputInterface::class => $this->output ??= new ConsoleOutput(),
             Application::class => $this->console ??= new Application(),
             Command::class => $this->command ??= new Command(),
-            default => parent::getArgument($parameter, $type),
+            default => null,
         };
     }
 
@@ -237,6 +248,7 @@ class SymfonyRuntime extends GenericRuntime
             Application::class => $self,
             Command::class => $self,
             InputInterface::class => $self,
+            RawInputInterface::class => $self,
             OutputInterface::class => $self,
         ];
         $runtime->options = $self->options;

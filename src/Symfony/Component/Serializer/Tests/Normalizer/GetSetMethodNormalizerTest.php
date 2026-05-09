@@ -530,6 +530,18 @@ class GetSetMethodNormalizerTest extends TestCase
         return new GetSetMethodNormalizer(new ClassMetadataFactory(new AttributeLoader()));
     }
 
+    public function testUnrelatedErrorFromGetterIsNotSwallowed()
+    {
+        $normalizer = new GetSetMethodNormalizer();
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('intentional getter failure');
+
+        $normalizer->normalize(new GetSetDummyWithThrowingGetter(), null, [
+            'skip_uninitialized_values' => true,
+        ]);
+    }
+
     public function testNormalizeWithDiscriminator()
     {
         $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
@@ -635,6 +647,28 @@ class GetSetMethodNormalizerTest extends TestCase
         $this->assertArrayNotHasKey('voidProperty', $normalized);
         $this->assertArrayNotHasKey('neverProperty', $normalized);
         $this->assertEquals('value', $normalized['normalProperty']);
+    }
+
+    public function testNormalizeWithCanPrefixMethods()
+    {
+        $obj = new GetSetDummyWithCanMethods();
+        $obj->setName('Alice');
+
+        $this->assertEquals(
+            ['name' => 'Alice', 'edit' => true, 'delete' => false],
+            $this->normalizer->normalize($obj, 'any')
+        );
+    }
+
+    public function testNormalizeWithCanPrefixOnly()
+    {
+        $obj = new GetSetDummyWithCanOnly();
+
+        $this->assertTrue($this->normalizer->supportsNormalization($obj));
+        $this->assertEquals(
+            ['read' => true, 'write' => false],
+            $this->normalizer->normalize($obj, 'any')
+        );
     }
 }
 
@@ -788,6 +822,14 @@ class GetConstructorOptionalArgsDummy
     public function otherMethod()
     {
         throw new \RuntimeException('Dummy::otherMethod() should not be called');
+    }
+}
+
+class GetSetDummyWithThrowingGetter
+{
+    public function getValue(): string
+    {
+        throw new \TypeError('intentional getter failure');
     }
 }
 
@@ -1020,5 +1062,43 @@ class GetSetWithAccessorishMethod
 
     public function isolate()
     {
+    }
+}
+
+class GetSetDummyWithCanMethods
+{
+    private $name;
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    public function canEdit(): bool
+    {
+        return true;
+    }
+
+    public function canDelete(): bool
+    {
+        return false;
+    }
+}
+
+class GetSetDummyWithCanOnly
+{
+    public function canRead(): bool
+    {
+        return true;
+    }
+
+    public function canWrite(): bool
+    {
+        return false;
     }
 }

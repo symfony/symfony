@@ -375,6 +375,8 @@ final class CurlResponse implements ResponseInterface, StreamableInterface
 
     /**
      * Parses header lines as curl yields them to us.
+     *
+     * @param-immediately-invoked-callable $resolveRedirect
      */
     private static function parseHeaderLine($ch, string $data, array &$info, array &$headers, ?array $options, CurlClientState $multi, int $id, ?string &$location, ?callable $resolveRedirect, ?LoggerInterface $logger): int
     {

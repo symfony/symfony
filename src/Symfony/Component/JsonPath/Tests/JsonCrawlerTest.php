@@ -17,10 +17,15 @@ use Symfony\Component\JsonPath\Exception\InvalidArgumentException;
 use Symfony\Component\JsonPath\Exception\InvalidJsonStringInputException;
 use Symfony\Component\JsonPath\Exception\JsonCrawlerException;
 use Symfony\Component\JsonPath\JsonCrawler;
+use Symfony\Component\JsonPath\JsonCrawlerInterface;
 use Symfony\Component\JsonPath\JsonPath;
+use Symfony\Component\JsonPath\JsonPathCrawler;
+use Symfony\Component\JsonPath\JsonPathCrawlerInterface;
 
 class JsonCrawlerTest extends TestCase
 {
+    use FunctionsLocatorTrait;
+
     public function testNotStringOrResourceThrows()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -35,6 +40,22 @@ class JsonCrawlerTest extends TestCase
         $this->expectExceptionMessage('Invalid JSON input: Syntax error');
 
         (new JsonCrawler('invalid'))->find('$..*');
+    }
+
+    public function testJsonPathCrawlerCreatesJsonCrawler()
+    {
+        $jsonPathCrawler = new JsonPathCrawler($this->createFunctionsLocator([
+            'upper' => static fn (mixed $value): ?string => \is_string($value) ? strtoupper($value) : null,
+        ]));
+
+        $this->assertInstanceOf(JsonPathCrawlerInterface::class, $jsonPathCrawler);
+
+        $crawler = $jsonPathCrawler->crawl('{"items": [{"title": "hello"}, {"title": "world"}]}');
+
+        $this->assertInstanceOf(JsonCrawlerInterface::class, $crawler);
+        $this->assertSame([
+            ['title' => 'hello'],
+        ], $crawler->find('$.items[?upper(@.title) == "HELLO"]'));
     }
 
     public function testAllAuthors()
@@ -537,6 +558,23 @@ class JsonCrawlerTest extends TestCase
 
         $this->assertCount(1, $result);
         $this->assertSame([42], $result[0]['extra']);
+    }
+
+    #[DataProvider('provideNonSingularRelativeQueryFunctionArguments')]
+    public function testNonSingularRelativeQueryFunctionArgument(string $path)
+    {
+        $this->expectException(JsonCrawlerException::class);
+        $this->expectExceptionMessage('the JsonPath function "length" argument must be a singular query');
+
+        self::getBookstoreCrawler()->find($path);
+    }
+
+    public static function provideNonSingularRelativeQueryFunctionArguments(): array
+    {
+        return [
+            ['$.store.book[?length(@.*) > 0]'],
+            ['$.store.book[?length(@..author) > 0]'],
+        ];
     }
 
     public function testUnknownFunction()

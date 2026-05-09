@@ -178,7 +178,7 @@ class Connection extends AbstractConnection
             }
 
             if (!isset($parent['network_timeout'])) {
-                $options->setDefault('network_timeout', \ini_get('default_socket_timeout'));
+                $options->setDefault('network_timeout', (int) \ini_get('default_socket_timeout'));
             }
 
             $options->setDefaults([
@@ -203,7 +203,6 @@ class Connection extends AbstractConnection
         if (false === $connection = ldap_connect($this->config['connection_string'])) {
             throw new LdapException('Invalid connection string: '.$this->config['connection_string']);
         }
-
         $this->connection = $connection;
 
         foreach ($this->config['options'] as $name => $value) {

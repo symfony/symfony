@@ -11,6 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\CollectionSource;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\CollectionSourceItem;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\CollectionTarget;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\ObjectMapped;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\ObjectMapper\ObjectToBeMapped;
 
@@ -27,5 +30,23 @@ class ObjectMapperTest extends AbstractWebTestCase
         $objectMapper = static::getContainer()->get('object_mapper.alias');
         $mapped = $objectMapper->map(new ObjectToBeMapped());
         $this->assertSame($mapped->a, 'transformed');
+    }
+
+    public function testMapCollectionUsesContainerObjectMapper()
+    {
+        static::bootKernel(['test_case' => 'ObjectMapper']);
+
+        $objectMapper = static::getContainer()->get('object_mapper.alias');
+        $source = new CollectionSource([
+            new CollectionSourceItem('foo'),
+            new CollectionSourceItem('bar'),
+        ]);
+
+        /** @var CollectionTarget $mapped */
+        $mapped = $objectMapper->map($source);
+
+        $this->assertCount(2, $mapped->items);
+        $this->assertSame('foo', $mapped->items[0]->getName());
+        $this->assertSame('bar', $mapped->items[1]->getName());
     }
 }

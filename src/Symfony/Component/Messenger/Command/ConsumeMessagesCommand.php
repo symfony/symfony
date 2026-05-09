@@ -25,13 +25,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\SignalRegistry\SignalRegistry;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnFailureLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMemoryLimitListener;
 use Symfony\Component\Messenger\EventListener\StopWorkerOnMessageLimitListener;
-use Symfony\Component\Messenger\EventListener\StopWorkerOnTimeLimitListener;
 use Symfony\Component\Messenger\RoutableMessageBus;
 use Symfony\Component\Messenger\Transport\Sync\SyncTransport;
 use Symfony\Component\Messenger\Worker;
@@ -74,10 +74,11 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
                 new InputOption('sleep', null, InputOption::VALUE_REQUIRED, 'Seconds to sleep before asking for new messages after no messages were found', 1),
                 new InputOption('bus', 'b', InputOption::VALUE_REQUIRED, 'Name of the bus to which received messages should be dispatched (if not passed, bus is determined automatically)'),
                 new InputOption('queues', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Limit receivers to only consume from the specified queues'),
-                new InputOption('no-reset', null, InputOption::VALUE_NONE, 'Do not reset container services after each message'),
+                new InputOption('no-reset', null, InputOption::VALUE_OPTIONAL, 'Do not reset container services after each message, or pass a number to reset every N messages', false),
                 new InputOption('all', null, InputOption::VALUE_NONE, 'Consume messages from all receivers'),
                 new InputOption('exclude-receivers', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Exclude specific receivers/transports from consumption (can only be used with --all)'),
                 new InputOption('keepalive', null, InputOption::VALUE_OPTIONAL, 'Whether to use the transport\'s keepalive mechanism if implemented', self::DEFAULT_KEEPALIVE_INTERVAL),
+                new InputOption('fetch-size', null, InputOption::VALUE_REQUIRED, 'The number of messages to fetch per call to the transport', 1),
             ])
             ->setHelp(<<<'EOF'
                 The <info>%command.name%</info> command consumes messages and dispatches them to the message bus.
@@ -132,6 +133,10 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
                 Use the <info>--exclude-receivers</info> option to exclude specific receivers/transports from consumption (can only be used with <info>--all</info>):
 
                     <info>php %command.full_name% --all --exclude-receivers=<receiver-name></info>
+
+                Use the <info>--fetch-size</info> option to control how many messages are fetched per call to the transport:
+
+                    <info>php %command.full_name% <receiver-name> --fetch-size=8</info>
                 EOF
             )
         ;
@@ -232,7 +237,18 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             }
         }
 
-        if (null !== $this->resetServicesListener && !$input->getOption('no-reset')) {
+        $resetInterval = match ($resetInterval = $input->getOption('no-reset')) {
+            false => 1,
+            null => 0,
+            default => filter_var($resetInterval, \FILTER_VALIDATE_INT, \FILTER_NULL_ON_FAILURE),
+        };
+
+        if (0 > ($resetInterval ?? -1)) {
+            throw new InvalidOptionException(\sprintf('Option "no-reset" must be a positive integer, "%s" passed.', $input->getOption('no-reset')));
+        }
+
+        $this->resetServicesListener?->setInterval($resetInterval > 0 ? $resetInterval : 1);
+        if ($this->resetServicesListener && $resetInterval > 0) {
             $this->eventDispatcher->addSubscriber($this->resetServicesListener);
         }
 
@@ -262,7 +278,6 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
             }
 
             $stopsWhen[] = "been running for {$timeLimit}s";
-            $this->eventDispatcher->addSubscriber(new StopWorkerOnTimeLimitListener($timeLimit, $this->logger));
         }
 
         $stopsWhen[] = 'received a stop signal via the messenger:stop-workers command';
@@ -288,10 +303,20 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
         $this->worker = new Worker($receivers, $bus, $this->eventDispatcher, $this->logger, $rateLimiters);
         $options = [
             'sleep' => $input->getOption('sleep') * 1000000,
+            'time_limit' => null !== $timeLimit ? (int) $timeLimit : null,
         ];
+        if (null !== $timeLimit) {
+            $options['time_limit'] = (int) $timeLimit;
+        }
         if ($queues = $input->getOption('queues')) {
             $options['queues'] = $queues;
         }
+
+        if (1 > $fetchSize = (int) $input->getOption('fetch-size')) {
+            throw new \InvalidArgumentException(\sprintf('The "--fetch-size" option must be a positive integer, "%s" given.', $input->getOption('fetch-size')));
+        }
+
+        $options['fetch_size'] = $fetchSize;
 
         try {
             $this->worker->run($options);
@@ -321,7 +346,7 @@ class ConsumeMessagesCommand extends Command implements SignalableCommandInterfa
 
     public function getSubscribedSignals(): array
     {
-        return $this->signals ?? (\extension_loaded('pcntl') ? [\SIGTERM, \SIGINT, \SIGQUIT, \SIGALRM] : []);
+        return $this->signals ?? (SignalRegistry::isSupported() ? [\SIGTERM, \SIGINT, \SIGQUIT, \SIGALRM] : []);
     }
 
     public function handleSignal(int $signal, int|false $previousExitCode = 0): int|false

@@ -20,9 +20,14 @@ use Symfony\Contracts\EventDispatcher\Event as BaseEvent;
  * @author Fabien Potencier <fabien@symfony.com>
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  * @author Carlos Pereira De Amorim <carlos@shauri.fr>
+ *
+ * @template T of object
  */
 class Event extends BaseEvent
 {
+    /**
+     * @param T $subject
+     */
     public function __construct(
         private object $subject,
         private Marking $marking,
@@ -36,6 +41,9 @@ class Event extends BaseEvent
         return $this->marking;
     }
 
+    /**
+     * @return T
+     */
     public function getSubject(): object
     {
         return $this->subject;

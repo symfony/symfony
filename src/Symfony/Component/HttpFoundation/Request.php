@@ -64,123 +64,6 @@ class Request
     public const METHOD_CONNECT = 'CONNECT';
     public const METHOD_QUERY = 'QUERY';
 
-    /**
-     * @var string[]
-     */
-    protected static array $trustedProxies = [];
-
-    /**
-     * @var string[]
-     */
-    protected static array $trustedHostPatterns = [];
-
-    /**
-     * @var string[]
-     */
-    protected static array $trustedHosts = [];
-
-    protected static bool $httpMethodParameterOverride = false;
-
-    /**
-     * The HTTP methods that can be overridden.
-     *
-     * @var uppercase-string[]|null
-     */
-    protected static ?array $allowedHttpMethodOverride = null;
-
-    /**
-     * Custom parameters.
-     */
-    public ParameterBag $attributes;
-
-    /**
-     * Request body parameters ($_POST).
-     *
-     * @see getPayload() for portability between content types
-     */
-    public InputBag $request;
-
-    /**
-     * Query string parameters ($_GET).
-     *
-     * @var InputBag<string>
-     */
-    public InputBag $query;
-
-    /**
-     * Server and execution environment parameters ($_SERVER).
-     */
-    public ServerBag $server;
-
-    /**
-     * Uploaded files ($_FILES).
-     */
-    public FileBag $files;
-
-    /**
-     * Cookies ($_COOKIE).
-     *
-     * @var InputBag<string>
-     */
-    public InputBag $cookies;
-
-    /**
-     * Headers (taken from the $_SERVER).
-     */
-    public HeaderBag $headers;
-
-    /**
-     * @var string|resource|false|null
-     */
-    protected $content;
-
-    /**
-     * @var string[]|null
-     */
-    protected ?array $languages = null;
-
-    /**
-     * @var string[]|null
-     */
-    protected ?array $charsets = null;
-
-    /**
-     * @var string[]|null
-     */
-    protected ?array $encodings = null;
-
-    /**
-     * @var string[]|null
-     */
-    protected ?array $acceptableContentTypes = null;
-
-    protected ?string $pathInfo = null;
-    protected ?string $requestUri = null;
-    protected ?string $baseUrl = null;
-    protected ?string $basePath = null;
-    protected ?string $method = null;
-    protected ?string $format = null;
-    protected SessionInterface|\Closure|null $session = null;
-    protected ?string $locale = null;
-    protected string $defaultLocale = 'en';
-
-    /**
-     * @var array<string, string[]>|null
-     */
-    protected static ?array $formats = null;
-
-    protected static ?\Closure $requestFactory = null;
-
-    private ?string $preferredFormat = null;
-
-    private bool $isHostValid = true;
-    private bool $isForwardedValid = true;
-    private bool $isSafeContentPreferred;
-
-    private array $trustedValuesCache = [];
-
-    private static int $trustedHeaderSet = -1;
-
     private const FORWARDED_PARAMS = [
         self::HEADER_X_FORWARDED_FOR => 'for',
         self::HEADER_X_FORWARDED_HOST => 'host',
@@ -228,6 +111,165 @@ class Request
         'yaml' => 'yaml',
     ];
 
+    /**
+     * Custom parameters.
+     */
+    public ParameterBag $attributes {
+        set {
+            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "attributes" of "%s" is deprecated; pass attributes as a constructor argument or call "initialize()" instead.', __CLASS__);
+
+            $this->attributes = $value;
+        }
+    }
+
+    /**
+     * Request body parameters ($_POST).
+     *
+     * @see getPayload() for portability between content types
+     */
+    public InputBag $request {
+        set {
+            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "request" of "%s" is deprecated; pass the POST data as a constructor argument or call "initialize()" instead.', __CLASS__);
+
+            $this->request = $value;
+        }
+    }
+
+    /**
+     * Query string parameters ($_GET).
+     *
+     * @var InputBag<string>
+     */
+    public InputBag $query {
+        set {
+            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "query" of "%s" is deprecated; pass query parameters as a constructor argument or call "initialize()" instead.', __CLASS__);
+
+            $this->query = $value;
+        }
+    }
+
+    /**
+     * Server and execution environment parameters ($_SERVER).
+     */
+    public ServerBag $server {
+        set {
+            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "server" of "%s" is deprecated; pass server parameters as a constructor argument or call "initialize()" instead.', __CLASS__);
+
+            $this->server = $value;
+        }
+    }
+
+    /**
+     * Uploaded files ($_FILES).
+     */
+    public FileBag $files {
+        set {
+            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "files" of "%s" is deprecated; pass files as a constructor argument or call "initialize()" instead.', __CLASS__);
+
+            $this->files = $value;
+        }
+    }
+
+    /**
+     * Cookies ($_COOKIE).
+     *
+     * @var InputBag<string>
+     */
+    public InputBag $cookies {
+        set {
+            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "cookies" of "%s" is deprecated; pass cookies as a constructor argument or call "initialize()" instead.', __CLASS__);
+
+            $this->cookies = $value;
+        }
+    }
+
+    /**
+     * Headers (taken from the $_SERVER).
+     */
+    public HeaderBag $headers {
+        set {
+            trigger_deprecation('symfony/http-foundation', '8.1', 'Directly setting property "headers" of "%s" is deprecated; pass header parameters as a constructor argument or call "initialize()" instead.', __CLASS__);
+
+            $this->headers = $value;
+        }
+    }
+
+    /**
+     * @var string|resource|false|null
+     */
+    protected $content;
+
+    /**
+     * @var string[]|null
+     */
+    protected ?array $languages = null;
+
+    /**
+     * @var string[]|null
+     */
+    protected ?array $charsets = null;
+
+    /**
+     * @var string[]|null
+     */
+    protected ?array $encodings = null;
+
+    /**
+     * @var string[]|null
+     */
+    protected ?array $acceptableContentTypes = null;
+
+    protected ?string $pathInfo = null;
+    protected ?string $requestUri = null;
+    protected ?string $baseUrl = null;
+    protected ?string $basePath = null;
+    protected ?string $method = null;
+    protected ?string $format = null;
+    protected SessionInterface|\Closure|null $session = null;
+    protected ?string $locale = null;
+    protected string $defaultLocale = 'en';
+
+    /**
+     * @var array<string, string[]>|null
+     */
+    protected static ?array $formats = null;
+
+    /**
+     * @var string[]
+     */
+    protected static array $trustedProxies = [];
+
+    /**
+     * @var string[]
+     */
+    protected static array $trustedHostPatterns = [];
+
+    /**
+     * @var string[]
+     */
+    protected static array $trustedHosts = [];
+
+    protected static bool $httpMethodParameterOverride = false;
+
+    /**
+     * The HTTP methods that can be overridden.
+     *
+     * @var uppercase-string[]|null
+     */
+    protected static ?array $allowedHttpMethodOverride = null;
+
+    protected static ?\Closure $requestFactory = null;
+
+    private ?string $preferredFormat = null;
+
+    private bool $isHostValid = true;
+    private bool $isForwardedValid = true;
+    private bool $isSafeContentPreferred;
+
+    private array $trustedValuesCache = [];
+
+    private static int $trustedHeaderSet = -1;
+
     private bool $isIisRewrite = false;
 
     /**
@@ -259,13 +301,13 @@ class Request
      */
     public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null): void
     {
-        $this->request = new InputBag($request);
-        $this->query = new InputBag($query);
-        $this->attributes = new ParameterBag($attributes);
-        $this->cookies = new InputBag($cookies);
-        $this->files = new FileBag($files);
-        $this->server = new ServerBag($server);
-        $this->headers = new HeaderBag($this->server->getHeaders());
+        self::setProperty($this, 'request', new InputBag($request));
+        self::setProperty($this, 'query', new InputBag($query));
+        self::setProperty($this, 'attributes', new ParameterBag($attributes));
+        self::setProperty($this, 'cookies', new InputBag($cookies));
+        self::setProperty($this, 'files', new FileBag($files));
+        self::setProperty($this, 'server', new ServerBag($server));
+        self::setProperty($this, 'headers', new HeaderBag($this->server->getHeaders()));
 
         $this->content = $content;
         $this->languages = null;
@@ -467,23 +509,23 @@ class Request
     {
         $dup = clone $this;
         if (null !== $query) {
-            $dup->query = new InputBag($query);
+            self::setProperty($dup, 'query', new InputBag($query));
         }
         if (null !== $request) {
-            $dup->request = new InputBag($request);
+            self::setProperty($dup, 'request', new InputBag($request));
         }
         if (null !== $attributes) {
-            $dup->attributes = new ParameterBag($attributes);
+            self::setProperty($dup, 'attributes', new ParameterBag($attributes));
         }
         if (null !== $cookies) {
-            $dup->cookies = new InputBag($cookies);
+            self::setProperty($dup, 'cookies', new InputBag($cookies));
         }
         if (null !== $files) {
-            $dup->files = new FileBag($files);
+            self::setProperty($dup, 'files', new FileBag($files));
         }
         if (null !== $server) {
-            $dup->server = new ServerBag($server);
-            $dup->headers = new HeaderBag($dup->server->getHeaders());
+            self::setProperty($dup, 'server', new ServerBag($server));
+            self::setProperty($dup, 'headers', new HeaderBag($dup->server->getHeaders()));
         }
         $dup->languages = null;
         $dup->charsets = null;
@@ -515,13 +557,13 @@ class Request
      */
     public function __clone()
     {
-        $this->query = clone $this->query;
-        $this->request = clone $this->request;
-        $this->attributes = clone $this->attributes;
-        $this->cookies = clone $this->cookies;
-        $this->files = clone $this->files;
-        $this->server = clone $this->server;
-        $this->headers = clone $this->headers;
+        self::setProperty($this, 'query', clone $this->query);
+        self::setProperty($this, 'request', clone $this->request);
+        self::setProperty($this, 'attributes', clone $this->attributes);
+        self::setProperty($this, 'cookies', clone $this->cookies);
+        self::setProperty($this, 'files', clone $this->files);
+        self::setProperty($this, 'server', clone $this->server);
+        self::setProperty($this, 'headers', clone $this->headers);
     }
 
     public function __toString(): string
@@ -2218,5 +2260,14 @@ class Request
 
         // use preg_replace() instead of preg_match() to prevent DoS attacks with long host names
         return '' === preg_replace('/[-a-zA-Z0-9_]++\.?/', '', $host);
+    }
+
+    private static function setProperty(self $response, string $name, mixed $value): void
+    {
+        static $cache;
+
+        $r = $cache[$name] ??= new \ReflectionProperty(self::class, $name);
+
+        $r->setRawValue($response, $value);
     }
 }

@@ -69,9 +69,8 @@ abstract class CompoundConstraintTestCase extends TestCase
 
         $validator = new CompoundValidator();
         $context = $this->createContext();
-        $validator->initialize($context);
 
-        $validator->validate($this->validatedValue, new class($constraints) extends Compound {
+        $validator->validateInContext($this->validatedValue, new class($constraints) extends Compound {
             public function __construct(private array $testedConstraints)
             {
                 parent::__construct();
@@ -81,7 +80,7 @@ abstract class CompoundConstraintTestCase extends TestCase
             {
                 return $this->testedConstraints;
             }
-        });
+        }, $context);
 
         $expectedViolations = iterator_to_array($context->getViolations());
 

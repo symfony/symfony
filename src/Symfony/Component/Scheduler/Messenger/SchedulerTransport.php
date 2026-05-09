@@ -24,7 +24,10 @@ class SchedulerTransport implements TransportInterface
     ) {
     }
 
-    public function get(): iterable
+    /**
+     * @param int $fetchSize
+     */
+    public function get(/* int $fetchSize = 1 */): iterable
     {
         foreach ($this->messageGenerator->getMessages() as $context => $message) {
             $stamp = new ScheduledStamp($context);

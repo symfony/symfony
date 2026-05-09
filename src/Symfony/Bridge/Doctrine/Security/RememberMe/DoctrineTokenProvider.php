@@ -188,6 +188,8 @@ final class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifi
 
     /**
      * Adds the Table to the Schema if "remember me" uses this Connection.
+     *
+     * @param-immediately-invoked-callable $isSameDatabase
      */
     public function configureSchema(Schema $schema, Connection $forConnection, \Closure $isSameDatabase): void
     {

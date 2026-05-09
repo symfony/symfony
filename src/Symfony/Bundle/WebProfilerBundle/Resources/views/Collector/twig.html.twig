@@ -84,7 +84,7 @@
 
 {% block menu %}
     <span class="label {{ 0 == collector.templateCount ? 'disabled' }}">
-        <span class="icon">{{ source('@WebProfiler/Icon/twig.svg') }}</span>
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/twig.svg') }}</span>
         <strong>Twig</strong>
     </span>
 {% endblock %}

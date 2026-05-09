@@ -141,7 +141,7 @@ class PasswordTypePasswordHasherExtensionTest extends TypeTestCase
         $this->assertNull($user->getPassword());
 
         $form = $this->factory
-            ->createBuilder(data: $user)
+            ->createBuilder(FormType::class, $user)
             ->add('plainPassword', $type, $options)
             ->getForm()
         ;

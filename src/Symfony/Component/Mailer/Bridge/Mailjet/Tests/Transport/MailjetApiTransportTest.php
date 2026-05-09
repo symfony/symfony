@@ -21,6 +21,7 @@ use Symfony\Component\Mailer\Exception\HttpTransportException;
 use Symfony\Component\Mailer\SentMessage;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Part\DataPart;
 
 class MailjetApiTransportTest extends TestCase
 {
@@ -472,5 +473,46 @@ class MailjetApiTransportTest extends TestCase
             ],
             $method->invoke($transport, $email, $envelope)
         );
+    }
+
+    public function testInlineWithCustomContentId()
+    {
+        $imagePart = (new DataPart('text-contents', 'text.txt'));
+        $imagePart->asInline();
+        $imagePart->setContentId('content-identifier@symfony');
+
+        $email = new Email();
+        $email->addPart($imagePart);
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
+        $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $contentId = $payload['Messages'][0]['InlinedAttachments'][0]['ContentID'] ?? null;
+
+        $this->assertSame('content-identifier@symfony', $contentId);
+        $this->assertCount(1, $payload['Messages']);
+        $this->assertCount(1, $payload['Messages'][0]['InlinedAttachments']);
+    }
+
+    public function testInlineWithoutCustomContentId()
+    {
+        $imagePart = (new DataPart('text-contents', 'text.txt'));
+        $imagePart->asInline();
+
+        $email = new Email();
+        $email->addPart($imagePart);
+        $envelope = new Envelope(new Address('alice@system.com'), [new Address('bob@system.com')]);
+
+        $transport = new MailjetApiTransport(self::USER, self::PASSWORD);
+        $method = new \ReflectionMethod(MailjetApiTransport::class, 'getPayload');
+        $payload = $method->invoke($transport, $email, $envelope);
+
+        $contentId = $payload['Messages'][0]['InlinedAttachments'][0]['ContentID'] ?? null;
+
+        $this->assertSame('text.txt', $contentId ?? null);
+        $this->assertCount(1, $payload['Messages']);
+        $this->assertCount(1, $payload['Messages'][0]['InlinedAttachments']);
     }
 }

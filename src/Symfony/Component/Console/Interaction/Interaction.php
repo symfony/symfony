@@ -28,6 +28,8 @@ final class Interaction
     }
 
     /**
+     * @param-immediately-invoked-callable $parameterResolver
+     *
      * @param \Closure(\ReflectionFunction $function, InputInterface $input, OutputInterface $output): array $parameterResolver
      */
     public function interact(InputInterface $input, OutputInterface $output, \Closure $parameterResolver): void

@@ -118,7 +118,7 @@
 
 {% block menu %}
     <span class="label {{ collector.workflows|length == 0 ? 'disabled' }}">
-        <span class="icon">
+        <span class="icon" aria-hidden="true">
             {{ source('@WebProfiler/Icon/workflow.svg') }}
         </span>
         <strong>Workflow</strong>

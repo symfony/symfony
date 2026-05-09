@@ -93,22 +93,27 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
     private const MAX_HEURISTIC_FRESHNESS_TTL = 86400;
 
     private array $defaultOptions = self::OPTIONS_DEFAULTS;
+    private bool $isInnerRequest = false;
 
     /**
-     * @param bool     $sharedCache Indicates whether this cache is shared or private. When true, responses
-     *                              may be skipped from caching in presence of certain headers
-     *                              (e.g. Authorization) unless explicitly marked as public.
-     * @param int|null $maxTtl      The maximum time-to-live (in seconds) for cached responses.
-     *                              If a server-provided TTL exceeds this value, it will be capped
-     *                              to this maximum.
+     * @param bool         $sharedCache Indicates whether this cache is shared or private. When true, responses
+     *                                  may be skipped from caching in presence of certain headers
+     *                                  (e.g. Authorization) unless explicitly marked as public.
+     * @param positive-int $maxTtl      The maximum time-to-live (in seconds) for cached responses.
+     *                                  If a server-provided TTL exceeds this value, it will be capped
+     *                                  to this maximum.
      */
     public function __construct(
         private HttpClientInterface $client,
         private readonly TagAwareCacheInterface $cache,
         array $defaultOptions = [],
         private readonly bool $sharedCache = true,
-        private readonly ?int $maxTtl = null,
+        private readonly ?int $maxTtl = 86400,
     ) {
+        if (null === $maxTtl) {
+            trigger_deprecation('symfony/http-client', '8.1', 'Passing null as "$maxTtl" to "%s()" is deprecated, pass a positive integer instead.', __METHOD__);
+        }
+
         if ($defaultOptions) {
             [, $this->defaultOptions] = self::prepareRequest(null, null, $defaultOptions, $this->defaultOptions);
         }
@@ -116,13 +121,17 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
 
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
+        if ($this->isInnerRequest) {
+            return $this->client->request($method, $url, $options);
+        }
+
         [$fullUrl, $options] = self::prepareRequest($method, $url, $options, $this->defaultOptions);
 
         $fullUrl = implode('', $fullUrl);
         $fullUrlTag = self::hash($fullUrl);
 
         if ('' !== $options['body'] || ($options['extra']['no_cache'] ?? false) || isset($options['normalized_headers']['range']) || !\in_array($method, self::CACHEABLE_METHODS, true)) {
-            return new AsyncResponse($this->client, $method, $url, $options, function (ChunkInterface $chunk, AsyncContext $context) use ($method, $fullUrlTag): \Generator {
+            $passthru = function (ChunkInterface $chunk, AsyncContext $context) use ($method, $fullUrlTag): \Generator {
                 if (null !== $chunk->getError() || $chunk->isTimeout() || !$chunk->isFirst()) {
                     yield $chunk;
 
@@ -137,7 +146,15 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
                 $context->passthru();
 
                 yield $chunk;
-            });
+            };
+
+            $this->isInnerRequest = true;
+
+            try {
+                return new AsyncResponse($this, $method, $url, $options, $passthru);
+            } finally {
+                $this->isInnerRequest = false;
+            }
         }
 
         $requestHash = self::hash($method.$fullUrl.serialize(array_intersect_key($options['normalized_headers'], self::RESPONSE_INFLUENCING_HEADERS)));
@@ -165,36 +182,83 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
         }
 
         // consistent expiration time for all items
-        $expiresAt = null === $this->maxTtl ? null : \DateTimeImmutable::createFromFormat('U', time() + $this->maxTtl);
+        $expiresAt = \DateTimeImmutable::createFromFormat('U', time() + ($this->maxTtl ?? 86400));
 
-        return new AsyncResponse(
-            $this->client,
-            $method,
+        $passthru = function (ChunkInterface $chunk, AsyncContext $context) use (
+            $expiresAt,
+            $fullUrlTag,
+            $requestHash,
+            $varyKey,
+            $varyFields,
+            &$metadataKey,
+            $cachedData,
+            $freshness,
             $url,
+            $method,
             $options,
-            function (ChunkInterface $chunk, AsyncContext $context) use (
-                $expiresAt,
-                $fullUrlTag,
-                $requestHash,
-                $varyKey,
-                $varyFields,
-                &$metadataKey,
-                $cachedData,
-                $freshness,
-                $url,
-                $method,
-                $options,
-            ): \Generator {
-                static $attemptTag = null;
-                static $firstChunkKey = null;
-                static $chunkKey = null;
+        ): \Generator {
+            static $attemptTag = null;
+            static $firstChunkKey = null;
+            static $chunkKey = null;
 
-                if (null !== $chunk->getError() || $chunk->isTimeout()) {
-                    null !== $attemptTag && $this->cache->invalidateTags([$attemptTag]);
+            if (null !== $chunk->getError() || $chunk->isTimeout()) {
+                null !== $attemptTag && $this->cache->invalidateTags([$attemptTag]);
 
+                if (Freshness::StaleButUsable === $freshness) {
+                    // avoid throwing exception in ErrorChunk#__destruct()
+                    $chunk instanceof ErrorChunk && $chunk->didThrow(true);
+                    $context->passthru();
+                    $context->replaceResponse($this->createResponseFromCache($cachedData, $method, $url, $options, $metadataKey));
+
+                    return;
+                }
+
+                if (Freshness::MustRevalidate === $freshness) {
+                    // avoid throwing exception in ErrorChunk#__destruct()
+                    $chunk instanceof ErrorChunk && $chunk->didThrow(true);
+                    $context->passthru();
+                    $context->replaceResponse(self::createGatewayTimeoutResponse($method, $url, $options));
+
+                    return;
+                }
+
+                yield $chunk;
+
+                return;
+            }
+
+            $headers = $context->getHeaders();
+
+            if ($chunk->isFirst()) {
+                $statusCode = $context->getStatusCode();
+
+                $attemptTag = self::generateChunkKey();
+
+                if (304 === $statusCode && null !== $freshness) {
+                    $headers = array_merge($cachedData['headers'], array_diff_key($headers, self::EXCLUDED_HEADERS));
+
+                    $cacheControl = self::parseCacheControlHeader($headers['cache-control'] ?? []);
+                    $maxAge = $this->determineMaxAge($headers, $cacheControl);
+
+                    $this->cache->get($metadataKey, static function (ItemInterface $item) use ($headers, $maxAge, $cachedData, $expiresAt, $fullUrlTag, $metadataKey): array {
+                        $item->expiresAt($expiresAt)->tag([$fullUrlTag, $metadataKey]);
+
+                        $cachedData['expires_at'] = self::calculateExpiresAt($maxAge);
+                        $cachedData['stored_at'] = time();
+                        $cachedData['initial_age'] = self::getCurrentAge($headers);
+                        $cachedData['headers'] = $headers;
+
+                        return $cachedData;
+                    }, \INF);
+
+                    $context->passthru();
+                    $context->replaceResponse($this->createResponseFromCache($cachedData, $method, $url, $options, $metadataKey, $expiresAt));
+
+                    return;
+                }
+
+                if ($statusCode >= 500 && $statusCode < 600) {
                     if (Freshness::StaleButUsable === $freshness) {
-                        // avoid throwing exception in ErrorChunk#__destruct()
-                        $chunk instanceof ErrorChunk && $chunk->didThrow(true);
                         $context->passthru();
                         $context->replaceResponse($this->createResponseFromCache($cachedData, $method, $url, $options, $metadataKey));
 
@@ -202,162 +266,121 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
                     }
 
                     if (Freshness::MustRevalidate === $freshness) {
-                        // avoid throwing exception in ErrorChunk#__destruct()
-                        $chunk instanceof ErrorChunk && $chunk->didThrow(true);
                         $context->passthru();
                         $context->replaceResponse(self::createGatewayTimeoutResponse($method, $url, $options));
 
                         return;
                     }
+                }
+
+                $cacheControl = self::parseCacheControlHeader($headers['cache-control'] ?? []);
+
+                if (!$this->isServerResponseCacheable($statusCode, $options['normalized_headers'], $headers, $cacheControl)) {
+                    $context->passthru();
 
                     yield $chunk;
 
                     return;
                 }
 
-                $headers = $context->getHeaders();
-
-                if ($chunk->isFirst()) {
-                    $statusCode = $context->getStatusCode();
-                    $cacheControl = self::parseCacheControlHeader($headers['cache-control'] ?? []);
-
-                    $attemptTag = self::generateChunkKey();
-
-                    if (304 === $statusCode && null !== $freshness) {
-                        $maxAge = $this->determineMaxAge($headers, $cacheControl);
-
-                        $this->cache->get($metadataKey, static function (ItemInterface $item) use ($headers, $maxAge, $cachedData, $expiresAt, $fullUrlTag, $metadataKey): array {
-                            $item->expiresAt($expiresAt)->tag([$fullUrlTag, $metadataKey]);
-
-                            $cachedData['expires_at'] = self::calculateExpiresAt($maxAge);
-                            $cachedData['stored_at'] = time();
-                            $cachedData['initial_age'] = (int) ($headers['age'][0] ?? 0);
-                            $cachedData['headers'] = array_merge($cachedData['headers'], array_diff_key($headers, self::EXCLUDED_HEADERS));
-
-                            return $cachedData;
-                        }, \INF);
-
-                        $context->passthru();
-                        $context->replaceResponse($this->createResponseFromCache($cachedData, $method, $url, $options, $metadataKey, $expiresAt));
-
-                        return;
-                    }
-
-                    if ($statusCode >= 500 && $statusCode < 600) {
-                        if (Freshness::StaleButUsable === $freshness) {
-                            $context->passthru();
-                            $context->replaceResponse($this->createResponseFromCache($cachedData, $method, $url, $options, $metadataKey));
-
-                            return;
+                // recomputing vary fields in case it changed or for first request
+                $newVaryFields = [];
+                foreach ($headers['vary'] ?? [] as $vary) {
+                    foreach (explode(',', $vary) as $field) {
+                        $field = strtolower(trim($field));
+                        if ('cookie' === $field ? $this->sharedCache : !preg_match('/^[!#$%&\'*+\-.^_`|~0-9A-Za-z]+$/D', $field)) {
+                            $field = '*';
                         }
-
-                        if (Freshness::MustRevalidate === $freshness) {
-                            $context->passthru();
-                            $context->replaceResponse(self::createGatewayTimeoutResponse($method, $url, $options));
-
-                            return;
-                        }
+                        $newVaryFields[] = $field;
                     }
+                }
 
-                    if (!$this->isServerResponseCacheable($statusCode, $options['normalized_headers'], $headers, $cacheControl)) {
-                        $context->passthru();
-
-                        yield $chunk;
-
-                        return;
-                    }
-
-                    // recomputing vary fields in case it changed or for first request
-                    $newVaryFields = [];
-                    foreach ($headers['vary'] ?? [] as $vary) {
-                        foreach (explode(',', $vary) as $field) {
-                            $field = strtolower(trim($field));
-                            if ('cookie' === $field ? $this->sharedCache : !preg_match('/^[!#$%&\'*+\-.^_`|~0-9A-Za-z]+$/D', $field)) {
-                                $field = '*';
-                            }
-                            $newVaryFields[] = $field;
-                        }
-                    }
-
-                    if (\in_array('*', $newVaryFields, true)) {
-                        $context->passthru();
-
-                        yield $chunk;
-
-                        return;
-                    }
-
-                    sort($newVaryFields);
-
-                    if ($varyFields !== $newVaryFields) {
-                        $this->cache->invalidateTags([$fullUrlTag]);
-
-                        $metadataKey = self::getMetadataKey($requestHash, $options['normalized_headers'], $newVaryFields);
-                    }
-
-                    $this->cache->get($varyKey, static function (ItemInterface $item) use ($newVaryFields, $expiresAt, $fullUrlTag): array {
-                        $item->tag([$fullUrlTag])->expiresAt($expiresAt);
-
-                        return $newVaryFields;
-                    }, \INF);
-
-                    $firstChunkKey = $chunkKey = self::generateChunkKey();
+                if (\in_array('*', $newVaryFields, true)) {
+                    $context->passthru();
 
                     yield $chunk;
 
                     return;
                 }
 
-                if (null === $chunkKey) {
-                    // informational chunks
-                    yield $chunk;
+                sort($newVaryFields);
 
-                    return;
+                if ($varyFields !== $newVaryFields) {
+                    $this->cache->invalidateTags([$fullUrlTag]);
+
+                    $metadataKey = self::getMetadataKey($requestHash, $options['normalized_headers'], $newVaryFields);
                 }
 
-                if ($chunk->isLast()) {
-                    $this->cache->get($chunkKey, static function (ItemInterface $item) use ($expiresAt, $fullUrlTag, $metadataKey, $chunk, $attemptTag): array {
-                        $item->tag([$fullUrlTag, $metadataKey, $attemptTag])->expiresAt($expiresAt);
+                $this->cache->get($varyKey, static function (ItemInterface $item) use ($newVaryFields, $expiresAt, $fullUrlTag): array {
+                    $item->tag([$fullUrlTag])->expiresAt($expiresAt);
 
-                        return [
-                            'content' => $chunk->getContent(),
-                            'next_chunk' => null,
-                        ];
-                    }, \INF);
+                    return $newVaryFields;
+                }, \INF);
 
-                    $maxAge = $this->determineMaxAge($headers, self::parseCacheControlHeader($headers['cache-control'] ?? []));
-                    $this->cache->get($metadataKey, static function (ItemInterface $item) use ($context, $headers, $maxAge, $expiresAt, $fullUrlTag, $metadataKey, $attemptTag, $firstChunkKey): array {
-                        $item->tag([$fullUrlTag, $metadataKey, $attemptTag])->expiresAt($expiresAt);
+                $firstChunkKey = $chunkKey = self::generateChunkKey();
 
-                        return [
-                            'status_code' => $context->getStatusCode(),
-                            'headers' => array_diff_key($headers, self::EXCLUDED_HEADERS),
-                            'initial_age' => (int) ($headers['age'][0] ?? 0),
-                            'stored_at' => time(),
-                            'expires_at' => self::calculateExpiresAt($maxAge),
-                            'next_chunk' => $firstChunkKey,
-                        ];
-                    }, \INF);
+                yield $chunk;
 
-                    yield $chunk;
+                return;
+            }
 
-                    return;
-                }
+            if (null === $chunkKey) {
+                // informational chunks
+                yield $chunk;
 
-                $nextChunkKey = self::generateChunkKey();
-                $this->cache->get($chunkKey, static function (ItemInterface $item) use ($expiresAt, $fullUrlTag, $metadataKey, $attemptTag, $chunk, $nextChunkKey): array {
+                return;
+            }
+
+            if ($chunk->isLast()) {
+                $this->cache->get($chunkKey, static function (ItemInterface $item) use ($expiresAt, $fullUrlTag, $metadataKey, $chunk, $attemptTag): array {
                     $item->tag([$fullUrlTag, $metadataKey, $attemptTag])->expiresAt($expiresAt);
 
                     return [
                         'content' => $chunk->getContent(),
-                        'next_chunk' => $nextChunkKey,
+                        'next_chunk' => null,
                     ];
                 }, \INF);
-                $chunkKey = $nextChunkKey;
+
+                $maxAge = $this->determineMaxAge($headers, self::parseCacheControlHeader($headers['cache-control'] ?? []));
+                $this->cache->get($metadataKey, static function (ItemInterface $item) use ($context, $headers, $maxAge, $expiresAt, $fullUrlTag, $metadataKey, $attemptTag, $firstChunkKey): array {
+                    $item->tag([$fullUrlTag, $metadataKey, $attemptTag])->expiresAt($expiresAt);
+
+                    return [
+                        'status_code' => $context->getStatusCode(),
+                        'headers' => array_diff_key($headers, self::EXCLUDED_HEADERS),
+                        'initial_age' => self::getCurrentAge($headers),
+                        'stored_at' => time(),
+                        'expires_at' => self::calculateExpiresAt($maxAge),
+                        'next_chunk' => $firstChunkKey,
+                    ];
+                }, \INF);
 
                 yield $chunk;
+
+                return;
             }
-        );
+
+            $nextChunkKey = self::generateChunkKey();
+            $this->cache->get($chunkKey, static function (ItemInterface $item) use ($expiresAt, $fullUrlTag, $metadataKey, $attemptTag, $chunk, $nextChunkKey): array {
+                $item->tag([$fullUrlTag, $metadataKey, $attemptTag])->expiresAt($expiresAt);
+
+                return [
+                    'content' => $chunk->getContent(),
+                    'next_chunk' => $nextChunkKey,
+                ];
+            }, \INF);
+            $chunkKey = $nextChunkKey;
+
+            yield $chunk;
+        };
+
+        $this->isInnerRequest = true;
+
+        try {
+            return new AsyncResponse($this, $method, $url, $options, $passthru);
+        } finally {
+            $this->isInnerRequest = false;
+        }
     }
 
     public function stream(ResponseInterface|iterable $responses, ?float $timeout = null): ResponseStreamInterface
@@ -368,26 +391,40 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
 
         $mockResponses = [];
         $asyncResponses = [];
+        $clientResponses = [];
 
         foreach ($responses as $response) {
             if ($response instanceof MockResponse) {
                 $mockResponses[] = $response;
-            } else {
+            } elseif ($response instanceof AsyncResponse) {
                 $asyncResponses[] = $response;
+            } else {
+                $clientResponses[] = $response;
             }
         }
 
-        if (!$mockResponses) {
+        if (!$mockResponses && !$clientResponses) {
             return $this->asyncStream($asyncResponses, $timeout);
         }
 
-        if (!$asyncResponses) {
+        if (!$asyncResponses && !$clientResponses) {
             return new ResponseStream(MockResponse::stream($mockResponses, $timeout));
         }
 
-        return new ResponseStream((function () use ($mockResponses, $asyncResponses, $timeout) {
-            yield from MockResponse::stream($mockResponses, $timeout);
-            yield from $this->asyncStream($asyncResponses, $timeout);
+        if (!$mockResponses && !$asyncResponses) {
+            return $this->client->stream($clientResponses, $timeout);
+        }
+
+        return new ResponseStream((function () use ($mockResponses, $asyncResponses, $clientResponses, $timeout) {
+            if ($mockResponses) {
+                yield from MockResponse::stream($mockResponses, $timeout);
+            }
+            if ($clientResponses) {
+                yield from $this->client->stream($clientResponses, $timeout);
+            }
+            if ($asyncResponses) {
+                yield from $this->asyncStream($asyncResponses, $timeout);
+            }
         })());
     }
 

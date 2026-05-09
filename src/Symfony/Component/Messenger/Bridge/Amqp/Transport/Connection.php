@@ -107,6 +107,11 @@ class Connection
             throw new LogicException(\sprintf('You cannot use the "%s" as the "amqp" extension is not installed.', __CLASS__));
         }
 
+        if (isset($connectionOptions['user'])) {
+            $connectionOptions['login'] ??= $connectionOptions['user'];
+            unset($connectionOptions['user']);
+        }
+
         $this->connectionOptions = array_replace_recursive([
             'delay' => [
                 'exchange_name' => 'delays',
@@ -615,6 +620,9 @@ class Connection
         return $amqpStamp?->getRoutingKey() ?? $this->getDefaultPublishRoutingKey();
     }
 
+    /**
+     * @param-immediately-invoked-callable $callable
+     */
     private function withConnectionExceptionRetry(callable $callable): void
     {
         $maxRetries = 3;

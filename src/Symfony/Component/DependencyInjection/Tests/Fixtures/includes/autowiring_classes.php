@@ -6,6 +6,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireCallable;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Contracts\Service\Attribute\Required;
 
 require __DIR__.'/uniontype_classes.php';
@@ -140,6 +141,15 @@ class CollisionB implements CollisionInterface
 {
 }
 
+class UnionClassesWithTarget
+{
+    public function __construct(
+        #[Target('collision')]
+        CollisionA|CollisionB $any,
+    ) {
+    }
+}
+
 class CannotBeAutowired
 {
     public function __construct(CollisionInterface $collision)
@@ -217,6 +227,15 @@ class UnderscoreNamedArgument
     }
 }
 
+class UnderscoreNamedArgumentWithTarget
+{
+    public function __construct(
+        #[Target('now_datetime')]
+        public \DateTimeImmutable $dt,
+    ) {
+    }
+}
+
 /*
  * Classes used for testing createResourceForClass
  */
@@ -249,6 +268,14 @@ class SetterInjectionCollision
         // The CollisionInterface cannot be autowired - there are multiple
 
         // should throw an exception
+    }
+}
+
+class SetterInjectionCollisionWithTarget
+{
+    #[Required]
+    public function setMultipleInstancesForOneArg(#[Target('collision')] CollisionInterface $col)
+    {
     }
 }
 

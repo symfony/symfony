@@ -7,7 +7,7 @@ Configuration example:
 
 ```env
 # SMTP
-MAILER_DSN=ses+smtp://USERNAME:PASSWORD@default?region=REGION&session_token=SESSION_TOKEN
+MAILER_DSN=ses+smtp://USERNAME:PASSWORD@default:PORT?region=REGION&session_token=SESSION_TOKEN
 
 # HTTP
 MAILER_DSN=ses+https://ACCESS_KEY:SECRET_KEY@default?region=REGION&session_token=SESSION_TOKEN
@@ -21,6 +21,7 @@ where:
  - `SECRET_KEY` is your Amazon SES access key secret
  - `REGION` is Amazon SES selected region (optional, default `eu-west-1`)
  - `SESSION_TOKEN` is your Amazon SES session token (optional)
+ - `PORT` is the port you want to communicate to SES with (optional, default `465`)
 
 Resources
 ---------

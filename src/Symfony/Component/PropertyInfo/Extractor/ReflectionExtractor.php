@@ -156,7 +156,13 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
     public function getType(string $class, string $property, array $context = []): ?Type
     {
-        [$mutatorReflection, $prefix] = $this->getMutatorMethod($class, $property);
+        try {
+            $refClass = new \ReflectionClass($class);
+        } catch (\ReflectionException) {
+            return null;
+        }
+
+        [$mutatorReflection, $prefix] = $this->getMutatorMethod($refClass, $property);
 
         if ($mutatorReflection) {
             try {
@@ -171,9 +177,9 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             }
         }
 
-        [$accessorReflection, $prefix] = $this->getAccessorMethod($class, $property);
+        [$accessorReflection, $prefix] = $this->getAccessorMethod($refClass, $property);
         $allowedPrefixes = array_diff($this->accessorPrefixes, ['is', 'can', 'has']);
-        if ($accessorReflection && \in_array($prefix, $allowedPrefixes, true)) {
+        if ($accessorReflection && (\in_array($prefix, $allowedPrefixes, true) || !property_exists($class, $property))) {
             try {
                 return $this->typeResolver->resolve($accessorReflection);
             } catch (UnsupportedException) {
@@ -181,20 +187,22 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         if ($context['enable_constructor_extraction'] ?? $this->enableConstructorExtraction) {
-            try {
-                $reflectionClass = new \ReflectionClass($class);
-                if ($type = $this->extractTypeFromConstructor($reflectionClass, $property)) {
-                    return $type;
-                }
-            } catch (\ReflectionException) {
+            if ($type = $this->extractTypeFromConstructor($refClass, $property)) {
+                return $type;
             }
         }
 
         try {
-            $reflectionClass = new \ReflectionClass($class);
-            $reflectionProperty = $reflectionClass->getProperty($property);
+            $reflectionProperty = $refClass->getProperty($property);
         } catch (\ReflectionException) {
             return null;
+        }
+
+        if ($reflectionProperty->hasHook(\PropertyHookType::Set) && $setHookParams = $reflectionProperty->getHook(\PropertyHookType::Set)->getParameters()) {
+            try {
+                return $this->typeResolver->resolve($setHookParams[0]);
+            } catch (UnsupportedException) {
+            }
         }
 
         try {
@@ -203,7 +211,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         }
 
         $allowedPrefixes = array_diff($this->accessorPrefixes, $allowedPrefixes);
-        [$accessorReflection, $prefix] = $this->getAccessorMethod($class, $property);
+        [$accessorReflection, $prefix] = $this->getAccessorMethod($refClass, $property);
         if ($accessorReflection && \in_array($prefix, $allowedPrefixes, true)) {
             try {
                 return $this->typeResolver->resolve($accessorReflection);
@@ -211,7 +219,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             }
         }
 
-        if (null === $defaultValue = ($reflectionClass->getDefaultProperties()[$property] ?? null)) {
+        if (null === $defaultValue = ($refClass->getDefaultProperties()[$property] ?? null)) {
             return null;
         }
 
@@ -273,14 +281,20 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             return true;
         }
 
+        try {
+            $refClass = new \ReflectionClass($class);
+        } catch (\ReflectionException) {
+            return null;
+        }
+
         // First test with the camelized property name
-        [$reflectionMethod] = $this->getMutatorMethod($class, $this->camelize($property));
+        [$reflectionMethod] = $this->getMutatorMethod($refClass, $this->camelize($property));
         if (null !== $reflectionMethod) {
             return true;
         }
 
         // Otherwise check for the old way
-        [$reflectionMethod] = $this->getMutatorMethod($class, $property);
+        [$reflectionMethod] = $this->getMutatorMethod($refClass, $property);
 
         return null !== $reflectionMethod;
     }
@@ -368,10 +382,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         $allowConstruct = $context['enable_constructor_extraction'] ?? $this->enableConstructorExtraction;
         $allowAdderRemover = $context['enable_adder_remover_extraction'] ?? true;
 
-        $camelized = $this->camelize($property);
-        $nonCamelized = ucfirst($property);
         $constructor = $reflClass->getConstructor();
-        $singulars = $this->inflector->singularize($camelized);
         $errors = [];
 
         if (null !== $constructor && $allowConstruct) {
@@ -382,7 +393,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
             }
         }
 
-        [$adderAccessName, $removerAccessName, $adderAndRemoverErrors] = $this->findAdderAndRemover($reflClass, $singulars);
+        $camelized = $this->camelize($property);
+        $nonCamelized = ucfirst($property);
+
+        [$adderAccessName, $removerAccessName, $adderAndRemoverErrors] = $this->findAdderAndRemover($reflClass, $camelized);
         if ($allowAdderRemover && null !== $adderAccessName && null !== $removerAccessName) {
             $adderMethod = $reflClass->getMethod($adderAccessName);
             $removerMethod = $reflClass->getMethod($removerAccessName);
@@ -574,13 +588,13 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      * Returns an array with an instance of \ReflectionMethod as the first key
      * and the prefix of the method as the second, or null if not found.
      */
-    private function getAccessorMethod(string $class, string $property): ?array
+    private function getAccessorMethod(\ReflectionClass $refClass, string $property): ?array
     {
         $ucProperty = ucfirst($property);
 
         foreach ($this->accessorPrefixes as $prefix) {
             try {
-                $reflectionMethod = new \ReflectionMethod($class, $prefix.$ucProperty);
+                $reflectionMethod = $refClass->getMethod($prefix.$ucProperty);
                 if ($reflectionMethod->isStatic()) {
                     continue;
                 }
@@ -600,7 +614,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      * Returns an array with an instance of \ReflectionMethod as the first key
      * and the prefix of the method as the second, or null if not found.
      */
-    private function getMutatorMethod(string $class, string $property): ?array
+    private function getMutatorMethod(\ReflectionClass $refClass, string $property): ?array
     {
         $ucProperty = ucfirst($property);
         $ucSingulars = $this->inflector->singularize($ucProperty);
@@ -615,7 +629,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
 
             foreach ($names as $name) {
                 try {
-                    $reflectionMethod = new \ReflectionMethod($class, $prefix.$name);
+                    $reflectionMethod = $refClass->getMethod($prefix.$name);
                     if ($reflectionMethod->isStatic()) {
                         continue;
                     }
@@ -660,11 +674,10 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
      * Searches for add and remove methods.
      *
      * @param \ReflectionClass $reflClass The reflection class for the given object
-     * @param array            $singulars The singular form of the property name or null
      *
      * @return array An array containing the adder and remover when found and errors
      */
-    private function findAdderAndRemover(\ReflectionClass $reflClass, array $singulars): array
+    private function findAdderAndRemover(\ReflectionClass $reflClass, string $property): array
     {
         if (2 !== \count($this->arrayMutatorPrefixes)) {
             return [null, null, []];
@@ -673,7 +686,7 @@ class ReflectionExtractor implements PropertyListExtractorInterface, PropertyTyp
         [$addPrefix, $removePrefix] = $this->arrayMutatorPrefixes;
         $errors = [];
 
-        foreach ($singulars as $singular) {
+        foreach ($this->inflector->singularize($property) as $singular) {
             $addMethod = $addPrefix.$singular;
             $removeMethod = $removePrefix.$singular;
 

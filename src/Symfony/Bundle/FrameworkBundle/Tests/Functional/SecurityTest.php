@@ -13,6 +13,7 @@ namespace Symfony\Bundle\FrameworkBundle\Tests\Functional;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Security\Core\User\InMemoryUser;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class SecurityTest extends AbstractWebTestCase
 {
@@ -84,5 +85,84 @@ class SecurityTest extends AbstractWebTestCase
 
         $client->request('GET', '/main/user_profile');
         $this->assertEquals('Welcome no-role-username!', $client->getResponse()->getContent());
+    }
+
+    public function testLoginUserThrowsContextualErrorWhenUserGraphIsNotSerializable()
+    {
+        $user = new SecurityTestUserWithUnserializableField('the-username', ['ROLE_FOO']);
+        $client = $this->createClient(['test_case' => 'Security', 'root_config' => 'config.yml']);
+
+        try {
+            $client->loginUser($user);
+            $this->fail('Expected LogicException was not thrown.');
+        } catch (\LogicException $e) {
+            $this->assertStringContainsString(SecurityTestUserWithUnserializableField::class, $e->getMessage());
+            $this->assertStringContainsString('not serializable', $e->getMessage());
+            $this->assertStringContainsString('Implement "__serialize()"/"__unserialize()"', $e->getMessage());
+        }
+    }
+
+    public function testLoginUserSuggestsReviewWhenUserAlreadyImplementsSerialize()
+    {
+        $user = new SecurityTestUserWithBrokenSerialize();
+        $client = $this->createClient(['test_case' => 'Security', 'root_config' => 'config.yml']);
+
+        try {
+            $client->loginUser($user);
+            $this->fail('Expected LogicException was not thrown.');
+        } catch (\LogicException $e) {
+            $this->assertStringContainsString(SecurityTestUserWithBrokenSerialize::class, $e->getMessage());
+            $this->assertStringContainsString('Review the "__serialize()" implementation', $e->getMessage());
+        }
+    }
+}
+
+class SecurityTestUserWithUnserializableField implements UserInterface
+{
+    public \SplFileInfo $file;
+
+    public function __construct(private string $username, private array $roles = [])
+    {
+        $this->file = new \SplFileInfo(__FILE__);
+    }
+
+    public function getRoles(): array
+    {
+        return $this->roles;
+    }
+
+    public function eraseCredentials(): void
+    {
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+}
+
+class SecurityTestUserWithBrokenSerialize implements UserInterface
+{
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
+    }
+
+    public function eraseCredentials(): void
+    {
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return 'broken-serialize-user';
+    }
+
+    public function __serialize(): array
+    {
+        return ['file' => new \SplFileInfo(__FILE__)];
+    }
+
+    public function __unserialize(array $data): void
+    {
     }
 }

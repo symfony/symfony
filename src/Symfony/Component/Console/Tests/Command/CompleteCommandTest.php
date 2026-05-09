@@ -37,7 +37,7 @@ class CompleteCommandTest extends TestCase
         $this->application = new Application();
         $this->application->addCommand(new CompleteCommandTest_HelloCommand());
         $this->application->getDefinition()
-            ->addOption(new InputOption('global-option', null, InputOption::VALUE_REQUIRED, suggestedValues: ['foo', 'bar', 'baz']));
+            ->addOption(new InputOption('global-option', null, InputOption::VALUE_REQUIRED, '', null, ['foo', 'bar', 'baz']));
 
         $this->command->setApplication($this->application);
         $this->tester = new CommandTester($this->command);
@@ -102,10 +102,12 @@ class CompleteCommandTest extends TestCase
 
     public static function provideCompleteCommandNameInputs()
     {
-        yield 'empty' => [['bin/console'], ['help', 'list', 'completion', 'hello', 'ahoy']];
-        yield 'partial' => [['bin/console', 'he'], ['help', 'list', 'completion', 'hello', 'ahoy']];
-        yield 'complete-shortcut-name' => [['bin/console', 'hell'], ['hello', 'ahoy']];
-        yield 'complete-aliases' => [['bin/console', 'ah'], ['hello', 'ahoy']];
+        yield 'empty' => [['bin/console'], ['help', 'list', 'completion', 'hello', 'ahoy', 'h', 'ahah']];
+        yield 'partial' => [['bin/console', 'he'], ['help', 'list', 'completion', 'hello', 'ahoy', 'h', 'ahah']];
+        yield 'complete-shortcut-name' => [['bin/console', 'hell'], ['hello']];
+        yield 'complete-aliases' => [['bin/console', 'ah'], ['ahoy']];
+        yield 'short-alias-completes-to-name' => [['bin/console', 'h'], ['hello']];
+        yield 'ambiguous-of-same-command-completes-to-first-match' => [['bin/console', 'ah'], ['ahoy']];
     }
 
     #[DataProvider('provideCompleteCommandInputDefinitionInputs')]
@@ -121,6 +123,7 @@ class CompleteCommandTest extends TestCase
         yield 'custom' => [['bin/console', 'hello'], ['Fabien', 'Robin', 'Wouter']];
         yield 'definition-aliased' => [['bin/console', 'ahoy', '-'], ['--help', '--silent', '--quiet', '--verbose', '--version', '--ansi', '--no-ansi', '--no-interaction', '--global-option']];
         yield 'custom-aliased' => [['bin/console', 'ahoy'], ['Fabien', 'Robin', 'Wouter']];
+        yield 'custom-aliased-input' => [['bin/console', 'ahoy', 'Fa'], ['Fabien', 'Robin', 'Wouter']];
         yield 'global-option-values' => [['bin/console', '--global-option'], ['foo', 'bar', 'baz']];
         yield 'global-option-with-command-values' => [['bin/console', 'ahoy', '--global-option'], ['foo', 'bar', 'baz']];
     }
@@ -137,7 +140,7 @@ class CompleteCommandTest_HelloCommand extends Command
     public function configure(): void
     {
         $this->setName('hello')
-             ->setAliases(['ahoy'])
+             ->setAliases(['ahoy', 'h', 'ahah'])
              ->setDescription('Hello test command')
              ->addArgument('name', InputArgument::REQUIRED)
         ;

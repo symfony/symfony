@@ -80,7 +80,12 @@ final class TokenBucket implements LimiterStateInterface
 
     public function getExpirationTime(): int
     {
-        return $this->rate->calculateTimeForTokens($this->burstSize);
+        // The bucket must persist long enough to cover both a natural refill
+        // back to the burst size and any outstanding reservation debt — the
+        // latter is tracked by a negative token count. Evicting early would
+        // lose the debt and let a fresh bucket hand out already-reserved
+        // tokens.
+        return $this->rate->calculateTimeForTokens(max($this->burstSize, $this->burstSize - $this->tokens));
     }
 
     public function __serialize(): array

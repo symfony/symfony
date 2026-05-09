@@ -260,3 +260,5 @@ final class Builder
         return [$emojiText, $textEmoji];
     }
 }
+
+// @php-cs-fixer-ignore psr_autoloading

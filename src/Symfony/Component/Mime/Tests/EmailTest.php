@@ -464,6 +464,24 @@ class EmailTest extends TestCase
         $this->assertStringMatchesFormat('<div background=3D"cid:%s@symfony"></div>', $parts[0]->bodyToString());
     }
 
+    public function testInlinedPartReferencedViaCidPreservesFilename()
+    {
+        $image = fopen(__DIR__.'/Fixtures/mimetypes/test.gif', 'r');
+        $e = (new Email())->from('me@example.com')->to('you@example.com');
+        $e->html('html content <img src="cid:logo-image.gif">');
+        $e->addPart((new DataPart($image, 'logo-image.gif'))->asInline());
+
+        $body = $e->getBody();
+        $this->assertInstanceOf(RelatedPart::class, $body);
+        $parts = $body->getParts();
+        $inlinePart = $parts[1];
+
+        $this->assertSame('logo-image.gif', $inlinePart->getName());
+        $headers = $inlinePart->getPreparedHeaders()->toString();
+        $this->assertStringContainsString('name=logo-image.gif', $headers);
+        $this->assertStringNotContainsString('name='.$inlinePart->getContentId(), $headers);
+    }
+
     private function generateSomeParts(): array
     {
         $text = new TextPart('text content');

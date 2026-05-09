@@ -34,7 +34,7 @@ class ConstraintValidatorTestCaseTest extends ConstraintValidatorTestCase
             new DateTime(),
         ]);
 
-        $this->validator->validate('ccc', $this->constraint);
+        $this->validate('ccc', $this->constraint);
 
         $contextualValidator = $this->context->getValidator()->inContext($this->context);
         // Simulate __destruct to assert it throws

@@ -60,9 +60,6 @@ class LoggingTranslator implements TranslatorInterface, TranslatorBagInterface, 
         return $this->translator->getCatalogues();
     }
 
-    /**
-     * Gets the fallback locales.
-     */
     public function getFallbackLocales(): array
     {
         if ($this->translator instanceof Translator || method_exists($this->translator, 'getFallbackLocales')) {

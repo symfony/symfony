@@ -21,12 +21,12 @@
         "symfony/cache-implementation": "1.1|2.0|3.0"
     },
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "psr/cache": "^2.0|^3.0",
         "psr/log": "^1.1|^2|^3",
         "symfony/cache-contracts": "^3.6",
         "symfony/service-contracts": "^2.5|^3",
-        "symfony/var-exporter": "^7.4|^8.0"
+        "symfony/var-exporter": "^8.1"
     },
     "require-dev": {
         "cache/integration-tests": "dev-master",
@@ -43,8 +43,7 @@
     },
     "conflict": {
         "ext-redis": "<6.1",
-        "ext-relay": "<0.12.1",
-        "doctrine/dbal": "<4.3"
+        "ext-relay": "<0.12.1"
     },
     "autoload": {
         "psr-4": { "Symfony\\Component\\Cache\\": "" },

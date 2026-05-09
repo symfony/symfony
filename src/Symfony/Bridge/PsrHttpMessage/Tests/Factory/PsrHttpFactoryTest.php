@@ -274,7 +274,7 @@ class PsrHttpFactoryTest extends TestCase
     public static function provideFactories(): \Generator
     {
         yield 'Discovery' => [new PsrHttpFactory()];
-        yield 'incomplete dependencies' => [new PsrHttpFactory(responseFactory: new Psr17Factory())];
+        yield 'incomplete dependencies' => [new PsrHttpFactory(null, null, null, new Psr17Factory())];
         yield 'Nyholm' => [self::buildHttpMessageFactory()];
     }
 

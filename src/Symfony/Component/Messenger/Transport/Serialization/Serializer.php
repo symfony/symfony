@@ -23,7 +23,6 @@ use Symfony\Component\Messenger\Stamp\StampInterface;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Encoder\XmlEncoder;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
@@ -83,14 +82,18 @@ class Serializer implements SerializerInterface
     public function decode(array $encodedEnvelope): Envelope
     {
         if (empty($encodedEnvelope['body']) || empty($encodedEnvelope['headers'])) {
-            throw new MessageDecodingFailedException('Encoded envelope should have at least a "body" and some "headers", or maybe you should implement your own serializer.');
+            return MessageDecodingFailedException::wrap($encodedEnvelope, 'Encoded envelope should have at least a "body" and some "headers", or maybe you should implement your own serializer.');
         }
 
         if (empty($encodedEnvelope['headers']['type'])) {
-            throw new MessageDecodingFailedException('Encoded envelope does not have a "type" header.');
+            return MessageDecodingFailedException::wrap($encodedEnvelope, 'Encoded envelope does not have a "type" header.');
         }
 
-        $stamps = $this->decodeStamps($encodedEnvelope);
+        try {
+            $stamps = $this->decodeStamps($encodedEnvelope);
+        } catch (\Throwable $e) {
+            return MessageDecodingFailedException::wrap($encodedEnvelope, $e->getMessage(), (int) $e->getCode(), $e);
+        }
         $stamps[] = new SerializedMessageStamp($encodedEnvelope['body']);
 
         $serializerStamp = $this->findFirstSerializerStamp($stamps);
@@ -105,8 +108,8 @@ class Serializer implements SerializerInterface
 
         try {
             $message = $this->serializer->deserialize($encodedEnvelope['body'], $type, $this->format, $context);
-        } catch (ExceptionInterface $e) {
-            throw new MessageDecodingFailedException('Could not decode message: '.$e->getMessage(), $e->getCode(), $e);
+        } catch (\Throwable $e) {
+            return MessageDecodingFailedException::wrap($encodedEnvelope, 'Could not decode message: '.$e->getMessage(), (int) $e->getCode(), $e);
         }
 
         return new Envelope($message, $stamps);
@@ -115,12 +118,10 @@ class Serializer implements SerializerInterface
     public function encode(Envelope $envelope): array
     {
         $context = $this->context;
-        /** @var SerializerStamp|null $serializerStamp */
         if ($serializerStamp = $envelope->last(SerializerStamp::class)) {
             $context = $serializerStamp->getContext() + $context;
         }
 
-        /** @var SerializedMessageStamp|null $serializedMessageStamp */
         $serializedMessageStamp = $envelope->last(SerializedMessageStamp::class);
 
         $envelope = $envelope->withoutStampsOfType(NonSendableStampInterface::class);
@@ -147,17 +148,10 @@ class Serializer implements SerializerInterface
                 continue;
             }
 
-            try {
-                $stamps[] = $this->serializer->deserialize($value, substr($name, \strlen(self::STAMP_HEADER_PREFIX)).'[]', $this->format, $this->context);
-            } catch (ExceptionInterface $e) {
-                throw new MessageDecodingFailedException('Could not decode stamp: '.$e->getMessage(), $e->getCode(), $e);
-            }
-        }
-        if ($stamps) {
-            $stamps = array_merge(...$stamps);
+            $stamps[] = $this->serializer->deserialize($value, substr($name, \strlen(self::STAMP_HEADER_PREFIX)).'[]', $this->format, $this->context);
         }
 
-        return $stamps;
+        return array_merge(...$stamps);
     }
 
     private function encodeStamps(Envelope $envelope): array

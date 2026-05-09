@@ -50,7 +50,7 @@ abstract class CompleteConfigurationTestCase extends TestCase
         $this->assertEquals(AuthenticatorManager::class, $authenticatorManager->getClass());
 
         // required badges
-        $this->assertEquals([CsrfTokenBadge::class, RememberMeBadge::class], $authenticatorManager->getArgument(7));
+        $this->assertEquals([CsrfTokenBadge::class, RememberMeBadge::class], $authenticatorManager->getArgument(6));
 
         // login link
         $expiredStorage = $container->getDefinition($expiredStorageId = 'security.authenticator.expired_login_link_storage.main');

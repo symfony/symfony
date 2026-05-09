@@ -30,6 +30,6 @@ class RelayClusterStoreTest extends AbstractRedisStoreTestCase
 
     protected function getRedisConnection(): RelayCluster
     {
-        return new RelayCluster('', explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
+        return new RelayCluster(null, explode(' ', getenv('REDIS_CLUSTER_HOSTS')));
     }
 }

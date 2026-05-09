@@ -35,21 +35,21 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Email());
+        $this->validate(null, new Email());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Email());
+        $this->validate('', new Email());
 
         $this->assertNoViolation();
     }
 
     public function testObjectEmptyStringIsValid()
     {
-        $this->validator->validate(new EmptyEmailObject(), new Email());
+        $this->validate(new EmptyEmailObject(), new Email());
 
         $this->assertNoViolation();
     }
@@ -57,13 +57,13 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new Email());
+        $this->validate(new \stdClass(), new Email());
     }
 
     #[DataProvider('getValidEmails')]
     public function testValidEmails($email)
     {
-        $this->validator->validate($email, new Email());
+        $this->validate($email, new Email());
 
         $this->assertNoViolation();
     }
@@ -71,7 +71,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidEmails')]
     public function testValidEmailsWithNewLine($email)
     {
-        $this->validator->validate($email."\n", new Email());
+        $this->validate($email."\n", new Email());
 
         $this->buildViolation('This value is not a valid email address.')
             ->setParameter('{{ value }}', '"'.$email."\n\"")
@@ -91,7 +91,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidEmailsWithWhitespaces')]
     public function testValidNormalizedEmails($email)
     {
-        $this->validator->validate($email, new Email(normalizer: 'trim'));
+        $this->validate($email, new Email(normalizer: 'trim'));
 
         $this->assertNoViolation();
     }
@@ -107,7 +107,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidEmailsHtml5')]
     public function testValidEmailsHtml5($email)
     {
-        $this->validator->validate($email, new Email(mode: Email::VALIDATION_MODE_HTML5));
+        $this->validate($email, new Email(mode: Email::VALIDATION_MODE_HTML5));
 
         $this->assertNoViolation();
     }
@@ -127,7 +127,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Email(message: 'myMessage');
 
-        $this->validator->validate($email, $constraint);
+        $this->validate($email, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$email.'"')
@@ -153,7 +153,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             mode: Email::VALIDATION_MODE_HTML5,
         );
 
-        $this->validator->validate($email, $constraint);
+        $this->validate($email, $constraint);
 
         $this->buildViolation('myMessage')
              ->setParameter('{{ value }}', '"'.$email.'"')
@@ -191,7 +191,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             mode: Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD,
         );
 
-        $this->validator->validate($email, $constraint);
+        $this->validate($email, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$email.'"')
@@ -214,7 +214,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Email(mode: Email::VALIDATION_MODE_STRICT);
 
-        $this->validator->validate('example@mywebsite.tld', $constraint);
+        $this->validate('example@mywebsite.tld', $constraint);
 
         $this->assertNoViolation();
     }
@@ -223,7 +223,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Email(mode: Email::VALIDATION_MODE_HTML5);
 
-        $this->validator->validate('example@example..com', $constraint);
+        $this->validate('example@example..com', $constraint);
 
         $this->buildViolation('This value is not a valid email address.')
              ->setParameter('{{ value }}', '"example@example..com"')
@@ -235,7 +235,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Email(mode: Email::VALIDATION_MODE_HTML5_ALLOW_NO_TLD);
 
-        $this->validator->validate('example@example', $constraint);
+        $this->validate('example@example', $constraint);
 
         $this->assertNoViolation();
     }
@@ -248,7 +248,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('The "Symfony\Component\Validator\Constraints\Email::$mode" parameter value is not valid.');
 
-        $this->validator->validate('example@example..com', $constraint);
+        $this->validate('example@example..com', $constraint);
     }
 
     #[DataProvider('getInvalidEmailsForStrictChecks')]
@@ -259,7 +259,7 @@ class EmailValidatorTest extends ConstraintValidatorTestCase
             mode: Email::VALIDATION_MODE_STRICT,
         );
 
-        $this->validator->validate($email, $constraint);
+        $this->validate($email, $constraint);
 
         $this
             ->buildViolation('myMessage')

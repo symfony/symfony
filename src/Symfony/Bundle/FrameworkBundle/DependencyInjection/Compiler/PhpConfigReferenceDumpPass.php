@@ -21,9 +21,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ConfigurationExtensionInterface;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
+use Symfony\Component\DependencyInjection\Kernel\BundleInterface;
 use Symfony\Component\DependencyInjection\Loader\Configurator\AppReference;
 use Symfony\Component\ExpressionLanguage\Expression;
-use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Routing\Loader\Configurator\RoutesReference;
 
 /**
@@ -43,14 +43,13 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
         {APP_TYPES}
         final class App
         {
-            /**
-             * @param ConfigType $config
-             *
-             * @psalm-return ConfigType
-             */
+            {APP_PARAM}
             public static function config(array $config): array
             {
-                return AppReference::config($config);
+                /** @var ConfigType $config */
+                $config = AppReference::config($config);
+
+                return $config;
             }
         }
 
@@ -172,6 +171,7 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
                 '{SHAPE}' => $this->getShapeForExtensions($extensions, $container, '    '),
             ]), $i, 0);
         }
+        $appParam = $r->getMethod('config')->getDocComment();
 
         $r = new \ReflectionClass(RoutesReference::class);
 
@@ -195,6 +195,7 @@ class PhpConfigReferenceDumpPass implements CompilerPassInterface
 
         $configReference = strtr(self::REFERENCE_TEMPLATE, [
             '{APP_TYPES}' => $appTypes,
+            '{APP_PARAM}' => $appParam,
             '{ROUTES_TYPES}' => $routesTypes,
             '{ROUTES_PARAM}' => $r->getMethod('config')->getDocComment(),
         ]);

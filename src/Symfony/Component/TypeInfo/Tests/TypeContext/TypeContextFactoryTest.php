@@ -21,6 +21,8 @@ use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithImportedOnlyTypeAliases;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAlias;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithInvalidTypeAliasImport;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPhpstanTemplates;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithPsalmTemplates;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithRecursiveTypeAliases;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplateAndParent;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithTemplates;
@@ -90,8 +92,9 @@ class TypeContextFactoryTest extends TestCase
 
         $uses = [
             'Type' => Type::class,
-            \DateTimeInterface::class => '\\'.\DateTimeInterface::class,
-            'DateTime' => '\\'.\DateTimeImmutable::class,
+            'TI' => 'Symfony\\Component\\TypeInfo\\TypeIdentifier',
+            \DateTimeInterface::class => \DateTimeInterface::class,
+            'DateTime' => \DateTimeImmutable::class,
         ];
 
         $this->assertSame($uses, $this->typeContextFactory->createFromClassName(DummyWithUses::class)->uses);
@@ -108,8 +111,8 @@ class TypeContextFactoryTest extends TestCase
 
         $uses = [
             'Type' => Type::class,
-            \DateTimeInterface::class => '\\'.\DateTimeInterface::class,
-            'DateTime' => '\\'.\DateTimeImmutable::class,
+            \DateTimeInterface::class => \DateTimeInterface::class,
+            'DateTime' => \DateTimeImmutable::class,
         ];
 
         $this->assertSame($uses, $this->typeContextFactory->createFromClassName(DummyWithUsesWindowsLineEndings::class)->uses);
@@ -120,36 +123,52 @@ class TypeContextFactoryTest extends TestCase
         $this->assertEquals($uses, $this->typeContextFactory->createFromReflection(new \ReflectionParameter([DummyWithUsesWindowsLineEndings::class, 'setCreatedAt'], 'createdAt'))->uses);
     }
 
-    public function testCollectTemplates()
+    /**
+     * @param class-string $className
+     */
+    #[DataProvider('collectTemplatesDataProvider')]
+    public function testCollectTemplates(string $className)
     {
-        $this->assertEquals([], $this->typeContextFactory->createFromClassName(Dummy::class)->templates);
         $this->assertEquals([
             'T' => Type::union(Type::int(), Type::string()),
             'U' => Type::mixed(),
-        ], $this->typeContextFactory->createFromClassName(DummyWithTemplates::class)->templates);
+        ], $this->typeContextFactory->createFromClassName($className)->templates);
 
         $this->assertEquals([
             'T' => Type::union(Type::int(), Type::string()),
             'U' => Type::mixed(),
-        ], $this->typeContextFactory->createFromReflection(new \ReflectionClass(DummyWithTemplates::class))->templates);
+        ], $this->typeContextFactory->createFromReflection(new \ReflectionClass($className))->templates);
 
         $this->assertEquals([
             'T' => Type::union(Type::int(), Type::string()),
             'U' => Type::mixed(),
-        ], $this->typeContextFactory->createFromReflection(new \ReflectionProperty(DummyWithTemplates::class, 'price'))->templates);
+        ], $this->typeContextFactory->createFromReflection(new \ReflectionProperty($className, 'price'))->templates);
 
         $this->assertEquals([
             'T' => Type::union(Type::int(), Type::float()),
             'U' => Type::mixed(),
             'V' => Type::mixed(),
-        ], $this->typeContextFactory->createFromReflection(new \ReflectionMethod(DummyWithTemplates::class, 'getPrice'))->templates);
+        ], $this->typeContextFactory->createFromReflection(new \ReflectionMethod($className, 'getPrice'))->templates);
 
         $this->assertEquals([
             'T' => Type::union(Type::int(), Type::float()),
             'U' => Type::mixed(),
             'V' => Type::mixed(),
-        ], $this->typeContextFactory->createFromReflection(new \ReflectionParameter([DummyWithTemplates::class, 'getPrice'], 'inCents'))->templates);
+        ], $this->typeContextFactory->createFromReflection(new \ReflectionParameter([$className, 'getPrice'], 'inCents'))->templates);
+    }
 
+    /**
+     * @return iterable<array{0: class-string}>
+     */
+    public static function collectTemplatesDataProvider(): iterable
+    {
+        yield [DummyWithTemplates::class];
+        yield [DummyWithPhpstanTemplates::class];
+        yield [DummyWithPsalmTemplates::class];
+    }
+
+    public function testCollectTemplatesWithParent()
+    {
         $this->assertEquals([
             'T' => Type::object(DummyInDifferentNs::class),
         ], $this->typeContextFactory->createFromReflection(new \ReflectionClass(DummyWithTemplateAndParent::class))->templates);

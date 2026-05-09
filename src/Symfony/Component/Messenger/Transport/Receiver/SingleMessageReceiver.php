@@ -30,7 +30,10 @@ class SingleMessageReceiver implements ReceiverInterface
     ) {
     }
 
-    public function get(): iterable
+    /**
+     * @param int $fetchSize
+     */
+    public function get(/* int $fetchSize = 1 */): iterable
     {
         if ($this->hasReceived) {
             return [];

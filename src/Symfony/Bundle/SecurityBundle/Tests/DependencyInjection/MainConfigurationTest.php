@@ -12,6 +12,8 @@
 namespace Symfony\Bundle\SecurityBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\MainConfiguration;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\AuthenticatorFactoryInterface;
@@ -219,6 +221,18 @@ class MainConfigurationTest extends TestCase
         $processedConfig = $processor->processConfiguration($configuration, [$config, $config2]);
 
         $this->assertSame(MainConfiguration::STRATEGY_UNANIMOUS, $processedConfig['access_decision_manager']['strategy']);
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testEraseCredentialsDeprecation()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/security-bundle 8.1: Setting the "security.erase_credentials" configuration option is deprecated. It will be removed in Symfony 9.0, as the "eraseCredentials()" method was removed in Symfony 8.0.');
+
+        $config = array_merge(static::$minimalConfig, ['erase_credentials' => false]);
+        $processor = new Processor();
+        $configuration = new MainConfiguration([], []);
+        $processor->processConfiguration($configuration, [$config]);
     }
 
     public function testFirewalls()

@@ -5,6 +5,7 @@ CHANGELOG
 ---
 
  * Add `form_flow_*` Twig form helper functions to access values from `FormFlowCursor`
+ * Add daisyUI 5 form layout
 
 8.0
 ---

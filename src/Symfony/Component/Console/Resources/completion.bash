@@ -54,7 +54,7 @@ _sf_{{ COMMAND_NAME }}() {
     done
 
     local sfcomplete
-    if sfcomplete=$(${completecmd[@]} 2>&1); then
+    if sfcomplete=$(SHELL_VERBOSITY=0 ${completecmd[@]} 2>&1); then
         local quote suggestions
         quote=${cur:0:1}
 

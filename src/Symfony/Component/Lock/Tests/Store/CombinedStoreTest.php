@@ -142,7 +142,6 @@ class CombinedStoreTest extends AbstractStoreTestCase
             ->method('canBeMet')
             ->willReturn(false);
         $strategy
-            ->expects($this->any())
             ->method('isMet')
             ->willReturn(false);
 
@@ -245,7 +244,6 @@ class CombinedStoreTest extends AbstractStoreTestCase
             ->method('canBeMet')
             ->willReturn(false);
         $strategy
-            ->expects($this->any())
             ->method('isMet')
             ->willReturn(false);
 
@@ -268,7 +266,6 @@ class CombinedStoreTest extends AbstractStoreTestCase
         $ttl = random_int(1, 10);
 
         $strategy
-            ->expects($this->any())
             ->method('canBeMet')
             ->willReturn(true);
         $strategy
@@ -297,7 +294,6 @@ class CombinedStoreTest extends AbstractStoreTestCase
 
         $strategy = $this->createMock(StrategyInterface::class);
         $strategy
-            ->expects($this->any())
             ->method('canBeMet')
             ->willReturn(true);
         $strategy

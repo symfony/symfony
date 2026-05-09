@@ -177,11 +177,7 @@ class FooType extends AbstractType
         });
         $resolver->setAllowedTypes('foo', 'string');
         $resolver->setAllowedValues('foo', ['bar', 'baz']);
-        $resolver->setNormalizer('foo', function (Options $options, $value) {
-            \assert(null !== $this); // explicitly test non-static normalizer
-
-            return (string) $value;
-        });
+        $resolver->setNormalizer('foo', static fn (Options $options, $value) => (string) $value);
         $resolver->setOptions('baz', static function (OptionsResolver $baz) {
             $baz->setRequired('foo');
             $baz->setDefaults(['foo' => true, 'bar' => true]);

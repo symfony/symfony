@@ -59,10 +59,14 @@ class InputArgument
         mixed $default = null,
         private \Closure|array $suggestedValues = [],
     ) {
-        if (null === $mode) {
-            $mode = self::OPTIONAL;
-        } elseif ($mode >= (self::IS_ARRAY << 1) || $mode < 1) {
+        // If not explicitly marked as required, we assume the value to be optional
+        $mode = self::REQUIRED === (self::REQUIRED & $mode) ? $mode : (self::OPTIONAL | $mode);
+        if ($mode >= (self::IS_ARRAY << 1) || $mode < 1) {
             throw new InvalidArgumentException(\sprintf('Argument mode "%s" is not valid.', $mode));
+        }
+
+        if ((self::REQUIRED | self::OPTIONAL) === ((self::REQUIRED | self::OPTIONAL) & $mode)) {
+            trigger_deprecation('symfony/console', '8.1', 'Argument "%s" mode should specify either required or optional.', $name);
         }
 
         $this->mode = $mode;

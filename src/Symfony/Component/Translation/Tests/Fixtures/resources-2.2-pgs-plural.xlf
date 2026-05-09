@@ -1,0 +1,19 @@
+<xliff xmlns="urn:oasis:names:tc:xliff:document:2.0" xmlns:pgs="urn:oasis:names:tc:xliff:pgs:1.0"
+       version="2.2" srcLang="en" trgLang="fr">
+    <file id="f1">
+        <unit id="tu1" name="file_deleted" pgs:switch="plural:file_count">
+            <segment id="seg1" pgs:case="0">
+                <source>You deleted no file.</source>
+                <target>Vous n'avez supprimé aucun fichier.</target>
+            </segment>
+            <segment id="seg2" pgs:case="1">
+                <source>You deleted one file.</source>
+                <target>Vous avez supprimé un fichier.</target>
+            </segment>
+            <segment id="seg3" pgs:case="other">
+                <source>You deleted <ph id="1" disp="file_count"/> files.</source>
+                <target>Vous avez supprimé <ph id="1" disp="file_count"/> fichiers.</target>
+            </segment>
+        </unit>
+    </file>
+</xliff>

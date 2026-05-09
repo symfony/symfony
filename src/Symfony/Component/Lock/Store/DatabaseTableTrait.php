@@ -54,7 +54,7 @@ trait DatabaseTableTrait
     {
         $key = (string) $key;
 
-        return strlen($key) <= 64 ? $key : hash('sha256', $key);
+        return \strlen($key) <= 64 ? $key : hash('sha256', $key);
     }
 
     private function getUniqueToken(Key $key): string

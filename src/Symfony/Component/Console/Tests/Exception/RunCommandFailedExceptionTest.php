@@ -41,8 +41,8 @@ class RunCommandFailedExceptionTest extends TestCase
             $inner,
             new RunCommandContext(
                 new RunCommandMessage('foo'),
-                exitCode: Command::FAILURE,
-                output: 'bar'
+                Command::FAILURE,
+                'bar'
             )
         );
     }

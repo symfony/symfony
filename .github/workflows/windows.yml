@@ -42,7 +42,7 @@ jobs:
         run: |
           $env:Path = 'c:\php;' + $env:Path
           mkdir c:\php && cd c:\php
-          iwr -outf php.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.0-Win32-vs17-x86.zip
+          iwr -outf php.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.1-Win32-vs17-x86.zip
           7z x php.zip -y >nul
           Copy php.ini-development php.ini
           "memory_limit=-1" >> php.ini
@@ -56,6 +56,8 @@ jobs:
           "extension=php_mbstring.dll" >> php.ini
           "extension=php_openssl.dll" >> php.ini
           "extension=php_curl.dll" >> php.ini
+          "intl.default_locale=en" >> php.ini
+          "intl.error_level=0" >> php.ini
           cd ${{ github.workspace }}
           iwr -outf composer.phar https://getcomposer.org/download/latest-stable/composer.phar
 
@@ -141,7 +143,7 @@ jobs:
         run: |
           $env:Path = 'c:\php;' + $env:Path
           mkdir c:\php && cd c:\php
-          iwr -outf php.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.0-Win32-vs17-x86.zip
+          iwr -outf php.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php-8.4.1-Win32-vs17-x86.zip
           7z x php.zip -y >nul
           cd ext
           iwr -outf php_apcu.zip https://github.com/symfony/binary-utils/releases/download/v0.1/php_apcu-5.1.24-8.4-ts-vs17-x86.zip
@@ -173,6 +175,8 @@ jobs:
           "extension=php_pdo_sqlite.dll" >> php.ini
           "extension=php_curl.dll" >> php.ini
           "extension=php_sodium.dll" >> php.ini
+          "intl.default_locale=en" >> php.ini
+          "intl.error_level=0" >> php.ini
           cd ${{ github.workspace }}
           iwr -outf composer.phar https://getcomposer.org/download/latest-stable/composer.phar
 

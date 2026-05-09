@@ -53,6 +53,22 @@ class BazClass
     }
 }
 
+class BazInvokableFactory
+{
+    public function __invoke(): BazClass
+    {
+        return new BazClass();
+    }
+}
+
+class BazInvokableConfigurator
+{
+    public function __invoke($instance): void
+    {
+        $instance->configure();
+    }
+}
+
 class BarUserClass
 {
     public $foo;

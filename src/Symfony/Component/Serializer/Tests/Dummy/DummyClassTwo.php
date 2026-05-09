@@ -11,6 +11,10 @@
 
 namespace Symfony\Component\Serializer\Tests\Dummy;
 
+use Symfony\Component\Serializer\Attribute\SerializedName;
+
 class DummyClassTwo
 {
+    #[SerializedName('nested')]
+    public DummyClassOne $child;
 }

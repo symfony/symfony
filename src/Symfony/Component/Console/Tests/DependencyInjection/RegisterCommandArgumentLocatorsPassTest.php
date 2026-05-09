@@ -11,11 +11,14 @@
 
 namespace Symfony\Component\Console\Tests\DependencyInjection;
 
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\DependencyInjection\RegisterCommandArgumentLocatorsPass;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -56,6 +59,60 @@ class RegisterCommandArgumentLocatorsPassTest extends TestCase
 
         $commands = $commandLocator->getArgument(0);
         $this->assertArrayHasKey('test:command', $commands);
+    }
+
+    #[DoesNotPerformAssertions]
+    public function testProcessServiceArgumentWithAutowireAttribute()
+    {
+        $container = new ContainerBuilder();
+        $container->register('console.argument_resolver.service')->setSynthetic(true)->addArgument(null);
+        $container->register('logger')->setSynthetic(true);
+
+        $command = new Definition(CommandWithAutowireAttribute::class);
+        $command->addTag('console.command', ['command' => 'test:command']);
+        $command->addTag('console.command.service_arguments');
+        $container->setDefinition('test.command', $command);
+
+        $pass = new RegisterCommandArgumentLocatorsPass();
+
+        $pass->process($container);
+        $container->compile();
+    }
+
+    #[DoesNotPerformAssertions]
+    public function testProcessNullableAutowireAttributeWithInvalidService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('console.argument_resolver.service')->setSynthetic(true)->addArgument(null);
+
+        $command = new Definition(CommandWithAutowireAttributeNullableInvalidReference::class);
+        $command->setAutowired(true);
+        $command->addTag('console.command', ['command' => 'test:command']);
+        $command->addTag('console.command.service_arguments');
+        $container->setDefinition('test.command', $command);
+
+        $pass = new RegisterCommandArgumentLocatorsPass();
+        $pass->process($container);
+
+        $container->compile();
+    }
+
+    public function testProcessThrowsOnInvalidAutowiredService()
+    {
+        $container = new ContainerBuilder();
+        $container->register('console.argument_resolver.service')->setSynthetic(true)->addArgument(null);
+
+        $command = new Definition(CommandWithAutowireAttributeInvalidReference::class);
+        $command->setAutowired(true);
+        $command->addTag('console.command', ['command' => 'test:command']);
+        $command->addTag('console.command.service_arguments');
+        $container->setDefinition('test.command', $command);
+
+        $pass = new RegisterCommandArgumentLocatorsPass();
+        $pass->process($container);
+
+        $this->expectException(ServiceNotFoundException::class);
+        $container->compile();
     }
 
     public function testProcessWithManualArgumentMapping()
@@ -174,6 +231,33 @@ class CommandWithServiceArguments
 {
     public function __invoke(LoggerInterface $logger): void
     {
+    }
+}
+
+class CommandWithAutowireAttribute
+{
+    public function __invoke(
+        #[Autowire(service: 'logger')]
+        LoggerInterface $logger,
+    ) {
+    }
+}
+
+class CommandWithAutowireAttributeInvalidReference
+{
+    public function __invoke(
+        #[Autowire(service: 'invalid.id')]
+        \stdClass $service2,
+    ) {
+    }
+}
+
+class CommandWithAutowireAttributeNullableInvalidReference
+{
+    public function __invoke(
+        #[Autowire(service: 'invalid.id')]
+        ?\stdClass $service2 = null,
+    ) {
     }
 }
 

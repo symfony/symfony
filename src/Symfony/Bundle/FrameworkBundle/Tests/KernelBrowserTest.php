@@ -76,7 +76,7 @@ class KernelBrowserTest extends AbstractWebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mock->expects($this->any())->method('handle')->willReturn(new Response('foo'));
+        $mock->method('handle')->willReturn(new Response('foo'));
 
         return $mock;
     }

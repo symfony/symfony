@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Handler;
 
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\Messenger\Exception\LogicException;
 
 /**
@@ -18,6 +20,8 @@ use Symfony\Component\Messenger\Exception\LogicException;
  */
 class Acknowledger
 {
+    public readonly ClockInterface $clock;
+
     private ?\Closure $ack;
     private \Throwable|false|null $error = null;
     private mixed $result = null;
@@ -28,7 +32,9 @@ class Acknowledger
     public function __construct(
         private string $handlerClass,
         ?\Closure $ack = null,
+        ?ClockInterface $clock = null,
     ) {
+        $this->clock = $clock ?? Clock::get();
         $this->ack = $ack ?? static function () {};
     }
 

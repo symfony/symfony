@@ -165,7 +165,7 @@ abstract class DoctrineType extends AbstractType implements ResetInterface
                     'binary' => 'toBinary',
                     'hex' => 'toHex',
                     'rfc4122' => 'toRfc4122',
-                    default => throw new RuntimeException(sprintf('Unsupported value "%s" for "uid_format" option; valid values are "base32", "base58", "binary", "hex" and "rfc4122".', $uidFormat)),
+                    default => throw new RuntimeException(\sprintf('Unsupported value "%s" for "uid_format" option; valid values are "base32", "base58", "binary", "hex" and "rfc4122".', $uidFormat)),
                 };
 
                 return ChoiceList::value($this, static function (?object $object = null) use ($idReader, $formatMethod): string {

@@ -12,6 +12,7 @@
 namespace Symfony\Component\Routing\Tests\Matcher;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\NoConfigurationException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
@@ -55,6 +56,33 @@ class UrlMatcherTest extends TestCase
         } catch (MethodNotAllowedException $e) {
             $this->assertEquals(['POST'], $e->getAllowedMethods());
         }
+    }
+
+    public function testMatchRequestHonorsTheRequestsMethodOverTheStaticContext()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', [], [], [], '', [], ['GET']));
+
+        $matcher = $this->getUrlMatcher($coll, new RequestContext('', 'POST'));
+
+        $this->assertSame(
+            ['_route' => 'foo'],
+            $matcher->matchRequest(Request::create('/foo', 'GET'))
+        );
+    }
+
+    public function testMatchRequestRestoresTheContextAfterwards()
+    {
+        $coll = new RouteCollection();
+        $coll->add('foo', new Route('/foo', [], [], [], '', [], ['GET']));
+
+        $originalContext = new RequestContext('', 'POST', 'example.com');
+        $matcher = $this->getUrlMatcher($coll, $originalContext);
+        $matcher->matchRequest(Request::create('https://other.example/foo', 'GET'));
+
+        $this->assertSame('POST', $originalContext->getMethod());
+        $this->assertSame('example.com', $originalContext->getHost());
+        $this->assertSame($originalContext, $matcher->getContext());
     }
 
     public function testMethodNotAllowedOnRoot()

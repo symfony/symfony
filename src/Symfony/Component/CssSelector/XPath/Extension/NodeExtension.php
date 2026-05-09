@@ -100,29 +100,32 @@ class NodeExtension extends AbstractExtension
 
     public function translateMatching(Node\MatchingNode $node, Translator $translator): XPathExpr
     {
-        $xpath = $translator->nodeToXPath($node->selector);
-
-        foreach ($node->arguments as $argument) {
-            $expr = $translator->nodeToXPath($argument);
-            $expr->addNameTest();
-            if ($condition = $expr->getCondition()) {
-                $xpath->addCondition($condition, 'or');
-            }
-        }
-
-        return $xpath;
+        return $this->translateMatchingOrSpecificityAdjustment($node->selector, $node->arguments, $translator);
     }
 
     public function translateSpecificityAdjustment(Node\SpecificityAdjustmentNode $node, Translator $translator): XPathExpr
     {
-        $xpath = $translator->nodeToXPath($node->selector);
+        return $this->translateMatchingOrSpecificityAdjustment($node->selector, $node->arguments, $translator);
+    }
 
-        foreach ($node->arguments as $argument) {
+    /**
+     * @param array<Node\NodeInterface> $arguments
+     */
+    private function translateMatchingOrSpecificityAdjustment(Node\NodeInterface $selector, array $arguments, Translator $translator): XPathExpr
+    {
+        $xpath = $translator->nodeToXPath($selector);
+
+        $conditions = [];
+        foreach ($arguments as $argument) {
             $expr = $translator->nodeToXPath($argument);
             $expr->addNameTest();
-            if ($condition = $expr->getCondition()) {
-                $xpath->addCondition($condition, 'or');
+            if ('' !== $condition = $expr->getCondition()) {
+                $conditions[] = $condition;
             }
+        }
+
+        if ($conditions) {
+            $xpath->addCondition(1 === \count($conditions) ? $conditions[0] : '('.implode(') or (', $conditions).')');
         }
 
         return $xpath;

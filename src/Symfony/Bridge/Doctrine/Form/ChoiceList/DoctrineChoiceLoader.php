@@ -66,6 +66,9 @@ class DoctrineChoiceLoader extends AbstractChoiceLoader
         return parent::doLoadValuesForChoices($choices);
     }
 
+    /**
+     * @param-immediately-invoked-callable $value
+     */
     protected function doLoadChoicesForValues(array $values, ?callable $value): array
     {
         if ($this->idReader && null === $value) {

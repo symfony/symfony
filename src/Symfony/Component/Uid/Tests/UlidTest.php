@@ -49,6 +49,19 @@ class UlidTest extends TestCase
         new Ulid('this is not a ulid');
     }
 
+    public function testInvalidUlidContainsInvalidValue()
+    {
+        $invalidUlid = 'this is not a ulid';
+
+        try {
+            new Ulid($invalidUlid);
+            $this->fail(\sprintf('Expected "%s" to be thrown.', InvalidArgumentException::class));
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('Invalid ULID.', $e->getMessage());
+            $this->assertSame($invalidUlid, $e->invalidValue);
+        }
+    }
+
     public function testBinary()
     {
         $ulid = new Ulid('00000000000000000000000000');
@@ -203,6 +216,19 @@ class UlidTest extends TestCase
             ['1BVXue8CnY8ogucrHX3TeF'],
             ['0177058f-4dac-d0b2-a990-a49af02bc008'],
         ];
+    }
+
+    public function testInvalidBinaryUidContainsInvalidValue()
+    {
+        $invalidBinary = '01EW2RYKDCT2SAK454KBR2QG08';
+
+        try {
+            Ulid::fromBinary($invalidBinary);
+            $this->fail(\sprintf('Expected "%s" to be thrown.', InvalidArgumentException::class));
+        } catch (InvalidArgumentException $e) {
+            $this->assertSame('Invalid binary uid provided.', $e->getMessage());
+            $this->assertSame($invalidBinary, $e->invalidValue);
+        }
     }
 
     public function testFromBase58()

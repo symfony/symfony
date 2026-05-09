@@ -96,10 +96,14 @@ class InputOption
             }
         }
 
-        if (null === $mode) {
-            $mode = self::VALUE_NONE;
-        } elseif ($mode >= (self::VALUE_NEGATABLE << 1) || $mode < 1) {
+        // If not explicitly marked as required or optional, we assume the value accepts no input
+        $mode = self::VALUE_REQUIRED === (self::VALUE_REQUIRED & $mode) || self::VALUE_OPTIONAL === (self::VALUE_OPTIONAL & $mode) ? $mode : (self::VALUE_NONE | $mode);
+        if ($mode >= (self::VALUE_NEGATABLE << 1) || $mode < 1) {
             throw new InvalidArgumentException(\sprintf('Option mode "%s" is not valid.', $mode));
+        }
+
+        if (!\in_array($mode & (self::VALUE_NONE | self::VALUE_REQUIRED | self::VALUE_OPTIONAL), [self::VALUE_NONE, self::VALUE_REQUIRED, self::VALUE_OPTIONAL], true)) {
+            trigger_deprecation('symfony/console', '8.1', 'Option "%s" mode should be either none, required or optional.', $name);
         }
 
         $this->name = $name;
@@ -190,8 +194,12 @@ class InputOption
      */
     public function setDefault(mixed $default): void
     {
-        if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
+        if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && !$this->isNegatable() && null !== $default) {
             throw new LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');
+        }
+
+        if ($this->isNegatable() && null !== $default && !\is_bool($default)) {
+            throw new LogicException('A default value for a negatable option must be a boolean or null.');
         }
 
         if ($this->isArray()) {

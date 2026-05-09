@@ -13,7 +13,7 @@ namespace Symfony\Component\Messenger\Tests\EventListener;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\DependencyInjection\ServicesResetter;
+use Symfony\Component\DependencyInjection\ServicesResetter;
 use Symfony\Component\Messenger\Event\WorkerRunningEvent;
 use Symfony\Component\Messenger\Event\WorkerStoppedEvent;
 use Symfony\Component\Messenger\EventListener\ResetServicesListener;

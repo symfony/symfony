@@ -11,6 +11,8 @@
 
 namespace Symfony\Component\Messenger\Bridge\Doctrine\Transport;
 
+use Doctrine\DBAL\Connection as DBALConnection;
+
 /**
  * Uses PostgreSQL LISTEN/NOTIFY to push messages to workers.
  *
@@ -27,11 +29,11 @@ final class PostgreSqlConnection extends Connection
 
     /**
      * * check_delayed_interval: The interval to check for delayed messages, in milliseconds. Set to 0 to disable checks. Default: 60000 (1 minute)
-     * * get_notify_timeout: The time to wait for a message, in milliseconds. Default: 0, which means until check_delayed_interval is reached.
+     * * get_notify_timeout: The maximum time to wait for a NOTIFY, in milliseconds. Default: 60000 (1 minute).
      */
     protected const DEFAULT_OPTIONS = parent::DEFAULT_OPTIONS + [
         'check_delayed_interval' => 60000,
-        'get_notify_timeout' => 0,
+        'get_notify_timeout' => 60000,
     ];
 
     public function __serialize(): array
@@ -60,10 +62,10 @@ final class PostgreSqlConnection extends Connection
         $this->unlisten();
     }
 
-    public function get(): ?array
+    public function get(int $fetchSize = 1): ?array
     {
         if ($this->notifyHandledExternally || null === $this->queueEmptiedAt) {
-            return parent::get();
+            return parent::get($fetchSize);
         }
 
         // Fallback: when no external listener handles LISTEN/NOTIFY,
@@ -90,7 +92,7 @@ final class PostgreSqlConnection extends Connection
             return null;
         }
 
-        return parent::get();
+        return parent::get($fetchSize);
     }
 
     /**
@@ -100,14 +102,27 @@ final class PostgreSqlConnection extends Connection
      * assuming an external listener (e.g. PostgreSqlNotifyOnIdleListener) handles it.
      *
      * Safe to call multiple times; PostgreSQL ignores duplicate LISTEN for the same channel.
+     *
+     * @param bool $registerOnDatabase Whether to execute the SQL LISTEN command.
+     *                                 When false, only marks get() as externally handled
+     *                                 without registering on the database. This avoids
+     *                                 accumulating unread notifications on connections
+     *                                 that will never call waitForNotify().
      */
-    public function listen(): void
+    public function listen(bool $registerOnDatabase = true): void
     {
-        // This is secure because the table name must be a valid identifier:
-        // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
-        $this->executeStatement(\sprintf('LISTEN "%s"', $this->configuration['table_name']));
-        $this->listening = true;
+        if ($registerOnDatabase) {
+            // This is secure because the table name must be a valid identifier:
+            // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+            $this->executeStatement(\sprintf('LISTEN "%s"', $this->configuration['table_name']));
+            $this->listening = true;
+        }
         $this->notifyHandledExternally = true;
+    }
+
+    public function getDriverConnection(): DBALConnection
+    {
+        return $this->driverConnection;
     }
 
     /**

@@ -30,7 +30,10 @@ class SyncTransport implements TransportInterface
     ) {
     }
 
-    public function get(): iterable
+    /**
+     * @param int $fetchSize
+     */
+    public function get(/* int $fetchSize = 1 */): iterable
     {
         throw new InvalidArgumentException('You cannot receive messages from the Messenger SyncTransport.');
     }

@@ -1,0 +1,39 @@
+{
+    "name": "symfony/prelude-notifier",
+    "type": "symfony-notifier-bridge",
+    "description": "Symfony Prelude Notifier Bridge",
+    "keywords": [
+        "prelude",
+        "sms",
+        "notifier",
+        "symfony"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Imad Zairig",
+            "email": "imadzairig@gmail.com"
+        },
+        {
+            "name": "Symfony Community",
+            "homepage": "https://symfony.com/contributors"
+        }
+    ],
+    "require": {
+        "php": ">=8.4",
+        "symfony/http-client": "^7.4|^8.0",
+        "symfony/notifier": "^7.4|^8.0"
+    },
+    "require-dev": {
+        "symfony/http-client": "^7.4|^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Symfony\\Component\\Notifier\\Bridge\\Prelude\\": ""
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "minimum-stability": "dev"
+}

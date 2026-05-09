@@ -99,7 +99,7 @@ class LessThanOrEqualValidatorTest extends AbstractComparisonValidatorTestCase
 
         $extremeDate = (new \DateTimeImmutable())->setDate(185449, 12, 31)->setTime(23, 0, 0);
 
-        $this->validator->validate($extremeDate, $constraint);
+        $this->validate($extremeDate, $constraint);
 
         $violations = $this->context->getViolations();
         $this->assertCount(1, $violations);

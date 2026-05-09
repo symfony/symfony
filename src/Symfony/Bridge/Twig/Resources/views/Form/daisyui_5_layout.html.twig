@@ -1,0 +1,113 @@
+{% use 'form_div_layout.html.twig' %}
+
+{%- block form_row -%}
+    {%- set row_attr = row_attr|merge({class: row_attr.class|default(row_class|default('flex flex-col mb-6'))}) -%}
+    {{- parent() -}}
+{%- endblock form_row -%}
+
+{%- block widget_attributes -%}
+    {%- set attr = attr|merge({class: attr.class|default(widget_class|default('mt-1 w-full')) ~ (errors|length ? ' ' ~ widget_errors_class|default('input-error'))}) -%}
+    {{- parent() -}}
+{%- endblock widget_attributes -%}
+
+{%- block form_errors -%}
+    {%- if errors|length > 0 -%}
+        <ul>
+            {%- for error in errors -%}
+                <li class="{{ error_item_class|default('text-error') }}">{{ error.message }}</li>
+            {%- endfor -%}
+        </ul>
+    {%- endif -%}
+{%- endblock form_errors -%}
+
+{%- block form_help -%}
+    {%- set help_attr = help_attr|merge({class: (help_attr.class|default('mt-1 label'))|trim}) -%}
+    {{- parent() -}}
+{%- endblock form_help -%}
+
+{%- block form_label -%}
+    {%- set label_attr = label_attr|merge({class: label_attr.class|default(label_class|default('label'))}) -%}
+    {{- parent() -}}
+{%- endblock form_label -%}
+
+{%- block button_widget -%}
+    {%- set attr = attr|merge({class: (attr.class|default('btn-neutral') ~ ' btn')|trim}) -%}
+    {{- parent() -}}
+{%- endblock button_widget %}
+
+{%- block submit_widget -%}
+    {%- set attr = attr|merge({class: (attr.class|default('btn-primary'))|trim}) -%}
+    {{- parent() -}}
+{%- endblock submit_widget %}
+
+{%- block choice_widget_expanded -%}
+    {%- set attr = attr|merge({class: attr.class|default('mt-2')}) -%}
+    <div {{ block('widget_container_attributes') }}>
+        {%- for child in form %}
+            <label class="flex items-center label mb-2">
+                {{- form_widget(child) -}}
+                {% set label = child.vars.label %}
+                {% if label != false %}
+                    {{- block('form_label_content') -}}
+                {% endif %}
+            </label>
+        {% endfor -%}
+    </div>
+{%- endblock choice_widget_expanded -%}
+
+{%- block checkbox_row -%}
+    {%- set row_attr = row_attr|merge({class: row_attr.class|default(row_class|default('mb-6'))}) -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~ '_help'}} -%}
+    {%- endif -%}
+    <div{% with {attr: row_attr} %}{{ block('attributes') }}{% endwith %}>
+        {{- form_errors(form) -}}
+        <label class="flex items-center label mb-2">
+            {{- form_widget(form, widget_attr) -}}
+            {{- block('form_label_content') -}}
+        </label>
+        {{- form_help(form) -}}
+    </div>
+{%- endblock checkbox_row -%}
+
+{%- block checkbox_widget -%}
+    {%- set widget_class = (widget_class|default('checkbox') ~ (errors|length ? ' checkbox-error')) -%}
+    {{- parent() -}}
+{%- endblock checkbox_widget -%}
+
+{% block radio_widget -%}
+{%- set widget_class = (widget_class|default('radio') ~ (errors|length ? ' radio-error')) -%}
+    {{- parent() -}}
+{%- endblock radio_widget %}
+
+{%- block choice_widget_collapsed -%}
+    {%- set attr = attr|merge({class: (attr.class|default('') ~ ' select mt-2')|trim}) -%}
+    {{- parent() -}}
+{%- endblock choice_widget_collapsed -%}
+
+{% block textarea_widget -%}
+    {% set attr = attr|merge({class: (attr.class|default('') ~ ' textarea mt-2')|trim}) %}
+    {{- parent() -}}
+{%- endblock textarea_widget %}
+
+{%- block range_widget -%}
+    {% set type = type|default('range') %}
+    {%- set widget_class = widget_class|default('range mt-2') -%}
+    {{- block('form_widget_simple') -}}
+{%- endblock range_widget %}
+
+{%- block file_widget -%}
+    {% set type = type|default('file') %}
+    {%- set widget_class = (widget_class|default('file-input mt-2') ~ (errors|length ? ' file-input-error')) -%}
+    {{- block('form_widget_simple') -}}
+{%- endblock file_widget %}
+
+{% block form_widget_simple -%}
+    {%- if type is not defined or type not in ['hidden', 'range', 'file'] %}
+        {%- set widget_class = ' input mt-2' %}
+        {%- set attr = attr|merge({class: (attr.class|default('') ~ widget_class)|trim}) -%}
+    {% endif -%}
+
+    {{- parent() -}}
+{%- endblock form_widget_simple %}

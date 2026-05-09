@@ -27,7 +27,7 @@
 
 {% block menu %}
     <span class="label label-status-{{ collector.data.nb_errors ? 'error' }} {{ collector.data.forms is empty ? 'disabled' }}">
-        <span class="icon">{{ source('@WebProfiler/Icon/form.svg') }}</span>
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/form.svg') }}</span>
         <strong>Forms</strong>
         {% if collector.data.nb_errors > 0 %}
             <span class="count">

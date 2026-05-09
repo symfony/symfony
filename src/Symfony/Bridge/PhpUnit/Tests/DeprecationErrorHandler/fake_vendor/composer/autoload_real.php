@@ -26,6 +26,16 @@ class ComposerLoaderFake
         ];
     }
 
+    public function getFallbackDirs()
+    {
+        return [];
+    }
+
+    public function getFallbackDirsPsr4()
+    {
+        return [];
+    }
+
     public function loadClass($className)
     {
         if ($file = $this->findFile($className)) {

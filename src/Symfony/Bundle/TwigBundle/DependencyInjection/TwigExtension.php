@@ -98,6 +98,8 @@ class TwigExtension extends Extension
         $container->setParameter('twig.default_path', $config['default_path']);
         $defaultTwigPath = $container->getParameterBag()->resolveValue($config['default_path']);
 
+        $container->getDefinition('twig.runtime.escaper')->replaceArgument(0, $config['charset']);
+
         $envConfiguratorDefinition = $container->getDefinition('twig.configurator.environment');
         $envConfiguratorDefinition->replaceArgument(0, $config['date']['format']);
         $envConfiguratorDefinition->replaceArgument(1, $config['date']['interval_format']);

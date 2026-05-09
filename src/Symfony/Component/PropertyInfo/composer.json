@@ -23,9 +23,9 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "symfony/string": "^7.4|^8.0",
-        "symfony/type-info": "^7.4.4|^8.0.4"
+        "symfony/type-info": "^7.4.7|^8.0.7"
     },
     "require-dev": {
         "phpdocumentor/reflection-docblock": "^5.2|^6.0",

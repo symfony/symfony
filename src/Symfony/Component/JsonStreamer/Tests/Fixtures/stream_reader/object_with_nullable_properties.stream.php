@@ -3,10 +3,10 @@
 /**
  * @return Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties
  */
-return static function (mixed $stream, \Psr\Container\ContainerInterface $valueTransformers, \Symfony\Component\JsonStreamer\Read\LazyInstantiator $instantiator, array $options): mixed {
-    $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties'] = static function ($stream, $offset, $length) use ($options, $valueTransformers, $instantiator, &$providers) {
+return static function (mixed $stream, \Psr\Container\ContainerInterface $transformers, \Symfony\Component\JsonStreamer\Read\LazyInstantiator $instantiator, array $options): mixed {
+    $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties'] = static function ($stream, $offset, $length) use ($options, $transformers, $instantiator, &$providers) {
         $data = \Symfony\Component\JsonStreamer\Read\Splitter::splitDict($stream, $offset, $length);
-        return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties::class, static function ($object) use ($stream, $data, $options, $valueTransformers, $instantiator, &$providers) {
+        return $instantiator->instantiate(\Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNullableProperties::class, static function ($object) use ($stream, $data, $options, $transformers, $instantiator, &$providers) {
             foreach ($data as $k => $v) {
                 match ($k) {
                     'name' => $object->name = \Symfony\Component\JsonStreamer\Read\Decoder::decodeStream($stream, $v[0], $v[1]),
@@ -19,7 +19,7 @@ return static function (mixed $stream, \Psr\Container\ContainerInterface $valueT
     $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum'] = static function ($stream, $offset, $length) {
         return \Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum::from(\Symfony\Component\JsonStreamer\Read\Decoder::decodeStream($stream, $offset, $length));
     };
-    $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null'] = static function ($stream, $offset, $length) use ($options, $valueTransformers, $instantiator, &$providers) {
+    $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum|null'] = static function ($stream, $offset, $length) use ($options, $transformers, $instantiator, &$providers) {
         $data = \Symfony\Component\JsonStreamer\Read\Decoder::decodeStream($stream, $offset, $length);
         if (\is_int($data)) {
             return $providers['Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum']($stream, $offset, $length);

@@ -52,6 +52,37 @@ class CssSelectorConverterTest extends TestCase
         (new CssSelectorConverter())->toXPath('h1:');
     }
 
+    public function testLruCacheMovesRecentlyUsedToEnd()
+    {
+        CssSelectorConverter::$maxCachedItems = 5;
+        $htmlCacheProperty = new \ReflectionProperty(CssSelectorConverter::class, 'htmlCache');
+        $htmlCacheProperty->setValue(null, []);
+
+        $converter = new CssSelectorConverter(true);
+
+        // Fill cache with 5 entries (h0-h4)
+        for ($i = 0; $i < 5; ++$i) {
+            $converter->toXPath("h$i");
+        }
+
+        // Access h0 to move it to end (most recently used)
+        $converter->toXPath('h0');
+
+        // Trigger eviction
+        $converter->toXPath('h5');
+
+        $cache = $htmlCacheProperty->getValue();
+
+        // h0 was accessed recently (moved to end), so it survives eviction
+        $this->assertArrayHasKey("descendant-or-self::\0h0", $cache);
+        // h5 is the newest entry
+        $this->assertArrayHasKey("descendant-or-self::\0h5", $cache);
+        // h1 was the oldest untouched entry, should be evicted
+        $this->assertArrayNotHasKey("descendant-or-self::\0h1", $cache);
+
+        CssSelectorConverter::$maxCachedItems = 1024;
+    }
+
     #[DataProvider('getCssToXPathWithoutPrefixTestData')]
     public function testCssToXPathWithoutPrefix($css, $xpath)
     {

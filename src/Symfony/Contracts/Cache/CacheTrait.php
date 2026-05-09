@@ -35,6 +35,9 @@ trait CacheTrait
         return $this->deleteItem($key);
     }
 
+    /**
+     * @param-immediately-invoked-callable $callback
+     */
     private function doGet(CacheItemPoolInterface $pool, string $key, callable $callback, ?float $beta, ?array &$metadata = null, ?LoggerInterface $logger = null): mixed
     {
         if (0 > $beta ??= 1.0) {

@@ -27,6 +27,9 @@ class ResourceCheckerConfigCacheFactory implements ConfigCacheFactoryInterface
     ) {
     }
 
+    /**
+     * @param-immediately-invoked-callable $callable
+     */
     public function cache(string $file, callable $callable): ConfigCacheInterface
     {
         $cache = new ResourceCheckerConfigCache($file, $this->resourceCheckers);

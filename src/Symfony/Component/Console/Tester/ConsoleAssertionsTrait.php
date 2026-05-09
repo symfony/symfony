@@ -22,22 +22,22 @@ use Symfony\Component\Console\Tester\Constraint\CommandIsSuccessful;
  */
 trait ConsoleAssertionsTrait
 {
-    public function assertIsSuccessful(ExecutionResult $result, string $message = ''): void
+    public function assertCommandIsSuccessful(ExecutionResult $result, string $message = ''): void
     {
         $this->assertThat($result->statusCode, new CommandIsSuccessful(), $message);
     }
 
-    public function assertFailed(ExecutionResult $result, string $message = ''): void
+    public function assertCommandFailed(ExecutionResult $result, string $message = ''): void
     {
         $this->assertThat($result->statusCode, new CommandFailed(), $message);
     }
 
-    public function assertIsInvalid(ExecutionResult $result, string $message = ''): void
+    public function assertCommandIsInvalid(ExecutionResult $result, string $message = ''): void
     {
         $this->assertThat($result->statusCode, new CommandIsInvalid(), $message);
     }
 
-    public function assertResultEquals(ExecutionResult $result, ?int $expectedStatusCode = null, ?string $expectedOutput = null, ?string $expectedErrorOutput = null, ?string $expectedDisplay = null, string $message = ''): void
+    public function assertCommandResultEquals(ExecutionResult $result, ?int $expectedStatusCode = null, ?string $expectedOutput = null, ?string $expectedErrorOutput = null, ?string $expectedDisplay = null, string $message = ''): void
     {
         $expected = [];
         $actual = [];

@@ -31,7 +31,7 @@ class XmlValidatorTest extends ConstraintValidatorTestCase
     #[DataProvider('getValidXmlFormatValues')]
     public function testValidXmlFormatValue($value)
     {
-        $this->validator->validate($value, new Xml());
+        $this->validate($value, new Xml());
         $this->assertNoViolation();
     }
 
@@ -50,7 +50,7 @@ class XmlValidatorTest extends ConstraintValidatorTestCase
     public function testInvalidXmlFormatValue($value)
     {
         $constraint = new Xml(formatMessage: 'myMessage');
-        $this->validator->validate($value, $constraint);
+        $this->validate($value, $constraint);
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"'.$value.'"')
             ->setCode(Xml::INVALID_XML_ERROR)
@@ -77,7 +77,7 @@ class XmlValidatorTest extends ConstraintValidatorTestCase
 
         $constraint = new Xml(schemaPath: __DIR__.'/Fixtures/example.xsd');
 
-        $this->validator->validate($xml, $constraint);
+        $this->validate($xml, $constraint);
         $this->assertNoViolation();
     }
 
@@ -93,7 +93,7 @@ class XmlValidatorTest extends ConstraintValidatorTestCase
 
         $constraint = new Xml(schemaPath: __DIR__.'/Fixtures/example.xsd');
 
-        $this->validator->validate($xml, $constraint);
+        $this->validate($xml, $constraint);
 
         // Since the exact error message depends on libxml, we'll just check that a violation was raised
         // with the correct error code
@@ -109,7 +109,7 @@ class XmlValidatorTest extends ConstraintValidatorTestCase
         // Use LIBXML_NONET flag to disallow network access during validation
         $constraint = new Xml(schemaPath: __DIR__.'/Fixtures/example.xsd', schemaFlags: \LIBXML_NONET);
 
-        $this->validator->validate($xml, $constraint);
+        $this->validate($xml, $constraint);
         $this->assertNoViolation();
     }
 
@@ -122,6 +122,6 @@ class XmlValidatorTest extends ConstraintValidatorTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(\sprintf('The XSD schema file "%s" is not valid.', realpath(__DIR__.'/Fixtures/invalid.xsd')));
 
-        $this->validator->validate($xml, $constraint);
+        $this->validate($xml, $constraint);
     }
 }

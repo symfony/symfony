@@ -224,18 +224,22 @@ abstract class AttributeClassLoader implements LoaderInterface
             } else {
                 $collection->add($name, $route, $priority);
             }
-            foreach ($attr->aliases as $aliasAttribute) {
+        }
+
+        foreach ($attr->aliases as $aliasAttribute) {
+            $aliasName = $aliasAttribute instanceof DeprecatedAlias ? $aliasAttribute->aliasName : $aliasAttribute;
+
+            foreach (array_keys($paths) as $locale) {
+                $suffix = 0 !== $locale ? '.'.$locale : '';
+                $alias = $collection->addAlias($aliasName.$suffix, $name.$suffix);
+
                 if ($aliasAttribute instanceof DeprecatedAlias) {
-                    $alias = $collection->addAlias($aliasAttribute->aliasName, $name);
                     $alias->setDeprecated(
                         $aliasAttribute->package,
                         $aliasAttribute->version,
                         $aliasAttribute->message
                     );
-                    continue;
                 }
-
-                $collection->addAlias($aliasAttribute, $name);
             }
         }
     }

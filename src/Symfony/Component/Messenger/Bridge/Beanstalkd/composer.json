@@ -12,9 +12,9 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "pda/pheanstalk": "^5.1|^7.0|^8.0",
-        "symfony/messenger": "^7.4|^8.0"
+        "symfony/messenger": "^8.1"
     },
     "require-dev": {
         "symfony/property-access": "^7.4|^8.0",

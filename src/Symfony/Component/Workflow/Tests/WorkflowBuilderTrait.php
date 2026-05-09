@@ -87,6 +87,41 @@ trait WorkflowBuilderTrait
         // +---+     +----+     +---+     +----+     +---+
     }
 
+    private static function createWorkflowWithMetadataEdgeCases(): Definition
+    {
+        $places = range('a', 'd');
+
+        $transitions = [];
+        $transitions[] = new Transition('t1', 'a', 'b');
+        $transitions[] = new Transition('t2', 'b', 'c');
+        $transitionWithDescription = new Transition('t3', 'c', 'd');
+        $transitions[] = $transitionWithDescription;
+
+        $placesMetadata = [];
+        // bg_color only, no description
+        $placesMetadata['b'] = [
+            'bg_color' => 'Orange',
+        ];
+        // description only, no bg_color
+        $placesMetadata['c'] = [
+            'description' => 'A <bold> description with "special" chars & entities',
+        ];
+        // multiline description with bg_color
+        $placesMetadata['d'] = [
+            'bg_color' => 'Lime',
+            'description' => "First line\nSecond line",
+        ];
+
+        $transitionsMetadata = new \SplObjectStorage();
+        $transitionsMetadata[$transitionWithDescription] = [
+            'bg_color' => 'LightCoral',
+            'description' => 'Transition description',
+        ];
+        $inMemoryMetadataStore = new InMemoryMetadataStore([], $placesMetadata, $transitionsMetadata);
+
+        return new Definition($places, $transitions, null, $inMemoryMetadataStore);
+    }
+
     private static function createWorkflowWithSameNameTransition(): Definition
     {
         $places = range('a', 'c');

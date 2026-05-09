@@ -14,9 +14,10 @@ namespace Symfony\Bundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AddDebugLogProcessorPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\AssetsContextPass;
-use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ConsoleArgumentValueResolverPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ContainerBuilderDebugDumpPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\DeprecateJsonStreamerValueTransformerTagPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ErrorLoggerCompilerPass;
+use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\JsonPathPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\PhpConfigReferenceDumpPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\ProfilerPass;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RemoveUnusedSessionMarshallingHandlerPass;
@@ -36,17 +37,18 @@ use Symfony\Component\Cache\DependencyInjection\CachePoolClearerPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPrunerPass;
 use Symfony\Component\Config\Resource\ClassExistenceResource;
-use Symfony\Component\Console\ConsoleEvents;
-use Symfony\Component\Console\DependencyInjection\AddConsoleCommandPass;
-use Symfony\Component\Console\DependencyInjection\RegisterCommandArgumentLocatorsPass;
-use Symfony\Component\Console\DependencyInjection\RemoveEmptyCommandArgumentLocatorsPass;
+use Symfony\Component\Console\ConsoleBundle;
+use Symfony\Component\DependencyInjection\Compiler\AddBehaviorDescribingTagsPass;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\Compiler\RegisterReverseContainerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Kernel\RequiredBundle;
+use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\ErrorHandler\ErrorHandler;
-use Symfony\Component\EventDispatcher\DependencyInjection\RegisterListenersPass;
+use Symfony\Component\EventDispatcher\DependencyInjection\AddEventAliasesPass;
 use Symfony\Component\Form\DependencyInjection\FormPass;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\HttpClient\DependencyInjection\HttpClientPass;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -58,9 +60,9 @@ use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterControllerArgumentLocatorsPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RegisterLocaleAwareServicesPass;
 use Symfony\Component\HttpKernel\DependencyInjection\RemoveEmptyControllerArgumentLocatorsPass;
-use Symfony\Component\HttpKernel\DependencyInjection\ResettableServicePass;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\JsonStreamer\DependencyInjection\StreamablePass;
+use Symfony\Component\JsonStreamer\DependencyInjection\TransformerPass;
 use Symfony\Component\Messenger\DependencyInjection\MessengerPass;
 use Symfony\Component\Mime\DependencyInjection\AddMimeTypeGuesserPass;
 use Symfony\Component\ObjectMapper\DependencyInjection\ReverseMappingPass;
@@ -88,6 +90,7 @@ use Symfony\Component\VarExporter\Internal\Registry;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowDebugPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowGuardListenerPass;
 use Symfony\Component\Workflow\DependencyInjection\WorkflowValidatorPass;
+use Symfony\Component\Workflow\WorkflowEvents;
 
 // Help opcache.preload discover always-needed symbols
 class_exists(ApcuAdapter::class);
@@ -105,6 +108,8 @@ class_exists(Registry::class);
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
+#[RequiredBundle(ServicesBundle::class)]
+#[RequiredBundle(ConsoleBundle::class, ignoreOnInvalid: true)]
 class FrameworkBundle extends Bundle
 {
     public function boot(): void
@@ -132,48 +137,46 @@ class FrameworkBundle extends Bundle
         if ($this->container->hasParameter('kernel.trust_x_sendfile_type_header') && $this->container->getParameter('kernel.trust_x_sendfile_type_header')) {
             BinaryFileResponse::trustXSendfileTypeHeader();
         }
+
+        // Instantiate the mime_types service so its setDefault() call fires.
+        // The service is made public by AddMimeTypeGuesserPass only when custom guessers are tagged.
+        if ($this->container->has('mime_types')) {
+            $this->container->get('mime_types');
+        }
     }
 
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
 
-        $registerListenersPass = new RegisterListenersPass();
-        $registerListenersPass->setHotPathEvents([
-            KernelEvents::REQUEST,
-            KernelEvents::CONTROLLER,
-            KernelEvents::CONTROLLER_ARGUMENTS,
-            KernelEvents::RESPONSE,
-            KernelEvents::FINISH_REQUEST,
-        ]);
-        if (class_exists(ConsoleEvents::class)) {
-            $registerListenersPass->setNoPreloadEvents([
-                ConsoleEvents::COMMAND,
-                ConsoleEvents::TERMINATE,
-                ConsoleEvents::ERROR,
-            ]);
-        }
+        $container->addCompilerPass(new AddEventAliasesPass(
+            array_merge(
+                KernelEvents::ALIASES,
+                class_exists(FormEvents::class) ? FormEvents::ALIASES : [],
+                class_exists(WorkflowEvents::class) ? WorkflowEvents::ALIASES : [],
+            ),
+            [
+                KernelEvents::REQUEST,
+                KernelEvents::CONTROLLER,
+                KernelEvents::CONTROLLER_ARGUMENTS,
+                KernelEvents::RESPONSE,
+                KernelEvents::FINISH_REQUEST,
+            ],
+        ));
 
+        $container->addCompilerPass(new AddBehaviorDescribingTagsPass(['kernel.locale_aware']), PassConfig::TYPE_BEFORE_OPTIMIZATION, 200);
         $container->addCompilerPass(new AssetsContextPass());
         $container->addCompilerPass(new LoggerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterControllerArgumentLocatorsPass());
         $container->addCompilerPass(new RemoveEmptyControllerArgumentLocatorsPass(), PassConfig::TYPE_BEFORE_REMOVING);
-        $this->addCompilerPassIfExists($container, RegisterCommandArgumentLocatorsPass::class);
-        $this->addCompilerPassIfExists($container, RemoveEmptyCommandArgumentLocatorsPass::class, PassConfig::TYPE_BEFORE_REMOVING);
-        $this->addCompilerPassIfExists($container, ConsoleArgumentValueResolverPass::class);
         $container->addCompilerPass(new RoutingResolverPass());
         $this->addCompilerPassIfExists($container, RoutingControllerPass::class);
         $this->addCompilerPassIfExists($container, DataCollectorTranslatorPass::class);
         $container->addCompilerPass(new ProfilerPass());
-        // must be registered before removing private services as some might be listeners/subscribers
-        // but as late as possible to get resolved parameters
-        $container->addCompilerPass($registerListenersPass, PassConfig::TYPE_BEFORE_REMOVING);
         $this->addCompilerPassIfExists($container, ControllerAttributesListenerPass::class, PassConfig::TYPE_BEFORE_REMOVING);
         $this->addCompilerPassIfExists($container, AddConstraintValidatorsPass::class);
         $this->addCompilerPassIfExists($container, AddValidatorInitializersPass::class);
         $this->addCompilerPassIfExists($container, AttributeMetadataPass::class);
-        $this->addCompilerPassIfExists($container, AddConsoleCommandPass::class, PassConfig::TYPE_BEFORE_REMOVING);
-        // must be registered before the AddConsoleCommandPass
         $container->addCompilerPass(new TranslationLintCommandPass(), PassConfig::TYPE_BEFORE_REMOVING, 10);
         // must be registered as late as possible to get access to all Twig paths registered in
         // twig.template_iterator definition
@@ -195,7 +198,6 @@ class FrameworkBundle extends Bundle
         $this->addCompilerPassIfExists($container, FormPass::class);
         $this->addCompilerPassIfExists($container, WorkflowGuardListenerPass::class);
         $this->addCompilerPassIfExists($container, WorkflowValidatorPass::class);
-        $container->addCompilerPass(new ResettableServicePass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new RegisterLocaleAwareServicesPass());
         $container->addCompilerPass(new TestServiceContainerWeakRefPass(), PassConfig::TYPE_BEFORE_REMOVING, -32);
         $container->addCompilerPass(new TestServiceContainerRealRefPass(), PassConfig::TYPE_AFTER_REMOVING);
@@ -211,8 +213,11 @@ class FrameworkBundle extends Bundle
         $container->addCompilerPass(new ErrorLoggerCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, -32);
         $container->addCompilerPass(new VirtualRequestStackPass());
         $container->addCompilerPass(new TranslationUpdateCommandPass(), PassConfig::TYPE_BEFORE_REMOVING);
+        $this->addCompilerPassIfExists($container, DeprecateJsonStreamerValueTransformerTagPass::class);
         $this->addCompilerPassIfExists($container, StreamablePass::class);
+        $this->addCompilerPassIfExists($container, TransformerPass::class);
         $this->addCompilerPassIfExists($container, ReverseMappingPass::class);
+        $this->addCompilerPassIfExists($container, JsonPathPass::class);
 
         if ($container->getParameter('kernel.debug')) {
             if ($container->hasParameter('.kernel.config_dir') && $container->hasParameter('.kernel.bundles_definition')) {

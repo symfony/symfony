@@ -44,6 +44,7 @@ class MapRequestPayload extends ValueResolver
         string $resolver = RequestPayloadValueResolver::class,
         public readonly int $validationFailedStatusCode = Response::HTTP_UNPROCESSABLE_ENTITY,
         public readonly ?string $type = null,
+        public bool $mapWhenEmpty = false,
     ) {
         parent::__construct($resolver);
     }

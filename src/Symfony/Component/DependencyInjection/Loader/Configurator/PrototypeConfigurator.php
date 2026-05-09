@@ -13,6 +13,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
+use Symfony\Component\VarExporter\DeepCloner;
 
 /**
  * @author Nicolas Grekas <p@tchwork.com>
@@ -54,7 +55,7 @@ class PrototypeConfigurator extends AbstractServiceConfigurator
         $definition->setAutowired($defaults->isAutowired());
         $definition->setAutoconfigured($defaults->isAutoconfigured());
         // deep clone, to avoid multiple process of the same instance in the passes
-        $definition->setBindings(unserialize(serialize($defaults->getBindings())));
+        $definition->setBindings(DeepCloner::deepClone($defaults->getBindings()));
         $definition->setChanges([]);
 
         parent::__construct($parent, $definition, $namespace, $defaults->getTags());

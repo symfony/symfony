@@ -29,7 +29,9 @@ class TransportsTest extends TestCase
 
         $message = new ChatMessage('subject');
 
-        $one->method('supports')->with($message)->willReturn(true);
+        $one->method('supports')->willReturnMap([
+            [$message, true],
+        ]);
 
         $one->expects($this->once())->method('send')->willReturn(new SentMessage($message, 'one'));
 
@@ -48,11 +50,12 @@ class TransportsTest extends TestCase
 
         $message = new ChatMessage('subject');
 
-        $one->method('supports')->with($message)->willReturn(false);
-        $two->method('supports')->with($message)->willReturn(true);
-
-        $one->method('send')->with($message)->willReturn(new SentMessage($message, 'one'));
-        $two->method('send')->with($message)->willReturn(new SentMessage($message, 'two'));
+        $one->method('supports')->willReturnMap([
+            [$message, false],
+        ]);
+        $two->method('supports')->willReturnMap([
+            [$message, true],
+        ]);
 
         $one->expects($this->never())->method('send');
         $two->expects($this->once())->method('send')->willReturn(new SentMessage($message, 'two'));

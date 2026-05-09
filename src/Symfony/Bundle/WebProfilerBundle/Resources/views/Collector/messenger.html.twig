@@ -72,7 +72,7 @@
 
 {% block menu %}
     <span class="label{{ collector.exceptionsCount ? ' label-status-error' }}{{ collector.messages is empty ? ' disabled' }}">
-        <span class="icon">{{ source('@WebProfiler/Icon/messenger.svg') }}</span>
+        <span class="icon" aria-hidden="true">{{ source('@WebProfiler/Icon/messenger.svg') }}</span>
         <strong>Messages</strong>
         {% if collector.exceptionsCount > 0 %}
             <span class="count">

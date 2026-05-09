@@ -644,6 +644,8 @@ class TextDescriptor extends Descriptor
     }
 
     /**
+     * @param-immediately-invoked-callable $getContainer
+     *
      * @param (callable():ContainerBuilder)|null $getContainer
      */
     private function formatControllerLink(mixed $controller, string $anchorText, ?callable $getContainer = null): string

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `JsonPathCrawlerInterface`, an autowireable factory for creating `JsonCrawlerInterface` instances with custom functions
+ * Add `#[AsJsonPathFunction]` to declare invokable JsonPath functions for autoconfiguration
+
 7.4
 ---
 

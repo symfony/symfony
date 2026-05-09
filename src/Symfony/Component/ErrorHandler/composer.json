@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "psr/log": "^1|^2|^3",
         "symfony/polyfill-php85": "^1.32",
         "symfony/var-dumper": "^7.4|^8.0"

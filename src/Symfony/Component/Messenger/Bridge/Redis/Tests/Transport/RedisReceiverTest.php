@@ -35,7 +35,7 @@ class RedisReceiverTest extends TestCase
     public function testItReturnsTheDecodedMessageToTheHandler(array $redisEnvelope, $expectedMessage, SerializerInterface $serializer)
     {
         $connection = $this->createStub(Connection::class);
-        $connection->method('get')->willReturn($redisEnvelope);
+        $connection->method('get')->willReturn([$redisEnvelope]);
 
         $receiver = new RedisReceiver($connection, $serializer);
         $actualEnvelopes = $receiver->get();
@@ -50,20 +50,85 @@ class RedisReceiverTest extends TestCase
         $this->assertSame($redisEnvelope['id'], $transportMessageIdStamp->getId());
     }
 
+    public function testGetUsesFetchSizeWhenProvided()
+    {
+        $serializer = new Serializer(
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+        );
+        $redisEnvelope = [
+            'id' => 1,
+            'data' => [
+                'message' => json_encode([
+                    'body' => '{"message": "Hi"}',
+                    'headers' => [
+                        'type' => DummyMessage::class,
+                    ],
+                ]),
+            ],
+        ];
+
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('get')->with(7)->willReturn([$redisEnvelope]);
+
+        $receiver = new RedisReceiver($connection, $serializer);
+        $actualEnvelopes = $receiver->get(7);
+
+        $this->assertCount(1, $actualEnvelopes);
+    }
+
+    public function testItReturnsMultipleDecodedMessagesWhenAvailable()
+    {
+        $connection = $this->createStub(Connection::class);
+        $connection->method('get')->willReturn([
+            [
+                'id' => '1',
+                'data' => [
+                    'message' => json_encode([
+                        'body' => '{"message": "Hi"}',
+                        'headers' => [
+                            'type' => DummyMessage::class,
+                        ],
+                    ]),
+                ],
+            ],
+            [
+                'id' => '2',
+                'data' => [
+                    'message' => json_encode([
+                        'body' => '{"message": "Hello"}',
+                        'headers' => [
+                            'type' => DummyMessage::class,
+                        ],
+                    ]),
+                ],
+            ],
+        ]);
+
+        $receiver = new RedisReceiver($connection, new Serializer(
+            new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
+        ));
+
+        $envelopes = $receiver->get(2);
+
+        $this->assertCount(2, $envelopes);
+        $this->assertEquals(new DummyMessage('Hi'), $envelopes[0]->getMessage());
+        $this->assertEquals(new DummyMessage('Hello'), $envelopes[1]->getMessage());
+    }
+
     #[DataProvider('rejectedRedisEnvelopeProvider')]
     public function testItRejectTheMessageIfThereIsAMessageDecodingFailedException(array $redisEnvelope)
     {
-        $this->expectException(MessageDecodingFailedException::class);
-
         $serializer = $this->createStub(PhpSerializer::class);
         $serializer->method('decode')->willThrowException(new MessageDecodingFailedException());
 
-        $connection = $this->createMock(Connection::class);
-        $connection->method('get')->willReturn($redisEnvelope);
-        $connection->expects($this->once())->method('reject');
+        $connection = $this->createStub(Connection::class);
+        $connection->method('get')->willReturn([$redisEnvelope]);
 
         $receiver = new RedisReceiver($connection, $serializer);
-        $receiver->get();
+        $envelopes = $receiver->get();
+
+        $this->assertCount(1, $envelopes);
+        $this->assertInstanceOf(MessageDecodingFailedException::class, $envelopes[0]->getMessage());
     }
 
     public static function redisEnvelopeProvider(): \Generator
@@ -270,8 +335,8 @@ class RedisReceiverTest extends TestCase
             ],
         ];
 
-        $connection = $this->createMock(Connection::class);
-        $connection->method('find')->with('123')->willReturn($message);
+        $connection = $this->createStub(Connection::class);
+        $connection->method('find')->willReturn($message);
 
         $receiver = new RedisReceiver($connection, new Serializer(
             new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
@@ -286,8 +351,8 @@ class RedisReceiverTest extends TestCase
 
     public function testFindReturnsNullForNonExistentMessage()
     {
-        $connection = $this->createMock(Connection::class);
-        $connection->method('find')->with('999')->willReturn(null);
+        $connection = $this->createStub(Connection::class);
+        $connection->method('find')->willReturn(null);
 
         $receiver = new RedisReceiver($connection, new Serializer(
             new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])
@@ -306,8 +371,8 @@ class RedisReceiverTest extends TestCase
             ],
         ];
 
-        $connection = $this->createMock(Connection::class);
-        $connection->method('find')->with('123')->willReturn($message);
+        $connection = $this->createStub(Connection::class);
+        $connection->method('find')->willReturn($message);
 
         $receiver = new RedisReceiver($connection, new Serializer(
             new SerializerComponent\Serializer([new ObjectNormalizer()], ['json' => new JsonEncoder()])

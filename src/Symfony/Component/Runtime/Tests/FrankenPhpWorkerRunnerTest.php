@@ -44,4 +44,15 @@ class FrankenPhpWorkerRunnerTest extends TestCase
         $runner = new FrankenPhpWorkerRunner($application, 500);
         $this->assertSame(0, $runner->run());
     }
+
+    public function testRunWithResponse()
+    {
+        $response = $this->createMock(Response::class);
+        $response
+            ->expects($this->once())
+            ->method('send');
+
+        $runner = new FrankenPhpWorkerRunner($response, 500);
+        $this->assertSame(0, $runner->run());
+    }
 }

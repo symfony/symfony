@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.4",
+        "php": ">=8.4.1",
         "symfony/translation-contracts": "^2.5|^3",
         "twig/twig": "^3.21"
     },
@@ -36,7 +36,7 @@
         "symfony/http-foundation": "^7.4|^8.0",
         "symfony/http-kernel": "^7.4|^8.0",
         "symfony/intl": "^7.4|^8.0",
-        "symfony/mime": "^7.4|^8.0",
+        "symfony/mime": "^7.4.9|^8.0.9",
         "symfony/polyfill-intl-icu": "^1.0",
         "symfony/property-info": "^7.4|^8.0",
         "symfony/routing": "^7.4|^8.0",
@@ -58,7 +58,8 @@
     "conflict": {
         "phpdocumentor/reflection-docblock": "<5.2|>=7",
         "phpdocumentor/type-resolver": "<1.5.1",
-        "symfony/form": "<7.4.4|>8.0,<8.0.4"
+        "symfony/form": "<7.4.4|>8.0,<8.0.4",
+        "symfony/mime": "<7.4.9|>8.0,<8.0.9"
     },
     "autoload": {
         "psr-4": { "Symfony\\Bridge\\Twig\\": "" },

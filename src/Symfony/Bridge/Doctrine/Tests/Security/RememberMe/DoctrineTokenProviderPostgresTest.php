@@ -43,7 +43,8 @@ class DoctrineTokenProviderPostgresTest extends DoctrineTokenProviderTest
         ], $config);
         $connection->executeStatement(<<<'SQL'
             DROP TABLE IF EXISTS rememberme_token;
-        SQL);
+            SQL
+        );
 
         $connection->executeStatement(<<<'SQL'
             CREATE TABLE rememberme_token (
@@ -53,7 +54,8 @@ class DoctrineTokenProviderPostgresTest extends DoctrineTokenProviderTest
                 class    VARCHAR(100) NOT NULL,
                 username VARCHAR(200) NOT NULL
             );
-        SQL);
+            SQL
+        );
 
         return new DoctrineTokenProvider($connection);
     }

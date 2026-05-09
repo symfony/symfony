@@ -11,6 +11,9 @@
 
 namespace Symfony\Component\Messenger\Handler;
 
+use Symfony\Component\Clock\Clock;
+use Symfony\Component\Clock\ClockInterface;
+
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
@@ -18,6 +21,7 @@ trait BatchHandlerTrait
 {
     private array $jobs = [];
     private ?int $lastMessageAt = null;
+    private ?ClockInterface $batchClock = null;
 
     public function flush(bool $force): void
     {
@@ -40,10 +44,11 @@ trait BatchHandlerTrait
      */
     private function handle(object $message, ?Acknowledger $ack): mixed
     {
-        $this->lastMessageAt = time();
+        $this->batchClock ??= $ack?->clock ?? Clock::get();
+        $this->lastMessageAt = (int) $this->batchClock->now()->format('U');
 
         if (null === $ack) {
-            $ack = new Acknowledger(get_debug_type($this));
+            $ack = new Acknowledger(get_debug_type($this), null, $this->batchClock);
             $this->jobs[] = [$message, $ack];
             $this->flush(true);
 
@@ -68,7 +73,7 @@ trait BatchHandlerTrait
 
         $idleTimeout = $this->getIdleTimeout();
         if (null !== $idleTimeout && null !== $this->lastMessageAt) {
-            return (time() - $this->lastMessageAt) >= $idleTimeout;
+            return ((int) ($this->batchClock ?? Clock::get())->now()->format('U') - $this->lastMessageAt) >= $idleTimeout;
         }
 
         return false;

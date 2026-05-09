@@ -11,6 +11,9 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Tests\Console;
 
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\EventListener\SuggestMissingPackageSubscriber;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
@@ -43,6 +46,18 @@ class ApplicationTest extends TestCase
         $application->doRun(new ArrayInput(['list']), new NullOutput());
     }
 
+    public function testNotOverridingRegisterCommandsAvoidsDeprecation()
+    {
+        $bundle = new class extends Bundle {};
+
+        $kernel = $this->getKernel([$bundle], true);
+
+        $application = new Application($kernel);
+        $application->doRun(new ArrayInput(['list']), new NullOutput());
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testBundleCommandsAreRegistered()
     {
         $bundle = $this->createBundleMock([]);
@@ -50,12 +65,17 @@ class ApplicationTest extends TestCase
         $kernel = $this->getKernel([$bundle], true);
 
         $application = new Application($kernel);
+
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/framework-bundle 8.1: Overriding the "Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands()" method in "%s" is deprecated, use the "#[AsCommand]" attribute or the "console.command" service tag instead.', get_debug_type($bundle)));
+
         $application->doRun(new ArrayInput(['list']), new NullOutput());
 
         // Calling twice: registration should only be done once.
         $application->doRun(new ArrayInput(['list']), new NullOutput());
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testBundleCommandsAreRetrievable()
     {
         $bundle = $this->createBundleMock([]);
@@ -63,12 +83,17 @@ class ApplicationTest extends TestCase
         $kernel = $this->getKernel([$bundle]);
 
         $application = new Application($kernel);
+
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/framework-bundle 8.1: Overriding the "Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands()" method in "%s" is deprecated, use the "#[AsCommand]" attribute or the "console.command" service tag instead.', get_debug_type($bundle)));
+
         $application->all();
 
         // Calling twice: registration should only be done once.
         $application->all();
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testBundleSingleCommandIsRetrievable()
     {
         $command = new Command('example');
@@ -79,9 +104,13 @@ class ApplicationTest extends TestCase
 
         $application = new Application($kernel);
 
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/framework-bundle 8.1: Overriding the "Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands()" method in "%s" is deprecated, use the "#[AsCommand]" attribute or the "console.command" service tag instead.', get_debug_type($bundle)));
+
         $this->assertSame($command, $application->get('example'));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testBundleCommandCanBeFound()
     {
         $command = new Command('example');
@@ -92,9 +121,13 @@ class ApplicationTest extends TestCase
 
         $application = new Application($kernel);
 
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/framework-bundle 8.1: Overriding the "Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands()" method in "%s" is deprecated, use the "#[AsCommand]" attribute or the "console.command" service tag instead.', get_debug_type($bundle)));
+
         $this->assertSame($command, $application->find('example'));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testBundleCommandCanBeFoundByAlias()
     {
         $command = new Command('example');
@@ -106,9 +139,13 @@ class ApplicationTest extends TestCase
 
         $application = new Application($kernel);
 
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/framework-bundle 8.1: Overriding the "Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands()" method in "%s" is deprecated, use the "#[AsCommand]" attribute or the "console.command" service tag instead.', get_debug_type($bundle)));
+
         $this->assertSame($command, $application->find('alias'));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testBundleCommandCanOverriddeAPreExistingCommandWithTheSameName()
     {
         $command = new Command('example');
@@ -121,9 +158,13 @@ class ApplicationTest extends TestCase
         $newCommand = new Command('example');
         $application->addCommand($newCommand);
 
+        $this->expectUserDeprecationMessage(\sprintf('Since symfony/framework-bundle 8.1: Overriding the "Symfony\Component\HttpKernel\Bundle\Bundle::registerCommands()" method in "%s" is deprecated, use the "#[AsCommand]" attribute or the "console.command" service tag instead.', get_debug_type($bundle)));
+
         $this->assertSame($newCommand, $application->get('example'));
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testRunOnlyWarnsOnUnregistrableCommand()
     {
         $container = new ContainerBuilder();
@@ -158,6 +199,8 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('fine', $output);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testRegistrationErrorsAreDisplayedOnCommandNotFound()
     {
         $container = new ContainerBuilder();
@@ -189,6 +232,8 @@ class ApplicationTest extends TestCase
         $this->assertStringContainsString('Command "fine" is not defined.', $output);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
     public function testRunOnlyWarnsOnUnregistrableCommandAtTheEnd()
     {
         $container = new ContainerBuilder();
@@ -251,7 +296,10 @@ class ApplicationTest extends TestCase
         return $event->getError()->getMessage();
     }
 
-    private function getKernel(array $bundles, $useDispatcher = false)
+    /**
+     * @param BundleInterface[] $bundles
+     */
+    private function getKernel(array $bundles, bool $useDispatcher = false): KernelInterface&MockObject
     {
         $container = new Container(new ParameterBag([
             'console.command.ids' => [],
@@ -271,12 +319,10 @@ class ApplicationTest extends TestCase
         $kernel = $this->createMock(KernelInterface::class);
         $kernel->expects($this->once())->method('boot');
         $kernel
-            ->expects($this->any())
             ->method('getBundles')
             ->willReturn($bundles)
         ;
         $kernel
-            ->expects($this->any())
             ->method('getContainer')
             ->willReturn($container)
         ;
@@ -284,7 +330,10 @@ class ApplicationTest extends TestCase
         return $kernel;
     }
 
-    private function createBundleMock(array $commands)
+    /**
+     * @param array<callable|Command> $commands
+     */
+    private function createBundleMock(array $commands): Bundle&MockObject
     {
         $bundle = $this->createMock(Bundle::class);
         $bundle

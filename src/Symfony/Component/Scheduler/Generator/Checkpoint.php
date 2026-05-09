@@ -11,11 +11,14 @@
 
 namespace Symfony\Component\Scheduler\Generator;
 
+use Psr\Cache\CacheItemInterface;
 use Symfony\Component\Lock\LockInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 
 final class Checkpoint implements CheckpointInterface
 {
+    private const CACHE_EXPIRY = 5 * 365 * 86400; // 5 years
+
     private \DateTimeImmutable $from;
     private \DateTimeImmutable $time;
     private int $index = -1;
@@ -38,7 +41,11 @@ final class Checkpoint implements CheckpointInterface
         }
 
         if ($this->cache) {
-            [$this->time, $this->index, $this->from] = $this->cache->get($this->name, static fn () => [$now, -1, $now]) + [2 => $now];
+            [$this->time, $this->index, $this->from] = $this->cache->get($this->name, static function (CacheItemInterface $item) use ($now) {
+                $item->expiresAfter(self::CACHE_EXPIRY);
+
+                return [$now, -1, $now];
+            }) + [2 => $now];
             $this->save($this->time, $this->index);
         } elseif ($this->reset) {
             $this->reset = false;
@@ -71,7 +78,12 @@ final class Checkpoint implements CheckpointInterface
         $this->time = $time;
         $this->index = $index;
         $this->from ??= $time;
-        $this->cache?->get($this->name, fn () => [$time, $index, $this->from], \INF);
+        $from = $this->from;
+        $this->cache?->get($this->name, static function (CacheItemInterface $item) use ($time, $index, $from) {
+            $item->expiresAfter(self::CACHE_EXPIRY);
+
+            return [$time, $index, $from];
+        }, \INF);
     }
 
     /**

@@ -3,7 +3,7 @@
 /**
  * @param list<Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithArray> $data
  */
-return static function (mixed $data, \Psr\Container\ContainerInterface $valueTransformers, array $options): \Traversable {
+return static function (mixed $data, \Psr\Container\ContainerInterface $transformers, array $options): \Traversable {
     try {
         yield "[";
         $prefix1 = '';
@@ -31,6 +31,6 @@ return static function (mixed $data, \Psr\Container\ContainerInterface $valueTra
         }
         yield "]";
     } catch (\JsonException $e) {
-        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException($e->getMessage(), 0, $e);
+        throw new \Symfony\Component\JsonStreamer\Exception\NotEncodableValueException("Cannot encode \"list<Symfony\\Component\\JsonStreamer\\Tests\\Fixtures\\Model\\DummyWithArray>\" to JSON: {$e->getMessage()}.", 0, $e);
     }
 };

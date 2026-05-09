@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Mailer\Bridge\Postal\Transport;
 
+use Symfony\Component\Mailer\Exception\IncompleteDsnException;
 use Symfony\Component\Mailer\Exception\UnsupportedSchemeException;
 use Symfony\Component\Mailer\Transport\AbstractTransportFactory;
 use Symfony\Component\Mailer\Transport\Dsn;
@@ -36,5 +37,10 @@ final class PostalTransportFactory extends AbstractTransportFactory
     protected function getSupportedSchemes(): array
     {
         return ['postal', 'postal+api'];
+    }
+
+    protected function getPassword(Dsn $dsn): string
+    {
+        return $dsn->getPassword() ?? $dsn->getUser() ?? throw new IncompleteDsnException('Password is not set.');
     }
 }

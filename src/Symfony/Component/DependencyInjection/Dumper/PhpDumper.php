@@ -15,6 +15,8 @@ use Composer\Autoload\ClassLoader;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\DependencyInjection\Argument\AbstractArgument;
 use Symfony\Component\DependencyInjection\Argument\ArgumentInterface;
+use Symfony\Component\DependencyInjection\Argument\EnvClosure;
+use Symfony\Component\DependencyInjection\Argument\EnvClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\IteratorArgument;
 use Symfony\Component\DependencyInjection\Argument\LazyClosure;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
@@ -35,7 +37,6 @@ use Symfony\Component\DependencyInjection\ExpressionLanguage;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\DumperInterface;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\LazyServiceDumper;
 use Symfony\Component\DependencyInjection\LazyProxy\PhpDumper\NullDumper;
-use Symfony\Component\DependencyInjection\Loader\FileLoader;
 use Symfony\Component\DependencyInjection\Parameter;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Symfony\Component\DependencyInjection\Reference;
@@ -569,21 +570,23 @@ class PhpDumper extends Dumper
             }
             $alreadyGenerated[$asGhostObject][$class] = true;
 
-            foreach (array_column($definition->getTag('proxy'), 'interface') ?: [$class] as $r) {
-                if (!$r = $this->container->getReflectionClass($r)) {
-                    continue;
-                }
-                do {
-                    if ($file = $r->getFileName()) {
-                        if (str_ends_with($file, ') : eval()\'d code')) {
-                            $file = substr($file, 0, strrpos($file, '(', -17));
-                        }
-                        if (is_file($file)) {
-                            $this->container->addResource(new FileResource($file));
-                        }
+            if ($this->container->isTrackingResources()) {
+                foreach (array_column($definition->getTag('proxy'), 'interface') ?: [$class] as $r) {
+                    if (!$r = $this->container->getReflectionClass($r)) {
+                        continue;
                     }
-                    $r = $r->getParentClass() ?: null;
-                } while ($r?->isUserDefined());
+                    do {
+                        if ($file = $r->getFileName()) {
+                            if (str_ends_with($file, ') : eval()\'d code')) {
+                                $file = substr($file, 0, strrpos($file, '(', -17));
+                            }
+                            if (is_file($file)) {
+                                $this->container->addResource(new FileResource($file));
+                            }
+                        }
+                        $r = $r->getParentClass() ?: null;
+                    } while ($r?->isUserDefined());
+                }
             }
 
             if ("\n" === $proxyCode = "\n".$proxyDumper->getProxyCode($definition, $id)) {
@@ -753,6 +756,20 @@ class PhpDumper extends Dumper
         }
 
         return true;
+    }
+
+    private function getResetMethodsCode(Definition $definition): ?string
+    {
+        if (!$resetTags = $definition->getTag('container.tracked_for_reset')) {
+            return null;
+        }
+
+        $methods = [];
+        foreach ($resetTags as $tag) {
+            $methods[] = $this->export($tag['method']);
+        }
+
+        return implode(', ', $methods);
     }
 
     private function addServiceMethodCalls(Definition $definition, string $variableName, ?string $sharedNonLazyId): string
@@ -1059,6 +1076,8 @@ class PhpDumper extends Dumper
 
         if ($arguments = array_filter([$inlineDef->getProperties(), $inlineDef->getMethodCalls(), $inlineDef->getConfigurator()])) {
             $isSimpleInstance = false;
+        } elseif ($isRootInstance && $this->container->hasDefinition($id) && $this->container->getDefinition($id)->hasTag('container.tracked_for_reset')) {
+            $isSimpleInstance = false;
         } elseif ($definition !== $inlineDef && 2 > $this->inlinedDefinitions[$inlineDef]) {
             return $code;
         }
@@ -1092,6 +1111,10 @@ class PhpDumper extends Dumper
 
         if (!$isRootInstance || $isSimpleInstance) {
             return $code;
+        }
+
+        if ($this->container->hasDefinition($id) && $methodsCode = $this->getResetMethodsCode($this->container->getDefinition($id))) {
+            $code .= \sprintf("\n        \$container->trackForReset(\$instance, [%s]);\n", $methodsCode);
         }
 
         return $code."\n        return \$instance;\n";
@@ -1280,16 +1303,9 @@ class PhpDumper extends Dumper
             }
         }
 
-        if (Container::class !== $this->baseClass) {
-            $r = $this->container->getReflectionClass($this->baseClass, false);
-            if (null !== $r
-                && (null !== $constructor = $r->getConstructor())
-                && 0 === $constructor->getNumberOfRequiredParameters()
-                && Container::class !== $constructor->class
-            ) {
-                $code .= "        parent::__construct();\n";
-                $code .= "        \$this->parameterBag = null;\n\n";
-            }
+        if ($this->needsUnsetParameterBag()) {
+            $code .= "        parent::__construct();\n";
+            $code .= "        unset(\$this->parameterBag);\n\n";
         }
 
         if ($this->container->getParameterBag()->all()) {
@@ -1398,7 +1414,7 @@ class PhpDumper extends Dumper
             $ids = array_keys($ids);
             sort($ids);
             foreach ($ids as $id) {
-                if (preg_match(FileLoader::ANONYMOUS_ID_REGEXP, $id)) {
+                if (preg_match(ContainerBuilder::ANONYMOUS_ID_REGEXP, $id)) {
                     continue;
                 }
                 $code .= '            '.$this->doExport($id)." => true,\n";
@@ -1585,11 +1601,24 @@ class PhpDumper extends Dumper
         return $code ? \sprintf("\n        \$this->privates['service_container'] = static function (\$container) {%s\n        };\n", $code) : '';
     }
 
+    private function needsUnsetParameterBag(): bool
+    {
+        if (Container::class === $this->baseClass) {
+            return false;
+        }
+        $r = $this->container->getReflectionClass($this->baseClass, false);
+
+        return null !== $r
+            && (null !== $constructor = $r->getConstructor())
+            && 0 === $constructor->getNumberOfRequiredParameters()
+            && Container::class !== $constructor->class;
+    }
+
     private function addDefaultParametersMethod(): string
     {
         $bag = $this->container->getParameterBag();
 
-        if (!$bag->all() && (!$bag instanceof ParameterBag || !$bag->allNonEmpty())) {
+        if (!$bag->all() && (!$bag instanceof ParameterBag || !$bag->allNonEmpty()) && !$this->needsUnsetParameterBag()) {
             return '';
         }
 
@@ -1888,6 +1917,13 @@ class PhpDumper extends Dumper
                     return \sprintf('%sfn ()%s => %s', $attribute, $returnedType, $code);
                 }
 
+                if ($value instanceof EnvClosureArgument) {
+                    $closure = \sprintf('fn () => %s', $this->export($value->getValue()));
+                    $code = \sprintf('new \\%s(%s, %s)', EnvClosure::class, $closure, $this->export($value->getDefault()));
+
+                    return $value->isStringable() ? $code : (null !== $value->getDefault() ? $code.'->__invoke(...)' : $closure);
+                }
+
                 if ($value instanceof IteratorArgument) {
                     if (!$values = $value->getValues()) {
                         return 'new RewindableGenerator(fn () => new \EmptyIterator(), 0)';
@@ -1961,7 +1997,13 @@ class PhpDumper extends Dumper
                 throw new RuntimeException('Cannot dump definitions which have a configurator.');
             }
 
-            return $this->addNewInstance($value);
+            $code = $this->addNewInstance($value);
+
+            if ($methodsCode = $this->getResetMethodsCode($value)) {
+                return \sprintf('$container->trackForReset(%s, [%s])', $code, $methodsCode);
+            }
+
+            return $code;
         } elseif ($value instanceof Variable) {
             return '$'.$value;
         } elseif ($value instanceof Reference) {
@@ -2054,7 +2096,7 @@ class PhpDumper extends Dumper
                 if (!$definition->isShared()) {
                     return $code;
                 }
-            } elseif ($this->isTrivialInstance($definition)) {
+            } elseif ($this->isTrivialInstance($definition) && ($definition->isShared() || !$definition->hasTag('container.tracked_for_reset'))) {
                 if ($definition->hasErrors() && $e = $definition->getErrors()) {
                     return \sprintf('throw new RuntimeException(%s)', $this->export(reset($e)));
                 }

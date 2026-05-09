@@ -18,6 +18,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Adapter\ChainAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Cache\Adapter\NullAdapter;
+use Symfony\Component\Cache\Adapter\ParameterNormalizer;
 use Symfony\Component\Cache\Adapter\RedisAdapter;
 use Symfony\Component\Cache\Adapter\TagAwareAdapter;
 use Symfony\Component\Cache\DependencyInjection\CachePoolPass;
@@ -303,6 +304,34 @@ class CachePoolPassTest extends TestCase
         $adapters = $container->getDefinition('cache.chain_with_marshaller')->getArgument(0);
         $this->assertArrayNotHasKey('index_3', $adapters[0]->getArguments());
         $this->assertEquals($expectedMarshallerRef, $adapters[1]->getArgument(3));
+    }
+
+    public function testChainAdapterNormalizesDefaultLifetimeDurationString()
+    {
+        $container = new ContainerBuilder();
+        $container->setParameter('kernel.container_class', 'app');
+        $container->setParameter('kernel.project_dir', 'foo');
+
+        $container->register('cache.adapter.array', ArrayAdapter::class)
+            ->addTag('cache.pool');
+        $container->register('cache.adapter.apcu', ApcuAdapter::class)
+            ->setArguments([null, 0, null])
+            ->addTag('cache.pool');
+        $container->register('cache.adapter.chain', ChainAdapter::class);
+        $container->setDefinition('cache.chain', new ChildDefinition('cache.adapter.chain'))
+            ->addArgument(['cache.adapter.array', 'cache.adapter.apcu'])
+            ->addTag('cache.pool', ['default_lifetime' => '1 week']);
+
+        $this->cachePoolPass->process($container);
+
+        $chainPool = $container->getDefinition('cache.chain');
+        foreach ($chainPool->getArgument(0) as $innerAdapter) {
+            $this->assertInstanceOf(Definition::class, $innerAdapter);
+            $arguments = $innerAdapter->getArguments();
+            $lifetimeArg = $arguments[array_key_last($arguments)];
+            $this->assertSame([ParameterNormalizer::class, 'normalizeDuration'], $lifetimeArg->getFactory());
+            $this->assertSame(['1 week'], $lifetimeArg->getArguments());
+        }
     }
 
     public function testGlobalClearerAlias()

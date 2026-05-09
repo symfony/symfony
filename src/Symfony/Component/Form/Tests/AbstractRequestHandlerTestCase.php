@@ -15,7 +15,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Form\Extension\Core\DataMapper\DataMapper;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilder;
@@ -58,6 +60,84 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->requestHandler = $this->getRequestHandler();
         $this->factory = Forms::createFormFactoryBuilder()->getFormFactory();
         $this->request = null;
+    }
+
+    #[DataProvider('methodExceptPatchProvider')]
+    public function testSubmitCheckboxInCollectionFormWithEmptyData($method)
+    {
+        $form = $this->factory->create(CollectionType::class, [true, false, true], [
+            'entry_type' => CheckboxType::class,
+            'method' => $method,
+        ]);
+
+        $this->setRequestData($method, []);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertEqualsCanonicalizing([false, false, false], $form->getData());
+    }
+
+    #[DataProvider('methodExceptPatchProvider')]
+    public function testSubmitCheckboxInCollectionFormWithPartialData($method)
+    {
+        $form = $this->factory->create(CollectionType::class, [true, false, true], [
+            'entry_type' => CheckboxType::class,
+            'method' => $method,
+        ]);
+
+        $this->setRequestData($method, [
+            'collection' => [
+                1 => true,
+            ],
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertEqualsCanonicalizing([false, true, false], $form->getData());
+    }
+
+    #[DataProvider('methodExceptPatchProvider')]
+    public function testSubmitCheckboxFormWithEmptyData($method)
+    {
+        $form = $this->factory->create(FormType::class, ['subform' => ['checkbox' => true]], [
+            'method' => $method,
+        ])
+            ->add('subform', FormType::class, [
+                'compound' => true,
+            ]);
+
+        $form->get('subform')
+            ->add('checkbox', CheckboxType::class);
+
+        $this->setRequestData($method, []);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertEquals(['subform' => ['checkbox' => false]], $form->getData());
+    }
+
+    #[DataProvider('methodExceptPatchProvider')]
+    public function testSubmitSimpleCheckboxFormWithEmptyData($method)
+    {
+        $form = $this->factory->createNamed('checkbox', CheckboxType::class, true, [
+            'method' => $method,
+        ]);
+
+        $this->setRequestData($method, []);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $this->assertFalse($form->getData());
+    }
+
+    public static function methodExceptPatchProvider(): array
+    {
+        return [
+            ['POST'],
+            ['PUT'],
+            ['DELETE'],
+            ['GET'],
+        ];
     }
 
     public static function methodExceptGetProvider(): array
@@ -326,7 +406,56 @@ abstract class AbstractRequestHandlerTestCase extends TestCase
         $this->assertFalse($itemsForm->has('1'));
 
         $this->assertEquals('test', $itemsForm->get('0')->get('item')->getData());
-        $this->assertNotNull($itemsForm->get('0')->get('file'));
+        $this->assertNotNull($itemsForm->get('0')->get('file')->getData());
+    }
+
+    public function testMergePartialDataFromCollection()
+    {
+        $form = $this->createForm('root', 'POST', true);
+        $form->add('items', CollectionType::class, [
+            'entry_type' => ItemFileType::class,
+            'allow_add' => true,
+        ]);
+
+        $file = $this->getUploadedFile();
+        $file2 = $this->getUploadedFile();
+
+        $this->setRequestData('POST', [
+            'root' => [
+                'items' => [
+                    1 => [
+                        'item' => 'test',
+                    ],
+                ],
+            ],
+        ], [
+            'root' => [
+                'items' => [
+                    0 => [
+                        'file' => $file,
+                    ],
+                    1 => [
+                        'file' => $file2,
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->requestHandler->handleRequest($form, $this->request);
+
+        $itemsForm = $form->get('items');
+        $data = $itemsForm->getData();
+        $this->assertTrue($form->isSubmitted());
+        $this->assertTrue($form->isValid());
+
+        $this->assertCount(2, $data);
+        $this->assertArrayHasKey(0, $data);
+        $this->assertArrayHasKey(1, $data);
+
+        $this->assertNull($itemsForm->get('0')->get('item')->getData());
+        $this->assertNotNull($itemsForm->get('0')->get('file')->getData());
+        $this->assertEquals('test', $itemsForm->get('1')->get('item')->getData());
+        $this->assertNotNull($itemsForm->get('1')->get('file')->getData());
     }
 
     #[DataProvider('methodExceptGetProvider')]

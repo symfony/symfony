@@ -356,6 +356,8 @@ class RedisStore implements SharedLockStoreInterface
     /**
      * @template T
      *
+     * @param-immediately-invoked-callable $callback
+     *
      * @param callable(): T $callback
      *
      * @return T

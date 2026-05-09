@@ -1182,18 +1182,18 @@ class FilesystemTest extends FilesystemTestCase
             ['/aa/bb/../../cc', '/aa/../dd/..', 'cc/'],
             ['/../aa/bb/cc', '/aa/dd/..', 'bb/cc/'],
             ['/../../aa/../bb/cc', '/aa/dd/..', '../bb/cc/'],
-            ['C:/aa/bb/cc', 'C:/aa/dd/..', 'bb/cc/'],
-            ['C:/aa/bb/cc', 'c:/aa/dd/..', 'bb/cc/'],
-            ['c:/aa/../bb/cc', 'c:/aa/dd/..', '../bb/cc/'],
-            ['C:/aa/bb/../../cc', 'C:/aa/../dd/..', 'cc/'],
-            ['C:/../aa/bb/cc', 'C:/aa/dd/..', 'bb/cc/'],
-            ['C:/../../aa/../bb/cc', 'C:/aa/dd/..', '../bb/cc/'],
-            ['D:/', 'C:/aa/../bb/cc', 'D:/'],
-            ['D:/aa/bb', 'C:/aa', 'D:/aa/bb/'],
-            ['D:/../../aa/../bb/cc', 'C:/aa/dd/..', 'D:/bb/cc/'],
         ];
 
         if ('\\' === \DIRECTORY_SEPARATOR) {
+            $paths[] = ['C:/aa/bb/cc', 'C:/aa/dd/..', 'bb/cc/'];
+            $paths[] = ['C:/aa/bb/cc', 'c:/aa/dd/..', 'bb/cc/'];
+            $paths[] = ['c:/aa/../bb/cc', 'c:/aa/dd/..', '../bb/cc/'];
+            $paths[] = ['C:/aa/bb/../../cc', 'C:/aa/../dd/..', 'cc/'];
+            $paths[] = ['C:/../aa/bb/cc', 'C:/aa/dd/..', 'bb/cc/'];
+            $paths[] = ['C:/../../aa/../bb/cc', 'C:/aa/dd/..', '../bb/cc/'];
+            $paths[] = ['D:/', 'C:/aa/../bb/cc', 'D:/'];
+            $paths[] = ['D:/aa/bb', 'C:/aa', 'D:/aa/bb/'];
+            $paths[] = ['D:/../../aa/../bb/cc', 'C:/aa/dd/..', 'D:/bb/cc/'];
             $paths[] = ['c:\var\lib/symfony/src/Symfony/', 'c:/var/lib/symfony/', 'src/Symfony/'];
         }
 
@@ -1212,6 +1212,19 @@ class FilesystemTest extends FilesystemTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The end path "var/lib/symfony/" is not absolute.');
         $this->assertSame('../../../', $this->filesystem->makePathRelative('var/lib/symfony/', '/var/lib/symfony/src/Symfony/Component'));
+    }
+
+    public function testMakePathRelativeWithExistingFile()
+    {
+        $dir = $this->workspace.\DIRECTORY_SEPARATOR.'foo'.\DIRECTORY_SEPARATOR.'bar';
+        mkdir($dir, 0o777, true);
+        $file = $dir.\DIRECTORY_SEPARATOR.'test.txt';
+        touch($file);
+
+        // File path must not get a trailing slash
+        $this->assertSame('foo/bar/test.txt', $this->filesystem->makePathRelative($file, $this->workspace));
+        // Directory path must still get a trailing slash
+        $this->assertSame('foo/bar/', $this->filesystem->makePathRelative($dir, $this->workspace));
     }
 
     public function testMirrorCopiesFilesAndDirectoriesRecursively()
@@ -1455,14 +1468,19 @@ class FilesystemTest extends FilesystemTestCase
 
     public static function providePathsForIsAbsolutePath()
     {
-        return [
+        $paths = [
             ['/var/lib', true],
-            ['c:\\\\var\\lib', true],
-            ['\\var\\lib', true],
             ['var/lib', false],
             ['../var/lib', false],
             ['', false],
         ];
+
+        if ('\\' === \DIRECTORY_SEPARATOR) {
+            $paths[] = ['c:\\\\var\\lib', true];
+            $paths[] = ['\\var\\lib', true];
+        }
+
+        return $paths;
     }
 
     public function testTempnam()

@@ -109,5 +109,4 @@ class stdClassProxyAa01f12 extends \stdClass implements \Symfony\Component\VarEx
 }
 
 // Help opcache.preload discover always-needed symbols
-class_exists(\Symfony\Component\VarExporter\Internal\Hydrator::class);
 class_exists(\Symfony\Component\VarExporter\Internal\LazyObjectRegistry::class);

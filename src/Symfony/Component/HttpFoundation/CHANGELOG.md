@@ -5,6 +5,8 @@ CHANGELOG
 ---
 
  * Add `BinaryFileResponse::shouldDeleteFileAfterSend()`
+ * Deprecate setting public properties of `Request` and `Response` objects directly; use setters or constructor arguments instead
+ * Add `SessionHasFlashMessage` test constraint
 
 8.0
 ---

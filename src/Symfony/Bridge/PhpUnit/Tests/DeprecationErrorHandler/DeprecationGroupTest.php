@@ -15,7 +15,7 @@ use PHPUnit\Framework\Attributes\RequiresPhpunit;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\DeprecationGroup;
 
-#[RequiresPhpunit('<10')]
+#[RequiresPhpunit('<10.0.0')]
 final class DeprecationGroupTest extends TestCase
 {
     public function testItGroupsByMessage()

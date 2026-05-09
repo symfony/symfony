@@ -452,107 +452,107 @@
             </trans-unit>
             <trans-unit id="116">
                 <source>This value does not represent a valid week in the ISO 8601 format.</source>
-                <target state="needs-review-translation">Ši reikšmė neatitinka galiojančios savaitės ISO 8601 formatu.</target>
+                <target>Ši reikšmė neatitinka galiojančios savaitės ISO 8601 formatu.</target>
             </trans-unit>
             <trans-unit id="117">
                 <source>This value is not a valid week.</source>
-                <target state="needs-review-translation">Ši reikšmė nėra galiojanti savaitė.</target>
+                <target>Ši reikšmė nėra galiojanti savaitė.</target>
             </trans-unit>
             <trans-unit id="118">
                 <source>This value should not be before week "{{ min }}".</source>
-                <target state="needs-review-translation">Ši reikšmė neturėtų būti prieš savaitę "{{ min }}".</target>
+                <target>Ši reikšmė neturėtų būti prieš savaitę "{{ min }}".</target>
             </trans-unit>
             <trans-unit id="119">
                 <source>This value should not be after week "{{ max }}".</source>
-                <target state="needs-review-translation">Ši reikšmė neturėtų būti po savaitės "{{ max }}".</target>
+                <target>Ši reikšmė neturėtų būti po savaitės "{{ max }}".</target>
             </trans-unit>
             <trans-unit id="121">
                 <source>This value is not a valid Twig template.</source>
-                <target state="needs-review-translation">Ši reikšmė nėra tinkamas „Twig“ šablonas.</target>
+                <target>Ši reikšmė nėra tinkamas „Twig“ šablonas.</target>
             </trans-unit>
             <trans-unit id="122">
                 <source>This file is not a valid video.</source>
-                <target state="needs-review-translation">Šis failas nėra galiojantis vaizdo įrašas.</target>
+                <target>Šis failas nėra galiojantis vaizdo įrašas.</target>
             </trans-unit>
             <trans-unit id="123">
                 <source>The size of the video could not be detected.</source>
-                <target state="needs-review-translation">Nepavyko nustatyti vaizdo įrašo dydžio.</target>
+                <target>Nepavyko nustatyti vaizdo įrašo dydžio.</target>
             </trans-unit>
             <trans-unit id="124">
                 <source>The video width is too big ({{ width }}px). Allowed maximum width is {{ max_width }}px.</source>
-                <target state="needs-review-translation">Vaizdo įrašo plotis per didelis ({{ width }}px). Leidžiamas didžiausias plotis yra {{ max_width }}px.</target>
+                <target>Vaizdo įrašo plotis per didelis ({{ width }}px). Leidžiamas didžiausias plotis yra {{ max_width }}px.</target>
             </trans-unit>
             <trans-unit id="125">
                 <source>The video width is too small ({{ width }}px). Minimum width expected is {{ min_width }}px.</source>
-                <target state="needs-review-translation">Vaizdo įrašo plotis per mažas ({{ width }}px). Tikėtinas mažiausias plotis yra {{ min_width }}px.</target>
+                <target>Vaizdo įrašo plotis per mažas ({{ width }}px). Tikėtinas mažiausias plotis yra {{ min_width }}px.</target>
             </trans-unit>
             <trans-unit id="126">
                 <source>The video height is too big ({{ height }}px). Allowed maximum height is {{ max_height }}px.</source>
-                <target state="needs-review-translation">Vaizdo aukštis per didelis ({{ height }}px). Leidžiamas maksimalus aukštis yra {{ max_height }}px.</target>
+                <target>Vaizdo aukštis per didelis ({{ height }}px). Leidžiamas maksimalus aukštis yra {{ max_height }}px.</target>
             </trans-unit>
             <trans-unit id="127">
                 <source>The video height is too small ({{ height }}px). Minimum height expected is {{ min_height }}px.</source>
-                <target state="needs-review-translation">Vaizdo aukštis per mažas ({{ height }}px). Tikėtinas minimalus aukštis yra {{ min_height }}px.</target>
+                <target>Vaizdo aukštis per mažas ({{ height }}px). Tikėtinas minimalus aukštis yra {{ min_height }}px.</target>
             </trans-unit>
             <trans-unit id="128">
                 <source>The video has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">Vaizdo įraše per mažai pikselių ({{ pixels }}). Tikimasi mažiausiai {{ min_pixels }}.</target>
+                <target>Vaizdo įraše per mažai pikselių ({{ pixels }}). Tikimasi mažiausiai {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="129">
                 <source>The video has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">Vaizdo įraše per daug pikselių ({{ pixels }}). Tikimasi, kad didžiausias kiekis yra {{ max_pixels }}.</target>
+                <target>Vaizdo įraše per daug pikselių ({{ pixels }}). Tikimasi, kad didžiausias kiekis yra {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="130">
                 <source>The video ratio is too big ({{ ratio }}). Allowed maximum ratio is {{ max_ratio }}.</source>
-                <target state="needs-review-translation">Vaizdo santykis per didelis ({{ ratio }}). Leidžiamas didžiausias santykis yra {{ max_ratio }}.</target>
+                <target>Vaizdo santykis per didelis ({{ ratio }}). Leidžiamas didžiausias santykis yra {{ max_ratio }}.</target>
             </trans-unit>
             <trans-unit id="131">
                 <source>The video ratio is too small ({{ ratio }}). Minimum ratio expected is {{ min_ratio }}.</source>
-                <target state="needs-review-translation">Vaizdo santykis per mažas ({{ ratio }}). Tikimasi mažiausias santykis yra {{ min_ratio }}.</target>
+                <target>Vaizdo santykis per mažas ({{ ratio }}). Tikimasi mažiausias santykis yra {{ min_ratio }}.</target>
             </trans-unit>
             <trans-unit id="132">
                 <source>The video is square ({{ width }}x{{ height }}px). Square videos are not allowed.</source>
-                <target state="needs-review-translation">Vaizdo įrašas yra kvadratinis ({{ width }}x{{ height }}px). Kvadratiniai vaizdo įrašai neleidžiami.</target>
+                <target>Vaizdo įrašas yra kvadratinis ({{ width }}x{{ height }}px). Kvadratiniai vaizdo įrašai neleidžiami.</target>
             </trans-unit>
             <trans-unit id="133">
                 <source>The video is landscape oriented ({{ width }}x{{ height }}px). Landscape oriented videos are not allowed.</source>
-                <target state="needs-review-translation">Vaizdo įrašas yra gulsčio formato ({{ width }}x{{ height }} px). Gulsčio formato vaizdo įrašai neleidžiami.</target>
+                <target>Vaizdo įrašas yra gulsčio formato ({{ width }}x{{ height }} px). Gulsčio formato vaizdo įrašai neleidžiami.</target>
             </trans-unit>
             <trans-unit id="134">
                 <source>The video is portrait oriented ({{ width }}x{{ height }}px). Portrait oriented videos are not allowed.</source>
-                <target state="needs-review-translation">Vaizdo įrašas yra portreto orientacijos ({{ width }}x{{ height }}px). Portreto orientacijos vaizdo įrašai neleidžiami.</target>
+                <target>Vaizdo įrašas yra portreto orientacijos ({{ width }}x{{ height }}px). Portreto orientacijos vaizdo įrašai neleidžiami.</target>
             </trans-unit>
             <trans-unit id="135">
                 <source>The video file is corrupted.</source>
-                <target state="needs-review-translation">Vaizdo failas sugadintas.</target>
+                <target>Vaizdo failas sugadintas.</target>
             </trans-unit>
             <trans-unit id="136">
                 <source>The video contains multiple streams. Only one stream is allowed.</source>
-                <target state="needs-review-translation">Vaizdo įraše yra keli srautai. Leidžiamas tik vienas srautas.</target>
+                <target>Vaizdo įraše yra keli srautai. Leidžiamas tik vienas srautas.</target>
             </trans-unit>
             <trans-unit id="137">
                 <source>Unsupported video codec "{{ codec }}".</source>
-                <target state="needs-review-translation">Nepalaikomas vaizdo kodekas „{{ codec }}“.</target>
+                <target>Nepalaikomas vaizdo kodekas „{{ codec }}“.</target>
             </trans-unit>
             <trans-unit id="138">
                 <source>Unsupported video container "{{ container }}".</source>
-                <target state="needs-review-translation">Nepalaikomas vaizdo konteineris "{{ container }}".</target>
+                <target>Nepalaikomas vaizdo konteineris "{{ container }}".</target>
             </trans-unit>
             <trans-unit id="139">
                 <source>The image file is corrupted.</source>
-                <target state="needs-review-translation">Paveikslėlio failas sugadintas.</target>
+                <target>Paveikslėlio failas sugadintas.</target>
             </trans-unit>
             <trans-unit id="140">
                 <source>The image has too few pixels ({{ pixels }} pixels). Minimum amount expected is {{ min_pixels }} pixels.</source>
-                <target state="needs-review-translation">Paveikslėlyje per mažai pikselių ({{ pixels }}). Tikimasi mažiausiai {{ min_pixels }}.</target>
+                <target>Paveikslėlyje per mažai pikselių ({{ pixels }}). Tikimasi mažiausiai {{ min_pixels }}.</target>
             </trans-unit>
             <trans-unit id="141">
                 <source>The image has too many pixels ({{ pixels }} pixels). Maximum amount expected is {{ max_pixels }} pixels.</source>
-                <target state="needs-review-translation">Paveikslėlis turi per daug pikselių ({{ pixels }}). Tikėtinas didžiausias kiekis yra {{ max_pixels }}.</target>
+                <target>Paveikslėlis turi per daug pikselių ({{ pixels }}). Tikėtinas didžiausias kiekis yra {{ max_pixels }}.</target>
             </trans-unit>
             <trans-unit id="142">
                 <source>This filename does not match the expected charset.</source>
-                <target state="needs-review-translation">Šis failo pavadinimas neatitinka laukiamo ženklų rinkinio.</target>
+                <target>Šis failo pavadinimas neatitinka laukiamo ženklų rinkinio.</target>
             </trans-unit>
         </body>
     </file>

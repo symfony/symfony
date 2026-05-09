@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\JsonPath;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\JsonPath\Exception\InvalidArgumentException;
 use Symfony\Component\JsonPath\Exception\InvalidJsonPathException;
 use Symfony\Component\JsonPath\Exception\InvalidJsonStringInputException;
@@ -20,6 +21,7 @@ use Symfony\Component\JsonPath\Tokenizer\JsonPathTokenizer;
 use Symfony\Component\JsonPath\Tokenizer\TokenType;
 use Symfony\Component\JsonStreamer\Exception\UnexpectedValueException;
 use Symfony\Component\JsonStreamer\Read\Splitter;
+use Symfony\Contracts\Service\ServiceProviderInterface;
 
 /**
  * Crawls a JSON document using a JSON Path as described in the RFC 9535.
@@ -30,19 +32,6 @@ use Symfony\Component\JsonStreamer\Read\Splitter;
  */
 final class JsonCrawler implements JsonCrawlerInterface
 {
-    private const RFC9535_FUNCTIONS = [
-        'length' => true,
-        'count' => true,
-        'match' => true,
-        'search' => true,
-        'value' => true,
-    ];
-
-    private const SINGULAR_ARGUMENT_FUNCTIONS = ['length', 'match', 'search'];
-
-    /**
-     * Comparison operators and their corresponding lengths.
-     */
     private const COMPARISON_OPERATORS = [
         '!=' => 2,
         '==' => 2,
@@ -53,10 +42,14 @@ final class JsonCrawler implements JsonCrawlerInterface
     ];
 
     /**
-     * @param resource|string $raw
+     * @param resource|string                                                                        $raw
+     * @param ContainerInterface|ServiceProviderInterface<callable(mixed ...$arguments): mixed>|null $functionsProvider
+     * @param array<string, array{arity?: int|null, return_type?: FunctionReturnType|null}>          $functionsMetadata
      */
     public function __construct(
         private readonly mixed $raw,
+        private readonly ?ContainerInterface $functionsProvider = null,
+        private readonly array $functionsMetadata = [],
     ) {
         if (!\is_string($raw) && !\is_resource($raw)) {
             throw new InvalidArgumentException(\sprintf('Expected string or resource, got "%s".', get_debug_type($raw)));
@@ -391,25 +384,9 @@ final class JsonCrawler implements JsonCrawlerInterface
             }
 
             $needsParentheses = true;
-            if (str_starts_with($filterExpr, '(') && str_ends_with($filterExpr, ')')) {
-                $depth = 0;
-                $isWrapped = true;
-                $filterLen = \strlen($filterExpr);
-
-                for ($i = 0; $i < $filterLen; ++$i) {
-                    $char = $filterExpr[$i];
-                    if ('(' === $char) {
-                        ++$depth;
-                    } elseif (')' === $char && 0 === --$depth && $i < $filterLen - 1) {
-                        $isWrapped = false;
-                        break;
-                    }
-                }
-
-                if ($isWrapped) {
-                    $needsParentheses = false;
-                    $filterExpr = trim(substr($filterExpr, 1, -1));
-                }
+            if (null !== $unwrapped = self::unwrapParentheses($filterExpr)) {
+                $needsParentheses = false;
+                $filterExpr = $unwrapped;
             }
 
             if ($needsParentheses && !str_starts_with($filterExpr, '(')) {
@@ -543,22 +520,8 @@ final class JsonCrawler implements JsonCrawlerInterface
     {
         $expr = JsonPathUtils::normalizeWhitespace($expr);
 
-        // remove outer parentheses if they wrap the entire expression
-        if (str_starts_with($expr, '(') && str_ends_with($expr, ')')) {
-            $depth = 0;
-            $isWrapped = true;
-            $i = -1;
-            while (null !== $char = $expr[++$i] ?? null) {
-                if ('(' === $char) {
-                    ++$depth;
-                } elseif (')' === $char && 0 === --$depth && isset($expr[$i + 1])) {
-                    $isWrapped = false;
-                    break;
-                }
-            }
-            if ($isWrapped) {
-                $expr = trim(substr($expr, 1, -1));
-            }
+        if (null !== $unwrapped = self::unwrapParentheses($expr)) {
+            $expr = $unwrapped;
         }
 
         if (str_starts_with($expr, '!')) {
@@ -612,9 +575,11 @@ final class JsonCrawler implements JsonCrawlerInterface
         // function calls
         if (preg_match('/^(\w++)\s*+\((.*)\)$/', $expr, $matches)) {
             $functionName = trim($matches[1]);
-            if (!isset(self::RFC9535_FUNCTIONS[$functionName])) {
+            if (!isset(JsonPathTokenizer::RFC9535_FUNCTION_ARITY[$functionName]) && !$this->functionsProvider?->has($functionName)) {
                 throw new JsonCrawlerException($expr, \sprintf('invalid function "%s"', $functionName));
             }
+
+            $this->validateFunctionTestReturnType($expr);
 
             $functionResult = $this->evaluateFunction($functionName, $matches[2], $context);
 
@@ -730,7 +695,8 @@ final class JsonCrawler implements JsonCrawlerInterface
 
         // function calls
         if (preg_match('/^(\w++)\((.*)\)$/', $expr, $matches)) {
-            if (!isset(self::RFC9535_FUNCTIONS[$functionName = trim($matches[1])])) {
+            $functionName = trim($matches[1]);
+            if (!isset(JsonPathTokenizer::RFC9535_FUNCTION_ARITY[$functionName]) && !$this->functionsProvider?->has($functionName)) {
                 throw new JsonCrawlerException($expr, \sprintf('invalid function "%s"', $functionName));
             }
 
@@ -742,44 +708,57 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     private function evaluateFunction(string $name, string $args, mixed $context): mixed
     {
+        $argStrings = ($args = trim($args)) ? JsonPathUtils::parseCommaSeparatedValues($args) : [];
+        $expectedArgCount = JsonPathTokenizer::RFC9535_FUNCTION_ARITY[$name] ?? $this->functionsMetadata[$name]['arity'] ?? null;
+
+        if (null !== $expectedArgCount && \count($argStrings) !== $expectedArgCount) {
+            throw new JsonCrawlerException($args, \sprintf('the JsonPath function "%s" requires exactly %d argument(s).', $name, $expectedArgCount));
+        }
+
+        // Parse and evaluate arguments
         $argList = [];
         $nodelistSizes = [];
-        if ($args = trim($args)) {
-            $args = JsonPathUtils::parseCommaSeparatedValues($args);
-            foreach ($args as $arg) {
-                $arg = trim($arg);
-                if (str_starts_with($arg, '$')) { // special handling for absolute paths
-                    $results = $this->evaluate(new JsonPath($arg));
-                    $argList[] = $results[0] ?? null;
-                    $nodelistSizes[] = \count($results);
-                } elseif (!str_starts_with($arg, '@')) { // special handling for @ to track nodelist size
-                    $argList[] = $this->evaluateScalar($arg, $context);
-                    $nodelistSizes[] = 1;
-                } elseif ('@' === $arg) {
-                    $argList[] = $context;
-                    $nodelistSizes[] = 1;
-                } elseif (!$this->isArrayOrObject($context)) {
-                    $argList[] = null;
-                    $nodelistSizes[] = 0;
-                } elseif (str_starts_with($pathPart = substr($arg, 1), '[')) {
-                    // handle bracket expressions like @['a','d']
-                    $results = $this->evaluateBracket(substr($pathPart, 1, -1), $context);
-                    $argList[] = $results;
-                    $nodelistSizes[] = \count($results);
-                } else {
-                    // handle dot notation like @.a
-                    $results = $this->evaluateTokensOnDecodedData(JsonPathTokenizer::tokenize(new JsonPath('$'.$pathPart)), $context);
-                    $argList[] = $results[0] ?? null;
-                    $nodelistSizes[] = \count($results);
-                }
+        foreach ($argStrings as $arg) {
+            $arg = trim($arg);
+            if (str_starts_with($arg, '$')) { // special handling for absolute paths
+                $results = $this->evaluate(new JsonPath($arg));
+                $argList[] = $results[0] ?? null;
+                $nodelistSizes[] = \count($results);
+            } elseif (!str_starts_with($arg, '@')) { // special handling for @ to track nodelist size
+                $argList[] = $this->evaluateScalar($arg, $context);
+                $nodelistSizes[] = 1;
+            } elseif ('@' === $arg) {
+                $argList[] = $context;
+                $nodelistSizes[] = 1;
+            } elseif (!$this->isArrayOrObject($context)) {
+                $argList[] = null;
+                $nodelistSizes[] = 0;
+            } elseif (str_starts_with($pathPart = substr($arg, 1), '[')) {
+                // handle bracket expressions like @['a','d']
+                $results = $this->evaluateBracket(substr($pathPart, 1, -1), $context);
+                $argList[] = $results;
+                $nodelistSizes[] = \count($results);
+            } else {
+                // handle dot notation like @.a
+                $results = $this->evaluateTokensOnDecodedData(JsonPathTokenizer::tokenize(new JsonPath('$'.$pathPart)), $context);
+                $argList[] = $results[0] ?? null;
+                $nodelistSizes[] = \count($results);
             }
         }
 
         $value = $argList[0] ?? null;
         $nodelistSize = $nodelistSizes[0] ?? 0;
 
-        if ($nodelistSize > 1 && \in_array($name, self::SINGULAR_ARGUMENT_FUNCTIONS, true)) {
+        if ($nodelistSize > 1 && \in_array($name, JsonPathTokenizer::SINGULAR_ARGUMENT_FUNCTIONS, true)) {
             throw new JsonCrawlerException($args, \sprintf('non-singular query is not allowed as argument to "%s" function', $name));
+        }
+
+        if ($this->functionsProvider?->has($name)) {
+            try {
+                return $this->functionsProvider->get($name)(...$argList);
+            } catch (\Exception $e) {
+                throw new InvalidJsonPathException(\sprintf('An error occurred while executing the custom JsonPath function "%s": ', $name).$e->getMessage(), null, $e);
+            }
         }
 
         return match ($name) {
@@ -972,11 +951,6 @@ final class JsonCrawler implements JsonCrawlerInterface
         }
     }
 
-    private function isNonSingularRelativeQuery(string $expr): bool
-    {
-        return preg_match('/@\[.*,.*]/', $expr) || '@.*' === $expr || preg_match('/@\[.*:.*]/', $expr);
-    }
-
     private function findOperatorPosition(string $expr, string $op): int|false
     {
         $bracketDepth = 0;
@@ -1005,6 +979,20 @@ final class JsonCrawler implements JsonCrawlerInterface
 
     private function validateFilterExpression(string $expr): void
     {
+        $expr = trim($expr);
+
+        if (null !== $unwrapped = self::unwrapParentheses($expr)) {
+            $this->validateFilterExpression($unwrapped);
+
+            return;
+        }
+
+        if (str_starts_with($expr, '!')) {
+            $this->validateFilterExpression(trim(substr($expr, 1)));
+
+            return;
+        }
+
         if ($logicalOp = $this->findRightmostLogicalOperator($expr)) {
             $this->validateFilterExpression(trim(substr($expr, 0, $logicalOp['position']))); // left
             $this->validateFilterExpression(trim(substr($expr, $logicalOp['position'] + \strlen($logicalOp['operator'])))); // right
@@ -1029,35 +1017,70 @@ final class JsonCrawler implements JsonCrawlerInterface
                 }
 
                 if (
-                    str_starts_with($left, '@') && $this->isNonSingularRelativeQuery($left)
-                    || str_starts_with($right, '@') && $this->isNonSingularRelativeQuery($right)
+                    str_starts_with($left, '@') && JsonPathTokenizer::isNonSingularRelativeQuery($left)
+                    || str_starts_with($right, '@') && JsonPathTokenizer::isNonSingularRelativeQuery($right)
                 ) {
                     throw new JsonCrawlerException($left, 'non-singular query is not comparable');
                 }
 
                 $this->validateFunctionArguments($left);
                 $this->validateFunctionArguments($right);
+                $this->validateFunctionReturnType($left);
+                $this->validateFunctionReturnType($right);
 
                 return;
             }
         }
+
+        $this->validateFunctionTestReturnType($expr);
     }
 
     private function validateFunctionArguments(string $expr): void
     {
-        // is there a function call?
         if (!preg_match('/^(\w+)\((.*)\)$/', trim($expr), $matches)) {
             return;
         }
 
-        if (!\in_array($functionName = $matches[1], self::SINGULAR_ARGUMENT_FUNCTIONS, true)) {
+        if (!\in_array($functionName = $matches[1], JsonPathTokenizer::SINGULAR_ARGUMENT_FUNCTIONS, true)) {
             return;
         }
 
         $arg = trim($matches[2]);
-        if (str_starts_with($arg, '@') && $this->isNonSingularRelativeQuery($arg)) {
+        if (str_starts_with($arg, '@') && JsonPathTokenizer::isNonSingularRelativeQuery($arg)) {
             throw new JsonCrawlerException($arg, \sprintf('non-singular query is not allowed as argument to "%s" function', $functionName));
         }
+    }
+
+    private function validateFunctionReturnType(string $expr): void
+    {
+        if (!preg_match('/^(\w+)\s*\(/', trim($expr), $matches)) {
+            return;
+        }
+
+        $functionName = $matches[1];
+        $returnType = $this->functionsMetadata[$functionName]['return_type'] ?? null;
+
+        if (null === $returnType || FunctionReturnType::Value === $returnType) {
+            return;
+        }
+
+        throw new JsonCrawlerException($expr, \sprintf('the result of the custom JsonPath function "%s" (%s) cannot be used in comparisons', $functionName, $returnType->name.'Type'));
+    }
+
+    private function validateFunctionTestReturnType(string $expr): void
+    {
+        if (!preg_match('/^(\w+)\s*\(/', trim($expr), $matches)) {
+            return;
+        }
+
+        $functionName = $matches[1];
+        $returnType = $this->functionsMetadata[$functionName]['return_type'] ?? null;
+
+        if (FunctionReturnType::Value !== $returnType) {
+            return;
+        }
+
+        throw new JsonCrawlerException($expr, \sprintf('the result of the custom JsonPath function "%s" (%s) cannot be used in test expressions', $functionName, $returnType->name.'Type'));
     }
 
     /**
@@ -1087,6 +1110,26 @@ final class JsonCrawler implements JsonCrawlerInterface
         }
 
         return $result;
+    }
+
+    private static function unwrapParentheses(string $expr): ?string
+    {
+        if (!str_starts_with($expr, '(') || !str_ends_with($expr, ')')) {
+            return null;
+        }
+
+        $depth = 0;
+        $i = -1;
+
+        while (null !== $char = $expr[++$i] ?? null) {
+            if ('(' === $char) {
+                ++$depth;
+            } elseif (')' === $char && 0 === --$depth && isset($expr[$i + 1])) {
+                return null;
+            }
+        }
+
+        return trim(substr($expr, 1, -1));
     }
 
     private function isArrayOrObject(mixed $value): bool

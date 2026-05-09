@@ -14,6 +14,7 @@ namespace Symfony\Component\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\VarExporter\DeepCloner;
 
 /**
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
@@ -24,6 +25,7 @@ final class TagDecoratorPass implements CompilerPassInterface
     {
         foreach ($container->findTaggedResourceIds('container.tag_decorator', false) as $id => $tags) {
             $definition = $container->getDefinition($id);
+            $definitionCloner = null;
 
             foreach ($tags as $tag) {
                 if (!$decoratesTag = $tag['decorates_tag'] ?? null) {
@@ -43,14 +45,12 @@ final class TagDecoratorPass implements CompilerPassInterface
                         throw new ServiceNotFoundException($decoratesTag, $id);
                     }
                 }
+                $definitionCloner ??= new DeepCloner($definition);
 
                 foreach ($taggedServices as $taggedServiceId => $_) {
-                    $clonedDefinition = clone $definition;
-                    $clonedDefinition->clearTag('container.tag_decorator');
-                    $clonedDefinition->clearTag('container.excluded');
-                    $clonedDefinition->setDecoratedService($taggedServiceId, null, $priority, $invalidBehavior);
-                    $decoratorId = \sprintf('.decorator.%s.%s', $taggedServiceId, $id);
-                    $container->setDefinition($decoratorId, $clonedDefinition);
+                    $container->setDefinition(\sprintf('.decorator.%s.%s', $taggedServiceId, $id), $definitionCloner->clone())
+                        ->clearTag('container.tag_decorator')->clearTag('container.excluded')
+                        ->setDecoratedService($taggedServiceId, null, $priority, $invalidBehavior);
                 }
             }
 

@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Allow `HtmlDumper::setNonce()` to take a distinct style nonce alongside the script nonce
+ * Dump class-strings as class stubs with source location and static properties
+
 7.4
 ---
 

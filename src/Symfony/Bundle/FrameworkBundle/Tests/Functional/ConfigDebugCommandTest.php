@@ -16,6 +16,7 @@ use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\TestWith;
 use Symfony\Bundle\FrameworkBundle\Command\ConfigDebugCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Tests\Functional\Bundle\TestBundle\EnvVarLoader\StatefulEnvVarLoader;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -241,6 +242,34 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
         $this->assertSame(1, $tester->getStatusCode());
         $this->assertStringContainsString('Unable to find configuration for "framework.secret.foo"', $tester->getDisplay());
+    }
+
+    public function testEnvVarsResolvedFromRunningContainerProcessor()
+    {
+        // This test reproduces the scenario where an env var is only resolvable via a
+        // loader (e.g. SodiumVault) that is already initialized in the running container
+        // but cannot be re-instantiated inside the freshly built container (e.g. because
+        // its secrets dir or decryption key depends on another vault secret – a circular
+        // dependency). StatefulEnvVarLoader simulates such a vault: after its state is
+        // cleared, new instances return nothing, but the already-running processor
+        // retains the value in its $loadedVars cache.
+        StatefulEnvVarLoader::setEnvVar('TEST_VAULT_SECRET', 'from_loader');
+
+        $application = $this->createApplication(true);
+
+        // Accessing the primer service forces the running container's EnvVarProcessor
+        // to call StatefulEnvVarLoader::loadEnvVars() and cache the result.
+        static::$kernel->getContainer()->get('test.vault_env_var_primer');
+
+        // Clear the loader's static state: from this point on, new StatefulEnvVarLoader
+        // instances (as would be created by the freshly compiled container) return [].
+        StatefulEnvVarLoader::reset();
+
+        $tester = new CommandTester($application->find('debug:config'));
+        $ret = $tester->execute(['name' => 'foo', '--resolve-env' => true]);
+
+        $this->assertSame(0, $ret);
+        $this->assertStringContainsString('vault_test_secret: from_loader', $tester->getDisplay());
     }
 
     private function createCommandTester(bool $debug): CommandTester

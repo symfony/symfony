@@ -268,6 +268,9 @@ class UnicodeString extends AbstractUnicodeString
         return $str;
     }
 
+    /**
+     * @param-immediately-invoked-callable $to
+     */
     public function replaceMatches(string $fromRegexp, string|callable $to): static
     {
         $str = parent::replaceMatches($fromRegexp, $to);

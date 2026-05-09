@@ -81,6 +81,44 @@ class ConsoleArgumentResolverTest extends AbstractWebTestCase
         $this->assertStringContainsString('Name: test-advanced', $output);
     }
 
+    public function testValidatedMapInputWithValidData()
+    {
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run([
+            'command' => 'app:validated-input',
+            'name' => 'John',
+            '--email' => 'john@example.com',
+        ]);
+
+        $tester->assertCommandIsSuccessful();
+        $output = $tester->getDisplay();
+
+        $this->assertStringContainsString('Name: John', $output);
+        $this->assertStringContainsString('Email: john@example.com', $output);
+    }
+
+    public function testValidatedMapInputWithInvalidData()
+    {
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run([
+            'command' => 'app:validated-input',
+            'name' => '',
+            '--email' => 'not-an-email',
+        ]);
+
+        $this->assertNotSame(0, $tester->getStatusCode());
+        $output = $tester->getDisplay();
+
+        $this->assertStringContainsString('name:', $output);
+        $this->assertStringContainsString('email:', $output);
+    }
+
     public function testValueResolverAutoconfiguration()
     {
         $application = new Application(static::$kernel);

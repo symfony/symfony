@@ -12,12 +12,15 @@
 namespace Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\RequiresMethod;
 use Psr\Cache\CacheItemPoolInterface;
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LogLevel;
 use Symfony\Bundle\FrameworkBundle\DependencyInjection\FrameworkExtension;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Tests\DependencyInjection\Fixtures\Workflow\Validator\DefinitionValidator;
+use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\JsonPath\UppercaseFunction;
 use Symfony\Bundle\FrameworkBundle\Tests\Fixtures\Messenger\DummyMessage;
 use Symfony\Bundle\FrameworkBundle\Tests\TestCase;
 use Symfony\Bundle\FullStack;
@@ -36,14 +39,15 @@ use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\Argument\ServiceLocatorArgument;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\AddBehaviorDescribingTagsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveBindingsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
-use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveTaggedIteratorArgumentPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\LogicException;
+use Symfony\Component\DependencyInjection\Kernel\ServicesBundle;
 use Symfony\Component\DependencyInjection\Loader\ClosureLoader;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\DependencyInjection\ParameterBag\EnvPlaceholderParameterBag;
@@ -61,17 +65,21 @@ use Symfony\Component\HttpClient\RetryableHttpClient;
 use Symfony\Component\HttpClient\ThrottlingHttpClient;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpKernel\DependencyInjection\LoggerPass;
+use Symfony\Component\HttpKernel\EventListener\RateLimitAttributeListener;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\HttpKernel\Fragment\FragmentUriGeneratorInterface;
+use Symfony\Component\JsonPath\FunctionReturnType;
+use Symfony\Component\JsonPath\JsonPathCrawlerInterface;
 use Symfony\Component\Lock\Store\FlockStore;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Messenger\Bridge\AmazonSqs\Transport\AmazonSqsTransportFactory;
 use Symfony\Component\Messenger\Bridge\Amqp\Transport\AmqpTransportFactory;
 use Symfony\Component\Messenger\Bridge\Beanstalkd\Transport\BeanstalkdTransportFactory;
 use Symfony\Component\Messenger\Bridge\Redis\Transport\RedisTransportFactory;
+use Symfony\Component\Messenger\Middleware\DecodeFailedMessageMiddleware;
 use Symfony\Component\Messenger\Middleware\DeduplicateMiddleware;
 use Symfony\Component\Messenger\Transport\TransportFactory;
 use Symfony\Component\Notifier\ChatterInterface;
@@ -1208,6 +1216,23 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertEquals($expectedRateLimitersByRateLimitedTransports, $rateLimitedTransports);
     }
 
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testLegacyMessengerRouting()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/framework-bundle 8.1: Using the "senders" nesting level for messenger routing configuration is deprecated and will be removed in version 9.0. Use a flat list of senders instead.');
+
+        $container = $this->createContainerFromFile('messenger_routing_legacy_senders');
+        $senderLocatorDefinition = $container->getDefinition('messenger.senders_locator');
+
+        $sendersMapping = $senderLocatorDefinition->getArgument(0);
+        $this->assertEquals(['amqp', 'messenger.transport.audit'], $sendersMapping[DummyMessage::class]);
+        $sendersLocator = $container->getDefinition((string) $senderLocatorDefinition->getArgument(1));
+        $this->assertSame(['amqp', 'audit', 'messenger.transport.amqp', 'messenger.transport.audit'], array_keys($sendersLocator->getArgument(0)));
+        $this->assertEquals(new Reference('messenger.transport.amqp'), $sendersLocator->getArgument(0)['amqp']->getValues()[0]);
+        $this->assertEquals(new Reference('messenger.transport.audit'), $sendersLocator->getArgument(0)['messenger.transport.audit']->getValues()[0]);
+    }
+
     public function testMessengerRouting()
     {
         $container = $this->createContainerFromFile('messenger_routing');
@@ -1252,6 +1277,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.commands']],
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'dispatch_after_current_bus'],
+            ...(class_exists(DecodeFailedMessageMiddleware::class) ? [['id' => 'decode_failed_message_middleware']] : []),
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'send_message', 'arguments' => [true]],
             ['id' => 'handle_message', 'arguments' => [false]],
@@ -1263,6 +1289,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.events']],
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'dispatch_after_current_bus'],
+            ...(class_exists(DecodeFailedMessageMiddleware::class) ? [['id' => 'decode_failed_message_middleware']] : []),
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'with_factory', 'arguments' => ['foo', true, ['bar' => 'baz']]],
             ['id' => 'send_message', 'arguments' => [true]],
@@ -1296,6 +1323,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.events']],
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'dispatch_after_current_bus'],
+            ...(class_exists(DecodeFailedMessageMiddleware::class) ? [['id' => 'decode_failed_message_middleware']] : []),
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'send_message', 'arguments' => [true]],
             ['id' => 'handle_message', 'arguments' => [false]],
@@ -1317,6 +1345,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.commands']],
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'dispatch_after_current_bus'],
+            ...(class_exists(DecodeFailedMessageMiddleware::class) ? [['id' => 'decode_failed_message_middleware']] : []),
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'deduplicate_middleware'],
             ['id' => 'send_message', 'arguments' => [true]],
@@ -1329,6 +1358,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             ['id' => 'add_bus_name_stamp_middleware', 'arguments' => ['messenger.bus.events']],
             ['id' => 'reject_redelivered_message_middleware'],
             ['id' => 'dispatch_after_current_bus'],
+            ...(class_exists(DecodeFailedMessageMiddleware::class) ? [['id' => 'decode_failed_message_middleware']] : []),
             ['id' => 'failed_message_processing_middleware'],
             ['id' => 'deduplicate_middleware'],
             ['id' => 'with_factory', 'arguments' => ['foo', true, ['bar' => 'baz']]],
@@ -2189,33 +2219,6 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($iterator->needsIndexes());
     }
 
-    public function testRemovesResourceCheckerConfigCacheFactoryArgumentOnlyIfNoDebug()
-    {
-        $container = $this->createContainer(['kernel.debug' => true]);
-        (new FrameworkExtension())->load([], $container);
-        $this->assertCount(1, $container->getDefinition('config_cache_factory')->getArguments());
-
-        $container = $this->createContainer(['kernel.debug' => false]);
-        (new FrameworkExtension())->load([], $container);
-        $this->assertSame([], $container->getDefinition('config_cache_factory')->getArguments());
-    }
-
-    public function testLoggerAwareRegistration()
-    {
-        $container = $this->createContainerFromFile('full', [], true, false);
-        $container->addCompilerPass(new ResolveInstanceofConditionalsPass());
-        $container->register('foo', LoggerAwareInterface::class)
-            ->setAutoconfigured(true);
-        $container->compile();
-
-        $calls = $container->findDefinition('foo')->getMethodCalls();
-
-        $this->assertCount(1, $calls, 'Definition should contain 1 method call');
-        $this->assertSame('setLogger', $calls[0][0], 'Method name should be "setLogger"');
-        $this->assertInstanceOf(Reference::class, $calls[0][1][0]);
-        $this->assertSame('logger', (string) $calls[0][1][0], 'Argument should be a reference to "logger"');
-    }
-
     public function testSessionCookieSecureAuto()
     {
         $container = $this->createContainerFromFile('session_cookie_secure_auto');
@@ -2419,6 +2422,16 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertSame('foo.throttling.limiter', (string) $arguments[1]);
     }
 
+    public function testRateLimiterAttributeListener()
+    {
+        $container = $this->createContainerFromFile('http_client_rate_limiter');
+
+        $this->assertTrue($container->hasDefinition('rate_limiter.attribute_listener'));
+        $definition = $container->getDefinition('rate_limiter.attribute_listener');
+        $this->assertSame(RateLimitAttributeListener::class, $definition->getClass());
+        $this->assertTrue($definition->hasTag('kernel.event_subscriber'));
+    }
+
     public static function provideMailer(): iterable
     {
         yield [
@@ -2528,7 +2541,17 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     public function testRegisterParameterCollectingBehaviorDescribingTags()
     {
-        $container = $this->createContainerFromFile('default_config');
+        $container = $this->createContainerFromFile('default_config', [], true, false);
+        $container->addCompilerPass(new AddBehaviorDescribingTagsPass([
+            'container.do_not_inline',
+            'container.service_locator',
+            'container.service_subscriber',
+            'kernel.event_subscriber',
+            'kernel.event_listener',
+            'kernel.reset',
+        ]));
+        $container->addCompilerPass(new AddBehaviorDescribingTagsPass(['kernel.locale_aware']));
+        $container->compile();
 
         $this->assertTrue($container->hasParameter('container.behavior_describing_tags'));
         $this->assertEquals([
@@ -2537,8 +2560,8 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'container.service_subscriber',
             'kernel.event_subscriber',
             'kernel.event_listener',
-            'kernel.locale_aware',
             'kernel.reset',
+            'kernel.locale_aware',
         ], $container->getParameter('container.behavior_describing_tags'));
     }
 
@@ -2759,6 +2782,11 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
         $this->assertFalse($container->getDefinition('webhook.transport')->hasErrors());
         $this->assertEquals('webhook.payload_serializer.serializer', $container->getDefinition('webhook.body_configurator.json')->getArgument(0));
+
+        $this->assertSame('Webhook-Event', $container->getDefinition('webhook.headers_configurator')->getArgument(0));
+        $this->assertSame('Webhook-Id', $container->getDefinition('webhook.headers_configurator')->getArgument(1));
+        $this->assertSame('sha256', $container->getDefinition('webhook.signer')->getArgument(0));
+        $this->assertSame('Webhook-Signature', $container->getDefinition('webhook.signer')->getArgument(1));
     }
 
     public function testWebhookWithoutSerializer()
@@ -2944,6 +2972,40 @@ abstract class FrameworkExtensionTestCase extends TestCase
         $this->assertTrue($container->has('json_streamer.stream_writer'));
     }
 
+    #[RequiresMethod(JsonPathCrawlerInterface::class, 'crawl')]
+    public function testJsonPathEnabled()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', []);
+        });
+
+        $this->assertTrue($container->hasDefinition('json_path.crawler'));
+        $this->assertSame('json_path.crawler', (string) $container->getAlias(JsonPathCrawlerInterface::class));
+
+        $locatorArgument = $container->getDefinition('json_path.crawler')->getArgument(0);
+        $this->assertInstanceOf(ServiceLocatorArgument::class, $locatorArgument);
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $locatorArgument->getTaggedIteratorArgument());
+        $this->assertSame('json_path.function', $locatorArgument->getTaggedIteratorArgument()->getTag());
+    }
+
+    #[RequiresMethod(JsonPathCrawlerInterface::class, 'crawl')]
+    public function testJsonPathFunctionAttributeAutoconfiguration()
+    {
+        $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
+            $container->loadFromExtension('framework', []);
+            $container->register('json_path.function.upper', UppercaseFunction::class)
+                ->setAutoconfigured(true);
+        });
+
+        $this->assertEquals([['name' => 'upper', 'return_type' => FunctionReturnType::Value, 'arity' => 1]], $container->getDefinition('json_path.function.upper')->getTag('json_path.function'));
+
+        $locatorArgument = $container->getDefinition('json_path.crawler')->getArgument(0);
+        $this->assertInstanceOf(ServiceLocatorArgument::class, $locatorArgument);
+        $this->assertInstanceOf(TaggedIteratorArgument::class, $locatorArgument->getTaggedIteratorArgument());
+        $this->assertSame('json_path.function', $locatorArgument->getTaggedIteratorArgument()->getTag());
+        $this->assertSame('name', $locatorArgument->getTaggedIteratorArgument()->getIndexAttribute());
+    }
+
     public function testObjectMapperEnabled()
     {
         $container = $this->createContainerFromClosure(static function (ContainerBuilder $container) {
@@ -2983,7 +3045,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
 
     protected function createContainer(array $data = [])
     {
-        return new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([
+        $container = new ContainerBuilder(new EnvPlaceholderParameterBag(array_merge([
             'kernel.bundles' => ['FrameworkBundle' => FrameworkBundle::class],
             'kernel.bundles_metadata' => ['FrameworkBundle' => ['namespace' => 'Symfony\\Bundle\\FrameworkBundle', 'path' => __DIR__.'/../..']],
             'kernel.cache_dir' => __DIR__,
@@ -2999,6 +3061,10 @@ abstract class FrameworkExtensionTestCase extends TestCase
             'container.build_id' => hash('crc32', 'Abc123423456789'),
             'container.build_time' => 23456789,
         ], $data)));
+
+        new ServicesBundle()->getContainerExtension()->load([], $container);
+
+        return $container;
     }
 
     protected function createContainerFromFile(string $file, array $data = [], bool $resetCompilerPasses = true, bool $compile = true, ?FrameworkExtension $extension = null): ContainerBuilder
@@ -3016,7 +3082,7 @@ abstract class FrameworkExtensionTestCase extends TestCase
             $container->getCompilerPassConfig()->setRemovingPasses([]);
             $container->getCompilerPassConfig()->setAfterRemovingPasses([]);
         }
-        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new LoggerPass()]);
+        $container->getCompilerPassConfig()->setBeforeOptimizationPasses([new AddBehaviorDescribingTagsPass(), new LoggerPass()]);
         $container->getCompilerPassConfig()->setBeforeRemovingPasses([new AddConstraintValidatorsPass(), new TranslatorPass()]);
 
         if (!$compile) {

@@ -73,10 +73,15 @@ class CompiledUrlGeneratorDumper extends GeneratorDumper
             }
 
             $compiledTarget = $target->compile();
+            $defaults = $target->getDefaults();
+
+            if (isset($defaults['_locale']) && str_ends_with($name, '.'.$defaults['_locale'])) {
+                $defaults['_canonical_route'] = substr($name, 0, -\strlen($defaults['_locale']) - 1);
+            }
 
             $compiledAliases[$name] = [
                 $compiledTarget->getVariables(),
-                $target->getDefaults(),
+                $defaults,
                 $target->getRequirements(),
                 $compiledTarget->getTokens(),
                 $compiledTarget->getHostTokens(),

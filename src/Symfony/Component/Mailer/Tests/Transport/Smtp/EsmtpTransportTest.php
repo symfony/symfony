@@ -50,7 +50,7 @@ class EsmtpTransportTest extends TestCase
     public function testExtensibility()
     {
         $stream = new DummyStream();
-        $transport = new CustomEsmtpTransport(stream: $stream);
+        $transport = new CustomEsmtpTransport('localhost', 0, null, null, null, $stream);
 
         $message = new Email();
         $message->from('sender@example.org');
@@ -66,7 +66,7 @@ class EsmtpTransportTest extends TestCase
     public function testSmtpUtf8()
     {
         $stream = new DummyStream();
-        $transport = new SmtpUtf8EsmtpTransport(stream: $stream);
+        $transport = new SmtpUtf8EsmtpTransport('localhost', 0, null, null, null, $stream);
 
         $message = new Email();
         $message->from('info@dømi.fo');
@@ -82,7 +82,7 @@ class EsmtpTransportTest extends TestCase
     public function testMissingSmtpUtf8()
     {
         $stream = new DummyStream();
-        $transport = new EsmtpTransport(stream: $stream);
+        $transport = new EsmtpTransport('localhost', 0, null, null, null, $stream);
 
         $message = new Email();
         $message->from('info@dømi.fo');
@@ -97,7 +97,7 @@ class EsmtpTransportTest extends TestCase
     public function testSmtpUtf8FallbackToIDN()
     {
         $stream = new DummyStream();
-        $transport = new EsmtpTransport(stream: $stream);
+        $transport = new EsmtpTransport('localhost', 0, null, null, null, $stream);
 
         $message = new Email();
         $message->from('info@dømi.fo'); // UTF8 only in the domain
@@ -113,7 +113,7 @@ class EsmtpTransportTest extends TestCase
     public function testConstructorWithDefaultAuthenticators()
     {
         $stream = new DummyStream();
-        $transport = new EsmtpTransport(stream: $stream);
+        $transport = new EsmtpTransport('localhost', 0, null, null, null, $stream);
         $transport->setUsername('testuser');
         $transport->setPassword('p4ssw0rd');
 
@@ -210,7 +210,7 @@ class EsmtpTransportTest extends TestCase
     public function testSetAuthenticators()
     {
         $stream = new DummyStream();
-        $transport = new EsmtpTransport(stream: $stream);
+        $transport = new EsmtpTransport('localhost', 0, null, null, null, $stream);
         $transport->setUsername('testuser');
         $transport->setPassword('p4ssw0rd');
         $transport->setAuthenticators([new XOAuth2Authenticator()]);
@@ -244,7 +244,7 @@ class EsmtpTransportTest extends TestCase
     public function testConstructorWithEmptyAuthenticator()
     {
         $stream = new DummyStream();
-        $transport = new EsmtpTransport(stream: $stream);
+        $transport = new EsmtpTransport('localhost', 0, null, null, null, $stream);
         $transport->setUsername('testuser');
         $transport->setPassword('p4ssw0rd');
         $transport->setAuthenticators([]); // if no authenticators defined, then there needs to be a TransportException
@@ -266,7 +266,7 @@ class EsmtpTransportTest extends TestCase
     public function testSocketTimeout()
     {
         $stream = new DummyStream();
-        $transport = new EsmtpTransport(stream: $stream);
+        $transport = new EsmtpTransport('localhost', 0, null, null, null, $stream);
         $transport->setUsername('testuser');
         $transport->setPassword('timedout');
         $transport->setAuthenticators([new LoginAuthenticator()]);
@@ -301,7 +301,7 @@ class EsmtpTransportTest extends TestCase
     public function testRequireTls()
     {
         $stream = new DummyStream();
-        $transport = new EsmtpTransport(stream: $stream);
+        $transport = new EsmtpTransport('localhost', 0, null, null, null, $stream);
         $transport->setRequireTls(true);
 
         $message = new Email();

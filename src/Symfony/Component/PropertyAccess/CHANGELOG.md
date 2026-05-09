@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.1
+---
+
+ * Add `PropertyPath::append()`
+
 7.0
 ---
 

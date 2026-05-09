@@ -100,6 +100,7 @@ final class TranslationPushCommand extends Command
                 This command pushes all translations associated with the <info>messages</> and <info>validators</> domains for the <info>en</> locale.
                 Provider translations for the specified domains and locale are deleted if they're not present locally and overwritten if it's the case.
                 Provider translations for others domains and locales are ignored.
+
                 EOF
             )
         ;
@@ -169,7 +170,7 @@ final class TranslationPushCommand extends Command
         $domains = [];
 
         foreach ($translatorBag->getCatalogues() as $catalogue) {
-            $domains += $catalogue->getDomains();
+            $domains = array_merge($domains, $catalogue->getDomains());
         }
 
         return array_unique($domains);

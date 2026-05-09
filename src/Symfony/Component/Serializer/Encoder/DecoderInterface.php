@@ -21,9 +21,9 @@ interface DecoderInterface
     /**
      * Decodes a string into PHP data.
      *
-     * @param string $data    Data to decode
-     * @param string $format  Format name
-     * @param array  $context Options that decoders have access to
+     * @param string               $data    Data to decode
+     * @param string               $format  Format name
+     * @param array<string, mixed> $context Options that decoders have access to
      *
      * The format parameter specifies which format the data is in; valid values
      * depend on the specific implementation. Authors implementing this interface

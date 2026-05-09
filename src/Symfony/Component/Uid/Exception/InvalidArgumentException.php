@@ -13,4 +13,10 @@ namespace Symfony\Component\Uid\Exception;
 
 class InvalidArgumentException extends \InvalidArgumentException
 {
+    public function __construct(
+        string $message,
+        public readonly mixed $invalidValue = null,
+    ) {
+        parent::__construct($message);
+    }
 }

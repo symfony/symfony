@@ -55,7 +55,7 @@ class TypeTest extends TestCase
         );
         $this->assertEquals(
             [Type::union(Type::int(), Type::string())],
-            iterator_to_array(Type::union(Type::int(), Type::string())->traverse(traverseComposite: false)),
+            iterator_to_array(Type::union(Type::int(), Type::string())->traverse(false)),
         );
 
         $this->assertEquals(
@@ -64,7 +64,7 @@ class TypeTest extends TestCase
         );
         $this->assertEquals(
             [Type::generic(Type::object(\Traversable::class), Type::string())],
-            iterator_to_array(Type::generic(Type::object(\Traversable::class), Type::string())->traverse(traverseWrapped: false)),
+            iterator_to_array(Type::generic(Type::object(\Traversable::class), Type::string())->traverse(true, false)),
         );
 
         $this->assertEquals(
@@ -73,15 +73,15 @@ class TypeTest extends TestCase
         );
         $this->assertEquals(
             [Type::nullable(Type::int()), Type::int()],
-            iterator_to_array(Type::nullable(Type::int())->traverse(traverseComposite: false)),
+            iterator_to_array(Type::nullable(Type::int())->traverse(false)),
         );
         $this->assertEquals(
             [Type::nullable(Type::int()), Type::int(), Type::null()],
-            iterator_to_array(Type::nullable(Type::int())->traverse(traverseWrapped: false)),
+            iterator_to_array(Type::nullable(Type::int())->traverse(true, false)),
         );
         $this->assertEquals(
             [Type::nullable(Type::int())],
-            iterator_to_array(Type::nullable(Type::int())->traverse(traverseComposite: false, traverseWrapped: false)),
+            iterator_to_array(Type::nullable(Type::int())->traverse(false, false)),
         );
     }
 }

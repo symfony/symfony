@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\Exception\InvalidArgumentException;
 use Symfony\Component\Validator\Tests\Fixtures\ClassConstraint;
 use Symfony\Component\Validator\Tests\Fixtures\ConstraintA;
+use Symfony\Component\Validator\Tests\Fixtures\CustomRegex;
 
 class ConstraintTest extends TestCase
 {
@@ -73,5 +74,12 @@ class ConstraintTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         Constraint::getErrorName(1);
+    }
+
+    public function testChildConstraintCanSatisfyRequiredOptionsOfParent()
+    {
+        $constraint = new CustomRegex();
+
+        $this->assertSame('/^xxxxx$/', $constraint->pattern);
     }
 }

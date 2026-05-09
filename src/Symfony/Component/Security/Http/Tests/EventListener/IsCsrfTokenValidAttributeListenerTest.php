@@ -34,7 +34,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
 {
     public function testIsCsrfTokenValidCalledCorrectlyOnInvokableClass()
     {
-        $request = new Request(request: ['_token' => 'bar']);
+        $request = new Request([], ['_token' => 'bar']);
 
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
         $csrfTokenManager->expects($this->once())
@@ -74,7 +74,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
 
     public function testIsCsrfTokenValidCalledCorrectly()
     {
-        $request = new Request(request: ['_token' => 'bar']);
+        $request = new Request([], ['_token' => 'bar']);
 
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
         $csrfTokenManager->expects($this->once())
@@ -96,7 +96,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
 
     public function testIsCsrfTokenValidCalledCorrectlyInPayload()
     {
-        $request = new Request(server: ['CONTENT_TYPE' => 'application/json'], content: json_encode(['_token' => 'bar']));
+        $request = new Request([], [], [], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode(['_token' => 'bar']));
 
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
         $csrfTokenManager->expects($this->once())
@@ -173,9 +173,29 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
         $listener->onKernelControllerAttribute(new ControllerAttributeEvent($attribute, $event));
     }
 
+    public function testNonStringIdThrows()
+    {
+        $event = new ControllerArgumentsEvent(
+            $this->createStub(HttpKernelInterface::class),
+            [new IsCsrfTokenValidAttributeMethodsController(), 'withCustomExpressionId'],
+            ['123'],
+            new Request(request: ['_token' => 'bar']),
+            null
+        );
+
+        $attribute = new IsCsrfTokenValid(static fn () => 42);
+
+        $listener = new IsCsrfTokenValidAttributeListener($this->createStub(CsrfTokenManagerInterface::class));
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('must evaluate to a string, "int" given');
+
+        $listener->onKernelControllerAttribute(new ControllerAttributeEvent($attribute, $event));
+    }
+
     public function testIsCsrfTokenValidCalledCorrectlyWithCustomTokenKey()
     {
-        $request = new Request(request: ['my_token_key' => 'bar']);
+        $request = new Request([], ['my_token_key' => 'bar']);
 
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
         $csrfTokenManager->expects($this->once())
@@ -199,7 +219,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
     {
         $this->expectException(InvalidCsrfTokenException::class);
 
-        $request = new Request(request: ['_token' => 'bar']);
+        $request = new Request([], ['_token' => 'bar']);
 
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
         $csrfTokenManager->expects($this->never())
@@ -239,7 +259,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
 
     public function testIsCsrfTokenValidCalledCorrectlyWithDeleteMethod()
     {
-        $request = new Request(request: ['_token' => 'bar']);
+        $request = new Request([], ['_token' => 'bar']);
         $request->setMethod('DELETE');
 
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
@@ -262,7 +282,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
 
     public function testIsCsrfTokenValidIgnoredWithNonMatchingMethod()
     {
-        $request = new Request(request: ['_token' => 'bar']);
+        $request = new Request([], ['_token' => 'bar']);
         $request->setMethod('POST');
 
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
@@ -283,7 +303,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
 
     public function testIsCsrfTokenValidCalledCorrectlyWithGetOrPostMethodWithGetMethod()
     {
-        $request = new Request(request: ['_token' => 'bar']);
+        $request = new Request([], ['_token' => 'bar']);
         $request->setMethod('GET');
 
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
@@ -306,7 +326,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
 
     public function testIsCsrfTokenValidIgnoredWithGetOrPostMethodWithPutMethod()
     {
-        $request = new Request(request: ['_token' => 'bar']);
+        $request = new Request([], ['_token' => 'bar']);
         $request->setMethod('PUT');
 
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
@@ -329,7 +349,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
     {
         $this->expectException(InvalidCsrfTokenException::class);
 
-        $request = new Request(request: ['_token' => 'bar']);
+        $request = new Request([], ['_token' => 'bar']);
         $request->setMethod('POST');
 
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
@@ -350,7 +370,7 @@ class IsCsrfTokenValidAttributeListenerTest extends TestCase
 
     public function testIsCsrfTokenValidIgnoredWithInvalidTokenKeyAndUnavailableMethod()
     {
-        $request = new Request(request: ['_token' => 'bar']);
+        $request = new Request([], ['_token' => 'bar']);
         $request->setMethod('PUT');
 
         $csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);

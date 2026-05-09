@@ -147,18 +147,68 @@ class ConnectionTest extends TestCase
         $this->assertInstanceOf(Connection::class, new Connection([], $redis));
     }
 
-    public function testKeepGettingPendingMessages()
+    public function testPendingScanAdvancesCursorWithoutDuplicates()
     {
         $redis = $this->createRedisMock();
 
-        $redis->expects($this->exactly(3))->method('xreadgroup')
-            ->with('symfony', 'consumer', ['queue' => 0], 1, 1)
-            ->willReturn(['queue' => [['message' => json_encode(['body' => 'Test', 'headers' => []])]]]);
+        $redis->expects($this->exactly(4))->method('xreadgroup')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    // pending scan from '0': returns first pending message
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], ['queue' => ['100-0' => ['message' => '{"body":"1","headers":[]}']]]],
+                    // pending scan advances cursor past '100-0': returns next pending message
+                    [['symfony', 'consumer', ['queue' => '100-0'], 1, 1], ['queue' => ['200-0' => ['message' => '{"body":"2","headers":[]}']]]],
+                    // pending scan advances cursor past '200-0': no more pending messages
+                    [['symfony', 'consumer', ['queue' => '200-0'], 1, 1], []],
+                    // fallback to new messages: none available
+                    [['symfony', 'consumer', ['queue' => '>'], 1, 1], []],
+                ];
+
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            });
 
         $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
-        $this->assertNotNull($connection->get());
-        $this->assertNotNull($connection->get());
-        $this->assertNotNull($connection->get());
+
+        $msg1 = $connection->get();
+        $this->assertSame('100-0', $msg1[0]['id']);
+
+        $msg2 = $connection->get();
+        $this->assertSame('200-0', $msg2[0]['id']);
+
+        $this->assertNull($connection->get());
+    }
+
+    public function testGetUsesFetchSizeWhenProvided()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->exactly(2))->method('xreadgroup')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    // pending scan from '0' with count=1: no pending messages
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], []],
+                    // new messages with fetchSize=5
+                    [['symfony', 'consumer', ['queue' => '>'], 5, 1], ['queue' => [
+                        '1-0' => ['message' => json_encode(['body' => 'First', 'headers' => []])],
+                        '2-0' => ['message' => json_encode(['body' => 'Second', 'headers' => []])],
+                    ]]],
+                ];
+
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            })
+        ;
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+        $messages = $connection->get(5);
+
+        $this->assertSame('1-0', $messages[0]['id']);
+        $this->assertSame('2-0', $messages[1]['id']);
     }
 
     #[DataProvider('provideAuthDsn')]
@@ -330,15 +380,13 @@ class ConnectionTest extends TestCase
         $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
         $message = $connection->get();
 
+        $this->assertSame(0, $message[0]['id']);
         $this->assertSame([
-            'id' => 0,
-            'data' => [
-                'message' => json_encode([
-                    'body' => '1',
-                    'headers' => [],
-                ]),
-            ],
-        ], $message);
+            'message' => json_encode([
+                'body' => '1',
+                'headers' => [],
+            ]),
+        ], $message[0]['data']);
     }
 
     public function testClaimAbandonedMessageWithRaceCondition()
@@ -498,7 +546,7 @@ class ConnectionTest extends TestCase
         $redis = $this->createRedisMock();
         $redis->expects($this->atLeastOnce())->method($method)->willReturn($return);
 
-        $id = Connection::fromDsn(dsn: 'redis://localhost/queue', redis: $redis)->add('body', [], $delay);
+        $id = Connection::fromDsn('redis://localhost/queue', [], $redis)->add('body', [], $delay);
 
         $this->assertMatchesRegularExpression($expected, $id);
     }
@@ -634,6 +682,230 @@ class ConnectionTest extends TestCase
         $this->expectException(TransportException::class);
         $this->expectExceptionMessage('Redis redeliver_timeout (1000s) cannot be smaller than the keepalive interval (3000s).');
         $connection->keepalive('redisid-123', 3000);
+    }
+
+    public function testSkipAlreadyInflightPendingMessage()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->exactly(5))->method('xreadgroup')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    // get #1: pending scan returns msg-A
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], ['queue' => ['msg-A' => ['message' => '{"body":"1","headers":[]}']]]],
+                    // get #2: pending scan from 'msg-A', no more pending
+                    [['symfony', 'consumer', ['queue' => 'msg-A'], 1, 1], []],
+                    // get #2: claim resets cursor to '0', rescan returns msg-A again — skipped (in-flight)
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], ['queue' => ['msg-A' => ['message' => '{"body":"1","headers":[]}']]]],
+                    // get #2: cursor advances past msg-A, no more pending
+                    [['symfony', 'consumer', ['queue' => 'msg-A'], 1, 1], []],
+                    // get #2: fallback to new messages
+                    [['symfony', 'consumer', ['queue' => '>'], 1, 1], []],
+                ];
+
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            });
+
+        $redis->expects($this->once())->method('xpending')
+            ->willReturn([[0 => 'other-msg', 1 => 'consumer-2', 2 => 3600001]]);
+        $redis->expects($this->once())->method('xclaim')->willReturn([]);
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+
+        $this->assertSame('msg-A', $connection->get()[0]['id']);
+
+        // msg-A is still in-flight, so when the claim resets the cursor and
+        // the rescan encounters msg-A again, it must be skipped
+        $this->assertNull($connection->get());
+    }
+
+    public function testAckRemovesInflightId()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->once())->method('xreadgroup')
+            ->with('symfony', 'consumer', ['queue' => '0'], 1, 1)
+            ->willReturn(['queue' => ['msg-A' => ['message' => '{"body":"1","headers":[]}']]]);
+
+        $redis->expects($this->once())->method('xack')
+            ->with('queue', 'symfony', ['msg-A'])
+            ->willReturn(1);
+        $redis->expects($this->once())->method('xdel')
+            ->with('queue', ['msg-A'])
+            ->willReturn(1);
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+
+        $inflightIds = (new \ReflectionClass(Connection::class))->getProperty('inflightIds');
+
+        $msg = $connection->get();
+        $this->assertSame('msg-A', $msg[0]['id']);
+        $this->assertArrayHasKey('msg-A', $inflightIds->getValue($connection));
+
+        $connection->ack('msg-A');
+        $this->assertEmpty($inflightIds->getValue($connection));
+    }
+
+    public function testRejectRemovesInflightId()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->once())->method('xreadgroup')
+            ->with('symfony', 'consumer', ['queue' => '0'], 1, 1)
+            ->willReturn(['queue' => ['msg-A' => ['message' => '{"body":"1","headers":[]}']]]);
+
+        $redis->expects($this->once())->method('xack')
+            ->with('queue', 'symfony', ['msg-A'])
+            ->willReturn(1);
+        $redis->expects($this->once())->method('xdel')
+            ->with('queue', ['msg-A'])
+            ->willReturn(1);
+
+        $connection = Connection::fromDsn('redis://localhost/queue?delete_after_reject=true', [], $redis);
+
+        $inflightIds = (new \ReflectionClass(Connection::class))->getProperty('inflightIds');
+
+        $msg = $connection->get();
+        $this->assertSame('msg-A', $msg[0]['id']);
+        $this->assertArrayHasKey('msg-A', $inflightIds->getValue($connection));
+
+        $connection->reject('msg-A');
+        $this->assertEmpty($inflightIds->getValue($connection));
+    }
+
+    public function testClaimCanProcessMultipleMessagesWithinOneInterval()
+    {
+        $redis = $this->createRedisMock();
+
+        // Flow:
+        // get() #1: pending '0' → empty, claim finds claim-1, pending '0' → claim-1
+        // ack('claim-1')
+        // get() #2: pending 'claim-1' → empty, claim finds claim-2, pending '0' → claim-2
+        $redis->expects($this->exactly(4))->method('xreadgroup')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], []],
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], ['queue' => ['claim-1' => ['message' => '{"body":"1","headers":[]}']]]],
+                    [['symfony', 'consumer', ['queue' => 'claim-1'], 1, 1], []],
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], ['queue' => ['claim-2' => ['message' => '{"body":"2","headers":[]}']]]],
+                ];
+
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            });
+
+        $redis->expects($this->exactly(2))->method('xpending')
+            ->willReturnOnConsecutiveCalls(
+                [[0 => 'claim-1', 1 => 'consumer-2', 2 => 3600001]],
+                [[0 => 'claim-2', 1 => 'consumer-2', 2 => 3600001]]
+            );
+
+        $redis->expects($this->exactly(2))->method('xclaim')
+            ->willReturn([]);
+
+        $redis->expects($this->once())->method('xack')
+            ->with('queue', 'symfony', ['claim-1'])
+            ->willReturn(1);
+        $redis->expects($this->once())->method('xdel')
+            ->with('queue', ['claim-1'])
+            ->willReturn(1);
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+
+        $msg1 = $connection->get();
+        $this->assertSame('claim-1', $msg1[0]['id']);
+
+        $connection->ack('claim-1');
+
+        $msg2 = $connection->get();
+        $this->assertSame('claim-2', $msg2[0]['id']);
+    }
+
+    public function testClaimIntervalAdvancedOnlyWhenNoClaimableMessages()
+    {
+        $redis = $this->createRedisMock();
+
+        $redis->expects($this->exactly(4))->method('xreadgroup')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], []],
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], ['queue' => ['msg-A' => ['message' => '{"body":"1","headers":[]}']]]],
+                    [['symfony', 'consumer', ['queue' => 'msg-A'], 1, 1], []],
+                    [['symfony', 'consumer', ['queue' => '>'], 1, 1], []],
+                ];
+
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            });
+
+        $redis->expects($this->exactly(2))->method('xpending')
+            ->willReturnOnConsecutiveCalls(
+                [[0 => 'msg-A', 1 => 'consumer-2', 2 => 3600001]],
+                []
+            );
+
+        $redis->expects($this->once())->method('xclaim')->willReturn([]);
+        $redis->expects($this->once())->method('xack')->willReturn(1);
+        $redis->expects($this->once())->method('xdel')->willReturn(1);
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+
+        $nextClaimProp = (new \ReflectionClass(Connection::class))->getProperty('nextClaim');
+
+        $this->assertSame(0.0, $nextClaimProp->getValue($connection));
+
+        $msg = $connection->get();
+        $this->assertSame('msg-A', $msg[0]['id']);
+        $this->assertSame(0.0, $nextClaimProp->getValue($connection));
+
+        $connection->ack('msg-A');
+
+        $this->assertNull($connection->get());
+        $this->assertGreaterThan(0.0, $nextClaimProp->getValue($connection));
+    }
+
+    public function testClaimAdvancesIntervalWhenOldestPendingBelongsToOwnConsumer()
+    {
+        $redis = $this->createRedisMock();
+
+        // get #1: pending scan from '0' returns msg-A
+        // get #2: pending scan from 'msg-A' → empty (cursor exhausted)
+        //         claim: xpending returns msg-A owned by OUR consumer → should advance nextClaim, NOT rescan
+        //         fallback to new messages: none
+        $redis->expects($this->exactly(3))->method('xreadgroup')
+            ->willReturnCallback(function (...$args) {
+                static $series = [
+                    [['symfony', 'consumer', ['queue' => '0'], 1, 1], ['queue' => ['msg-A' => ['message' => '{"body":"1","headers":[]}']]]],
+                    [['symfony', 'consumer', ['queue' => 'msg-A'], 1, 1], []],
+                    [['symfony', 'consumer', ['queue' => '>'], 1, 1], []],
+                ];
+
+                [$expectedArgs, $return] = array_shift($series);
+                $this->assertSame($expectedArgs, $args);
+
+                return $return;
+            });
+
+        $redis->expects($this->once())->method('xpending')
+            ->willReturn([[0 => 'msg-A', 1 => 'consumer', 2 => 100]]);
+
+        $connection = Connection::fromDsn('redis://localhost/queue', [], $redis);
+
+        $nextClaimProp = (new \ReflectionClass(Connection::class))->getProperty('nextClaim');
+
+        $msg = $connection->get();
+        $this->assertSame('msg-A', $msg[0]['id']);
+        $this->assertSame(0.0, $nextClaimProp->getValue($connection));
+
+        $this->assertNull($connection->get());
+        $this->assertGreaterThan(0.0, $nextClaimProp->getValue($connection));
     }
 
     private function createRedisMock(): MockObject&\Redis

@@ -12,14 +12,19 @@
 namespace Symfony\Component\JsonStreamer\ValueTransformer;
 
 use Symfony\Component\JsonStreamer\Exception\InvalidArgumentException;
+use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\Type\BuiltinType;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+
+trigger_deprecation('symfony/json-streamer', '8.1', 'The "%s" class is deprecated. Date times will be transformed thanks to "%s" instead.', DateTimeToStringValueTransformer::class, DateTimeValueObjectTransformer::class);
 
 /**
  * Transforms DateTimeInterface to string during stream writing.
  *
  * @author Mathias Arlaud <mathias.arlaud@gmail.com>
+ *
+ * @deprecated since Symfony 8.1, date times will be transformed thanks to DateTimeValueObjectTransformer instead
  */
 final class DateTimeToStringValueTransformer implements ValueTransformerInterface
 {

@@ -21,7 +21,7 @@
     </div>
 
         <div id="content">
-            <div id="main">
+            <main id="main">
                 <div id="sidebar">
                     {% block sidebar %}
                         <div id="sidebar-contents">
@@ -53,7 +53,7 @@
                                         {%- endset %}
                                         {% if menu is not empty %}
                                             <li class="{{ name }} {{ name == panel ? 'selected' }}">
-                                                <a href="{{ path('_profiler', {token: token, panel: name, type: profile_type}) }}">{{ menu|raw }}</a>
+                                                <a href="{{ path('_profiler', {token: token, panel: name, type: profile_type}) }}"{{ name == panel ? ' aria-current="page"' }}>{{ menu|raw }}</a>
                                             </li>
                                         {% endif %}
                                     {% endfor %}
@@ -72,7 +72,7 @@
                         {% block panel '' %}
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
     </div>
 {% endblock %}

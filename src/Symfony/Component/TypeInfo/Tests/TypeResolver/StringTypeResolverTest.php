@@ -18,6 +18,7 @@ use Symfony\Component\TypeInfo\Exception\UnsupportedException;
 use Symfony\Component\TypeInfo\Tests\Fixtures\AbstractDummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\Dummy;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyBackedEnum;
+use Symfony\Component\TypeInfo\Tests\Fixtures\DummyBackedEnumInterface;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyCollection;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyEnum;
 use Symfony\Component\TypeInfo\Tests\Fixtures\DummyWithConstants;
@@ -86,7 +87,8 @@ class StringTypeResolverTest extends TestCase
         yield [Type::array(Type::template('TValue', Type::mixed()), Type::template('TKey', Type::union(Type::int(), Type::string()))), 'array<TKey, TValue>', $typeContextFactory->createFromClassName(DummyCollection::class)];
         yield [Type::array(Type::template('TValue', Type::mixed()), Type::arrayKey()), 'array<array-key, TValue>', $typeContextFactory->createFromClassName(DummyCollection::class)];
         yield [Type::array(Type::bool(), Type::union(Type::template('TFoo', Type::int()), Type::template('TBar', Type::string()))), 'array<TFoo|TBar, bool>', $typeContextFactory->createFromClassName($dummyTemplateKeyUnion::class)];
-        yield [Type::array(Type::bool(), Type::arrayKey()), 'array<'.DummyWithConstants::class.'::DUMMY_STRING_A|'.DummyWithConstants::class.'::DUMMY_INT_A, bool>', $typeContextFactory->createFromClassName(DummyWithConstants::class)];
+        // explicitly test both with fully qualified class name and with imported short class name
+        yield [Type::array(Type::bool(), Type::arrayKey()), 'array<\\'.DummyWithConstants::class.'::DUMMY_STRING_A|DummyWithConstants::DUMMY_INT_A, bool>', $typeContextFactory->createFromClassName(DummyWithConstants::class)];
 
         // list
         yield [Type::list(Type::bool()), 'list<bool>'];
@@ -123,6 +125,7 @@ class StringTypeResolverTest extends TestCase
         // const fetch
         yield [Type::string(), DummyWithConstants::class.'::DUMMY_STRING_*'];
         yield [Type::string(), DummyWithConstants::class.'::DUMMY_STRING_A'];
+        yield [Type::string(), 'DummyWithConstants::DUMMY_STRING_A', $typeContextFactory->createFromClassName(DummyWithConstants::class)];
         yield [Type::int(), DummyWithConstants::class.'::DUMMY_INT_*'];
         yield [Type::int(), DummyWithConstants::class.'::DUMMY_INT_A'];
         yield [Type::float(), DummyWithConstants::class.'::DUMMY_FLOAT_*'];
@@ -185,6 +188,7 @@ class StringTypeResolverTest extends TestCase
         yield [Type::object(Dummy::class), 'Dummy', $typeContextFactory->createFromClassName(Dummy::class)];
         yield [Type::enum(DummyEnum::class), 'DummyEnum', $typeContextFactory->createFromClassName(DummyEnum::class)];
         yield [Type::enum(DummyBackedEnum::class), 'DummyBackedEnum', $typeContextFactory->createFromClassName(DummyBackedEnum::class)];
+        yield [Type::object(DummyBackedEnumInterface::class), 'DummyBackedEnumInterface', $typeContextFactory->createFromClassName(DummyBackedEnumInterface::class)];
         yield [Type::template('T', Type::union(Type::int(), Type::string())), 'T', $typeContextFactory->createFromClassName(DummyWithTemplates::class)];
         yield [Type::template('V'), 'V', $typeContextFactory->createFromReflection(new \ReflectionMethod(DummyWithTemplates::class, 'getPrice'))];
 

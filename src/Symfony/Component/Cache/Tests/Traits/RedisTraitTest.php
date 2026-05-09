@@ -338,5 +338,4 @@ class RedisTraitTest extends TestCase
 
         return $predisClass::class;
     }
-
 }

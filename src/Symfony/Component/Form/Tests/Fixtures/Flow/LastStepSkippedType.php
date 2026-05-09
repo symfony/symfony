@@ -11,6 +11,7 @@
 
 namespace Symfony\Component\Form\Tests\Fixtures\Flow;
 
+use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Flow\AbstractFlowType;
 use Symfony\Component\Form\Flow\FormFlowBuilderInterface;
@@ -22,7 +23,7 @@ class LastStepSkippedType extends AbstractFlowType
     public function buildFormFlow(FormFlowBuilderInterface $builder, array $options): void
     {
         $builder->addStep('step1', TextType::class);
-        $builder->addStep('step2', skip: static fn () => true);
+        $builder->addStep('step2', FormType::class, [], static fn () => true);
 
         $builder->add('navigator', NavigatorFlowType::class, [
             'with_reset' => true,

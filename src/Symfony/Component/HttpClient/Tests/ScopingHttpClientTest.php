@@ -105,16 +105,16 @@ class ScopingHttpClientTest extends TestCase
     public function testRetryableHttpClientIntegration()
     {
         $responses = [
-            new MockResponse(info: ['http_code' => 503]),
-            new MockResponse(info: ['http_code' => 503]),
-            new MockResponse(info: ['http_code' => 503]),
+            new MockResponse('', ['http_code' => 503]),
+            new MockResponse('', ['http_code' => 503]),
+            new MockResponse('', ['http_code' => 503]),
             new MockResponse(),
         ];
 
         $client = ScopingHttpClient::forBaseUri(
             new RetryableHttpClient(
                 new MockHttpClient($responses),
-                new GenericRetryStrategy(delayMs: 0)
+                new GenericRetryStrategy(GenericRetryStrategy::DEFAULT_RETRY_STATUS_CODES, 0)
             ),
             'https://foo.example.com/app/',
         );

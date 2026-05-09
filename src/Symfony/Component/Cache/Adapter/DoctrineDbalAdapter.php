@@ -38,6 +38,8 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
 {
     private const MAX_KEY_LENGTH = 255;
 
+    private static int $savepointCounter = 0;
+
     private MarshallerInterface $marshaller;
     private Connection $conn;
     private string $platformName;
@@ -70,6 +72,10 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         array $options = [],
         ?MarshallerInterface $marshaller = null,
     ) {
+        if (!class_exists(PrimaryKeyConstraint::class)) {
+            throw new \LogicException(\sprintf('Using "%s" requires "doctrine/dbal" 4.3 or higher; try running "composer require doctrine/dbal:^4.3".', __CLASS__));
+        }
+
         if (isset($namespace[0]) && preg_match('#[^-+.A-Za-z0-9]#', $namespace, $match)) {
             throw new InvalidArgumentException(\sprintf('Namespace contains "%s" but only characters in [-+.A-Za-z0-9] are allowed.', $match[0]));
         }
@@ -127,6 +133,9 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
         }
     }
 
+    /**
+     * @param-immediately-invoked-callable $isSameDatabase
+     */
     public function configureSchema(Schema $schema, Connection $forConnection, \Closure $isSameDatabase): void
     {
         if ($schema->hasTable($this->table)) {
@@ -241,6 +250,26 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             return $failed;
         }
 
+        if ($this->conn->isTransactionActive() && $this->conn->getDatabasePlatform()->supportsSavepoints()) {
+            $savepoint = 'cache_save_'.++self::$savepointCounter;
+            try {
+                $this->conn->createSavepoint($savepoint);
+                $failed = $this->doSaveInner($values, $lifetime, $failed);
+                $this->conn->releaseSavepoint($savepoint);
+
+                return $failed;
+            } catch (\Throwable $e) {
+                $this->conn->rollbackSavepoint($savepoint);
+
+                throw $e;
+            }
+        }
+
+        return $this->doSaveInner($values, $lifetime, $failed);
+    }
+
+    private function doSaveInner(array $values, int $lifetime, array $failed): array|bool
+    {
         $platformName = $this->getPlatformName();
         $insertSql = "INSERT INTO $this->table ($this->idCol, $this->dataCol, $this->lifetimeCol, $this->timeCol) VALUES (?, ?, ?, ?)";
 

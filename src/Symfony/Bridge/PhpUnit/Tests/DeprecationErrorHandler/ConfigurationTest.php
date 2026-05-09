@@ -19,7 +19,7 @@ use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\Deprecation;
 use Symfony\Bridge\PhpUnit\DeprecationErrorHandler\DeprecationGroup;
 use Symfony\Component\ErrorHandler\DebugClassLoader;
 
-#[RequiresPhpunit('<10')]
+#[RequiresPhpunit('<10.0.0')]
 class ConfigurationTest extends TestCase
 {
     private $files;

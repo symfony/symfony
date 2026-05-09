@@ -38,6 +38,9 @@ abstract class AbstractChoiceLoader implements ChoiceLoaderInterface
         return $this->doLoadChoicesForValues($values, $value);
     }
 
+    /**
+     * @param-immediately-invoked-callable $value
+     */
     public function loadValuesForChoices(array $choices, ?callable $value = null): array
     {
         if (!$choices) {

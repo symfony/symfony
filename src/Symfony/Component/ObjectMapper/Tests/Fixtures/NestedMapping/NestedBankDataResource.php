@@ -18,4 +18,3 @@ class NestedBankDataResource
     public string $bankCode;
     public string $bankName;
 }
-

@@ -4,7 +4,9 @@ CHANGELOG
 8.1
 ---
 
+ * Add `Uuid47Transformer` to convert between UUIDv7 and UUIDv4 using SipHash-2-4 timestamp masking
  * Add argument `$format` to `Ulid::isValid()`
+ * Add `$invalidValue` property to `InvalidArgumentException` thrown by UID classes
 
 8.0
 ---

@@ -42,6 +42,9 @@ class FileProfilerStorage implements ProfilerStorageInterface
         }
     }
 
+    /**
+     * @param-immediately-invoked-callable $filter
+     */
     public function find(?string $ip, ?string $url, ?int $limit, ?string $method, ?int $start = null, ?int $end = null, ?string $statusCode = null, ?\Closure $filter = null): array
     {
         $file = $this->getIndexFilename();

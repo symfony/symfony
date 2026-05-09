@@ -210,13 +210,8 @@ class DoctrinePingConnectionMiddlewareTest extends MiddlewareTestCase
 
         $registry = $withExpectations ? $this->createMock(ManagerRegistry::class) : $this->createStub(ManagerRegistry::class);
 
-        if ($withExpectations) {
-            $registry->expects($this->any())->method('getManagerNames')->willReturn(array_combine(array_keys($managers), array_keys($managers)));
-            $registry->expects($this->any())->method('getManager')->willReturnCallback(static fn (?string $name): ?EntityManagerInterface => $managers[$name ?? $defaultName] ?? null);
-        } else {
-            $registry->method('getManagerNames')->willReturn(array_combine(array_keys($managers), array_keys($managers)));
-            $registry->method('getManager')->willReturnCallback(static fn (?string $name): ?EntityManagerInterface => $managers[$name ?? $defaultName] ?? null);
-        }
+        $registry->method('getManagerNames')->willReturn(array_combine(array_keys($managers), array_keys($managers)));
+        $registry->method('getManager')->willReturnCallback(static fn (?string $name): ?EntityManagerInterface => $managers[$name ?? $defaultName] ?? null);
 
         return $registry;
     }

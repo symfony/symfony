@@ -189,7 +189,7 @@ class ParameterBagTest extends TestCase
         $bag = new ParameterBag(['digits' => ['123']]);
 
         $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('Parameter value "digits" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
+        $this->expectExceptionMessage('Parameter value "digits" cannot be converted to "int".');
 
         $bag->getInt('digits');
     }
@@ -199,7 +199,7 @@ class ParameterBagTest extends TestCase
         $bag = new ParameterBag(['word' => 'foo_BAR_012']);
 
         $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('Parameter value "word" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
+        $this->expectExceptionMessage('Parameter value "word" cannot be converted to "int".');
 
         $bag->getInt('word');
     }
@@ -332,7 +332,7 @@ class ParameterBagTest extends TestCase
         $bag = new ParameterBag(['invalid' => 'foo']);
 
         $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('Parameter value "invalid" is invalid and flag "FILTER_NULL_ON_FAILURE" was not set.');
+        $this->expectExceptionMessage('Parameter value "invalid" cannot be converted to "bool".');
 
         $bag->getBoolean('invalid');
     }

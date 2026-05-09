@@ -41,6 +41,7 @@ class MapQueryString extends ValueResolver
         string $resolver = RequestPayloadValueResolver::class,
         public readonly int $validationFailedStatusCode = Response::HTTP_NOT_FOUND,
         public readonly ?string $key = null,
+        public bool $mapWhenEmpty = false,
     ) {
         parent::__construct($resolver);
     }

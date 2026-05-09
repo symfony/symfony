@@ -32,6 +32,10 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('webhook.headers_configurator', HeadersConfigurator::class)
+            ->args([
+                abstract_arg('event header name'),
+                abstract_arg('id header name'),
+            ])
 
         ->set('webhook.body_configurator.json', JsonBodyConfigurator::class)
             ->args([
@@ -46,6 +50,10 @@ return static function (ContainerConfigurator $container) {
             ])
 
         ->set('webhook.signer', HeaderSignatureConfigurator::class)
+            ->args([
+                abstract_arg('signing algorithm'),
+                abstract_arg('signature header name'),
+            ])
 
         ->set('webhook.messenger.send_handler', SendWebhookHandler::class)
             ->args([

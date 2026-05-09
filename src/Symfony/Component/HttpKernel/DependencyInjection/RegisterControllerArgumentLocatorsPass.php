@@ -167,6 +167,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
                     }
 
                     if ($autowireAttributes) {
+                        $invalidBehavior = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
                         $attribute = $autowireAttributes[0]->newInstance();
                         $value = $parameterBag->resolveValue($attribute->value);
 

@@ -31,14 +31,14 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
     public function testNullIsValid()
     {
-        $this->validator->validate(null, new Timezone());
+        $this->validate(null, new Timezone());
 
         $this->assertNoViolation();
     }
 
     public function testEmptyStringIsValid()
     {
-        $this->validator->validate('', new Timezone());
+        $this->validate('', new Timezone());
 
         $this->assertNoViolation();
     }
@@ -46,13 +46,13 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     public function testExpectsStringCompatibleType()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->validator->validate(new \stdClass(), new Timezone());
+        $this->validate(new \stdClass(), new Timezone());
     }
 
     #[DataProvider('getValidTimezones')]
     public function testValidTimezones(string $timezone)
     {
-        $this->validator->validate($timezone, new Timezone());
+        $this->validate($timezone, new Timezone());
 
         $this->assertNoViolation();
     }
@@ -92,7 +92,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Timezone(zone: $zone);
 
-        $this->validator->validate($timezone, $constraint);
+        $this->validate($timezone, $constraint);
 
         $this->assertNoViolation();
     }
@@ -121,7 +121,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Timezone(message: 'myMessage');
 
-        $this->validator->validate($timezone, $constraint);
+        $this->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', \sprintf('"%s"', $timezone))
@@ -145,7 +145,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
             message: 'myMessage',
         );
 
-        $this->validator->validate($timezone, $constraint);
+        $this->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', \sprintf('"%s"', $timezone))
@@ -170,7 +170,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Timezone(zone: \DateTimeZone::AMERICA, message: 'myMessage');
 
-        $this->validator->validate('Europe/Berlin', $constraint);
+        $this->validate('Europe/Berlin', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"Europe/Berlin"')
@@ -186,7 +186,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
             countryCode: $country,
         );
 
-        $this->validator->validate($timezone, $constraint);
+        $this->validate($timezone, $constraint);
 
         $this->assertNoViolation();
     }
@@ -222,7 +222,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
             countryCode: $countryCode,
         );
 
-        $this->validator->validate($timezone, $constraint);
+        $this->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', \sprintf('"%s"', $timezone))
@@ -247,7 +247,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
             countryCode: 'foobar',
         );
 
-        $this->validator->validate('Europe/Amsterdam', $constraint);
+        $this->validate('Europe/Amsterdam', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"Europe/Amsterdam"')
@@ -265,7 +265,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
 
         $constraint = new Timezone(\DateTimeZone::ALL_WITH_BC);
 
-        $this->validator->validate($timezone, $constraint);
+        $this->validate($timezone, $constraint);
 
         $this->assertNoViolation();
     }
@@ -275,7 +275,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
     {
         $constraint = new Timezone(message: 'myMessage');
 
-        $this->validator->validate($timezone, $constraint);
+        $this->validate($timezone, $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', \sprintf('"%s"', $timezone))
@@ -320,7 +320,7 @@ class TimezoneValidatorTest extends ConstraintValidatorTestCase
             intlCompatible: true,
         );
 
-        $this->validator->validate('Europe/Saratov', $constraint);
+        $this->validate('Europe/Saratov', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ value }}', '"Europe/Saratov"')

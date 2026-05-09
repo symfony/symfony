@@ -41,7 +41,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable, HashableIn
     public static function fromBinary(string $uid): static
     {
         if (16 !== \strlen($uid)) {
-            throw new InvalidArgumentException('Invalid binary uid provided.');
+            throw new InvalidArgumentException('Invalid binary uid provided.', $uid);
         }
 
         return static::fromString($uid);
@@ -53,7 +53,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable, HashableIn
     public static function fromBase58(string $uid): static
     {
         if (22 !== \strlen($uid)) {
-            throw new InvalidArgumentException('Invalid base-58 uid provided.');
+            throw new InvalidArgumentException('Invalid base-58 uid provided.', $uid);
         }
 
         return static::fromString($uid);
@@ -65,7 +65,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable, HashableIn
     public static function fromBase32(string $uid): static
     {
         if (26 !== \strlen($uid)) {
-            throw new InvalidArgumentException('Invalid base-32 uid provided.');
+            throw new InvalidArgumentException('Invalid base-32 uid provided.', $uid);
         }
 
         return static::fromString($uid);
@@ -79,7 +79,7 @@ abstract class AbstractUid implements \JsonSerializable, \Stringable, HashableIn
     public static function fromRfc4122(string $uid): static
     {
         if (36 !== \strlen($uid)) {
-            throw new InvalidArgumentException('Invalid RFC4122 uid provided.');
+            throw new InvalidArgumentException('Invalid RFC4122 uid provided.', $uid);
         }
 
         return static::fromString($uid);

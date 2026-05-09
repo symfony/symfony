@@ -11,24 +11,34 @@
 
 namespace Symfony\Component\ObjectMapper\Condition;
 
-use Symfony\Component\ObjectMapper\ConditionCallableInterface;
-
 /**
  * @template T of object
  *
- * @implements ConditionCallableInterface<object, T>
+ * @implements ClassRuleConditionCallableInterface<object, T>
  */
-final class TargetClass implements ConditionCallableInterface
+final class TargetClass implements ClassRuleConditionCallableInterface
 {
     /**
-     * @param class-string<T> $className
+     * @var non-empty-array<class-string>
      */
-    public function __construct(private readonly string $className)
+    private readonly array $targets;
+
+    /**
+     * @param class-string<T>|array<class-string<T>> $className
+     */
+    public function __construct(string|array $className)
     {
+        $this->targets = \is_array($className) ? $className : [$className];
     }
 
     public function __invoke(mixed $value, object $source, ?object $target): bool
     {
-        return $target instanceof $this->className;
+        foreach ($this->targets as $validTarget) {
+            if ($target instanceof $validTarget) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

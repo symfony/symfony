@@ -67,6 +67,22 @@ class AdapterTest extends LdapTestCase
         $ldap->getConnection()->whoami();
     }
 
+    public function testResetClearsConnectionAndEntryManager()
+    {
+        $adapter = new Adapter();
+
+        $connection1 = $adapter->getConnection();
+        $entryManager1 = $adapter->getEntryManager();
+
+        $adapter->reset();
+
+        $connection2 = $adapter->getConnection();
+        $entryManager2 = $adapter->getEntryManager();
+
+        $this->assertNotSame($connection1, $connection2);
+        $this->assertNotSame($entryManager1, $entryManager2);
+    }
+
     #[Group('functional')]
     public function testLdapQuery()
     {

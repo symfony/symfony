@@ -74,9 +74,6 @@ final class DataCollectorTranslator implements TranslatorInterface, TranslatorBa
         return [];
     }
 
-    /**
-     * Gets the fallback locales.
-     */
     public function getFallbackLocales(): array
     {
         if ($this->translator instanceof Translator || method_exists($this->translator, 'getFallbackLocales')) {

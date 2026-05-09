@@ -29,9 +29,13 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\B;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\C;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Cost;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceAndAutoMappedView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\CostRequestWithSourceView;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\Quote;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassMap\QuoteRequestView;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassRule\A as ClassRuleA;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassRule\B as ClassRuleB;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassRule\C as ClassRuleC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ClassWithoutTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ConditionalConstructorArgument\InputSource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\ConditionalSourceMap\Address as ConditionalSourceMapAddress;
@@ -63,6 +67,10 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\InstanceCallback\B as Instance
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InstanceCallbackWithArguments\A as InstanceCallbackWithArgumentsA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InstanceCallbackWithArguments\B as InstanceCallbackWithArgumentsB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\InvalidConfiguration;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\IsNotNullCondition\IsNotNullSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\IsNotNullCondition\IsNotNullSourceMapping;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\IsNotNullCondition\IsNotNullTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\IsNotNullCondition\IsNotNullTargetMapping;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\LazyFoo;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\AToBMapper;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\MapStructMapperMetadataFactory;
@@ -70,6 +78,9 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Source;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapStruct\Target;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapTargetToSource\A as MapTargetToSourceA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MapTargetToSource\B as MapTargetToSourceB;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleSourceProperty\A as MultipleSourcePropertyA;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleSourceProperty\B as MultipleSourcePropertyB;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleSourceProperty\C as MultipleSourcePropertyC;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\A as MultipleTargetPropertyA;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\B as MultipleTargetPropertyB;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\MultipleTargetProperty\C as MultipleTargetPropertyC;
@@ -83,6 +94,10 @@ use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedCollectionMapping\OrderT
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMapping\NestedBankDataDto;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMapping\NestedBankDataResource;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMapping\NestedBankDto;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransformer\ChildWithClassTransformTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransformer\ChildWithoutClassTransformerTarget;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransformer\ParentSource;
+use Symfony\Component\ObjectMapper\Tests\Fixtures\NestedMappingWithClassTransformer\ParentTarget;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PartialInput\FinalInput;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PartialInput\PartialInput;
 use Symfony\Component\ObjectMapper\Tests\Fixtures\PromotedConstructor\Source as PromotedConstructorSource;
@@ -212,7 +227,7 @@ final class ObjectMapperTest extends TestCase
     public function testMapWithInitializedConstructor()
     {
         $a = new InitializedConstructorA();
-        $mapper = new ObjectMapper(propertyAccessor: PropertyAccess::createPropertyAccessor());
+        $mapper = new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), PropertyAccess::createPropertyAccessor());
         $b = $mapper->map($a, InitializedConstructorB::class);
         $this->assertInstanceOf(InitializedConstructorB::class, $b);
         $this->assertEquals($b->tags, ['foo', 'bar']);
@@ -222,7 +237,7 @@ final class ObjectMapperTest extends TestCase
     {
         $expected = 'bar';
 
-        $mapper = new ObjectMapper(propertyAccessor: PropertyAccess::createPropertyAccessor());
+        $mapper = new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), PropertyAccess::createPropertyAccessor());
 
         $source = new \stdClass();
         $source->bar = $expected;
@@ -237,7 +252,7 @@ final class ObjectMapperTest extends TestCase
     {
         $expected = 'bar';
 
-        $mapper = new ObjectMapper(propertyAccessor: PropertyAccess::createPropertyAccessor());
+        $mapper = new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), PropertyAccess::createPropertyAccessor());
 
         $source = new \stdClass();
         $source->bar = $expected;
@@ -370,8 +385,8 @@ final class ObjectMapperTest extends TestCase
         $u = new \stdClass();
         $u->foo = 'bar';
 
-        $metadata = $this->createMock(ObjectMapperMetadataFactoryInterface::class);
-        $metadata->method('create')->with($u)->willReturn([new Mapping(target: \stdClass::class, transform: new TransformToString())]);
+        $metadata = $this->createStub(ObjectMapperMetadataFactoryInterface::class);
+        $metadata->method('create')->willReturn([new Mapping(target: \stdClass::class, transform: new TransformToString())]);
         $mapper = new ObjectMapper($metadata);
         $mapper->map($u);
     }
@@ -392,8 +407,8 @@ final class ObjectMapperTest extends TestCase
         $u = new \stdClass();
         $u->foo = 'bar';
 
-        $metadata = $this->createMock(ObjectMapperMetadataFactoryInterface::class);
-        $metadata->method('create')->with($u)->willReturn([new Mapping(target: ClassWithoutTarget::class, transform: new TransformToStdClass())]);
+        $metadata = $this->createStub(ObjectMapperMetadataFactoryInterface::class);
+        $metadata->method('create')->willReturn([new Mapping(target: ClassWithoutTarget::class, transform: new TransformToStdClass())]);
         $mapper = new ObjectMapper($metadata);
         $mapper->map($u);
     }
@@ -415,11 +430,61 @@ final class ObjectMapperTest extends TestCase
         $b = $mapper->map($u, MultipleTargetPropertyB::class);
         $this->assertInstanceOf(MultipleTargetPropertyB::class, $b);
         $this->assertEquals('TEST', $b->foo);
+        $this->assertEquals('testother', $b->otherFoo);
+
         $c = $mapper->map($u, MultipleTargetPropertyC::class);
         $this->assertInstanceOf(MultipleTargetPropertyC::class, $c);
         $this->assertEquals('test', $c->bar);
         $this->assertEquals('donotmap', $c->foo);
+        $this->assertEquals('testother', $c->otherFoo);
         $this->assertEquals('foo', $c->doesNotExistInTargetB);
+    }
+
+    public function testMultipleSourceMapProperty()
+    {
+        $b = new MultipleSourcePropertyB();
+        $c = new MultipleSourcePropertyC();
+        $mapper = new ObjectMapper();
+
+        $a1 = $mapper->map($b, MultipleSourcePropertyA::class);
+        $this->assertInstanceOf(MultipleSourcePropertyA::class, $a1);
+        $this->assertEquals('test', $a1->something);
+        $this->assertEquals('TEST', $a1->somethingOther);
+
+        $a2 = $mapper->map($c, MultipleSourcePropertyA::class);
+        $this->assertInstanceOf(MultipleSourcePropertyA::class, $a2);
+        $this->assertEquals('TEST', $a2->something);
+        $this->assertEquals('DONOTMAP', $a2->somethingOther);
+        $this->assertEquals('foo', $a2->doesNotExistInSourceB);
+    }
+
+    public function testMultipleClassRuleMapProperty()
+    {
+        $a = new ClassRuleA();
+
+        $mapper = new ObjectMapper();
+        $b = $mapper->map($a, ClassRuleB::class);
+        $this->assertInstanceOf(ClassRuleB::class, $b);
+        $this->assertEquals('TESTTARGETED', $b->foo);
+
+        $c = $mapper->map($a, ClassRuleC::class);
+        $this->assertInstanceOf(ClassRuleC::class, $c);
+        $this->assertEquals('testTargeted', $c->bar);
+        $this->assertEquals('donotmap', $c->foo);
+
+        $b = new ClassRuleB();
+        $c = new ClassRuleC();
+        $mapper = new ObjectMapper();
+
+        $a1 = $mapper->map($b, ClassRuleA::class);
+        $this->assertInstanceOf(ClassRuleA::class, $a1);
+        $this->assertEquals('testsourced', $a1->somethingSourced);
+        $this->assertEquals('testTargeted', $a1->somethingTargeted);
+
+        $a2 = $mapper->map($c, ClassRuleA::class);
+        $this->assertInstanceOf(ClassRuleA::class, $a2);
+        $this->assertEquals('TESTSOURCED', $a2->somethingSourced);
+        $this->assertEquals('testTargeted', $a2->somethingTargeted);
     }
 
     public function testDefaultValueStdClass()
@@ -435,7 +500,7 @@ final class ObjectMapperTest extends TestCase
     {
         $u = new \stdClass();
         $u->id = 'abc';
-        $mapper = new ObjectMapper(propertyAccessor: PropertyAccess::createPropertyAccessorBuilder()->disableExceptionOnInvalidPropertyPath()->getPropertyAccessor());
+        $mapper = new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), PropertyAccess::createPropertyAccessorBuilder()->disableExceptionOnInvalidPropertyPath()->getPropertyAccessor());
         $b = $mapper->map($u, TargetDto::class);
         $this->assertInstanceOf(TargetDto::class, $b);
         $this->assertSame('abc', $b->id);
@@ -673,7 +738,7 @@ final class ObjectMapperTest extends TestCase
             name: 'John Doe'
         );
 
-        $mapper = new ObjectMapper(propertyAccessor: PropertyAccess::createPropertyAccessor());
+        $mapper = new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), PropertyAccess::createPropertyAccessor());
         $user = $mapper->map($dto, UserEmbeddedMapping::class);
 
         $this->assertInstanceOf(UserEmbeddedMapping::class, $user);
@@ -691,7 +756,7 @@ final class ObjectMapperTest extends TestCase
             name: 'John Doe'
         );
 
-        $mapper = new ObjectMapper(propertyAccessor: PropertyAccess::createPropertyAccessor());
+        $mapper = new ObjectMapper(new ReflectionObjectMapperMetadataFactory(), PropertyAccess::createPropertyAccessor());
         $mappedUser = $mapper->map($dto, ConditionalSourceMapUser::class);
         $reverseMappedUserDTO = $mapper->map($mappedUser, $dto);
 
@@ -761,6 +826,24 @@ final class ObjectMapperTest extends TestCase
         $this->assertEquals('bar', $costRequestView->foo);
     }
 
+    public function testClassMapWithSourceAttributeDoesNotBreakAutoMapping()
+    {
+        $classMap = [
+            Cost::class => CostRequestWithSourceAndAutoMappedView::class,
+        ];
+
+        $cost = new Cost(10, 20, 'bar');
+
+        $mapper = new ObjectMapper(new ReverseClassObjectMapperMetadataFactory(new ReflectionObjectMapperMetadataFactory(), $classMap));
+
+        $costRequestView = $mapper->map($cost);
+
+        $this->assertInstanceOf(CostRequestWithSourceAndAutoMappedView::class, $costRequestView);
+        $this->assertEquals('bar', $costRequestView->foo, 'Explicit mapping should work');
+        $this->assertEquals(10, $costRequestView->amount, 'Auto-mapping should also work for properties with the same name');
+        $this->assertEquals(20, $costRequestView->tax);
+    }
+
     public function testMissingSourcePropertiesAreIgnored()
     {
         $mapper = new ObjectMapper();
@@ -825,5 +908,101 @@ final class ObjectMapperTest extends TestCase
         $this->assertSame('BIC123', $bankDataResource->bic);
         $this->assertSame('BANK001', $bankDataResource->bankCode);
         $this->assertSame('Test Bank', $bankDataResource->bankName);
+    }
+
+    public function testNestedMappingWithClassTransform()
+    {
+        $target = (new ObjectMapper())->map(new ParentSource());
+
+        $this->assertInstanceOf(ParentTarget::class, $target);
+        $this->assertTrue($target->transformed);
+        $this->assertInstanceOf(ChildWithClassTransformTarget::class, $target->childWithClassTransformer);
+        $this->assertSame('ChildWithClassTransformSource', $target->childWithClassTransformer->name);
+        $this->assertTrue($target->childWithClassTransformer->classTransformed);
+    }
+
+    public function testNestedMappingWithPropertyTransform()
+    {
+        $target = (new ObjectMapper())->map(new ParentSource());
+
+        $this->assertInstanceOf(ChildWithoutClassTransformerTarget::class, $target->childWithoutClassTransformer);
+        $this->assertSame('child', $target->childWithoutClassTransformer->name);
+        $this->assertTrue($target->childWithoutClassTransformer->propertyTransformed);
+    }
+
+    public function testNestedMappingWithBothPropertyAndClassTransforms()
+    {
+        $target = (new ObjectMapper())->map(new ParentSource());
+
+        $this->assertInstanceOf(ChildWithClassTransformTarget::class, $target->childWithBothTransformers);
+        $this->assertSame('both', $target->childWithBothTransformers->name);
+        $this->assertTrue($target->childWithBothTransformers->classTransformed);
+    }
+
+    public function testIsNotNullConditionSkipsNullProperties()
+    {
+        $mapper = new ObjectMapper();
+
+        $source = new IsNotNullSource(name: 'Alice');
+        $target = $mapper->map($source);
+        $this->assertInstanceOf(IsNotNullTarget::class, $target);
+        $this->assertSame('Alice', $target->name);
+        $this->assertNull($target->age);
+    }
+
+    public function testIsNotNullConditionPreservesExistingTargetValues()
+    {
+        $mapper = new ObjectMapper();
+
+        $source = new IsNotNullSource(name: 'Bob');
+        $target = new IsNotNullTarget();
+        $target->age = 30;
+
+        $mapped = $mapper->map($source, $target);
+        $this->assertSame('Bob', $mapped->name);
+        $this->assertSame(30, $mapped->age);
+    }
+
+    public function testIsNotNullConditionMapsAllNonNullValues()
+    {
+        $mapper = new ObjectMapper();
+
+        $source = new IsNotNullSource(name: 'Charlie', age: 25);
+        $target = $mapper->map($source);
+        $this->assertSame('Charlie', $target->name);
+        $this->assertSame(25, $target->age);
+    }
+
+    public function testIsNotNullConditionWithSourceMappingSkipsNullProperties()
+    {
+        $mapper = new ObjectMapper();
+
+        $source = new IsNotNullSourceMapping(firstName: 'Alice');
+        $target = $mapper->map($source, new IsNotNullTargetMapping());
+        $this->assertSame('Alice', $target->name);
+        $this->assertNull($target->points);
+    }
+
+    public function testIsNotNullConditionWithSourceMappingPreservesExistingTargetValues()
+    {
+        $mapper = new ObjectMapper();
+
+        $source = new IsNotNullSourceMapping(firstName: 'Bob');
+        $target = new IsNotNullTargetMapping();
+        $target->points = 100;
+
+        $mapped = $mapper->map($source, $target);
+        $this->assertSame('Bob', $mapped->name);
+        $this->assertSame(100, $mapped->points);
+    }
+
+    public function testIsNotNullConditionWithSourceMappingMapsAllNonNullValues()
+    {
+        $mapper = new ObjectMapper();
+
+        $source = new IsNotNullSourceMapping(firstName: 'Charlie', score: 42);
+        $target = $mapper->map($source, new IsNotNullTargetMapping());
+        $this->assertSame('Charlie', $target->name);
+        $this->assertSame(42, $target->points);
     }
 }

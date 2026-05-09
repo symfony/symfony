@@ -32,6 +32,7 @@ final class MailerHandler extends AbstractProcessingHandler
         callable|Email $messageTemplate,
         string|int|Level $level = Level::Debug,
         bool $bubble = true,
+        private int $subjectMaxLength = 200,
     ) {
         parent::__construct($level, $bubble);
 
@@ -101,7 +102,13 @@ final class MailerHandler extends AbstractProcessingHandler
 
         if ($records) {
             $subjectFormatter = $this->getSubjectFormatter($message->getSubject());
-            $message->subject($subjectFormatter->format($this->getHighestRecord($records)));
+            $subject = $subjectFormatter->format($this->getHighestRecord($records));
+
+            if ($this->subjectMaxLength && \strlen($subject) > $this->subjectMaxLength) {
+                $subject = substr_replace($subject, '[...]', $this->subjectMaxLength);
+            }
+
+            $message->subject($subject);
         }
 
         if ($this->getFormatter() instanceof HtmlFormatter) {

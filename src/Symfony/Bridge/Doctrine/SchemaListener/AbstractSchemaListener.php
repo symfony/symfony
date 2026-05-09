@@ -12,7 +12,7 @@
 namespace Symfony\Bridge\Doctrine\SchemaListener;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Exception\ConnectionException;
+use Doctrine\DBAL\Driver\Exception as DBALDriverException;
 use Doctrine\DBAL\Exception\DatabaseObjectExistsException;
 use Doctrine\DBAL\Exception\DatabaseObjectNotFoundException;
 use Doctrine\DBAL\Schema\Name\Identifier;
@@ -28,6 +28,9 @@ abstract class AbstractSchemaListener
 {
     abstract public function postGenerateSchema(GenerateSchemaEventArgs $event): void;
 
+    /**
+     * @param-immediately-invoked-callable $configurator
+     */
     protected function filterSchemaChanges(Schema $schema, Connection $connection, callable $configurator): void
     {
         $filter = $connection->getConfiguration()->getSchemaAssetsFilter();
@@ -65,7 +68,7 @@ abstract class AbstractSchemaListener
         return static function (\Closure $exec) use ($connection): bool {
             $schemaManager = $connection->createSchemaManager();
             $key = bin2hex(random_bytes(7));
-            $table = new Table('_schema_subscriber_check');
+            $table = new Table('schema_subscriber_check_');
             $table->addColumn('id', Types::INTEGER)
                 ->setAutoincrement(true)
                 ->setNotnull(true);
@@ -81,19 +84,19 @@ abstract class AbstractSchemaListener
             } catch (DatabaseObjectExistsException) {
             }
 
-            $connection->executeStatement('INSERT INTO _schema_subscriber_check (random_key) VALUES (:key)', ['key' => $key], ['key' => Types::STRING]);
+            $connection->executeStatement('INSERT INTO schema_subscriber_check_ (random_key) VALUES (:key)', ['key' => $key], ['key' => Types::STRING]);
 
             try {
-                $exec(\sprintf('DELETE FROM _schema_subscriber_check WHERE random_key = %s', $connection->getDatabasePlatform()->quoteStringLiteral($key)));
-            } catch (DatabaseObjectNotFoundException|ConnectionException|\PDOException) {
+                $exec(\sprintf('DELETE FROM schema_subscriber_check_ WHERE random_key = %s', $connection->getDatabasePlatform()->quoteStringLiteral($key)));
+            } catch (DBALDriverException|\PDOException) {
             }
 
             try {
-                return !$connection->executeStatement('DELETE FROM _schema_subscriber_check WHERE random_key = :key', ['key' => $key], ['key' => Types::STRING]);
+                return !$connection->executeStatement('DELETE FROM schema_subscriber_check_ WHERE random_key = :key', ['key' => $key], ['key' => Types::STRING]);
             } finally {
-                if (!$connection->executeQuery('SELECT count(id) FROM _schema_subscriber_check')->fetchOne()) {
+                if (!$connection->executeQuery('SELECT count(id) FROM schema_subscriber_check_')->fetchOne()) {
                     try {
-                        $schemaManager->dropTable('_schema_subscriber_check');
+                        $schemaManager->dropTable('schema_subscriber_check_');
                     } catch (DatabaseObjectNotFoundException) {
                     }
                 }

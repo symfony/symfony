@@ -33,7 +33,7 @@ class ResponseIsSuccessfulTest extends TestCase
 
     public function testReducedVerbosity()
     {
-        $constraint = new ResponseIsSuccessful(verbose: false);
+        $constraint = new ResponseIsSuccessful(false);
 
         try {
             $constraint->evaluate(new Response('Response body', 404));

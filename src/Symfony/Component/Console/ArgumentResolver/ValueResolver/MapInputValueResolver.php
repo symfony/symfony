@@ -15,7 +15,9 @@ use Symfony\Component\Console\Attribute\Argument;
 use Symfony\Component\Console\Attribute\MapInput;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Attribute\Reflection\ReflectionMember;
+use Symfony\Component\Console\Exception\InputValidationFailedException;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Resolves the value of a input argument/option to an object holding the #[MapInput] attribute.
@@ -29,6 +31,7 @@ final class MapInputValueResolver implements ValueResolverInterface
         private readonly ValueResolverInterface $builtinTypeResolver,
         private readonly ValueResolverInterface $backedEnumResolver,
         private readonly ValueResolverInterface $dateTimeResolver,
+        private readonly ?ValidatorInterface $validator = null,
     ) {
     }
 
@@ -38,7 +41,22 @@ final class MapInputValueResolver implements ValueResolverInterface
             return [];
         }
 
-        return [$this->resolveMapInput($attribute, $input)];
+        $instance = $this->resolveMapInput($attribute, $input);
+        $violations = $this->validator?->validate($instance, null, $attribute->validationGroups) ?? [];
+
+        if (!\count($violations)) {
+            return [$instance];
+        }
+
+        $map = $this->buildPropertyToInputMap($attribute);
+        $messages = [];
+        foreach ($violations as $violation) {
+            $path = $violation->getPropertyPath();
+            $label = $map[$path] ?? $path;
+            $messages[] = $label.': '.$violation->getMessage();
+        }
+
+        throw new InputValidationFailedException(implode("\n", $messages), $violations);
     }
 
     private function resolveMapInput(MapInput $mapInput, InputInterface $input): object
@@ -59,6 +77,27 @@ final class MapInputValueResolver implements ValueResolverInterface
         }
 
         return $instance;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function buildPropertyToInputMap(MapInput $mapInput, string $prefix = ''): array
+    {
+        $map = [];
+        foreach ($mapInput->getDefinition() as $propertyName => $spec) {
+            $path = $prefix.$propertyName;
+            $map[$path] = match (true) {
+                $spec instanceof Argument => $spec->name,
+                $spec instanceof Option => '--'.$spec->name,
+                default => $path,
+            };
+            if ($spec instanceof MapInput) {
+                $map += $this->buildPropertyToInputMap($spec, $path.'.');
+            }
+        }
+
+        return $map;
     }
 
     private function resolveArgumentSpec(Argument $argument, \ReflectionProperty $property, InputInterface $input): mixed

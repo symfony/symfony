@@ -234,6 +234,19 @@ class ContainerDebugCommandTest extends AbstractWebTestCase
         );
     }
 
+    public function testDescribeUnknownParameter()
+    {
+        static::bootKernel(['test_case' => 'ContainerDebug', 'root_config' => 'config.yml', 'debug' => true]);
+
+        $application = new Application(static::$kernel);
+        $application->setAutoExit(false);
+
+        $tester = new ApplicationTester($application);
+        $tester->run(['command' => 'debug:container', '--parameter' => '.unknown']);
+
+        $this->assertStringContainsString('You have requested a non-existent parameter ".unknown".', $tester->getDisplay());
+    }
+
     public function testDescribeEnvVars()
     {
         putenv('REAL=value');

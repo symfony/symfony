@@ -213,15 +213,14 @@ class CsrfTokenManagerTest extends TestCase
 
     private function assertRandomizeTheToken($namespace, $manager, $storage): void
     {
-
         if ($storage instanceof MockObject) {
             $storage
                 ->method('hasToken')
-                ->with($namespace . 'token_id')
+                ->with($namespace.'token_id')
                 ->willReturn(true);
             $storage
                 ->method('getToken')
-                ->with($namespace . 'token_id')
+                ->with($namespace.'token_id')
                 ->willReturn('TOKEN');
         }
 

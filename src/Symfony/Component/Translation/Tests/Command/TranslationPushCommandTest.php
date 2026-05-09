@@ -200,10 +200,11 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         ], 'fr'));
 
         $provider = $this->createMock(ProviderInterface::class);
-        $provider->expects($this->any())
+        $provider
             ->method('read')
-            ->with($domains, $locales)
-            ->willReturn($providerReadTranslatorBag);
+            ->willReturnMap([
+                [$domains, $locales, $providerReadTranslatorBag],
+            ]);
 
         // Create local bag, with a missing message.
         $localTranslatorBag = new TranslatorBag();
@@ -222,10 +223,11 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'en'));
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'fr'));
 
-        $provider->expects($this->any())
+        $provider
             ->method('read')
-            ->with($domains, $locales)
-            ->willReturn($providerReadTranslatorBag);
+            ->willReturnMap([
+                [$domains, $locales, $providerReadTranslatorBag],
+            ]);
 
         $provider->expects($this->once())
             ->method('write')
@@ -262,10 +264,11 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         ], 'fr'));
 
         $provider = $this->createMock(ProviderInterface::class);
-        $provider->expects($this->any())
+        $provider
             ->method('read')
-            ->with($domains, $locales)
-            ->willReturn($providerReadTranslatorBag);
+            ->willReturnMap([
+                [$domains, $locales, $providerReadTranslatorBag],
+            ]);
 
         // Create local bag, with a missing message, an updated one and a new one.
         $localTranslatorBag = new TranslatorBag();
@@ -284,10 +287,11 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'en'));
         $providerReadTranslatorBag->addCatalogue($arrayLoader->load(['note' => 'NOTE'], 'fr'));
 
-        $provider->expects($this->any())
+        $provider
             ->method('read')
-            ->with($domains, $locales)
-            ->willReturn($providerReadTranslatorBag);
+            ->willReturnMap([
+                [$domains, $locales, $providerReadTranslatorBag],
+            ]);
 
         $translationBagToWrite = $localTranslatorBag->diff($providerReadTranslatorBag);
         $translationBagToWrite->addBag($localTranslatorBag->intersect($providerReadTranslatorBag));
@@ -313,7 +317,6 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $arrayLoader = new ArrayLoader();
         $xliffLoader = new XliffFileLoader();
         $locales = ['en', 'fr'];
-        $domains = ['messages'];
 
         // Simulate existing messages on Provider
         $providerReadTranslatorBag = new TranslatorBag();
@@ -323,23 +326,28 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
         $provider = $this->createMock(FilteringProvider::class);
         $provider->expects($this->once())
             ->method('read')
-            ->with($domains, $locales)
+            ->with($this->equalToCanonicalizing(['messages', 'validators']), $locales)
             ->willReturn($providerReadTranslatorBag);
         $provider->expects($this->once())
             ->method('getDomains')
-            ->willReturn(['messages']);
+            ->willReturn([]);
 
-        $filenameEn = $this->createFile([
+        $filenameMessagesEn = $this->createFile([
             'note' => 'NOTE',
             'new.foo' => 'newFoo',
         ]);
-        $filenameFr = $this->createFile([
+        $filenameMessagesFr = $this->createFile([
             'note' => 'NOTE',
             'new.foo' => 'nouveauFoo',
         ], 'fr');
+        $filenameValidatorsFr = $this->createFile([
+            'foo.error' => 'Valeur erronée',
+            'bar.success' => 'Formulaire valide !',
+        ], 'fr', 'validators.%locale%.xlf');
         $localTranslatorBag = new TranslatorBag();
-        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameEn, 'en'));
-        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameFr, 'fr'));
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameMessagesEn, 'en'));
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameMessagesFr, 'fr'));
+        $localTranslatorBag->addCatalogue($xliffLoader->load($filenameValidatorsFr, 'fr', 'validators'));
 
         $provider->expects($this->once())
             ->method('write')
@@ -367,7 +375,7 @@ class TranslationPushCommandTest extends TranslationProviderTestCase
 
         $tester->execute(['--locales' => ['en', 'fr']]);
 
-        $this->assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages" domain(s)).', trim($tester->getDisplay()));
+        $this->assertStringContainsString('[OK] New local translations has been sent to "null" (for "en, fr" locale(s), and "messages, validators" domain(s)).', trim($tester->getDisplay()));
     }
 
     #[DataProvider('provideCompletionSuggestions')]

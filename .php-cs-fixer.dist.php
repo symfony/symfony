@@ -45,11 +45,7 @@ return (new PhpCsFixer\Config())
                 '/s',
             ]),
         ],
-        'declare_strict_types' => false, // part of PHP?x?Migration:risky, awaits https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/pull/9384
         'php_unit_attributes' => true,
-        'void_return' => [
-            'fix_lambda' => false,
-        ],
     ])
     ->setRuleCustomisationPolicy(new class implements PhpCsFixer\Config\RuleCustomisationPolicyInterface {
         public function getPolicyVersionForCache(): string
@@ -115,6 +111,7 @@ return (new PhpCsFixer\Config())
             ->exclude([
                 'Symfony/Component/Emoji/Resources/',
                 'Symfony/Component/Intl/Resources/data/',
+                'Symfony/Component/String/Resources/data/',
             ])
             // Support for older PHPunit version
             ->notPath('#Symfony/Bridge/PhpUnit/.*Mock\.php#')

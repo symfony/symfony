@@ -108,7 +108,8 @@ class UrlGenerator implements UrlGeneratorInterface, ConfigurableRequirementsInt
 
         if (null !== $locale) {
             do {
-                if (null !== ($route = $this->routes->get($name.'.'.$locale)) && $route->getDefault('_canonical_route') === $name) {
+                $route = $this->routes->get($name.'.'.$locale);
+                if ($route && ($route->getDefault('_canonical_route') === $name || $this->routes->getAlias($name.'.'.$locale))) {
                     break;
                 }
             } while (false !== $locale = strstr($locale, '_', true));

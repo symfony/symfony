@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Command;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -39,6 +40,12 @@ use Symfony\Component\Yaml\Yaml;
 #[AsCommand(name: 'debug:config', description: 'Dump the current configuration for an extension')]
 class ConfigDebugCommand extends AbstractConfigCommand
 {
+    public function __construct(
+        private ?ContainerInterface $envVarProcessors = null,
+    ) {
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this
@@ -146,6 +153,9 @@ class ConfigDebugCommand extends AbstractConfigCommand
 
         $method = new \ReflectionMethod($kernel, 'buildContainer');
         $container = $method->invoke($kernel);
+        if ($this->envVarProcessors) {
+            $container->set('container.env_var_processors_locator', $this->envVarProcessors);
+        }
         $container->getCompiler()->compile($container);
 
         return $container;

@@ -11,6 +11,7 @@
 
 namespace Symfony\Bundle\FrameworkBundle\Console;
 
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Command\ListCommand;
@@ -24,11 +25,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Contracts\Service\ContainerAwareInterface;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Application extends BaseApplication
+class Application extends BaseApplication implements ContainerAwareInterface
 {
     private bool $commandsRegistered = false;
     private array $registrationErrors = [];
@@ -50,6 +52,13 @@ class Application extends BaseApplication
     public function getKernel(): KernelInterface
     {
         return $this->kernel;
+    }
+
+    public function getContainer(): ContainerInterface
+    {
+        $this->kernel->boot();
+
+        return $this->kernel->getContainer();
     }
 
     public function reset(): void
@@ -184,7 +193,12 @@ class Application extends BaseApplication
         $container = $this->kernel->getContainer();
 
         foreach ($this->kernel->getBundles() as $bundle) {
-            if ($bundle instanceof Bundle) {
+            if ($bundle instanceof Bundle
+                && method_exists($bundle, 'registerCommands')
+                && Bundle::class !== new \ReflectionMethod($bundle, 'registerCommands')->getDeclaringClass()->getName()
+            ) {
+                trigger_deprecation('symfony/framework-bundle', '8.1', 'Overriding the "%s::registerCommands()" method in "%s" is deprecated, use the "#[AsCommand]" attribute or the "console.command" service tag instead.', Bundle::class, get_debug_type($bundle));
+
                 try {
                     $bundle->registerCommands($this);
                 } catch (\Throwable $e) {

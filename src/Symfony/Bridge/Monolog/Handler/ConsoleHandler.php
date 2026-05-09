@@ -54,6 +54,7 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
     ];
 
     private ?InputInterface $input = null;
+    private int $nestedCommandDepth = 0;
 
     /**
      * @param OutputInterface|null $output            The console output to use (the handler remains disabled when passing null
@@ -120,6 +121,7 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
     public function close(): void
     {
         $this->input = null;
+        $this->nestedCommandDepth = 0;
         $this->output = null;
 
         parent::close();
@@ -132,6 +134,10 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
     public function onCommand(ConsoleCommandEvent $event): void
     {
         $this->setInput($event->getInput());
+
+        if (1 !== ++$this->nestedCommandDepth) {
+            return;
+        }
 
         $output = $event->getOutput();
         if ($output instanceof ConsoleOutputInterface) {
@@ -146,7 +152,9 @@ final class ConsoleHandler extends AbstractProcessingHandler implements EventSub
      */
     public function onTerminate(ConsoleTerminateEvent $event): void
     {
-        $this->close();
+        if ($this->nestedCommandDepth && !--$this->nestedCommandDepth) {
+            $this->close();
+        }
     }
 
     public static function getSubscribedEvents(): array

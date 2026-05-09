@@ -26,7 +26,7 @@ class FileValidatorPathTest extends FileValidatorTestCase
             notFoundMessage: 'myMessage',
         );
 
-        $this->validator->validate('foobar', $constraint);
+        $this->validate('foobar', $constraint);
 
         $this->buildViolation('myMessage')
             ->setParameter('{{ file }}', '"foobar"')

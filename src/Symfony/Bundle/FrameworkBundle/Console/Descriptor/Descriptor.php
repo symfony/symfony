@@ -50,7 +50,7 @@ abstract class Descriptor implements DescriptorInterface
         }
 
         match (true) {
-            $object instanceof RouteCollection => $this->describeRouteCollection($this->filterRoutesByHttpMethod($object, $options['method'] ?? ''), $options),
+            $object instanceof RouteCollection => $this->describeRouteCollection($this->sortRouteCollection($this->filterRoutesByHttpMethod($object, $options['method'] ?? ''), $options['sort'] ?? null), $options),
             $object instanceof Route => $this->describeRoute($object, $options),
             $object instanceof ParameterBag => $this->describeContainerParameters($object, $options),
             $object instanceof ContainerBuilder && !empty($options['env-vars']) => $this->describeContainerEnvVars($this->getContainerEnvVars($object), $options),
@@ -430,5 +430,45 @@ abstract class Descriptor implements DescriptorInterface
         }
 
         return $filteredRoutes;
+    }
+
+    private function sortRouteCollection(RouteCollection $routes, ?string $sort): RouteCollection
+    {
+        if (null === $sort) {
+            return $routes;
+        }
+
+        $sort = strtolower($sort);
+        $routesArray = $routes->all();
+
+        $getSortValue = match ($sort) {
+            'name' => static fn (string $name, Route $route) => strtolower($name),
+            'path' => static fn (string $name, Route $route) => strtolower($route->getPath()),
+            'method' => static fn (string $name, Route $route) => $route->getMethods() ? strtolower(implode('|', $route->getMethods())) : '',
+            'scheme' => static fn (string $name, Route $route) => $route->getSchemes() ? strtolower(implode('|', $route->getSchemes())) : '',
+            'host' => static fn (string $name, Route $route) => strtolower($route->getHost()),
+            default => throw new \InvalidArgumentException(\sprintf('The sort column "%s" is not supported.', $sort)),
+        };
+
+        $sortValues = [];
+        foreach ($routesArray as $name => $route) {
+            $sortValues[$name] = $getSortValue($name, $route);
+        }
+        asort($sortValues);
+
+        $sortedRoutes = new RouteCollection();
+        foreach (array_keys($sortValues) as $name) {
+            $sortedRoutes->add($name, $routesArray[$name]);
+        }
+
+        foreach ($routes->getAliases() as $aliasName => $alias) {
+            $newAlias = $sortedRoutes->addAlias($aliasName, $alias->getId());
+            if ($alias->isDeprecated()) {
+                $deprecation = $alias->getDeprecation($aliasName);
+                $newAlias->setDeprecated($deprecation['package'], $deprecation['version'], str_replace($aliasName, '%alias_id%', $deprecation['message']));
+            }
+        }
+
+        return $sortedRoutes;
     }
 }

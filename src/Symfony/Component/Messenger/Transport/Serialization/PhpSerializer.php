@@ -12,6 +12,7 @@
 namespace Symfony\Component\Messenger\Transport\Serialization;
 
 use Symfony\Component\Messenger\Envelope;
+use Symfony\Component\Messenger\Exception\InvalidArgumentException;
 use Symfony\Component\Messenger\Exception\MessageDecodingFailedException;
 use Symfony\Component\Messenger\Stamp\MessageDecodingFailedStamp;
 use Symfony\Component\Messenger\Stamp\NonSendableStampInterface;
@@ -42,16 +43,32 @@ class PhpSerializer implements SerializerInterface
     public function decode(array $encodedEnvelope): Envelope
     {
         if (empty($encodedEnvelope['body'])) {
-            throw new MessageDecodingFailedException('Encoded envelope should have at least a "body", or maybe you should implement your own serializer.');
+            return MessageDecodingFailedException::wrap($encodedEnvelope, 'Encoded envelope should have at least a "body", or maybe you should implement your own serializer.');
         }
 
         if (!str_ends_with($encodedEnvelope['body'], '}')) {
             $encodedEnvelope['body'] = base64_decode($encodedEnvelope['body']);
         }
 
-        $serializeEnvelope = stripslashes($encodedEnvelope['body']);
+        if ('' === $serializeEnvelope = stripslashes($encodedEnvelope['body'])) {
+            return MessageDecodingFailedException::wrap($encodedEnvelope, 'Encoded envelope should have at least a "body", or maybe you should implement your own serializer.');
+        }
 
-        return $this->safelyUnserialize($serializeEnvelope);
+        try {
+            $envelope = $this->safelyUnserialize($serializeEnvelope);
+
+            if (!$envelope instanceof Envelope) {
+                return MessageDecodingFailedException::wrap($encodedEnvelope, 'Could not decode message into an Envelope.');
+            }
+
+            if ($envelope->getMessage() instanceof \__PHP_Incomplete_Class) {
+                $envelope = $envelope->with(new MessageDecodingFailedStamp());
+            }
+        } catch (\Throwable $e) {
+            return MessageDecodingFailedException::wrap($encodedEnvelope, 'Could not decode Envelope: '.$e->getMessage(), $e->getCode(), $e);
+        }
+
+        return $envelope;
     }
 
     public function encode(Envelope $envelope): array
@@ -69,12 +86,8 @@ class PhpSerializer implements SerializerInterface
         ];
     }
 
-    private function safelyUnserialize(string $contents): Envelope
+    private function safelyUnserialize(string $contents): mixed
     {
-        if ('' === $contents) {
-            throw new MessageDecodingFailedException('Could not decode an empty message using PHP serialization.');
-        }
-
         if ($this->acceptPhpIncompleteClass) {
             $prevUnserializeHandler = ini_set('unserialize_callback_func', null);
         } else {
@@ -89,28 +102,11 @@ class PhpSerializer implements SerializerInterface
         });
 
         try {
-            /** @var Envelope */
-            $envelope = unserialize($contents);
-        } catch (\Throwable $e) {
-            if ($e instanceof MessageDecodingFailedException) {
-                throw $e;
-            }
-
-            throw new MessageDecodingFailedException('Could not decode Envelope: '.$e->getMessage(), 0, $e);
+            return unserialize($contents);
         } finally {
             restore_error_handler();
             ini_set('unserialize_callback_func', $prevUnserializeHandler);
         }
-
-        if (!$envelope instanceof Envelope) {
-            throw new MessageDecodingFailedException('Could not decode message into an Envelope.');
-        }
-
-        if ($envelope->getMessage() instanceof \__PHP_Incomplete_Class) {
-            $envelope = $envelope->with(new MessageDecodingFailedStamp());
-        }
-
-        return $envelope;
     }
 
     /**
@@ -118,6 +114,6 @@ class PhpSerializer implements SerializerInterface
      */
     public static function handleUnserializeCallback(string $class): never
     {
-        throw new MessageDecodingFailedException(\sprintf('Message class "%s" not found during decoding.', $class));
+        throw new InvalidArgumentException(\sprintf('Message class "%s" not found during decoding.', $class));
     }
 }

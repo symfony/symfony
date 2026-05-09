@@ -81,6 +81,7 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
                     $item->expiresAt(\DateTimeImmutable::createFromFormat('U.u', \sprintf('%.6F', $item->metadata[CacheItem::METADATA_EXPIRY])));
                 } elseif (0 < $defaultLifetime) {
                     $item->expiresAfter($defaultLifetime);
+                    $item->newMetadata[CacheItem::METADATA_EXPIRY] = $item->expiry;
                 }
 
                 return $item;
@@ -90,6 +91,9 @@ class ChainAdapter implements AdapterInterface, CacheInterface, NamespacedPoolIn
         );
     }
 
+    /**
+     * @param-immediately-invoked-callable $callback
+     */
     public function get(string $key, callable $callback, ?float $beta = null, ?array &$metadata = null): mixed
     {
         $doSave = true;

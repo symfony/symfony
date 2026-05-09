@@ -18,12 +18,12 @@ use Symfony\Component\JsonStreamer\Mapping\GenericTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Mapping\PropertyMetadataLoaderInterface;
 use Symfony\Component\JsonStreamer\Mapping\Write\AttributePropertyMetadataLoader;
-use Symfony\Component\JsonStreamer\Mapping\Write\DateTimeTypePropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyBackedEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Enum\DummyEnum;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Mapping\SyntheticPropertyMetadataLoader;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\ClassicDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithArray;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDateTimes;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithDollarNamedProperties;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithList;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithNameAttributes;
@@ -38,9 +38,10 @@ use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\DummyWithValueTransforme
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummy;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyDict;
 use Symfony\Component\JsonStreamer\Tests\Fixtures\Model\SelfReferencingDummyList;
-use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\BooleanToStringValueTransformer;
-use Symfony\Component\JsonStreamer\Tests\Fixtures\ValueTransformer\DoubleIntAndCastToStringValueTransformer;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\BooleanToStringValueTransformer;
+use Symfony\Component\JsonStreamer\Tests\Fixtures\Transformer\DoubleIntAndCastToStringValueTransformer;
 use Symfony\Component\JsonStreamer\Tests\ServiceContainer;
+use Symfony\Component\JsonStreamer\Transformer\DateTimeValueObjectTransformer;
 use Symfony\Component\JsonStreamer\Write\StreamWriterGenerator;
 use Symfony\Component\TypeInfo\Type;
 use Symfony\Component\TypeInfo\TypeContext\TypeContextFactory;
@@ -67,18 +68,20 @@ class StreamWriterGeneratorTest extends TestCase
     public function testGeneratedStreamWriter(string $fixture, Type $type, ?PropertyMetadataLoaderInterface $propertyMetadataLoader = null)
     {
         $propertyMetadataLoader ??= new GenericTypePropertyMetadataLoader(
-            new DateTimeTypePropertyMetadataLoader(new AttributePropertyMetadataLoader(
+            new AttributePropertyMetadataLoader(
                 new PropertyMetadataLoader(TypeResolver::create()),
                 new ServiceContainer([
                     DoubleIntAndCastToStringValueTransformer::class => new DoubleIntAndCastToStringValueTransformer(),
                     BooleanToStringValueTransformer::class => new BooleanToStringValueTransformer(),
                 ]),
                 TypeResolver::create(),
-            )),
+            ),
             new TypeContextFactory(new StringTypeResolver()),
         );
 
-        $generator = new StreamWriterGenerator($propertyMetadataLoader, $this->streamWritersDir);
+        $generator = new StreamWriterGenerator($propertyMetadataLoader, new ServiceContainer([
+            \DateTimeInterface::class => new DateTimeValueObjectTransformer(),
+        ]), $this->streamWritersDir);
 
         if ($_ENV['TEST_GENERATE_FIXTURES'] ?? false) {
             file_put_contents(
@@ -130,6 +133,7 @@ class StreamWriterGeneratorTest extends TestCase
         yield ['nullable_object', Type::nullable(Type::object(DummyWithNameAttributes::class))];
         yield ['object_in_object', Type::object(DummyWithOtherDummies::class)];
         yield ['object_with_value_transformer', Type::object(DummyWithValueTransformerAttributes::class)];
+        yield ['object_with_value_object', Type::object(DummyWithDateTimes::class)];
         yield ['self_referencing_object', Type::object(SelfReferencingDummy::class)];
         yield ['self_referencing_object_list', Type::object(SelfReferencingDummyList::class)];
         yield ['self_referencing_object_dict', Type::object(SelfReferencingDummyDict::class)];
@@ -142,7 +146,7 @@ class StreamWriterGeneratorTest extends TestCase
 
     public function testDoNotSupportIntersectionType()
     {
-        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create()), $this->streamWritersDir);
+        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamWritersDir);
 
         $this->expectException(UnsupportedException::class);
         $this->expectExceptionMessage('"Stringable&Traversable" type is not supported.');
@@ -152,7 +156,7 @@ class StreamWriterGeneratorTest extends TestCase
 
     public function testDoNotSupportEnumType()
     {
-        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create()), $this->streamWritersDir);
+        $generator = new StreamWriterGenerator(new PropertyMetadataLoader(TypeResolver::create()), new ServiceContainer(), $this->streamWritersDir);
 
         $this->expectException(UnsupportedException::class);
         $this->expectExceptionMessage(\sprintf('"%s" type is not supported.', DummyEnum::class));
@@ -174,7 +178,7 @@ class StreamWriterGeneratorTest extends TestCase
             ])
             ->willReturn([]);
 
-        $generator = new StreamWriterGenerator($propertyMetadataLoader, $this->streamWritersDir);
+        $generator = new StreamWriterGenerator($propertyMetadataLoader, new ServiceContainer(), $this->streamWritersDir);
         $generator->generate($type);
     }
 }

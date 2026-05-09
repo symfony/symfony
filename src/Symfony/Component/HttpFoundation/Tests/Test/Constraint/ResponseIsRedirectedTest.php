@@ -33,7 +33,7 @@ class ResponseIsRedirectedTest extends TestCase
 
     public function testReducedVerbosity()
     {
-        $constraint = new ResponseIsRedirected(verbose: false);
+        $constraint = new ResponseIsRedirected(false);
         try {
             $constraint->evaluate(new Response('Body content'));
         } catch (ExpectationFailedException $e) {

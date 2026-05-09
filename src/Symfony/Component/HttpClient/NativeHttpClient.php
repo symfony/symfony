@@ -327,6 +327,8 @@ final class NativeHttpClient implements HttpClientInterface, LoggerAwareInterfac
 
     /**
      * Resolves the IP of the host using the local DNS cache if possible.
+     *
+     * @param-immediately-invoked-callable $onProgress
      */
     private static function dnsResolve(string $host, NativeClientState $multi, array &$info, ?\Closure $onProgress): string
     {

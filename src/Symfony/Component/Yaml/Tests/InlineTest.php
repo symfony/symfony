@@ -1115,4 +1115,25 @@ class InlineTest extends TestCase
         $this->assertSame([null, 'foo', 'bar'], Inline::parse('[, foo, bar]'));
         $this->assertSame(['foo', 'bar'], Inline::parse('[foo, bar, ]'));
     }
+
+    public function testFlowAndBlockProduceSameOutputForAmpersandPrefixedItems()
+    {
+        $this->assertSame([null], Inline::parse('[&string4]'));
+        $this->assertSame(['foo' => null], Inline::parse('{foo: &string4}'));
+
+        $this->assertSame(['&string3'], Inline::parse('[!!str &string3]'));
+        $this->assertSame(['foo' => '&string3'], Inline::parse('{foo: !!str &string3}'));
+
+        $yaml = <<<YAML
+            block:
+                - '&string1'
+                - "&string2"
+                - !!str &string3
+                - &string4
+            flow: ['&string1', "&string2", !!str &string3, &string4 ]
+            YAML;
+        $parsed = Yaml::parse($yaml);
+        $this->assertSame(['&string1', '&string2', '&string3', null], $parsed['block']);
+        $this->assertSame($parsed['block'], $parsed['flow']);
+    }
 }

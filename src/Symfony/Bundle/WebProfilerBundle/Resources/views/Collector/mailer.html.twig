@@ -281,7 +281,7 @@
                                     <td>
                                         {% if event.message.subject is defined %}
                                             {{ event.message.getSubject() ?? '(No subject)' }}
-                                        {% elseif event.message.headers.has('subject') %}
+                                        {% elseif event.message.headers is defined and event.message.headers.has('subject') %}
                                             {{ event.message.headers.get('subject').bodyAsString()|default('(No subject)') }}
                                         {% else %}
                                             (No subject)
@@ -290,7 +290,7 @@
                                     <td>
                                         {% if event.message.to is defined %}
                                             {{ event.message.getTo()|map(addr => addr.toString())|join(', ')|default('(empty)') }}
-                                        {% elseif event.message.headers.has('to') %}
+                                        {% elseif event.message.headers is defined and event.message.headers.has('to') %}
                                             {{ event.message.headers.get('to').bodyAsString()|default('(empty)') }}
                                         {% else %}
                                             (empty)

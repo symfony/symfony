@@ -92,7 +92,7 @@ class GenericRetryStrategy implements RetryStrategyInterface
 
     public function getDelay(AsyncContext $context, ?string $responseContent, ?TransportExceptionInterface $exception): int
     {
-        $delay = $this->delayMs * $this->multiplier ** $context->getInfo('retry_count');
+        $delay = $this->getDelayFromHeader($context->getHeaders()) ?? $this->delayMs * $this->multiplier ** $context->getInfo('retry_count');
 
         if ($this->jitter > 0) {
             $randomness = (int) ($delay * $this->jitter);
@@ -105,4 +105,19 @@ class GenericRetryStrategy implements RetryStrategyInterface
 
         return (int) $delay;
     }
+
+    private function getDelayFromHeader(array $headers): ?int
+    {
+        if (null !== $after = $headers['retry-after'][0] ?? null) {
+            if (is_numeric($after)) {
+                return (int) ($after * 1000);
+            }
+
+            if (false !== $time = strtotime($after)) {
+                return max(0, $time - time()) * 1000;
+            }
+        }
+
+        return null;
+    }   
 }

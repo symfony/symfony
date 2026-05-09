@@ -121,4 +121,37 @@ class GenericRetryStrategyTest extends TestCase
 
         return new AsyncContext($passthru, new MockHttpClient(), $response, $info, null, 0);
     }
+
+    #[DataProvider('provideDelayWithRetryAfter')]
+    public function testGetDelayWithRetryAfterInSeconds(int $retryAfter, int $maxDelay, int $expectedDelay): void
+    {
+        $strategy = new GenericRetryStrategy([], 1000, 2, $maxDelay, 0);
+        $context = $this->getContextWithHeaders(0, 'GET', 'http://example.com/', 200, ['retry-after' => [$retryAfter]]);
+ 
+        $this->assertSame($expectedDelay, $strategy->getDelay($context, null, null));
+    }
+
+    public static function provideDelayWithRetryAfter(): iterable
+    {
+        // retryAfter in seconds, maxDelay in milliseconds, expected delay in milliseconds
+        yield [1, 50000, 1000];
+        yield [12, 50000, 12000];
+        yield [120, 5000, 5000];
+        yield [120, 0, 120000];
+    }
+
+    private function getContextWithHeaders($retryCount, $method, $url, $statusCode, array $headers): AsyncContext
+    {
+        $passthru = null;
+        $info = [
+            'retry_count' => $retryCount,
+            'http_method' => $method,
+            'url' => $url,
+            'http_code' => $statusCode,
+            'response_headers' => $headers,
+        ];
+        $response = new MockResponse('', $info);
+
+        return new AsyncContext($passthru, new MockHttpClient(), $response, $info, null, 0);
+    }
 }

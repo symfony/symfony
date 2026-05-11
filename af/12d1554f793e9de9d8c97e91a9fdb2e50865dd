@@ -1,0 +1,325 @@
+---------------------------------------------------------------------------
+
+by carsonbot at 2025-04-29T10:27:07Z
+
+Hey!
+
+I see that this is your first PR. That is great! Welcome!
+
+Symfony has a [contribution guide](https://symfony.com/doc/current/contributing/index.html) which I suggest you to read.
+
+In short:
+- Always add tests
+- Keep backward compatibility (see https://symfony.com/bc).
+- Bug fixes must be submitted against the lowest maintained branch where they apply (see https://symfony.com/releases)
+- Features and deprecations must be submitted against the 7.3 branch.
+
+Review the GitHub status checks of your pull request and try to solve the reported issues. If some tests are failing, try to see if they are failing because of this change.
+
+When two Symfony core team members approve this change, it will be merged and you will become an official Symfony contributor!
+If this PR is merged in a lower version branch, it will be merged up to all maintained branches within a few days.
+
+I am going to sit back now and wait for the reviews.
+
+Cheers!
+
+Carsonbot
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2025-05-06T06:08:16Z
+
+I've already done it in a nodeJS project and it works well in production.
+```javascript
+async function createDelayedQueue(channel, exchange, queue, delay) {
+    const date = new Date().toISOString().split('T')[0];
+    const delayedQueue = `delay_${exchange}_${queue}_${delay}_${date}`;
+    const delayedExchange = 'delays';
+    const baseExpire = 24 * 60 * 60 * 1000;
+
+    await channel.assertQueue(delayedQueue, {
+        durable: true,
+        arguments: {
+            'x-message-ttl': delay,
+            'x-expires': delay + 60 * 1000 + baseExpire,
+            'x-dead-letter-exchange': exchange,
+            'x-dead-letter-routing-key': queue,
+            'x-queue-type': 'quorum'
+        }
+    });
+
+    await channel.bindQueue(delayedQueue, delayedExchange, delayedQueue);
+
+    return { delayedQueue, delayedExchange };
+}
+```
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-05-06T06:12:44Z
+
+This probably also affect 6.4, right?
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2025-05-06T06:14:53Z
+
+> This probably also affect 6.4, right?
+
+Yes, that's right
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2025-05-06T10:00:20Z
+
+Sorry, I've tried to change the base branch to 6.4 and by mistake it has added automatically the reviewers, feel free to leave :pray:
+I come back to point to 7.2, as it add a lot of change to the PR, my fault.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-05-06T10:53:05Z
+
+No worries, we can target 6.4 while merging this PR 👍
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2025-06-18T07:49:05Z
+
+Hi there! Just a friendly ping to see if there's anything else needed on this PR or if it can be reviewed when you get a chance. Thanks a lot for your time!
+
+---------------------------------------------------------------------------
+
+by walva at 2025-06-19T10:09:25Z
+
+Hi everyone!
+My devops team requested us to use Quorum queues and I can confirm we are also affected by this. Please let my know if I can help.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-06-19T10:18:06Z
+
+As this is a new feature, it must target `7.4` branch
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2025-06-19T10:45:38Z
+
+> As this is a new feature, it must target `7.4` branch
+
+Well, I consider it as a bug fix, because is causing problems when you use symfony with quorum rabbitmq queues, but, for me it's not a problem target it to `7.4`
+
+---------------------------------------------------------------------------
+
+by stof at 2025-06-19T11:47:47Z
+
+I would say that adding support for quorum queues could be considered as a new feature, and it seems safer to deliver this in a minor version. Can you target the 7.4 branch please ?
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2025-06-19T12:11:57Z
+
+> I would say that adding support for quorum queues could be considered as a new feature, and it seems safer to deliver this in a minor version. Can you target the 7.4 branch please ?
+
+Well, in fact, you can actually work with quorum queues in symfony 5.4, it's not a new feature, and nothing prevents you to use in delay queues, so, for my point of view is a bug, because if you use them, you'll lost messages, as the delay queue is removed.
+
+I don't thing that is a new feature, it is an already feature that didn't work as expected.
+But, I can change the target, sorry for asking, is it safe to change it directly here, in the PR, or should I have to do some changes by console?
+
+---------------------------------------------------------------------------
+
+by walva at 2025-06-19T13:44:26Z
+
+**Long live message concerns**
+
+I have a real-life use case involving messages that need to be processed after a delay of more than 72 hours, and I wanted to clarify how the delay queues behave for messages published later in the day, after the very first message.
+
+After reviewing the PR and studying the underlying mechanism, the solution seems solid and should work as expected for long delays.
+
+Here’s an example scenario:
+- One message is published at 1:00 AM with a 72-hour delay.
+- Another message is published at 11:00 PM the same day, also with a 72-hour delay.
+
+My concern was whether the second message (published at 11:00 PM) would be processed too early because it enters a delay queue that already exists due to the earlier message.
+
+**Target version**
+
+I’ve reviewed the discussion and would like to support the points made by @stof.
+- It is not possible to create a retry/delay queue of type quorum in Symfony 6.4 (tested).
+- It is possible to create a main queue of type quorum in Symfony 6.4 (tested).
+- Creating a retry/delay queue of type quorum has been possible since 7.2 (tested), but is affected by the bug this PR intent to resolve.
+
+From what I see, the issue with temporary queues (retry/delay) only affects quorum queues. Classic queues have never been impacted by this bug, since their behavior remains unchanged.
+
+In my opinion, both perspectives are legitimate:
+- One could argue this is a bugfix that belongs in 7.2, as it makes the retry/delay queues finally behave consistently with the main queue in terms of quorum support.
+- Alternatively, since the lack of support for quorum on retry/delay queues has existed for so long without being addressed, some may see this as more of a new feature that could land in 7.4.
+
+Personally, as a community member, I tend to agree with the view that this is a bugfix that naturally fits in 7.2. However, I also understand the reasoning for not backporting it to 6.4, given it was never supported there and that changing this in an LTS might have unexpected side effects for existing users.
+
+Just wanted to share my perspective, without polemic, as someone who has been affected by this limitation and appreciates the improvement brought by this PR.
+
+**Alternative**
+
+I would like to challenge another approach with you all.
+
+Given Symfony Messenger already supports per-message TTL for delays using DelayStamp on AMQP transports (the AMQP expiration property).
+
+We could introduce a new configuration to allow Messenger to use a single **durable** quorum delay queue without a queue-level TTL and rely entirely on per-message TTLs.
+
+By doing this, all messages keep their individual TTL, and expire themselves. RabbitMQ will automatically dead-letter them to the target queue using DLX.
+
+This would avoid the issues with dynamic creation/deletion of quorum delay queues.
+
+I am not an AMQP expert at all, but this idea crossed my mind and I wanted to share it with you. It **seems** fully compatible with Messenger’s current features and RabbitMQ’s capabilities, and it would simplify the delay queue logic, especially for users with quorum queues and long-lived messages.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-06-19T19:23:40Z
+
+> But, I can change the target, sorry for asking, is it safe to change it directly here, in the PR, or should I have to do some changes by console?
+
+No need, we will do this while merging
+
+> Please squash your commits before merging, in line with [Symfony's contribution standards](https://symfony.com/doc/current/contributing/code/standards.html#commit-messages).
+
+No need, we do while merging
+
+> Make sure your final commit message summarizes the change clearly and references the related issue.
+
+No need
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2025-06-20T10:50:02Z
+
+Hi,
+
+> My concern was whether the second message (published at 11:00 PM) would be processed too early because it enters a delay queue that already exists due to the earlier message.
+
+Actually, these are two separate concepts: the queue's *duration* and the message's *TTL*. The second message will be dead-lettered to the final queue only after **its own TTL** expires, regardless of when the queue was created or when the first message entered it.
+
+The mechanism is exactly the same as the one already used today. The difference is that with classic queues, if you redeclare the queue, its expiration is refreshed. With quorum queues, this doesn't happen—so we must ensure that the queue lasts long enough for all its messages. That’s why I create a delay queue per day with a TTL of *delay + 1 day*: this way, we ensure messages are processed properly, and we can still clean up old queues.
+
+> It is not possible to create a retry/delay queue of type quorum in Symfony 6.4 (tested).
+
+This is not entirely accurate. You can set the default queue type for a RabbitMQ Virtual Host. That’s actually how I discovered this issue: in our setup, `quorum` is the default queue type (after the bug we had to put classic as a default).
+
+I’m not arguing whether this is a bug or a missing feature, and I’m OK with this being addressed in Symfony 7.4. My goal is simply to move the PR forward, because RabbitMQ is deprecating classic mirrored queues. In RabbitMQ 4, `quorum` we won't be able to create a HA classic queues.
+
+> Alternative approach
+
+This was actually the first solution I tried when we started migrating from Beanstalkd (which has native support for delayed messages, and is very simple to use). Unfortunately, this approach has a critical issue: **delay queues process messages in order**. If the first message has a delay of 5 minutes, and the second one only 5 seconds, the second one will wait for the first to expire before being processed.
+
+This is why Symfony Messenger creates one queue per delay duration. It avoids the head-of-line blocking problem that comes with FIFO processing in delay queues.
+
+As I said previously, we even have some services in Node.js that use the same pattern. They’ve been running smoothly for over 6 months, with quorum queues, no message loss, and proper queue cleanup.
+
+I know this is a complex topic to fully explain in a PR comment, and English is not my first language—so if anything is unclear, please let me know and I’ll try to explain it differently.
+
+Thanks again for your feedback and time.
+
+---------------------------------------------------------------------------
+
+by walva at 2025-06-20T12:56:43Z
+
+@miquel-angel thanks for your time answering my comments. I learn a lot. Big thanks for your contribution. I'm looking forward to your PR to be merged :D
+
+@OskarStark I edited my comment to remove inexact information. Thanks for the feedback.
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2025-06-25T09:56:54Z
+
+Hi,
+There are 2 checks that are failing, Psalm and Unit Tests, but I think that they are failing too in symfony/7.2.
+I've already done a rebase from upstream 7.2.
+What should I have to do now?
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2025-09-30T07:44:14Z
+
+Hello,
+Can you please review it? The original issue has been open for more than a year, and it's an important bug. In rabbit MQ 4.0 Mirrored Classic Queues will be removed, so the only option to have an HA delayed messages will be with quorum queues (https://www.rabbitmq.com/blog/2021/08/21/4.0-deprecation-announcements#removal-of-classic-queue-mirroring).
+Can I do something to help?
+Thank you
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2025-12-10T08:44:03Z
+
+Hello,
+I'm a bit frustrated trying to help and contribute but not receiving any response.
+
+This is an important issue — the ticket has been open for more than a year and this PR for more than 6 months.
+I’ve tried to address everything that was previously commented, and I also asked if there was anything else I could do to help.
+
+The only recent changes have been moving the target version higher. This fix should be included in Symfony 7.2 or 7.4, and now it’s tagged for Symfony 8.1.
+
+Again: is there anything I can do to help move this forward, please?
+
+Thank you.
+
+---------------------------------------------------------------------------
+
+by OskarStark at 2025-12-10T09:01:42Z
+
+Please rebase on the `8.1` branch, thanks
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2025-12-11T07:57:22Z
+
+> Please rebase on the `8.1` branch, thanks
+
+Do you mean that I rebase `8.1` on my branch?
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2025-12-15T07:07:55Z
+
+Done.
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2026-01-28T07:07:21Z
+
+Hi,
+I've changed pointing to 8.1, do you need anything else from me? Can we merge it?
+
+---------------------------------------------------------------------------
+
+by VincentEngel at 2026-03-05T07:45:50Z
+
+Hey everyone @miquel-angel @OskarStark
+
+Can we do anything to support @miquel-angel here? This is quite an issue/bug and it would be great if this MR can be merged.
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2026-04-08T11:12:11Z
+
+Hello!
+
+This pull request is close to its first anniversary and is still open.
+Is there anything else I need to do?
+
+This is an important bug that prevents users from upgrading to RabbitMQ 4 and using HA queues for delays.
+
+Please let me know if there’s anything more I should do or how I can help move this PR forward.
+
+Thanks!
+
+---------------------------------------------------------------------------
+
+by miquel-angel at 2026-05-07T05:54:53Z
+
+> LGTM! 👍 This will generate minimal impact (negligible memory footprint due to ephemeral delay queue lasting longer) and would allow us to use quorum queues with HA capabilities.
+>
+> The feature is opt-in, so I would ask you to backport this as a fix into 6.4. It would definitely help me since this is a blocker for upgrading to RabbitMQ 4.x (and 3.x is EOL since 2024).
+>
+> (to be fair, I'll need this in 5.4 too, but I would backport it there myself)
+
+Well, we already discussed whether this is a bug fix or not. IMHO, it should be fixed in 6.4, but I don't want to start that conversation again. This PR has been open for more than a year; I just want to get it merged. As you said, it's blocking the upgrade to RabbitMQ 4.x.

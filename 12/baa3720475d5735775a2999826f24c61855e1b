@@ -1,0 +1,30 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-05-06T15:48:23Z
+
+In the past, we shipped formatting changes in minor versions, not a bug fixes (this is not a bug after all. `{  }` is also a valid Yaml representation).
+I think it makes sense to also do it in this case (if some projects have tests doing assertions on the dumped output, it avoids making them fail when upgrading patch versions on the LTS branch).
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-05-06T16:08:20Z
+
+The red `Unit Tests` you can still see on `0a8e381` was a legitimate failure: `DumperTest::testIndentationInConstructor` and `testInlineLevel` embed `"foo'bar": {  }` directly inside heredocs, and I had only updated the direct `assertSame('{  }', …)` calls in the first round.
+
+`2411aef` (current head, rebased onto `8.1`) updates those heredoc fixtures along with the eight remaining occurrences in `getDumpCompactNestedMapping`. The 474 tests in `Yaml/Tests/` pass locally on PHPUnit 11 / PHP 8.4. CI on `2411aef` is currently running.
+
+The "Docker registry 500" only applied to the very first run (`080e9aa`, against `6.4`). Apologies for the conflation.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-06T16:14:37Z
+
+Please don't let your LLM reply instead of you, that's noisy.
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-05-06T17:22:25Z
+
+I've removed comments after noticing there were errors, and will keep future interactions direct and human-reviewed.
+
+I'm putting the necessary checks in place to avoid having to correct this kind of issue going forward. Apologies again, and thanks for the feedback.

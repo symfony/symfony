@@ -247,7 +247,7 @@ class SmtpTransport extends AbstractTransport
     private function doMailFromCommand(string $address, bool $smtputf8): void
     {
         if ($smtputf8 && !$this->serverSupportsSmtpUtf8()) {
-            throw new InvalidArgumentException('Invalid addresses: non-ASCII characters not supported in local-part of email.');
+            throw new InvalidArgumentException('The SMTP server does not support the SMTPUTF8 extension required to send to addresses with non-ASCII characters in their local-part.');
         }
         $this->executeCommand(\sprintf("MAIL FROM:<%s>%s\r\n", $address, $smtputf8 ? ' SMTPUTF8' : ''), [250]);
     }

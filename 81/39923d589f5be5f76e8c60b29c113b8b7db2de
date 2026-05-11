@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-05-11T09:57:59Z
+
+I think the logger should be injected through `setLogger` (of `Psr\Log\LoggerAwareInterface`) as done in CurlHttpClient and AmpHttpClient (and maybe forwarding the logger if the inner client implements `Psr\Log\LoggerAwareInterface`, to be checked how it is wired today)
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-05-11T12:22:54Z
+
+Thanks for the review @stof — agreed, 7515c58f51b switches `CachingHttpClient` to `Psr\Log\LoggerAwareInterface` via `setLogger()` (matching `CurlHttpClient` / `AmpHttpClient`), drops the constructor argument, and forwards the logger to the inner client when it implements `LoggerAwareInterface`. CHANGELOG updated and added a test covering the forwarding path.

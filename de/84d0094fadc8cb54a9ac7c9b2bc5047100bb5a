@@ -1,0 +1,24 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-04T16:08:25Z
+
+Is this legit? Isn't this hiding a bug earlier in the app? `$_ENV` should not contain array values (or any other non-scalars actually)
+
+---------------------------------------------------------------------------
+
+by bodendorfer-simplethings at 2026-05-05T04:38:08Z
+
+> Is this legit? Isn't this hiding a bug earlier in the app? `$_ENV` should not contain array values (or any other non-scalars actually)
+
+I agree with you, that a non scalar inside the `$_ENV` should not be considered as intended use.
+However the use can simply set some values inside the `$_ENV` var.
+
+If that is the case, the process component throws an exception. The MR changes that to silently ignore non-scalar values from `$_ENV`.
+
+---------------------------------------------------------------------------
+
+by dionisvl at 2026-05-09T16:37:34Z
+
+> Is this legit? Isn't this hiding a bug earlier in the app? $_ENV should not contain array values (or any other non-scalars actually)
+
+Hi, @nicolas-grekas, Process already skips false, argc/argv, and invalid names before proc_open() - this just extends the same defensive filtering to non-scalars, which proc_open() cannot handle regardless of their origin.

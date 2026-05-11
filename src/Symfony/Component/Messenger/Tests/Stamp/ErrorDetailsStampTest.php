@@ -56,6 +56,18 @@ class ErrorDetailsStampTest extends TestCase
     {
         $exception = new \Exception('exception message');
         $stamp = ErrorDetailsStamp::create($exception);
+
+        // FlattenExceptionNormalizer drops trace args, mirror that on the expected stamp
+        $flattenException = $stamp->getFlattenException();
+        $trace = array_map(static function (array $frame): array {
+            unset($frame['args']);
+
+            return $frame;
+        }, $flattenException->getTrace());
+        $traceProperty = new \ReflectionProperty(FlattenException::class, 'trace');
+        $traceProperty->setAccessible(true);
+        $traceProperty->setValue($flattenException, $trace);
+
         $serializer = new Serializer(
             new SymfonySerializer([
                 new ArrayDenormalizer(),

@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by peter17 at 2026-05-11T14:08:52Z
+
+Hello @nicolas-grekas,
+A few thoughts about this PR:
+- Thanks for suggesting to implement this using a decorator. Because this implementation relies on a new class and does not modify Symfony's code, it has already been on production on my project for a few weeks.
+- I was able to understand why I get errors on DNS resolution: it is because some websites answer with invalid content on the `Location:` header. For example, `example1.com/test` will redirect to `example2.comtest` (without the `/`) or even `example2.com%2ftest` (encoded `/`). Using my internal DNS resolver, I am able to add a validation step before resolving the redirect.
+- If there is a will to merge this and have it maintained inside the HttpClient code, I will be very happy. If not, no problem, we can close this pull-request and I will keep the decorator in my project code.
+
+Best regards

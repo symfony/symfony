@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
  *
  * @internal
  */
-abstract class AbstractDoctrineMiddleware implements MiddlewareInterface
+abstract class AbstractOrmMiddleware implements MiddlewareInterface
 {
     public function __construct(
         protected ManagerRegistry $managerRegistry,
@@ -34,7 +34,9 @@ abstract class AbstractDoctrineMiddleware implements MiddlewareInterface
     final public function handle(Envelope $envelope, StackInterface $stack): Envelope
     {
         try {
-            $entityManager = $this->managerRegistry->getManager($this->entityManagerName);
+            if (!($entityManager = $this->managerRegistry->getManager($this->entityManagerName)) instanceof EntityManagerInterface) {
+                throw new \InvalidArgumentException(\sprintf('Expected "%s" to be an entity manager, but got a "%s".', $this->entityManagerName ?? $this->managerRegistry->getDefaultManagerName(), $entityManager::class));
+            }
         } catch (\InvalidArgumentException $e) {
             throw new UnrecoverableMessageHandlingException($e->getMessage(), 0, $e);
         }

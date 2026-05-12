@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Middleware\StackInterface;
  *
  * @author Grégoire Pineau <lyrixx@lyrixx.info>
  */
-class DoctrineOpenTransactionLoggerMiddleware extends AbstractDoctrineMiddleware
+class DoctrineOpenTransactionLoggerMiddleware extends AbstractOrmMiddleware
 {
     private bool $isHandling = false;
 

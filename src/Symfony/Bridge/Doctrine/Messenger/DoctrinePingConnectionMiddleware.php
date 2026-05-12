@@ -23,7 +23,7 @@ use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
  *
  * @author Fuong <insidestyles@gmail.com>
  */
-class DoctrinePingConnectionMiddleware extends AbstractDoctrineMiddleware
+class DoctrinePingConnectionMiddleware extends AbstractOrmMiddleware
 {
     protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope
     {

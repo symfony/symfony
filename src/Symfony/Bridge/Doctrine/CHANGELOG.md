@@ -7,6 +7,8 @@ CHANGELOG
  * Add IterableToArrayCollectionTransformer for ObjectMapper
  * Throw a `ConstraintDefinitionException` from `UniqueEntity` when a checked field holds an array or is a to-many association, instead of building a query that cannot match
  * Allow using closures with the `#[MapEntity]` attribute
+ * Add `$connectionName` to `DoctrineCloseConnectionMiddleware` constructor and deprecate not passing it
+ * Deprecate overriding `DoctrineCloseConnectionMiddleware::handleForManager()`
 
 8.1
 ---

@@ -11,7 +11,7 @@
 
 namespace Symfony\Bridge\Doctrine\Messenger;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\DBAL\Connection;
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
@@ -21,13 +21,11 @@ use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
  *
  * @author Fuong <insidestyles@gmail.com>
  */
-class DoctrineCloseConnectionMiddleware extends AbstractDoctrineMiddleware
+class DoctrineCloseConnectionMiddleware extends AbstractDbalMiddleware
 {
-    protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope
+    protected function handleForConnection(Connection $connection, Envelope $envelope, StackInterface $stack): Envelope
     {
         try {
-            $connection = $entityManager->getConnection();
-
             return $stack->next()->handle($envelope, $stack);
         } finally {
             if (null !== $envelope->last(ConsumedByWorkerStamp::class)) {

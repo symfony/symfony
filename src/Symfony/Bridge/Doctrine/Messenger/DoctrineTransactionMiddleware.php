@@ -22,7 +22,7 @@ use Symfony\Component\Messenger\Stamp\HandledStamp;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class DoctrineTransactionMiddleware extends AbstractDoctrineMiddleware
+class DoctrineTransactionMiddleware extends AbstractOrmMiddleware
 {
     protected function handleForManager(EntityManagerInterface $entityManager, Envelope $envelope, StackInterface $stack): Envelope
     {

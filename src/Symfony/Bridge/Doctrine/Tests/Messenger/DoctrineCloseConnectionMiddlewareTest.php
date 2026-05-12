@@ -12,75 +12,39 @@
 namespace Symfony\Bridge\Doctrine\Tests\Messenger;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bridge\Doctrine\Messenger\DoctrineCloseConnectionMiddleware;
 use Symfony\Component\Messenger\Envelope;
-use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Stamp\ConsumedByWorkerStamp;
 use Symfony\Component\Messenger\Test\Middleware\MiddlewareTestCase;
 
 class DoctrineCloseConnectionMiddlewareTest extends MiddlewareTestCase
 {
-    private MockObject&Connection $connection;
-    private EntityManagerInterface $entityManager;
-    private ManagerRegistry $managerRegistry;
-    private DoctrineCloseConnectionMiddleware $middleware;
-    private string $entityManagerName = 'default';
-
-    protected function setUp(): void
+    public function testMiddlewareCloseConnection()
     {
-        $this->connection = $this->createMock(Connection::class);
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->once())->method('close');
 
-        $this->entityManager = $this->createStub(EntityManagerInterface::class);
-        $this->entityManager->method('getConnection')->willReturn($this->connection);
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getConnection')->willReturn($connection);
 
-        $this->managerRegistry = $this->createStub(ManagerRegistry::class);
-        $this->managerRegistry->method('getManager')->willReturn($this->entityManager);
-
-        $this->middleware = new DoctrineCloseConnectionMiddleware(
-            $this->managerRegistry,
-            $this->entityManagerName
+        new DoctrineCloseConnectionMiddleware($managerRegistry, connectionName: 'connection')->handle(
+            new Envelope(new \stdClass(), [new ConsumedByWorkerStamp()]),
+            $this->getStackMock(),
         );
     }
 
-    public function testMiddlewareCloseConnection()
+    public function testMiddlewareDoesNotCloseConnectionInNonWorkerContext()
     {
-        $this->connection->expects($this->once())
-            ->method('close')
-        ;
+        $connection = $this->createMock(Connection::class);
+        $connection->expects($this->never())->method('close');
 
-        $envelope = new Envelope(new \stdClass(), [
-            new ConsumedByWorkerStamp(),
-        ]);
-        $this->middleware->handle($envelope, $this->getStackMock());
-    }
+        $managerRegistry = $this->createStub(ManagerRegistry::class);
+        $managerRegistry->method('getConnection')->willReturn($connection);
 
-    public function testInvalidEntityManagerThrowsException()
-    {
-        $this->connection->expects($this->never())->method('getDatabasePlatform');
-        $managerRegistry = $this->createMock(ManagerRegistry::class);
-        $managerRegistry
-            ->expects($this->once())
-            ->method('getManager')
-            ->with('unknown_manager')
-            ->willThrowException(new \InvalidArgumentException());
-
-        $middleware = new DoctrineCloseConnectionMiddleware($managerRegistry, 'unknown_manager');
-
-        $this->expectException(UnrecoverableMessageHandlingException::class);
-
-        $middleware->handle(new Envelope(new \stdClass()), $this->getStackMock(false));
-    }
-
-    public function testMiddlewareNotCloseInNonWorkerContext()
-    {
-        $this->connection->expects($this->never())
-            ->method('close')
-        ;
-
-        $envelope = new Envelope(new \stdClass());
-        $this->middleware->handle($envelope, $this->getStackMock());
+        new DoctrineCloseConnectionMiddleware($managerRegistry, connectionName: 'connection')->handle(
+            new Envelope(new \stdClass()),
+            $this->getStackMock(),
+        );
     }
 }

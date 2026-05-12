@@ -24,6 +24,14 @@ DoctrineBridge
  * `UniqueEntity` now throws a `ConstraintDefinitionException` when a checked field holds an array or is a to-many
    association and the default `findBy` repository method is used. Such fields were silently validated against a
    query that could not match. Use the `repositoryMethod` option to provide a method that can query them
+ * Add `$connectionName` to `DoctrineCloseConnectionMiddleware` constructor and deprecate not passing it
+    ```diff
+     'middleware' => [
+    -   'doctrine_close_connection' => ['entity_manager_name'],
+    +   'doctrine_close_connection' => ['$connectionName' => 'connection_name'],
+     ],
+    ```
+ * Deprecate overriding `DoctrineCloseConnectionMiddleware::handleForManager()`
 
 Form
 ----

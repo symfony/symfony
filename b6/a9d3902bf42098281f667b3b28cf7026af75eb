@@ -1,0 +1,23 @@
+---------------------------------------------------------------------------
+
+by Jean85 at 2026-05-11T21:58:16Z
+
+Force-push since CarsonBot will not allow to push cherry-picked commits with different authors.
+
+CI failures seems unrelated.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-12T06:18:30Z
+
+If using this option is needed for upgrading to RabbitMQ 4, shouldn't this be the default? Asking while I'm not into the topic :)
+
+---------------------------------------------------------------------------
+
+by Jean85 at 2026-05-12T06:41:56Z
+
+> If using this option is needed for upgrading to RabbitMQ 4, shouldn't this be the default? Asking while I'm not into the topic :)
+
+It may be disruptive to anyone already using it, because it changes the name of delayed queues; if your setup has anything name-based (rules, routing, external metrics, external autoscalers, etc) it could break it. It would definitively be a good default for the next major for sure.
+
+Also, it's a requirement for quorum queues, but those are needed for their HA properties; classic queues are still available, they just lost their HA capabilities in RabbitMQ 4.x. So, I would expect all enterprise-like environment to have done the change, but not all of the users.

@@ -250,6 +250,10 @@ class Inline
             $output[] = \sprintf('%s: %s', self::dump($key, $flags), self::dump($val, $flags));
         }
 
+        if (!$output) {
+            return '{ }';
+        }
+
         return \sprintf('{ %s }', implode(', ', $output));
     }
 

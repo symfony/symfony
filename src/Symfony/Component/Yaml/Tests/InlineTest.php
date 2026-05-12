@@ -550,6 +550,7 @@ class InlineTest extends TestCase
             // mappings
             ['{ foo: bar, bar: foo, \'false\': false, \'null\': null, integer: 12 }', ['foo' => 'bar', 'bar' => 'foo', 'false' => false, 'null' => null, 'integer' => 12]],
             ['{ foo: bar, bar: \'foo: bar\' }', ['foo' => 'bar', 'bar' => 'foo: bar']],
+            ['{ }', []],
 
             // nested sequences and mappings
             ['[foo, [bar, foo]]', ['foo', ['bar', 'foo']]],

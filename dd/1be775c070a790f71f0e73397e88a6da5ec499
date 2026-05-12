@@ -1,0 +1,29 @@
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2026-02-26T10:38:04Z
+
+Could someone take a review ? @OskarStark @nicolas-grekas
+
+I already miss the 8.0 releases, I'd like to be sure to be in the 8.1 one :)
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2026-03-27T14:04:42Z
+
+Can someone help me moving this PR forward ? I feel like it just require a review.
+
+This would be a useful feature on our side cause RecoverableMessageHandlingException currently does not respect retry strategy when the retry delay is provided and could be retried infinitely.
+
+Maybe @nicolas-grekas @stof @xabbuh ?
+
+---------------------------------------------------------------------------
+
+by VincentLanglet at 2026-05-12T10:10:36Z
+
+Hi, @nicolas-grekas I saw you modified the milestone.
+
+What is missing to this PR in order to moving it forward?
+
+I really want this feature and it seems to be postponed two times already while the PR seems ready to me and just lack of review.
+
+Thanks for your time

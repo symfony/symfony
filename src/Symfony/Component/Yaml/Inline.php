@@ -796,6 +796,8 @@ class Inline
     {
         $parsedBinaryData = self::parseScalar(preg_replace('/\s/', '', $scalar));
 
+        $parsedBinaryData = (string) $parsedBinaryData;
+
         if (0 !== (\strlen($parsedBinaryData) % 4)) {
             throw new ParseException(sprintf('The normalized base64 encoded data (data without whitespace characters) length must be a multiple of four (%d bytes given).', \strlen($parsedBinaryData)), self::$parsedLineNumber + 1, $scalar, self::$parsedFilename);
         }

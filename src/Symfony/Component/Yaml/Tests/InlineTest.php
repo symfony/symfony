@@ -651,6 +651,7 @@ class InlineTest extends TestCase
             'invalid characters' => ['!!binary "SGVsbG8#d29ybGQ="', '/The base64 encoded data \(.*\) contains invalid characters/'],
             'too many equals characters' => ['!!binary "SGVsbG8gd29yb==="', '/The base64 encoded data \(.*\) contains invalid characters/'],
             'misplaced equals character' => ['!!binary "SGVsbG8gd29ybG=Q"', '/The base64 encoded data \(.*\) contains invalid characters/'],
+            'unparsable scalar value' => ['!!binary !php/object a', '/The base64 encoded data \(\) contains invalid characters/'],
         ];
     }
 

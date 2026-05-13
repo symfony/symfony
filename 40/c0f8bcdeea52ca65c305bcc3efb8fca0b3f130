@@ -1,0 +1,17 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-13T10:26:43Z
+
+Please have a look at tests.
+Also it be great to hint us about a use case for this.
+
+---------------------------------------------------------------------------
+
+by hockdudu at 2026-05-13T11:23:22Z
+
+Thanks for the quick response. I'll take a look at the tests and fix them.
+
+Our use case is the following:
+- We are developing a custom Symfony bundle, and our bundle provides a few optional user providers
+- The configuration for the providers (e.g., the user class, and other settings) are inferred from the bundle config itself, but it may be overridden, if needed
+  - That means, the config in `security.yaml` could be empty (meaning: use all default bundle settings), or it could be explicitly set

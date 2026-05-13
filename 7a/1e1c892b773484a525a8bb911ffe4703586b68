@@ -1,0 +1,5 @@
+---------------------------------------------------------------------------
+
+by stof at 2026-05-06T10:42:11Z
+
+Should be submitted to 8.1. We don't consider such changes that are only about improving static analysis reports (especially for features that are only enables in strict rules and not in the default rules) as bug fixes applied in LTS versions.

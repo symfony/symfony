@@ -1,0 +1,11 @@
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-12T10:31:45Z
+
+Did we consider patching DoctrineBundle instead?
+
+---------------------------------------------------------------------------
+
+by stof at 2026-05-12T12:38:36Z
+
+@nicolas-grekas we cannot. EntityValueResolver needs to be at higher priority than RequestAttributeValueResolver (which is at priority 100) to allow converting arguments to an entity when the argument name matches the routing parameter name (which is the recommended usage of that ValueResolver, avoiding the need for explicit `MapEntity` attributes on all arguments)

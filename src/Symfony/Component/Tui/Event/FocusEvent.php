@@ -29,10 +29,15 @@ use Symfony\Component\Tui\Widget\FocusableInterface;
 class FocusEvent extends AbstractEvent
 {
     public function __construct(
-        AbstractWidget&FocusableInterface $target,
+        private readonly AbstractWidget&FocusableInterface $target,
         private readonly ?FocusableInterface $previous,
     ) {
         parent::__construct($target);
+    }
+
+    public function getTarget(): AbstractWidget&FocusableInterface
+    {
+        return $this->target;
     }
 
     /**

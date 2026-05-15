@@ -79,4 +79,28 @@ interface FocusableInterface
      * @return $this
      */
     public function setKeybindings(?Keybindings $keybindings): static;
+
+    /**
+     * Return ordered display labels for keybindings shown in KeyBindingWidget.
+     *
+     * Keys define which actions are displayed and in what order.
+     * Values are the human-readable labels.
+     * Actions absent from this array are not displayed.
+     * An empty array means "show all actions with humanized action names".
+     *
+     * @return array<string, string>
+     */
+    public function getKeybindingLabels(): array;
+
+    /**
+     * Set explicit display labels for this widget's keybindings.
+     *
+     * When set, takes priority over the widget's default labels.
+     * Pass null to revert to those defaults.
+     *
+     * @param array<string, string>|null $labels
+     *
+     * @return $this
+     */
+    public function setKeybindingLabels(?array $labels): static;
 }

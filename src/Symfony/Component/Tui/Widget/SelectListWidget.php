@@ -329,6 +329,40 @@ class SelectListWidget extends AbstractWidget implements FocusableInterface
     }
 
     /**
+     * @return array<string, string>
+     */
+    public function getKeybindingLabels(): array
+    {
+        if (null !== $this->keybindingLabels) {
+            return $this->keybindingLabels;
+        }
+
+        $labels = static::getDefaultKeybindingLabels();
+
+        if (!$this->multiselect) {
+            unset($labels['choice_toggle']);
+        }
+
+        return $labels;
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected static function getDefaultKeybindingLabels(): array
+    {
+        return [
+            'select_down' => 'Down',
+            'select_up' => 'Up',
+            'select_page_down' => 'Page Down',
+            'select_page_up' => 'Page Up',
+            'choice_toggle' => 'Toggle',
+            'select_confirm' => 'Select',
+            'select_cancel' => 'Cancel',
+        ];
+    }
+
+    /**
      * @param array{value: string, label: string, description?: string, checked?: bool} $item
      */
     private function renderItem(array $item, bool $isSelected, ?string $description, int $columns, int $labelColumnWidth): string

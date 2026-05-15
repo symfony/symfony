@@ -447,6 +447,28 @@ class SelectListTest extends TestCase
         );
     }
 
+    public function testKeybindingLabelsOmitToggleWithoutMultiselect()
+    {
+        $labels = $this->createTestList()->getKeybindingLabels();
+
+        $this->assertArrayNotHasKey('choice_toggle', $labels);
+        $this->assertSame('Select', $labels['select_confirm']);
+    }
+
+    public function testKeybindingLabelsIncludeToggleWithMultiselect()
+    {
+        $labels = $this->createTestList(multiselect: true)->getKeybindingLabels();
+
+        $this->assertSame('Toggle', $labels['choice_toggle']);
+    }
+
+    public function testExplicitKeybindingLabelsWin()
+    {
+        $labels = $this->createTestList()->setKeybindingLabels(['select_confirm' => 'OK'])->getKeybindingLabels();
+
+        $this->assertSame(['select_confirm' => 'OK'], $labels);
+    }
+
     /**
      * @return array{SelectListWidget, Tui}
      */

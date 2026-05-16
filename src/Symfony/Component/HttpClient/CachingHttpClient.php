@@ -65,9 +65,9 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
      */
     private const CACHEABLE_METHODS = ['GET', 'HEAD'];
     /**
-     * The HTTP methods that will trigger a cache invalidation.
+     * The HTTP methods that are considered safe per RFC 9110.
      */
-    private const UNSAFE_METHODS = ['POST', 'PUT', 'DELETE', 'PATCH'];
+    private const SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS', 'TRACE'];
     /**
      * Headers that influence the response and may affect caching behavior.
      */
@@ -168,7 +168,7 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
                 }
 
                 $statusCode = $context->getStatusCode();
-                if ($statusCode >= 100 && $statusCode < 400 && \in_array($method, self::UNSAFE_METHODS, true)) {
+                if ($statusCode >= 200 && $statusCode < 400 && !\in_array($method, self::SAFE_METHODS, true)) {
                     $this->cache->invalidateTags([$fullUrlTag]);
                 }
 

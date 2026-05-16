@@ -1016,13 +1016,63 @@ class CachingHttpClientTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('initial get', $response->getContent());
 
-        // Unsafe POST with body (bypasses cache but invalidates on success)
-        $client->request('POST', 'http://example.com/unsafe-test', ['body' => 'invalidate']);
+        // Unsafe POST with body (bypasses cache but invalidates on successful responses)
+        $response = $client->request('POST', 'http://example.com/unsafe-test', ['body' => 'invalidate']);
+        $this->assertSame(204, $response->getStatusCode());
+        $this->assertSame('', $response->getContent());
 
         // Next GET should miss cache and fetch new
         $response = $client->request('GET', 'http://example.com/unsafe-test');
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('after invalidate', $response->getContent());
+    }
+
+    public function testUnknownMethodInvalidationInBypassFlow()
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('initial get', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('', ['http_code' => 204]),
+            new MockResponse('after invalidate', ['http_code' => 200]),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $response = $client->request('GET', 'http://example.com/unknown-method-test');
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('initial get', $response->getContent());
+
+        // Deliberately unknown methods are treated as unsafe and must invalidate cache entries on successful responses.
+        $response = $client->request('FOO', 'http://example.com/unknown-method-test', ['body' => 'invalidate']);
+        $this->assertSame(204, $response->getStatusCode());
+        $this->assertSame('', $response->getContent());
+
+        $response = $client->request('GET', 'http://example.com/unknown-method-test');
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('after invalidate', $response->getContent());
+    }
+
+    public function testNoInvalidationOnInformationalResponseInBypassFlow()
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('initial get', ['http_code' => 200, 'response_headers' => ['Cache-Control' => 'max-age=300']]),
+            new MockResponse('', ['http_code' => 103]),
+            new MockResponse('should not be fetched', ['http_code' => 200]),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $response = $client->request('GET', 'http://example.com/no-invalidate-1xx-test');
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('initial get', $response->getContent());
+
+        $response = $client->request('FOO', 'http://example.com/no-invalidate-1xx-test', ['body' => 'do not invalidate']);
+        $this->assertSame(103, $response->getStatusCode());
+        $this->assertSame('', $response->getContent(false));
+
+        // Informational response must not invalidate.
+        $response = $client->request('GET', 'http://example.com/no-invalidate-1xx-test');
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('initial get', $response->getContent());
     }
 
     public function testNoInvalidationOnErrorInBypassFlow()

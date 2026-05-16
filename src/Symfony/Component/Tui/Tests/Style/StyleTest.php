@@ -20,6 +20,8 @@ use Symfony\Component\Tui\Style\Color;
 use Symfony\Component\Tui\Style\CursorShape;
 use Symfony\Component\Tui\Style\Direction;
 use Symfony\Component\Tui\Style\Padding;
+use Symfony\Component\Tui\Style\Shadow;
+use Symfony\Component\Tui\Style\ShadowOrientation;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Style\TextAlign;
 use Symfony\Component\Tui\Style\VerticalAlign;
@@ -237,6 +239,93 @@ class StyleTest extends TestCase
         $this->assertStringContainsString("\x1b[36m", $result);
     }
 
+    // ---------------------------------------------------------------
+    // Shadow constructor / factory
+    // ---------------------------------------------------------------
+
+    public function testShadowCanBePassedToConstructor()
+    {
+        $shadow = new Shadow(density: 3);
+        $style = new Style(shadow: $shadow);
+
+        $this->assertSame($shadow, $style->getShadow());
+    }
+
+    public function testShadowStaticFactory()
+    {
+        $shadow = new Shadow(offset: 2);
+        $style = Style::shadow($shadow);
+
+        $this->assertSame($shadow, $style->getShadow());
+    }
+
+    // ---------------------------------------------------------------
+    // withShadow / getShadow
+    // ---------------------------------------------------------------
+
+    public function testWithShadowStoresShadow()
+    {
+        $shadow = new Shadow(orientation: ShadowOrientation::BottomLeft, density: 3, offset: 2);
+        $style = (new Style())->withShadow($shadow);
+
+        $this->assertSame($shadow, $style->getShadow());
+    }
+
+    public function testWithShadowNullClearsShadow()
+    {
+        $style = (new Style())
+            ->withShadow(new Shadow())
+            ->withShadow(null);
+
+        $this->assertNull($style->getShadow());
+    }
+
+    public function testWithShadowIsImmutable()
+    {
+        $original = new Style();
+        $withShadow = $original->withShadow(new Shadow());
+
+        $this->assertNull($original->getShadow());
+        $this->assertNotNull($withShadow->getShadow());
+    }
+
+    public function testMergeAllIncludesShadow()
+    {
+        $shadow = new Shadow(density: 4);
+        $a = new Style(bold: true);
+        $b = (new Style())->withShadow($shadow);
+
+        $result = Style::mergeAll([$a, $b]);
+
+        $this->assertSame($shadow, $result->getShadow());
+        $this->assertTrue($result->getBold());
+    }
+
+    public function testMergeAllLaterShadowOverridesEarlier()
+    {
+        $shadow1 = new Shadow(density: 1);
+        $shadow2 = new Shadow(density: 4);
+
+        $result = Style::mergeAll([
+            (new Style())->withShadow($shadow1),
+            (new Style())->withShadow($shadow2),
+        ]);
+
+        $this->assertSame($shadow2, $result->getShadow());
+    }
+
+    public function testMergeAllShadowSurvivesEmptyOverride()
+    {
+        $shadow = new Shadow();
+
+        $result = Style::mergeAll([
+            (new Style())->withShadow($shadow),
+            new Style(),
+        ]);
+
+        $this->assertSame($shadow, $result->getShadow());
+    }
+
     public function testWithoutLayoutPropertiesStripsAllLayoutProperties()
     {
         $style = new Style()
@@ -252,7 +341,8 @@ class StyleTest extends TestCase
             ->withFlex(1)
             ->withFont('big')
             ->withColor('red')
-            ->withBold();
+            ->withBold()
+            ->withShadow(new Shadow());
         $stripped = $style->withoutLayoutProperties();
 
         // Layout properties stripped
@@ -266,6 +356,7 @@ class StyleTest extends TestCase
         $this->assertNull($stripped->getAlign());
         $this->assertNull($stripped->getVerticalAlign());
         $this->assertNull($stripped->getFlex());
+        $this->assertNull($stripped->getShadow());
 
         // Content and visual properties preserved
         $this->assertSame(Color::named('red')->toForegroundCode(), $stripped->getColor()->toForegroundCode());

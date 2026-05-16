@@ -13,16 +13,19 @@ namespace Symfony\Component\Tui\Render;
 
 use Symfony\Component\Tui\Ansi\AnsiUtils;
 use Symfony\Component\Tui\Style\Border;
+use Symfony\Component\Tui\Style\Color;
+use Symfony\Component\Tui\Style\Shadow;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Style\TextAlign;
 use Symfony\Component\Tui\Widget\AbstractWidget;
 
 /**
- * Applies chrome (padding, border, background) around widget content.
+ * Applies chrome (padding, border, background, shadow) around widget content.
  *
  * Chrome is the visual frame around a widget's rendered lines:
- * padding adds space inside, borders draw a box, and background colors
- * fill the area. The result is cached for performance.
+ * padding adds space inside, borders draw a box, background colors
+ * fill the area, and a shadow paints shade cells next to the box.
+ * The result is cached for performance.
  *
  * @experimental
  *
@@ -38,13 +41,18 @@ final class ChromeApplier
     }
 
     /**
-     * Apply chrome (padding, border, background) to rendered lines.
+     * Apply chrome (padding, border, background, shadow) to rendered lines.
      */
     public function apply(LineBufferInterface $lines, int $width, Style $style, AbstractWidget $widget): LineBufferInterface
     {
         if ($this->isIdentity($style)) {
             return $lines;
         }
+
+        $shadow = $style->getShadow();
+        // Reserve the shadow columns next to the box, keeping at least 1 column for it
+        $shadowOffset = min($shadow->offset ?? 0, max(0, $width - 1));
+        $width -= $shadowOffset;
 
         $border = $style->getBorder();
         $padding = $style->getPadding();
@@ -136,12 +144,18 @@ final class ChromeApplier
 
         $innerLines = [...$topPadding, ...$contentLines, ...$bottomPadding];
 
-        return new ArrayLineBuffer($border?->wrapLines(
+        $boxLines = $border?->wrapLines(
             $innerLines,
             $innerWidth,
             $style,
             $outerStyle,
-        ) ?? $innerLines);
+        ) ?? $innerLines;
+
+        if ($shadowOffset && $boxLines) {
+            $boxLines = $this->applyShadow($boxLines, $shadow, $shadowOffset, $width);
+        }
+
+        return new ArrayLineBuffer($boxLines);
     }
 
     private function isIdentity(Style $style): bool
@@ -158,11 +172,12 @@ final class ChromeApplier
             && !($padding?->bottom ?? 0)
             && !($padding?->left ?? 0)
             && null === $style->getTextAlign()
+            && null === $style->getShadow()
             && $style->isPlain();
     }
 
     /**
-     * Compute inner dimensions (content area after border/padding).
+     * Compute inner dimensions (content area after border/padding/shadow).
      *
      * @return array{int, int} [innerColumns, innerRows]
      */
@@ -170,11 +185,14 @@ final class ChromeApplier
     {
         $border = $style->getBorder();
         $padding = $style->getPadding();
+        $shadowOffset = $style->getShadow()->offset ?? 0;
 
         $hChrome = ($border?->left ?? 0) + ($border?->right ?? 0)
-            + ($padding?->left ?? 0) + ($padding?->right ?? 0);
+            + ($padding?->left ?? 0) + ($padding?->right ?? 0)
+            + $shadowOffset;
         $vChrome = ($border?->top ?? 0) + ($border?->bottom ?? 0)
-            + ($padding?->top ?? 0) + ($padding?->bottom ?? 0);
+            + ($padding?->top ?? 0) + ($padding?->bottom ?? 0)
+            + $shadowOffset;
 
         return [
             max(1, $columns - $hChrome),
@@ -183,7 +201,7 @@ final class ChromeApplier
     }
 
     /**
-     * Compute the top-left chrome offset (border + padding) for a style.
+     * Compute the top-left chrome offset (border + padding + shadow) for a style.
      *
      * @return array{int, int} [topOffset, leftOffset]
      */
@@ -191,9 +209,12 @@ final class ChromeApplier
     {
         $border = $style->getBorder();
         $padding = $style->getPadding();
+        $shadow = $style->getShadow();
 
-        $top = ($border?->top ?? 0) + ($padding?->top ?? 0);
-        $left = ($border?->left ?? 0) + ($padding?->left ?? 0);
+        $top = ($border?->top ?? 0) + ($padding?->top ?? 0)
+            + (null !== $shadow && !$shadow->orientation->isBottom() ? $shadow->offset : 0);
+        $left = ($border?->left ?? 0) + ($padding?->left ?? 0)
+            + (null !== $shadow && !$shadow->orientation->isRight() ? $shadow->offset : 0);
 
         return [$top, $left];
     }
@@ -212,6 +233,78 @@ final class ChromeApplier
         // visual formatting (color, bold, etc.). The Renderer owns layout
         // (padding, border, gap, direction, hidden, cursorShape, textAlign, align, verticalAlign); widgets own content.
         return new RenderContext($innerColumns, $innerRows, $context->getStyle()->withoutLayoutProperties(), $context->getFontRegistry());
+    }
+
+    /**
+     * Paint the shadow cells next to the box, then add the shadow rows.
+     *
+     * Each line in $lines is $boxWidth cells wide. After this method, each
+     * line is $boxWidth + $offset cells wide and $offset rows were added.
+     *
+     * The shadow is shifted diagonally from the box: the row and column
+     * touching the opposite corner stay blank, so the box looks lifted.
+     * Moving away from that corner, the side shadow fills in one cell per
+     * row up to $offset cells, and each shadow row shifts by one more cell.
+     *
+     * @param string[] $lines
+     *
+     * @return string[]
+     */
+    private function applyShadow(array $lines, Shadow $shadow, int $offset, int $boxWidth): array
+    {
+        $count = \count($lines);
+        $isRight = $shadow->orientation->isRight();
+        $isBottom = $shadow->orientation->isBottom();
+        $paint = static fn (string $cells) => '' !== $cells ? $shadow->color->toForegroundCode().$cells.Color::resetForeground() : '';
+
+        for ($i = 0; $i < $count; ++$i) {
+            // Rows count from the blank edge: the top row for a bottom shadow,
+            // the bottom row for a top shadow
+            $distance = $isBottom ? $i : $count - 1 - $i;
+            $shadowCount = min($distance, $offset);
+            $blank = str_repeat(' ', $offset - $shadowCount);
+
+            $cells = '';
+            if ($isRight) {
+                for ($colD = 1; $colD <= $shadowCount; ++$colD) {
+                    $cells .= $shadow->getChar($colD);
+                }
+                $lines[$i] .= $paint($cells).$blank;
+            } else {
+                // Mirrored: blank cells outermost, then the cells from farthest to nearest
+                for ($colD = $shadowCount; $colD >= 1; --$colD) {
+                    $cells .= $shadow->getChar($colD);
+                }
+                $lines[$i] = $blank.$paint($cells).$lines[$i];
+            }
+        }
+
+        // Shadow rows: rowD counts from the box edge outward; each row shifts
+        // one more cell toward the orientation, leaving a growing blank gap
+        $shadowRows = [];
+        for ($rowD = 1; $rowD <= $offset; ++$rowD) {
+            $gap = str_repeat(' ', min($rowD, $boxWidth));
+            $body = str_repeat($shadow->getChar($rowD), max(0, $boxWidth - $rowD));
+
+            $corner = '';
+            if ($isRight) {
+                for ($colD = 1; $colD <= $offset; ++$colD) {
+                    $corner .= $shadow->getChar(max($rowD, $colD));
+                }
+                $shadowRows[] = $gap.$paint($body.$corner);
+            } else {
+                for ($colD = $offset; $colD >= 1; --$colD) {
+                    $corner .= $shadow->getChar(max($rowD, $colD));
+                }
+                $shadowRows[] = $paint($corner.$body).$gap;
+            }
+        }
+
+        if ($isBottom) {
+            return [...$lines, ...$shadowRows];
+        }
+
+        return [...array_reverse($shadowRows), ...$lines];
     }
 
     /**

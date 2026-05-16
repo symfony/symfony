@@ -19,7 +19,10 @@ use Symfony\Component\Tui\Render\ChromeApplier;
 use Symfony\Component\Tui\Render\RenderContext;
 use Symfony\Component\Tui\Render\WidgetRendererInterface;
 use Symfony\Component\Tui\Style\Border;
+use Symfony\Component\Tui\Style\Color;
 use Symfony\Component\Tui\Style\Padding;
+use Symfony\Component\Tui\Style\Shadow;
+use Symfony\Component\Tui\Style\ShadowOrientation;
 use Symfony\Component\Tui\Style\Style;
 use Symfony\Component\Tui\Style\TextAlign;
 use Symfony\Component\Tui\Widget\TextWidget;
@@ -55,6 +58,9 @@ final class ChromeApplierTest extends TestCase
         yield 'border and padding' => [40, 10, new Style(padding: Padding::all(1), border: Border::all(1, 'none')), [36, 6]];
         yield 'asymmetric padding' => [40, 10, new Style(padding: new Padding(2, 3, 1, 5)), [32, 7]];
         yield 'clamps to 1' => [4, 4, new Style(padding: Padding::all(3)), [1, 1]];
+        yield 'shadow only offset=1' => [40, 10, (new Style())->withShadow(new Shadow(offset: 1)), [39, 9]];
+        yield 'shadow only offset=2' => [40, 10, (new Style())->withShadow(new Shadow(offset: 2)), [38, 8]];
+        yield 'shadow and border' => [40, 10, (new Style())->withShadow(new Shadow(offset: 1))->withBorder([1]), [37, 7]];
     }
 
     // ---------------------------------------------------------------
@@ -81,6 +87,10 @@ final class ChromeApplierTest extends TestCase
         yield 'padding only' => [new Style(padding: new Padding(2, 0, 0, 3)), [2, 3]];
         yield 'border only' => [new Style(border: Border::all(1, 'none')), [1, 1]];
         yield 'border and padding' => [new Style(padding: new Padding(1, 0, 0, 2), border: Border::all(1, 'none')), [2, 3]];
+        yield 'bottom-right shadow shifts nothing' => [(new Style())->withShadow(new Shadow(offset: 2)), [0, 0]];
+        yield 'top-left shadow shifts both' => [(new Style())->withShadow(new Shadow(orientation: ShadowOrientation::TopLeft, offset: 2)), [2, 2]];
+        yield 'top-right shadow shifts down' => [(new Style())->withShadow(new Shadow(orientation: ShadowOrientation::TopRight, offset: 1)), [1, 0]];
+        yield 'bottom-left shadow shifts right' => [(new Style())->withShadow(new Shadow(orientation: ShadowOrientation::BottomLeft, offset: 1)), [0, 1]];
     }
 
     // ---------------------------------------------------------------
@@ -358,6 +368,206 @@ final class ChromeApplierTest extends TestCase
         }
         // Content should be on line 2 (index 2)
         $this->assertStringContainsString('Text', $result[2]);
+    }
+
+    // ---------------------------------------------------------------
+    // apply: shadow
+    // ---------------------------------------------------------------
+
+    public function testApplyShadowClampedInNarrowBox()
+    {
+        $applier = $this->createApplier();
+        $widget = new TextWidget('test');
+        $style = (new Style())->withShadow(new Shadow(offset: 3));
+
+        $result = $applier->apply(new ArrayLineBuffer(['AB']), 2, $style, $widget)->toArray();
+
+        // The shadow shrinks to 1 column so the box keeps 1
+        $this->assertCount(2, $result);
+        foreach ($result as $line) {
+            $this->assertSame(2, AnsiUtils::visibleWidth($line));
+        }
+    }
+
+    public function testApplyShadowUsesItsColorOnce()
+    {
+        $applier = $this->createApplier();
+        $widget = new TextWidget('test');
+        $style = (new Style())->withShadow(new Shadow(color: Color::named('red'), offset: 2));
+
+        $result = $applier->apply(new ArrayLineBuffer(['AAAA', 'BBBB', 'CCCC']), 20, $style, $widget)->toArray();
+
+        $red = Color::named('red')->toForegroundCode();
+        // A full side run is painted with a single color prefix
+        $this->assertSame(1, substr_count($result[2], $red));
+        $this->assertStringContainsString($red, $result[3]);
+        $this->assertStringContainsString($red, $result[4]);
+        // The skipped first row carries no shadow color
+        $this->assertStringNotContainsString($red, $result[0]);
+    }
+
+    public function testApplyShadowBottomRightAddsRowsAndColumns()
+    {
+        $applier = $this->createApplier();
+        $widget = new TextWidget('test');
+        // offset=1: 1 extra row (bottom), 1 extra col (right)
+        $style = (new Style())->withShadow(new Shadow(offset: 1));
+
+        $result = $applier->apply(new ArrayLineBuffer(['Hello']), 20, $style, $widget)->toArray();
+
+        // 1 content row + 1 shadow row = 2 lines
+        $this->assertCount(2, $result);
+        // All lines must be exactly $width wide (19 content + 1 shadow col)
+        foreach ($result as $line) {
+            $this->assertSame(20, AnsiUtils::visibleWidth($line));
+        }
+    }
+
+    public function testApplyShadowBottomRightVerticalStaircase()
+    {
+        $applier = $this->createApplier();
+        $widget = new TextWidget('test');
+        // offset=2: side shadow builds up over 2 rows
+        $style = (new Style())->withShadow(new Shadow(offset: 2));
+        $lines = new ArrayLineBuffer(['AAAA', 'BBBB', 'CCCC']);
+
+        $result = $applier->apply($lines, 20, $style, $widget)->toArray();
+
+        // 3 content rows + 2 shadow rows = 5
+        $this->assertCount(5, $result);
+
+        // Row 0 (distance=0 from top/skipped edge): trailing spaces only, no shadow chars
+        $plain0 = AnsiUtils::stripAnsiCodes($result[0]);
+        $this->assertSame(' ', mb_substr($plain0, -1, 1)); // trailing space
+        $this->assertSame(' ', mb_substr($plain0, -2, 1)); // second-to-last also space
+
+        // Row 1 (distance=1): 1 shadow col + 1 trailing space
+        $plain1 = AnsiUtils::stripAnsiCodes($result[1]);
+        $this->assertSame(' ', mb_substr($plain1, -1, 1)); // trailing space
+        $this->assertNotSame(' ', mb_substr($plain1, -2, 1)); // shadow char before trailing space
+
+        // Row 2 (distance=2 ≥ offset): 2 shadow cols, no trailing space
+        $plain2 = AnsiUtils::stripAnsiCodes($result[2]);
+        $this->assertNotSame(' ', mb_substr($plain2, -1, 1)); // no trailing space
+        $this->assertNotSame(' ', mb_substr($plain2, -2, 1)); // shadow char at -2 too
+
+        // All lines same total width
+        foreach ($result as $line) {
+            $this->assertSame(20, AnsiUtils::visibleWidth($line));
+        }
+    }
+
+    public function testApplyShadowBottomRightHorizontalStaircase()
+    {
+        $applier = $this->createApplier();
+        $widget = new TextWidget('test');
+        // offset=2: 2 shadow rows below
+        $style = (new Style())->withShadow(new Shadow(offset: 2));
+
+        $result = $applier->apply(new ArrayLineBuffer(['AAAA']), 20, $style, $widget)->toArray();
+
+        // 1 content + 2 shadow rows = 3
+        $this->assertCount(3, $result);
+
+        // Shadow row rowD=1 (index 1): starts with 1 space (gap=1), then shadow body
+        $plain1 = AnsiUtils::stripAnsiCodes($result[1]);
+        $this->assertSame(' ', $plain1[0]);
+
+        // Shadow row rowD=2 (index 2): starts with 2 spaces (gap=2), then shorter body
+        $plain2 = AnsiUtils::stripAnsiCodes($result[2]);
+        $this->assertSame(' ', $plain2[0]);
+        $this->assertSame(' ', $plain2[1]);
+
+        // All lines same total width
+        foreach ($result as $line) {
+            $this->assertSame(20, AnsiUtils::visibleWidth($line));
+        }
+    }
+
+    public function testApplyShadowTopRightAddsRowAboveAndColumnRight()
+    {
+        $applier = $this->createApplier();
+        $widget = new TextWidget('test');
+        $style = (new Style())->withShadow(new Shadow(orientation: ShadowOrientation::TopRight, offset: 1));
+
+        $result = $applier->apply(new ArrayLineBuffer(['Hello']), 20, $style, $widget)->toArray();
+
+        // 1 shadow row (top) + 1 content = 2 lines
+        $this->assertCount(2, $result);
+        foreach ($result as $line) {
+            $this->assertSame(20, AnsiUtils::visibleWidth($line));
+        }
+    }
+
+    public function testApplyShadowBottomLeftAddsRowBelowAndColumnLeft()
+    {
+        $applier = $this->createApplier();
+        $widget = new TextWidget('test');
+        $style = (new Style())->withShadow(new Shadow(orientation: ShadowOrientation::BottomLeft, offset: 1));
+
+        $result = $applier->apply(new ArrayLineBuffer(['Hello']), 20, $style, $widget)->toArray();
+
+        // 1 content + 1 shadow row = 2 lines
+        $this->assertCount(2, $result);
+        foreach ($result as $line) {
+            $this->assertSame(20, AnsiUtils::visibleWidth($line));
+        }
+
+        // Content line: shadow column prepended (left side)
+        $plain0 = AnsiUtils::stripAnsiCodes($result[0]);
+        // First row from top edge = skipped (no shadow chars), only leading space
+        $this->assertSame(' ', $plain0[0]);
+    }
+
+    public function testApplyShadowTopLeftAddsRowAboveAndColumnLeft()
+    {
+        $applier = $this->createApplier();
+        $widget = new TextWidget('test');
+        $style = (new Style())->withShadow(new Shadow(orientation: ShadowOrientation::TopLeft, offset: 1));
+
+        $result = $applier->apply(new ArrayLineBuffer(['Hello']), 20, $style, $widget)->toArray();
+
+        // 1 shadow row (top) + 1 content = 2 lines
+        $this->assertCount(2, $result);
+        foreach ($result as $line) {
+            $this->assertSame(20, AnsiUtils::visibleWidth($line));
+        }
+    }
+
+    public function testApplyShadowWithSpreadFalseUsesUniformChar()
+    {
+        $applier = $this->createApplier();
+        $widget = new TextWidget('test');
+        // density=3 (▓), spread=false → all shadow cells use ▓
+        $style = (new Style())->withShadow(new Shadow(density: 3, spread: false, offset: 2));
+
+        $result = $applier->apply(new ArrayLineBuffer(['AAAA', 'BBBB', 'CCCC']), 20, $style, $widget)->toArray();
+
+        // Row 1: 1 shadow col + 1 trailing space (staircase)
+        $plain1 = AnsiUtils::stripAnsiCodes($result[1]);
+        $this->assertSame('▓', mb_substr($plain1, -2, 1));
+        $this->assertSame(' ', mb_substr($plain1, -1, 1));
+
+        // Row 2: 2 shadow cols, no trailing space
+        $plain2 = AnsiUtils::stripAnsiCodes($result[2]);
+        $this->assertSame('▓▓', mb_substr($plain2, -2));
+    }
+
+    public function testApplyShadowCombinedWithBorder()
+    {
+        $applier = $this->createApplier();
+        $widget = new TextWidget('test');
+        $style = (new Style())
+            ->withBorder([1])
+            ->withShadow(new Shadow(offset: 1));
+
+        $result = $applier->apply(new ArrayLineBuffer(['Hello']), 20, $style, $widget)->toArray();
+
+        // 1 border-top + 1 content + 1 border-bottom + 1 shadow row = 4 lines
+        $this->assertCount(4, $result);
+        foreach ($result as $line) {
+            $this->assertSame(20, AnsiUtils::visibleWidth($line));
+        }
     }
 
     // ---------------------------------------------------------------

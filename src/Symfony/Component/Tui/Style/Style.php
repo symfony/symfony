@@ -86,6 +86,7 @@ final class Style
      * @param Align|null            $align         Horizontal alignment of child widgets (null = not set, defaults to left)
      * @param VerticalAlign|null    $verticalAlign Vertical alignment of child widgets (null = not set, defaults to top)
      * @param int|null              $flex          Flex grow weight for horizontal layouts (null = not set, 0 = intrinsic width, 1+ = proportional)
+     * @param Shadow|null           $shadow        Drop-shadow configuration (null = not set)
      */
     public function __construct(
         private ?Padding $padding = null,
@@ -108,6 +109,7 @@ final class Style
         private ?Align $align = null,
         private ?VerticalAlign $verticalAlign = null,
         private ?int $flex = null,
+        private ?Shadow $shadow = null,
     ) {
         $this->backgroundColor = null !== $background ? Color::from($background) : null;
         $this->foregroundColor = null !== $color ? Color::from($color) : null;
@@ -287,6 +289,14 @@ final class Style
     }
 
     /**
+     * Get the drop-shadow configuration.
+     */
+    public function getShadow(): ?Shadow
+    {
+        return $this->shadow;
+    }
+
+    /**
      * Check whether the style applies no visual formatting.
      *
      * @internal
@@ -326,6 +336,14 @@ final class Style
     }
 
     /**
+     * Create a style with shadow only.
+     */
+    public static function shadow(Shadow $shadow): self
+    {
+        return new self(shadow: $shadow);
+    }
+
+    /**
      * Merge multiple styles into one in a single pass.
      *
      * Later styles override earlier ones for non-null properties.
@@ -355,6 +373,7 @@ final class Style
         $align = null;
         $verticalAlign = null;
         $flex = null;
+        $shadow = null;
 
         foreach ($styles as $style) {
             $padding = $style->padding ?? $padding;
@@ -377,6 +396,7 @@ final class Style
             $align = $style->align ?? $align;
             $verticalAlign = $style->verticalAlign ?? $verticalAlign;
             $flex = $style->flex ?? $flex;
+            $shadow = $style->shadow ?? $shadow;
         }
 
         return new self(
@@ -400,6 +420,7 @@ final class Style
             $align,
             $verticalAlign,
             $flex,
+            $shadow,
         );
     }
 
@@ -673,6 +694,19 @@ final class Style
     }
 
     /**
+     * Create new style with a drop-shadow.
+     *
+     * @param Shadow|null $shadow Shadow configuration, or null to clear
+     */
+    public function withShadow(?Shadow $shadow): self
+    {
+        $clone = clone $this;
+        $clone->shadow = $shadow;
+
+        return $clone;
+    }
+
+    /**
      * Create a copy with only visual formatting and content properties.
      *
      * Strips layout properties that the Renderer owns: padding, border,
@@ -694,7 +728,7 @@ final class Style
             && null === $this->hidden && null === $this->cursorShape
             && null === $this->textAlign && null === $this->maxColumns
             && null === $this->align && null === $this->verticalAlign
-            && null === $this->flex) {
+            && null === $this->flex && null === $this->shadow) {
             return $this;
         }
 
@@ -710,6 +744,7 @@ final class Style
         $clone->align = null;
         $clone->verticalAlign = null;
         $clone->flex = null;
+        $clone->shadow = null;
 
         return $clone;
     }

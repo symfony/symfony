@@ -18,34 +18,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class MonthType extends AbstractType
 {
-    public function buildView(FormView $view, FormInterface $form, array $options): void
-    {
-        $view->vars['type'] = 'month';
-
-        if (null !== $options['min']) {
-            $view->vars['attr']['min'] = $options['min'];
-        }
-
-        if (null !== $options['max']) {
-            $view->vars['attr']['max'] = $options['max'];
-        }
-
-        if (null !== $options['step']) {
-            $view->vars['attr']['step'] = $options['step'];
-        }
-    }
-
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'min' => null,
-            'max' => null,
-            'step' => null,
+            'invalid_message' => 'Please enter a month (YYYY-MM).',
         ]);
-
-        $resolver->setAllowedTypes('min', ['null', 'string']);
-        $resolver->setAllowedTypes('max', ['null', 'string']);
-        $resolver->setAllowedTypes('step', ['null', 'int', 'string']);
     }
 
     public function getParent(): string

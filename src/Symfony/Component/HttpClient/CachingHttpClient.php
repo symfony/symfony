@@ -53,13 +53,9 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
     use HttpClientTrait;
 
     /**
-     * The status codes that are always cacheable.
+     * The status codes that are cacheable by default.
      */
-    private const CACHEABLE_STATUS_CODES = [200, 203, 204, 300, 301, 404, 410];
-    /**
-     * The status codes that are cacheable if the response carries explicit cache directives.
-     */
-    private const CONDITIONALLY_CACHEABLE_STATUS_CODES = [302, 303, 307, 308];
+    private const DEFAULT_CACHEABLE_STATUS_CODES = [200, 203, 204, 300, 301, 308, 404, 405, 410, 414, 501];
     /**
      * The HTTP methods that are always cacheable.
      */
@@ -95,6 +91,10 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
      * Maximum heuristic freshness lifetime in seconds (24 hours).
      */
     private const MAX_HEURISTIC_FRESHNESS_TTL = 86400;
+    /**
+     * RFC 9111 recommends a heuristic freshness lifetime of 10% of the time since Last-Modified.
+     */
+    private const HEURISTIC_FRESHNESS_FRACTION = 0.1;
 
     private TagAwareCacheInterface|HttpCache $cache;
     private array $defaultOptions = self::OPTIONS_DEFAULTS;
@@ -651,24 +651,37 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             }
         }
 
-        // Heuristic freshness fallback when no explicit directives are present
-        if (
-            !isset($cacheControl['no-cache'])
-            && !isset($cacheControl['no-store'])
-            && isset($headers['last-modified'])
-        ) {
-            foreach ($headers['last-modified'] as $lastModified) {
-                if (false === $lastModifiedTimestamp = strtotime($lastModified)) {
-                    continue;
-                }
-                if (0 < $secondsSinceLastModified = time() - $lastModifiedTimestamp) {
-                    // Heuristic: 10% of time since last modified, capped at max heuristic freshness
-                    $heuristicFreshnessSeconds = (int) ($secondsSinceLastModified * 0.1);
-                    $cappedHeuristicFreshness = min($heuristicFreshnessSeconds, self::MAX_HEURISTIC_FRESHNESS_TTL);
+        if (null !== $heuristicFreshnessLifetime = $this->determineHeuristicFreshnessLifetime($headers, $cacheControl)) {
+            return max(0, $heuristicFreshnessLifetime - $age);
+        }
 
-                    return max(0, $cappedHeuristicFreshness - $age);
-                }
+        return null;
+    }
+
+    /**
+     * @param array<string, string|string[]> $headers
+     * @param array<string, string|true>     $cacheControl
+     */
+    private function determineHeuristicFreshnessLifetime(array $headers, array $cacheControl): ?int
+    {
+        if (!$this->allowsHeuristicFreshness($headers, $cacheControl)) {
+            return null;
+        }
+
+        foreach ($headers['last-modified'] as $lastModified) {
+            if (false === $lastModifiedTimestamp = strtotime($lastModified)) {
+                continue;
             }
+
+            $secondsSinceLastModified = time() - $lastModifiedTimestamp;
+
+            if (0 >= $secondsSinceLastModified) {
+                continue;
+            }
+
+            $heuristicFreshnessLifetime = (int) ($secondsSinceLastModified * self::HEURISTIC_FRESHNESS_FRACTION);
+
+            return min($heuristicFreshnessLifetime, self::MAX_HEURISTIC_FRESHNESS_TTL);
         }
 
         return null;
@@ -737,29 +750,67 @@ class CachingHttpClient implements HttpClientInterface, ResetInterface
             }
         }
 
-        // Conditionals require an explicit expiration
-        if (\in_array($statusCode, self::CONDITIONALLY_CACHEABLE_STATUS_CODES, true)) {
-            return $this->hasExplicitExpiration($responseHeaders, $cacheControl);
+        if (self::isDefaultCacheableStatusCode($statusCode)) {
+            return true;
         }
 
-        return \in_array($statusCode, self::CACHEABLE_STATUS_CODES, true);
+        if (self::isStatusCodeExcludedFromStorage($statusCode)) {
+            return false;
+        }
+
+        if ($this->hasExplicitFreshness($responseHeaders, $cacheControl)) {
+            return true;
+        }
+
+        return $this->allowsHeuristicFreshnessForNonDefaultStatus($responseHeaders, $cacheControl);
+    }
+
+    private static function isDefaultCacheableStatusCode(int $statusCode): bool
+    {
+        return \in_array($statusCode, self::DEFAULT_CACHEABLE_STATUS_CODES, true);
+    }
+
+    private static function isStatusCodeExcludedFromStorage(int $statusCode): bool
+    {
+        // 206 is only cacheable for range requests, which this client does not store.
+        return 206 === $statusCode || 304 === $statusCode;
     }
 
     /**
-     * Checks if the response has an explicit expiration.
+     * Checks if the response has explicit freshness.
      *
-     * This function will return true if the response has an explicit expiration
-     * time specified in the headers or in the Cache-Control directives,
+     * This function will return true if the response has explicit freshness
+     * specified in the headers or in the Cache-Control directives,
      * false otherwise.
      *
      * @param array<string, string|string[]> $headers
      * @param array<string, string|true>     $cacheControl
      */
-    private function hasExplicitExpiration(array $headers, array $cacheControl): bool
+    private function hasExplicitFreshness(array $headers, array $cacheControl): bool
     {
         return isset($headers['expires'])
             || ($this->sharedCache && isset($cacheControl['s-maxage']))
             || isset($cacheControl['max-age']);
+    }
+
+    /**
+     * @param array<string, string|string[]> $headers
+     * @param array<string, string|true>     $cacheControl
+     */
+    private function allowsHeuristicFreshnessForNonDefaultStatus(array $headers, array $cacheControl): bool
+    {
+        return isset($cacheControl['public']) && $this->allowsHeuristicFreshness($headers, $cacheControl);
+    }
+
+    /**
+     * @param array<string, string|string[]> $headers
+     * @param array<string, string|true>     $cacheControl
+     */
+    private function allowsHeuristicFreshness(array $headers, array $cacheControl): bool
+    {
+        return !isset($cacheControl['no-cache'])
+            && !isset($cacheControl['no-store'])
+            && isset($headers['last-modified']);
     }
 
     /**

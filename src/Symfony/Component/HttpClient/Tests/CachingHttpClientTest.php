@@ -752,6 +752,46 @@ class CachingHttpClientTest extends TestCase
         $this->assertSame('chunk1chunk2chunk3', $content);
     }
 
+    public function testItCachesHeuristicallyCacheableStatuses()
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('method not allowed', ['http_code' => 405, 'response_headers' => ['Last-Modified' => 'Wed, 21 Oct 2015 07:28:00 GMT']]),
+            new MockResponse('uri too long', ['http_code' => 414, 'response_headers' => ['Last-Modified' => 'Wed, 21 Oct 2015 07:28:00 GMT']]),
+            new MockResponse('not implemented', ['http_code' => 501, 'response_headers' => ['Last-Modified' => 'Wed, 21 Oct 2015 07:28:00 GMT']]),
+            new MockResponse('should not be served'),
+            new MockResponse('should not be served'),
+            new MockResponse('should not be served'),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $this->assertSame('method not allowed', $client->request('GET', 'http://example.com/405')->getContent(false));
+        $this->assertSame('uri too long', $client->request('GET', 'http://example.com/414')->getContent(false));
+        $this->assertSame('not implemented', $client->request('GET', 'http://example.com/501')->getContent(false));
+
+        $this->assertSame('method not allowed', $client->request('GET', 'http://example.com/405')->getContent(false));
+        $this->assertSame('uri too long', $client->request('GET', 'http://example.com/414')->getContent(false));
+        $this->assertSame('not implemented', $client->request('GET', 'http://example.com/501')->getContent(false));
+    }
+
+    public function testItStoresResponsesWithExplicitFreshnessEvenForOtherStatuses()
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('legal reasons', [
+                'http_code' => 451,
+                'response_headers' => [
+                    'Cache-Control' => 'max-age=60',
+                ],
+            ]),
+            new MockResponse('should not be served'),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $this->assertSame('legal reasons', $client->request('GET', 'http://example.com/451')->getContent(false));
+        $this->assertSame('legal reasons', $client->request('GET', 'http://example.com/451')->getContent(false));
+    }
+
     public function testConditionalCacheableStatusCodeWithoutExpiration()
     {
         $mockClient = new MockHttpClient([
@@ -789,6 +829,130 @@ class CachingHttpClientTest extends TestCase
         $response = $client->request('GET', 'http://example.com/redirect');
         $this->assertSame(302, $response->getStatusCode());
         $this->assertSame('redirected', $response->getContent(false));
+    }
+
+    public function testHeuristicDefaultCacheableStatusCode()
+    {
+        $lastModified = gmdate('D, d M Y H:i:s', time() - 1000).' GMT';
+        $mockClient = new MockHttpClient([
+            new MockResponse('permanent redirect', [
+                'http_code' => 308,
+                'response_headers' => [
+                    'Last-Modified' => $lastModified,
+                ],
+            ]),
+            new MockResponse('should not be served', ['http_code' => 308]),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $response = $client->request('GET', 'http://example.com/redirect-308');
+        $this->assertSame(308, $response->getStatusCode());
+        $this->assertSame('permanent redirect', $response->getContent(false));
+
+        $response = $client->request('GET', 'http://example.com/redirect-308');
+        $this->assertSame(308, $response->getStatusCode());
+        $this->assertSame('permanent redirect', $response->getContent(false));
+    }
+
+    public function testExplicitFreshnessStatusCode206IsNotStored()
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('partial response one', [
+                'http_code' => 206,
+                'response_headers' => [
+                    'Cache-Control' => 'max-age=60',
+                ],
+            ]),
+            new MockResponse('partial response two', [
+                'http_code' => 206,
+                'response_headers' => [
+                    'Cache-Control' => 'max-age=60',
+                ],
+            ]),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $response = $client->request('GET', 'http://example.com/partial');
+        $this->assertSame(206, $response->getStatusCode());
+        $this->assertSame('partial response one', $response->getContent(false));
+
+        $response = $client->request('GET', 'http://example.com/partial');
+        $this->assertSame(206, $response->getStatusCode());
+        $this->assertSame('partial response two', $response->getContent(false));
+    }
+
+    public function testExplicitFreshnessStandaloneStatusCode304IsNotStored()
+    {
+        $mockClient = new MockHttpClient([
+            new MockResponse('', [
+                'http_code' => 304,
+                'response_headers' => [
+                    'Cache-Control' => 'max-age=60',
+                ],
+            ]),
+            new MockResponse('fresh payload', ['http_code' => 200]),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $response = $client->request('GET', 'http://example.com/not-modified');
+        $this->assertSame(304, $response->getStatusCode());
+        $this->assertSame('', $response->getContent(false));
+
+        $response = $client->request('GET', 'http://example.com/not-modified');
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertSame('fresh payload', $response->getContent(false));
+    }
+
+    public function testPublicNonDefaultStatusCodeUsesHeuristicFreshness()
+    {
+        $lastModified = gmdate('D, d M Y H:i:s', time() - 1000).' GMT';
+        $mockClient = new MockHttpClient([
+            new MockResponse('created once', [
+                'http_code' => 201,
+                'response_headers' => [
+                    'Cache-Control' => 'public',
+                    'Last-Modified' => $lastModified,
+                ],
+            ]),
+            new MockResponse('should not be served', ['http_code' => 201]),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $response = $client->request('GET', 'http://example.com/created');
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertSame('created once', $response->getContent(false));
+
+        $response = $client->request('GET', 'http://example.com/created');
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertSame('created once', $response->getContent(false));
+    }
+
+    public function testNonDefaultStatusCodeWithoutPublicDirectiveDoesNotUseHeuristicFreshness()
+    {
+        $lastModified = gmdate('D, d M Y H:i:s', time() - 1000).' GMT';
+        $mockClient = new MockHttpClient([
+            new MockResponse('created once', [
+                'http_code' => 201,
+                'response_headers' => [
+                    'Last-Modified' => $lastModified,
+                ],
+            ]),
+            new MockResponse('created twice', ['http_code' => 201]),
+        ]);
+
+        $client = new CachingHttpClient($mockClient, $this->cacheAdapter);
+
+        $response = $client->request('GET', 'http://example.com/created');
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertSame('created once', $response->getContent(false));
+
+        $response = $client->request('GET', 'http://example.com/created');
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertSame('created twice', $response->getContent(false));
     }
 
     public function testETagRevalidation()

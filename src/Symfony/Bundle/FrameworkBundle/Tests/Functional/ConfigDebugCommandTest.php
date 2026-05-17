@@ -80,6 +80,39 @@ class ConfigDebugCommandTest extends AbstractWebTestCase
 
     #[TestWith([true])]
     #[TestWith([false])]
+    public function testDumpBundleOptionWithDotInKey(bool $debug)
+    {
+        $tester = $this->createCommandTester($debug);
+        $ret = $tester->execute(['name' => 'TestBundle', 'path' => 'options.option.main']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('data: foo', $tester->getDisplay());
+    }
+
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testDumpBundleOptionWithDotInKeyResolvesEachKey(bool $debug)
+    {
+        $tester = $this->createCommandTester($debug);
+        $ret = $tester->execute(['name' => 'TestBundle', 'path' => 'options.option.sub.data']);
+
+        $this->assertSame(0, $ret, 'Returns 0 in case of success');
+        $this->assertStringContainsString('bar', $tester->getDisplay());
+    }
+
+    #[TestWith([true])]
+    #[TestWith([false])]
+    public function testDumpBundleOptionWithUnknownDottedKey(bool $debug)
+    {
+        $tester = $this->createCommandTester($debug);
+        $ret = $tester->execute(['name' => 'TestBundle', 'path' => 'options.option.nope']);
+
+        $this->assertSame(1, $ret);
+        $this->assertStringContainsString('Unable to find configuration for "test.options.option.nope"', $tester->getDisplay());
+    }
+
+    #[TestWith([true])]
+    #[TestWith([false])]
     public function testDumpWithoutTitleIsValidJson(bool $debug)
     {
         $tester = $this->createCommandTester($debug);

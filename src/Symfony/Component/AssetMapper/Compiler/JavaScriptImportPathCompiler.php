@@ -39,12 +39,16 @@ final class JavaScriptImportPathCompiler implements AssetCompilerInterface
                 "(?:[^"\\\\\n]|\\\\.)*+"      # Strings enclosed in double quotes
             )
         |
-            (?:                            # Import statements (script captured)
+            (?:                            # Import or re-export statements (script captured)
                 import\s*
                     (?:
                         (?:\*\s*as\s+\w+|\s+[\w\s{},*]+)
                         \s*from\s*
                     )?
+            |
+                export\s*                  # Re-exports always carry a "from" clause
+                    (?:\*(?:\s*as\s+\w+)?|\{[^}]*+\})
+                    \s*from\s*
             |
                 \bimport\(
             )

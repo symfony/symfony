@@ -196,6 +196,41 @@ class JavaScriptImportPathCompilerTest extends TestCase
             'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
         ];
 
+        yield 'static_named_reexport' => [
+            'input' => 'export { myFunction } from "./other.js";',
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'static_named_reexport_single_quotes' => [
+            'input' => 'export { myFunction as helper } from \'./other.js\';',
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'static_reexport_everything' => [
+            'input' => 'export * from "./other.js";',
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'static_reexport_namespace' => [
+            'input' => 'export * as myModule from "./other.js";',
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'static_multiple_named_reexports' => [
+            'input' => <<<EOF
+                export {
+                    myFunction,
+                    helperFunction
+                } from "./other.js";
+                EOF,
+            'expectedJavaScriptImports' => ['/assets/other.js' => ['lazy' => false, 'asset' => 'other.js', 'add' => true]],
+        ];
+
+        yield 'local_export_without_from_is_not_a_reexport' => [
+            'input' => "export const foo = 1;\nexport default foo;\nexport { foo };",
+            'expectedJavaScriptImports' => [],
+        ];
+
         yield 'mix_of_static_and_dynamic_imports' => [
             'input' => 'import "./other.js"; import("./subdir/foo.js");',
             'expectedJavaScriptImports' => [

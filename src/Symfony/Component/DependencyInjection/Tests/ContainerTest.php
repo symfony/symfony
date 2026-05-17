@@ -144,7 +144,7 @@ class ContainerTest extends TestCase
 
         $sc = new ProjectServiceContainer();
         $sc->set('foo', $obj = new \stdClass());
-        $this->assertEquals(['service_container', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'internal_dependency', 'alias', 'foo'], $sc->getServiceIds(), '->getServiceIds() returns defined service ids by factory methods in the method map, followed by service ids defined by set()');
+        $this->assertEquals(['service_container', 'bar', 'foo_bar', 'foo.baz', 'circular', 'throw_exception', 'throws_exception_on_service_configuration', 'internal_dependency', 'boots_with_broken_dependency', 'broken_dependency', 'alias', 'foo'], $sc->getServiceIds(), '->getServiceIds() returns defined service ids by factory methods in the method map, followed by service ids defined by set()');
     }
 
     public function testSet()
@@ -372,6 +372,23 @@ class ContainerTest extends TestCase
         $this->assertFalse($c->initialized('throws_exception_on_service_configuration'));
     }
 
+    public function testGetDoesNotUnsetAncestorWhenANestedServiceCannotBoot()
+    {
+        $c = new ProjectServiceContainer();
+
+        try {
+            $c->get('boots_with_broken_dependency');
+            $this->fail('->get() should rethrow the exception of the failing dependency.');
+        } catch (\Exception $e) {
+            $this->assertSame('Cannot boot the broken dependency!', $e->getMessage());
+        }
+
+        // The service that actually failed to boot is the one rolled back...
+        $this->assertFalse($c->initialized('broken_dependency'));
+        // ...not the ancestor service it was being created for.
+        $this->assertTrue($c->initialized('boots_with_broken_dependency'));
+    }
+
     protected function getField($obj, $field)
     {
         $reflection = new \ReflectionProperty($obj, $field);
@@ -462,6 +479,8 @@ class ProjectServiceContainer extends Container
             'throw_exception' => 'getThrowExceptionService',
             'throws_exception_on_service_configuration' => 'getThrowsExceptionOnServiceConfigurationService',
             'internal_dependency' => 'getInternalDependencyService',
+            'boots_with_broken_dependency' => 'getBootsWithBrokenDependencyService',
+            'broken_dependency' => 'getBrokenDependencyService',
         ];
     }
 
@@ -509,5 +528,19 @@ class ProjectServiceContainer extends Container
         $instance->internal = $this->privates['internal'] ?? $this->getInternalService();
 
         return $instance;
+    }
+
+    protected function getBootsWithBrokenDependencyService()
+    {
+        $this->services['boots_with_broken_dependency'] = $instance = new \stdClass();
+
+        $instance->dependency = $this->get('broken_dependency');
+
+        return $instance;
+    }
+
+    protected function getBrokenDependencyService()
+    {
+        throw new \Exception('Cannot boot the broken dependency!');
     }
 }

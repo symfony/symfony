@@ -63,6 +63,7 @@ class Container implements ContainerInterface, ResetInterface
 
     private array $envCache = [];
     private bool $compiled = false;
+    private ?\Exception $loadingException = null;
     private \Closure $getEnv;
 
     private static \Closure $make;
@@ -231,11 +232,22 @@ class Container implements ContainerInterface, ResetInterface
                 return /* self::IGNORE_ON_UNINITIALIZED_REFERENCE */ 4 === $invalidBehavior ? null : $container->{$container->methodMap[$id]}($container);
             }
         } catch (\Exception $e) {
-            unset($container->services[$id]);
+            // Roll back only the service whose factory actually raised the
+            // exception, not the ancestor services it was being created for:
+            // the same exception unwinds through every parent make() frame,
+            // and unsetting their id would wrongly drop unrelated services.
+            if ($container->loadingException !== $e) {
+                $container->loadingException = $e;
+                unset($container->services[$id]);
+            }
 
             throw $e;
         } finally {
             unset($container->loading[$id]);
+
+            if (!$container->loading) {
+                $container->loadingException = null;
+            }
         }
 
         if (self::EXCEPTION_ON_INVALID_REFERENCE === $invalidBehavior) {
@@ -338,8 +350,6 @@ class Container implements ContainerInterface, ResetInterface
 
     /**
      * Creates a service by requiring its factory file.
-     *
-     * @return mixed
      */
     protected function load(string $file)
     {

@@ -1,0 +1,15 @@
+---------------------------------------------------------------------------
+
+by chalasr at 2026-05-18T16:44:56Z
+
+> Console EntityValueResolver: add support for #[Option] parameters (previously only #[Argument] was resolved).
+
+Do you have a use case in mind for this? I couldn't think of one at the time, and still struggle to.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-18T16:57:22Z
+
+`app:moderate --user=42 --post=123 --reason=spam` ?
+
+`app:report:generate [--user=ID]`?

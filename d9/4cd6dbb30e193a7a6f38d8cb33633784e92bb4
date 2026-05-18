@@ -1,0 +1,22 @@
+---------------------------------------------------------------------------
+
+by philbates35 at 2026-05-15T12:37:00Z
+
+> Thanks for investigating this issue and providing a regression test.
+>
+> As noted by @HypeMC, this should be fixed in Monolog's [`AbstractProcessingHandler`](https://github.com/Seldaek/monolog/blob/main/src/Monolog/Handler/AbstractProcessingHandler.php)
+>
+> ```diff
+> - return false === $this->bubble;
+> + return !$this->getBubble();
+> ```
+>
+> Once monolog is updated, the `ConsoleHandler::handle()` method override can be removed.
+
+Fix submitted here: https://github.com/Seldaek/monolog/pull/2031
+
+---------------------------------------------------------------------------
+
+by philbates35 at 2026-05-15T12:52:44Z
+
+Thanks for the review @GromNaN @HypeMC, I've updated the PR with the requested changes. Do I understand correctly that you'd be happy to get this fix in now, and we later remove the override in a follow up PR if/when the fix becomes available on the monolog side?

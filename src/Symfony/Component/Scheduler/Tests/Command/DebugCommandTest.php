@@ -74,9 +74,9 @@ class DebugCommandTest extends TestCase
             "schedule_name\n".
             "-------------\n".
             "\n".
-            " --------- ---------- ---------- \n".
-            "  Trigger   Provider   Next Run  \n".
-            " --------- ---------- ---------- \n".
+            " --------- ---------- ------------- ------------- \n".
+            "  Trigger   Provider   Next Run On   Next Run In  \n".
+            " --------- ---------- ------------- ------------- \n".
             "\n", $tester->getDisplay(true));
     }
 
@@ -109,11 +109,11 @@ class DebugCommandTest extends TestCase
             "schedule_name\n".
             "-------------\n".
             "\n".
-            " --------- ---------- ---------- \n".
-            "  Trigger   Provider   Next Run  \n".
-            " --------- ---------- ---------- \n".
-            "  test      stdClass   -         \n".
-            " --------- ---------- ---------- \n".
+            " --------- ---------- ------------- ------------- \n".
+            "  Trigger   Provider   Next Run On   Next Run In  \n".
+            " --------- ---------- ------------- ------------- \n".
+            "  test      stdClass   -             -            \n".
+            " --------- ---------- ------------- ------------- \n".
             "\n", $tester->getDisplay(true));
     }
 
@@ -146,11 +146,11 @@ class DebugCommandTest extends TestCase
             "schedule_name\n".
             "-------------\n".
             "\n".
-            " ------------------------------- ---------- --------------------------------- \n".
-            "  Trigger                         Provider   Next Run                         \n".
-            " ------------------------------- ---------- --------------------------------- \n".
-            "  every first day of next month   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
-            " ------------------------------- ---------- --------------------------------- \n".
+            " ------------------------------- ---------- --------------------------------- ------------- \n".
+            "  Trigger                         Provider   Next Run On                       Next Run In  \n".
+            " ------------------------------- ---------- --------------------------------- ------------- \n".
+            "  every first day of next month   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}   [^\n]+  \n".
+            ' ------------------------------- ---------- --------------------------------- ------------- '.
             "\n/", $tester->getDisplay(true));
     }
 
@@ -195,13 +195,13 @@ class DebugCommandTest extends TestCase
             "schedule_name\n".
             "-------------\n".
             "\n".
-            " ----------------- ---------- --------------------------------- \n".
-            "  Trigger           Provider   Next Run                         \n".
-            " ----------------- ---------- --------------------------------- \n".
-            "  every 3 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
-            "  every 1 minute    stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
-            "  every 2 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
-            " ----------------- ---------- --------------------------------- \n".
+            " ----------------- ---------- --------------------------------- ------------- \n".
+            "  Trigger           Provider   Next Run On                       Next Run In  \n".
+            " ----------------- ---------- --------------------------------- ------------- \n".
+            "  every 3 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}   3 min        \n".
+            "  every 1 minute    stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}   1 min        \n".
+            "  every 2 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}   2 min        \n".
+            " ----------------- ---------- --------------------------------- ------------- \n".
             "\n/",
         ];
 
@@ -214,13 +214,13 @@ class DebugCommandTest extends TestCase
             "schedule_name\n".
             "-------------\n".
             "\n".
-            " ----------------- ---------- --------------------------------- \n".
-            "  Trigger           Provider   Next Run                         \n".
-            " ----------------- ---------- --------------------------------- \n".
-            "  every 1 minute    stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
-            "  every 2 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
-            "  every 3 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
-            " ----------------- ---------- --------------------------------- \n".
+            " ----------------- ---------- --------------------------------- ------------- \n".
+            "  Trigger           Provider   Next Run On                       Next Run In  \n".
+            " ----------------- ---------- --------------------------------- ------------- \n".
+            "  every 1 minute    stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}   1 min        \n".
+            "  every 2 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}   2 min        \n".
+            "  every 3 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}   3 min        \n".
+            " ----------------- ---------- --------------------------------- ------------- \n".
             "\n/",
         ];
     }
@@ -258,13 +258,13 @@ class DebugCommandTest extends TestCase
             "schedule_name\n".
             "-------------\n".
             "\n".
-            " ----------------- ---------- --------------------------------- \n".
-            "  Trigger           Provider   Next Run                         \n".
-            " ----------------- ---------- --------------------------------- \n".
-            "  terminated        stdClass   -                                \n".
-            "  every 1 minute    stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
-            "  every 2 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}  \n".
-            " ----------------- ---------- --------------------------------- \n".
+            " ----------------- ---------- --------------------------------- ------------- \n".
+            "  Trigger           Provider   Next Run On                       Next Run In  \n".
+            " ----------------- ---------- --------------------------------- ------------- \n".
+            "  terminated        stdClass   -                                 -            \n".
+            "  every 1 minute    stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}   1 min        \n".
+            "  every 2 minutes   stdClass   \w{3}, \d{1,2} \w{3} \d{4} \d{2}:\d{2}:\d{2} (\+|-)\d{4}   2 min        \n".
+            " ----------------- ---------- --------------------------------- ------------- \n".
             "\n/", $tester->getDisplay(true));
     }
 
@@ -336,6 +336,40 @@ class DebugCommandTest extends TestCase
         $this->assertStringContainsString('stateful', $display);
         // "every 1 hour" seeded with checkpoint 2024-01-15 10:00:00 UTC ⇒ next run 11:00:00 UTC, not "now + 1h"
         $this->assertStringContainsString('Mon, 15 Jan 2024 11:00:00 +0000', $display);
+        // the run is long overdue, so the remaining time is negative and measured from now, not from the checkpoint
+        $this->assertMatchesRegularExpression('/Mon, 15 Jan 2024 11:00:00 \+0000\s+-\d+ y,/', $display);
+    }
+
+    public function testExecuteRendersTheTimeUntilTheNextRun()
+    {
+        $schedule = new Schedule();
+        $schedule->add(RecurringMessage::every('1 hour', new \stdClass()));
+
+        $schedules = $this->createStub(ServiceProviderInterface::class);
+        $schedules->method('getProvidedServices')->willReturn(['schedule_name' => $schedule]);
+        $schedules->method('get')->willReturn($schedule);
+
+        $tester = new CommandTester(new DebugCommand($schedules));
+        $tester->execute(['--date' => '2026-08-15 12:00:00 UTC'], ['decorated' => false]);
+
+        $display = $tester->getDisplay(true);
+        $this->assertStringContainsString('Next Run In', $display);
+        $this->assertMatchesRegularExpression('/Sat, 15 Aug 2026 13:00:00 \+0000\s+1 h\s/', $display);
+    }
+
+    public function testExecuteRendersSubSecondsAsFractionalSeconds()
+    {
+        $schedule = new Schedule();
+        $schedule->add(RecurringMessage::every('1 hour', new \stdClass(), from: new \DateTimeImmutable('2026-08-15 12:00:00 UTC')));
+
+        $schedules = $this->createStub(ServiceProviderInterface::class);
+        $schedules->method('getProvidedServices')->willReturn(['schedule_name' => $schedule]);
+        $schedules->method('get')->willReturn($schedule);
+
+        $tester = new CommandTester(new DebugCommand($schedules));
+        $tester->execute(['--date' => '2026-08-15 12:00:00.25 UTC'], ['decorated' => false]);
+
+        $this->assertMatchesRegularExpression('/Sat, 15 Aug 2026 13:00:00 \+0000\s+59 min, 59.75 s\s/', $tester->getDisplay(true));
     }
 
     public function testExecuteWithStatefulScheduleWithoutCheckpointFallsBackToNow()

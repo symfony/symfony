@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Add a "Next Run In" column to `debug:scheduler` showing the time until the next run
+
 8.1
 ---
 

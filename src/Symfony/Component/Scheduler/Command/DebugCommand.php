@@ -108,15 +108,15 @@ final class DebugCommand extends Command
                 $io->comment(\sprintf('Schedule "%s" is stateful: next run dates computed from stored checkpoint %s.', $name, $effectiveDate->format('r')));
             }
 
-            $recurringMessages = array_filter(array_map(self::renderRecurringMessage(...), $messages, array_fill(0, \count($messages), $effectiveDate), array_fill(0, \count($messages), $input->getOption('all'))));
+            $recurringMessages = array_filter(array_map(self::renderRecurringMessage(...), $messages, array_fill(0, \count($messages), $effectiveDate), array_fill(0, \count($messages), $date), array_fill(0, \count($messages), $input->getOption('all'))));
 
             if ($input->getOption('sort')) {
                 usort($recurringMessages, static fn (array $a, array $b): int => $a[2] <=> $b[2]);
             }
 
             $io->table(
-                ['Trigger', 'Provider', 'Next Run'],
-                array_map(static fn (array $row): array => [$row[0], $row[1], $row[2]?->format('r') ?? '-'], $recurringMessages),
+                ['Trigger', 'Provider', 'Next Run On', 'Next Run In'],
+                array_map(static fn (array $row): array => [$row[0], $row[1], $row[2]?->format('r') ?? '-', self::formatDateInterval($row[3]) ?? '-'], $recurringMessages),
             );
         }
 
@@ -151,9 +151,9 @@ final class DebugCommand extends Command
     }
 
     /**
-     * @return array{0:string,1:string,2:\DateTimeImmutable|null}|null
+     * @return array{0:string,1:string,2:\DateTimeImmutable|null,3:\DateInterval|null}|null
      */
-    private static function renderRecurringMessage(RecurringMessage $recurringMessage, \DateTimeImmutable $date, bool $all): ?array
+    private static function renderRecurringMessage(RecurringMessage $recurringMessage, \DateTimeImmutable $date, \DateTimeImmutable $now, bool $all): ?array
     {
         $trigger = $recurringMessage->getTrigger();
 
@@ -165,6 +165,44 @@ final class DebugCommand extends Command
         $provider = $recurringMessage->getProvider();
         $description = $provider instanceof \Stringable ? (string) $provider : $provider->getId();
 
-        return [(string) $trigger, $description, $next];
+        return [(string) $trigger, $description, $next, $next ? $now->diff($next) : null];
+    }
+
+    private static function formatDateInterval(?\DateInterval $interval): ?string
+    {
+        if (null === $interval) {
+            return null;
+        }
+
+        // same unit vocabulary as Helper::formatTime(), which stops at days
+        $units = [
+            'y' => 'y',
+            'm' => 'mo',
+            'd' => 'd',
+            'h' => 'h',
+            'i' => 'min',
+            's' => 's',
+        ];
+
+        $parts = [];
+        foreach ($units as $property => $unit) {
+            if ('s' === $property || 0 === $value = $interval->$property) {
+                continue;
+            }
+
+            $parts[] = $value.' '.$unit;
+        }
+
+        // seconds carry the fraction, so that a sub-second interval is not reported as zero
+        if (0 < $seconds = round($interval->s + $interval->f, 3)) {
+            $parts[] = rtrim(rtrim(\sprintf('%.3F', $seconds), '0'), '.').' s';
+        }
+
+        if (!$parts) {
+            return '0 s';
+        }
+
+        // a next run date in the past means the schedule is overdue
+        return ($interval->invert ? '-' : '').implode(', ', $parts);
     }
 }

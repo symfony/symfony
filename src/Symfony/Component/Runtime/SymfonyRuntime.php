@@ -105,7 +105,7 @@ class SymfonyRuntime extends GenericRuntime
             (new Dotenv($envKey, $debugKey))
                 ->setProdEnvs((array) ($options['prod_envs'] ?? ['prod']))
                 ->usePutenv($options['use_putenv'] ?? false)
-                ->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'dev', (array) ($options['test_envs'] ?? ['test']), $options['dotenv_overload'] ?? false);
+                ->bootEnv($options['project_dir'].'/'.($options['dotenv_path'] ?? '.env'), 'prod', (array) ($options['test_envs'] ?? ['test']), $options['dotenv_overload'] ?? false);
 
             if (isset($this->input) && ($options['dotenv_overload'] ?? false)) {
                 if ($this->input->getParameterOption(['--env', '-e'], $_SERVER[$envKey], true) !== $_SERVER[$envKey]) {

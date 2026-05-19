@@ -62,7 +62,7 @@ class GenericRuntime implements RuntimeInterface
         $options['env_var_name'] ??= 'APP_ENV';
         $debugKey = $options['debug_var_name'] ??= 'APP_DEBUG';
 
-        $debug = $options['debug'] ?? $_SERVER[$debugKey] ?? $_ENV[$debugKey] ?? true;
+        $debug = $options['debug'] ?? $_SERVER[$debugKey] ?? $_ENV[$debugKey] ?? false;
 
         if (!\is_bool($debug)) {
             $debug = filter_var($debug, \FILTER_VALIDATE_BOOL);

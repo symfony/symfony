@@ -29,6 +29,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\UsageTrackingTokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\SwitchUserToken;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -237,6 +238,49 @@ class ContextListenerTest extends TestCase
     {
         $refreshedUser = new InMemoryUser('foobar', 'baz');
         $tokenStorage = $this->handleEventWithPreviousSession([new NotSupportingUserProvider(true), new NotSupportingUserProvider(false), new SupportingUserProvider($refreshedUser)]);
+
+        $this->assertNull($tokenStorage->getToken());
+    }
+
+    public function testSwitchUserTokenIsNotDeauthenticatedWhenRolesAreUnchanged()
+    {
+        $impersonated = new InMemoryUser('foo', 'bar', ['ROLE_USER']);
+        $originalToken = new UsernamePasswordToken(new InMemoryUser('admin', 'pass', ['ROLE_ADMIN']), 'context_key', ['ROLE_ADMIN']);
+        $token = new SwitchUserToken($impersonated, 'context_key', $impersonated->getRoles(), $originalToken);
+
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('_security_context_key', serialize($token));
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+
+        $tokenStorage = new TokenStorage();
+        $listener = new ContextListener($tokenStorage, [new SupportingUserProvider($impersonated)], 'context_key');
+        $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
+
+        $this->assertInstanceOf(SwitchUserToken::class, $tokenStorage->getToken());
+        $this->assertSame('foo', $tokenStorage->getToken()->getUserIdentifier());
+        $this->assertSame('admin', $tokenStorage->getToken()->getOriginalToken()->getUserIdentifier());
+    }
+
+    public function testSwitchUserTokenIsDeauthenticatedWhenRolesChange()
+    {
+        $impersonated = new InMemoryUser('foo', 'bar', ['ROLE_USER']);
+        $originalToken = new UsernamePasswordToken(new InMemoryUser('admin', 'pass', ['ROLE_ADMIN']), 'context_key', ['ROLE_ADMIN']);
+        $token = new SwitchUserToken($impersonated, 'context_key', ['ROLE_USER'], $originalToken);
+
+        $session = new Session(new MockArraySessionStorage());
+        $session->set('_security_context_key', serialize($token));
+
+        $request = new Request();
+        $request->setSession($session);
+        $request->cookies->set('MOCKSESSID', true);
+
+        $refreshed = new InMemoryUser('foo', 'bar', ['ROLE_USER', 'ROLE_ADMIN']);
+        $tokenStorage = new TokenStorage();
+        $listener = new ContextListener($tokenStorage, [new SupportingUserProvider($refreshed)], 'context_key');
+        $listener->authenticate(new RequestEvent($this->createStub(HttpKernelInterface::class), $request, HttpKernelInterface::MAIN_REQUEST));
 
         $this->assertNull($tokenStorage->getToken());
     }

@@ -312,11 +312,6 @@ class ContextListener extends AbstractListener
         }
 
         $userRoles = array_map('strval', (array) $refreshedUser->getRoles());
-
-        if ($token instanceof SwitchUserToken) {
-            $userRoles[] = 'ROLE_PREVIOUS_ADMIN';
-        }
-
         $tokenRoleNames = $token->getRoleNames();
 
         if (

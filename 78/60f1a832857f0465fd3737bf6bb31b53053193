@@ -1,0 +1,56 @@
+---------------------------------------------------------------------------
+
+by mttsch at 2026-05-14T06:57:48Z
+
+See https://github.com/symfony/symfony/actions/runs/25846152806/job/75941751516#step:7:326 for errors causes by the test files in `src/Symfony/Contracts/Tests`.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-15T07:00:05Z
+
+I see that psalm doesn't highlight these errors.
+The reason seems to me that the baseline feature of psalm works better than phpstan's: we want the job (and phpstan) to tell us only about newly introduced issues.
+Ignoring this folder will remove some false positives, but I'd rather fix the root cause and figure out if/how phpstan can be used in the mode we want.
+
+Any idea?
+
+---------------------------------------------------------------------------
+
+by mttsch at 2026-05-15T07:09:23Z
+
+@nicolas-grekas I understood these lines to indicate the goal to just ignore test files completely in PHPStan analysis.
+
+The underlying issue (not visible in the CI output) is that these types of errors are non-ignorable, e.g.
+
+```
+  88     Method Symfony\Contracts\Tests\Service\ParentTestService::aParentService() should return Symfony\Component\DependencyInjection\Tests\Fixtures\Prototype\OtherDir\Component1\Dir1\Service1 but return statement is missing.
+         🪪  return.missing (non-ignorable)
+```
+
+PHPStan docs say the that
+
+> Some errors are non-ignorable because they indicate code that would cause a crash or a fatal error at runtime.
+
+Thus it appears that they are also not added to the baseline, see verbose output:
+
+```
+./vendor/bin/phpstan analyze --debug src/Symfony/Contracts/Tests/ --generate-baseline -vv
+Note: Using configuration file /var/www/html/phpstan.dist.neon.
+Result cache not used because of debug mode.
+/var/www/html/src/Symfony/Contracts/Tests/Cache/CacheTraitTest.php
+/var/www/html/src/Symfony/Contracts/Tests/Service/ServiceSubscriberTraitTest.php
+Result cache is saved.
+Unignorable errors could not be added to the baseline:
+Method Symfony\Contracts\Tests\Cache\TestPool::hasItem() should return bool but return statement is missing.
+/var/www/html/src/Symfony/Contracts/Tests/Cache/CacheTraitTest.php
+
+[…]
+```
+
+Thus we could check these errors specifically if they should return a value (probably) or if them not returning a value is needed for the test cases.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-15T07:11:05Z
+
+phpstan is too opinionated on this one and may thus not be a good fit for this job then.

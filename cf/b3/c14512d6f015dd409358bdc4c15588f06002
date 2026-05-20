@@ -1,0 +1,13 @@
+---------------------------------------------------------------------------
+
+by jmatthiesen81 at 2026-05-20T16:20:15Z
+
+ Do you think `YamlFileLoader` is the right place for this fix? A YAML file can never produce a `\Symfony\Component\DependencyInjection\Reference` object, so this branch in `parseCallable()` would be dead code for any actual YAML-based configuration.
+
+ The real issue originates in `PhpFileLoader`, which calls `ContainerConfigurator::processValue()` to convert `ReferenceConfigurator` instances into `Reference` objects before delegating to `YamlFileLoader::parseCallable()`. The fix should therefore be applied closer to that conversion — for example in `PhpFileLoader` — so that `YamlFileLoader` and its `parseCallable()` method remain concerned only with YAML input and do not need to know about PHP-config internals.
+
+---------------------------------------------------------------------------
+
+by nicolas-grekas at 2026-05-20T16:50:42Z
+
+YamlLoader is not only for yaml anymore with the php config format. We refactored it in 8.1 for this reason, but the code remains.

@@ -32,6 +32,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
+use Symfony\Component\Security\Http\Event\BeforeAuthenticateEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Http\Event\LoginFailureEvent;
@@ -174,6 +175,9 @@ class AuthenticatorManager implements AuthenticatorManagerInterface, UserAuthent
         $previousToken = $this->tokenStorage->getToken();
 
         try {
+            // announce the upcoming authentication attempt
+            $this->eventDispatcher->dispatch(new BeforeAuthenticateEvent($authenticator, $request));
+
             // get the passport from the Authenticator
             $passport = $authenticator->authenticate($request);
 

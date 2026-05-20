@@ -38,7 +38,9 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordC
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\Event\AuthenticationTokenCreatedEvent;
+use Symfony\Component\Security\Http\Event\BeforeAuthenticateEvent;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
+use Symfony\Component\Security\Http\Event\LoginFailureEvent;
 use Symfony\Component\Security\Http\Tests\Fixtures\DummySupportsAuthenticator;
 
 class AuthenticatorManagerTest extends TestCase
@@ -148,6 +150,87 @@ class AuthenticatorManagerTest extends TestCase
     {
         yield [0];
         yield [1];
+    }
+
+    public function testBeforeAuthenticateEvent()
+    {
+        $authenticator = $this->createStub(TestInteractiveAuthenticator::class);
+        $authenticator->method('supports')->willReturn(true);
+        $authenticator->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', fn () => $this->user)));
+        $authenticator->method('createToken')->willReturn($this->token);
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
+
+        $listenerCalled = false;
+        $this->eventDispatcher->addListener(BeforeAuthenticateEvent::class, function (BeforeAuthenticateEvent $event) use (&$listenerCalled, $authenticator) {
+            if ($event->getAuthenticator() === $authenticator && $event->getRequest() === $this->request) {
+                $listenerCalled = true;
+            }
+        });
+
+        $manager = $this->createManager([$authenticator], exposeSecurityErrors: ExposeSecurityLevel::None);
+        $this->assertNull($manager->authenticateRequest($this->request));
+        $this->assertTrue($listenerCalled, 'The BeforeAuthenticateEvent listener is not called');
+    }
+
+    public function testBeforeAuthenticateEventIsDispatchedEvenWhenAuthenticateThrows()
+    {
+        $authenticator = $this->createStub(TestInteractiveAuthenticator::class);
+        $authenticator->method('supports')->willReturn(true);
+        $authenticator->method('authenticate')->willThrowException(new UserNotFoundException());
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
+
+        $listenerCalled = false;
+        $this->eventDispatcher->addListener(BeforeAuthenticateEvent::class, static function () use (&$listenerCalled) {
+            $listenerCalled = true;
+        });
+
+        $manager = $this->createManager([$authenticator], exposeSecurityErrors: ExposeSecurityLevel::None);
+        $manager->authenticateRequest($this->request);
+
+        $this->assertTrue($listenerCalled, 'The BeforeAuthenticateEvent listener is called before authenticate() throws');
+    }
+
+    public function testBeforeAuthenticateEventUnwrapsTraceableAuthenticator()
+    {
+        $authenticator = $this->createStub(TestInteractiveAuthenticator::class);
+        $authenticator->method('supports')->willReturn(true);
+        $authenticator->method('authenticate')->willReturn(new SelfValidatingPassport(new UserBadge('wouter', fn () => $this->user)));
+        $authenticator->method('createToken')->willReturn($this->token);
+
+        $traceable = new TraceableAuthenticator($authenticator);
+        $this->request->attributes->set('_security_authenticators', [$traceable]);
+
+        $seenAuthenticator = null;
+        $this->eventDispatcher->addListener(BeforeAuthenticateEvent::class, static function (BeforeAuthenticateEvent $event) use (&$seenAuthenticator) {
+            $seenAuthenticator = $event->getAuthenticator();
+        });
+
+        $manager = $this->createManager([$traceable], exposeSecurityErrors: ExposeSecurityLevel::None);
+        $manager->authenticateRequest($this->request);
+
+        $this->assertSame($authenticator, $seenAuthenticator, 'getAuthenticator() should unwrap the TraceableAuthenticator');
+    }
+
+    public function testBeforeAuthenticateEventCanVetoAuthentication()
+    {
+        $authenticator = $this->createMock(TestInteractiveAuthenticator::class);
+        $authenticator->method('supports')->willReturn(true);
+        $authenticator->expects($this->never())->method('authenticate');
+        $this->request->attributes->set('_security_authenticators', [$authenticator]);
+
+        $this->eventDispatcher->addListener(BeforeAuthenticateEvent::class, static function (): void {
+            throw new BadCredentialsException('vetoed by listener');
+        });
+
+        $failurePassport = 'not-dispatched';
+        $this->eventDispatcher->addListener(LoginFailureEvent::class, static function (LoginFailureEvent $event) use (&$failurePassport) {
+            $failurePassport = $event->getPassport();
+        });
+
+        $manager = $this->createManager([$authenticator], exposeSecurityErrors: ExposeSecurityLevel::None);
+        $manager->authenticateRequest($this->request);
+
+        $this->assertNull($failurePassport, 'LoginFailureEvent is dispatched with a null passport when a listener vetoes before authenticate()');
     }
 
     public function testNoCredentialsValidated()

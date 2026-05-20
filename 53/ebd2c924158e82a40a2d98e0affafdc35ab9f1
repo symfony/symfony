@@ -1,0 +1,31 @@
+---------------------------------------------------------------------------
+
+by yousefkadah at 2026-05-17T20:22:25Z
+
+Hi @ousamabenyounes 👋 I'd opened #64232 for the same issue (#64183) before spotting yours — closing mine in favor of this one since it came first. A few things from my version that might be worth folding in here:
+
+1. **Minified re-exports** — `export\s+` requires whitespace after `export`, so it misses minified code like `export{x}from'./y.js'` or `export*from'./y.js'`. Using `export\s*` covers those.
+2. **Stricter named-export matching** — `[\w\s{},*]+` is quite loose; requiring real braces with a possessive quantifier (`\{[^}]*+\}`) stays closer to actual JS syntax and avoids potential regex backtracking.
+3. **Extra test coverage** — a negative test that purely local exports produce no imports:
+
+```php
+yield 'local_export_without_from_is_not_a_reexport' => [
+    'input' => "export const foo = 1;\nexport default foo;\nexport { foo };",
+    'expectedJavaScriptImports' => [],
+];
+```
+
+plus a multi-line `export { a, b } from "./other.js"` case.
+
+Happy to open a PR against your branch with these if it's useful. Thanks for tackling this!
+
+---------------------------------------------------------------------------
+
+by ousamabenyounes at 2026-05-17T21:14:34Z
+
+Thanks for the review @yousefkadah — all three folded in at 4c085f6:
+- `export\s+` → `export\s*` for minified re-exports.
+- Named-export group tightened to `\{[^}]*+\}` (real braces, possessive).
+- Added the pure negative test, a multi-line `export { a, b } from` case, and a minified case.
+
+You're credited as co-author on the commit.

@@ -33,21 +33,43 @@ abstract class AbstractSchemaListener
             return;
         }
 
-        $getNames = static fn ($array) => array_map(static fn ($object) => $object instanceof NamedObject ? $object->getObjectName()->toString() : $object->getName(), $array);
+        $getName = static fn ($object) => $object instanceof NamedObject ? $object->getObjectName()->toString() : $object->getName();
+        $getNames = static fn ($array) => array_map($getName, $array);
         $previousTableNames = $getNames($schema->getTables());
         $previousSequenceNames = $getNames($schema->getSequences());
 
         $configurator();
 
+        $useEditor = method_exists($schema, 'edit');
+
         foreach (array_diff($getNames($schema->getTables()), $previousTableNames) as $addedTable) {
             if (!$filter($addedTable)) {
-                $schema->dropTable($addedTable);
+                $useEditor ? $this->removeFromSchema($schema, '_tables', $addedTable, $getName) : $schema->dropTable($addedTable);
             }
         }
 
         foreach (array_diff($getNames($schema->getSequences()), $previousSequenceNames) as $addedSequence) {
             if (!$filter($addedSequence)) {
-                $schema->dropSequence($addedSequence);
+                $useEditor ? $this->removeFromSchema($schema, '_sequences', $addedSequence, $getName) : $schema->dropSequence($addedSequence);
+            }
+        }
+    }
+
+    /**
+     * Drops a Table or Sequence from the Schema in place, avoiding the deprecated
+     * Schema::dropTable() / dropSequence() on DBAL 4.5+.
+     */
+    private function removeFromSchema(Schema $schema, string $property, string $name, callable $getName): void
+    {
+        $items = $schema->{'_tables' === $property ? 'getTables' : 'getSequences'}();
+        foreach ($items as $key => $item) {
+            if ($getName($item) === $name) {
+                $prop = new \ReflectionProperty(Schema::class, $property);
+                $values = $prop->getValue($schema);
+                unset($values[$key]);
+                $prop->setValue($schema, $values);
+
+                return;
             }
         }
     }

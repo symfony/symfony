@@ -1,3 +1,5 @@
+/Fuzzing export-ignore
 /Tests export-ignore
 /phpunit.xml.dist export-ignore
 /.git* export-ignore
+/infection.json5 export-ignore

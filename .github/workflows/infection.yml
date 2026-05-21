@@ -1,0 +1,71 @@
+name: Infection
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/infection.yml
+      - src/Symfony/Component/HtmlSanitizer/**
+  push:
+    branches: [ '*.*' ]
+    paths:
+      - .github/workflows/infection.yml
+      - src/Symfony/Component/HtmlSanitizer/**
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  mutation-tests:
+    name: HtmlSanitizer
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, intl
+          ini-values: date.timezone=UTC,memory_limit=-1
+          coverage: xdebug
+          tools: composer:2.9.8
+
+      - name: Install HtmlSanitizer dependencies
+        working-directory: src/Symfony/Component/HtmlSanitizer
+        run: |
+          composer require --dev --prefer-stable --no-interaction --no-progress --ansi 'infection/infection:^0.33' 'phpunit/phpunit:^13.1' 'symfony/event-dispatcher-contracts:^3.0' 'symfony/phpunit-bridge:^7.4|^8.0'
+
+      - name: Generate Infection coverage
+        working-directory: src/Symfony/Component/HtmlSanitizer
+        run: |
+          mkdir -p build/infection
+          vendor/bin/phpunit --configuration phpunit.xml.dist --exclude-source-from-xml-coverage --coverage-xml build/infection/coverage-xml --log-junit build/infection/junit.xml
+          php <<'PHP'
+          <?php
+
+          $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator('build/infection'));
+          foreach ($iterator as $file) {
+              if (!$file->isFile() || 'xml' !== $file->getExtension()) {
+                  continue;
+              }
+
+              $path = $file->getPathname();
+              file_put_contents($path, preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F]/', '', file_get_contents($path)));
+          }
+          PHP
+
+      - name: Run Infection
+        working-directory: src/Symfony/Component/HtmlSanitizer
+        run: vendor/bin/infection --configuration=infection.json5 --skip-initial-tests --coverage=build/infection --show-mutations=0 --threads=max --no-progress

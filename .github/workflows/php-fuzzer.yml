@@ -1,0 +1,101 @@
+name: PHP-Fuzzer
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/php-fuzzer.yml
+      - src/Symfony/**
+  push:
+    branches: [ '*.*' ]
+    paths:
+      - .github/workflows/php-fuzzer.yml
+      - src/Symfony/**
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: Number of PHP-Fuzzer executions per target
+        required: true
+        default: '100000'
+        type: choice
+        options:
+          - '100000'
+          - '10000000'
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  find-targets:
+    name: Find fuzz targets
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.find.outputs.matrix }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Find targets
+        id: find
+        run: |
+          matrix=$(find src/Symfony -path '*/Fuzzing/target.php' -printf '%h\n' | sort | jq -R -s -c '
+            split("\n")[:-1]
+            | map({
+                name: (split("/") | .[2] + "/" + .[3]),
+                component: (split("/")[0:4] | join("/")),
+                fuzzing: .
+              })
+          ')
+
+          if [[ "$matrix" == "[]" ]]; then
+            echo "::error::No PHP-Fuzzer targets were found."
+            exit 1
+          fi
+
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+
+  fuzz:
+    name: ${{ matrix.target.name }}
+    needs: find-targets
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    env:
+      FUZZER_RUNS: ${{ github.event_name == 'workflow_dispatch' && inputs.runs || '100000' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJson(needs.find-targets.outputs.matrix) }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: dom, intl
+          ini-values: date.timezone=UTC,memory_limit=-1
+          coverage: none
+          tools: composer:2.9.8, nikic/php-fuzzer
+
+      - name: Install component dependencies
+        run: composer install --working-dir="${{ matrix.target.component }}" --no-interaction --no-progress --ansi
+
+      - name: Replay seed corpus
+        run: |
+          for seed in "${{ matrix.target.fuzzing }}"/Corpus/*; do
+            php-fuzzer run-single "${{ matrix.target.fuzzing }}/target.php" "$seed"
+          done
+
+      - name: Run bounded fuzzing campaign
+        run: |
+          php-fuzzer fuzz --max-runs="$FUZZER_RUNS" "${{ matrix.target.fuzzing }}/target.php" "${{ matrix.target.fuzzing }}/Corpus"

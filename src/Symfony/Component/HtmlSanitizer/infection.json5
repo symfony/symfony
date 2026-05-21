@@ -1,0 +1,27 @@
+{
+    source: {
+        directories: [
+            ".",
+        ],
+        excludes: [
+            "Fuzzing",
+            "Tests",
+            "vendor",
+        ],
+    },
+    timeout: 10,
+    threads: "max",
+    logs: {
+        github: true,
+        text: "php://stdout",
+    },
+    phpUnit: {
+        configDir: ".",
+        customPath: "vendor/bin/phpunit",
+    },
+    mutators: {
+        "@default": true,
+    },
+    minMsi: 80,
+    minCoveredMsi: 80,
+}

@@ -19,6 +19,7 @@ use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Tools\DsnParser;
 use Symfony\Component\Lock\Exception\InvalidArgumentException;
 use Symfony\Component\Lock\Exception\InvalidTtlException;
@@ -276,11 +277,16 @@ class DoctrineDbalStore implements PersistingStoreInterface
             return;
         }
 
-        $table = $schema->createTable($this->table);
+        $useEditor = method_exists($schema, 'edit');
+        $table = $useEditor ? new Table($this->table) : $schema->createTable($this->table);
         $table->addColumn($this->idCol, 'string', ['length' => 64]);
         $table->addColumn($this->tokenCol, 'string', ['length' => 44]);
         $table->addColumn($this->expirationCol, 'integer', ['unsigned' => true]);
         $table->setPrimaryKey([$this->idCol]);
+
+        if ($useEditor) {
+            (new \ReflectionMethod(Schema::class, '_addTable'))->invoke($schema, $table);
+        }
     }
 
     /**

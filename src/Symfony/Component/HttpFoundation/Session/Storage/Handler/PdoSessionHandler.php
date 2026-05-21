@@ -12,6 +12,7 @@
 namespace Symfony\Component\HttpFoundation\Session\Storage\Handler;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 
 /**
@@ -187,7 +188,9 @@ class PdoSessionHandler extends AbstractSessionHandler
             return;
         }
 
-        $table = $schema->createTable($this->table);
+        $useEditor = method_exists($schema, 'edit');
+        $table = $useEditor ? new Table($this->table) : $schema->createTable($this->table);
+
         switch ($this->driver) {
             case 'mysql':
                 $table->addColumn($this->idCol, Types::BINARY)->setLength(128)->setNotnull(true);
@@ -225,6 +228,10 @@ class PdoSessionHandler extends AbstractSessionHandler
         }
         $table->setPrimaryKey([$this->idCol]);
         $table->addIndex([$this->lifetimeCol], $this->lifetimeCol.'_idx');
+
+        if ($useEditor) {
+            (new \ReflectionMethod(Schema::class, '_addTable'))->invoke($schema, $table);
+        }
     }
 
     /**

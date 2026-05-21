@@ -21,6 +21,7 @@ use Doctrine\DBAL\Exception\TableNotFoundException;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Schema\DefaultSchemaManagerFactory;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\ServerVersionProvider;
 use Doctrine\DBAL\Tools\DsnParser;
 use Symfony\Component\Cache\Exception\InvalidArgumentException;
@@ -425,11 +426,16 @@ class DoctrineDbalAdapter extends AbstractAdapter implements PruneableInterface
             'sqlite' => 'text',
         ];
 
-        $table = $schema->createTable($this->table);
+        $useEditor = method_exists($schema, 'edit');
+        $table = $useEditor ? new Table($this->table) : $schema->createTable($this->table);
         $table->addColumn($this->idCol, $types[$this->getPlatformName()] ?? 'string', ['length' => 255]);
         $table->addColumn($this->dataCol, 'blob', ['length' => 16777215]);
         $table->addColumn($this->lifetimeCol, 'integer', ['unsigned' => true, 'notnull' => false]);
         $table->addColumn($this->timeCol, 'integer', ['unsigned' => true]);
         $table->setPrimaryKey([$this->idCol]);
+
+        if ($useEditor) {
+            (new \ReflectionMethod(Schema::class, '_addTable'))->invoke($schema, $table);
+        }
     }
 }

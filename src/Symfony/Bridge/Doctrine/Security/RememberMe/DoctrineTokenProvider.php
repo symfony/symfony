@@ -16,6 +16,7 @@ use Doctrine\DBAL\Driver\Result as DriverResult;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentToken;
 use Symfony\Component\Security\Core\Authentication\RememberMe\PersistentTokenInterface;
@@ -206,12 +207,17 @@ class DoctrineTokenProvider implements TokenProviderInterface, TokenVerifierInte
 
     private function addTableToSchema(Schema $schema): void
     {
-        $table = $schema->createTable('rememberme_token');
+        $useEditor = method_exists($schema, 'edit');
+        $table = $useEditor ? new Table('rememberme_token') : $schema->createTable('rememberme_token');
         $table->addColumn('series', Types::STRING, ['length' => 88]);
         $table->addColumn('value', Types::STRING, ['length' => 88]);
         $table->addColumn('lastUsed', Types::DATETIME_IMMUTABLE);
         $table->addColumn('class', Types::STRING, ['length' => 100]);
         $table->addColumn('username', Types::STRING, ['length' => 200]);
         $table->setPrimaryKey(['series']);
+
+        if ($useEditor) {
+            (new \ReflectionMethod(Schema::class, '_addTable'))->invoke($schema, $table);
+        }
     }
 }

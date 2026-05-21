@@ -28,6 +28,7 @@ use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\ComparatorConfig;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaDiff;
+use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Synchronizer\SchemaSynchronizer;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
@@ -486,7 +487,11 @@ class Connection implements ResetInterface
 
     private function getSchema(): Schema
     {
-        $schema = new Schema([], [], $this->createSchemaManager()->createSchemaConfig());
+        $schemaConfig = $this->createSchemaManager()->createSchemaConfig();
+        $schema = method_exists(Schema::class, 'editor')
+            ? Schema::editor()->setSchemaConfig($schemaConfig)->create()
+            : new Schema([], [], $schemaConfig);
+
         $this->addTableToSchema($schema);
 
         return $schema;
@@ -494,9 +499,12 @@ class Connection implements ResetInterface
 
     private function addTableToSchema(Schema $schema): void
     {
-        $table = $schema->createTable($this->configuration['table_name']);
+        $useEditor = method_exists($schema, 'edit');
+        $tableName = $this->configuration['table_name'];
+        $table = $useEditor ? new Table($tableName) : $schema->createTable($tableName);
+
         // add an internal option to mark that we created this & the non-namespaced table name
-        $table->addOption(self::TABLE_OPTION_NAME, $this->configuration['table_name']);
+        $table->addOption(self::TABLE_OPTION_NAME, $tableName);
         $idColumn = $table->addColumn('id', Types::BIGINT)
             ->setAutoincrement(true)
             ->setNotnull(true);
@@ -517,10 +525,26 @@ class Connection implements ResetInterface
         $table->addIndex(['queue_name', 'available_at', 'delivered_at', 'id']);
 
         // We need to create a sequence for Oracle and set the id column to get the correct nextval
-        if ($this->driverConnection->getDatabasePlatform() instanceof OraclePlatform) {
-            $idColumn->setDefault($this->configuration['table_name'].self::ORACLE_SEQUENCES_SUFFIX.'.nextval');
+        $sequenceName = $this->driverConnection->getDatabasePlatform() instanceof OraclePlatform
+            ? $tableName.self::ORACLE_SEQUENCES_SUFFIX
+            : null;
 
-            $schema->createSequence($this->configuration['table_name'].self::ORACLE_SEQUENCES_SUFFIX);
+        if (null !== $sequenceName) {
+            $idColumn->setDefault($sequenceName.'.nextval');
+        }
+
+        if ($useEditor) {
+            (new \ReflectionMethod(Schema::class, '_addTable'))->invoke($schema, $table);
+
+            if (null !== $sequenceName) {
+                (new \ReflectionMethod(Schema::class, '_addSequence'))->invoke($schema, new Sequence($sequenceName));
+            }
+
+            return;
+        }
+
+        if (null !== $sequenceName) {
+            $schema->createSequence($sequenceName);
         }
     }
 

@@ -34,7 +34,14 @@ final class Schedule implements ScheduleProviderInterface
 
     public function with(RecurringMessage $message, RecurringMessage ...$messages): static
     {
-        return static::doAdd(new self($this->dispatcher), $message, ...$messages);
+        $newInstance = static::doAdd(new self($this->dispatcher), $message, ...$messages);
+
+        $this->lock && $newInstance->lock($this->lock);
+        $this->state && $newInstance->stateful($this->state);
+        $newInstance->processOnlyLastMissedRun($this->shouldProcessOnlyLastMissedRun());
+        $newInstance->setRestart($this->shouldRestart());
+
+        return $newInstance;
     }
 
     /**

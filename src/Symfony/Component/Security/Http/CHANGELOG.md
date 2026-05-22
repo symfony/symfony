@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+8.2
+---
+
+ * Deprecate storing uninitialized lazy user objects into the session, make sure they implement `__serialize()` and that it triggers their initialization
+
 8.1
 ---
 

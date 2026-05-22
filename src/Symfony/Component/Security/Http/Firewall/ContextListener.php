@@ -176,6 +176,11 @@ class ContextListener extends AbstractListener
         } else {
             $session->set($this->sessionKey, serialize($token));
 
+            $user = $token->getUser();
+            if ($user && new \ReflectionClass($user)->isUninitializedLazyObject($user)) {
+                trigger_deprecation('symfony/security-http', '8.2', 'Storing uninitialized lazy user objects into the session is deprecated, make sure "%s" implements "__serialize()" and that it triggers its initialization.', $user::class);
+            }
+
             $this->logger?->debug('Stored the security token in the session.', ['key' => $this->sessionKey]);
         }
 

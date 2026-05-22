@@ -12,9 +12,12 @@
 namespace Symfony\Component\Security\Http\Tests\Firewall;
 
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use Symfony\Bridge\PhpUnit\ExpectUserDeprecationMessageTrait;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,6 +47,8 @@ use Symfony\Contracts\Service\ServiceLocatorTrait;
 
 class ContextListenerTest extends TestCase
 {
+    use ExpectUserDeprecationMessageTrait;
+
     public function testItRequiresContextKey()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -434,6 +439,19 @@ class ContextListenerTest extends TestCase
 
         $this->assertInstanceOf(UsernamePasswordToken::class, $tokenStorage->getToken());
         $this->assertSame($user, $tokenStorage->getToken()->getUser());
+    }
+
+    #[Group('legacy')]
+    #[IgnoreDeprecations]
+    public function testStoringUninitializedLazyUserObjectIntoTheSessionIsDeprecated()
+    {
+        $this->expectUserDeprecationMessage('Since symfony/security-http 8.2: Storing uninitialized lazy user objects into the session is deprecated, make sure "Symfony\Component\Security\Core\User\InMemoryUser" implements "__serialize()" and that it triggers its initialization.');
+
+        $this->runSessionOnKernelResponse(new UsernamePasswordToken(
+            new \ReflectionClass(InMemoryUser::class)->newLazyGhost(function() {}, \ReflectionClass::SKIP_INITIALIZATION_ON_SERIALIZE),
+            'phpunit',
+            ['ROLE_USER'],
+        ));
     }
 
     protected function runSessionOnKernelResponse($newToken, $original = null)

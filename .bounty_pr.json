@@ -1,0 +1,17 @@
+{
+  "status": "ready",
+  "vertical": "translation",
+  "commit_message": "i18n(vi): fix incorrect Vietnamese translations and clear review markers",
+  "pr_title": "i18n(vi): fix incorrect translations and clear review markers",
+  "pr_body": "## Summary\n\nFixes #53309 — Missing/incorrect Vietnamese (vi) translations.\n\nAll `trans-unit` IDs were already present in the `vi` files, but several had incorrect translations or stale `state=\"needs-review-translation\"` markers that needed attention.\n\n### Validator (`src/Symfony/Component/Validator/Resources/translations/validators.vi.xlf`)\n\n- **Critical mistranslations fixed (ids 88–91):** `positive`/`negative` had been rendered as `thực hiện được` (\"executable\") and `bị từ chối` (\"rejected\"). Corrected to `số dương` / `số âm` (positive/negative number).\n- **Mistranslated \"field\" (ids 9, 10):** `Lĩnh vực` (sector/domain) → `Trường` (form field), the correct term in form-validation context.\n- **Whitespace cleanup (ids 3, 7, 68):** removed double spaces around `{{ placeholders }}`.\n- **Resolved `needs-review-translation` markers** on entries verified as already correct (ids 37, 51, 59, 81, 83, 111–142).\n\n### Security (`src/Symfony/Component/Security/Core/Resources/translations/security.vi.xlf`)\n\n- **id 20:** removed an erroneous `|` plural separator that wasn't present in the EN source; cleared the review marker.\n\n### Stats\n- 2 files changed, 46 insertions(+), 46 deletions(-)\n- ~40 strings improved or normalized\n- XML well-formedness verified via `xml.etree.ElementTree`\n\nCloses #53309",
+  "branch": "i18n-vi/issue-53309-missing-translations-for-vietnamese",
+  "files_changed": [
+    "src/Symfony/Component/Validator/Resources/translations/validators.vi.xlf",
+    "src/Symfony/Component/Security/Core/Resources/translations/security.vi.xlf"
+  ],
+  "strings_translated": 40,
+  "target_locale": "vi",
+  "tests_run": [],
+  "tests_passed": null,
+  "notes": "No trans-unit IDs were missing across the three vi.xlf files (Validator, Form, Security) — but quality issues warranted fixes. The most critical were validator ids 88–91 where 'positive/negative' had been completely mistranslated as 'executable/rejected'. Also fixed the mistranslation of 'field' as 'Lĩnh vực' (sector) instead of 'Trường' (form field), which is the correct context-appropriate term. Cleared 'needs-review-translation' markers for entries that read as accurate after review. The Form validators.vi.xlf was already complete and accurate; no changes there. Formal Vietnamese ('bạn' form) preserved throughout. All placeholders ({{ var }}, %placeholder%, |plural|) preserved exactly."
+}

@@ -1,0 +1,12 @@
+---------------------------------------------------------------------------
+
+by signor-pedro at 2026-05-22T10:12:15Z
+
+There are many CI failures but frankly, I don't see how these could relate to my change.
+
+I at least fixed some formatting as suggested by fabbot, but the only meaningful change is
+```php
+$prefixLen = \strlen($prefix ?? '');
+```
+
+Am I supposed to fix the rest of the failing jobs?
